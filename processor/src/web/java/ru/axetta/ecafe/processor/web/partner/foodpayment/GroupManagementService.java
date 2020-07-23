@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.foodpayment;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.EditClientsGroupsGroupDTO;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.hibernate.Criteria;
@@ -297,6 +298,19 @@ public class GroupManagementService implements IGroupManagementService {
             result.addItem(resultClients);
         }
         return result;
+    }
+
+    @Override
+    public List<EditClientsGroupsGroupDTO> editClientsGroup(Long orgId, Long newGroupId, List<Long> contractIds)
+            throws Exception {
+        //ClientGroup clientGroup = DAOUtils.
+        return null;
+    }
+
+    @Override
+    public List<EditClientsGroupsGroupDTO> editGroupClientsGroup(Long orgId, Long newGroupId, List<Long> oldGroupIds)
+            throws Exception {
+        return null;
     }
 
     private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
