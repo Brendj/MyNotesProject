@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
 
@@ -48,15 +47,21 @@ public class JWTLoginServiceImpl implements JWTLoginService {
                     JwtLoginErrors.USERNAME_IS_NULL.getErrorMessage());
         }
         if (StringUtils.isEmpty(password)) {
-            User user = DAOUtils.findUser(persistenceSession, username);
-            processBadPassword(user, remoteAddr);
-            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
-                    .createLoginFaultRecord(remoteAddr, username, user,
-                            SecurityJournalAuthenticate.DenyCause.PASSWORD_MISSING.getIdentification());
-            DAOService.getInstance().writeAuthJournalRecord(record);
+            try {
+                User user = ((JwtUserDetailsImpl) userDetailsService.loadUserByUsername(username)).getUser();
+                processBadPassword(user, remoteAddr);
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createLoginFaultRecord(remoteAddr, username, user,
+                                SecurityJournalAuthenticate.DenyCause.PASSWORD_MISSING.getIdentification());
+                DAOService.getInstance().writeAuthJournalRecord(record);
 
-            throw new JwtLoginException(JwtLoginErrors.INVALID_PASSWORD.getErrorCode(),
-                    JwtLoginErrors.INVALID_PASSWORD.getErrorMessage() + String.format(" for user \"%s\"", username));
+                throw new JwtLoginException(JwtLoginErrors.INVALID_PASSWORD.getErrorCode(),
+                        JwtLoginErrors.INVALID_PASSWORD.getErrorMessage() + String.format(" for user \"%s\"", username));
+            }
+            catch (UsernameNotFoundException e){
+                throw new JwtLoginException(JwtLoginErrors.USER_NOT_FOUND.getErrorCode(),
+                        JwtLoginErrors.USER_NOT_FOUND.getErrorMessage());
+            }
         }
         try {
             loginSuccsess = checkUserCredentials(username, password, remoteAddr);
@@ -154,8 +159,8 @@ public class JWTLoginServiceImpl implements JWTLoginService {
             return true;
         }
         catch (UsernameNotFoundException e){
-            throw new JwtLoginException(JwtLoginErrors.USERNAME_IS_NULL.getErrorCode(),
-                    JwtLoginErrors.USERNAME_IS_NULL.getErrorMessage());
+            throw new JwtLoginException(JwtLoginErrors.USER_NOT_FOUND.getErrorCode(),
+                    JwtLoginErrors.USER_NOT_FOUND.getErrorMessage());
         }
         catch (Exception e) {
             throw e;

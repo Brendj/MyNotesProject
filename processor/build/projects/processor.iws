@@ -39,13 +39,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;upd processor.iws">
       <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/synctest.iml" beforeDir="false" afterPath="$PROJECT_DIR$/synctest.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util.iml" beforeDir="false" afterPath="$PROJECT_DIR$/util.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/RefreshTokenData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/RefreshTokenData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JwtUserDetailsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JwtUserDetailsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/login/JwtLoginDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/JwtLoginDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JWTLoginServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JWTLoginServiceImpl.java" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -363,7 +357,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/../../.." value="dev_220" />
+        <entry key="$PROJECT_DIR$/../../.." value="issue_561" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
@@ -686,13 +680,6 @@
     <property name="settings.editor.selected.configurable" value="spring.boot" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\scripts" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\styles" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\back-office" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\java\org\richfaces\renderkit\calendar" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\WEB-INF\classes\META-INF\resources" />
-    </key>
     <key name="ImportMappingsDialog.RecentPackages">
       <recent name="ru.axetta.ecafe.processor.core.persistence.distributedobjects" />
       <recent name="ru.axetta.ecafe.processor.core.persistence" />
@@ -711,8 +698,12 @@
       <recent name="ru.axetta.ecafe.processor.core.report.BasicReport" />
       <recent name="ru.axetta.ecafe.processor.core.model.ClientPayment" />
     </key>
-    <key name="CreateTestDialog.Recents.Supers">
-      <recent name="" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\scripts" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\styles" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\back-office" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\java\org\richfaces\renderkit\calendar" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\WEB-INF\classes\META-INF\resources" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="ru.axetta.ecafe.processor.web.partner.foodpayment" />
@@ -742,6 +733,9 @@
     <key name="CreateClassDialog.RecentsKey">
       <recent name="ru.axetta.ecafe.processor.web.partner.integra.dataflow" />
       <recent name="ru.axetta.ecafe.processor.core.sync.handlers.client.request" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
     </key>
   </component>
   <component name="RunManager" selected="JBoss Server.JBoss 7.1.1.Final1">
@@ -2182,38 +2176,38 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="729" y="298" key="FileChooserDialogImpl/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594898472671" />
-    <state width="1382" height="304" key="GridCell.Tab.0.bottom" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.bottom" timestamp="1595512780747">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.0.center" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780747" />
+    <state width="1382" height="304" key="GridCell.Tab.0.center" timestamp="1595512780747">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.0.left" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780747" />
+    <state width="1382" height="304" key="GridCell.Tab.0.left" timestamp="1595512780746">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.0.right" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780746" />
+    <state width="1382" height="304" key="GridCell.Tab.0.right" timestamp="1595512780747">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.1.bottom" timestamp="1595433222427">
+    <state width="1382" height="304" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780747" />
+    <state width="1382" height="304" key="GridCell.Tab.1.bottom" timestamp="1595512780747">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222427" />
-    <state width="1382" height="304" key="GridCell.Tab.1.center" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780747" />
+    <state width="1382" height="304" key="GridCell.Tab.1.center" timestamp="1595512780747">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.1.left" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780747" />
+    <state width="1382" height="304" key="GridCell.Tab.1.left" timestamp="1595512780747">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.1.right" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780747" />
+    <state width="1382" height="304" key="GridCell.Tab.1.right" timestamp="1595512780747">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
+    <state width="1382" height="304" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512780747" />
     <state x="724" y="259" key="RollbackChangesDialog" timestamp="1594920859786">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
@@ -2254,10 +2248,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="801" y="269" key="git4idea.branch.GitSmartOperationDialog/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595420763624" />
-    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup" timestamp="1595168179468">
+    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup" timestamp="1595512812265">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595168179468" />
+    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512812265" />
     <state x="705" y="239" key="spring file set editor" timestamp="1594828196325">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
