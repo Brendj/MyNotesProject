@@ -8,10 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.CreateGroupData;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.EditEmployeeData;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.LoginData;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.RefreshTokenData;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.*;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
@@ -448,6 +445,92 @@ public class SchoolRestController {
         }
         catch (RequestProcessingException e){
             logger.error(String.format("Bad request: orgId = %o; %s", discountClientsListRequest.getOrgId(), e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "editclientsgroups")
+    public Response editClientsGroups(EditClientsGroupRequest editClientsGroupRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), editClientsGroupRequest.getOrgId());
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return null;
+            /*responseDiscounts.setErrorCode(0);
+            responseDiscounts.setErrorMessage("Ok");*/
+            //return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: orgId = %o; %s", editClientsGroupRequest.getOrgId(), e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "editgroupclientsgroup")
+    public Response editGroupClientsGroup(EditClientsGroupRequest editClientsGroupRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), editClientsGroupRequest.getOrgId());
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return null;
+            /*responseDiscounts.setErrorCode(0);
+            responseDiscounts.setErrorMessage("Ok");*/
+            //return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: orgId = %o; %s", editClientsGroupRequest.getOrgId(), e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
