@@ -10,19 +10,8 @@ import java.util.List;
 
 public class ClientsListRequest {
 
-    @JsonProperty("OrgId")
-    private Long orgId;
-
     @JsonProperty("GroupsList")
     private List<String> groupsList;
-
-    public Long getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Long orgId) {
-        this.orgId = orgId;
-    }
 
     public List<String> getGroupsList() {
         return groupsList;
