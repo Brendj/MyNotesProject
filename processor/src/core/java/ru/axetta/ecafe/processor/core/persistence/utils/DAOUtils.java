@@ -3886,22 +3886,26 @@ public class DAOUtils {
 
     public static List<GoodRequestPosition> getGoodRequestPositionsByGoodRequest(Session session,
             GoodRequest request) {
-        Query query = session.createSQLQuery("select grp.idofgoodsrequestposition from cf_goods_requests_positions grp "
-                + "where grp.idofgoodsrequest = :idOfGoodRequest").setParameter("idOfGoodRequest",
-                request.getGlobalId());
+        Query query = session.createSQLQuery("select grp.guid from cf_goods_requests_positions grp "
+                + "inner join cf_goods_requests gr on grp.idofgoodsrequest = gr.idofgoodsrequest "
+                + "where gr.guid = :guid").setParameter("guid", request.getGuid());
         List<GoodRequestPosition> result = new ArrayList<>();
         for (Object o : query.list()) {
-            result.add(getGoodRequestPositionById(session, ((BigInteger) o).longValue()));
+            GoodRequestPosition goodRequestPosition = getGoodRequestPositionByGuid(session, o.toString());
+            if (goodRequestPosition != null) {
+                result.add(goodRequestPosition);
+            }
         }
         return result;
     }
 
-    public static GoodRequestPosition getGoodRequestPositionById(Session session, Long id) {
+    public static GoodRequestPosition getGoodRequestPositionByGuid(Session session, String guid) {
         try {
-            Query query = session.createQuery("SELECT grp from GoodRequestPosition grp where grp.globalId = :id");
-            query.setParameter("id", id);
+            Query query = session.createQuery("SELECT grp from GoodRequestPosition grp where grp.guid = :guid");
+            query.setParameter("guid", guid);
             return (GoodRequestPosition) query.uniqueResult();
         } catch (Exception e) {
+            logger.error("Can't find GoodRequestPosition guid=" + guid + ": " + e.getMessage());
             return null;
         }
     }

@@ -30,7 +30,7 @@ public class ResRequestsSupplierDetail {
         this.guid = goodRequestPosition.getGuid();
         this.idOfComplex = goodRequestPosition.getComplexId() == null ? null : goodRequestPosition.getComplexId().longValue();
         this.idOfDish = goodRequestPosition.getIdOfDish();
-        this.fType = RequestsSupplierDetailTypeEnum.fromInteger(goodRequestPosition.getType());
+        this.fType = RequestsSupplierDetailTypeEnum.fromInteger(goodRequestPosition.getFeedingType());
         this.totalCount = goodRequestPosition.getTotalCount().intValue();
         this.dProbeCount = goodRequestPosition.getDailySampleCount() == null ? 0 :
                 goodRequestPosition.getDailySampleCount().intValue();

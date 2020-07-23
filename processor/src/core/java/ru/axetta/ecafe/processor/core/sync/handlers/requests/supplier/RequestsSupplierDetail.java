@@ -150,7 +150,7 @@ public class RequestsSupplierDetail {
             }
         }
 
-        GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
+        //GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
 
         this.setProperties(guid, guidRequest, idOfComplex, idOfDish, RequestsSupplierDetailTypeEnum.fromInteger(fType),
                 totalCount, dProbeCount, tempClientsCount, deletedState, version, errorMessage.toString(),

@@ -56,7 +56,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
     private Integer complexId;
     private Long idOfDish;
-    private Integer type;
+    private Integer feedingType;
 
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
@@ -90,6 +90,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("lastDailySampleCount"), "lastDailySampleCount");
         projectionList.add(Projections.property("lastTempClientsCount"), "lastTempClientsCount");
         projectionList.add(Projections.property("complexId"), "complexId");
+        projectionList.add(Projections.property("feedingType"), "feedingType");
 
         projectionList.add(Projections.property("gr.guid"), "guidOfGR");
         projectionList.add(Projections.property("g.guid"), "guidOfG");
@@ -120,6 +121,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (!StringUtils.isEmpty(guidOfP)) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfBaseProduct", guidOfP);
         }
+        XMLUtils.setAttributeIfNotNull(element, "FeedingType", feedingType);
     }
 
     @Override
@@ -186,6 +188,12 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (longNetWeight != null) {
             setNetWeight(longNetWeight);
         }
+        Integer intFeedingType = XMLUtils.getIntegerAttributeValue(node, "FeedingType");
+        if (intFeedingType != null){
+            setFeedingType(intFeedingType);
+        } else {
+            setFeedingType(0);
+        }
         guidOfGR = XMLUtils.getStringAttributeValue(node, "GuidOfGoodsRequest", 36);
         guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfBaseProduct", 36);
@@ -208,6 +216,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         setDailySampleCount(((GoodRequestPosition) distributedObject).getDailySampleCount()); // суточная проба
         setTempClientsCount(((GoodRequestPosition) distributedObject).getTempClientsCount());
         setComplexId(((GoodRequestPosition) distributedObject).getComplexId());
+        setFeedingType(((GoodRequestPosition) distributedObject).getFeedingType());
         /* старые значения всего и суточной пробы */
         setLastTotalCount(lastTotalCount);
         setLastDailySampleCount(lastDailySampleCount); // суточная проба
@@ -376,11 +385,11 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         this.idOfDish = idOfDish;
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getFeedingType() {
+        return feedingType;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setFeedingType(Integer feedingType) {
+        this.feedingType = feedingType;
     }
 }

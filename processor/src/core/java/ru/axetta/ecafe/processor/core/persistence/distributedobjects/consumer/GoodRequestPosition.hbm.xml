@@ -48,7 +48,7 @@
         <property name="lastTempClientsCount" column="LastTempClientsCount" type="long"/>
         <property name="complexId" column="complexId" type="int"/>
         <property name="idOfDish" column="idOfDish" type="long"/>
-        <property name="type" column="type" type="int"/>
+        <property name="feedingType" column="feedingtype" type="int"/>
 
         <many-to-one name="goodRequest" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest">
             <column name="IdOfGoodsRequest" not-null="false" />

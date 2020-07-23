@@ -43,7 +43,9 @@ public class ResRequestsSupplierItem {
         this.staffGuid = goodRequest.getGuidOfStaff();
         this.deletedState = goodRequest.getDeletedState();
         this.version = goodRequest.getGlobalVersion();
-        this.staffGuid = goodRequest.getStaff().getGuid();
+        if (goodRequest.getStaff() != null) {
+            this.staffGuid = goodRequest.getStaff().getGuid();
+        }
     }
 
     public ResRequestsSupplierItem(String guid, Long version) {

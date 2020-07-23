@@ -118,7 +118,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                 }
 
                                 goodRequestPosition.setIdOfDish(detail.getIdOfDish());
-                                goodRequestPosition.setType(detail.getfType().ordinal());
+                                goodRequestPosition.setFeedingType(detail.getfType().ordinal());
                                 goodRequestPosition.setNetWeight(0L);
                                 goodRequestPosition.setUnitsScale(UnitScale.GRAMS);
                                 goodRequestPosition.setCreatedDate(new Date(System.currentTimeMillis()));
