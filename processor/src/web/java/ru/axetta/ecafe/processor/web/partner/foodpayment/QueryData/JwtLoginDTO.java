@@ -2,7 +2,9 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.partner.foodpayment;
+package ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData;
+
+import ru.axetta.ecafe.processor.web.partner.foodpayment.Result;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 

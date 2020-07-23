@@ -8,10 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.CreateGroupData;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.EditEmployeeData;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.LoginData;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.RefreshTokenData;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.*;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
@@ -56,9 +53,6 @@ public class SchoolRestController {
         try{
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if(loginData.getUsername() == null || loginData.getPassword() == null)
-                throw new JwtLoginException(JwtLoginErrors.USERNAME_IS_NULL.getErrorCode(),
-                        JwtLoginErrors.USERNAME_IS_NULL.getErrorMessage());
             tokenService = new JwtTokenProvider();
             jwtLoginService = new JWTLoginServiceImpl();
             if(jwtLoginService.login(loginData.getUsername(), loginData.getPassword(), request.getRemoteAddr(), persistenceSession)){
@@ -262,8 +256,11 @@ public class SchoolRestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            if(!groupManagementService.isFriendlyOrg(editEmployeeData.getOrgId(), jwtUserDetails.getIdOfOrg().longValue()))
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             //Проверка на доступ определенной роли
-            groupManagementService.editEmployee(jwtUserDetails.getIdOfOrg(), editEmployeeData.getGroupName(),
+            groupManagementService.editEmployee(editEmployeeData.getOrgId(), editEmployeeData.getGroupName(),
                     editEmployeeData.getContractId(), editEmployeeData.getStatus());
             persistenceSession.flush();
             persistenceTransaction.commit();
