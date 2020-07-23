@@ -10,22 +10,11 @@ import java.util.List;
 
 public class EditClientsGroupRequest {
 
-    @JsonProperty("orgId")
-    private long orgId;
-
     @JsonProperty("NewGroupId")
     private long newGroupId;
 
     @JsonProperty("contractId")
     private List<Long> contractIds;
-
-    public long getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(long orgId) {
-        this.orgId = orgId;
-    }
 
     public long getNewGroupId() {
         return newGroupId;

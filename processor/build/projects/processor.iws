@@ -39,6 +39,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#580&#10;fix">
       <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditClientsGroupRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditClientsGroupRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditGroupClientsGroupRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditGroupClientsGroupRequest.java" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -679,9 +681,12 @@
     <property name="settings.editor.selected.configurable" value="spring.boot" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="ru.axetta.ecafe.processor.web.partner.integra.dataflow" />
-      <recent name="ru.axetta.ecafe.processor.core.sync.handlers.client.request" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\scripts" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\styles" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\back-office" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\java\org\richfaces\renderkit\calendar" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\WEB-INF\classes\META-INF\resources" />
     </key>
     <key name="ImportMappingsDialog.RecentPackages">
       <recent name="ru.axetta.ecafe.processor.core.persistence.distributedobjects" />
@@ -729,12 +734,9 @@
       <recent name="http://31.13.60.141:8080/processor/soap/client?wsdl" />
       <recent name="https://github.com/SpringSource/spring-data-jpa-examples.git" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\scripts" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\styles" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\back-office" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\java\org\richfaces\renderkit\calendar" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\WEB-INF\classes\META-INF\resources" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="ru.axetta.ecafe.processor.web.partner.integra.dataflow" />
+      <recent name="ru.axetta.ecafe.processor.core.sync.handlers.client.request" />
     </key>
   </component>
   <component name="RunManager" selected="JBoss Server.JBoss 7.1.1.Final1">
