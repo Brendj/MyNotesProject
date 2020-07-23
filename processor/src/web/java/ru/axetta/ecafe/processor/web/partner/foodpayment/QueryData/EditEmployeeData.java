@@ -5,9 +5,18 @@
 package ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData;
 
 public class EditEmployeeData {
+    private long orgId;
     private String groupName;
     private long contractId;
     private boolean status;
+
+    public long getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(long orgId) {
+        this.orgId = orgId;
+    }
 
     public void setGroupName(String groupName) {
         this.groupName = groupName.trim();
