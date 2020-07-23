@@ -5,12 +5,12 @@
 package ru.axetta.ecafe.processor.web.token.security.util;
 
 public enum JwtAuthenticationErrors {
-    TOKEN_CORRUPTED(100,"Token corrupted"),
-    TOKEN_INVALID(101,"Token invalid"),
-    TOKEN_EXPIRED(103,"Token expired"),
-    USER_DISABLED(104,"User is disabled"),
-    USERNAME_IS_NULL(105, "Username cannot be null"),
-    INVALID_PASSWORD(106, "Invalid password"),
+    TOKEN_CORRUPTED(300,"Token corrupted"),
+    TOKEN_INVALID(301,"Token invalid"),
+    TOKEN_EXPIRED(303,"Token expired"),
+    USER_DISABLED(304,"User is disabled"),
+    USERNAME_IS_NULL(305, "Username cannot be null"),
+    INVALID_PASSWORD(306, "Invalid password"),
     ;
 
     private int errorCode;

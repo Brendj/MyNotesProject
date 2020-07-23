@@ -15,7 +15,7 @@ public class JwtLoginDTO extends Result {
     private String refreshToken;
 
     public JwtLoginDTO(String accessToken, String refreshToken){
-        super(100, "Ok");
+        super(0, "OK");
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
