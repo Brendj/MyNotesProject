@@ -149,8 +149,11 @@ public class JwtTokenProvider {
             Integer idOfRole = (Integer) claims.get(JwtClaimsConstant.ID_OF_ROLE);
             String roleName = (String) claims.get(JwtClaimsConstant.ROLE_NAME);
             if(username == null || isEnabled == null)
-                throw  new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
+                throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
                         JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
+            if(!isEnabled.booleanValue())
+                throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.USER_DISABLED.getErrorCode(),
+                        JwtAuthenticationErrors.USER_DISABLED.getErrorMessage()));
             JwtUserDetailsImpl jwtUserDetails = new JwtUserDetailsImpl(grantedAuthorities, isEnabled, isEnabled, username,
                     surname, firstname, secondname, idOfUser, idOfRole, roleName, contractId, idOfOrg, shortOrgName,
                     null, null);

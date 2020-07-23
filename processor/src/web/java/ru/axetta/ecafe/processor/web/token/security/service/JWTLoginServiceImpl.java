@@ -64,8 +64,8 @@ public class JWTLoginServiceImpl implements JWTLoginService {
         }
         try {
             loginSuccsess = checkUserCredentials(username, password, remoteAddr);
-        } catch (Exception e) {
-            throw new JwtLoginException(JwtLoginErrors.USER_IS_BLOCKED.getErrorCode(), e.getMessage());
+        } catch (JwtLoginException e) {
+            throw e;
         }
         return loginSuccsess;
     }

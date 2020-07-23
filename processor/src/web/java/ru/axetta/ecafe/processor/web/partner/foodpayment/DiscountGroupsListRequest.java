@@ -10,9 +10,6 @@ import java.util.List;
 
 public class DiscountGroupsListRequest {
 
-    @JsonProperty("OrgId")
-    private Long orgId;
-
     @JsonProperty("DiscountId")
     private Long discountId;
 
@@ -21,14 +18,6 @@ public class DiscountGroupsListRequest {
 
     @JsonProperty("Groups")
     private List<String> groups;
-
-    public Long getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Long orgId) {
-        this.orgId = orgId;
-    }
 
     public Long getDiscountId() {
         return discountId;

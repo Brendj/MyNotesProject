@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData;
 
-public class EditEmployeeData extends QueryBodyData {
+public class EditEmployeeData {
     private String groupName;
     private long contractId;
     private boolean status;
@@ -35,7 +35,7 @@ public class EditEmployeeData extends QueryBodyData {
 
     @Override
     public String toString(){
-        return new StringBuilder(String.format("EditEmployeeData: orgId = %o; groupName = %s; contractId = %o; status = %s",
-                this.getOrgId(), this.groupName, this.contractId, this.status)).toString();
+        return new StringBuilder(String.format("EditEmployeeData:  groupName = %s; contractId = %o; status = %s",
+                this.groupName, this.contractId, this.status)).toString();
     }
 }
