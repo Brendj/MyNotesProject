@@ -18,6 +18,7 @@ public class ClientTransactionsReportItem {
     private String transactionDescription;
     private String transactionTime;
     private String orderNumber;
+    private String idOfTransaction;
     private Long personalAccount;
 
     private List<OrgNameAndAddress> orgNames;
@@ -116,5 +117,13 @@ public class ClientTransactionsReportItem {
 
     public void setAddresses(List<OrgNameAndAddress> addresses) {
         this.addresses = addresses;
+    }
+
+    public String getIdOfTransaction() {
+        return idOfTransaction;
+    }
+
+    public void setIdOfTransaction(String idOfTransaction) {
+        this.idOfTransaction = idOfTransaction;
     }
 }
