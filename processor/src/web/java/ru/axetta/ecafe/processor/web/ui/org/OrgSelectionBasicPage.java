@@ -68,13 +68,12 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected List<OrganizationTypeItem> availableOrganizationTypes = buildAvailableOrganizationTypes();
 
     protected List<OrgShortItem> items = Collections.emptyList();
-    protected Long idOfContragent;
     protected Long idOfContract;
 
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, List<OrganizationTypeItem> orgTypes,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
-            Long idOfContragent, Long idOfContract) throws Exception {
+            Long idOfContragent, Long idOfContract, boolean onlySupplier) throws Exception {
         Criteria orgCriteria = session.createCriteria(Org.class);
 
         Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
@@ -110,16 +109,18 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             orgCriteria.add(Restrictions.eq("district", region));
         }
 
-        if (CollectionUtils.isNotEmpty(idOfSourceMenuOrgList) && idOfSourceMenuOrgList.get(0) != null) {
-            orgCriteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfSourceMenuOrgList));
-        }
+        if(!onlySupplier) {
+            if (CollectionUtils.isNotEmpty(idOfSourceMenuOrgList) && idOfSourceMenuOrgList.get(0) != null) {
+                orgCriteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfSourceMenuOrgList));
+            }
 
-        if (CollectionUtils.isNotEmpty(idOfSupplierList)){
+            if (CollectionUtils.isNotEmpty(idOfSupplierList)) {
                 orgCriteria.add(Restrictions.in("defaultSupplier.idOfContragent", idOfSupplierList));
-        } else if (idOfContragent != null) {
-            orgCriteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
-        } else if(idOfContract != null) {
-            orgCriteria.add(Restrictions.eq("contractId", "" + idOfContract));
+            } else if (idOfContragent != null) {
+                orgCriteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
+            } else if (idOfContract != null) {
+                orgCriteria.add(Restrictions.eq("contractId", "" + idOfContract));
+            }
         }
 
         if(CollectionUtils.isNotEmpty(orgTypes)) {
@@ -302,11 +303,11 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     public Long getIdOfContragent() {
-        return idOfContragent;
+        return idOfSelectedContragent;
     }
 
     public void setIdOfContragent(Long idOfContragent) {
-        this.idOfContragent = idOfContragent;
+        this.idOfSelectedContragent = idOfContragent;
     }
 
     public Long getIdOfContract() {
@@ -330,7 +331,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         deselectAllItems();
         Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, idOfSupplierList, idOfContragent, null);
+                idOfSourceMenuOrgList, idOfSupplierList, idOfContragent, null, getFilterMode().equals(2));
     }
 
     @SuppressWarnings("unchecked")
@@ -339,7 +340,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         deselectAllItems();
         Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, Collections.EMPTY_LIST,idOfContragent , null);
+                idOfSourceMenuOrgList, Collections.EMPTY_LIST, idOfContragent, null, getFilterMode().equals(2));
     }
 
     public List<SelectItem> getContragentsList() {

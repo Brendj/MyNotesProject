@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -48,6 +50,8 @@ public class ResMenuSupplier implements AbstractToElement {
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
     SimpleDateFormat dateWithoutTimeFormat = new SimpleDateFormat(dateWithoutTimePattern);
+
+    private static final Logger logger = LoggerFactory.getLogger(ResMenuSupplier.class);
 
     public ResMenuSupplier() {
         orgGroups = new HashSet<>();
@@ -133,7 +137,11 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Element menusElem = document.createElement("Menus");
         for (WtMenu menu : menus) {
-            menusElem.appendChild(menuToElement(document, menu));
+            if (DAOReadonlyService.getInstance().isMenuItemAvailable (menu.getIdOfMenu())) {
+                menusElem.appendChild(menuToElement(document, menu));
+            } else {
+                logger.error("В буфетном меню id=" + menu.getIdOfMenu() + " блюда встречаются больше 1 раза");
+            }
         }
 
         Element complexesElem = document.createElement("Complexes");
