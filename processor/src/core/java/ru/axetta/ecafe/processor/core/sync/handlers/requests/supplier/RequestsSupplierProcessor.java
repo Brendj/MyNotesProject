@@ -163,7 +163,8 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
         RequestsSupplierData result = new RequestsSupplierData();
         List<ResRequestsSupplierItem> items = new ArrayList<>();
         ResRequestsSupplierItem resItem;
-        List<GoodRequest> list = DAOUtils.getGoodRequestForOrgSinceVersion(session,
+        // Для уменьшения числа записей отбираем только заявки, у позиций которых заполнено idOfDish
+        List<GoodRequest> list = DAOUtils.getGoodRequestForOrgSinceVersionWithDishes(session,
                 requestsSupplier.getIdOfOrgOwner(), requestsSupplier.getMaxVersion());
         for (GoodRequest goodRequest : list) {
             if (goodRequest != null) {

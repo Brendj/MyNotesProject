@@ -3261,12 +3261,22 @@ public class DAOUtils {
     }
 
     public static List<GoodRequest> getGoodRequestForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
-        //List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
         Criteria criteria = session.createCriteria(GoodRequest.class);
-        //criteria.add(Restrictions.in("orgOwner", orgIds));
-        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        criteria.add(Restrictions.in("orgOwner", orgIds));
         criteria.add(Restrictions.gt("globalVersion", version));
         return criteria.list();
+    }
+
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersionWithDishes(Session session, Long idOfOrg,
+            long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Query query = session
+                .createQuery("select distinct gr from GoodRequestPosition grp join grp.goodRequest gr "
+                        + "where gr.orgOwner in (:orgIds) and gr.globalVersion > :version and grp.idOfDish is not null");
+        query.setParameterList("orgIds", orgIds);
+        query.setParameter("version", version);
+        return query.list();
     }
 
     public static List<ComplexSchedule> getComplexSchedulesForOrgSinceVersion(Session session, Long idOfOrg,
