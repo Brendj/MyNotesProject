@@ -35,8 +35,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -54,6 +54,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     public final Integer PREORDER_REQUEST_TYPE = 3;
     public static final Integer MAX_FORBIDDEN_DAYS = 3;
     public static final int DAY_PREORDER_CHECK = 5;
+    public final Integer POSITION_FEEDING_TYPE = 5;
 
     private Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItems = new HashMap<Long, GoodRequestsChangeAsyncNotificationService.OrgItem>();
 
@@ -531,6 +532,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         pos.setDailySampleCount(0L);
         pos.setTempClientsCount(0L);
         pos.setNotified(false);
+        pos.setFeedingType(POSITION_FEEDING_TYPE);
         pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
         if (preorderItem.getComplex()) {
