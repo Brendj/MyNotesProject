@@ -3273,7 +3273,7 @@ public class DAOUtils {
         List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
         Query query = session
                 .createQuery("select distinct gr from GoodRequestPosition grp join grp.goodRequest gr "
-                        + "where gr.orgOwner in (:orgIds) and gr.globalVersion > :version and grp.idOfDish is not null");
+                        + "where gr.orgOwner in (:orgIds) and gr.globalVersion > :version and grp.good is null");
         query.setParameterList("orgIds", orgIds);
         query.setParameter("version", version);
         return query.list();
