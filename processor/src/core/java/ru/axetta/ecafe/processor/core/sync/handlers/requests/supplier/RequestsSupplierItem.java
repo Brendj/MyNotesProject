@@ -31,6 +31,7 @@ public class RequestsSupplierItem {
     private Long orgId;
     private String guid;
     private String number;
+    private Date dateOfGoodsRequest;
     private Date doneDate;
     private RequestsSupplierTypeEnum type;
     private String staffGuid;
@@ -51,6 +52,7 @@ public class RequestsSupplierItem {
         Long orgId = null;
         String guid = null;
         String number = null;
+        Date dateOfGoodsRequest = null;
         Date doneDate = null;
         Integer type = null;
         String staffGuid = null;
@@ -84,6 +86,17 @@ public class RequestsSupplierItem {
         number = XMLUtils.getAttributeValue(itemNode, "Number");
         if (StringUtils.isEmpty(number)) {
             errorMessage.append("Attribute Number was not found");
+        }
+
+        String strDateOfGoodsRequest = XMLUtils.getAttributeValue(itemNode, "Date");
+        if (StringUtils.isNotEmpty(strDateOfGoodsRequest)) {
+            try {
+                dateOfGoodsRequest = CalendarUtils.parseDate(strDateOfGoodsRequest);
+            } catch (Exception e) {
+                errorMessage.append("Attribute Date was not found or incorrect");
+            }
+        } else {
+            errorMessage.append("Attribute Date was not found");
         }
 
         String strDoneDate = XMLUtils.getAttributeValue(itemNode, "DoneDate");
@@ -153,17 +166,18 @@ public class RequestsSupplierItem {
             detailNode = detailNode.getNextSibling();
         }
 
-        this.setProperties(orgId, guid, number, doneDate, RequestsSupplierTypeEnum.fromInteger(type), staffGuid,
+        this.setProperties(orgId, guid, number, dateOfGoodsRequest, doneDate, RequestsSupplierTypeEnum.fromInteger(type), staffGuid,
                 deletedState, version, errorMessage.toString(), requestsSupplierDetailList, goodRequest);
     }
 
-    private void setProperties(Long orgId, String guid, String number, Date doneDate, RequestsSupplierTypeEnum type,
+    private void setProperties(Long orgId, String guid, String number, Date dateOfGoodsRequest, Date doneDate, RequestsSupplierTypeEnum type,
             String staffGuid, Boolean deletedState, Long version, String errorMessage,
             List<RequestsSupplierDetail> requestsSupplierDetailList,
             GoodRequest goodRequest) {
         this.orgId = orgId;
         this.guid = guid;
         this.number = number;
+        this.dateOfGoodsRequest = dateOfGoodsRequest;
         this.doneDate = doneDate;
         this.type = type;
         this.staffGuid = staffGuid;
@@ -273,5 +287,13 @@ public class RequestsSupplierItem {
 
     public void setGoodRequest(GoodRequest goodRequest) {
         this.goodRequest = goodRequest;
+    }
+
+    public Date getDateOfGoodsRequest() {
+        return dateOfGoodsRequest;
+    }
+
+    public void setDateOfGoodsRequest(Date dateOfGoodsRequest) {
+        this.dateOfGoodsRequest = dateOfGoodsRequest;
     }
 }

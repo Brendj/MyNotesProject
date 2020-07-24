@@ -38,16 +38,18 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
     public ResRequestsSupplier process() throws Exception {
         ResRequestsSupplier result = new ResRequestsSupplier();
         List<ResRequestsSupplierItem> items = new ArrayList<>();
-        List<DistributedObject> listForNotifications = new LinkedList<>();
         Calendar calendarStart = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
         final Date startDate = calendarStart.getTime();
 
         try {
+            List<DistributedObject> listForNotifications = new LinkedList<>();
             ResRequestsSupplierItem resItem = null;
             boolean errorFound = false;
 
-            Long nextVersion = DAOUtils.nextVersionByGoodRequest(session);
-            Long nextPositionVersion = DAOUtils.nextVersionByGoodRequestPosition(session);
+            //Long nextVersion = DAOUtils.nextVersionByGoodRequest(session);
+            //Long nextPositionVersion = DAOUtils.nextVersionByGoodRequestPosition(session);
+            Long nextVersion = DOVersionRepository.updateClassVersion("GoodRequest", session);
+            Long nextPositionVersion = DOVersionRepository.updateClassVersion("GoodRequestPosition", session);
 
             for (RequestsSupplierItem item : requestsSupplier.getItems()) {
                 errorFound = !item.getResCode().equals(RequestsSupplierItem.ERROR_CODE_ALL_OK);
@@ -57,6 +59,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                     String guid = item.getGuid();
                     Long idOfOrg = item.getOrgId();
                     String number = item.getNumber();
+                    Date dateOfGoodsRequest = item.getDateOfGoodsRequest();
                     Date doneDate = item.getDoneDate();
                     RequestsSupplierTypeEnum type = item.getType();
                     String staffGuid = item.getStaffGuid();
@@ -88,6 +91,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                         goodRequest.setDeletedState(deletedState);
                         goodRequest.setCreatedDate(new Date(System.currentTimeMillis()));
                         goodRequest.setDoneDate(doneDate);
+                        goodRequest.setDateOfGoodsRequest(dateOfGoodsRequest);
                         goodRequest.setState(DocumentState.FOLLOW);
                         goodRequest.setRequestType(type.ordinal());
                         goodRequest.setStaff(staff);
@@ -152,18 +156,14 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                 resItem.setErrorMessage(item.getErrorMessage());
                 items.add(resItem);
             }
-
-            DOVersionRepository.updateClassVersion("GoodRequest", session);
-            DOVersionRepository.updateClassVersion("GoodRequestPosition", session);
             session.flush();
+            // Рассылка уведомлений
+            notifyOrgsAboutChangeGoodRequests(startDate, listForNotifications);
 
         } catch (Exception e) {
             logger.error("Error by saving RequestsSupplier", e);
             return null;
         }
-
-        // Рассылка уведомлений
-        notifyOrgsAboutChangeGoodRequests(startDate, listForNotifications);
 
         result.setItems(items);
         return result;

@@ -21,6 +21,7 @@ public class ResRequestsSupplierItem {
     private String guid;
     private String number;
     private Date doneDate;
+    private Date dateOfGoodsRequest;
     private RequestsSupplierTypeEnum type;
     private Long orgId;
     private String staffGuid;
@@ -37,6 +38,7 @@ public class ResRequestsSupplierItem {
     public ResRequestsSupplierItem(GoodRequest goodRequest) {
         this.guid = goodRequest.getGuid();
         this.number = goodRequest.getNumber();
+        this.dateOfGoodsRequest = goodRequest.getDateOfGoodsRequest();
         this.doneDate = goodRequest.getDoneDate();
         this.type = RequestsSupplierTypeEnum.fromInteger(goodRequest.getRequestType());
         this.orgId = goodRequest.getOrgOwner();
@@ -57,8 +59,11 @@ public class ResRequestsSupplierItem {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
         XMLUtils.setAttributeIfNotNull(element, "Number", number);
+        if (dateOfGoodsRequest != null) {
+            XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateOfGoodsRequest));
+        }
         if (doneDate != null) {
-            XMLUtils.setAttributeIfNotNull(element, "DoneDate", CalendarUtils.dateShortToStringFullYear(doneDate));
+            XMLUtils.setAttributeIfNotNull(element, "DoneDate", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(doneDate));
         }
         if (type != null) {
             XMLUtils.setAttributeIfNotNull(element, "Type", type.ordinal());
@@ -180,4 +185,11 @@ public class ResRequestsSupplierItem {
         this.errorMessage = errorMessage;
     }
 
+    public Date getDateOfGoodsRequest() {
+        return dateOfGoodsRequest;
+    }
+
+    public void setDateOfGoodsRequest(Date dateOfGoodsRequest) {
+        this.dateOfGoodsRequest = dateOfGoodsRequest;
+    }
 }
