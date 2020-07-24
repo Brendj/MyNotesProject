@@ -17,6 +17,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -297,6 +298,37 @@ public class GroupManagementService implements IGroupManagementService {
             result.addItem(resultClients);
         }
         return result;
+    }
+
+    @Override
+    public Long getIdOfOrgFromUser(String username) throws Exception {
+        User user = DAOUtils.findUser(persistanceSession, username);
+        if(user == null || user.isBlocked() || user.getDeletedState())
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        if(user.getOrg() == null && user.getClient() == null)
+            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        if(user.getOrg() == null && user.getClient().getOrg() == null)
+            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        if(user.getClient() != null){
+            return user.getClient().getOrg().getIdOfOrg();
+        }
+        else {
+            return user.getOrg().getIdOfOrg();
+        }
+    }
+
+    @Override
+    public List<FriendlyOrgDTO> getFriendlyOrgs(Long orgId) throws Exception {
+        List<FriendlyOrgDTO> friendlyOrgDTOList = new ArrayList<>();
+        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
+        for(Org org: friendlyOrgs){
+            friendlyOrgDTOList.add(new FriendlyOrgDTO(org));
+        }
+        return friendlyOrgDTOList;
     }
 
     private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
