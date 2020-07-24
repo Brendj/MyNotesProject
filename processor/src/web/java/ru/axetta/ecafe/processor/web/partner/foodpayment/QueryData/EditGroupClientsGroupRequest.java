@@ -4,31 +4,55 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData;
 
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.RequestGroupDTO;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 
 public class EditGroupClientsGroupRequest {
 
-    @JsonProperty("NewGroupId")
-    private long newGroupId;
+    @JsonProperty("OrgId")
+    private long orgId;
 
-    @JsonProperty("OldGroupId")
-    private List<Long> oldGroupIds;
+    @JsonProperty("NewGroupName")
+    private String newGroupName;
 
-    public long getNewGroupId() {
-        return newGroupId;
+    @JsonProperty("OldGroups")
+    private List<RequestGroupDTO> oldGroups;
+
+    @JsonProperty("StrictEditMode")
+    private boolean strictEditMode;
+
+    public long getOrgId() {
+        return orgId;
     }
 
-    public void setNewGroupId(long newGroupId) {
-        this.newGroupId = newGroupId;
+    public void setOrgId(long orgId) {
+        this.orgId = orgId;
     }
 
-    public List<Long> getOldGroupIds() {
-        return oldGroupIds;
+    public String getNewGroupName() {
+        return newGroupName;
     }
 
-    public void setOldGroupIds(List<Long> oldGroupIds) {
-        this.oldGroupIds = oldGroupIds;
+    public void setNewGroupName(String newGroupName) {
+        this.newGroupName = newGroupName;
+    }
+
+    public List<RequestGroupDTO> getOldGroups() {
+        return oldGroups;
+    }
+
+    public void setOldGroups(List<RequestGroupDTO> oldGroups) {
+        this.oldGroups = oldGroups;
+    }
+
+    public boolean isStrictEditMode() {
+        return strictEditMode;
+    }
+
+    public void setStrictEditMode(boolean strictEditMode) {
+        this.strictEditMode = strictEditMode;
     }
 }

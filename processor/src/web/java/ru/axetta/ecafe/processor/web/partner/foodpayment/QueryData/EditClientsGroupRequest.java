@@ -10,18 +10,32 @@ import java.util.List;
 
 public class EditClientsGroupRequest {
 
-    @JsonProperty("NewGroupId")
-    private long newGroupId;
+    @JsonProperty("OrgId")
+    private long orgId;
 
-    @JsonProperty("contractId")
+    @JsonProperty("NewGroupName")
+    private String newGroupName;
+
+    @JsonProperty("ContractIds")
     private List<Long> contractIds;
 
-    public long getNewGroupId() {
-        return newGroupId;
+    @JsonProperty("StrictEditMode")
+    private boolean strictEditMode;
+
+    public long getOrgId() {
+        return orgId;
     }
 
-    public void setNewGroupId(long newGroupId) {
-        this.newGroupId = newGroupId;
+    public void setOrgId(long orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getNewGroupName() {
+        return newGroupName;
+    }
+
+    public void setNewGroupName(String newGroupName) {
+        this.newGroupName = newGroupName;
     }
 
     public List<Long> getContractIds() {
@@ -30,5 +44,13 @@ public class EditClientsGroupRequest {
 
     public void setContractIds(List<Long> contractIds) {
         this.contractIds = contractIds;
+    }
+
+    public boolean isStrictEditMode() {
+        return strictEditMode;
+    }
+
+    public void setStrictEditMode(boolean strictEditMode) {
+        this.strictEditMode = strictEditMode;
     }
 }

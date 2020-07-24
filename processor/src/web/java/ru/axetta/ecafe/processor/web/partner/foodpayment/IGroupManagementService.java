@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.ClientGroupDTO;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.EditClientsGroupsGroupDTO;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.RequestGroupDTO;
 
 import java.util.List;
 
@@ -18,6 +21,8 @@ public interface IGroupManagementService {
     ResponseDiscounts getDiscountsList(Long orgId) throws Exception;
     ResponseDiscountClients processDiscountClientsList(Long orgId, Long discountId, Boolean status, List<Long> clients) throws Exception;
     ResponseDiscountGroups processDiscountGroupsList(Long orgId, Long discountId, Boolean status, List<String> groups) throws Exception;
-    List<EditClientsGroupsGroupDTO> editClientsGroup(Long orgId, Long newGroupId, List<Long> contractIds) throws Exception;
-    List<EditClientsGroupsGroupDTO> editGroupClientsGroup(Long orgId, Long newGroupId, List<Long> oldGroupIds) throws Exception;
+    ClientGroupDTO getClientGroupDto(Long orgId, String groupName) throws Exception;
+    List<Client> getClientsForContractIds(ClientGroupDTO newClientGroup, List<Long> contractIds, boolean strictEditMode) throws Exception;
+    List<Client> getClientsForGroups(ClientGroupDTO newClientGroup, List<RequestGroupDTO> oldGroups, boolean strictEditMode) throws Exception;
+    List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroupDTO newClientGroup, List<Client> clients, String username) throws Exception;
 }

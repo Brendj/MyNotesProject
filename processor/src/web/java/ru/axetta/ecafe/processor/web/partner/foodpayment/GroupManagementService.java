@@ -7,7 +7,9 @@ package ru.axetta.ecafe.processor.web.partner.foodpayment;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.ClientGroupDTO;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.EditClientsGroupsGroupDTO;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.RequestGroupDTO;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.hibernate.Criteria;
@@ -18,6 +20,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -301,17 +304,121 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     @Override
-    public List<EditClientsGroupsGroupDTO> editClientsGroup(Long orgId, Long newGroupId, List<Long> contractIds)
-            throws Exception {
-        //ClientGroup clientGroup = DAOUtils.
-        return null;
+    public ClientGroupDTO getClientGroupDto(Long orgId, String groupName) throws Exception {
+        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
+        Disjunction restrictionOrgIdIn = Restrictions.disjunction();
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
+        ClientGroup group = null;
+        for (Org friendlyOrg:friendlyOrgs
+        ) {
+            group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg(), groupName);
+            if(group != null)
+                break;
+        }
+        if(group == null)
+            throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
+        for (Org friendlyOrg:friendlyOrgs) {
+            restrictionOrgIdIn.add(Restrictions.eq("idOfMainOrg", friendlyOrg.getIdOfOrg()));
+        }
+        Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
+        groupNamesToOrgCriteria.add(restrictionOrgIdIn);
+        groupNamesToOrgCriteria.add(Restrictions.eq("groupName", group.getGroupName()));
+        groupNamesToOrgCriteria.setMaxResults(1);
+        GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
+        if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null){
+            return new ClientGroupDTO(groupNamesToOrgs.getIdOfOrg(), group);
+        }
+        else {
+            return new ClientGroupDTO(group.getCompositeIdOfClientGroup().getIdOfOrg(), group);
+        }
     }
 
     @Override
-    public List<EditClientsGroupsGroupDTO> editGroupClientsGroup(Long orgId, Long newGroupId, List<Long> oldGroupIds)
+    public List<Client> getClientsForContractIds(ClientGroupDTO newClientGroup, List<Long> contractIds,
+            boolean strictEditMode) throws Exception {
+        List<Client> clients = DAOUtils.findClientsByListOfContractId(persistanceSession, contractIds);
+        if(!strictEditMode)
+            return clients;
+        else {
+            return getClientsForStrictMode(newClientGroup, clients);
+        }
+    }
+
+    @Override
+    public List<Client> getClientsForGroups(ClientGroupDTO newClientGroup, List<RequestGroupDTO> oldGroups,
+            boolean strictEditMode) throws Exception {
+        Disjunction restrictionClientGroup = Restrictions.disjunction();
+        Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
+        List<Client> clients;
+        for(RequestGroupDTO group: oldGroups){
+            ClientGroup clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistanceSession, group.getOrgId(), group.getGroupId());
+            if(clientGroup != null){
+                restrictionClientGroup.add(Restrictions.eq("org.idOfOrg",clientGroup.getCompositeIdOfClientGroup().getIdOfOrg()));
+                restrictionClientGroup.add(Restrictions.eq("idOfClientGroup",clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup()));
+            }
+        }
+        clientsCriteria.add(restrictionClientGroup);
+        clients = clientsCriteria.list();
+        if(!strictEditMode)
+            return clients;
+        else {
+            return getClientsForStrictMode(newClientGroup,clients);
+        }
+    }
+
+    @Override
+    public List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroupDTO newClientGroup, List<Client> clients, String username)
             throws Exception {
         return null;
     }
+
+    private List<Client> getClientsForStrictMode(ClientGroupDTO clientGroup, List<Client> clients) {
+        List<Client> processedClients = new ArrayList<>();
+        boolean clientGroupIsNotPredefined = isGroupNotPredefined(clientGroup.getClientGroup());
+        for(Client client: clients){
+            if(client.getClientGroup() == null)
+                continue;
+            Long clientClientGroupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+            if(clientGroupIsNotPredefined){
+                if(isGroupNotPredefined(client.getClientGroup()))
+                    processedClients.add(client);
+                else if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
+                        || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
+                        || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
+                 processedClients.add(client);
+                }
+            }
+            if(!clientGroupIsNotPredefined){
+                if(!isGroupNotPredefined(client.getClientGroup())){
+                    if(clientClientGroupId.longValue() != ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()){
+                        processedClients.add(client);
+                        continue;
+                    }
+                    else {
+                        if(clientGroup.getClientGroup().getCompositeIdOfClientGroup()
+                                .getIdOfClientGroup().longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()
+                        || clientGroup.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()){
+                            processedClients.add(client);
+                        }
+                        else
+                            continue;
+                    }
+                }
+                else {
+                    Long newGroupId = clientGroup.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+                    if(newGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
+                            || newGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
+                            || newGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()){
+                        processedClients.add(client);
+                        continue;
+                    }
+                }
+            }
+        }
+        return processedClients;
+    }
+
 
     private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
         CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, idOfCategoryDiscount);
@@ -517,6 +624,16 @@ public class GroupManagementService implements IGroupManagementService {
         for (Org org: orgs){
             if(org.getIdOfOrg() != null){
                 if(org.getIdOfOrg().longValue() == friendlyOrgId)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean orgIsFriendly(long orgId, List<Org> friedlyOrgs){
+        for (Org org: friedlyOrgs){
+            if(org.getIdOfOrg() != null){
+                if(org.getIdOfOrg().longValue() == orgId)
                     return true;
             }
         }

@@ -38,8 +38,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;upd processor.iws">
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/DTO/ClientGroupDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/DTO/RequestGroupDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/EditClientsGroupErrors.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JWTLoginServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JWTLoginServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/IGroupManagementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/IGroupManagementService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditClientsGroupRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditClientsGroupRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditGroupClientsGroupRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditGroupClientsGroupRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -343,9 +350,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="spring-beans.schema" />
-        <option value="Enum" />
         <option value="FxmlFile" />
         <option value="Class" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -2156,10 +2163,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="505" y="131" key="#Project_Structure/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594898248628" />
-    <state x="830" y="272" key="#com.intellij.ide.util.MemberChooser" timestamp="1595341363418">
+    <state x="830" y="272" key="#com.intellij.ide.util.MemberChooser" timestamp="1595595201387">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="830" y="272" key="#com.intellij.ide.util.MemberChooser/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595341363418" />
+    <state x="830" y="272" key="#com.intellij.ide.util.MemberChooser/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595595201387" />
     <state x="754" y="355" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1595428840957">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
@@ -2216,10 +2223,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="505" y="131" key="SettingsEditor/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594906217206" />
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595423402667">
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595575918611">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595423402667" />
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595575918611" />
     <state x="754" y="448" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1594898200963">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
@@ -2248,10 +2255,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="801" y="269" key="git4idea.branch.GitSmartOperationDialog/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595420763624" />
-    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup" timestamp="1595512812265">
+    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup" timestamp="1595603907144">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595512812265" />
+    <state x="687" y="243" width="672" height="678" key="search.everywhere.popup/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595603907144" />
     <state x="705" y="239" key="spring file set editor" timestamp="1594828196325">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
