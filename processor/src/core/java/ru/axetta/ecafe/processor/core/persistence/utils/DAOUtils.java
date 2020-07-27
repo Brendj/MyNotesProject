@@ -2978,28 +2978,6 @@ public class DAOUtils {
         return version;
     }
 
-    public static long nextVersionByGoodRequest(Session session) {
-        long version = 0L;
-        Query query = session.createSQLQuery(
-                "select globalversion from cf_goods_requests order by globalversion desc limit 1 for update");
-        Object o = query.uniqueResult();
-        if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
-        }
-        return version;
-    }
-
-    public static long nextVersionByGoodRequestPosition(Session session) {
-        long version = 0L;
-        Query query = session.createSQLQuery(
-                "select globalversion from cf_goods_requests_positions order by globalversion desc limit 1 for update");
-        Object o = query.uniqueResult();
-        if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
-        }
-        return version;
-    }
-
     //todo Можно переделать все получения версии без for update на этот метод
     public static long nextVersionByTableWithoutLock(Session session, String tableName) {
         long version = 0L;

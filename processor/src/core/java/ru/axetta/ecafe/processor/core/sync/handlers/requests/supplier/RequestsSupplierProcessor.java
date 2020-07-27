@@ -46,8 +46,6 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
             ResRequestsSupplierItem resItem = null;
             boolean errorFound = false;
 
-            //Long nextVersion = DAOUtils.nextVersionByGoodRequest(session);
-            //Long nextPositionVersion = DAOUtils.nextVersionByGoodRequestPosition(session);
             Long nextVersion = DOVersionRepository.updateClassVersion("GoodRequest", session);
             Long nextPositionVersion = DOVersionRepository.updateClassVersion("GoodRequestPosition", session);
 
@@ -73,7 +71,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                             && goodRequest != null && versionFromClient < goodRequest.getGlobalVersion())) {
                         errorFound = true;
                         item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
-                        item.setErrorMessage("Record version conflict");
+                        item.setErrorMessage("GoodRequest versions conflict");
                     } else {
                         if (goodRequest == null) {
                             goodRequest = item.getGoodRequest();
@@ -105,16 +103,17 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                             for (RequestsSupplierDetail detail : requestsSupplierDetailList) {
 
                                 Long detailVersionFromClient = detail.getVersion();
+                                String detailGuid = detail.getGuid();
 
                                 GoodRequestPosition goodRequestPosition = DAOReadonlyService.getInstance()
-                                        .findGoodRequestPositionByGuid(guid);
+                                        .findGoodRequestPositionByGuid(detailGuid);
 
                                 if ((detailVersionFromClient == null && goodRequestPosition != null) || (
                                         detailVersionFromClient != null && goodRequestPosition != null
                                                 && detailVersionFromClient < goodRequestPosition.getGlobalVersion())) {
                                     errorFound = true;
                                     item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
-                                    item.setErrorMessage("Record versions conflict");
+                                    item.setErrorMessage("GoodRequestPosition versions conflict");
                                 } else if (goodRequestPosition == null) {
                                     goodRequestPosition = detail.getGoodRequestPosition();
                                 }
@@ -138,7 +137,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                     goodRequestPosition.setTempClientsCount(detail.getTempClientsCount().longValue());
                                 }
                                 goodRequestPosition.setGlobalVersion(nextPositionVersion);
-                                goodRequest.setDeletedState(detail.getDeletedState());
+                                goodRequestPosition.setDeletedState(detail.getDeletedState());
 
                                 session.saveOrUpdate(goodRequestPosition);
 

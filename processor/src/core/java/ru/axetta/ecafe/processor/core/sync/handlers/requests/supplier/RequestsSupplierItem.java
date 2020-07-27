@@ -138,6 +138,8 @@ public class RequestsSupplierItem {
             }
         }
 
+        version = XMLUtils.getLongAttributeValue(itemNode, "V");
+
         DistributedObject distributedObject = null;
         try {
             distributedObject = GoodRequest.class.newInstance();
