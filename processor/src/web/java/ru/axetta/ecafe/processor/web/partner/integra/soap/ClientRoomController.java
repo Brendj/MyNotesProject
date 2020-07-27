@@ -509,7 +509,7 @@ public interface ClientRoomController {
             @WebParam(name = "typeCard") Integer typeCard,
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
             @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
-            @WebParam(name = "degree") Integer relation);
+            @WebParam(name = "degree") Long relation);
 
     /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,

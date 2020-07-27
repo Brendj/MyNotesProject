@@ -8046,7 +8046,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "typeCard") Integer typeCard,
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
             @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
-            @WebParam(name = "degree") Integer relation) {
+            @WebParam(name = "degree") Long relation) {
 
         authenticateRequest(null);
 
@@ -8154,7 +8154,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian, ClientGuardianRelationType.fromInteger(relation).getDescription(), false, client.getIdOfClient(),
+                        .createClientGuardianInfoTransactionFree(session, guardian, ClientGuardianRelationType.fromInteger(relation.intValue()).getDescription(), false, client.getIdOfClient(),
                                 ClientCreatedFromType.MPGU, roleRepresentative);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
