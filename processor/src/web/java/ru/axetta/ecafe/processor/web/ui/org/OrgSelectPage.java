@@ -55,14 +55,14 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public void fill(Session session, List<Long> idOfMenuSourceOrgList) throws Exception {
-        this.idOfContragent = null;
+        this.idOfSelectedContragent = -1L;
         this.idOfContract = null;
         this.items = retrieveOrgs(session, idOfMenuSourceOrgList);
     }
 
     public void fill(Long idOfContragent, Long idOfContract, Session session, List<Long> idOfMenuSourceOrgList)
             throws Exception {
-        this.idOfContragent = idOfContragent;
+        this.idOfSelectedContragent = idOfContragent;
         this.idOfContract = idOfContract;
         this.filter = "";
         this.idFilter = "";
