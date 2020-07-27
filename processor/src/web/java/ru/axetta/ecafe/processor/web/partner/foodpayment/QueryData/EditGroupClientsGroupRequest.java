@@ -4,32 +4,30 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData;
 
-import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.RequestGroupDTO;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 
 public class EditGroupClientsGroupRequest {
 
-    @JsonProperty("OrgId")
-    private long orgId;
+    @JsonProperty("NewOrgId")
+    private long newOrgId;
 
     @JsonProperty("NewGroupName")
     private String newGroupName;
 
     @JsonProperty("OldGroups")
-    private List<RequestGroupDTO> oldGroups;
+    private List<Long> oldGroups;
 
     @JsonProperty("StrictEditMode")
     private boolean strictEditMode;
 
-    public long getOrgId() {
-        return orgId;
+    public long getNewOrgId() {
+        return newOrgId;
     }
 
-    public void setOrgId(long orgId) {
-        this.orgId = orgId;
+    public void setNewOrgId(long orgId) {
+        this.newOrgId = orgId;
     }
 
     public String getNewGroupName() {
@@ -40,11 +38,11 @@ public class EditGroupClientsGroupRequest {
         this.newGroupName = newGroupName;
     }
 
-    public List<RequestGroupDTO> getOldGroups() {
+    public List<Long> getOldGroups() {
         return oldGroups;
     }
 
-    public void setOldGroups(List<RequestGroupDTO> oldGroups) {
+    public void setOldGroups(List<Long> oldGroups) {
         this.oldGroups = oldGroups;
     }
 

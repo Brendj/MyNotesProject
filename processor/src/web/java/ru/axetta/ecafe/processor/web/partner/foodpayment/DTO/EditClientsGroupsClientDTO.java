@@ -17,6 +17,15 @@ public class EditClientsGroupsClientDTO {
     @JsonProperty("ResultMessage")
     private String resultMessage;
 
+    public EditClientsGroupsClientDTO(){
+    }
+
+    public EditClientsGroupsClientDTO(Long contractId){
+        this.contractId = contractId;
+        this.resultCode = 0;
+        this.resultMessage = "OK";
+    }
+
     public Long getContractId() {
         return contractId;
     }

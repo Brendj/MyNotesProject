@@ -5,9 +5,11 @@
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.ClientGroupDTO;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.*;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
@@ -456,10 +458,21 @@ public class SchoolRestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
-            //Проверка на доступ определенной роли
+            if(!groupManagementService.isFriendlyOrg(editClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
+            ClientGroupDTO clientGroupDTO = groupManagementService.getClientGroupDto(editClientsGroupRequest.getNewOrgId(),
+                    editClientsGroupRequest.getNewGroupName());
+            List<Client> clients = groupManagementService.getClientsForContractIds(clientGroupDTO,
+                    editClientsGroupRequest.getContractIds(), editClientsGroupRequest.isStrictEditMode());
+            ResponseEditClientsGroup responseEditClientsGroup = new ResponseEditClientsGroup();
+            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroupDTO,clients, jwtUserDetails.getUsername()));
+            responseEditClientsGroup.setErrorCode(0);
+            responseEditClientsGroup.setErrorMessage("OK");
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return Response.status(HttpURLConnection.HTTP_OK).entity(null).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEditClientsGroup).build();
 
         }
         catch (RequestProcessingException e){
@@ -493,9 +506,21 @@ public class SchoolRestController {
             checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             //Проверка на доступ определенной роли
+            if(!groupManagementService.isFriendlyOrg(editGroupClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
+            ClientGroupDTO clientGroupDTO = groupManagementService.getClientGroupDto(editGroupClientsGroupRequest.getNewOrgId(),
+                    editGroupClientsGroupRequest.getNewGroupName());
+            List<Client> clients = groupManagementService.getClientsForGroups(clientGroupDTO,
+                    editGroupClientsGroupRequest.getOldGroups(), editGroupClientsGroupRequest.isStrictEditMode());
+            ResponseEditClientsGroup responseEditClientsGroup = new ResponseEditClientsGroup();
+            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroupDTO,clients, jwtUserDetails.getUsername()));
+            responseEditClientsGroup.setErrorCode(0);
+            responseEditClientsGroup.setErrorMessage("OK");
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return Response.status(HttpURLConnection.HTTP_OK).entity(null).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEditClientsGroup).build();
 
         }
         catch (RequestProcessingException e){

@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 
-public class EditClientsGroupsGroupDTO {
+public class  EditClientsGroupsGroupDTO {
     @JsonProperty("OldGroupName")
     private String oldGroupName;
 

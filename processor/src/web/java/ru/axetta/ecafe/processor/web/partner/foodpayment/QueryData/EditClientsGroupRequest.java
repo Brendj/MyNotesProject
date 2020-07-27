@@ -10,8 +10,8 @@ import java.util.List;
 
 public class EditClientsGroupRequest {
 
-    @JsonProperty("OrgId")
-    private long orgId;
+    @JsonProperty("NewOrgId")
+    private long newOrgId;
 
     @JsonProperty("NewGroupName")
     private String newGroupName;
@@ -22,12 +22,12 @@ public class EditClientsGroupRequest {
     @JsonProperty("StrictEditMode")
     private boolean strictEditMode;
 
-    public long getOrgId() {
-        return orgId;
+    public long getNewOrgId() {
+        return newOrgId;
     }
 
-    public void setOrgId(long orgId) {
-        this.orgId = orgId;
+    public void setNewOrgId(long newOrgId) {
+        this.newOrgId = newOrgId;
     }
 
     public String getNewGroupName() {

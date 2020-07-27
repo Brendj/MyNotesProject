@@ -8,8 +8,8 @@ import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.ClientGroupDTO;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.EditClientsGroupsClientDTO;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.EditClientsGroupsGroupDTO;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.RequestGroupDTO;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.hibernate.Criteria;
@@ -20,9 +20,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class GroupManagementService implements IGroupManagementService {
     Logger logger = LoggerFactory.getLogger(GroupManagementService.class);
@@ -308,13 +306,7 @@ public class GroupManagementService implements IGroupManagementService {
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         Disjunction restrictionOrgIdIn = Restrictions.disjunction();
         friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
-        ClientGroup group = null;
-        for (Org friendlyOrg:friendlyOrgs
-        ) {
-            group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg(), groupName);
-            if(group != null)
-                break;
-        }
+        ClientGroup group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession,orgId, groupName);
         if(group == null)
             throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
@@ -337,7 +329,15 @@ public class GroupManagementService implements IGroupManagementService {
     @Override
     public List<Client> getClientsForContractIds(ClientGroupDTO newClientGroup, List<Long> contractIds,
             boolean strictEditMode) throws Exception {
-        List<Client> clients = DAOUtils.findClientsByListOfContractId(persistanceSession, contractIds);
+        Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
+        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, newClientGroup.getOrgId());
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, newClientGroup.getOrgId()));
+        List<Long> orgIds = getOrgIds(friendlyOrgs);
+        clientsCriteria.add(Restrictions.and(
+                Restrictions.in("contractId", contractIds),
+                Restrictions.in("org.idOfOrg", orgIds)
+        ));
+        List<Client> clients = clientsCriteria.list();
         if(!strictEditMode)
             return clients;
         else {
@@ -346,19 +346,18 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     @Override
-    public List<Client> getClientsForGroups(ClientGroupDTO newClientGroup, List<RequestGroupDTO> oldGroups,
+    public List<Client> getClientsForGroups(ClientGroupDTO newClientGroup, List<Long> oldGroups,
             boolean strictEditMode) throws Exception {
         Disjunction restrictionClientGroup = Restrictions.disjunction();
         Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
         List<Client> clients;
-        for(RequestGroupDTO group: oldGroups){
-            ClientGroup clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistanceSession, group.getOrgId(), group.getGroupId());
-            if(clientGroup != null){
-                restrictionClientGroup.add(Restrictions.eq("org.idOfOrg",clientGroup.getCompositeIdOfClientGroup().getIdOfOrg()));
-                restrictionClientGroup.add(Restrictions.eq("idOfClientGroup",clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup()));
-            }
-        }
-        clientsCriteria.add(restrictionClientGroup);
+        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, newClientGroup.getOrgId());
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, newClientGroup.getOrgId()));
+        List<Long> orgIds = getOrgIds(friendlyOrgs);
+        clientsCriteria.add(Restrictions.and(
+                Restrictions.in("org.idOfOrg", orgIds),
+                Restrictions.in("idOfClientGroup", oldGroups)
+        ));
         clients = clientsCriteria.list();
         if(!strictEditMode)
             return clients;
@@ -370,7 +369,57 @@ public class GroupManagementService implements IGroupManagementService {
     @Override
     public List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroupDTO newClientGroup, List<Client> clients, String username)
             throws Exception {
-        return null;
+        String comment = "Изменено пользователем " + username;
+        Org newGroupOrg = DAOUtils.findOrg(persistanceSession, newClientGroup.getOrgId());
+        Long newClientGroupId = newClientGroup.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+        HashMap<Long, List<Client>> orderedClients = getClientsGroupByClientGroup(clients);
+        List<EditClientsGroupsGroupDTO> editClientsGroupsGroupDTOList = new LinkedList<>();
+        for(Map.Entry entry: orderedClients.entrySet()){
+            EditClientsGroupsGroupDTO editClientsGroupsGroupDTO = new EditClientsGroupsGroupDTO();
+            editClientsGroupsGroupDTO.setNewGroupName(newClientGroup.getClientGroup().getGroupName());
+            List<EditClientsGroupsClientDTO> editClientsGroupsClientDTOList = new LinkedList<>();
+            Client firstClient = ((List<Client>) entry.getValue()).get(0);
+            if(!((List<Client>) entry.getValue()).isEmpty() && firstClient != null){
+                editClientsGroupsGroupDTO.setOldGroupName(firstClient.getClientGroup().getGroupName());
+                editClientsGroupsGroupDTO.setOrgId(firstClient.getOrg().getIdOfOrg());
+            }
+            else
+                continue;
+            for(Client client: (List<Client>)entry.getValue()){
+                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(newGroupOrg, client);
+                clientGroupMigrationHistory.setNewGroupId(newClientGroupId);
+                clientGroupMigrationHistory.setNewGroupName(newClientGroup.getClientGroup().getGroupName());
+                clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
+                clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+                clientGroupMigrationHistory.setComment(comment);
+                persistanceSession.save(clientGroupMigrationHistory);
+                client.setOrg(newGroupOrg);
+                client.setIdOfClientGroup(newClientGroupId);
+                client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
+                persistanceSession.update(client);
+                editClientsGroupsClientDTOList.add(new EditClientsGroupsClientDTO(client.getContractId()));
+            }
+            editClientsGroupsGroupDTO.setClients(editClientsGroupsClientDTOList);
+            editClientsGroupsGroupDTOList.add(editClientsGroupsGroupDTO);
+        }
+        return editClientsGroupsGroupDTOList;
+    }
+
+    private HashMap<Long, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
+        HashMap<Long, List<Client>> orderedClients = new LinkedHashMap<>();
+        for(Client client: clients){
+            if(client.getIdOfClientGroup() == null || client.getOrg() == null || client.getOrg().getIdOfOrg() == null)
+                continue;
+            Long key = client.getIdOfClientGroup() + client.getOrg().getIdOfOrg();
+            if(orderedClients.containsKey(key))
+                orderedClients.get(key).add(client);
+            else {
+                List<Client> hashMapClients = new LinkedList<>();
+                hashMapClients.add(client);
+                orderedClients.put(key, hashMapClients);
+            }
+        }
+        return orderedClients;
     }
 
     private List<Client> getClientsForStrictMode(ClientGroupDTO clientGroup, List<Client> clients) {
@@ -638,6 +687,15 @@ public class GroupManagementService implements IGroupManagementService {
             }
         }
         return false;
+    }
+
+    private List<Long> getOrgIds(List<Org> orgs){
+        List<Long> orgIds = new ArrayList<>();
+        for(Org org: orgs){
+            if(org.getIdOfOrg() != null)
+                orgIds.add(org.getIdOfOrg());
+        }
+        return orgIds;
     }
 
 }
