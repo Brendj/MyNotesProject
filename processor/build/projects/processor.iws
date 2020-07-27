@@ -38,12 +38,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#561&#10;Add methods">
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/FriendlyOrgDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/ResponseFriendlyOrgs.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/IGroupManagementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/IGroupManagementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/FriendlyOrgDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/FriendlyOrgDTO.java" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />

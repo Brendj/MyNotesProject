@@ -42,7 +42,7 @@ public class FriendlyOrgDTO {
     private String ogrn;
 
     @JsonProperty("OrgType")
-    private String orgType;
+    private Integer orgType;
 
     @JsonProperty("MainBuilding")
     private Boolean mainBuilding;
@@ -62,7 +62,7 @@ public class FriendlyOrgDTO {
         this.unad = org.getBtiUnad();
         this.inn = org.getINN();
         this.ogrn = org.getOGRN();
-        this.orgType = String.format("%o - %s", org.getType().getCode(), org.getType().getShortType());
+        this.orgType = org.getType().getCode();
         this.mainBuilding = org.isMainBuilding();
     }
 
@@ -146,11 +146,11 @@ public class FriendlyOrgDTO {
         this.ogrn = ogrn;
     }
 
-    public String getOrgType() {
+    public Integer getOrgType() {
         return orgType;
     }
 
-    public void setOrgType(String orgType) {
+    public void setOrgType(Integer orgType) {
         this.orgType = orgType;
     }
 
