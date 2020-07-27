@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -88,27 +87,45 @@ public class RequestsSupplierItem {
             errorMessage.append("Attribute Number was not found");
         }
 
-        String strDateOfGoodsRequest = XMLUtils.getAttributeValue(itemNode, "Date");
-        if (StringUtils.isNotEmpty(strDateOfGoodsRequest)) {
-            try {
-                dateOfGoodsRequest = CalendarUtils.parseDate(strDateOfGoodsRequest);
-            } catch (Exception e) {
-                errorMessage.append("Attribute Date was not found or incorrect");
+        //String strDateOfGoodsRequest = XMLUtils.getAttributeValue(itemNode, "Date");
+        //if (StringUtils.isNotEmpty(strDateOfGoodsRequest)) {
+        //    try {
+        //        dateOfGoodsRequest = CalendarUtils.parseDate(strDateOfGoodsRequest);
+        //    } catch (Exception e) {
+        //        errorMessage.append("Attribute Date was not found or incorrect");
+        //    }
+        //} else {
+        //    errorMessage.append("Attribute Date was not found");
+        //}
+
+        try {
+            dateOfGoodsRequest = XMLUtils.getDateTimeAttributeValue(itemNode, "Date");
+            if (dateOfGoodsRequest == null) {
+                errorMessage.append("Attribute Date was not found");
             }
-        } else {
-            errorMessage.append("Attribute Date was not found");
+        } catch (Exception e) {
+            errorMessage.append("Attribute Date was not found or incorrect");
         }
 
-        String strDoneDate = XMLUtils.getAttributeValue(itemNode, "DoneDate");
-        if (StringUtils.isNotEmpty(strDoneDate)) {
-            try {
-                doneDate = CalendarUtils.parseDate(strDoneDate);
-            } catch (Exception e) {
-                errorMessage.append("Attribute DoneDate was not found or incorrect");
+        try {
+            doneDate = XMLUtils.getDateTimeAttributeValue(itemNode, "DoneDate");
+            if (doneDate == null) {
+                errorMessage.append("Attribute DoneDate was not found");
             }
-        } else {
-            errorMessage.append("Attribute DoneDate was not found");
+        } catch (Exception e) {
+                errorMessage.append("Attribute DoneDate was not found or incorrect");
         }
+
+        //String strDoneDate = XMLUtils.getAttributeValue(itemNode, "DoneDate");
+        //if (StringUtils.isNotEmpty(strDoneDate)) {
+        //    try {
+        //        doneDate = CalendarUtils.parseDate(strDoneDate);
+        //    } catch (Exception e) {
+        //        errorMessage.append("Attribute DoneDate was not found or incorrect");
+        //    }
+        //} else {
+        //    errorMessage.append("Attribute DoneDate was not found");
+        //}
 
         String strType = XMLUtils.getAttributeValue(itemNode, "Type");
         if (StringUtils.isNotEmpty(strType)) {
