@@ -6,9 +6,13 @@
 package generated.contingent.ispp;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.*;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebEndpoint;
+import javax.xml.ws.WebServiceClient;
+import javax.xml.ws.WebServiceFeature;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 
 /**
@@ -17,53 +21,38 @@ import java.net.URL;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "IsppWebServiceService", targetNamespace = "urn:contingent.mos.ru:ws:ispp", wsdlLocation = "file:/C:/tmp/contingent/ispp.wsdl.xml")
+@WebServiceClient(name = "IsppWebServiceService", targetNamespace = "urn:contingent.mos.ru:ws:ispp", wsdlLocation = "META-INF/contingent/ispp.wsdl")
 public class IsppWebServiceService
     extends Service
 {
 
+    private final static String WSDL_LOCATION = "META-INF/contingent/ispp.wsdl";
     private final static URL ISPPWEBSERVICESERVICE_WSDL_LOCATION;
-    private final static WebServiceException ISPPWEBSERVICESERVICE_EXCEPTION;
-    private final static QName ISPPWEBSERVICESERVICE_QNAME = new QName("urn:contingent.mos.ru:ws:ispp", "IsppWebServiceService");
+    private final static Logger logger = Logger.getLogger(generated.contingent.ispp.IsppWebServiceService.class.getName());
 
     static {
         URL url = null;
-        WebServiceException e = null;
         try {
-            url = new URL("file:/C:/tmp/contingent/ispp.wsdl.xml");
-        } catch (MalformedURLException ex) {
-            e = new WebServiceException(ex);
+            URL baseUrl;
+            baseUrl = generated.contingent.ispp.IsppWebServiceService.class.getResource(".");
+            url = new URL(baseUrl, IsppWebServiceService.class.getClassLoader().getResource(WSDL_LOCATION).getPath());
+        } catch (MalformedURLException e) {
+            logger.warning("Failed to create URL for the wsdl Location: 'file:/D:/Temp/aiscontingent/ispp_1.wsdl', retrying as a local file");
+            logger.warning(e.getMessage());
         }
         ISPPWEBSERVICESERVICE_WSDL_LOCATION = url;
-        ISPPWEBSERVICESERVICE_EXCEPTION = e;
-    }
-
-    public IsppWebServiceService() {
-        super(__getWsdlLocation(), ISPPWEBSERVICESERVICE_QNAME);
-    }
-
-    public IsppWebServiceService(WebServiceFeature... features) {
-        super(__getWsdlLocation(), ISPPWEBSERVICESERVICE_QNAME, features);
-    }
-
-    public IsppWebServiceService(URL wsdlLocation) {
-        super(wsdlLocation, ISPPWEBSERVICESERVICE_QNAME);
-    }
-
-    public IsppWebServiceService(URL wsdlLocation, WebServiceFeature... features) {
-        super(wsdlLocation, ISPPWEBSERVICESERVICE_QNAME, features);
     }
 
     public IsppWebServiceService(URL wsdlLocation, QName serviceName) {
         super(wsdlLocation, serviceName);
     }
 
-    public IsppWebServiceService(URL wsdlLocation, QName serviceName, WebServiceFeature... features) {
-        super(wsdlLocation, serviceName, features);
+    public IsppWebServiceService() {
+        super(ISPPWEBSERVICESERVICE_WSDL_LOCATION, new QName("urn:contingent.mos.ru:ws:ispp", "IsppWebServiceService"));
     }
 
     /**
-     * 
+     *
      * @return
      *     returns IsppWebService
      */
@@ -73,7 +62,7 @@ public class IsppWebServiceService
     }
 
     /**
-     * 
+     *
      * @param features
      *     A list of {@link WebServiceFeature} to configure on the proxy.  Supported features not in the <code>features</code> parameter will have their default values.
      * @return
@@ -82,13 +71,6 @@ public class IsppWebServiceService
     @WebEndpoint(name = "IsppWebServicePort")
     public IsppWebService getIsppWebServicePort(WebServiceFeature... features) {
         return super.getPort(new QName("urn:contingent.mos.ru:ws:ispp", "IsppWebServicePort"), IsppWebService.class, features);
-    }
-
-    private static URL __getWsdlLocation() {
-        if (ISPPWEBSERVICESERVICE_EXCEPTION!= null) {
-            throw ISPPWEBSERVICESERVICE_EXCEPTION;
-        }
-        return ISPPWEBSERVICESERVICE_WSDL_LOCATION;
     }
 
 }
