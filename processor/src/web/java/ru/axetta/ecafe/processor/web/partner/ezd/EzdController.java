@@ -333,7 +333,6 @@ public class EzdController {
             Date date = new Date();
             Date currentDate = CalendarUtils.startOfDay(date);
 
-
             logger.info("Старт начала сбора данных по производственному календарю");
             //Загружаем все данные производственного календаря
             List<ProductionCalendar> productionCalendars = DAOUtils
@@ -483,6 +482,8 @@ public class EzdController {
                     } while (flag2 && !flagend);
                 } while (!flagend);
             }
+            //Подготовка окончена, далее сбор самого меню
+            //////////////////////////////////////////////////////////
             List<RequestsEzdMenuView> allMenuForEZD = null;
             allMenuForEZD = DAOUtils.getAllMenuForEZD(persistenceSession, null);
             if (allMenuForEZD == null) {
@@ -511,6 +512,7 @@ public class EzdController {
                 List<Date> dates = massCorrectDates.get((long) counter1);
                 counter1++;
                 if (!requestsEzdView.getUsewebarm()) {
+                    //Заполняем список меню для текущей организации
                     if (menuforCurrentOrg.isEmpty() || (idCurrentOrg != null && !idCurrentOrg
                             .equals(requestsEzdView.getIdoforg()))) {
                         menuforCurrentOrg.clear();
