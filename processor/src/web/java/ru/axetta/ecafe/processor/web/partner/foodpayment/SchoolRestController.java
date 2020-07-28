@@ -6,10 +6,10 @@ package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.ClientGroupDTO;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.*;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
@@ -462,12 +462,12 @@ public class SchoolRestController {
                 throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
-            ClientGroupDTO clientGroupDTO = groupManagementService.getClientGroupDto(editClientsGroupRequest.getNewOrgId(),
+            ClientGroup clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(editClientsGroupRequest.getNewOrgId(),
                     editClientsGroupRequest.getNewGroupName());
-            List<Client> clients = groupManagementService.getClientsForContractIds(clientGroupDTO,
+            List<Client> clients = groupManagementService.getClientsForContractIds(clientGroup,
                     editClientsGroupRequest.getContractIds(), editClientsGroupRequest.isStrictEditMode());
             ResponseEditClientsGroup responseEditClientsGroup = new ResponseEditClientsGroup();
-            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroupDTO,clients, jwtUserDetails.getUsername()));
+            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroup,clients, jwtUserDetails.getUsername()));
             responseEditClientsGroup.setErrorCode(0);
             responseEditClientsGroup.setErrorMessage("OK");
             persistenceTransaction.commit();
@@ -510,12 +510,12 @@ public class SchoolRestController {
                 throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
-            ClientGroupDTO clientGroupDTO = groupManagementService.getClientGroupDto(editGroupClientsGroupRequest.getNewOrgId(),
+            ClientGroup clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(editGroupClientsGroupRequest.getNewOrgId(),
                     editGroupClientsGroupRequest.getNewGroupName());
-            List<Client> clients = groupManagementService.getClientsForGroups(clientGroupDTO,
+            List<Client> clients = groupManagementService.getClientsForGroups(clientGroup,
                     editGroupClientsGroupRequest.getOldGroups(), editGroupClientsGroupRequest.isStrictEditMode());
             ResponseEditClientsGroup responseEditClientsGroup = new ResponseEditClientsGroup();
-            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroupDTO,clients, jwtUserDetails.getUsername()));
+            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroup,clients, jwtUserDetails.getUsername()));
             responseEditClientsGroup.setErrorCode(0);
             responseEditClientsGroup.setErrorMessage("OK");
             persistenceTransaction.commit();
