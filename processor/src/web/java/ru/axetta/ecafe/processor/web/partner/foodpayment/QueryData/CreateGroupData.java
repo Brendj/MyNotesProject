@@ -17,7 +17,7 @@ public class CreateGroupData extends QueryBodyData {
 
     @Override
     public String toString(){
-        return new StringBuilder(String.format("CreateGroupData: token = %s; userId = %o; orgId = %o; groupName = %s",
-                this.getToken(), this.getUserId(), this.getOrgId(), this.getGroupName())).toString();
+        return new StringBuilder(String.format("CreateGroupData: orgId = %o; groupName = %s",
+                this.getOrgId(), this.getGroupName())).toString();
     }
 }

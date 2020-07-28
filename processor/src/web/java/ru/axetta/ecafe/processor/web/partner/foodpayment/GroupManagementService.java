@@ -17,6 +17,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,9 +32,25 @@ public class GroupManagementService implements IGroupManagementService {
 
 
     @Override
-    public Boolean checkPermission(String token) throws Exception {
-        throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
-                GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+    public boolean isFriendlyOrg(long orgId, long friendlyOrgId) throws Exception {
+        if(orgId != friendlyOrgId){
+            if(!orgIsFriendly(orgId, friendlyOrgId))
+                return false;
+        }
+        return true;
+    }
+
+
+    public void checkPermission(int userIdOfRole, int permittedIdOfRole, long userOrgId, long requestOrgId)
+            throws Exception {
+        if(userIdOfRole != permittedIdOfRole)
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        if(userOrgId != requestOrgId){
+            if(!orgIsFriendly(requestOrgId, userOrgId))
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        }
     }
 
     @Override
@@ -253,34 +270,65 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     @Override
-    public ResponseDiscountClients processDiscountClientsList(DiscountClientsListRequest discountClientsListRequest) throws Exception {
+    public ResponseDiscountClients processDiscountClientsList(Long orgId, Long discountId, Boolean status, List<Long> clients) throws Exception {
         ResponseDiscountClients result = new ResponseDiscountClients();
-        CategoryDiscount categoryDiscount = getCategoryDiscount(discountClientsListRequest.getDiscountId());
-        ResponseDiscounts availableDiscounts = getDiscountsList(discountClientsListRequest.getOrgId());
-        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountClientsListRequest.getOrgId());
-        for (Long contractId : discountClientsListRequest.getClients()) {
-            result.addItem(processDiscountClient(allOrgs, contractId, discountClientsListRequest.getStatus(),
+        CategoryDiscount categoryDiscount = getCategoryDiscount(discountId);
+        ResponseDiscounts availableDiscounts = getDiscountsList(orgId);
+        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, orgId);
+        for (Long contractId : clients) {
+            result.addItem(processDiscountClient(allOrgs, contractId, status,
                     categoryDiscount, availableDiscounts));
         }
         return result;
     }
 
     @Override
-    public ResponseDiscountGroups processDiscountGroupsList(DiscountGroupsListRequest discountGroupsListRequest) throws Exception {
-        CategoryDiscount categoryDiscount = getCategoryDiscount(discountGroupsListRequest.getDiscountId());
-        ResponseDiscounts availableDiscounts = getDiscountsList(discountGroupsListRequest.getOrgId());
+    public ResponseDiscountGroups processDiscountGroupsList(Long orgId, Long discountId, Boolean status, List<String> groups) throws Exception {
+        CategoryDiscount categoryDiscount = getCategoryDiscount(discountId);
+        ResponseDiscounts availableDiscounts = getDiscountsList(orgId);
         ResponseDiscountGroups result = new ResponseDiscountGroups();
-        ResponseClients responseClients = getClientsList(discountGroupsListRequest.getGroups(), discountGroupsListRequest.getOrgId());
-        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountGroupsListRequest.getOrgId());
+        ResponseClients responseClients = getClientsList(groups, orgId);
+        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, orgId);
         for (FPGroup fpGroup : responseClients.getGroups()) {
             ResponseDiscountGroupItem resultClients = new ResponseDiscountGroupItem(fpGroup.getGroupName());
             for (FPClient fpClient : fpGroup.getClients()) {
-                resultClients.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), discountGroupsListRequest.getStatus(),
+                resultClients.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), status,
                         categoryDiscount, availableDiscounts));
             }
             result.addItem(resultClients);
         }
         return result;
+    }
+
+    @Override
+    public Long getIdOfOrgFromUser(String username) throws Exception {
+        User user = DAOUtils.findUser(persistanceSession, username);
+        if(user == null || user.isBlocked() || user.getDeletedState())
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        if(user.getOrg() == null && user.getClient() == null)
+            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        if(user.getOrg() == null && user.getClient().getOrg() == null)
+            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        if(user.getClient() != null){
+            return user.getClient().getOrg().getIdOfOrg();
+        }
+        else {
+            return user.getOrg().getIdOfOrg();
+        }
+    }
+
+    @Override
+    public List<FriendlyOrgDTO> getFriendlyOrgs(Long orgId) throws Exception {
+        List<FriendlyOrgDTO> friendlyOrgDTOList = new ArrayList<>();
+        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
+        for(Org org: friendlyOrgs){
+            friendlyOrgDTOList.add(new FriendlyOrgDTO(org));
+        }
+        return friendlyOrgDTOList;
     }
 
     private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
@@ -478,6 +526,17 @@ public class GroupManagementService implements IGroupManagementService {
                 | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()))
                 | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue()))) {
             return true;
+        }
+        return false;
+    }
+
+    private boolean orgIsFriendly(long orgId, long friendlyOrgId) throws Exception{
+        List<Org> orgs = DAOUtils.findFriendlyOrgs(persistanceSession,orgId);
+        for (Org org: orgs){
+            if(org.getIdOfOrg() != null){
+                if(org.getIdOfOrg().longValue() == friendlyOrgId)
+                    return true;
+            }
         }
         return false;
     }

@@ -296,6 +296,9 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                             nextVersion, historyVersion);
                 builder.withDateStart(item.getStartDate());
                 builder.withDateEnd(item.getEndDate());
+                item.getApplicationForFood().setDiscountDateStart(item.getStartDate());
+                item.getApplicationForFood().setDiscountDateEnd(item.getEndDate());
+                session.update(item.getApplicationForFood());
                 builder.save(session, clientDTISZNDiscountVersion);
             }
             transaction.commit();

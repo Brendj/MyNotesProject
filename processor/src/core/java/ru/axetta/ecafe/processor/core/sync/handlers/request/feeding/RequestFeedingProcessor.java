@@ -50,7 +50,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                         logger.error(String.format("Client with id=%d not found", item.getIdOfClient()));
                         continue;
                     }
-                    saveOtherDiscount(session, item, client);
+
                     ApplicationForFoodStatus status = new ApplicationForFoodStatus(
                             ApplicationForFoodState.fromCode(item.getStatus()),
                             ApplicationForFoodDeclineReason.fromInteger(item.getDeclineReason()));
@@ -119,6 +119,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                         }
                     }
 
+                    saveOtherDiscount(session, item, client, applicationForFood);
+
                     resItem = new ResRequestFeedingItem(applicationForFood, item.getResCode());
                 } else {
                     resItem = new ResRequestFeedingItem();
@@ -171,7 +173,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
         return result;
     }
 
-    private void saveOtherDiscount(Session session, RequestFeedingItem item, Client client) {
+    private void saveOtherDiscount(Session session, RequestFeedingItem item, Client client, ApplicationForFood applicationForFood) {
         if (null != item.getDtisznCode() && (null == item.getOtherDiscountStartDate() || null == item
                 .getOtherDiscountEndDate()) || null == item.getOtherDiscountStartDate() || null == item
                 .getOtherDiscountEndDate()) {
@@ -198,5 +200,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                 builder.save(session);
             }
         }
+        applicationForFood.setDiscountDateStart(item.getOtherDiscountStartDate());
+        applicationForFood.setDiscountDateEnd(item.getOtherDiscountEndDate());
+        session.update(applicationForFood);
     }
 }
