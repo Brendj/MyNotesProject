@@ -8065,30 +8065,30 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_TYPE);
         }
 
-        if (roleRepresentativePrincipal == null)
-        {
-            return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_CREATOR_TYPE);
-        }
+        //if (roleRepresentativePrincipal == null)
+        //{
+        //    return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_CREATOR_TYPE);
+        //}
 
         //Проверка на возможность создания
-        boolean canAdded = false;
-        Client clientChild = DAOService.getInstance().getClientByContractId(childContractId);
-        if (clientChild == null) {
-            return new Result(RC_INVALID_DATA, RC_CLIENT_NOT_FOUND_DESC);
-        }
-        List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getClientGuardian(clientChild, mobilePhoneCreator);
-        for (ClientGuardian clientGuardian: clientGuardians)
-        {
-            if ((clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1) ||
-                    (clientGuardian.getRepresentType().getCode() == 2 && roleRepresentativePrincipal == 2)) {
-                canAdded = true;
-                break;
+        if (roleRepresentativePrincipal != null) {
+            boolean canAdded = false;
+            Client clientChild = DAOService.getInstance().getClientByContractId(childContractId);
+            if (clientChild == null) {
+                return new Result(RC_INVALID_DATA, RC_CLIENT_NOT_FOUND_DESC);
             }
-        }
-        if (!canAdded)
-        {
-            return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
+            List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getClientGuardian(clientChild, mobilePhoneCreator);
+            for (ClientGuardian clientGuardian : clientGuardians) {
+                if ((clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1) || (
+                        clientGuardian.getRepresentType().getCode() == 2 && roleRepresentativePrincipal == 2)) {
+                    canAdded = true;
+                    break;
+                }
+            }
+            if (!canAdded) {
+                return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
+            }
         }
 
 
