@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.manager;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
@@ -227,6 +228,16 @@ public class Manager implements AbstractToElement {
             elementRO.appendChild(doClassElement);
             if (distributedObjects != null && !distributedObjects.isEmpty()) {
                 for (DistributedObject distributedObject : distributedObjects) {
+                    if (distributedObject.getClass() == GoodRequestPosition.class
+                            && ((GoodRequestPosition) distributedObject).getGood() == null) {
+                        continue;
+                    }
+                    if (distributedObject.getClass() == GoodRequest.class) {
+                        GoodRequestRepository goodRequestRepository = GoodRequestRepository.getInstance();
+                        if (!goodRequestRepository.isGoodRequestForROSection((GoodRequest) distributedObject)) {
+                            continue;
+                        }
+                    }
                     distributedObject.setIdOfSyncOrg(idOfOrg);
                     Element element = document.createElement("O");
                     doClassElement.appendChild(distributedObject.toElement(element));
