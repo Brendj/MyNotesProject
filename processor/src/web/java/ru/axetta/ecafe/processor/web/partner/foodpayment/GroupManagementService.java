@@ -338,9 +338,16 @@ public class GroupManagementService implements IGroupManagementService {
             throw new RequestProcessingException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorMessage());
         Criteria clientGroupManagersCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
-        clientGroupManagersCriteria.add(Res)
-        List<ClientGroupManager> clientGroupManagers = DAOU
-        return null;
+        clientGroupManagersCriteria.add(Restrictions.and(
+                Restrictions.eq("idOfClient",client.getIdOfClient()),
+                Restrictions.eq("deleted", false)
+        ));
+        List<ClientGroupManager> clientGroupsManager = clientGroupManagersCriteria.list();
+        List<GroupNameDTO> managerGroups = new LinkedList<>();
+        for(ClientGroupManager clientGroupManager: clientGroupsManager){
+            managerGroups.add(new GroupNameDTO(clientGroupManager.getClientGroupName()));
+        }
+        return managerGroups;
     }
 
     private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {

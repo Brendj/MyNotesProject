@@ -501,10 +501,11 @@ public class SchoolRestController {
             if(jwtUserDetails.getContractId() == null)
                 throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
-           
+            ResponseManagerGroups responseManagerGroups =
+                    new ResponseManagerGroups(groupManagementService.getManagerGroups(jwtUserDetails.getContractId()));
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return Response.status(HttpURLConnection.HTTP_OK).entity(null).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseManagerGroups).build();
 
         }
         catch (RequestProcessingException e){
