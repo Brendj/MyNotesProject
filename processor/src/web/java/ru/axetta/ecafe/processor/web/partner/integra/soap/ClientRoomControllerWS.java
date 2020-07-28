@@ -10428,7 +10428,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             ApplicationForFood applicationForFood = DAOUtils
-                    .getLastApplicationForFoodByClientGuid(persistenceSession, clientGuid);
+                    .getLastApplicationForFoodByClient(persistenceSession, client);
 
             if (null == applicationForFood) {
                 result.setApplicationExists(Boolean.FALSE);

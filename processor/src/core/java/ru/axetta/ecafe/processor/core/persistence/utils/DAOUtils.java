@@ -4212,10 +4212,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ApplicationForFood getLastApplicationForFoodByClientGuid(Session session, String clientGuid) {
+    public static ApplicationForFood getLastApplicationForFoodByClient(Session session, Client client) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.createAlias("client", "c");
-        criteria.add(Restrictions.eq("c.clientGUID", clientGuid));
+        criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("archived", Boolean.FALSE));
         criteria.addOrder(org.hibernate.criterion.Order.desc("lastUpdate"));
         criteria.setMaxResults(1);
