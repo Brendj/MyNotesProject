@@ -255,7 +255,8 @@ public class ClientTransactionsReportService {
             clientTransactionsReportItem.setOperationType("Отмена");
             clientTransactionsReportItem.setTransactionDescription("Пополнение");
             clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
-            clientTransactionsReportItem.setOrderNumber(DAOUtils.getCancelOrderIdBySource(session, accountTransaction.getSource()));
+            CanceledOrder canceledOrder = DAOUtils.getCancelOrderIdBySource(session, accountTransaction.getSource());
+            clientTransactionsReportItem.setOrderNumber(Long.toString(canceledOrder.getIdOfOrder()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem

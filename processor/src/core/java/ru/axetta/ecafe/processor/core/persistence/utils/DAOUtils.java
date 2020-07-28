@@ -5057,9 +5057,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static String getCancelOrderIdBySource(Session session, String source) {
+    public static CanceledOrder getCancelOrderIdBySource(Session session, String source) {
         Criteria criteria = session.createCriteria(CanceledOrder.class);
-        criteria.add(Restrictions.eq("idOfOrder", Long.parseLong(source)));
-        return (String) criteria.uniqueResult();
+        criteria.add(Restrictions.eq("idOfTransaction", Long.parseLong(source)));
+        return (CanceledOrder) criteria.uniqueResult();
     }
 }
