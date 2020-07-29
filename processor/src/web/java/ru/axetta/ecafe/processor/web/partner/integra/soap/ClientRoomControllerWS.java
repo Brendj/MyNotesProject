@@ -8153,11 +8153,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ClientGuardian clientGuardian = DAOUtils
                     .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
-                Integer relationINT = null;
-                if (relation != null)
-                    relationINT = relation.intValue();
+                String description = null;
+                if (relation != null) {
+                    description = ClientGuardianRelationType.fromInteger(relation.intValue()).getDescription();
+                }
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian, ClientGuardianRelationType.fromInteger(relationINT).getDescription(), false, client.getIdOfClient(),
+                        .createClientGuardianInfoTransactionFree(session, guardian, description, false, client.getIdOfClient(),
                                 ClientCreatedFromType.MPGU, roleRepresentative);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
