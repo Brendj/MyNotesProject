@@ -22,6 +22,6 @@ public interface IGroupManagementService {
     ResponseDiscountGroups processDiscountGroupsList(Long orgId, Long discountId, Boolean status, List<String> groups) throws Exception;
     ClientGroup getClientGroupByOrgIdAndGroupName(Long orgId, String groupName) throws Exception;
     List<Client> getClientsForContractIds(ClientGroup newClientGroup, List<Long> contractIds, boolean strictEditMode) throws Exception;
-    List<Client> getClientsForGroups(ClientGroup newClientGroup, List<Long> oldGroups, boolean strictEditMode) throws Exception;
+    List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups, boolean strictEditMode) throws Exception;
     List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients, String username) throws Exception;
 }

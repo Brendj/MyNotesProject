@@ -17,7 +17,7 @@ public class EditGroupClientsGroupRequest {
     private String newGroupName;
 
     @JsonProperty("OldGroups")
-    private List<Long> oldGroups;
+    private List<String> oldGroups;
 
     @JsonProperty("StrictEditMode")
     private boolean strictEditMode;
@@ -38,11 +38,11 @@ public class EditGroupClientsGroupRequest {
         this.newGroupName = newGroupName;
     }
 
-    public List<Long> getOldGroups() {
+    public List<String> getOldGroups() {
         return oldGroups;
     }
 
-    public void setOldGroups(List<Long> oldGroups) {
+    public void setOldGroups(List<String> oldGroups) {
         this.oldGroups = oldGroups;
     }
 

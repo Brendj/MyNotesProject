@@ -350,9 +350,8 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     @Override
-    public List<Client> getClientsForGroups(ClientGroup newClientGroup, List<Long> oldGroups,
+    public List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups,
             boolean strictEditMode) throws Exception {
-        Disjunction restrictionClientGroup = Restrictions.disjunction();
         Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
         List<Client> clients;
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession,
@@ -362,7 +361,7 @@ public class GroupManagementService implements IGroupManagementService {
         List<Long> orgIds = getOrgIds(friendlyOrgs);
         clientsCriteria.add(Restrictions.and(
                 Restrictions.in("org.idOfOrg", orgIds),
-                Restrictions.in("idOfClientGroup", oldGroups)
+                Restrictions.in("clientGroup.groupName", oldGroups)
         ));
         clients = clientsCriteria.list();
         if(!strictEditMode)
