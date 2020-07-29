@@ -1039,4 +1039,19 @@ public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contr
             return false;
         }
     }
+    public boolean isSixWorkWeekOrgAndGroup(Long orgId, String groupName) {
+        boolean resultByOrg = false; //isSixWorkWeek(orgId);
+        try {
+            List<Boolean> list = entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto "
+                    + "where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupname")
+                    .setParameter("idOfOrg", orgId).setParameter("groupname", groupName)
+                    .getResultList();
+            if (list.contains(Boolean.TRUE))
+                return true;
+            else
+                return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

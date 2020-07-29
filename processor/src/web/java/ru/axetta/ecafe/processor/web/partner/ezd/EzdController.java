@@ -125,7 +125,7 @@ public class EzdController {
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
                 Date startedDate = currentDate;
                 String curGroupName = requestsEzdView.getGroupname();
-                if (curGroupName.equals("8-А")) {
+                if (curGroupName.equals("1-И")) {
                     System.out.println("test");
                 }
                 Long curOrg = requestsEzdView.getIdoforg();
@@ -156,7 +156,7 @@ public class EzdController {
             for (int i = 0; i < massCorrectDates.size(); i++) {
                 List<Date> dates = massCorrectDates.get((long) i);
                 RequestsEzdView requestsEzdView = requestsEzdViews.get(i);
-                if (requestsEzdView.getGroupname().equals("8-А")) {
+                if (requestsEzdView.getGroupname().equals("1-И")) {
                     System.out.println("test");
                 }
                 Date startedDate = CalendarUtils.addOneDay(dates.get(0));
@@ -199,7 +199,7 @@ public class EzdController {
                                 }
                                 if (week == null && CalendarUtils.getDayOfWeek(startedDate) == Calendar.SATURDAY) {
                                     if (DAOReadonlyService.getInstance()
-                                            .isSixWorkWeekOrg(requestsEzdView.getIdoforg())) {
+                                            .isSixWorkWeekOrgAndGroup(requestsEzdView.getIdoforg(), requestsEzdView.getGroupname())) {
                                         dates.add(startedDate);
                                         countMax = countMax - 1;
                                         if (countMax == 0) {
@@ -462,7 +462,7 @@ public class EzdController {
                                 }
                                 if (week == null && CalendarUtils.getDayOfWeek(startedDate) == Calendar.SATURDAY) {
                                     if (DAOReadonlyService.getInstance()
-                                            .isSixWorkWeekOrg(requestsEzdView.getIdoforg())) {
+                                            .isSixWorkWeekOrgAndGroup(requestsEzdView.getIdoforg(), requestsEzdView.getGroupname())) {
                                         dates.add(startedDate);
                                         countMax = countMax - 1;
                                         if (countMax == 0) {
