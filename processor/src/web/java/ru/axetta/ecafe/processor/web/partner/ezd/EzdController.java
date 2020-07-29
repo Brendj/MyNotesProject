@@ -306,7 +306,15 @@ public class EzdController {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "discountcomplexlist")
     public Response getComplexList(@Context HttpServletRequest request) {
-        String type = request.getParameterMap().get("type")[0];
+        String type;
+        try
+        {
+            type = request.getParameterMap().get("type")[0];
+        }
+        catch (Exception e)
+        {
+            type = "full";
+        }
         logger.info("Начало работы сервиса сбора данных для ЭЖД");
         ResponseToEZD responseToEZD = new ResponseToEZD();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
