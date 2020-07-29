@@ -8060,10 +8060,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
 
-        if (roleRepresentative == null)
-        {
-            return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_TYPE);
-        }
+        //if (roleRepresentative == null)
+        //{
+        //    return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_TYPE);
+        //}
 
         //if (roleRepresentativePrincipal == null)
         //{
