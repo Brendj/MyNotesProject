@@ -602,6 +602,7 @@ public class GoodRequestsNewReportService {
         if (hideGeneratePeriod) {
             Disjunction dateDisjunction = Restrictions.disjunction();
             dateDisjunction.add(Restrictions.le("createdDate", generateEndTime));
+            dateDisjunction.add(Restrictions.le("lastUpdate", generateEndTime));
             criteria.add(dateDisjunction);
         }
 

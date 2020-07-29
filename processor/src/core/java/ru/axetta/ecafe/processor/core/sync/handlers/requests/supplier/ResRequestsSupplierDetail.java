@@ -31,7 +31,7 @@ public class ResRequestsSupplierDetail {
         this.idOfComplex = goodRequestPosition.getComplexId() == null ? null : goodRequestPosition.getComplexId().longValue();
         this.idOfDish = goodRequestPosition.getIdOfDish();
         this.fType = RequestsSupplierDetailTypeEnum.fromInteger(goodRequestPosition.getFeedingType());
-        this.totalCount = goodRequestPosition.getTotalCount().intValue();
+        this.totalCount = goodRequestPosition.getTotalCount() == null ? 0 : goodRequestPosition.getTotalCount().intValue();
         this.dProbeCount = goodRequestPosition.getDailySampleCount() == null ? 0 :
                 goodRequestPosition.getDailySampleCount().intValue();
         this.tempClientsCount = goodRequestPosition.getTempClientsCount() == null ? 0 :

@@ -73,9 +73,13 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                         item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
                         item.setErrorMessage("GoodRequest versions conflict");
                     } else {
+                        if (goodRequest != null) {
+                            goodRequest.setLastUpdate(new Date(System.currentTimeMillis()));
+                        }
                         if (goodRequest == null) {
                             goodRequest = item.getGoodRequest();
                             goodRequest.setGlobalVersionOnCreate(nextVersion);
+                            goodRequest.setCreatedDate(new Date(System.currentTimeMillis()));
                         }
 
                         Staff staff = DAOReadonlyService.getInstance().findStaffByGuid(staffGuid);
@@ -88,7 +92,6 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                         goodRequest.setNumber(number);
                         goodRequest.setGlobalVersion(nextVersion);
                         goodRequest.setDeletedState(deletedState);
-                        goodRequest.setCreatedDate(new Date(System.currentTimeMillis()));
                         goodRequest.setDoneDate(doneDate);
                         goodRequest.setDateOfGoodsRequest(dateOfGoodsRequest);
                         goodRequest.setState(DocumentState.FOLLOW);
@@ -115,35 +118,46 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                     errorFound = true;
                                     item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
                                     item.setErrorMessage("GoodRequestPosition versions conflict");
-                                } else if (goodRequestPosition == null) {
-                                    goodRequestPosition = detail.getGoodRequestPosition();
-                                    goodRequestPosition.setGlobalVersionOnCreate(nextPositionVersion);
-                                }
+                                } else {
+                                    if (goodRequestPosition != null) {
+                                        final Long lastTotalCount = goodRequestPosition.getTotalCount();
+                                        final Long lastDailySampleCount = goodRequestPosition.getDailySampleCount();
+                                        final Long lastTempClientsCount = goodRequestPosition.getTempClientsCount();
+                                        goodRequestPosition.setLastTotalCount(lastTotalCount);
+                                        goodRequestPosition.setLastDailySampleCount(lastDailySampleCount);
+                                        goodRequestPosition.setLastTempClientsCount(lastTempClientsCount);
+                                        goodRequestPosition.setLastUpdate(new Date(System.currentTimeMillis()));
+                                        goodRequestPosition.setNotified(false);
+                                    }
+                                    if (goodRequestPosition == null) {
+                                        goodRequestPosition = detail.getGoodRequestPosition();
+                                        goodRequestPosition.setGlobalVersionOnCreate(nextPositionVersion);
+                                        goodRequestPosition.setCreatedDate(new Date(System.currentTimeMillis()));
+                                    }
 
-                                goodRequestPosition.setOrgOwner(idOfOrg);
-                                goodRequestPosition.setGoodRequest(goodRequest);
-                                if (detail.getIdOfComplex() != null) {
-                                    goodRequestPosition.setComplexId(detail.getIdOfComplex().intValue());
-                                }
+                                    goodRequestPosition.setOrgOwner(idOfOrg);
+                                    goodRequestPosition.setGoodRequest(goodRequest);
+                                    if (detail.getIdOfComplex() != null) {
+                                        goodRequestPosition.setComplexId(detail.getIdOfComplex().intValue());
+                                    }
+                                    goodRequestPosition.setIdOfDish(detail.getIdOfDish());
+                                    goodRequestPosition.setFeedingType(detail.getfType().ordinal());
+                                    goodRequestPosition.setNetWeight(0L);
+                                    goodRequestPosition.setUnitsScale(UnitScale.UNITS);
+                                    goodRequestPosition.setTotalCount(detail.getTotalCount().longValue());
+                                    if (detail.getdProbeCount() != null) {
+                                        goodRequestPosition.setLastDailySampleCount(detail.getdProbeCount().longValue());
+                                    }
+                                    if (detail.getTempClientsCount() != null) {
+                                        goodRequestPosition.setTempClientsCount(detail.getTempClientsCount().longValue());
+                                    }
+                                    goodRequestPosition.setGlobalVersion(nextPositionVersion);
+                                    goodRequestPosition.setDeletedState(detail.getDeletedState());
 
-                                goodRequestPosition.setIdOfDish(detail.getIdOfDish());
-                                goodRequestPosition.setFeedingType(detail.getfType().ordinal());
-                                goodRequestPosition.setNetWeight(0L);
-                                goodRequestPosition.setUnitsScale(UnitScale.UNITS);
-                                goodRequestPosition.setCreatedDate(new Date(System.currentTimeMillis()));
-                                goodRequestPosition.setTotalCount(detail.getTotalCount().longValue());
-                                if (detail.getdProbeCount() != null) {
-                                    goodRequestPosition.setLastDailySampleCount(detail.getdProbeCount().longValue());
-                                }
-                                if (detail.getTempClientsCount() != null) {
-                                    goodRequestPosition.setTempClientsCount(detail.getTempClientsCount().longValue());
-                                }
-                                goodRequestPosition.setGlobalVersion(nextPositionVersion);
-                                goodRequestPosition.setDeletedState(detail.getDeletedState());
+                                    session.saveOrUpdate(goodRequestPosition);
 
-                                session.saveOrUpdate(goodRequestPosition);
-
-                                listForNotifications.add(goodRequestPosition);
+                                    listForNotifications.add(goodRequestPosition);
+                                }
                             }
                         }
                         resItem = new ResRequestsSupplierItem(goodRequest.getGuid(), goodRequest.getGlobalVersion());
