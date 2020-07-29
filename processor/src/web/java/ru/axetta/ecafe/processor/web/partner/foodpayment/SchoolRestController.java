@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -424,6 +426,101 @@ public class SchoolRestController {
             responseDiscounts.setErrorCode(0);
             responseDiscounts.setErrorMessage("Ok");
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: %s", e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "editclientsgroup")
+    public Response editClientsGroup(EditClientsGroupRequest editClientsGroupRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            if(!groupManagementService.isFriendlyOrg(editClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
+            ClientGroup clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(editClientsGroupRequest.getNewOrgId(),
+                    editClientsGroupRequest.getNewGroupName());
+            List<Client> clients = groupManagementService.getClientsForContractIds(clientGroup,
+                    editClientsGroupRequest.getContractIds(), editClientsGroupRequest.isStrictEditMode());
+            ResponseEditClientsGroup responseEditClientsGroup = new ResponseEditClientsGroup();
+            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroup,clients, jwtUserDetails.getUsername()));
+            responseEditClientsGroup.setErrorCode(0);
+            responseEditClientsGroup.setErrorMessage("OK");
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEditClientsGroup).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: %s", e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "editgroupclientsgroup")
+    public Response editGroupClientsGroup(EditGroupClientsGroupRequest editGroupClientsGroupRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            if(!groupManagementService.isFriendlyOrg(editGroupClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
+            ClientGroup clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(editGroupClientsGroupRequest.getNewOrgId(),
+                    editGroupClientsGroupRequest.getNewGroupName());
+            List<Client> clients = groupManagementService.getClientsForGroups(clientGroup,
+                    editGroupClientsGroupRequest.getOldGroups(), editGroupClientsGroupRequest.isStrictEditMode());
+            ResponseEditClientsGroup responseEditClientsGroup = new ResponseEditClientsGroup();
+            responseEditClientsGroup.setGroups(groupManagementService.moveClientsInGroup(clientGroup,clients, jwtUserDetails.getUsername()));
+            responseEditClientsGroup.setErrorCode(0);
+            responseEditClientsGroup.setErrorMessage("OK");
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEditClientsGroup).build();
 
         }
         catch (RequestProcessingException e){
