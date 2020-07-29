@@ -2911,11 +2911,11 @@ public class DAOService {
         return q.executeUpdate() > 0;
     }
 
-
-    public List<Long> getGroupByOrgForWEBARM(Long idOforg) throws Exception {
+    //Список союзов организаций, кужа входит данная организация
+    public List<Long> getOrgGroupsbyOrgForWEBARM(Long idOforg) throws Exception {
         Session session = (Session) entityManager.getDelegate();
-        org.hibernate.Query q = session.createSQLQuery(" select idoforggroup from cf_wt_org_group_relations where idoforg = "
-                + idOforg);
+        org.hibernate.Query q = session.createSQLQuery(" select idoforggroup from cf_wt_org_group_relations "
+                + "  where idoforg = " + idOforg);
         List<BigInteger> list = (List<BigInteger>) q.list();
         List<Long> result = new ArrayList<>();
         for (BigInteger value: list)
@@ -2945,7 +2945,7 @@ public class DAOService {
             groupString = groupString + "'" + groupid.toString() + "',";
         }
         groupString = groupString.substring(0,groupString.length()-1);
-        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate from cf_wt_complexes "
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate, idofagegroupitem from cf_wt_complexes "
                         + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idoforggroup in (" + groupString + ")");
         return q.list();
     }
@@ -2958,7 +2958,7 @@ public class DAOService {
             idOfComplexString = idOfComplexString + "'" + idOfComplex.toString() + "',";
         }
         idOfComplexString = idOfComplexString.substring(0,idOfComplexString.length()-1);
-        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate from cf_wt_complexes "
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate, idofagegroupitem from cf_wt_complexes "
                 + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idofcomplex in (" + idOfComplexString + ")");
         return q.list();
     }

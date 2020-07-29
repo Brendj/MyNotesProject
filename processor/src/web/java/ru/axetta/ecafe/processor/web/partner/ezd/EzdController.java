@@ -23,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
@@ -236,10 +238,8 @@ public class EzdController {
                 testRez1.setIdOforg(requestsEzdView.getIdoforg());
                 List<Date> detre = massCorrectDates.get((long) counter2);
                 List<String> datesStr = new ArrayList<>();
-                for (Date date1:detre)
-                {
-                    datesStr.add(new SimpleDateFormat("dd.MM.yyyy")
-                            .format(date1));
+                for (Date date1 : detre) {
+                    datesStr.add(new SimpleDateFormat("dd.MM.yyyy").format(date1));
                 }
                 testRez1.setDates(datesStr);
                 counter2++;
@@ -247,13 +247,13 @@ public class EzdController {
             }
             return rezList;
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return new ArrayList<>();
         }
     }
-    private class testRez
-    {
+
+    private class testRez {
+
         private String curGroupName;
         private Long ekisid;
         private String guid;
@@ -305,7 +305,8 @@ public class EzdController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "discountcomplexlist")
-    public Response getComplexList() {
+    public Response getComplexList(@Context HttpServletRequest request) {
+        String type = request.getParameterMap().get("type")[0];
         logger.info("Начало работы сервиса сбора данных для ЭЖД");
         ResponseToEZD responseToEZD = new ResponseToEZD();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -492,6 +493,7 @@ public class EzdController {
             Integer counter1 = 0;
             List<RequestsEzdMenuView> menuforCurrentOrg = new ArrayList<>();
             Long idCurrentOrg = null;
+            Long nameCurrentGroup = null;
             boolean goodComplex;
             Integer clas;
             //Здесь хранятся последние сформированные данные по guid, group и дата для ответа в ЭЖД
@@ -511,7 +513,7 @@ public class EzdController {
                 Long idOforg = requestsEzdView.getIdoforg();
                 List<Date> dates = massCorrectDates.get((long) counter1);
                 counter1++;
-                if (!requestsEzdView.getUsewebarm()) {
+                if (!requestsEzdView.getUsewebarm() && (type.equals("full") || type.equals("noWebArm"))) {
                     //Заполняем список меню для текущей организации
                     if (menuforCurrentOrg.isEmpty() || (idCurrentOrg != null && !idCurrentOrg
                             .equals(requestsEzdView.getIdoforg()))) {
@@ -592,40 +594,74 @@ public class EzdController {
                             }
                         }
                     }
-                }
-                else
-                {
-                    //Часть по web-арм
-                    if (idCurrentOrg == null || !idCurrentOrg.equals(idOforg)) {
-                        idCurrentOrg = idOforg;
-                        complexes = null;
-                        List<Long> groups = DAOService.getInstance().getGroupByOrgForWEBARM(idOforg);
-                        if (groups.isEmpty()) {
-                            //7.2
-                            List<Long> complexesTemp = DAOService.getInstance().getComplexesByOrgForWEBARM(idOforg);
-                            if (!complexesTemp.isEmpty()) {
-                                //7.4
-                                complexes = DAOService.getInstance().getComplexesByComplexForWEBARM(complexesTemp);
+                } else {
+                    if ((type.equals("full") || type.equals("WebArm"))) {
+                        //Часть по web-арм
+                        if (idCurrentOrg == null || !idCurrentOrg.equals(idOforg)) {
+                            idCurrentOrg = idOforg;
+                            complexes = null;
+                            List<Long> groupsOrgs = DAOService.getInstance().getOrgGroupsbyOrgForWEBARM(idOforg);
+                            if (groupsOrgs.isEmpty()) {
+                                //7.2
+                                List<Long> complexesTemp = DAOService.getInstance().getComplexesByOrgForWEBARM(idOforg);
+                                if (!complexesTemp.isEmpty()) {
+                                    //7.4
+                                    complexes = DAOService.getInstance().getComplexesByComplexForWEBARM(complexesTemp);
+                                }
+                            } else {
+                                //7.3
+                                complexes = DAOService.getInstance().getComplexesByGroupForWEBARM(groupsOrgs);
                             }
-                        } else {
-                            //7.3
-                            complexes = DAOService.getInstance().getComplexesByGroupForWEBARM(groups);
                         }
-                    }
 
-                    if (complexes != null)
-                    {
-                        for (Object complex : complexes) {
-                            //7.5
-                            Object[] obj = (Object[]) complex;
-                            Long idComplex = ((BigInteger)(obj[0])).longValue();
-                            String complexName = (String) (obj[1]);
-                            Date startDate = (Date) (obj[2]);
-                            Date endDate = (Date) (obj[3]);
-                            for (Date date1: dates)
-                            {
-                                if (date1.getTime() > startDate.getTime() && date1.getTime() < endDate.getTime())
-                                {
+                        if (complexes != null) {
+                            Map<Date, List<Object[]>> conteiner = new TreeMap<>();
+                            for (Object complex : complexes) {
+                                //7.5
+                                Object[] obj = (Object[]) complex;
+                                Date startDate = (Date) (obj[2]);
+                                Date endDate = (Date) (obj[3]);
+                                Long idofagegroupitem = ((BigInteger) (obj[4])).longValue();
+                                for (Date date1 : dates) {
+                                    if (date1.getTime() > startDate.getTime() && date1.getTime() < endDate.getTime()) {
+                                        goodComplex = false;
+                                        try {
+                                            clas = extractDigits(curGroupName);
+                                        } catch (NumberFormatException e) //т.е. в названии группы нет чисел
+                                        {
+                                            clas = 0;
+                                        }
+                                        if (clas > 0 && clas < 5)//1-4
+                                        {
+                                            if (idofagegroupitem == 3 || idofagegroupitem == 7) {
+                                                goodComplex = true;
+                                            }
+
+                                        } else {
+                                            if (clas > 4 && clas < 12)//5-11
+                                            {
+                                                if (idofagegroupitem == 4 || idofagegroupitem == 7) {
+                                                    goodComplex = true;
+                                                }
+                                            }
+                                        }
+                                        if (goodComplex) {
+                                            List<Object[]> objects = conteiner.get(date1);
+                                            if (objects == null) {
+                                                objects = new ArrayList<>();
+                                            }
+                                            objects.add(obj);
+                                            conteiner.put(date1, objects);
+                                        }
+                                    }
+                                }
+                            }
+                            for (Map.Entry<Date, List<Object[]>> entry : conteiner.entrySet()) {
+                                Date date1 = entry.getKey();
+                                List<Object[]> complexs = entry.getValue();
+                                for (Object[] obj : complexs) {
+                                    Long idComplex = ((BigInteger) (obj[0])).longValue();
+                                    String complexName = (String) (obj[1]);
                                     //Заполняем ответ
                                     //Если организация с такой guid не встречалась раньше, то создаем
                                     if (orgGuidResponse == null || !orgGuidResponse.equals(guid)) {
@@ -651,8 +687,7 @@ public class EzdController {
                                     //Достаем дни
                                     if (currentDatesResponse == null || !currentDatesResponse.equals(curDatesString)) {
                                         discountComplexItem = new DiscountComplexItem();
-                                        discountComplexItem.setDate(new SimpleDateFormat("dd.MM.yyyy")
-                                                .format(date1));
+                                        discountComplexItem.setDate(new SimpleDateFormat("dd.MM.yyyy").format(date1));
                                         discountComplexGroup.getDays().add(discountComplexItem);
                                         currentDatesResponse = curDatesString;
                                     }
