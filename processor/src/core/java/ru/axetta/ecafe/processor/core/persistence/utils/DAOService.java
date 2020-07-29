@@ -14,10 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contrac
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -1755,9 +1752,9 @@ public class DAOService {
         return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
     }
 
-    public List getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
-        Query query = entityManager.createQuery("select distinct createDate, type from " + className
-                + " where idOfOrg=:idOfOrg order by createDate desc");
+    public List<Object[]> getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
+        Query query = entityManager.createQuery(
+                "select distinct createDate, type from " + className + " where idOfOrg=:idOfOrg order by createDate desc");
         query.setParameter("idOfOrg", idOfOrg);
         return query.getResultList();
     }
@@ -2920,7 +2917,7 @@ public class DAOService {
         return q.executeUpdate() > 0;
     }
 
-    public List<Contragent> contragentsListByUser(Long idOfUser) {
+	public List<Contragent> contragentsListByUser(Long idOfUser) {
         Query q = entityManager.createQuery("select c from User u inner join u.contragents c"
                 + " where u.idOfUser = :idOfUser order by c.contragentName");
 
@@ -2939,4 +2936,68 @@ public class DAOService {
             return null;
         }
     }
+
+    public WtDish getWtDishById(Long idOfDish) {
+        Query query = entityManager.createQuery("SELECT dish FROM WtDish dish "
+                + "where dish.idOfDish = :idOfDish");
+        query.setParameter("idOfDish", idOfDish);
+        try {
+            return (WtDish) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+	public List<Long> getGroupByOrgForWEBARM(Long idOforg) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(" select idoforggroup from cf_wt_org_group_relations where idoforg = "
+                + idOforg);
+        List<BigInteger> list = (List<BigInteger>) q.list();
+        List<Long> result = new ArrayList<>();
+        for (BigInteger value: list)
+        {
+            result.add(value.longValue());
+        }
+        return result;
+    }
+
+    public List<Long> getComplexesByOrgForWEBARM(Long idOforg) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(" select idofcomplex from cf_wt_complexes_org where idoforg = "
+                + idOforg);
+        List<BigInteger> list = (List<BigInteger>) q.list();
+        List<Long> result = new ArrayList<>();
+        for (BigInteger value: list)
+        {
+            result.add(value.longValue());
+        }
+        return result;
+    }
+    public List getComplexesByGroupForWEBARM(List<Long> idOfgroups) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        String groupString = "";
+        for (Long groupid: idOfgroups)
+        {
+            groupString = groupString + "'" + groupid.toString() + "',";
+        }
+        groupString = groupString.substring(0,groupString.length()-1);
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate from cf_wt_complexes "
+                        + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idoforggroup in (" + groupString + ")");
+        return q.list();
+    }
+
+    public List getComplexesByComplexForWEBARM(List<Long> idOfComplexes) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        String idOfComplexString = "";
+        for (Long idOfComplex: idOfComplexes)
+        {
+            idOfComplexString = idOfComplexString + "'" + idOfComplex.toString() + "',";
+        }
+        idOfComplexString = idOfComplexString.substring(0,idOfComplexString.length()-1);
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate from cf_wt_complexes "
+                + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idofcomplex in (" + idOfComplexString + ")");
+        return q.list();
+    }
+
 }

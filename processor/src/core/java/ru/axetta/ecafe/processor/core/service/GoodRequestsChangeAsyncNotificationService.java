@@ -81,7 +81,7 @@ public class GoodRequestsChangeAsyncNotificationService {
 
     @Async
     public void notifyOrg(final Long idOfOrg, final Date beginGenerateTime, final Date endGenerateTime,
-            final Date lastCreateOrUpdateDate, List<String> guids) {
+            final Date lastCreateOrUpdateDate, List<String> guids, boolean isROSection) {
         if (!enableNotify) {
             return;
         }
@@ -254,7 +254,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                             persistenceSession = runtimeContext.createPersistenceSession();
                             persistenceTransaction = persistenceSession.beginTransaction();
                             reportJob = builder
-                                    .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar);
+                                    .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar, isROSection);
                             //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                             persistenceTransaction.commit();
                             persistenceTransaction = null;
@@ -347,6 +347,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                             }
                         }
                         //eventNotificationService.sendEmailAsync("ziganshin@axetta.ru",
+                        //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                        //eventNotificationService.sendEmailAsync("petrova@axetta.ru",
                         //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                     } else {
                         LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");

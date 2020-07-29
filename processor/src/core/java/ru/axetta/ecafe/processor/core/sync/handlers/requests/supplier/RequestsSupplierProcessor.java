@@ -75,6 +75,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                     } else {
                         if (goodRequest == null) {
                             goodRequest = item.getGoodRequest();
+                            goodRequest.setGlobalVersionOnCreate(nextVersion);
                         }
 
                         Staff staff = DAOReadonlyService.getInstance().findStaffByGuid(staffGuid);
@@ -116,6 +117,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                     item.setErrorMessage("GoodRequestPosition versions conflict");
                                 } else if (goodRequestPosition == null) {
                                     goodRequestPosition = detail.getGoodRequestPosition();
+                                    goodRequestPosition.setGlobalVersionOnCreate(nextPositionVersion);
                                 }
 
                                 goodRequestPosition.setOrgOwner(idOfOrg);
@@ -127,7 +129,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                 goodRequestPosition.setIdOfDish(detail.getIdOfDish());
                                 goodRequestPosition.setFeedingType(detail.getfType().ordinal());
                                 goodRequestPosition.setNetWeight(0L);
-                                goodRequestPosition.setUnitsScale(UnitScale.GRAMS);
+                                goodRequestPosition.setUnitsScale(UnitScale.UNITS);
                                 goodRequestPosition.setCreatedDate(new Date(System.currentTimeMillis()));
                                 goodRequestPosition.setTotalCount(detail.getTotalCount().longValue());
                                 if (detail.getdProbeCount() != null) {
@@ -188,7 +190,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                 .getInstance();
         for (Long orgOwner : mapPositions.keySet()) {
             List<String> guids = mapPositions.get(orgOwner);
-            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids);
+            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids, false);
         }
     }
 
