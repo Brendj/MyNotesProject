@@ -8080,8 +8080,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getClientGuardian(clientChild, mobilePhoneCreator);
             for (ClientGuardian clientGuardian : clientGuardians) {
-                if ((clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1) || (
-                        clientGuardian.getRepresentType().getCode() == 2 && roleRepresentativePrincipal == 2)) {
+                if ((clientGuardian.getRepresentType().getCode() == 0 && roleRepresentativePrincipal == 0) || (
+                        clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1)) {
                     canAdded = true;
                     break;
                 }
@@ -8091,6 +8091,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         }
 
+        //Конвертер
+        roleRepresentative += 1;
+        if (roleRepresentative == 3)
+            roleRepresentative = 0;
 
         Result result = new Result();
         Session session = null;
