@@ -9,6 +9,9 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
@@ -1125,6 +1128,36 @@ public class DAOReadonlyService {
             return (Boolean) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    public GoodRequest findGoodRequestByGuid(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT gr from GoodRequest gr where gr.guid = :guid");
+            query.setParameter("guid", guid);
+            return (GoodRequest) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Staff findStaffByGuid(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT s from Staff s where s.guid = :guid");
+            query.setParameter("guid", guid);
+            return (Staff) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public GoodRequestPosition findGoodRequestPositionByGuid(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT grp from GoodRequestPosition grp where grp.guid = :guid");
+            query.setParameter("guid", guid);
+            return (GoodRequestPosition) query.getSingleResult();
+        } catch (Exception e) {
             return null;
         }
     }

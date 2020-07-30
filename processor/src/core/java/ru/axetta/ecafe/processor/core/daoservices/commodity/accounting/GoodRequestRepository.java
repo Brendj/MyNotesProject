@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
@@ -11,7 +12,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -24,7 +24,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,8 +42,23 @@ public class GoodRequestRepository {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
+    public static GoodRequestRepository getInstance() {
+        return RuntimeContext.getAppContext().getBean(GoodRequestRepository.class);
+    }
+
     public void extractEmail(){
 
+    }
+
+    public boolean isGoodRequestForROSection(GoodRequest goodRequest) throws Exception {
+        String sql = "select grp from GoodRequestPosition grp where grp.goodRequest = :goodRequest and grp.good is null";
+        TypedQuery<GoodRequestPosition> query = entityManager.createQuery(sql, GoodRequestPosition.class);
+        query.setParameter("goodRequest", goodRequest);
+        List<GoodRequestPosition> res = query.getResultList();
+        if (res != null && res.size() > 0) {
+            return false;
+        }
+        return true;
     }
 
     public Map<Long, Long> extractOrgOwnerAndVersion(){
