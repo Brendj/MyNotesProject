@@ -146,7 +146,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                     goodRequestPosition.setUnitsScale(UnitScale.UNITS);
                                     goodRequestPosition.setTotalCount(detail.getTotalCount().longValue());
                                     if (detail.getdProbeCount() != null) {
-                                        goodRequestPosition.setLastDailySampleCount(detail.getdProbeCount().longValue());
+                                        goodRequestPosition.setDailySampleCount(detail.getdProbeCount().longValue());
                                     }
                                     if (detail.getTempClientsCount() != null) {
                                         goodRequestPosition.setTempClientsCount(detail.getTempClientsCount().longValue());
