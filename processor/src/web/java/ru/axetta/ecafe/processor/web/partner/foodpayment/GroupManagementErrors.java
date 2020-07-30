@@ -14,7 +14,8 @@ public enum GroupManagementErrors {
     GROUPS_NOT_FOUND(107, "Группы не найдены"),
     GROUP_IS_EXISTS(108, "Данная группа уже есть в организации"),
     DISCOUNT_NOT_FOUND(109, "Льгота не найдена"),
-    DISCOUNT_NOT_MODIFY(110, "По данной льготе запрещены изменения");
+    DISCOUNT_NOT_MODIFY(110, "По данной льготе запрещены изменения"),
+    VALIDATION_ERROR(111, "Ошибка валидации запроса");
 
     private int errorCode;
     private String errorMessage;

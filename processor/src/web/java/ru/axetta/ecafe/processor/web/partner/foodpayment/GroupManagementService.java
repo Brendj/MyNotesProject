@@ -19,9 +19,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.*;
 
 public class GroupManagementService implements IGroupManagementService {
@@ -411,6 +408,36 @@ public class GroupManagementService implements IGroupManagementService {
             editClientsGroupsGroupDTOList.add(editClientsGroupsGroupDTO);
         }
         return editClientsGroupsGroupDTOList;
+    }
+
+    @Override
+    public void createClient(ClientGroup clientGroup, Client client) throws Exception {
+        Client iacClient = DAOUtils.findClientByIacregid(persistanceSession, client.getIacRegId());
+        Org clientGroupOrg = DAOUtils.findOrg(persistanceSession, clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
+        if(client.getIacRegId() == null || client.getIacRegId().trim().isEmpty() || iacClient == null){
+            client.setOrg(clientGroupOrg);
+            client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            client.setClientGroup(clientGroup);
+            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
+            persistanceSession.save(client);
+            return;
+        }
+        else {
+            iacClient.setOrg(clientGroupOrg);
+            iacClient.setClientGroup(clientGroup);
+            iacClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            iacClient.getPerson().setSurname(client.getPerson().getSurname());
+            iacClient.getPerson().setFirstName(client.getPerson().getFirstName());
+            iacClient.getPerson().setSecondName(client.getPerson().getSecondName());
+            iacClient.setGender(client.getGender());
+            iacClient.setBirthDate(client.getBirthDate());
+            iacClient.setMobile(client.getMobile());
+            iacClient.setPassportSeries(client.getPassportSeries());
+            iacClient.setPassportNumber(client.getPassportNumber());
+            iacClient.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
+            persistanceSession.update(iacClient);
+            return;
+        }
     }
 
     private HashMap<Long, List<Client>> getClientsGroupByClientGroup(List<Client> clients){

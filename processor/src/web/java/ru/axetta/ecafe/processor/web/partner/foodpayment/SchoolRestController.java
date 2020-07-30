@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.*;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
@@ -20,6 +21,7 @@ import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.jboss.resteasy.spi.validation.ValidateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -134,7 +136,7 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             if(!groupManagementService.isFriendlyOrg(createGroupData.getOrgId(), jwtUserDetails.getIdOfOrg().longValue()))
                 throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
@@ -176,7 +178,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             ResponseGroups responseGroups = new ResponseGroups();
             groupManagementService = new GroupManagementService(persistenceSession);
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             List<GroupInfo> groupInfoList = groupManagementService.getOrgGroups(jwtUserDetails.getIdOfOrg());
             persistenceSession.flush();
@@ -216,7 +218,7 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             ResponseEmployees responseEmployees = new ResponseEmployees();
             List<GroupEmployee> groupEmployeeList = groupManagementService.getEmployees(jwtUserDetails.getIdOfOrg());
@@ -256,7 +258,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             if(!groupManagementService.isFriendlyOrg(editEmployeeData.getOrgId(), jwtUserDetails.getIdOfOrg().longValue()))
                 throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
@@ -297,7 +299,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             //Проверка на доступ определенной роли
             ResponseClients responseClients = groupManagementService.getClientsList(clientsListRequest.getGroupsList(),
@@ -336,7 +338,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             ResponseDiscounts responseDiscounts = groupManagementService.getDiscountsList(jwtUserDetails.getIdOfOrg());
             persistenceTransaction.commit();
@@ -373,7 +375,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             //Проверка на доступ определенной роли
             ResponseDiscountClients responseDiscounts = groupManagementService
@@ -414,7 +416,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             //Проверка на доступ определенной роли
             ResponseDiscountGroups responseDiscounts = groupManagementService
@@ -456,7 +458,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             if(!groupManagementService.isFriendlyOrg(editClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
                 throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
@@ -503,7 +505,7 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            checkPermission(authentication, groupManagementService, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             //Проверка на доступ определенной роли
             if(!groupManagementService.isFriendlyOrg(editGroupClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
@@ -574,8 +576,55 @@ public class SchoolRestController {
         }
     }
 
-    private void checkPermission(Authentication authentication,
-            IGroupManagementService groupManagementService, Integer idOfGroup) throws Exception {
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ValidateRequest
+    @Path(value = "createclient")
+    public Response createClient(CreateClientRequestDTO createClientRequestDTO) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            createClientRequestDTO.validateRequest();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification().intValue());
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            ClientGroup clientGroup;
+            try {
+                clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(jwtUserDetails.getIdOfOrg(),
+                        createClientRequestDTO.getGroupName());
+            }
+            catch (RequestProcessingException ex){
+                logger.info(String.format("Client group %s with org id %d not found. Create client group.", createClientRequestDTO.getGroupName(), jwtUserDetails.getIdOfOrg()));
+                clientGroup = DAOUtils.createClientGroup(persistenceSession, jwtUserDetails.getIdOfOrg(),
+                        createClientRequestDTO.getGroupName());
+            }
+            groupManagementService.createClient(clientGroup, CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO));
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(100, "OK")).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: %s", e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void checkPermission(Authentication authentication, Integer idOfGroup) throws Exception {
         checkAuthentication(authentication);
         Integer userIdOfGroup = ((JwtUserDetailsImpl) authentication.getPrincipal()).getIdOfRole();
         if(userIdOfGroup == null || idOfGroup == null)
