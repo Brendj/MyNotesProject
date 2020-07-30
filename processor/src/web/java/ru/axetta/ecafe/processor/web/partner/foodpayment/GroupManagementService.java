@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -419,6 +420,8 @@ public class GroupManagementService implements IGroupManagementService {
             client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             client.setClientGroup(clientGroup);
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
+            long contractId = RuntimeContext.getInstance().getClientContractIdGenerator().generate(client.getOrg().getIdOfOrg());
+            client.setContractId(contractId);
             persistanceSession.save(client);
             return;
         }
