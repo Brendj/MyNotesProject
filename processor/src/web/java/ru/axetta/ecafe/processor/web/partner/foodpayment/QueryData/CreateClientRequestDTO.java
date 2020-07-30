@@ -128,7 +128,7 @@ public class CreateClientRequestDTO {
         String errorMessage = "Поля GroupName, Surname, Name, Gender обязательные для заполнения.";
         if(isEmpty(this.groupName) || isEmpty(this.surname) || isEmpty(this.name) || this.gender == null )
             throw new RequestProcessingException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(), errorMessage);
-        if(this.gender.intValue() != 0 || this.gender.intValue() != 1)
+        if(this.gender.intValue() != 0 && this.gender.intValue() != 1)
             throw new RequestProcessingException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(),
                     "Значение поля Gender должно быть 0 или 1.");
     }
@@ -136,7 +136,8 @@ public class CreateClientRequestDTO {
     public static Client convertRequestToClient(CreateClientRequestDTO createClientRequestDTO) throws Exception{
         Person clientPerson = new Person(createClientRequestDTO.getName(), createClientRequestDTO.getSurname(),
                 createClientRequestDTO.getMiddlename());
-        Client client = new Client(null, clientPerson, null, 0,false,false,
+        Person contractPerson = new Person("","","");
+        Client client = new Client(null, clientPerson, contractPerson, 0,false,false,
                 false,0,null, 0, "",
                 0,0,0,0 );
         client.setIacRegId(createClientRequestDTO.getIacRegId());
@@ -145,6 +146,7 @@ public class CreateClientRequestDTO {
         client.setMobile(createClientRequestDTO.getMobile());
         client.setPassportSeries(createClientRequestDTO.getPassportSeries());
         client.setPassportNumber(createClientRequestDTO.getPassportNumber());
+        client.setAddress("");
         return client;
     }
 

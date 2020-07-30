@@ -416,12 +416,15 @@ public class GroupManagementService implements IGroupManagementService {
         Client iacClient = DAOUtils.findClientByIacregid(persistanceSession, client.getIacRegId());
         Org clientGroupOrg = DAOUtils.findOrg(persistanceSession, clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
         if(client.getIacRegId() == null || client.getIacRegId().trim().isEmpty() || iacClient == null){
+            persistanceSession.save(client.getPerson());
+            persistanceSession.save(client.getContractPerson());
             client.setOrg(clientGroupOrg);
             client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             client.setClientGroup(clientGroup);
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
             long contractId = RuntimeContext.getInstance().getClientContractIdGenerator().generate(client.getOrg().getIdOfOrg());
             client.setContractId(contractId);
+            client.setContractTime(new Date());
             persistanceSession.save(client);
             return;
         }
@@ -429,15 +432,17 @@ public class GroupManagementService implements IGroupManagementService {
             iacClient.setOrg(clientGroupOrg);
             iacClient.setClientGroup(clientGroup);
             iacClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            iacClient.getPerson().setSurname(client.getPerson().getSurname());
-            iacClient.getPerson().setFirstName(client.getPerson().getFirstName());
-            iacClient.getPerson().setSecondName(client.getPerson().getSecondName());
+            Person clientPerson = iacClient.getPerson();
+            clientPerson.setFirstName(client.getPerson().getFirstName());
+            clientPerson.setSurname(client.getPerson().getSurname());
+            clientPerson.setSecondName(client.getPerson().getSecondName());
             iacClient.setGender(client.getGender());
             iacClient.setBirthDate(client.getBirthDate());
             iacClient.setMobile(client.getMobile());
             iacClient.setPassportSeries(client.getPassportSeries());
             iacClient.setPassportNumber(client.getPassportNumber());
             iacClient.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
+            persistanceSession.update(clientPerson);
             persistanceSession.update(iacClient);
             return;
         }
