@@ -249,53 +249,24 @@ public class MaintenanceService {
                 complexInfoCount, complexInfoDetailCount, menuExchangeDeletedCount);
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public int[] cleanMenuInformationInternal(Long idOfMenu) {
         int[] res = new int[5];
-        //Session session = entityManager.unwrap(Session.class);
-
         Query qMenuDetailsDelete = entityManager
                 .createNativeQuery("SELECT idOfMenuDetail FROM CF_MenuDetails cmd WHERE cmd.idOfMenu = :idOfMenu");
         qMenuDetailsDelete.setParameter("idOfMenu", idOfMenu);
 
         List menuDetailsForDeleteMass = qMenuDetailsDelete.getResultList();
         if (menuDetailsForDeleteMass != null && !menuDetailsForDeleteMass.isEmpty()) {
-
-            String menuDetailsForDelete = "";
-            for (Object val : menuDetailsForDeleteMass) {
-                menuDetailsForDelete = menuDetailsForDelete + "'" + val.toString() + "',";
-            }
-            menuDetailsForDelete = menuDetailsForDelete.substring(0, menuDetailsForDelete.length() - 1);
-
-
-            Query qComplexInfo = entityManager.createNativeQuery(
-                    "DELETE FROM CF_ComplexInfoDetail cid WHERE cid.idOfMenuDetail = (:menuDetailsForDelete)");
-            qComplexInfo.setParameter("menuDetailsForDelete", menuDetailsForDelete);
-            res[0] = qComplexInfo.executeUpdate();
-
-            Query qComplex = entityManager.createNativeQuery(
-                    "DELETE FROM CF_ComplexInfo cc WHERE cc.idOfMenuDetail IN (:menuDetailsForDelete)");
-            qComplex.setParameter("menuDetailsForDelete", menuDetailsForDelete);
-            res[1] = qComplex.executeUpdate();
-
-            //org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("update GoodBasicBasketPrice set idofmenudetail = null where idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
-            Query qGoodBasicBasketPrice = entityManager.createNativeQuery(
-                    "DELETE FROM Cf_Good_Basic_Basket_Price cg WHERE cg.idofmenudetail IN (:menuDetailsForDelete)");
-            qGoodBasicBasketPrice.setParameter("menuDetailsForDelete", menuDetailsForDelete);
-            res[2] = qGoodBasicBasketPrice.executeUpdate();
+            res[0] = getProxy().cleanComplexInfoDetail(menuDetailsForDeleteMass);
+            res[1] = getProxy().cleanComplexInfo(menuDetailsForDeleteMass);
+            res[2] = getProxy().cleanGoodBasicBasket(menuDetailsForDeleteMass);
         } else {
             res[0] = 0;
             res[1] = 0;
             res[2] = 0;
         }
-
-        Query qMenuDetail = entityManager.createNativeQuery("DELETE FROM CF_MenuDetails WHERE idOfMenu = :idOfMenu");
-        qMenuDetail.setParameter("idOfMenu", idOfMenu);
-        res[3] = qMenuDetail.executeUpdate();
-
-        Query qMenu = entityManager.createNativeQuery("DELETE FROM CF_Menu WHERE idOfMenu = :idOfMenu");
-        qMenu.setParameter("idOfMenu", idOfMenu);
-        res[4] = qMenu.executeUpdate();
+        res[3] = getProxy().cleanMenuDetail(idOfMenu);
+        res[4] = getProxy().cleanMenu(idOfMenu);
 
         return res;
     }
@@ -306,5 +277,43 @@ public class MaintenanceService {
                 + " AND me.MenuDate < :date AND me.menuDate <> :nullDate");
         query.setParameter("idOfOrg", idOfOrg).setParameter("date", timeToClean).setParameter("nullDate", 0);
         return query.executeUpdate();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public int cleanComplexInfoDetail(List menuDetailsForDelete) {
+        Query qComplexInfo = entityManager.createNativeQuery(
+                "DELETE FROM CF_ComplexInfoDetail cid WHERE cid.idOfMenuDetail IN (:menuDetailsForDelete)");
+        qComplexInfo.setParameter("menuDetailsForDelete", menuDetailsForDelete);
+        return qComplexInfo.executeUpdate();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public int cleanComplexInfo(List menuDetailsForDelete) {
+        Query qComplex = entityManager.createNativeQuery(
+                "DELETE FROM CF_ComplexInfo cc WHERE cc.idOfMenuDetail IN (:menuDetailsForDelete)");
+        qComplex.setParameter("menuDetailsForDelete", menuDetailsForDelete);
+        return qComplex.executeUpdate();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public int cleanGoodBasicBasket(List menuDetailsForDelete) {
+        Query qGoodBasicBasketPrice = entityManager.createNativeQuery(
+                "DELETE FROM Cf_Good_Basic_Basket_Price cg WHERE cg.idofmenudetail IN (:menuDetailsForDelete)");
+        qGoodBasicBasketPrice.setParameter("menuDetailsForDelete", menuDetailsForDelete);
+        return qGoodBasicBasketPrice.executeUpdate();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public int cleanMenuDetail(Long idOfMenu) {
+        Query qMenuDetail = entityManager.createNativeQuery("DELETE FROM CF_MenuDetails WHERE idOfMenu = :idOfMenu");
+        qMenuDetail.setParameter("idOfMenu", idOfMenu);
+        return qMenuDetail.executeUpdate();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public int cleanMenu(Long idOfMenu) {
+        Query qMenu = entityManager.createNativeQuery("DELETE FROM CF_Menu WHERE idOfMenu = :idOfMenu");
+        qMenu.setParameter("idOfMenu", idOfMenu);
+        return qMenu.executeUpdate();
     }
 }
