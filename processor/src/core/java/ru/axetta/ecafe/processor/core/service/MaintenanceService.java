@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,13 +34,50 @@ public class MaintenanceService {
 
     private Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
 
-    private static int MAXROWS = 50000;
+    private int MAXROWS;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     private MaintenanceService getProxy() {
         return RuntimeContext.getAppContext().getBean(MaintenanceService.class);
+    }
+
+    public static class ClearingMenu implements Job {
+
+        @Override
+        public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            RuntimeContext.getAppContext().getBean(MaintenanceService.class).run();
+        }
+    }
+
+    public void scheduleSync() throws Exception {
+        String syncScheduleClear = RuntimeContext.getInstance().getConfigProperties()
+                .getProperty("ecafe.processor.clearmenu.maintenanceservice.cron", "");
+
+        try {
+            MAXROWS = Integer.valueOf(RuntimeContext.getInstance().getConfigProperties()
+                    .getProperty("ecafe.processor.clearmenu.maintenanceservice.size", ""));
+        } catch (Exception e) {
+            MAXROWS = 10;
+        }
+        try {
+            JobDetail jobDetailEndBenefit = new JobDetail("ClearMenu", Scheduler.DEFAULT_GROUP,
+                    MaintenanceService.ClearingMenu.class);
+            SchedulerFactory sfb = new StdSchedulerFactory();
+            Scheduler scheduler = sfb.getScheduler();
+            if (!syncScheduleClear.equals("")) {
+                CronTrigger triggerEndBenefit = new CronTrigger("ClearMenu", Scheduler.DEFAULT_GROUP);
+                triggerEndBenefit.setCronExpression(syncScheduleClear);
+                if (scheduler.getTrigger("ClearMenu", Scheduler.DEFAULT_GROUP) != null) {
+                    scheduler.deleteJob("ClearMenu", Scheduler.DEFAULT_GROUP);
+                }
+                scheduler.scheduleJob(jobDetailEndBenefit, triggerEndBenefit);
+            }
+            scheduler.start();
+        } catch (Exception e) {
+            logger.error("Failed to schedule cleaning menu service job:", e);
+        }
     }
 
     public void run() {
@@ -92,8 +132,7 @@ public class MaintenanceService {
         Date maxDate = null;
         try {
             maxDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getDeletedLastedDateMenu());
-            if (maxDate == null)
-            {
+            if (maxDate == null) {
                 maxDate = new Date(0L);
             }
         } catch (Exception ignore) {
@@ -120,16 +159,19 @@ public class MaintenanceService {
             maxDate = new Date(((BigInteger) el1[2]).longValue());
 
             if (records.size() == MAXROWS / 5) {
-                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
+                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate),
+                        Option.OPTION_LAST_DELATED_DATE_MENU);
             } else {
-                Long time = maxDate.getTime();
-                if (time.equals(0L))
-                {
-                    //Это сработает в том случае, если все в таблице почищено
-                    fullclean = true;
-                }
+                //Long time = maxDate.getTime();
+                //if (time.equals(0L))
+                //{
+                //    //Это сработает в том случае, если все в таблице почищено
+                //    fullclean = true;
+                //}
+                fullclean = true;
                 maxDate.setTime(0L);
-                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
+                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate),
+                        Option.OPTION_LAST_DELATED_DATE_MENU);
             }
             Iterator<Object[]> it = records.iterator();
 
@@ -210,29 +252,36 @@ public class MaintenanceService {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public int[] cleanMenuInformationInternal(Long idOfMenu) {
         int[] res = new int[5];
-        Session session = entityManager.unwrap(Session.class);
+        //Session session = entityManager.unwrap(Session.class);
 
-        org.hibernate.Query qMenuDetailsDelete = session
-                .createQuery("select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu");
+        Query qMenuDetailsDelete = entityManager
+                .createNativeQuery("SELECT idOfMenuDetail FROM CF_MenuDetails cmd WHERE cmd.idOfMenu = :idOfMenu");
         qMenuDetailsDelete.setParameter("idOfMenu", idOfMenu);
 
-        List menuDetailsForDelete = qMenuDetailsDelete.list();
+        List menuDetailsForDeleteMass = qMenuDetailsDelete.getResultList();
+        if (menuDetailsForDeleteMass != null && !menuDetailsForDeleteMass.isEmpty()) {
 
-        if (menuDetailsForDelete != null && !menuDetailsForDelete.isEmpty()) {
-            org.hibernate.Query qComplexInfo = session.createQuery(
-                    "delete from ComplexInfoDetail where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
-            qComplexInfo.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
+            String menuDetailsForDelete = "";
+            for (Object val : menuDetailsForDeleteMass) {
+                menuDetailsForDelete = menuDetailsForDelete + "'" + val.toString() + "',";
+            }
+            menuDetailsForDelete = menuDetailsForDelete.substring(0, menuDetailsForDelete.length() - 1);
+
+
+            Query qComplexInfo = entityManager.createNativeQuery(
+                    "DELETE FROM CF_ComplexInfoDetail cid WHERE cid.idOfMenuDetail = (:menuDetailsForDelete)");
+            qComplexInfo.setParameter("menuDetailsForDelete", menuDetailsForDelete);
             res[0] = qComplexInfo.executeUpdate();
 
-            org.hibernate.Query qComplex = session
-                    .createQuery("delete from ComplexInfo where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
-            qComplex.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
+            Query qComplex = entityManager.createNativeQuery(
+                    "DELETE FROM CF_ComplexInfo cc WHERE cc.idOfMenuDetail IN (:menuDetailsForDelete)");
+            qComplex.setParameter("menuDetailsForDelete", menuDetailsForDelete);
             res[1] = qComplex.executeUpdate();
 
             //org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("update GoodBasicBasketPrice set idofmenudetail = null where idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
-            org.hibernate.Query qGoodBasicBasketPrice = session
-                    .createQuery("delete from GoodBasicBasketPrice where idOfMenuDetail in (:menuDetailsForDelete)");
-            qGoodBasicBasketPrice.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
+            Query qGoodBasicBasketPrice = entityManager.createNativeQuery(
+                    "DELETE FROM Cf_Good_Basic_Basket_Price cg WHERE cg.idofmenudetail IN (:menuDetailsForDelete)");
+            qGoodBasicBasketPrice.setParameter("menuDetailsForDelete", menuDetailsForDelete);
             res[2] = qGoodBasicBasketPrice.executeUpdate();
         } else {
             res[0] = 0;
@@ -240,11 +289,11 @@ public class MaintenanceService {
             res[2] = 0;
         }
 
-        org.hibernate.Query qMenuDetail = session.createQuery("delete from MenuDetail where idOfMenu = :idOfMenu");
+        Query qMenuDetail = entityManager.createNativeQuery("DELETE FROM CF_MenuDetails WHERE idOfMenu = :idOfMenu");
         qMenuDetail.setParameter("idOfMenu", idOfMenu);
         res[3] = qMenuDetail.executeUpdate();
 
-        org.hibernate.Query qMenu = session.createQuery("delete from Menu WHERE idOfMenu = :idOfMenu");
+        Query qMenu = entityManager.createNativeQuery("DELETE FROM CF_Menu WHERE idOfMenu = :idOfMenu");
         qMenu.setParameter("idOfMenu", idOfMenu);
         res[4] = qMenu.executeUpdate();
 
