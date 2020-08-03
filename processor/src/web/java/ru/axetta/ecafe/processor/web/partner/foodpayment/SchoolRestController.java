@@ -604,7 +604,8 @@ public class SchoolRestController {
                 clientGroup = DAOUtils.createClientGroup(persistenceSession, jwtUserDetails.getIdOfOrg(),
                         createClientRequestDTO.getGroupName());
             }
-            groupManagementService.createClient(clientGroup, CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO));
+            groupManagementService.createClient(clientGroup, CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO),
+                    jwtUserDetails.getUsername());
             persistenceTransaction.commit();
             persistenceTransaction = null;
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(100, "OK")).build();
