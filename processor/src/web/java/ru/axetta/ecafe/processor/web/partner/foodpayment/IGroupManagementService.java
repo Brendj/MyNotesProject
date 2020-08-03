@@ -26,5 +26,5 @@ public interface IGroupManagementService {
     List<Client> getClientsForContractIds(ClientGroup newClientGroup, List<Long> contractIds, boolean strictEditMode) throws Exception;
     List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups, boolean strictEditMode) throws Exception;
     List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients, String username) throws Exception;
-    void createClient(ClientGroup clientGroup, Client client) throws Exception;
+    void createClient(ClientGroup clientGroup, Client client, String username) throws Exception;
 }

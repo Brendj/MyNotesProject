@@ -412,13 +412,14 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     @Override
-    public void createClient(ClientGroup clientGroup, Client client) throws Exception {
+    public void createClient(ClientGroup clientGroup, Client client, String username) throws Exception {
         Client iacClient = DAOUtils.findClientByIacregid(persistanceSession, client.getIacRegId());
         Org clientGroupOrg = DAOUtils.findOrg(persistanceSession, clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
         client.setClientGroup(clientGroup);
         client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         client.setOrg(clientGroupOrg);
         if(client.getIacRegId() == null || client.getIacRegId().trim().isEmpty() || iacClient == null){
+            String comment = "Создан пользователем " + username;
             persistanceSession.save(client.getPerson());
             persistanceSession.save(client.getContractPerson());
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
@@ -426,10 +427,13 @@ public class GroupManagementService implements IGroupManagementService {
             client.setContractId(contractId);
             client.setContractTime(new Date());
             persistanceSession.save(client);
+            ClientMigration clientMigration = new ClientMigration(client, client.getOrg());
+            clientMigration.setComment(comment);
+            persistanceSession.save(clientMigration);
             return;
         }
         else {
-            String comment = "Изменено в методе school/api/v1/createclient";
+            String comment = "Изменен пользователем " + username;
             if(iacClient.getOrg().getIdOfOrg() != client.getOrg().getIdOfOrg()){
                 ClientMigration clientMigration = new ClientMigration(iacClient, client.getOrg(), iacClient.getOrg());
                 if(iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()){
