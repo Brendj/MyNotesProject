@@ -415,12 +415,12 @@ public class GroupManagementService implements IGroupManagementService {
     public void createClient(ClientGroup clientGroup, Client client) throws Exception {
         Client iacClient = DAOUtils.findClientByIacregid(persistanceSession, client.getIacRegId());
         Org clientGroupOrg = DAOUtils.findOrg(persistanceSession, clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
+        client.setClientGroup(clientGroup);
+        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        client.setOrg(clientGroupOrg);
         if(client.getIacRegId() == null || client.getIacRegId().trim().isEmpty() || iacClient == null){
             persistanceSession.save(client.getPerson());
             persistanceSession.save(client.getContractPerson());
-            client.setOrg(clientGroupOrg);
-            client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            client.setClientGroup(clientGroup);
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
             long contractId = RuntimeContext.getInstance().getClientContractIdGenerator().generate(client.getOrg().getIdOfOrg());
             client.setContractId(contractId);
@@ -429,9 +429,25 @@ public class GroupManagementService implements IGroupManagementService {
             return;
         }
         else {
-            iacClient.setOrg(clientGroupOrg);
-            iacClient.setClientGroup(clientGroup);
-            iacClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            if(iacClient.getOrg().getIdOfOrg() != client.getOrg().getIdOfOrg()){
+                ClientMigration clientMigration = new ClientMigration(iacClient, client.getOrg(), iacClient.getOrg());
+                if(iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()){
+                    clientMigration.setOldGroupName(iacClient.getClientGroup().getGroupName());
+                    clientMigration.setNewGroupName(client.getClientGroup().getGroupName());
+                }
+                persistanceSession.save(clientMigration);
+            }
+            else if(iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()){
+                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(iacClient.getOrg(), iacClient);
+                clientGroupMigrationHistory.setOldGroupName(iacClient.getClientGroup().getGroupName());
+                clientGroupMigrationHistory.setOldGroupId(iacClient.getIdOfClientGroup());
+                clientGroupMigrationHistory.setNewGroupName(client.getClientGroup().getGroupName());
+                clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                persistanceSession.save(clientGroupMigrationHistory);
+            }
+            iacClient.setOrg(client.getOrg());
+            iacClient.setClientGroup(client.getClientGroup());
+            iacClient.setIdOfClientGroup(client.getIdOfClientGroup());
             Person clientPerson = iacClient.getPerson();
             clientPerson.setFirstName(client.getPerson().getFirstName());
             clientPerson.setSurname(client.getPerson().getSurname());
