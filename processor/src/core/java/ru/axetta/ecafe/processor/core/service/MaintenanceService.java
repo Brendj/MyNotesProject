@@ -155,61 +155,62 @@ public class MaintenanceService {
             //Максимальное количество записей для очистки - 50000
             List<Object[]> records = query.setMaxResults(MAXROWS / 5).getResultList();
 
-            Object[] el1 = records.get(records.size() - 1);
-            maxDate = new Date(((BigInteger) el1[2]).longValue());
+            if (!records.isEmpty()) {
+                Object[] el1 = records.get(records.size() - 1);
+                maxDate = new Date(((BigInteger) el1[2]).longValue());
 
-            if (records.size() == MAXROWS / 5) {
-                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate),
-                        Option.OPTION_LAST_DELATED_DATE_MENU);
-            } else {
-                //Long time = maxDate.getTime();
-                //if (time.equals(0L))
-                //{
-                //    //Это сработает в том случае, если все в таблице почищено
-                //    fullclean = true;
-                //}
-                fullclean = true;
-                maxDate.setTime(0L);
-                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate),
-                        Option.OPTION_LAST_DELATED_DATE_MENU);
-            }
-            Iterator<Object[]> it = records.iterator();
+                if (records.size() == MAXROWS / 5) {
+                    DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
+                } else {
+                    //Long time = maxDate.getTime();
+                    //if (time.equals(0L))
+                    //{
+                    //    //Это сработает в том случае, если все в таблице почищено
+                    //    fullclean = true;
+                    //}
+                    fullclean = true;
+                    maxDate.setTime(0L);
+                    DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
+                }
+                Iterator<Object[]> it = records.iterator();
 
-            while (it.hasNext()) {
-                Object[] el = it.next();
-                Long idOfMenu = ((BigInteger) el[0]).longValue();
+                while (it.hasNext()) {
+                    Object[] el = it.next();
+                    Long idOfMenu = ((BigInteger) el[0]).longValue();
 
-                //Находим детали меню для данного заказа
-                query = entityManager
-                        .createNativeQuery("SELECT m.MenuPath FROM CF_MenuDetails m WHERE m.IdOfMenu = :idOfMenu")
-                        .setParameter("idOfMenu", idOfMenu);
+                    //Находим детали меню для данного заказа
+                    query = entityManager.createNativeQuery("SELECT m.MenuPath FROM CF_MenuDetails m WHERE m.IdOfMenu = :idOfMenu")
+                            .setParameter("idOfMenu", idOfMenu);
 
-                List<String> recordsMenuDetail = query.getResultList();
+                    List<String> recordsMenuDetail = query.getResultList();
 
-                for (String row : recordsMenuDetail) {
-                    if (row.indexOf("[Интервальное]") == 0) {
-                        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                        try {
-                            //Получаем дату окончания действия интервального меню
-                            Date date = dateFormat.parse(row.substring(29, 39));
-                            if (date.getTime() > new Date().getTime()) {
-                                //Если дата окончания больше текущей, то удаляем это меню из списка
-                                it.remove();
-                                break;
+                    for (String row : recordsMenuDetail) {
+                        if (row.indexOf("[Интервальное]") == 0) {
+                            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                            try {
+                                //Получаем дату окончания действия интервального меню
+                                Date date = dateFormat.parse(row.substring(29, 39));
+                                if (date.getTime() > new Date().getTime()) {
+                                    //Если дата окончания больше текущей, то удаляем это меню из списка
+                                    it.remove();
+                                    break;
+                                }
+                            } catch (Exception e) {
+                                logger.debug("Cannot format row: " + row);
                             }
-                        } catch (Exception e) {
-                            logger.debug("Cannot format row: " + row);
                         }
                     }
                 }
+                result.addAll(records);
+                if (MAXROWS > result.size()) {
+                    full = false;
+                }
             }
-            result.addAll(records);
-            if (MAXROWS > result.size()) {
-                full = false;
+            else
+            {
+                fullclean = true;
             }
-
-
-        } while (!full || fullclean);
+        } while (!full || !fullclean);
 
 
         logger.debug("count menu: " + result.size());
