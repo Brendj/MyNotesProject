@@ -4,14 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.service.mesh;
 
+import ru.axetta.ecafe.processor.core.persistence.Card;
+
 public interface MeshCardService {
     int OK = 1;
 
-    int updateCardForClient();
+    int updateCardForClient(String meshGUID, Card card);
 
-    int deleteReferenceBetweenClientAndCard();
+    int deleteReferenceBetweenClientAndCard(String meshGUID, Long idOfCard);
 
-    int createReferenceBetweenClientAndCard();
+    int createReferenceBetweenClientAndCard(String meshGUID, Card card);
 
-    int changeCardOwner();
+    int changeCardOwner(String meshGUIDFrom, String meshGUIDto, Long idOfCard);
 }

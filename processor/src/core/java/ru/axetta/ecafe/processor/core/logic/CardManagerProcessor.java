@@ -9,6 +9,9 @@ import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.mesh.MeshCardService;
+import ru.axetta.ecafe.processor.core.service.mesh.MeshCardServiceIml;
+import ru.axetta.ecafe.processor.core.service.mesh.MockService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -36,13 +39,15 @@ import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
  * Time: 10:37
  */
 public class CardManagerProcessor implements CardManager {
-    private static final Logger logger = LoggerFactory.getLogger(Processor.class);
+    private static final Logger logger = LoggerFactory.getLogger(CardManagerProcessor.class);
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final Integer SMARTWATCH_CARD_SIGN_CERT_NUM = 16;
+
     public static Long getPriceOfMifare() {
         return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifare"));
     }
+
     public static Long getPriceOfMifareBracelet() {
         return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifareBracelet"));
     }
@@ -50,6 +55,15 @@ public class CardManagerProcessor implements CardManager {
     public CardManagerProcessor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
         this.eventNotificator = eventNotificator;
+    }
+
+    private MeshCardService getMeshService() {
+        //Если МСК, то отдать сервис взаимодействия с МЭШ, иначе класс-заглушку
+        if(RuntimeContext.getInstance().getRegistryType().equals(RuntimeContext.RegistryType.MSK)){
+            return RuntimeContext.getAppContext().getBean(MeshCardServiceIml.class);
+        } else {
+            return MockService.getInstance();
+        }
     }
 
     @Override
