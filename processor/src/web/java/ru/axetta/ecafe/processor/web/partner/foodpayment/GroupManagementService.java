@@ -429,16 +429,19 @@ public class GroupManagementService implements IGroupManagementService {
             return;
         }
         else {
+            String comment = "Изменено в методе school/api/v1/createclient";
             if(iacClient.getOrg().getIdOfOrg() != client.getOrg().getIdOfOrg()){
                 ClientMigration clientMigration = new ClientMigration(iacClient, client.getOrg(), iacClient.getOrg());
                 if(iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()){
                     clientMigration.setOldGroupName(iacClient.getClientGroup().getGroupName());
                     clientMigration.setNewGroupName(client.getClientGroup().getGroupName());
                 }
+                clientMigration.setComment(comment);
                 persistanceSession.save(clientMigration);
             }
             else if(iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()){
                 ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(iacClient.getOrg(), iacClient);
+                clientGroupMigrationHistory.setComment(comment);
                 clientGroupMigrationHistory.setOldGroupName(iacClient.getClientGroup().getGroupName());
                 clientGroupMigrationHistory.setOldGroupId(iacClient.getIdOfClientGroup());
                 clientGroupMigrationHistory.setNewGroupName(client.getClientGroup().getGroupName());
