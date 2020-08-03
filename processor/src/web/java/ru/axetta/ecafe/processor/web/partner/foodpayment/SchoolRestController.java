@@ -608,7 +608,7 @@ public class SchoolRestController {
                     jwtUserDetails.getUsername());
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(100, "OK")).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "OK")).build();
 
         }
         catch (RequestProcessingException e){
