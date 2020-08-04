@@ -144,7 +144,7 @@ public class MaintenanceService {
         boolean fullclean = false;
         List<Object[]> result = new ArrayList<>();
         do {
-            full = true;
+            full = false;
             //Получаем список меню
             Query query = entityManager.createNativeQuery(
                     "select m.IdOfMenu, m.IdOfOrg, m.MenuDate " + "from CF_Menu m where m.IdOfOrg " + orgFilter
@@ -192,7 +192,7 @@ public class MaintenanceService {
                                 Date date = dateFormat.parse(row.substring(29, 39));
                                 if (date.getTime() > new Date().getTime()) {
                                     //Если дата окончания больше текущей, то удаляем это меню из списка
-                                    it.remove();
+                                   // it.remove();
                                     break;
                                 }
                             } catch (Exception e) {
@@ -202,15 +202,15 @@ public class MaintenanceService {
                     }
                 }
                 result.addAll(records);
-                if (MAXROWS > result.size()) {
-                    full = false;
+                if (MAXROWS <= result.size()) {
+                    full = true;
                 }
             }
             else
             {
                 fullclean = true;
             }
-        } while (!full || !fullclean);
+        } while (!full && !fullclean);
 
 
         logger.debug("count menu: " + result.size());
