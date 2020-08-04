@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
@@ -4446,7 +4447,10 @@ public class Processor implements SyncProcessor {
                         }
                     }
                     if (purchase.getIdOfComplex() != null) {
-                        orderDetail.setIdOfComplex(purchase.getIdOfComplex());
+                        WtComplex wtComplex = findWtComplexById(persistenceSession, purchase.getIdOfComplex());
+                        if (wtComplex != null) {
+                            orderDetail.setWtComplex(wtComplex);
+                        }
                     }
                     if (purchase.getIdOfDish() != null) {
                         orderDetail.setIdOfDish(purchase.getIdOfDish());
