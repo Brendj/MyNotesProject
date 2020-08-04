@@ -5108,4 +5108,10 @@ public class DAOUtils {
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
         return criteria.list();
     }
+
+    public static CanceledOrder getCancelOrderIdBySource(Session session, String source) {
+        Criteria criteria = session.createCriteria(CanceledOrder.class);
+        criteria.add(Restrictions.eq("idOfTransaction", Long.parseLong(source)));
+        return (CanceledOrder) criteria.uniqueResult();
+    }
 }
