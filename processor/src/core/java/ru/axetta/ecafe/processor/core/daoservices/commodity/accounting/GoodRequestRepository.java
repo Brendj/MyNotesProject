@@ -50,8 +50,8 @@ public class GoodRequestRepository {
 
     }
 
-    public boolean isGoodRequestForROSection(GoodRequest goodRequest) throws Exception {
-        String sql = "select grp from GoodRequestPosition grp where grp.goodRequest = :goodRequest and grp.good is null";
+    public boolean isGoodRequestWithoutGood(GoodRequest goodRequest) {
+        String sql = "select grp from GoodRequestPosition grp where grp.goodRequest = :goodRequest and grp.good is not null";
         TypedQuery<GoodRequestPosition> query = entityManager.createQuery(sql, GoodRequestPosition.class);
         query.setParameter("goodRequest", goodRequest);
         List<GoodRequestPosition> res = query.getResultList();
@@ -59,6 +59,14 @@ public class GoodRequestRepository {
             return false;
         }
         return true;
+    }
+
+    public boolean isGoodRequestPositionWithoutGood(GoodRequestPosition goodRequestPosition) {
+        String sql = "select grp.good from GoodRequestPosition grp where grp = :goodRequestPosition";
+        TypedQuery<Good> query = entityManager.createQuery(sql, Good.class);
+        query.setParameter("goodRequestPosition", goodRequestPosition);
+        List<Good> list = query.getResultList();
+        return list.isEmpty();
     }
 
     public Map<Long, Long> extractOrgOwnerAndVersion(){
