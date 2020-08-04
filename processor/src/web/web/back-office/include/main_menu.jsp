@@ -896,9 +896,9 @@
                              rendered="#{mainPage.eligibleToServiceAdmin}">
             <a4j:support event="onclick" action="#{mainPage.showSpbGroupContingentPage}" reRender="workspaceForm" />
 
-            <%--@elvariable id="spbRegistrySynchPage" type="ru.axetta.ecafe.processor.web.ui.service.spb.SpbRegistrySynchPage"--%>
-            <rich:panelMenuItem id="spbOrgRegistrySync" binding="#{spbRegistrySynchPage.mainMenuComponent}"
-                                label="Интерактивная сверка" action="#{spbRegistrySynchPage.show}"
+            <%--@elvariable id="spbRegistrySyncPage" type="ru.axetta.ecafe.processor.web.ui.service.spb.SpbRegistrySyncPage"--%>
+            <rich:panelMenuItem id="spbOrgRegistrySync" binding="#{spbRegistrySyncPage.mainMenuComponent}"
+                                label="Интерактивная сверка" action="#{spbRegistrySyncPage.show}"
                                 reRender="workspaceForm" />
             <%--@elvariable id="spbRegistrySynchOverviewPage" type="ru.axetta.ecafe.processor.web.ui.service.spb.SpbRegistrySynchOverviewPage"--%>
             <rich:panelMenuItem id="spbOrgRegistrySyncOverview" binding="#{spbRegistrySynchOverviewPage.mainMenuComponent}"

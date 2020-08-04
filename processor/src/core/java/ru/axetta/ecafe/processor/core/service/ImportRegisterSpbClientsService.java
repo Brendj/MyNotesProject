@@ -48,7 +48,7 @@ import java.util.*;
  */
 @Component
 @Scope("singleton")
-public class ImportRegisterSpbClientsService {
+public class ImportRegisterSpbClientsService implements ImportClientRegisterService {
 
     private static final Logger logger = LoggerFactory.getLogger(ImportRegisterSpbClientsService.class);
 
@@ -114,9 +114,11 @@ public class ImportRegisterSpbClientsService {
         q.executeUpdate();
     }
 
+    @Override
     @Transactional
-    public StringBuffer syncClientsWithRegistry(long idOfOrg) throws Exception {
-        StringBuffer logBuffer = new StringBuffer();
+    public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
+            boolean manualCheckout) throws Exception {
+        logBuffer = new StringBuffer();
         if (!DAOService.getInstance().isSverkaEnabled()) {
             throw new Exception("Service temporary unavailable");
         }
@@ -163,6 +165,23 @@ public class ImportRegisterSpbClientsService {
                     SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());
             processEnd.saveWithSuccess(isSuccessEnd);
         }
+    }
+
+    @Override
+    public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation,
+            String groupName) throws Exception {
+        List<RegistryChangeCallback> result = new LinkedList<>();
+        for (Long idOfRegistryChange : changesList) {
+            try {
+                applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
+            } catch (Exception e1) {
+                logger.error("Error when apply RegistryChange: ", e1);
+                setChangeError(idOfRegistryChange, e1);
+                result.add(new RegistryChangeCallback(idOfRegistryChange, e1.getMessage()));
+            }
+        }
+        return result;
     }
 
     public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
@@ -738,6 +757,7 @@ public class ImportRegisterSpbClientsService {
         return change;
     }
 
+    @Override
     public RegistryChangeError getRegistryChangeError(Long idOfRegistryChangeError) {
         if (idOfRegistryChangeError == null) {
             return null;

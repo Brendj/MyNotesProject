@@ -19,6 +19,7 @@ public class RegistryChange {
     protected Long idOfMigrateOrgFrom;
     protected Long createDate;
     protected Long idOfRegistryChange;
+    protected String meshGUID;
     protected String clientGUID;
     protected String firstName;
     protected String secondName;
@@ -421,5 +422,13 @@ public class RegistryChange {
 
     public void setDsznDateEndFrom(Long dsznDateEndFrom) {
         this.dsznDateEndFrom = dsznDateEndFrom;
+    }
+
+    public String getMeshGUID() {
+        return meshGUID;
+    }
+
+    public void setMeshGUID(String meshGUID) {
+        this.meshGUID = meshGUID;
     }
 }

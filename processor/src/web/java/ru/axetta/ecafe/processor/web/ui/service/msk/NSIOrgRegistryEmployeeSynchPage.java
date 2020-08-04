@@ -4,13 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
-import generated.registry.manual_synch.FrontController;
-import generated.registry.manual_synch.RegistryChangeCallback;
-import generated.registry.manual_synch.RegistryChangeRevisionItem;
-
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.web.internal.FrontControllerProcessor;
+import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
+import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeRevisionItem;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
@@ -18,7 +14,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +24,7 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class NSIOrgRegistryEmployeeSynchPage extends NSIOrgRegistrySynchPageBase implements OrgSelectPage.CompleteHandler {
+public class NSIOrgRegistryEmployeeSynchPage extends NSIOrgRegistrySyncPageBase implements OrgSelectPage.CompleteHandler {
     protected Org org;
     protected String orgName;
 
@@ -73,23 +68,23 @@ public class NSIOrgRegistryEmployeeSynchPage extends NSIOrgRegistrySynchPageBase
     @Override
     protected List<ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2> loadChangedItems() {
         showOnlyClientGoups = false;
-        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+        return frontControllerProcessor.
                 loadRegistryChangeItemsEmployeeV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
     }
 
     @Override
-    protected List<RegistryChangeRevisionItem> loadRevisionsFromController (FrontController controller, Long idOfOrg) {
-        return controller.loadRegistryChangeEmployeeRevisions(idOfOrg);
+    protected List<RegistryChangeRevisionItem> loadRevisionsFromController (Long idOfOrg) {
+        return frontControllerProcessor.loadRegistryEmployeeChangeRevisions(idOfOrg);
     }
 
     @Override
-    protected List<RegistryChangeCallback> proceedRegitryChangeItemInternal(FrontController controller, List<Long> list, int operation, boolean fullNameValidation) {
-        return controller.proceedRegitryChangeEmployeeItem(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, null);
+    protected List<RegistryChangeCallback> proceedRegistryChangeItemInternal(List<Long> list, int operation, boolean fullNameValidation) {
+        return frontControllerProcessor.proceedRegistryEmployeeChangeItem(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, null);
     }
 
     @Override
     protected List<ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2> refreshRegistryChangeItemsV2(long idOfOrg) throws Exception {
-        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).refreshRegistryChangeEmployeeItemsV2(idOfOrg);
+        return frontControllerProcessor.refreshRegistryChangeEmployeeItemsV2(idOfOrg);
     }
 
     public Org getOrg() {
@@ -107,5 +102,4 @@ public class NSIOrgRegistryEmployeeSynchPage extends NSIOrgRegistrySynchPageBase
     public void setOrgName(String orgName) {
         this.orgName = orgName;
     }
-
 }

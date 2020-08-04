@@ -16,7 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -85,7 +85,8 @@ public class ClientManager {
         CREATED_FROM,
         MIDDLE_GROUP,
         IAC_REG_ID,
-        PARALLEL
+        PARALLEL,
+        MESH_GUID
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -136,6 +137,7 @@ public class ClientManager {
             new FieldProcessor.Def(42, false, false, "Подгруппа", null, FieldId.MIDDLE_GROUP, false),
             new FieldProcessor.Def(43, false, false, "ИАЦ regID", null, FieldId.IAC_REG_ID, true),
             new FieldProcessor.Def(44, false, false, "Параллель", null, FieldId.PARALLEL, true),
+            new FieldProcessor.Def(45, false, false, "GUID MESH", null, FieldId.MESH_GUID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -423,7 +425,7 @@ public class ClientManager {
             if (fieldConfig.getValue(FieldId.COMMENTS) != null) {
                 client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
             }
-            ImportRegisterClientsService.commentsAddsDelete(client, registerCommentsAdds);
+            ImportRegisterMSKClientsService.commentsAddsDelete(client, registerCommentsAdds);
 
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
@@ -436,7 +438,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
+                        ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
@@ -777,7 +779,6 @@ public class ClientManager {
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 724, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
             String fax = fieldConfig.getValue(FieldId.FAX);
             if (mobilePhone != null) {
@@ -793,7 +794,6 @@ public class ClientManager {
                 }
             }
             client.setMobile(mobilePhone);//tokens[14]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 740, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
             client.setFax(fax);//tokens[14]);
             client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
             client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
@@ -817,7 +817,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
+                        ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
@@ -842,21 +842,21 @@ public class ClientManager {
                 if (!StringUtils.isEmpty(middleGroup)) client.setMiddleGroup(middleGroup);
             }
 
-            if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID) != null) {
-                String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
-                if (clientGUID.isEmpty()) {
-                    client.setClientGUID(null);
-                } else {
-                    client.setClientGUID(clientGUID);
-                }
+            String clientGuid = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
+            if (StringUtils.isNotEmpty(clientGuid)) {
+                client.setClientGUID(clientGuid);
+            }
+
+            String meshGuid = fieldConfig.getValue(FieldId.MESH_GUID);
+            if (StringUtils.isNotEmpty(meshGuid)) {
+                client.setMeshGUID(meshGuid);
             }
 
             //tokens[32])
             if (fieldConfig.getValue(FieldId.GENDER) != null) {
                 if (fieldConfig.getValue(FieldId.GENDER).equals("m")) {
                     client.setGender(1);
-                }
-                if (fieldConfig.getValue(FieldId.GENDER).equals("f")) {
+                } else {
                     client.setGender(0);
                 }
             } else {
