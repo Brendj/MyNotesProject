@@ -2413,7 +2413,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setAmount(amount);
         preorderMenuDetail.setDeletedState(wtDish.getDeleteState() != 0);
         preorderMenuDetail.setState(PreorderState.OK);
-        preorderMenuDetail.setMenuDetailName(wtDish.getDishName());
+        preorderMenuDetail.setMenuDetailName(wtDish.getComponentsOfDish());
         preorderMenuDetail.setMenuDetailPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
         preorderMenuDetail.setGroupName(getMenuGroupByWtDish(wtDish));
         preorderMenuDetail.setItemCode(wtDish.getCode());
