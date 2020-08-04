@@ -1896,7 +1896,18 @@ public class ClientManager {
     }
 
     /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
-    public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile, Boolean value) throws Exception {
+    public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile,
+            Boolean value, Long newVersion) throws Exception {
+        if (guardian != null) {
+            Criteria cr = session.createCriteria(ClientGuardian.class);
+            cr.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
+            cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+            ClientGuardian cg = (ClientGuardian) cr.uniqueResult();
+            cg.setVersion(newVersion);
+            cg.setLastUpdate(new Date());
+            session.update(cg);
+        }
+
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", child));
         criteria.add(Restrictions.eq("guardianInformedSpecialMenu", guardian));
