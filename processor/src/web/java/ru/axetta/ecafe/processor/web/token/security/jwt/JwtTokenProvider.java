@@ -155,8 +155,7 @@ public class JwtTokenProvider {
                 throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.USER_DISABLED.getErrorCode(),
                         JwtAuthenticationErrors.USER_DISABLED.getErrorMessage()));
             JwtUserDetailsImpl jwtUserDetails = new JwtUserDetailsImpl(grantedAuthorities, isEnabled, isEnabled, username,
-                    surname, firstname, secondname, idOfUser, idOfRole, roleName, contractId, idOfOrg, shortOrgName,
-                    null, null);
+                    surname, firstname, secondname, idOfUser, idOfRole, roleName, contractId, idOfOrg, shortOrgName);
             return jwtUserDetails;
         }
         catch (Exception ex){

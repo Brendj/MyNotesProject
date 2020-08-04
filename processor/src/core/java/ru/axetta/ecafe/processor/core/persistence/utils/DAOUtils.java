@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -3238,6 +3238,25 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Criteria criteria = session.createCriteria(GoodRequest.class);
+        criteria.add(Restrictions.in("orgOwner", orgIds));
+        criteria.add(Restrictions.gt("globalVersion", version));
+        return criteria.list();
+    }
+
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersionWithDishes(Session session, Long idOfOrg,
+            long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Query query = session
+                .createQuery("select distinct gr from GoodRequestPosition grp join grp.goodRequest gr "
+                        + "where gr.orgOwner in (:orgIds) and gr.globalVersion > :version and grp.good is null");
+        query.setParameterList("orgIds", orgIds);
+        query.setParameter("version", version);
+        return query.list();
+    }
+
     public static List<ComplexSchedule> getComplexSchedulesForOrgSinceVersion(Session session, Long idOfOrg,
             long version) throws Exception {
         List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
@@ -3851,6 +3870,32 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(GoodRequestPosition.class);
         criteria.add(Restrictions.eq("goodRequest", request));
         return criteria.list();
+    }
+
+    public static List<GoodRequestPosition> getGoodRequestPositionsByGoodRequest(Session session,
+            GoodRequest request) {
+        Query query = session.createSQLQuery("select grp.guid from cf_goods_requests_positions grp "
+                + "inner join cf_goods_requests gr on grp.idofgoodsrequest = gr.idofgoodsrequest "
+                + "where gr.guid = :guid").setParameter("guid", request.getGuid());
+        List<GoodRequestPosition> result = new ArrayList<>();
+        for (Object o : query.list()) {
+            GoodRequestPosition goodRequestPosition = getGoodRequestPositionByGuid(session, o.toString());
+            if (goodRequestPosition != null) {
+                result.add(goodRequestPosition);
+            }
+        }
+        return result;
+    }
+
+    public static GoodRequestPosition getGoodRequestPositionByGuid(Session session, String guid) {
+        try {
+            Query query = session.createQuery("SELECT grp from GoodRequestPosition grp where grp.guid = :guid");
+            query.setParameter("guid", guid);
+            return (GoodRequestPosition) query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Can't find GoodRequestPosition guid=" + guid + ": " + e.getMessage());
+            return null;
+        }
     }
 
     public static GoodRequest findGoodRequestByPreorderInfo(Session session, Long idOfOrg, Date createdDate) {

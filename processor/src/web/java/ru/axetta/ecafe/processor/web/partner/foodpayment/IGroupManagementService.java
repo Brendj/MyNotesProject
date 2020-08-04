@@ -16,4 +16,6 @@ public interface IGroupManagementService {
     ResponseDiscounts getDiscountsList(Long orgId) throws Exception;
     ResponseDiscountClients processDiscountClientsList(Long orgId, Long discountId, Boolean status, List<Long> clients) throws Exception;
     ResponseDiscountGroups processDiscountGroupsList(Long orgId, Long discountId, Boolean status, List<String> groups) throws Exception;
+    Long getIdOfOrgFromUser(String username) throws Exception;
+    List<FriendlyOrgDTO> getFriendlyOrgs(Long orgId) throws Exception;
 }
