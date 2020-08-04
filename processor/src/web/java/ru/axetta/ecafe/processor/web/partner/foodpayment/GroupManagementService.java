@@ -566,6 +566,25 @@ public class GroupManagementService implements IGroupManagementService {
         return friendlyOrgDTOList;
     }
 
+    @Override
+    public List<GroupNameDTO> getManagerGroups(Long contractId) throws Exception {
+        Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
+        if(client == null)
+            throw new RequestProcessingException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorMessage());
+        Criteria clientGroupManagersCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
+        clientGroupManagersCriteria.add(Restrictions.and(
+                Restrictions.eq("idOfClient",client.getIdOfClient()),
+                Restrictions.eq("deleted", false)
+        ));
+        List<ClientGroupManager> clientGroupsManager = clientGroupManagersCriteria.list();
+        List<GroupNameDTO> managerGroups = new LinkedList<>();
+        for(ClientGroupManager clientGroupManager: clientGroupsManager){
+            managerGroups.add(new GroupNameDTO(clientGroupManager.getClientGroupName()));
+        }
+        return managerGroups;
+    }
+
     private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
         CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, idOfCategoryDiscount);
         if (categoryDiscount == null) {
