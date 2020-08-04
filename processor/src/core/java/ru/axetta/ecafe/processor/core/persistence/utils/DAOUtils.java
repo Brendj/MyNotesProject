@@ -186,6 +186,13 @@ public class DAOUtils {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
+    public static Client findClientByMeshGuid(Session persistenceSession, String guid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("meshGUID", guid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
     @SuppressWarnings("unchecked")
     public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
@@ -4276,10 +4283,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ApplicationForFood getLastApplicationForFoodByClientGuid(Session session, String clientGuid) {
+    public static ApplicationForFood getLastApplicationForFoodByClient(Session session, Client client) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.createAlias("client", "c");
-        criteria.add(Restrictions.eq("c.clientGUID", clientGuid));
+        criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("archived", Boolean.FALSE));
         criteria.addOrder(org.hibernate.criterion.Order.desc("lastUpdate"));
         criteria.setMaxResults(1);
