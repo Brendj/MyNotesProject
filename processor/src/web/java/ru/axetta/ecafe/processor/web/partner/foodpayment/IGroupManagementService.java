@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.DTO.EditClientsGroupsGroupDTO;
+
 import java.util.List;
 
 public interface IGroupManagementService {
@@ -18,4 +22,9 @@ public interface IGroupManagementService {
     ResponseDiscountGroups processDiscountGroupsList(Long orgId, Long discountId, Boolean status, List<String> groups) throws Exception;
     Long getIdOfOrgFromUser(String username) throws Exception;
     List<FriendlyOrgDTO> getFriendlyOrgs(Long orgId) throws Exception;
+    ClientGroup getClientGroupByOrgIdAndGroupName(Long orgId, String groupName) throws Exception;
+    List<Client> getClientsForContractIds(ClientGroup newClientGroup, List<Long> contractIds, boolean strictEditMode) throws Exception;
+    List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups, boolean strictEditMode) throws Exception;
+    List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients, String username) throws Exception;
+    void createClient(ClientGroup clientGroup, Client client, String username) throws Exception;
 }
