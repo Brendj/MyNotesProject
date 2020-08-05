@@ -5,10 +5,13 @@
 package ru.iteco.cardsync.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.PartitionOffset;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
@@ -22,21 +25,21 @@ public class KafkaService {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "#{'${kafka.topic.card}'}")
-   /*@KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}",
+    //@KafkaListener(topics = "#{'${kafka.topic.card}'}")
+   @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}",
             partitionOffsets = {
-                    @PartitionOffset(partition = "0", initialOffset = "0")
+                    @PartitionOffset(partition = "0", initialOffset = "401")
             }))//for tests*/
     public void meshListener(String message,
             @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
         log.info(String.format("Offset %d, Partition_ID %d, Received JSON: %s",
                 offset, partitionId, message));
-        //EntityChangeEventDTO dto = objectMapper.readValue(message, EntityChangeEventDTO.class);
-        commitJson();
+        BlockPersonEntranceRequest request = objectMapper.readValue(message, BlockPersonEntranceRequest.class);
+        commitJson(request);
     }
 
-    private void commitJson() {
+    private void commitJson(BlockPersonEntranceRequest request) {
         try {
 
         } catch (Exception e){
