@@ -2004,6 +2004,7 @@ public class PreorderDAOService {
         return em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd "
                 + "left join pmd.preorderComplex pc "
                 + "where pmd.client = :client and pmd.preorderDate = :date and "
+                + "pmd.regularPreorder is null and "
                 + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish and pmd.deletedState = false")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("date", date)
@@ -2021,8 +2022,8 @@ public class PreorderDAOService {
 
     private boolean allowCreateNewPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail) {
         return preorderMenuDetail.getDeletedState() &&
-                !(preorderMenuDetail.getState().equals(PreorderState.OK)
-                        || preorderMenuDetail.getState().equals(PreorderState.CHANGE_ORG)
+                !(//preorderMenuDetail.getState().equals(PreorderState.OK) ||
+                        preorderMenuDetail.getState().equals(PreorderState.CHANGE_ORG)
                         || preorderMenuDetail.getState().equals(PreorderState.PREORDER_OFF));
     }
 
