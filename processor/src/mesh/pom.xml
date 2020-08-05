@@ -18,6 +18,7 @@
         <module>mesh-sync</module>
         <module>rest-client</module>
         <module>nsi-sync</module>
+        <module>card-sync</module>
     </modules>
 
     <properties>
