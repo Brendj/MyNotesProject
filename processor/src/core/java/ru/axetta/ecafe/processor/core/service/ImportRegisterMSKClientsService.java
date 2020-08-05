@@ -418,7 +418,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         findByGuidsList = findClientsByNSIGuids(pupilsNSIGuidList);
         Map<String, Client> nsiGuidMap = new HashMap<>();
         for(Client client : findByGuidsList){
-            nsiGuidMap.put(client.getMeshGUID(), client);
+            nsiGuidMap.put(client.getClientGUID(), client);
         }
 
         //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
