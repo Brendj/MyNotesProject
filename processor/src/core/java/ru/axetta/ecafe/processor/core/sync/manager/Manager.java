@@ -228,16 +228,6 @@ public class Manager implements AbstractToElement {
             elementRO.appendChild(doClassElement);
             if (distributedObjects != null && !distributedObjects.isEmpty()) {
                 for (DistributedObject distributedObject : distributedObjects) {
-                    if (distributedObject.getClass() == GoodRequestPosition.class
-                            && ((GoodRequestPosition) distributedObject).getGood() == null) {
-                        continue;
-                    }
-                    if (distributedObject.getClass() == GoodRequest.class) {
-                        GoodRequestRepository goodRequestRepository = GoodRequestRepository.getInstance();
-                        if (!goodRequestRepository.isGoodRequestForROSection((GoodRequest) distributedObject)) {
-                            continue;
-                        }
-                    }
                     distributedObject.setIdOfSyncOrg(idOfOrg);
                     Element element = document.createElement("O");
                     doClassElement.appendChild(distributedObject.toElement(element));
@@ -437,26 +427,47 @@ public class Manager implements AbstractToElement {
                 saveException(sessionFactory, errorMessage);
             }
         }
-
+        // обновляем ComplexId
         if (doClass.getSimpleName().equals("GoodRequestPosition")) {
-            List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
             Session session = null;
             try {
                 session = sessionFactory.openSession();
-                currentResultDOListResult = currentResultDOListFind(session, currentResultDOList);
+                updateComplexId(session, currentResultDOList);
             } catch (Exception e) {
-                e.printStackTrace();
+                errorMessage = e.getMessage();
+                LOGGER.error("Error findResponseResult: " + e.getMessage(), e);
             } finally {
                 HibernateUtils.close(session, LOGGER);
+                if (StringUtils.isNotEmpty(errorMessage)) {
+                    saveException(sessionFactory, errorMessage);
+                }
+            }
+            // Не выводим записи с пустым товаром
+            GoodRequestRepository goodRequestRepository = GoodRequestRepository.getInstance();
+            List<DistributedObject> currentResultDOListResult = new ArrayList<>();
+            for(DistributedObject distributedObject : currentResultDOList) {
+                if (!goodRequestRepository.isGoodRequestPositionWithoutGood((GoodRequestPosition) distributedObject)) {
+                    currentResultDOListResult.add(distributedObject);
+                }
             }
             currentResultDOList = currentResultDOListResult;
         }
+        // Не выводим записи, все позиции которых с пустым товаром
+        if (doClass.getSimpleName().equals("GoodRequest")) {
+            GoodRequestRepository goodRequestRepository = GoodRequestRepository.getInstance();
+            List<DistributedObject> currentResultDOListResult = new ArrayList<>();
+            for (DistributedObject distributedObject : currentResultDOList) {
+                if (!goodRequestRepository.isGoodRequestWithoutGood((GoodRequest) distributedObject)) {
+                    currentResultDOListResult.add(distributedObject);
+                }
+            }
+            currentResultDOList = currentResultDOListResult;
+        }
+
         return currentResultDOList;
     }
 
-    private List<DistributedObject> currentResultDOListFind(Session session,
-            List<DistributedObject> currentResultDOList) {
-        List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
+    private void updateComplexId(Session session, List<DistributedObject> currentResultDOList) {
         for (DistributedObject distributedObject : currentResultDOList) {
             GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
             if (goodRequestPosition.getGuidOfGR() != null && (goodRequestPosition.getComplexId() == null ||
@@ -475,12 +486,10 @@ public class Manager implements AbstractToElement {
                     query.setParameter("currentComplexID", currentComplexID);
                     query.executeUpdate();
                 } catch (Exception e) {
-                    LOGGER.error("Error findResponseResult: " + e.getMessage(), e);
+                    LOGGER.error("Error by updating complexId: " + e.getMessage(), e);
                 }
-                currentResultDOListResult.add(goodRequestPosition);
             }
         }
-        return currentResultDOListResult;
     }
 
     private List<DistributedObject> findConfirmedDO(SessionFactory sessionFactory,

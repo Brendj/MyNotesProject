@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.nsi;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +69,7 @@ public class NSIRepairService {
         Session session = (Session) em.getDelegate();
         String q = replaceClientGroups(new String(LOAD_REPAIR_QUERY));
         org.hibernate.Query query = session.createSQLQuery(q);
-        query.setParameter("operation", ImportRegisterClientsService.DELETE_OPERATION);
+        query.setParameter("operation", ImportRegisterMSKClientsService.DELETE_OPERATION);
         query.setParameter("date", 1411344000000L);
         List res = query.list();
         for (Object entry : res) {

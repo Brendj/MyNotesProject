@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -181,6 +182,13 @@ public class DAOUtils {
     public static Client findClientByGuid(Session persistenceSession, String guid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.eq("clientGUID", guid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    public static Client findClientByMeshGuid(Session persistenceSession, String guid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("meshGUID", guid));
         List<Client> resultList = (List<Client>) criteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
     }
@@ -926,7 +934,7 @@ public class DAOUtils {
 
     public static List<Org> getOrgsSinceVersion(Session session, long version) throws Exception {
         Criteria criteria = session.createCriteria(Org.class);
-        criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
+        //criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
         criteria.add(Restrictions.gt("orgStructureVersion", version));
         return criteria.list();
     }
@@ -2151,6 +2159,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(Good.class);
         criteria.add(Restrictions.eq("guid", guidOfGood));
         return (Good) criteria.uniqueResult();
+    }
+
+    public static WtComplex findWtComplexById(Session session, Long idOfComplex) {
+        Criteria criteria = session.createCriteria(WtComplex.class);
+        criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
+        return (WtComplex) criteria.uniqueResult();
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
@@ -4269,10 +4283,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ApplicationForFood getLastApplicationForFoodByClientGuid(Session session, String clientGuid) {
+    public static ApplicationForFood getLastApplicationForFoodByClient(Session session, Client client) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.createAlias("client", "c");
-        criteria.add(Restrictions.eq("c.clientGUID", clientGuid));
+        criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("archived", Boolean.FALSE));
         criteria.addOrder(org.hibernate.criterion.Order.desc("lastUpdate"));
         criteria.setMaxResults(1);
@@ -5100,5 +5113,11 @@ public class DAOUtils {
         criteria.add(Restrictions.le("date", CalendarUtils.endOfDay(compositeIdOfSpecialDate.getDate())));
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
         return criteria.list();
+    }
+
+    public static CanceledOrder getCancelOrderIdBySource(Session session, String source) {
+        Criteria criteria = session.createCriteria(CanceledOrder.class);
+        criteria.add(Restrictions.eq("idOfTransaction", Long.parseLong(source)));
+        return (CanceledOrder) criteria.uniqueResult();
     }
 }

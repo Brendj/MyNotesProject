@@ -39,9 +39,10 @@ public class ImportRegisterFileService extends ClientMskNSIService {
 
     public final String FILENAME_PROPERTY = "ecafe.processor.nsi.registry.filename";
     public final String NODE_PROPERTY = "ecafe.processor.nsi.registry.node";
-    public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service, symmetric" или отсутствие настройки
+    public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service, symmetric, kafka" или отсутствие настройки
     public static final String MODE_FILE = "file";
     public static final String MODE_SYMMETRIC = "symmetric";
+    public static final String MODE_KAFKA = "kafka";
     public static final String LEGAL_REPRESENTATIVE = "Законный представитель";
 
     protected final String INITIAL_INSERT_STATEMENT = "insert into cf_registry_file(guidofclient, "
@@ -97,7 +98,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             inputStreamReader = new InputStreamReader(fileInputStream, "windows-1251");
             bufferedReader = new BufferedReader(inputStreamReader);
 
-            ClientMskNSIService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).getNSIService();
+            ClientMskNSIService service = RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class).getNSIService();
             service.fillTable(bufferedReader);
 
         } finally {
@@ -254,10 +255,10 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     }*/
 
     @Override
-    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+    public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> list = new ArrayList<String>();
         Boolean guidOK;
-        ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
+        ImportRegisterMSKClientsService service = RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -297,14 +298,14 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         }
     }
 
-    protected void fillOrgGuids(Query query, ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) {
+    protected void fillOrgGuids(Query query, ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) {
         query.setParameterList("guids", orgGuids.getOrgGuids());
     }
 
     @Override
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,
+    public List<ImportRegisterMSKClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
-        List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        List<ImportRegisterMSKClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
         Session session = null;
         Transaction transaction = null;
         try {
@@ -323,7 +324,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             transaction.commit();
             transaction = null;
             for (Object element : list) {
-                ImportRegisterClientsService.ExpandedPupilInfo pupil = new ImportRegisterClientsService.ExpandedPupilInfo();
+                ImportRegisterMSKClientsService.ExpandedPupilInfo pupil = new ImportRegisterMSKClientsService.ExpandedPupilInfo();
                 Object[] row = (Object[])element;
                 pupil.firstName = (String) row[2];
                 pupil.secondName = (String) row[3];
@@ -344,7 +345,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                         if (!StringUtils.isEmpty(arr[2])) {
                             String validPhone = getValidPhone(arr[3]);
                             if (validPhone == null) continue;
-                            ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
+                            ImportRegisterMSKClientsService.GuardianInfo guardianInfo = new ImportRegisterMSKClientsService.GuardianInfo();
                             guardianInfo.setFamilyName(arr[2]);
                             guardianInfo.setFirstName(arr[0]);
                             guardianInfo.setSecondName(arr[1]);
@@ -374,9 +375,9 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 pupils.add(pupil);
             }
             /// удалить неимпортируемые группы
-            for (Iterator<ImportRegisterClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
-                ImportRegisterClientsService.ExpandedPupilInfo p = i.next();
-                if (ImportRegisterClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
+            for (Iterator<ImportRegisterMSKClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
+                ImportRegisterMSKClientsService.ExpandedPupilInfo p = i.next();
+                if (ImportRegisterMSKClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
                     i.remove();
                 }
             }

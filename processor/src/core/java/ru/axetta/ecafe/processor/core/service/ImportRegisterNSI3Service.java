@@ -30,11 +30,11 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
     protected String CREATE_INDEX = "create index cf_registry_file_ekisid_idx on cf_registry_file using btree (ekisId)";
 
     @Override
-    protected void fillOrgGuids(Query query, ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) {
+    protected void fillOrgGuids(Query query, ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) {
         query.setParameterList("guids", orgGuids.getOrgEkisIds());
     }
 
-    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+    public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> list = new ArrayList<String>();
         if (orgGuids.getOrgEkisIds().size() == 0) {
             return "У организации не задан ЕКИС Id";

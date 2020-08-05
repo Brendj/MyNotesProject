@@ -598,7 +598,8 @@ public interface ClientRoomController {
     @WebMethod(operationName = "removeRequestForCashOut")
     Result removeRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "idOfRequest") Long idOfRequest);
     @WebMethod(operationName = "checkApplicationForFood")
-    CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid);
+    CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid,
+            @WebParam(name = "meshGuid") String meshGuid);
 
     @WebMethod(operationName = "registerApplicationForFood")
     Result registerApplicationForFood(@WebParam(name = "clientGuid") String clientGuid, @WebParam(name = "categoryDiscount") Long categoryDiscount,

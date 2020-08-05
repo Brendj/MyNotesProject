@@ -9,7 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 
-<%--@elvariable id="NSIOrgRegistrySynchErrorPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistrySynchErrorPage"--%>
+<%--@elvariable id="NSIOrgRegistrySynchErrorPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistrySyncErrorPage"--%>
 <rich:modalPanel id="NSIOrgRegistrySynchErrorPage" width="450" height="280" resizeable="false" moveable="false" binding="#{NSIOrgRegistrySynchErrorPage.pageComponent}">
 
     <f:facet name="header">
