@@ -6,6 +6,7 @@ package ru.iteco.cardsync.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
+import ru.iteco.cardsync.service.CardService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +21,12 @@ import org.springframework.stereotype.Service;
 public class KafkaService {
     private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
     private final ObjectMapper objectMapper;
+    private final CardService cardService;
 
-    public KafkaService(ObjectMapper objectMapper){
+    public KafkaService(ObjectMapper objectMapper,
+                        CardService cardService){
         this.objectMapper = objectMapper;
+        this.cardService = cardService;
     }
 
     //@KafkaListener(topics = "#{'${kafka.topic.card}'}")
@@ -41,7 +45,13 @@ public class KafkaService {
 
     private void commitJson(BlockPersonEntranceRequest request) {
         try {
-
+            switch (request.getAction()){
+                case block:
+                    cardService.blockCardForClient(request);
+                    break;
+                case unblock:
+                    cardService.unblockCardForClient(request);
+            }
         } catch (Exception e){
             log.error("Can't process message: ", e);
         }

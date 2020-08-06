@@ -4,10 +4,11 @@
 
 package ru.iteco.cardsync.models;
 
-import ru.iteco.cardsync.ActionType;
 import ru.iteco.cardsync.audit.AuditEntity;
 import ru.iteco.cardsync.audit.AuditEntityListener;
 import ru.iteco.cardsync.audit.Auditable;
+import ru.iteco.cardsync.enums.ActionType;
+import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -38,10 +39,10 @@ public class CardActionRequest implements Auditable {
     @Column(name = "requestId", nullable = false)
     private String requestId;
 
-    @Column("idofclient")
+    @Column(name = "idofclient")
     private Long idOfClient;
 
-    @Column(name = "idoforg", nullable = false)
+    @Column(name = "idoforg")
     private Long idOfOrg;
 
     @Column(name = "action", nullable = false)
@@ -54,8 +55,44 @@ public class CardActionRequest implements Auditable {
     @Column(name = "staffId", length = 36)
     private String staffId;
 
+    @Column(name = "comment", nullable = false)
+    private String comment;
+
+    @Column(name = "processed", nullable = false)
+    private Boolean processed;
+
     @Embedded
     private AuditEntity auditEntity;
+
+    public CardActionRequest(){
+        // for Hibernate
+    }
+
+    public static CardActionRequest buildCardActionRequest(BlockPersonEntranceRequest blockPersonEntranceRequest){
+        CardActionRequest request = new CardActionRequest();
+        request.setRequestId(blockPersonEntranceRequest.getId());
+        request.setActionType(blockPersonEntranceRequest.getAction());
+        request.setContingentId(blockPersonEntranceRequest.getContingentId());
+        request.setStaffId(blockPersonEntranceRequest.getStaffId());
+
+        return request;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Boolean getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(Boolean processed) {
+        this.processed = processed;
+    }
 
     public Long getId() {
         return id;

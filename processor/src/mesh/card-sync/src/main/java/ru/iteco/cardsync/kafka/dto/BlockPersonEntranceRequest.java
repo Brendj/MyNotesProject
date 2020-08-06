@@ -4,7 +4,7 @@
 
 package ru.iteco.cardsync.kafka.dto;
 
-import ru.iteco.cardsync.ActionType;
+import ru.iteco.cardsync.enums.ActionType;
 
 import java.util.List;
 
