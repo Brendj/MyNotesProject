@@ -2663,6 +2663,8 @@ public class Processor implements SyncProcessor {
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
 
         List<AbstractToElement> responseSections = new ArrayList<>();
@@ -2696,7 +2698,7 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
