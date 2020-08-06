@@ -1287,7 +1287,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                     result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), ""));
                 } catch (Exception e) {
-                    logger.error("Error sverka: ", e);
+                    logger.error("Error ClientRegistryChange: ", e);
                     setChangeError(change.getIdOfRegistryChange(), e);
                     result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), e.getMessage()));
                 } finally {
@@ -1384,6 +1384,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     addClientMigrationLeaving(session, dbClient, change);
 
                     dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    if(dbClient.getMeshGUID() == null && StringUtils.isNotEmpty(change.getMeshGUID())){
+                        dbClient.setMeshGUID(change.getMeshGUID());
+                    }
 
                     String dateDelete = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
@@ -1415,6 +1418,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                         dbClient.setParallel(change.getParallel());
                         dbClient.setOrg(newOrg);
+                        if(dbClient.getMeshGUID() == null && StringUtils.isNotEmpty(change.getMeshGUID())){
+                            dbClient.setMeshGUID(change.getMeshGUID());
+                        }
                     }
                     if(!newOrg.multiCardModeIsEnabled() && dbClient.activeMultiCardMode()){
                         dbClient.setMultiCardMode(false);
@@ -1432,6 +1438,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                     setGuidFromChange(modifyConfig, change);
+                    modifyConfig.setValue(ClientManager.FieldId.MESH_GUID, change.getMeshGUID());
                     modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
