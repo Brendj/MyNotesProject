@@ -5100,6 +5100,51 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static long nextVersionByHardwareSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_hardware_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
+            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettings.class);
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
+        return (HardwareSettings) criteria.uniqueResult();
+    }
+
+    public static long nextVersionByTurnstileSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_turnstile_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static TurnstileSettings getTurnstileSettingsRequestByOrgAndId(Session session, Long idOfOrg, String turnstileId) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("turnstileId", turnstileId));
+        return (TurnstileSettings) criteria.uniqueResult();
+    }
+
+    public static HardwareSettingsMT getHardwareSettingsMTByIdAndModuleType(Session session, CompositeIdOfHardwareSettings compositeIdOfHardwareSettings,
+            Integer moduleType) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettingsMT.class).createAlias("hardwareSettings","hs", JoinType.FULL_JOIN);
+        criteria.add(Restrictions.eq("hs.compositeIdOfHardwareSettings",compositeIdOfHardwareSettings));
+        criteria.add(Restrictions.eq("moduleType", moduleType));
+        return (HardwareSettingsMT) criteria.uniqueResult();
+    }
+
     public static List getAllDateFromProdactionCalendarForFutureDates(Session persistenceSession) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
         criteria.add(Restrictions.gt("day", new Date()));
@@ -5119,5 +5164,11 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(CanceledOrder.class);
         criteria.add(Restrictions.eq("idOfTransaction", Long.parseLong(source)));
         return (CanceledOrder) criteria.uniqueResult();
+    }
+
+    public static List<TurnstileSettings> getTurnstileListByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return criteria.list();
     }
 }

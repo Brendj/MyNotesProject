@@ -991,6 +991,9 @@
         <%--@elvariable id="orgSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncRequestPage"--%>
         <rich:panelMenuItem id="orgSyncRequest" binding="#{orgSyncRequestPage.mainMenuComponent}" reRender="workspaceForm"
                             label="Запрос проведения синхронизации" action="#{orgSyncRequestPage.show}"/>
+        <%--@elvariable id="hardwareSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.HardwareSettingsReportPage"--%>
+        <rich:panelMenuItem id="orgHardwareSettingsReport" binding="#{hardwareSettingsReportPage.mainMenuComponent}"
+                            label="Отчет по оборудованию" action="#{hardwareSettingsReportPage.show}" reRender="workspaceForm"/>
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="webTechnologistGroupMenuItem" label="WEB-Технолог"
