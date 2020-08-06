@@ -1945,7 +1945,7 @@ public class PreorderDAOService {
 
                 if (wtDish != null) {
                     PreorderMenuDetail preorderMenuDetail = findPreorderWtDish(currentDate, regularPreorder.getClient(),
-                            regularPreorder.getIdOfComplex(), wtDish.getIdOfDish());
+                            regularPreorder.getIdOfComplex(), wtDish.getIdOfDish(), regularPreorder);
 
                     if ((preorderMenuDetail == null || (preorderMenuDetail != null && allowCreateNewPreorderMenuDetail(preorderMenuDetail)))
                             && !forcePreorderWtMenuDetailExists(regularPreorder, currentDate)) {
@@ -2022,7 +2022,7 @@ public class PreorderDAOService {
 
     private boolean allowCreateNewPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail) {
         return preorderMenuDetail.getDeletedState() &&
-                !(//preorderMenuDetail.getState().equals(PreorderState.OK) ||
+                !(preorderMenuDetail.getState().equals(PreorderState.OK) ||
                         preorderMenuDetail.getState().equals(PreorderState.CHANGE_ORG)
                         || preorderMenuDetail.getState().equals(PreorderState.PREORDER_OFF));
     }
@@ -2183,15 +2183,17 @@ public class PreorderDAOService {
         return (list == null || list.size() == 0) ? null : list.get(0);
     }
 
-    private PreorderMenuDetail findPreorderWtDish(Date date, Client client, Integer idOfComplex, Long idOfDish) {
+    private PreorderMenuDetail findPreorderWtDish(Date date, Client client, Integer idOfComplex, Long idOfDish,
+            RegularPreorder regularPreorder) {
         Query query = em.createQuery("select pmd from PreorderMenuDetail pmd left join pmd.preorderComplex pc "
                 + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and "
-                + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish");
+                + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish and pmd.regularPreorder = :regularPreorder");
         query.setParameter("client", client);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
         query.setParameter("idOfDish", idOfDish);
         query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("regularPreorder", regularPreorder);
         List<PreorderMenuDetail> list = query.getResultList();
         return (list == null || list.size() == 0) ? null : list.get(0);
     }
