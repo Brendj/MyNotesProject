@@ -309,19 +309,19 @@ public class ClientManager {
             String contractDoc = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_DOC);
             Person contractPerson = client.getContractPerson();
             boolean changed = false;
-            if (contractFirstName != null && StringUtils.isNotEmpty(contractFirstName)) {
+            if (StringUtils.isNotEmpty(contractFirstName)) {
                 contractPerson.setFirstName(contractFirstName);
                 changed = true;
             }
-            if (contractSurname != null && StringUtils.isNotEmpty(contractSurname)) {
+            if (StringUtils.isNotEmpty(contractSurname)) {
                 contractPerson.setSurname(contractSurname);
                 changed = true;
             }
-            if (contractSecondName != null && StringUtils.isNotEmpty(contractSecondName)) {
+            if (StringUtils.isNotEmpty(contractSecondName)) {
                 contractPerson.setSecondName(contractSecondName);
                 changed = true;
             }
-            if (contractDoc != null && StringUtils.isNotEmpty(contractDoc)) {
+            if (StringUtils.isNotEmpty(contractDoc)) {
                 contractPerson.setIdDocument(contractDoc);
                 changed = true;
             }
@@ -480,6 +480,14 @@ public class ClientManager {
                     client.setClientGUID(null);
                 } else {
                     client.setClientGUID(clientGUID);
+                }
+            }
+            if (fieldConfig.getValue(FieldId.MESH_GUID) != null) {
+                String meshGUID = fieldConfig.getValue(FieldId.MESH_GUID);
+                if (meshGUID.isEmpty()) {
+                    client.setMeshGUID(null);
+                } else {
+                    client.setMeshGUID(meshGUID);
                 }
             }
             //tokens[32])

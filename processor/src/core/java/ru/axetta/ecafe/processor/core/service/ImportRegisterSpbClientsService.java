@@ -295,6 +295,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                     modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                    modifyConfig.setValue(ClientManager.FieldId.MESH_GUID, change.getMeshGUID());
                     modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
