@@ -16,8 +16,7 @@
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
-      <configuration>
-      </configuration>
+      <configuration />
     </facet>
     <facet type="hibernate" name="Hibernate">
       <configuration>
@@ -171,6 +170,7 @@
     <orderEntry type="library" name="jackson-core-asl-1.9.2" level="project" />
     <orderEntry type="library" name="bcpkix-jdk15on-1.50" level="project" />
     <orderEntry type="library" name="httpclient-4.1.2" level="project" />
-    <orderEntry type="library" exported="" name="io.jsonwebtoken:jjwt:0.4" level="project" />
+    <orderEntry type="library" name="io.jsonwebtoken:jjwt:0.4" level="project" />
+    <orderEntry type="library" exported="" name="jjwt" level="project" />
   </component>
 </module>
