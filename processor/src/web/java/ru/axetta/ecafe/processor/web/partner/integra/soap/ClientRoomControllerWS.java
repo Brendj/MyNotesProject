@@ -9795,12 +9795,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_INVALID_MOBILE;
                     return result;
                 }
+                Long version = getClientGuardiansResultVersion(session);
                 List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
                 boolean guardianWithMobileFound = false;
                 for (Client guardian : guardians) {
                     if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
                         guardianWithMobileFound = true;
-                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value);
+                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value, version);
                     }
                 }
 
