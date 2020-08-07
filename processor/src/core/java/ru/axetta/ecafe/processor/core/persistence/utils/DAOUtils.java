@@ -5171,4 +5171,10 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         return criteria.list();
     }
+
+    public static Org getOrgById(Session session, Long idOfOrg) {
+        Criteria orgCriteria = session.createCriteria(Org.class);
+        orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        return (Org) orgCriteria.uniqueResult();
+    }
 }
