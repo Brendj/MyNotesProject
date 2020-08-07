@@ -96,6 +96,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean helpdeskEnabled = false;
     private Boolean preordersEnabled = false;
     private Boolean preorderlp = false;
+    private Long orgIdFromNsi;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -692,6 +693,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setPreordersEnabled(preordersEnabled);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         org.setPreorderlp(preorderlp);
+        org.setOrgIdFromNsi(orgIdFromNsi);
         session.save(org);
         OrgSync orgSync = new OrgSync();
         orgSync.setIdOfPacket(0L);
@@ -874,4 +876,8 @@ public class OrgCreatePage extends BasicWorkspacePage
             }
         }
     }
+
+    public Long getOrgIdFromNsi() { return orgIdFromNsi; }
+
+    public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
 }
