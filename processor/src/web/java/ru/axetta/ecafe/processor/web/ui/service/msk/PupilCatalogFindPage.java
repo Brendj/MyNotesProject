@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -144,13 +144,13 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
     }
 
-    public static class Item extends ImportRegisterClientsService.ExpandedPupilInfo {
+    public static class Item extends ImportRegisterMSKClientsService.ExpandedPupilInfo {
 
         boolean toAdd, toBind;
         Long idOfClient, idOfClientForBind;
         String findByFIOResult, fullNameOfClientForBind;
 
-        public Item(ImportRegisterClientsService.ExpandedPupilInfo pi) {
+        public Item(ImportRegisterMSKClientsService.ExpandedPupilInfo pi) {
             this.copyFrom(pi);
         }
 
@@ -204,9 +204,9 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     @Transactional
     public void updateList() {
         try {
-            ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids=null;
+            ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids=null;
             if (org!= null) {
-                orgGuids = new ImportRegisterClientsService.OrgRegistryGUIDInfo(org);
+                orgGuids = new ImportRegisterMSKClientsService.OrgRegistryGUIDInfo(org);
                 if (orgGuids.getOrgGuids().size()==0) {
                     printError("У выбранной организации не указан GUID");
                     return;
@@ -224,13 +224,13 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             }
             pupilInfos = new LinkedList<Item>();
             int nItemsNotFound = 0;
-            List<ImportRegisterClientsService.ExpandedPupilInfo> pis = nsiService
+            List<ImportRegisterMSKClientsService.ExpandedPupilInfo> pis = nsiService
                     .getPupilsByOrgGUID(orgGuids, familyName, firstName, secondName);
             if(showOnlyClientGoups) {
                 pis = clearClientsByClass(pis);
             }
             Collections.sort(pis, new PupilCatalogComparator());
-            for (ImportRegisterClientsService.ExpandedPupilInfo pi : pis) {
+            for (ImportRegisterMSKClientsService.ExpandedPupilInfo pi : pis) {
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid, true);
                 if (i.idOfClient == null) {
@@ -246,9 +246,9 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
     }
 
-    protected List<ImportRegisterClientsService.ExpandedPupilInfo> clearClientsByClass(List<ImportRegisterClientsService.ExpandedPupilInfo> source) {
-        List<ImportRegisterClientsService.ExpandedPupilInfo> result = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
-        for(ImportRegisterClientsService.ExpandedPupilInfo i : source) {
+    protected List<ImportRegisterMSKClientsService.ExpandedPupilInfo> clearClientsByClass(List<ImportRegisterMSKClientsService.ExpandedPupilInfo> source) {
+        List<ImportRegisterMSKClientsService.ExpandedPupilInfo> result = new ArrayList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
+        for(ImportRegisterMSKClientsService.ExpandedPupilInfo i : source) {
             //if(!i.getGroup().matches("^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9.,$;]+$")) {
             if(i.getGroup().matches("^[0-9].*")) {
                 result.add(i);
@@ -545,8 +545,8 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     public class PupilCatalogComparator implements Comparator {
         @Override
         public int compare(Object o1, Object o2) {
-            ImportRegisterClientsService.ExpandedPupilInfo p1 = (ImportRegisterClientsService.ExpandedPupilInfo) o1;
-            ImportRegisterClientsService.ExpandedPupilInfo p2 = (ImportRegisterClientsService.ExpandedPupilInfo) o2;
+            ImportRegisterMSKClientsService.ExpandedPupilInfo p1 = (ImportRegisterMSKClientsService.ExpandedPupilInfo) o1;
+            ImportRegisterMSKClientsService.ExpandedPupilInfo p2 = (ImportRegisterMSKClientsService.ExpandedPupilInfo) o2;
             String name1 = p1.getFamilyName() + " " + p1.getFirstName() + " " + p1.getSecondName();
             String name2 = p2.getFamilyName() + " " + p2.getFirstName() + " " + p2.getSecondName();
             return name1.compareTo(name2);

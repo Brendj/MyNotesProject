@@ -278,10 +278,14 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setPerson(person);
                 session.save(person);
             }
-            if(userOrg.idOfOrg != null)
-                user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
-            if(userIdOfClient != null)
-                user.setClient((Client) session.load(Client.class, userIdOfClient));
+            if(userIdOfClient != null){
+                Client userClient = (Client) session.load(Client.class, userIdOfClient);
+                user.setClient(userClient);
+                if(userClient != null && userClient.getOrg() != null)
+                    user.setOrg(userClient.getOrg());
+                else if(userOrg.idOfOrg != null)
+                    user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+            }
 
             if (role != null && User.DefaultRole.DEFAULT.equals(role)) {
                 if (StringUtils.isEmpty(roleName)) {
@@ -744,6 +748,8 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             this.firstName = null;
             this.secondName = null;
             this.surname = null;
+            this.userOrg = new OrgItem(null,null);
+            this.userOrgName = "Не выбрано";
         }
         else {
             Client client = (Client) session.load(Client.class,idOfClient);
@@ -752,6 +758,12 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             this.firstName = client.getPerson().getFirstName();
             this.secondName = client.getPerson().getSecondName();
             this.surname = client.getPerson().getSurname();
+            if(client.getOrg() != null)
+            {
+                this.userOrg = new OrgItem(client.getOrg().getIdOfOrg(), client.getOrg().getShortName());
+                this.userOrgName = this.userOrg.getShortName();
+            }
+
         }
     }
 }

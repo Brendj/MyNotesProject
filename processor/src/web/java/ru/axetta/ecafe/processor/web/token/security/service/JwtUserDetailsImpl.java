@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.token.security.service;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -17,8 +16,6 @@ import java.util.Collection;
 public class JwtUserDetailsImpl implements UserDetails {
 
     private final User user;
-    private final String refreshToken;
-    private final String refreshTokenHash;
     private final Collection<GrantedAuthority> grantedAuthorities;
     private final boolean isEnabled;
     private final boolean isAccountNonExpired;
@@ -35,7 +32,7 @@ public class JwtUserDetailsImpl implements UserDetails {
 
 
 
-    public JwtUserDetailsImpl(final User user, final String refreshToken, final String refreshTokenHash ) {
+    public JwtUserDetailsImpl(final User user) {
         this.user = user;
         this.username = user.getUserName();
         if(user.getPerson() != null){
@@ -50,8 +47,6 @@ public class JwtUserDetailsImpl implements UserDetails {
         }
         this.isEnabled = !user.isBlocked();
         this.isAccountNonExpired = user.blockedDateExpired();
-        this.refreshToken = refreshToken;
-        this.refreshTokenHash = refreshTokenHash;
         this.grantedAuthorities = new ArrayList<>();
         this.grantedAuthorities.add(new GrantedAuthorityImpl(User.DefaultRole.parse(user.getIdOfRole()).name()));
         this.idOfUser = user.getIdOfUser();
@@ -61,34 +56,25 @@ public class JwtUserDetailsImpl implements UserDetails {
             this.contractId = null;
         else
             this.contractId = user.getClient().getContractId();
-        if(user.getOrg() == null){
-            if(user.getClient() != null){
-                Org userClientOrg = user.getClient().getOrg();
-                if(userClientOrg != null){
-                    this.idOfOrg = userClientOrg.getIdOfOrg();
-                    this.shortOrgName = userClientOrg.getShortName();
-                }
-                else {
-                    this.idOfOrg = null;
-                    this.shortOrgName = null;
-                }
-            }
-            else {
-                this.idOfOrg = null;
-                this.shortOrgName = null;
-            }
+
+        if(user.getClient() != null && user.getClient().getOrg() != null){
+            this.idOfOrg = user.getClient().getOrg().getIdOfOrg();
+            this.shortOrgName = user.getClient().getOrg().getShortName();
         }
-        else{
+        else if(user.getOrg() != null){
             this.idOfOrg = user.getOrg().getIdOfOrg();
             this.shortOrgName = user.getOrg().getShortName();
+        }
+        else {
+            this.idOfOrg = null;
+            this.shortOrgName = null;
         }
     }
 
     public JwtUserDetailsImpl(final Collection<GrantedAuthority> authorities, final Boolean isEnabled,
             final Boolean isAccountNonExpired,final String username, final String surname, final String firstname,
             final String secondname, final Long idOfUser, final Integer idOfRole, final String roleName,
-            final Long contractId, final Long idOfOrg, final String shortOrgName,
-            final String refreshTokenHash, final String refreshToken){
+            final Long contractId, final Long idOfOrg, final String shortOrgName){
         user = null;
         if(isEnabled != null)
             this.isEnabled = isEnabled.booleanValue();
@@ -103,8 +89,6 @@ public class JwtUserDetailsImpl implements UserDetails {
         this.firstname = firstname;
         this.secondname = secondname;
         this.grantedAuthorities = authorities;
-        this.refreshTokenHash = refreshTokenHash;
-        this.refreshToken = refreshToken;
         this.idOfUser = idOfUser;
         this.idOfRole = idOfRole;
         this.roleName = roleName;
@@ -150,14 +134,6 @@ public class JwtUserDetailsImpl implements UserDetails {
     }
 
     public User getUser() { return user; }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public String getRefreshTokenHash() {
-        return refreshTokenHash;
-    }
 
     public String getSurname() {
         return surname;

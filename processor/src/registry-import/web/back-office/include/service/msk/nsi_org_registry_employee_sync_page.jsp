@@ -34,7 +34,7 @@
 </style>
 
 
-<%--@elvariable id="NSIOrgRegistryEmployeeSynchPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistryEmployeeSynchPage"--%>
+<%--@elvariable id="NSIOrgRegistryEmployeeSynchPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistryEmployeeSyncPage"--%>
 <h:panelGrid id="NSIOrgRegistryEmployeeSynchPage" styleClass="borderless-grid" binding="#{NSIOrgRegistryEmployeeSynchPage.pageComponent}">
 
     <h:panelGrid styleClass="borderless-grid" id="synchTableInfoPanel" style="padding-bottom: 5px;">

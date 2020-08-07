@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.manager;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
@@ -426,26 +427,47 @@ public class Manager implements AbstractToElement {
                 saveException(sessionFactory, errorMessage);
             }
         }
-
+        // обновляем ComplexId
         if (doClass.getSimpleName().equals("GoodRequestPosition")) {
-            List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
             Session session = null;
             try {
                 session = sessionFactory.openSession();
-                currentResultDOListResult = currentResultDOListFind(session, currentResultDOList);
+                updateComplexId(session, currentResultDOList);
             } catch (Exception e) {
-                e.printStackTrace();
+                errorMessage = e.getMessage();
+                LOGGER.error("Error findResponseResult: " + e.getMessage(), e);
             } finally {
                 HibernateUtils.close(session, LOGGER);
+                if (StringUtils.isNotEmpty(errorMessage)) {
+                    saveException(sessionFactory, errorMessage);
+                }
+            }
+            // Не выводим записи с пустым товаром
+            GoodRequestRepository goodRequestRepository = GoodRequestRepository.getInstance();
+            List<DistributedObject> currentResultDOListResult = new ArrayList<>();
+            for(DistributedObject distributedObject : currentResultDOList) {
+                if (!goodRequestRepository.isGoodRequestPositionWithoutGood((GoodRequestPosition) distributedObject)) {
+                    currentResultDOListResult.add(distributedObject);
+                }
             }
             currentResultDOList = currentResultDOListResult;
         }
+        // Не выводим записи, все позиции которых с пустым товаром
+        if (doClass.getSimpleName().equals("GoodRequest")) {
+            GoodRequestRepository goodRequestRepository = GoodRequestRepository.getInstance();
+            List<DistributedObject> currentResultDOListResult = new ArrayList<>();
+            for (DistributedObject distributedObject : currentResultDOList) {
+                if (!goodRequestRepository.isGoodRequestWithoutGood((GoodRequest) distributedObject)) {
+                    currentResultDOListResult.add(distributedObject);
+                }
+            }
+            currentResultDOList = currentResultDOListResult;
+        }
+
         return currentResultDOList;
     }
 
-    private List<DistributedObject> currentResultDOListFind(Session session,
-            List<DistributedObject> currentResultDOList) {
-        List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
+    private void updateComplexId(Session session, List<DistributedObject> currentResultDOList) {
         for (DistributedObject distributedObject : currentResultDOList) {
             GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
             if (goodRequestPosition.getGuidOfGR() != null && (goodRequestPosition.getComplexId() == null ||
@@ -464,12 +486,10 @@ public class Manager implements AbstractToElement {
                     query.setParameter("currentComplexID", currentComplexID);
                     query.executeUpdate();
                 } catch (Exception e) {
-                    LOGGER.error("Error findResponseResult: " + e.getMessage(), e);
+                    LOGGER.error("Error by updating complexId: " + e.getMessage(), e);
                 }
-                currentResultDOListResult.add(goodRequestPosition);
             }
         }
-        return currentResultDOListResult;
     }
 
     private List<DistributedObject> findConfirmedDO(SessionFactory sessionFactory,
@@ -688,7 +708,7 @@ public class Manager implements AbstractToElement {
                 .getInstance();
         for (Long orgOwner : mapPositions.keySet()) {
             List<String> guids = mapPositions.get(orgOwner);
-            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids);
+            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids, true);
         }
     }
 

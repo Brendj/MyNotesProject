@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -181,6 +182,13 @@ public class DAOUtils {
     public static Client findClientByGuid(Session persistenceSession, String guid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.eq("clientGUID", guid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    public static Client findClientByMeshGuid(Session persistenceSession, String guid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("meshGUID", guid));
         List<Client> resultList = (List<Client>) criteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
     }
@@ -926,7 +934,7 @@ public class DAOUtils {
 
     public static List<Org> getOrgsSinceVersion(Session session, long version) throws Exception {
         Criteria criteria = session.createCriteria(Org.class);
-        criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
+        //criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
         criteria.add(Restrictions.gt("orgStructureVersion", version));
         return criteria.list();
     }
@@ -2153,6 +2161,12 @@ public class DAOUtils {
         return (Good) criteria.uniqueResult();
     }
 
+    public static WtComplex findWtComplexById(Session session, Long idOfComplex) {
+        Criteria criteria = session.createCriteria(WtComplex.class);
+        criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
+        return (WtComplex) criteria.uniqueResult();
+    }
+
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
             boolean cancelOrder, PreorderComplex preorderComplex, String itemCode, Long orderSum) {
         if (!cancelOrder) {
@@ -3238,6 +3252,25 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Criteria criteria = session.createCriteria(GoodRequest.class);
+        criteria.add(Restrictions.in("orgOwner", orgIds));
+        criteria.add(Restrictions.gt("globalVersion", version));
+        return criteria.list();
+    }
+
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersionWithDishes(Session session, Long idOfOrg,
+            long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Query query = session
+                .createQuery("select distinct gr from GoodRequestPosition grp join grp.goodRequest gr "
+                        + "where gr.orgOwner in (:orgIds) and gr.globalVersion > :version and grp.good is null");
+        query.setParameterList("orgIds", orgIds);
+        query.setParameter("version", version);
+        return query.list();
+    }
+
     public static List<ComplexSchedule> getComplexSchedulesForOrgSinceVersion(Session session, Long idOfOrg,
             long version) throws Exception {
         List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
@@ -3853,6 +3886,32 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<GoodRequestPosition> getGoodRequestPositionsByGoodRequest(Session session,
+            GoodRequest request) {
+        Query query = session.createSQLQuery("select grp.guid from cf_goods_requests_positions grp "
+                + "inner join cf_goods_requests gr on grp.idofgoodsrequest = gr.idofgoodsrequest "
+                + "where gr.guid = :guid").setParameter("guid", request.getGuid());
+        List<GoodRequestPosition> result = new ArrayList<>();
+        for (Object o : query.list()) {
+            GoodRequestPosition goodRequestPosition = getGoodRequestPositionByGuid(session, o.toString());
+            if (goodRequestPosition != null) {
+                result.add(goodRequestPosition);
+            }
+        }
+        return result;
+    }
+
+    public static GoodRequestPosition getGoodRequestPositionByGuid(Session session, String guid) {
+        try {
+            Query query = session.createQuery("SELECT grp from GoodRequestPosition grp where grp.guid = :guid");
+            query.setParameter("guid", guid);
+            return (GoodRequestPosition) query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Can't find GoodRequestPosition guid=" + guid + ": " + e.getMessage());
+            return null;
+        }
+    }
+
     public static GoodRequest findGoodRequestByPreorderInfo(Session session, Long idOfOrg, Date createdDate) {
         Criteria criteria = session.createCriteria(GoodRequest.class);
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
@@ -4224,10 +4283,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ApplicationForFood getLastApplicationForFoodByClientGuid(Session session, String clientGuid) {
+    public static ApplicationForFood getLastApplicationForFoodByClient(Session session, Client client) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.createAlias("client", "c");
-        criteria.add(Restrictions.eq("c.clientGUID", clientGuid));
+        criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("archived", Boolean.FALSE));
         criteria.addOrder(org.hibernate.criterion.Order.desc("lastUpdate"));
         criteria.setMaxResults(1);
@@ -5042,6 +5100,51 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static long nextVersionByHardwareSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_hardware_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
+            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettings.class);
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
+        return (HardwareSettings) criteria.uniqueResult();
+    }
+
+    public static long nextVersionByTurnstileSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_turnstile_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static TurnstileSettings getTurnstileSettingsRequestByOrgAndId(Session session, Long idOfOrg, String turnstileId) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("turnstileId", turnstileId));
+        return (TurnstileSettings) criteria.uniqueResult();
+    }
+
+    public static HardwareSettingsMT getHardwareSettingsMTByIdAndModuleType(Session session, CompositeIdOfHardwareSettings compositeIdOfHardwareSettings,
+            Integer moduleType) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettingsMT.class).createAlias("hardwareSettings","hs", JoinType.FULL_JOIN);
+        criteria.add(Restrictions.eq("hs.compositeIdOfHardwareSettings",compositeIdOfHardwareSettings));
+        criteria.add(Restrictions.eq("moduleType", moduleType));
+        return (HardwareSettingsMT) criteria.uniqueResult();
+    }
+
     public static List getAllDateFromProdactionCalendarForFutureDates(Session persistenceSession) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
         criteria.add(Restrictions.gt("day", new Date()));
@@ -5054,6 +5157,18 @@ public class DAOUtils {
         criteria.add(Restrictions.ge("date", CalendarUtils.startOfDay(compositeIdOfSpecialDate.getDate())));
         criteria.add(Restrictions.le("date", CalendarUtils.endOfDay(compositeIdOfSpecialDate.getDate())));
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
+        return criteria.list();
+    }
+
+    public static CanceledOrder getCancelOrderIdBySource(Session session, String source) {
+        Criteria criteria = session.createCriteria(CanceledOrder.class);
+        criteria.add(Restrictions.eq("idOfTransaction", Long.parseLong(source)));
+        return (CanceledOrder) criteria.uniqueResult();
+    }
+
+    public static List<TurnstileSettings> getTurnstileListByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         return criteria.list();
     }
 }

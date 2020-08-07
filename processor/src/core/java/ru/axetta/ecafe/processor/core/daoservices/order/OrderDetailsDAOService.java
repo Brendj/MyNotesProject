@@ -8,6 +8,11 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -140,6 +145,38 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
+    // для меню веб-технолога
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampBodyWtMenuValueByOrderType(Long idOfOrg, Date start, Long idOfComplex,
+            boolean includeActDiscrepancies, OrderTypeEnumType orderTypeEnumType) {
+        String sql = "select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                " and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
+                " cforder.idoforg=:idoforg and complex.idofcomplex = :idOfComplex and " +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " (cforder.ordertype=:orderType or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
+                : " and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", start.getTime());
+        query.setParameter("orderType", orderTypeEnumType.ordinal());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis() - 1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if (list == null || list.isEmpty() || list.get(0) == null) {
+            return 0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
 
 
     /* Подсчет суточной пробы для льготного питания*/
@@ -227,6 +264,67 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return  (List<GoodItem>) query.list();
     }
 
+
+    @SuppressWarnings("unchecked")
+    // для веб-технолога, добавить отбор комплексов по датам и categoryorgs?
+    public List<WtComplexItem> findAllWtComplexes(Long idOfOrg, Date startTime, Date endTime, Set orderTypes) {
+        String sql = "select distinct complex.idOfComplex as idOfComplex, "
+                + "complex.wtDietType as dietType, "
+                + "complex.wtAgeGroupItem as ageGroup, "
+                + "case ord.orderType when 10 then 1 else 0 end as orderType "
+                + "from OrderDetail details "
+                + "left join details.wtComplex complex "
+                + "left join details.order ord "
+                + "left join ord.org o "
+                + "where ord.state=0 "
+                + "and details.state=0 "
+                + "and ord.orderType in :orderType "
+                + "and details.wtComplex is not null "
+                + "and o.idOfOrg=:idOfOrg "
+                + "and ord.createTime between :startDate and :endDate "
+                + "and details.menuType >= :mintype "
+                + "and details.menuType <=:maxtype";
+        Query query = getSession().createQuery(sql);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameterList("orderType", orderTypes);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(WtComplexItem.class));
+        return  (List<WtComplexItem>) query.list();
+    }
+
+    public List<WtPaidComplexItem> findAllWtComplexesByOrderType(Long idOfOrg, Date startTime, Date endTime,
+            OrderTypeEnumType orderTypeEnumType) {
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<>();
+        orderTypeEnumTypeSet.add(orderTypeEnumType);
+        String sql = "select distinct complex.idOfComplex as idOfComplex, "
+                + "complex.wtDietType as dietType, "
+                + "complex.wtAgeGroupItem as ageGroup, "
+                + "details.RPrice as price "
+                + "from OrderDetail details "
+                + "left join details.wtComplex complex "
+                + "left join details.order ord "
+                + "left join ord.org o "
+                + "where ord.state=0 "
+                + "and details.state=0 "
+                + "and ord.orderType in (:orderType) "
+                + "and details.wtComplex is not null "
+                + "and o.idOfOrg=:idOfOrg "
+                + "and ord.createTime between :startDate and :endDate "
+                + "and details.menuType >= :mintype "
+                + "and details.menuType <=:maxtype";
+        Query query = getSession().createQuery(sql);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameterList("orderType", orderTypeEnumTypeSet);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(WtPaidComplexItem.class));
+        return  (List<WtPaidComplexItem>) query.list();
+    }
 
     /* получаем список всех товаров для льготного питания */
     @SuppressWarnings("unchecked")
@@ -521,4 +619,68 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return clientReportItems;
     }
 
+    // Подсчет количества для меню веб-технолога
+    public Long buildRegisterStampBodyWtMenuValue(Long idOfOrg, Date start, Long idOfComplex, boolean includeActDiscrepancies) {
+        String sql ="select sum(orderdetail.qty) "
+                + " from cf_orders cforder "
+                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
+                + "     left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex"
+                + " where cforder.state=0 "
+                + "     and orderdetail.state=0 "
+                + "     and cforder.createddate>=:startDate "
+                + "     and cforder.createddate<=:endDate "
+                + "     and orderdetail.socdiscount>0 "
+                + "     and cforder.idoforg=:idoforg "
+                + "     and complex.idofcomplex = :idOfComplex "
+                + "     and orderdetail.menutype>=:mintype "
+                + "     and orderdetail.menutype<=:maxtype "
+                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8"
+                + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if(list==null || list.isEmpty() || list.get(0)==null){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
+    // Подсчет суточной пробы для льготного питания - меню веб-технолога
+    public Long buildRegisterStampDailySampleWtMenuValueNew(Long idOfOrg, Date start, Long idOfComplex) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and" +
+                " cforder.idoforg=:idoforg and complex.idofcomplex = :idOfComplex" +
+                " and cforder.ordertype in (5) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
+        Object res = query.uniqueResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigInteger) res).longValue();
+        }
+    }
 }

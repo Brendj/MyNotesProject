@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -110,8 +110,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -7160,7 +7160,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
         menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
         menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
-        menuItemExt.setAvailableNow(0);
+        menuItemExt.setAvailableNow(1);
         menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
                 wtDish.getCarbohydrates().doubleValue());
         menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
@@ -9795,12 +9795,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_INVALID_MOBILE;
                     return result;
                 }
+                Long version = getClientGuardiansResultVersion(session);
                 List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
                 boolean guardianWithMobileFound = false;
                 for (Client guardian : guardians) {
                     if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
                         guardianWithMobileFound = true;
-                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value);
+                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value, version);
                     }
                 }
 
@@ -10552,9 +10553,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid) {
+    public CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid,
+            @WebParam(name = "meshGuid") String meshGuid) {
         CheckApplicationForFoodResult result = new CheckApplicationForFoodResult();
-        if (StringUtils.isEmpty(clientGuid)) {
+        if (StringUtils.isEmpty(clientGuid) && StringUtils.isEmpty(meshGuid)) {
             result.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
             result.description = RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC;
             return result;
@@ -10565,13 +10567,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client client = DAOUtils.findClientByGuid(persistenceSession, clientGuid);
+            Client client = null;
+            if (!StringUtils.isEmpty(meshGuid)) {
+                client = DAOUtils.findClientByMeshGuid(persistenceSession, meshGuid);
+            }
+
+            if (client == null) {
+                client = DAOUtils.findClientByGuid(persistenceSession, clientGuid);
+            }
             if (null == client) {
                 throw new ClientNotFoundException(String.format("Unable to find client with guid={%s}", clientGuid));
             }
 
             ApplicationForFood applicationForFood = DAOUtils
-                    .getLastApplicationForFoodByClientGuid(persistenceSession, clientGuid);
+                    .getLastApplicationForFoodByClient(persistenceSession, client);
 
             if (null == applicationForFood) {
                 result.setApplicationExists(Boolean.FALSE);

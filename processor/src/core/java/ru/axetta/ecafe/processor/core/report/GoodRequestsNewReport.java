@@ -11,7 +11,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -87,14 +86,31 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             parameterMap.put("endDate", endTime);
 
             calendar.setTime(startTime);
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, true);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
             return new GoodRequestsNewReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Map<String, Object> parameterMap) throws Exception{
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
+                boolean isROSection) throws Exception {
+            Date generateTime = new Date();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
+            calendar.setTime(startTime);
+            parameterMap.put("startDate", startTime);
+            parameterMap.put("endDate", endTime);
+
+            calendar.setTime(startTime);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, isROSection);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
+            Date generateEndTime = new Date();
+            long generateDuration = generateEndTime.getTime() - generateTime.getTime();
+            return new GoodRequestsNewReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
+        }
+
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Map<String,
+                Object> parameterMap, boolean isROSection) throws Exception{
             boolean hideMissedColumns = Boolean.parseBoolean(reportProperties.getProperty(P_HIDE_MISSED_COLUMNS, "false"));
             boolean hideGeneratePeriod = Boolean.parseBoolean(reportProperties.getProperty(P_HIDE_GENERATE_PERIOD, "false"));
             String nameFilter = StringUtils.trim(reportProperties.getProperty(P_NAME_FILTER, ""));
@@ -180,7 +196,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
                     hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly,
-                    needFullGoodNames));
+                    needFullGoodNames, isROSection));
         }
     }
 

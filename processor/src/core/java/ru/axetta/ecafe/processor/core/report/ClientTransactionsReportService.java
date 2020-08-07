@@ -6,13 +6,17 @@ package ru.axetta.ecafe.processor.core.report;
 
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by anvarov on 16.06.2017.
@@ -29,7 +33,7 @@ public class ClientTransactionsReportService {
                     idOfOrgList);
 
             for (AccountTransaction accountTransaction : accountTransactionList) {
-                clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction));
+                clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction, session));
             }
         } else {
             for (Client client : clientList) {
@@ -37,7 +41,7 @@ public class ClientTransactionsReportService {
                         client, idOfOrgList);
 
                 for (AccountTransaction accountTransaction : accountTransactionList) {
-                    clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction));
+                    clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction, session));
                 }
             }
         }
@@ -82,7 +86,7 @@ public class ClientTransactionsReportService {
         return clientTransactionsReportItemList;
     }
 
-    public List<ClientTransactionsReportItem> getItemsByAccountTransactions(AccountTransaction accountTransaction) {
+    public List<ClientTransactionsReportItem> getItemsByAccountTransactions(AccountTransaction accountTransaction, Session session) {
         List<ClientTransactionsReportItem> clientTransactionsReportItemList = new ArrayList<ClientTransactionsReportItem>();
 
         if (accountTransaction.getSourceType() == 3) {
@@ -100,7 +104,7 @@ public class ClientTransactionsReportService {
 
             clientTransactionsReportItem.setOperationType("Пополнение");
             clientTransactionsReportItem.setTransactionDescription("Пополнение");
-            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem
@@ -126,11 +130,11 @@ public class ClientTransactionsReportService {
             if (accountTransaction.getTransactionSum() > 0) {
                 clientTransactionsReportItem.setOperationType("Пополнение");
                 clientTransactionsReportItem.setTransactionDescription("Пополнение");
-                clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+                clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             } else {
                 clientTransactionsReportItem.setOperationType("Списание");
                 clientTransactionsReportItem.setTransactionDescription("Списание");
-                clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+                clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             }
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
@@ -163,6 +167,8 @@ public class ClientTransactionsReportService {
                         clientTransactionsReportItem.setTransactionDescription("Списание");
                         clientTransactionsReportItem
                                 .setOrderNumber(String.valueOf(order.getCompositeIdOfOrder().getIdOfOrder()));
+                        clientTransactionsReportItem
+                                .setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
                         clientTransactionsReportItem.setSumm(String.format("%d.%02d",
                                 ((orderDetail.getRPrice() - orderDetail.getDiscount()) * orderDetail.getQty()) / 100,
                                 Math.abs(((orderDetail.getRPrice() - orderDetail.getDiscount()) * orderDetail.getQty())
@@ -194,7 +200,7 @@ public class ClientTransactionsReportService {
 
             clientTransactionsReportItem.setOperationType("Списание");
             clientTransactionsReportItem.setTransactionDescription("Списание");
-            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem
@@ -221,7 +227,7 @@ public class ClientTransactionsReportService {
             }
             clientTransactionsReportItem.setOperationType("Списание");
             clientTransactionsReportItem.setTransactionDescription("Списание");
-            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem
@@ -248,7 +254,9 @@ public class ClientTransactionsReportService {
 
             clientTransactionsReportItem.setOperationType("Отмена");
             clientTransactionsReportItem.setTransactionDescription("Пополнение");
-            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
+            CanceledOrder canceledOrder = DAOUtils.getCancelOrderIdBySource(session, accountTransaction.getSource());
+            clientTransactionsReportItem.setOrderNumber(Long.toString(canceledOrder.getIdOfOrder()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem
@@ -275,13 +283,13 @@ public class ClientTransactionsReportService {
             if (accountTransaction.getTransactionSum() > 0) {
                 clientTransactionsReportItem.setOperationType("Пополнение");
                 clientTransactionsReportItem.setTransactionDescription("Пополнение");
-                clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+                clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             } else {
                 clientTransactionsReportItem.setOperationType("Списание");
                 clientTransactionsReportItem.setTransactionDescription("Списание");
-                clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+                clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             }
-            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem
@@ -306,7 +314,7 @@ public class ClientTransactionsReportService {
             }
             clientTransactionsReportItem.setOperationType("Списание");
             clientTransactionsReportItem.setTransactionDescription("Списание");
-            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem
@@ -333,7 +341,7 @@ public class ClientTransactionsReportService {
             clientTransactionsReportItem.setOperationType("Покупка карты " +
                     (accountTransaction.getTransactionSum().equals(-15000L)? "Mifare":"Mifare (Браслет)"));
             clientTransactionsReportItem.setTransactionDescription("Списание");
-            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setIdOfTransaction(String.valueOf(accountTransaction.getIdOfTransaction()));
             clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
                     Math.abs(accountTransaction.getTransactionSum() % 100)));
             clientTransactionsReportItem

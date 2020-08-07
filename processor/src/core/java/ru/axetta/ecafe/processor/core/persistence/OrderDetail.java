@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintOrders;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 
 import java.util.Set;
 
@@ -69,8 +70,9 @@ public class OrderDetail {
     private String manufacturer;
     private boolean sendToExternal;
     private OrderDetailFRationType fRation;
-    private Long idOfComplex;
+    //private Long idOfComplex;
     private Long idOfDish;
+    private WtComplex wtComplex;
 
     public String getManufacturer() {
         return manufacturer;
@@ -288,20 +290,20 @@ public class OrderDetail {
         this.sendToExternal = sendToExternal;
     }
 
-    public Long getIdOfComplex() {
-        return idOfComplex;
-    }
-
-    public void setIdOfComplex(Long idOfComplex) {
-        this.idOfComplex = idOfComplex;
-    }
-
     public Long getIdOfDish() {
         return idOfDish;
     }
 
     public void setIdOfDish(Long idOfDish) {
         this.idOfDish = idOfDish;
+    }
+
+    public WtComplex getWtComplex() {
+        return wtComplex;
+    }
+
+    public void setWtComplex(WtComplex wtComplex) {
+        this.wtComplex = wtComplex;
     }
 
     @Override
