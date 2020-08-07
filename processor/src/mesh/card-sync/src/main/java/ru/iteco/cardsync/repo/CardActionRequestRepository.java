@@ -4,10 +4,11 @@
 
 package ru.iteco.cardsync.repo;
 
+import ru.iteco.cardsync.enums.ActionType;
 import ru.iteco.cardsync.models.CardActionRequest;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CardActionRequestRepository extends JpaRepository<CardActionRequest, Long> {
-    CardActionRequest findByRequestId(String requestId);
+    CardActionRequest findByRequestIdAndProcessedAndActionType(String requestId, Boolean processed, ActionType type);
 }

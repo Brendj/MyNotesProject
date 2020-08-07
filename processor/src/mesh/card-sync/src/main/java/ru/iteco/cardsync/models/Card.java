@@ -4,14 +4,13 @@
 
 package ru.iteco.cardsync.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cf_cards")
 public class Card {
+
     @Id
     @Column(name = "idofcard")
     private Long idOfCard;
@@ -19,8 +18,9 @@ public class Card {
     @Column(name = "lastupdate", nullable = false)
     private Long lastUpdate;
 
-    @Column(name = "idofclient")
-    private Long idOfClient;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idofclient")
+    private Client client;
 
     @Column(name = "idoforg")
     private Long idOfOrg;
@@ -47,14 +47,6 @@ public class Card {
         this.lastUpdate = lastUpdate;
     }
 
-    public Long getIdOfClient() {
-        return idOfClient;
-    }
-
-    public void setIdOfClient(Long idOfClient) {
-        this.idOfClient = idOfClient;
-    }
-
     public Long getIdOfOrg() {
         return idOfOrg;
     }
@@ -77,5 +69,30 @@ public class Card {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Card)) {
+            return false;
+        }
+        Card card = (Card) o;
+        return Objects.equals(getIdOfCard(), card.getIdOfCard());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIdOfCard());
     }
 }

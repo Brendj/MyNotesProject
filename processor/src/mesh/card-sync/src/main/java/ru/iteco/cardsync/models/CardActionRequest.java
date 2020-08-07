@@ -10,40 +10,25 @@ import ru.iteco.cardsync.audit.Auditable;
 import ru.iteco.cardsync.enums.ActionType;
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
 import javax.persistence.*;
 
 @Entity
 @EntityListeners(AuditEntityListener.class)
 @Table(name = "cf_cr_cardactionrequests")
 public class CardActionRequest implements Auditable {
-    @GenericGenerator(
-            name = "cf_cr_cardactionrequests_seq",
-            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
-            parameters = {
-                    @Parameter(name = "sequence_name", value = "cf_cr_cardactionrequests_id_seq"),
-                    @Parameter(name = "INCREMENT", value = "1"),
-                    @Parameter(name = "MINVALUE", value = "1"),
-                    @Parameter(name = "MAXVALUE", value = "2147483647"),
-                    @Parameter(name = "CACHE", value = "1")
-            }
-    )
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_cr_cardactionrequests_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_cr_cardactionrequests_id_seq")
+    @SequenceGenerator(name = "cf_cr_cardactionrequests_id_seq", sequenceName = "cf_cr_cardactionrequests_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "requestId", nullable = false)
+    @Column(name = "requestid", length = 128, nullable = false)
     private String requestId;
 
-    @Column(name = "idofclient")
-    private Long idOfClient;
-
-    @Column(name = "idoforg")
-    private Long idOfOrg;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idofclient")
+    private Client client;
 
     @Column(name = "action", nullable = false)
     @Enumerated(EnumType.ORDINAL)
@@ -52,7 +37,7 @@ public class CardActionRequest implements Auditable {
     @Column(name = "contingentid", length = 36)
     private String contingentId;
 
-    @Column(name = "staffId", length = 36)
+    @Column(name = "staffid", length = 36)
     private String staffId;
 
     @Column(name = "comment", nullable = false)
@@ -64,11 +49,11 @@ public class CardActionRequest implements Auditable {
     @Embedded
     private AuditEntity auditEntity;
 
-    public CardActionRequest(){
+    public CardActionRequest() {
         // for Hibernate
     }
 
-    public static CardActionRequest buildCardActionRequest(BlockPersonEntranceRequest blockPersonEntranceRequest){
+    public static CardActionRequest buildCardActionRequest(BlockPersonEntranceRequest blockPersonEntranceRequest) {
         CardActionRequest request = new CardActionRequest();
         request.setRequestId(blockPersonEntranceRequest.getId());
         request.setActionType(blockPersonEntranceRequest.getAction());
@@ -110,20 +95,12 @@ public class CardActionRequest implements Auditable {
         this.requestId = requestId;
     }
 
-    public Long getIdOfClient() {
-        return idOfClient;
+    public Client getClient() {
+        return client;
     }
 
-    public void setIdOfClient(Long idOfClient) {
-        this.idOfClient = idOfClient;
-    }
-
-    public Long getIdOfOrg() {
-        return idOfOrg;
-    }
-
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public ActionType getActionType() {

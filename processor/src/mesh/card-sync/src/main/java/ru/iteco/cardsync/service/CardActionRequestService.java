@@ -4,8 +4,10 @@
 
 package ru.iteco.cardsync.service;
 
+import ru.iteco.cardsync.enums.ActionType;
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 import ru.iteco.cardsync.models.CardActionRequest;
+import ru.iteco.cardsync.models.Client;
 import ru.iteco.cardsync.repo.CardActionRequestRepository;
 
 import org.springframework.stereotype.Service;
@@ -18,14 +20,19 @@ public class CardActionRequestService {
         this.cardActionRequestRepository = cardActionRequestRepository;
     }
 
-    public CardActionRequest findByRequestId(String id) {
-        return cardActionRequestRepository.findByRequestId(id);
+    public CardActionRequest findBlockRequestByRequestId(String id) {
+        return cardActionRequestRepository.findByRequestIdAndProcessedAndActionType(id, true, ActionType.block);
     }
 
     public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed){
+        writeRecord(blockPersonEntranceRequest, message, processed, null);
+    }
+
+    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed, Client client){
         CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
         request.setComment(message);
         request.setProcessed(processed);
+        request.setClient(client);
 
         cardActionRequestRepository.save(request);
     }
