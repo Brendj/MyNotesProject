@@ -435,12 +435,13 @@ public class GroupManagementService implements IGroupManagementService {
 
     private List<Client> getClientsForStrictMode(ClientGroup clientGroup, List<Client> clients) {
         List<Client> processedClients = new ArrayList<>();
-        boolean clientGroupIsNotPredefined = isGroupNotPredefined(clientGroup);
+        boolean newClientGroupIsNotPredefined = isGroupNotPredefined(clientGroup);
+        Long newClientGroupId = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
         for(Client client: clients){
             if(client.getClientGroup() == null)
                 continue;
             Long clientClientGroupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-            if(clientGroupIsNotPredefined){
+            if(newClientGroupIsNotPredefined){
                 if(isGroupNotPredefined(client.getClientGroup()))
                     processedClients.add(client);
                 else if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
@@ -449,27 +450,28 @@ public class GroupManagementService implements IGroupManagementService {
                  processedClients.add(client);
                 }
             }
-            if(!clientGroupIsNotPredefined){
+            if(!newClientGroupIsNotPredefined){
                 if(!isGroupNotPredefined(client.getClientGroup())){
-                    if(clientClientGroupId.longValue() != ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()){
+                    if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue()
+                            && (newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
+                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue())){
                         processedClients.add(client);
                         continue;
                     }
-                    else {
-                        if(clientGroup.getCompositeIdOfClientGroup()
-                                .getIdOfClientGroup().longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()
-                        || clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()){
-                            processedClients.add(client);
-                        }
-                        else
-                            continue;
+                    if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
+                            || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue()) {
+                        processedClients.add(client);
+                        continue;
+                    }
+                    if(newClientGroupId.longValue() != ClientGroup.Predefined.CLIENT_DISPLACED.getValue()){
+                        processedClients.add(client);
+                        continue;
                     }
                 }
                 else {
-                    Long newGroupId = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                    if(newGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
-                            || newGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
-                            || newGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()){
+                    if(newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
+                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
+                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()){
                         processedClients.add(client);
                         continue;
                     }
