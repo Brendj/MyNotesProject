@@ -86,7 +86,15 @@ public class PreorderOperationsService {
         for (RegularPreorder regularPreorder : list) {
             if (regularPreorder.getIdOfComplex() != null) {
                 try {
-                    RuntimeContext.getAppContext().getBean(PreorderDAOService.class).createPreordersFromRegular(regularPreorder, false);
+                    Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getOrgByContractId(regularPreorder.getClient().getContractId());
+                    if (!org.getUseWebArm()) {
+                        RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .createPreordersFromRegular(regularPreorder, false);
+                    } else {
+                        RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .createWtPreordersFromRegular(regularPreorder, false);
+                    }
                 } catch (Exception e) {
                     logger.error("Error in generate preorders by schedule: ", e);
                 }
