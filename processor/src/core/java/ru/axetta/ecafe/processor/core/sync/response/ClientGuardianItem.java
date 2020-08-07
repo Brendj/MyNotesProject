@@ -29,6 +29,7 @@ public class ClientGuardianItem {
     private String guidRequest;
     private Boolean informedSpecialMenu; //ConsentToPreOrder
     private ClientGuardianRepresentType representType;
+    private Boolean allowedPreorder;
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
@@ -44,6 +45,8 @@ public class ClientGuardianItem {
                 clientGuardian.getIdOfGuardian());
         this.result = null;
         this.representType = clientGuardian.getRepresentType();
+        this.allowedPreorder = ClientManager.getAllowedPreorderByClientWithoutSession(clientGuardian.getIdOfChildren(),
+                clientGuardian.getIdOfGuardian());
     }
 
     public ClientGuardianItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
@@ -98,6 +101,7 @@ public class ClientGuardianItem {
         if(representType != null) {
             XMLUtils.setAttributeIfNotNull(element, "IsLegalRepresent", representType.getCode());
         }
+        XMLUtils.setAttributeIfNotNull(element, "AllowedPreorder", allowedPreorder ? "1" : "0");
         if(this.result!=null){
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
             XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
@@ -124,6 +128,7 @@ public class ClientGuardianItem {
         this.relation = relation;
         this.representType = ClientGuardianRepresentType.fromInteger(representType);
         this.informedSpecialMenu = ClientManager.getInformedSpecialMenuWithoutSession(idOfChildren, idOfGuardian);
+        this.allowedPreorder = ClientManager.getAllowedPreorderByClientWithoutSession(idOfChildren, idOfGuardian);
     }
 
 
@@ -157,5 +162,13 @@ public class ClientGuardianItem {
 
     public void setRepresentType(ClientGuardianRepresentType representType) {
         this.representType = representType;
+    }
+
+    public Boolean getAllowedPreorder() {
+        return allowedPreorder;
+    }
+
+    public void setAllowedPreorder(Boolean allowedPreorder) {
+        this.allowedPreorder = allowedPreorder;
     }
 }

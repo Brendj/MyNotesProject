@@ -42,7 +42,6 @@
           <factory-entry name="revisePU" />
           <factory-entry name="symmetricPU" />
         </datasource-mapping>
-        <naming-strategy-map />
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml" />
       </configuration>
     </facet>
@@ -83,7 +82,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../target/production/web" />
     <output-test url="file://$MODULE_DIR$/../../target/test/web" />
     <exclude-output />
@@ -170,7 +169,6 @@
     <orderEntry type="library" name="jackson-core-asl-1.9.2" level="project" />
     <orderEntry type="library" name="bcpkix-jdk15on-1.50" level="project" />
     <orderEntry type="library" name="httpclient-4.1.2" level="project" />
-    <orderEntry type="library" name="io.jsonwebtoken:jjwt:0.4" level="project" />
-    <orderEntry type="library" exported="" name="jjwt" level="project" />
+    <orderEntry type="library" name="jjwt" level="project" />
   </component>
 </module>
