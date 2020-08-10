@@ -30,7 +30,7 @@ public class ReviseDAOService {
     private EntityManager entityManager;
 
     public DiscountItemsWithTimestamp getDiscountsUpdatedSinceDate(Date updated) {
-        String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
+        String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del, mesh_guid "
                 + " from benefits_for_ispp where updated_at > :updatedDate and registry_guid is not null order by updated_at asc limit :lim";
         Query query = entityManager.createNativeQuery(sqlString);
         query.setParameter("updatedDate", updated);
@@ -50,8 +50,8 @@ public class ReviseDAOService {
     }
 
     public DiscountItemsWithTimestamp getDiscountsByGUID(String guid) {
-        String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
-                + " from benefits_for_ispp where registry_guid = :guid order by updated_at asc";
+        String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del, mesh_guid "
+                + " from benefits_for_ispp where registry_guid = :guid or mesh_guid = :guid order by updated_at asc";
         Query query = entityManager.createNativeQuery(sqlString);
         query.setParameter("guid", guid);
         try {
@@ -90,8 +90,9 @@ public class ReviseDAOService {
             Boolean isBenefitConfirmed = (Boolean) row[7];
             updatedAt = (Date) row[8];
             Boolean isDeleted = (Boolean) row[9];
+            String mesh_guid = (String) row[10];
             discountItemList.add(new DiscountItem(registryGUID, dsznCode, title, sd, sdDszn, fd, fdDszn, isBenefitConfirmed,
-                    updatedAt, isDeleted));
+                    updatedAt, isDeleted, mesh_guid));
 
         }
         return new DiscountItemsWithTimestamp(discountItemList, updatedAt);
@@ -125,6 +126,7 @@ public class ReviseDAOService {
 
     public static class DiscountItem {
         private String registryGUID;
+        private String meshGUID;
         private Integer dsznCode;
         private String title;
         private Date sd;
@@ -136,7 +138,7 @@ public class ReviseDAOService {
         private Boolean isDeleted;
 
         public DiscountItem(String registryGUID, Integer dsznCode, String title, Date sd, Date sdDszn, Date fd, Date fdDszn,
-                Boolean isBenefitConfirm, Date updatedAt, Boolean isDeleted) {
+                Boolean isBenefitConfirm, Date updatedAt, Boolean isDeleted, String meshGUID) {
             this.registryGUID = registryGUID;
             this.dsznCode = dsznCode;
             this.title = title;
@@ -147,6 +149,7 @@ public class ReviseDAOService {
             this.isBenefitConfirm = isBenefitConfirm;
             this.updatedAt = updatedAt;
             this.isDeleted = isDeleted;
+            this.meshGUID = meshGUID;
         }
 
         public String getRegistryGUID() {
@@ -227,6 +230,14 @@ public class ReviseDAOService {
 
         public void setDeleted(Boolean deleted) {
             isDeleted = deleted;
+        }
+
+        public String getMeshGUID() {
+            return meshGUID;
+        }
+
+        public void setMeshGUID(String meshGUID) {
+            this.meshGUID = meshGUID;
         }
     }
 }
