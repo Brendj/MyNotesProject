@@ -118,6 +118,16 @@ public class MaintenanceService {
                     query.setParameter("idOfOrg", id);
                     query.setParameter("datetime", dateTime.getTime());
                     int rows = query.executeUpdate();
+                    if (rows == 0) {
+                        query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg) "
+                                + "values(:idOfOrg)");
+                        query.setParameter("idOfOrg", id);
+                        query.executeUpdate();
+                        transaction.commit();
+                        transaction = null;
+                        logger.info("No records to delete");
+                        continue;
+                    }
                     logger.info("Temp table filled");
 
                     query = session.createSQLQuery("DELETE FROM cf_complexinfodetail WHERE idofmenudetail IN (SELECT idofmenudetail FROM temp_menudetails)");
