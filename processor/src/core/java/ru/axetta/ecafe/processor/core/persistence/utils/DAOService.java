@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -56,6 +56,31 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
+    }
+
+    public void createStatTable() {
+        entityManager.createNativeQuery("CREATE TABLE IF NOT EXISTS srv_clear_menu_stat\n"
+                + "(\n"
+                + "    idoforg BIGINT,\n"
+                + "    startdate BIGINT,\n"
+                + "    enddate BIGINT,\n"
+                + "    datefrom BIGINT,\n"
+                + "    amount integer\n"
+                + ");\n"
+                + "COMMENT ON TABLE srv_clear_menu_stat is 'Статистика сервиса очистки меню'")
+                .executeUpdate();
+    }
+
+    public List<Long> getOrgIdsForClearMenu() {
+        List<Long> result = new ArrayList<>();
+        Query q = entityManager.createNativeQuery("select idOfOrg from cf_orgs o "
+                + "where o.idoforg > (select coalesce(max(idoforg), 0) from srv_clear_menu_stat) order by o.idoforg");
+        List list = q.getResultList();
+        for (Object row : list) {
+            Long value = ((BigInteger) row).longValue();
+            result.add(value);
+        }
+        return result;
     }
 
     public List<CategoryDiscount> getCategoryDiscountList() {
