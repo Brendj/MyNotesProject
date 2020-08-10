@@ -1337,7 +1337,7 @@ public class PreorderDAOService {
         query.setParameter("mode", PreorderComplex.COMPLEX_MODE_4);
         preorderAmount += (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) as count1 "
+        query = emReport.createQuery("select coalesce(sum(case when pos.unitsScale = 3 then pos.totalCount else div(pos.totalCount, 1000) end), 0) as count1 "
                 + "from PreorderComplex pc, Org o, GoodRequestPosition pos "
                 + "where o.idOfOrg = pc.idOfOrgOnCreate "
                 + "and pc.idOfGoodsRequestPosition = pos.globalId "
@@ -1346,7 +1346,7 @@ public class PreorderDAOService {
         query.setParameter("date", date);
         Long pcAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) "
+        query = emReport.createQuery("select coalesce(sum(case when pos.unitsScale = 3 then pos.totalCount else div(pos.totalCount, 1000) end), 0) "
                 + "from PreorderComplex pc, PreorderMenuDetail pmd, Org o, GoodRequestPosition pos "
                 + "where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
                 + "and pmd.idOfGoodsRequestPosition = pos.globalId "
@@ -1356,7 +1356,9 @@ public class PreorderDAOService {
         query.setParameter("date", date);
         Long pmdAmount = (Long)query.getSingleResult();
 
-        Long goodRequestAmount = (pcAmount + pmdAmount) / 1000L;
+        // для нового меню делить на 1000 не нужно!
+        //Long goodRequestAmount = (pcAmount + pmdAmount) / 1000L;
+        Long goodRequestAmount = pcAmount + pmdAmount;
 
         query = em.createQuery("select pc from PreorderCheck pc where pc.date = :date order by createdDate desc");
         query.setParameter("date", date);
