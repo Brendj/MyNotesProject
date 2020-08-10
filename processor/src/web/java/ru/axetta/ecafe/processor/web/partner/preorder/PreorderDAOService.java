@@ -1459,6 +1459,54 @@ public class PreorderDAOService {
     }
 
     @Transactional
+    public void relevancePreordersToWtMenu(PreorderComplex preorderComplex, long nextVersion) {
+        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        Date preorderDate = preorderComplex.getPreorderDate();
+
+        WtComplex wtComplex = getWtComplex(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderDate);
+
+        if (wtComplex == null) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            return;
+        }
+
+        // Определяем подходящий состав комплекса
+        WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, CalendarUtils.startOfDay(preorderDate));
+        List<WtDish> wtDishes = new ArrayList<>();
+        if (complexItem != null) {
+            wtDishes = DAOReadExternalsService.getInstance()
+                    .getWtDishesByComplexItemAndDates(complexItem, CalendarUtils.startOfDay(preorderDate), CalendarUtils.endOfDay(preorderDate));
+        }
+        if (complexItem == null || preorderComplex.getPreorderMenuDetails().size() == 0 || wtDishes.size() == 0) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+            return;
+        }
+
+        if (preorderComplex.getAmount() > 0) {
+            if (!preorderComplex.getComplexPrice().equals(wtComplex.getPrice().multiply(new BigDecimal(100)).longValue())) {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
+                return;
+            }
+        } else {
+            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+                if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
+                if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
+                    WtDish wtDish = getWtDishByItemCodeAndId(complexItem, preorderDate, preorderMenuDetail.getIdOfDish());
+                    if (wtDish == null) {
+                        testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+                        break;
+                    } else {
+                        if (!preorderMenuDetail.getMenuDetailPrice().equals(wtDish.getPrice().multiply(new BigDecimal(100)).longValue())) {
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Transactional
     public void changeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, Long nextVersion) {
         logger.info("Start change localIdOfMenu");
         doChangeLocalIdOfMenu(modifyMenuList, BASE_ID_MENU_VALUE_FOR_MODIFY, nextVersion, false);
@@ -2230,7 +2278,7 @@ public class PreorderDAOService {
         if (wtComplex != null) {
             preorderComplex.setComplexName(wtComplex.getName());
             preorderComplex.setComplexPrice(wtComplex.getPrice() == null ? 0L :
-                    wtComplex.getPrice().multiply(new BigDecimal(100)) .longValue());
+                    wtComplex.getPrice().multiply(new BigDecimal(100)).longValue());
             preorderComplex.setModeFree(0);
             preorderComplex.setModeOfAdd(0);
         } else {

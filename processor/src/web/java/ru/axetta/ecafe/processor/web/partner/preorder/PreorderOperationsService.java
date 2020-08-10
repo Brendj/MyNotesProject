@@ -67,10 +67,17 @@ public class PreorderOperationsService {
                 if (preorderComplex.getIdOfGoodsRequestPosition() != null)
                     continue;
                 nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
-                List<ModifyMenu> mmList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .relevancePreordersToMenu(preorderComplex, nextVersion);
-                if (mmList != null) {
-                    modifyMenuList.addAll(mmList);
+                Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getOrgByContractId(preorderComplex.getClient().getContractId());
+                if (!org.getUseWebArm()) {
+                    List<ModifyMenu> mmList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .relevancePreordersToMenu(preorderComplex, nextVersion);
+                    if (mmList != null) {
+                        modifyMenuList.addAll(mmList);
+                    }
+                } else {
+                    RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .relevancePreordersToWtMenu(preorderComplex, nextVersion);
                 }
             } catch (Exception e) {
                 logger.error("Error in runRelevancePreordersToMenu: ", e);
