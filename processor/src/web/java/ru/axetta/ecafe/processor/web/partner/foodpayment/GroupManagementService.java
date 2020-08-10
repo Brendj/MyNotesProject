@@ -353,18 +353,24 @@ public class GroupManagementService implements IGroupManagementService {
     @Override
     public List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups,
             boolean strictEditMode) throws Exception {
-        Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
         List<Client> clients;
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession,
                 newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
         friendlyOrgs.add(DAOUtils.findOrg(persistanceSession,
                 newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg()));
         List<Long> orgIds = getOrgIds(friendlyOrgs);
-        clientsCriteria.add(Restrictions.and(
-                Restrictions.in("org.idOfOrg", orgIds),
-                Restrictions.in("clientGroup.groupName", oldGroups)
-        ));
-        clients = clientsCriteria.list();
+        List<String> oldGroupsInUpperCase = new LinkedList<>();
+        for(String groupName: oldGroups){
+            oldGroupsInUpperCase.add(groupName.toUpperCase());
+        }
+        Query query = persistanceSession.createQuery("from Client c "
+                + "join fetch c.clientGroup "
+                + "join fetch c.person "
+                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
+        query.setParameterList("idOfOrgList", orgIds);
+        query.setParameterList("nameOfGroupList", oldGroupsInUpperCase);
+
+        clients = query.list();
         if(!strictEditMode)
             return clients;
         else {
@@ -378,19 +384,18 @@ public class GroupManagementService implements IGroupManagementService {
         String comment = "Изменено пользователем " + username;
         Org newGroupOrg = DAOUtils.findOrg(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
         Long newClientGroupId = newClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-        HashMap<Long, List<Client>> orderedClients = getClientsGroupByClientGroup(clients);
+        HashMap<String, List<Client>> orderedClients = getClientsGroupByClientGroup(clients);
         List<EditClientsGroupsGroupDTO> editClientsGroupsGroupDTOList = new LinkedList<>();
         for(Map.Entry entry: orderedClients.entrySet()){
             EditClientsGroupsGroupDTO editClientsGroupsGroupDTO = new EditClientsGroupsGroupDTO();
             editClientsGroupsGroupDTO.setNewGroupName(newClientGroup.getGroupName());
+            editClientsGroupsGroupDTO.setOrgId(newClientGroup.getOrg().getIdOfOrg());
+            editClientsGroupsGroupDTO.setOldGroupName((String) entry.getKey());
             List<EditClientsGroupsClientDTO> editClientsGroupsClientDTOList = new LinkedList<>();
             Client firstClient = ((List<Client>) entry.getValue()).get(0);
-            if(!((List<Client>) entry.getValue()).isEmpty() && firstClient != null){
-                editClientsGroupsGroupDTO.setOldGroupName(firstClient.getClientGroup().getGroupName());
-                editClientsGroupsGroupDTO.setOrgId(firstClient.getOrg().getIdOfOrg());
+            if(((List<Client>) entry.getValue()).isEmpty() && firstClient == null){
+               continue;
             }
-            else
-                continue;
             for(Client client: (List<Client>)entry.getValue()){
                 ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(newGroupOrg, client);
                 clientGroupMigrationHistory.setNewGroupId(newClientGroupId);
@@ -471,12 +476,13 @@ public class GroupManagementService implements IGroupManagementService {
         }
     }
 
-    private HashMap<Long, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
-        HashMap<Long, List<Client>> orderedClients = new LinkedHashMap<>();
+    private HashMap<String, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
+        HashMap<String, List<Client>> orderedClients = new LinkedHashMap<>();
         for(Client client: clients){
-            if(client.getIdOfClientGroup() == null || client.getOrg() == null || client.getOrg().getIdOfOrg() == null)
+            if(client.getClientGroup() == null || client.getClientGroup().getGroupName() == null
+                    || client.getClientGroup().getGroupName().isEmpty())
                 continue;
-            Long key = client.getIdOfClientGroup() + client.getOrg().getIdOfOrg();
+            String key = client.getClientGroup().getGroupName();
             if(orderedClients.containsKey(key))
                 orderedClients.get(key).add(client);
             else {
@@ -490,12 +496,13 @@ public class GroupManagementService implements IGroupManagementService {
 
     private List<Client> getClientsForStrictMode(ClientGroup clientGroup, List<Client> clients) {
         List<Client> processedClients = new ArrayList<>();
-        boolean clientGroupIsNotPredefined = isGroupNotPredefined(clientGroup);
+        boolean newClientGroupIsNotPredefined = isGroupNotPredefined(clientGroup);
+        Long newClientGroupId = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
         for(Client client: clients){
             if(client.getClientGroup() == null)
                 continue;
             Long clientClientGroupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-            if(clientGroupIsNotPredefined){
+            if(newClientGroupIsNotPredefined){
                 if(isGroupNotPredefined(client.getClientGroup()))
                     processedClients.add(client);
                 else if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
@@ -504,27 +511,28 @@ public class GroupManagementService implements IGroupManagementService {
                  processedClients.add(client);
                 }
             }
-            if(!clientGroupIsNotPredefined){
+            if(!newClientGroupIsNotPredefined){
                 if(!isGroupNotPredefined(client.getClientGroup())){
-                    if(clientClientGroupId.longValue() != ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()){
+                    if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue()
+                            && (newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
+                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue())){
                         processedClients.add(client);
                         continue;
                     }
-                    else {
-                        if(clientGroup.getCompositeIdOfClientGroup()
-                                .getIdOfClientGroup().longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()
-                        || clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()){
-                            processedClients.add(client);
-                        }
-                        else
-                            continue;
+                    if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
+                            || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue()) {
+                        processedClients.add(client);
+                        continue;
+                    }
+                    if(newClientGroupId.longValue() != ClientGroup.Predefined.CLIENT_DISPLACED.getValue()){
+                        processedClients.add(client);
+                        continue;
                     }
                 }
                 else {
-                    Long newGroupId = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                    if(newGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
-                            || newGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
-                            || newGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()){
+                    if(newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
+                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
+                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()){
                         processedClients.add(client);
                         continue;
                     }
