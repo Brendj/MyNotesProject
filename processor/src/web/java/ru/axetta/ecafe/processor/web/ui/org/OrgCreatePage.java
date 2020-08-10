@@ -60,7 +60,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String mailingListReports1;
     private String mailingListReports2;
     private String guid;
-    private Long ekisId;
+    private Long ekisId = null;
     private String egissoId;
     private String tag;
     private String city;
@@ -96,7 +96,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean helpdeskEnabled = false;
     private Boolean preordersEnabled = false;
     private Boolean preorderlp = false;
-    private Long orgIdFromNsi;
+    private Long orgIdFromNsi = null;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -693,7 +693,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setPreordersEnabled(preordersEnabled);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         org.setPreorderlp(preorderlp);
-        org.setOrgIdFromNsi(orgIdFromNsi);
+        org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
         session.save(org);
         OrgSync orgSync = new OrgSync();
         orgSync.setIdOfPacket(0L);

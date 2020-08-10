@@ -71,7 +71,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports1;
     private String mailingListReports2;
     private String guid;
-    private Long ekisId;
+    private Long ekisId = null;
     private String egissoId;
     private ConfigurationProvider configurationProvider;
     private List<Long> idOfOrgList = new ArrayList<Long>();
@@ -139,7 +139,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean preorderlp;
 
     private Boolean useWebArm;
-    private Long orgIdFromNsi;
+    private Long orgIdFromNsi = null;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -421,7 +421,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         org.setPreorderlp(preorderlp);
         org.setUseWebArm(useWebArm);
-        org.setOrgIdFromNsi(orgIdFromNsi);
+        org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
 
         session.update(org);
         fill(org);
