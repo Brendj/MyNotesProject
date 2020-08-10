@@ -177,6 +177,12 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Очистка выполнена. Смотри лог");
     }
 
+    public void cleaningMenuVersion2() {
+        MaintenanceService maintenanceService = RuntimeContext.getAppContext().getBean(MaintenanceService.class);
+        maintenanceService.runVersion2();
+        printMessage("Процесс запущен");
+    }
+
     public void endBenefitNotification() {
         BenefitService service = RuntimeContext.getAppContext().getBean(BenefitService.class);
         service.runEndBenefit(true);
