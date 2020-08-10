@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2923,6 +2923,13 @@ public class DAOService {
 
         q.setParameter("idOfUser", idOfUser);
         return q.getResultList();
+    }
+
+    public Long getMeshIdByOrg(long idOfOrg) {
+        Query query = entityManager.createNativeQuery("select organizationidfromnsi from cf_orgs where IdOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        Object obj = query.getFirstResult();
+        return obj == null ? null : ((BigInteger)obj).longValue();
     }
 
     public WtComplex getWtComplexById(Long idOfComplex) {

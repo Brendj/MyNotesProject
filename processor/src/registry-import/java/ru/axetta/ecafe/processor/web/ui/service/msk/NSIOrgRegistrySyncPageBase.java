@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.mesh.MeshRestClient;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -250,6 +251,26 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
             load(true);
         } else {
             errorMessages = "Выберите организацию";
+        }
+    }
+
+    public void doRefreshMeshRest() {
+        long idOfOrg = getIdOfOrg();
+        if (idOfOrg != -1) {
+            nameFilter = "";
+            actionFilter = ALL_OPERATIONS;
+            loadMeshRest(idOfOrg);
+        } else {
+            errorMessages = "Выберите организацию";
+        }
+    }
+
+    public void loadMeshRest(long idOfOrg) {
+        try {
+            RuntimeContext.getAppContext().getBean(MeshRestClient.class).loadPersons(idOfOrg, nameFilter);
+        } catch (Exception e) {
+            errorMessages = e.getMessage();
+            return;
         }
     }
 

@@ -232,6 +232,8 @@
                     </rich:dataTable>
                     <a4j:commandButton value="Провести полную сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+                    <a4j:commandButton value="Провести полную сверку по REST МЭШ" action="#{NSIOrgRegistrySynchPage.doRefreshMeshRest}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
+                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
                 </h:panelGroup>
 
                 <h:panelGrid>
