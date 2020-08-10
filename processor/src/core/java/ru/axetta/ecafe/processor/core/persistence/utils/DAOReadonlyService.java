@@ -1058,8 +1058,8 @@ public class DAOReadonlyService {
             return false;
         }
     }
-
-    public Boolean checkExcludeDays(Date date, WtComplex wtComplex) {
+	
+        public Boolean checkExcludeDays(Date date, WtComplex wtComplex) {
         try {
             Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
                             + "WHERE excludeDays.complex = :complex "
@@ -1159,6 +1159,21 @@ public class DAOReadonlyService {
             return (GoodRequestPosition) query.getSingleResult();
         } catch (Exception e) {
             return null;
+        }
+    }
+	public boolean isSixWorkWeekOrgAndGroup(Long orgId, String groupName) {
+        boolean resultByOrg = false; //isSixWorkWeek(orgId);
+        try {
+            List<Boolean> list = entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto "
+                    + "where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupname")
+                    .setParameter("idOfOrg", orgId).setParameter("groupname", groupName)
+                    .getResultList();
+            if (list.contains(Boolean.TRUE))
+                return true;
+            else
+                return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
