@@ -8,8 +8,11 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -22,11 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 @Scope("singleton")
@@ -35,6 +38,8 @@ public class MaintenanceService {
     private Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
 
     private int MAXROWS;
+    private static final AtomicLong threadCounter = new AtomicLong();
+    private static final int daysMinus = 45;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -77,6 +82,100 @@ public class MaintenanceService {
             scheduler.start();
         } catch (Exception e) {
             logger.error("Failed to schedule cleaning menu service job:", e);
+        }
+    }
+
+    public void wrapRun() {
+        if (!RuntimeContext.getInstance().isMainNode()) {
+            return;
+        }
+        runVersion2();
+    }
+
+    public void runVersion2() {
+        Session session = null;
+        Transaction transaction = null;
+        Date dateTime = CalendarUtils.addDays(new Date(), -daysMinus);
+        dateTime = CalendarUtils.startOfDay(dateTime);
+        try {
+            DAOService.getInstance().createStatTable();
+            List<Long> orgList = DAOService.getInstance().getOrgIdsForClearMenu();
+            logger.info(String.format("Found %s orgs to clear menu ", orgList.size()));
+            for (Long id : orgList) {
+                logger.info(String.format("Start clear menu for org id = %s", id));
+                Thread.currentThread().setName("ClearMenu_ORG_ID-" + id + "-n" + threadCounter.addAndGet(1));
+                try {
+                    Date startDate = new Date();
+                    session = RuntimeContext.getInstance().createPersistenceSession();
+                    session.setFlushMode(FlushMode.COMMIT);
+                    transaction = session.beginTransaction();
+                    org.hibernate.Query query = session.createSQLQuery("CREATE TEMP TABLE temp_menudetails(idofmenudetail BIGINT) ON COMMIT DROP");
+                    query.executeUpdate();
+                    query = session.createSQLQuery("INSERT INTO temp_menudetails \n"
+                            + "  SELECT idofmenudetail \n"
+                            + "  FROM cf_menudetails md JOIN cf_menu m ON m.idofmenu = md.idofmenu \n"
+                            + "  WHERE m.menudate < :datetime AND m.idoforg = :idOfOrg");
+                    query.setParameter("idOfOrg", id);
+                    query.setParameter("datetime", dateTime.getTime());
+                    int rows = query.executeUpdate();
+                    if (rows == 0) {
+                        query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg) "
+                                + "values(:idOfOrg)");
+                        query.setParameter("idOfOrg", id);
+                        query.executeUpdate();
+                        transaction.commit();
+                        transaction = null;
+                        logger.info("No records to delete");
+                        continue;
+                    }
+                    logger.info("Temp table filled");
+
+                    query = session.createSQLQuery("DELETE FROM cf_complexinfodetail WHERE idofmenudetail IN (SELECT idofmenudetail FROM temp_menudetails)");
+                    query.executeUpdate();
+                    logger.info("Deleted from complexinfodetail");
+
+                    query = session.createSQLQuery("DELETE FROM cf_complexinfo WHERE idofmenudetail IN (SELECT idofmenudetail FROM temp_menudetails)");
+                    query.executeUpdate();
+                    logger.info("Deleted from complexinfo");
+
+                    query = session.createSQLQuery("DELETE FROM cf_good_basic_basket_price WHERE idofmenudetail IN (SELECT idofmenudetail FROM temp_menudetails)");
+                    query.executeUpdate();
+                    logger.info("Deleted from basic_basket");
+
+                    query = session.createSQLQuery("DELETE FROM cf_menudetails WHERE idofmenudetail IN (SELECT idofmenudetail FROM temp_menudetails)");
+                    query.executeUpdate();
+                    logger.info("Deleted from menudetails");
+
+                    query = session.createSQLQuery("DELETE FROM cf_menu WHERE menudate < :datetime AND idoforg = :idOfOrg");
+                    query.setParameter("idOfOrg", id);
+                    query.setParameter("datetime", dateTime.getTime());
+                    query.executeUpdate();
+                    logger.info("Deleted from menu");
+
+                    Date endDate = new Date();
+                    query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg, startdate, enddate, datefrom, amount) "
+                            + "values(:idOfOrg, :startDate, :endDate, :dateFrom, :amount)");
+                    query.setParameter("idOfOrg", id);
+                    query.setParameter("startDate", startDate.getTime());
+                    query.setParameter("endDate", endDate.getTime());
+                    query.setParameter("dateFrom", dateTime.getTime());
+                    query.setParameter("amount", rows);
+                    query.executeUpdate();
+
+                    transaction.commit();
+                    transaction = null;
+                    logger.info(String.format("End clear menu for org id = %s", id));
+                } catch (Exception e) {
+                    logger.error(String.format("Error in clear menu version 2 for orgId=%s", id), e);
+                } finally {
+                    HibernateUtils.rollback(transaction, logger);
+                    HibernateUtils.close(session, logger);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in clear menu version 2", e);
+        } finally {
+            Thread.currentThread().setName("ClearMenu_OFF" + "-n" + threadCounter.addAndGet(1));
         }
     }
 

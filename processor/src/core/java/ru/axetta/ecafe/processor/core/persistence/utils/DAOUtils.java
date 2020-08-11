@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
@@ -4980,8 +4981,7 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
-    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname,
-            Date startDate) throws Exception {
+    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
         if (orgs != null && !orgs.isEmpty()) {
             List<Long> ids = new ArrayList<>();
@@ -4993,7 +4993,7 @@ public class DAOUtils {
         if (groupname != null) {
             criteria.add(Restrictions.eq("groupname", groupname));
         }
-        criteria.add(Restrictions.gt("menudate", startDate));
+        //criteria.add(Restrictions.gt("menudate", startDate));
         return criteria.list();
     }
 
@@ -5012,9 +5012,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List getAllDateFromProdactionCalendarForEZD(Session persistenceSession) throws Exception {
-        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
-        criteria.add(Restrictions.gt("day", new Date()));
+
+    public static List getAllMenuForEZD(Session persistenceSession,
+            List<Long> idofOrg) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdMenuView.class);
+        criteria.add(Restrictions.gt("menuDate", new Date()));
+        if (idofOrg != null && !idofOrg.isEmpty()) {
+            criteria.add(Restrictions.in("idOforg", idofOrg));
+        }
         return criteria.list();
     }
 

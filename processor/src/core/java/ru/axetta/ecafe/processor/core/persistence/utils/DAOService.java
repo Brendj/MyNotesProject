@@ -58,6 +58,31 @@ public class DAOService {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
     }
 
+    public void createStatTable() {
+        entityManager.createNativeQuery("CREATE TABLE IF NOT EXISTS srv_clear_menu_stat\n"
+                + "(\n"
+                + "    idoforg BIGINT,\n"
+                + "    startdate BIGINT,\n"
+                + "    enddate BIGINT,\n"
+                + "    datefrom BIGINT,\n"
+                + "    amount integer\n"
+                + ");\n"
+                + "COMMENT ON TABLE srv_clear_menu_stat is 'Статистика сервиса очистки меню'")
+                .executeUpdate();
+    }
+
+    public List<Long> getOrgIdsForClearMenu() {
+        List<Long> result = new ArrayList<>();
+        Query q = entityManager.createNativeQuery("select idOfOrg from cf_orgs o "
+                + "where o.idoforg > (select coalesce(max(idoforg), 0) from srv_clear_menu_stat) order by o.idoforg");
+        List list = q.getResultList();
+        for (Object row : list) {
+            Long value = ((BigInteger) row).longValue();
+            result.add(value);
+        }
+        return result;
+    }
+
     public List<CategoryDiscount> getCategoryDiscountList() {
         TypedQuery<CategoryDiscount> q = entityManager
                 .createQuery("from CategoryDiscount order by idOfCategoryDiscount", CategoryDiscount.class);
@@ -2955,11 +2980,12 @@ public class DAOService {
             return null;
         }
     }
-
-	public List<Long> getGroupByOrgForWEBARM(Long idOforg) throws Exception {
+	
+	//Список союзов организаций, кужа входит данная организация
+    public List<Long> getOrgGroupsbyOrgForWEBARM(Long idOforg) throws Exception {
         Session session = (Session) entityManager.getDelegate();
-        org.hibernate.Query q = session.createSQLQuery(" select idoforggroup from cf_wt_org_group_relations where idoforg = "
-                + idOforg);
+        org.hibernate.Query q = session.createSQLQuery(" select idoforggroup from cf_wt_org_group_relations "
+                + "  where idoforg = " + idOforg);
         List<BigInteger> list = (List<BigInteger>) q.list();
         List<Long> result = new ArrayList<>();
         for (BigInteger value: list)
@@ -2989,7 +3015,7 @@ public class DAOService {
             groupString = groupString + "'" + groupid.toString() + "',";
         }
         groupString = groupString.substring(0,groupString.length()-1);
-        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate from cf_wt_complexes "
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate, idofagegroupitem from cf_wt_complexes "
                         + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idoforggroup in (" + groupString + ")");
         return q.list();
     }
@@ -3002,9 +3028,8 @@ public class DAOService {
             idOfComplexString = idOfComplexString + "'" + idOfComplex.toString() + "',";
         }
         idOfComplexString = idOfComplexString.substring(0,idOfComplexString.length()-1);
-        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate from cf_wt_complexes "
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate, idofagegroupitem from cf_wt_complexes "
                 + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idofcomplex in (" + idOfComplexString + ")");
         return q.list();
     }
-
 }

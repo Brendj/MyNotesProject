@@ -46,7 +46,7 @@ public class EZDControllerSOAP extends HttpServlet {
             }
             logger.info("Старт начала сбора данных по производственному календарю");
             //Загружаем все данные производственного календаря
-            List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarForEZD(persistenceSession);
+            List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarForFutureDates(persistenceSession);
             if (productionCalendars == null) {
                 productionCalendars = new ArrayList<>();
             }

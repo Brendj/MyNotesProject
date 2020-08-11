@@ -51,6 +51,8 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Очистка таблиц меню - 2" action="#{otherActionsPage.cleaningMenuVersion2}"
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Оповещение об окончании срока действия льготы" action="#{otherActionsPage.endBenefitNotification}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <rich:panel>
