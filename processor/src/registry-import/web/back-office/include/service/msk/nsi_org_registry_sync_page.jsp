@@ -51,6 +51,16 @@
             </h:panelGroup>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
+            <%--<h:outputText escape="true" value="Фильтр ФИО" styleClass="output-text" />
+            <h:inputText value="#{NSIOrgRegistrySynchPage.nameFilter}" size="64" styleClass="input-text" />--%>
+            <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
+            <h:inputText value="#{NSIOrgRegistrySynchPage.lastName}" size="64" styleClass="input-text" />
+            <h:outputText escape="true" value="Имя" styleClass="output-text" />
+            <h:inputText value="#{NSIOrgRegistrySynchPage.firstName}" size="64" styleClass="input-text" />
+            <h:outputText escape="true" value="Отчество" styleClass="output-text" />
+            <h:inputText value="#{NSIOrgRegistrySynchPage.patronymic}" size="64" styleClass="input-text" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Дата сверки разногласий" styleClass="output-text" />
             <h:selectOneMenu id="revisionDates" value="#{NSIOrgRegistrySynchPage.revisionCreateDate}" style="width:350px;" >
                 <f:selectItems value="#{NSIOrgRegistrySynchPage.revisions}"/>
@@ -62,21 +72,22 @@
                 <f:selectItems value="#{NSIOrgRegistrySynchPage.actionFilters}"/>
             </h:selectOneMenu>
         </h:panelGrid>
-        <h:panelGrid columns="2" styleClass="borderless-grid">
-            <h:outputText escape="true" value="Фильтр ФИО" styleClass="output-text" />
-            <h:inputText value="#{NSIOrgRegistrySynchPage.nameFilter}" size="64" styleClass="input-text" />
-        </h:panelGrid>
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+
+        <%--<h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Проверка ФИО на дубликат при регистрации" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchPage.fullNameValidation}" styleClass="output-text"/>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText value="Включать только классы:" styleClass="output-text"/>
             <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchPage.showOnlyClientGoups}"/>
-        </h:panelGrid>
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+        </h:panelGrid>--%>
+        <h:panelGrid columns="4" styleClass="borderless-grid">
             <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchPage.doUpdate}"
                                reRender="synchTable,synchTableInfoPanel,revisionInfo,NSIOrgRegistrySynchPage_tabpanel,resultTitle" styleClass="command-button" status="updateStatus"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+            <a4j:commandButton value="Провести полную сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+            <a4j:commandButton value="Актуализировать данные" action="#{NSIOrgRegistrySynchPage.doRefreshMeshRest}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
                                onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
             <a4j:status id="updateStatus">
                 <f:facet name="start">
@@ -230,10 +241,8 @@
                             </rich:datascroller>
                         </f:facet>
                     </rich:dataTable>
-                    <a4j:commandButton value="Провести полную сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
-                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
-                    <a4j:commandButton value="Провести полную сверку по REST МЭШ" action="#{NSIOrgRegistrySynchPage.doRefreshMeshRest}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
-                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+
+
                 </h:panelGroup>
 
                 <h:panelGrid>

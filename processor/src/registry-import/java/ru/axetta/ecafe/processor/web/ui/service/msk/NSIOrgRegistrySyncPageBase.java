@@ -83,6 +83,9 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
     protected String nameFilter;
     private long loadedOrgRevisions = -1L;
     boolean showOnlyClientGoups = true;
+    protected String firstName;
+    protected String lastName;
+    protected String patronymic;
 
     private FrontControllerProcessor getFrontControllerProcessor(){
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class);
@@ -554,6 +557,30 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
 
     public void setFullNameValidation(boolean fullNameValidation) {
         this.fullNameValidation = fullNameValidation;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPatronymic() {
+        return patronymic;
+    }
+
+    public void setPatronymic(String patronymic) {
+        this.patronymic = patronymic;
     }
 
     public class WebRegistryChangeItem extends RegistryChangeItemV2 {
