@@ -1776,7 +1776,8 @@ public class PreorderDAOService {
                         continue;
                     }
                 }
-                PreorderMenuDetail preorderMenuDetail = findPreorderMenuDetail(currentDate, regularPreorder.getClient(), menuDetail.getLocalIdOfMenu());
+                PreorderMenuDetail preorderMenuDetail = findPreorderMenuDetail(currentDate, regularPreorder.getClient(),
+                        menuDetail.getLocalIdOfMenu(), regularPreorder);
                 if ((preorderMenuDetail == null || (preorderMenuDetail != null && allowCreateNewPreorderMenuDetail(preorderMenuDetail)))
                         && !forcePreorderMenuDetailExists(regularPreorder, currentDate)) {
                     //на искомую дату нет предзаказа, надо создавать
@@ -2161,13 +2162,15 @@ public class PreorderDAOService {
         return (list == null || list.size() == 0) ? null : list.get(0);
     }
 
-    private PreorderMenuDetail findPreorderMenuDetail(Date date, Client client, Long armIdOfMenu) {
+    private PreorderMenuDetail findPreorderMenuDetail(Date date, Client client, Long armIdOfMenu, RegularPreorder regularPreorder) {
         Query query = em.createQuery("select pmd from PreorderMenuDetail pmd "
-                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu");
+                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu "
+                + "and pmd.regularPreorder = :regularPreorder");
         query.setParameter("client", client);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
         query.setParameter("armIdOfMenu", armIdOfMenu);
+        query.setParameter("regularPreorder", regularPreorder);
         List<PreorderMenuDetail> list = query.getResultList();
         return (list == null || list.size() == 0) ? null : list.get(0);
     }
