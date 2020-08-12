@@ -445,7 +445,9 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "c.idofclient, "                                                                             //12
                             + "c.idofclientgroup, "                                                                        //13
                             + "pc.usedsum, "                                                                                //14
-                            + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end " //15
+                            + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end, " //15
+                            + "pc.armcomplexid, "                                                                           //16
+                            + "pmd.idofdish "                                                                               //17
                             + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                             + "INNER JOIN cf_complexinfo ci ON pc.idoforgoncreate = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
@@ -470,7 +472,9 @@ public class PreorderRequestsReportService extends RecoverableService {
                     + "c.idofclient, "                                                                                      //12
                     + "c.idofclientgroup, "                                                                                 //13
                     + "pc.usedsum, "                                                                                        //14
-                    + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end "   //15
+                    + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end, "   //15
+                    + "pc.armcomplexid, "                                                                                   //16
+                    + "pmd.idofdish "                                                                                       //17
                     + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                     + "LEFT JOIN cf_wt_complexes wc ON wc.idofcomplex = pc.armcomplexid AND wc.deletestate = 0 "
                     + "AND pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wc.begindate) * 1000) AND (EXTRACT(EPOCH FROM wc.enddate) * 1000) "
@@ -513,12 +517,14 @@ public class PreorderRequestsReportService extends RecoverableService {
                 Boolean isComplex = !complexAmount.equals(0);
                 Long idOfClientGroup = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
                 Long usedSum = (null != o[14]) ? ((BigInteger) o[14]).longValue() : 0L;
+                Integer complexId = (null != o[16]) ? (Integer) o [16] : null;
+                Long idOfDish = (null != o[17]) ? ((BigInteger) o [17]).longValue() : null;
 
                 preorderItemList
                         .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
                                 createdDate, idOfGoodsRequest, preorderDate,
                                 complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance,
-                                idOfClient, isDeleted, isComplex, idOfClientGroup, usedSum));
+                                idOfClient, isDeleted, isComplex, idOfClientGroup, usedSum, complexId, idOfDish));
             }
             transaction.commit();
             transaction = null;
@@ -577,6 +583,8 @@ public class PreorderRequestsReportService extends RecoverableService {
         pos.setTempClientsCount(0L);
         pos.setNotified(false);
         pos.setFeedingType(POSITION_FEEDING_TYPE);
+        pos.setComplexId(preorderItem.getComplexId());
+        pos.setIdOfDish(preorderItem.getIdOfDish());
         pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
         if (preorderItem.getComplex()) {
@@ -688,10 +696,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         private Boolean isComplex;
         private Long idOfClientGroup;
         private Long usedSum;
+        private Integer complexId;
+        private Long idOfDish;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
                 Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance,
-                Long idOfClient, Boolean isDeleted, Boolean isComplex, Long idOfClientGroup, Long usedSum) {
+                Long idOfClient, Boolean isDeleted, Boolean isComplex, Long idOfClientGroup, Long usedSum, Integer complexId,
+                Long idOfDish) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -707,6 +718,8 @@ public class PreorderRequestsReportService extends RecoverableService {
             this.isComplex = isComplex;
             this.idOfClientGroup = idOfClientGroup;
             this.usedSum = usedSum;
+            this.complexId = complexId;
+            this.idOfDish = idOfDish;
         }
 
         public PreorderItem() {
@@ -831,6 +844,22 @@ public class PreorderRequestsReportService extends RecoverableService {
 
         public void setUsedSum(Long usedSum) {
             this.usedSum = usedSum;
+        }
+
+        public Integer getComplexId() {
+            return complexId;
+        }
+
+        public void setComplexId(Integer complexId) {
+            this.complexId = complexId;
+        }
+
+        public Long getIdOfDish() {
+            return idOfDish;
+        }
+
+        public void setIdOfDish(Long idOfDish) {
+            this.idOfDish = idOfDish;
         }
 
         @Override
