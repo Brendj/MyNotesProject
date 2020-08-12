@@ -868,10 +868,10 @@ public class PreorderDAOService {
                     preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
                     preorderComplex.setAmount(complex.getAmount());
+                    preorderComplex.setLastUpdate(new Date());
+                    //preorderComplex.setDeletedState(!complexSelected);
+                    preorderComplex.setVersion(nextVersion);
                 }
-                preorderComplex.setLastUpdate(new Date());
-                //preorderComplex.setDeletedState(!complexSelected);
-                preorderComplex.setVersion(nextVersion);
 
                 /*if (set.size() > 0) {
                     preorderComplex.setPreorderMenuDetails(set);
@@ -1062,9 +1062,9 @@ public class PreorderDAOService {
                     preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
                     preorderComplex.setAmount(complex.getAmount());
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setVersion(nextVersion);
                 }
-                preorderComplex.setLastUpdate(new Date());
-                preorderComplex.setVersion(nextVersion);
 
                 //if (set.size() > 0) {
                 //    preorderComplex.setPreorderMenuDetails(set);
