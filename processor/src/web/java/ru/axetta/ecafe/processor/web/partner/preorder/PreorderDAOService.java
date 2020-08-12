@@ -897,10 +897,9 @@ public class PreorderDAOService {
                     preorderComplex.setMobile(guardianMobile);
                     preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
-                    preorderComplex.setAmount(complex.getAmount());
                 }
                 preorderComplex.setLastUpdate(new Date());
-                //preorderComplex.setDeletedState(!complexSelected);
+                preorderComplex.setDeletedState(!complexSelected);
                 preorderComplex.setVersion(nextVersion);
 
                 /*if (set.size() > 0) {
@@ -1081,30 +1080,15 @@ public class PreorderDAOService {
             }
 
             if (preorderComplex != null) {
-                if (preorderComplex.getPreorderMenuDetails() == null) {
+                if (set.size() > 0) {
                     preorderComplex.setPreorderMenuDetails(set);
                 }
-                if (set.size() > 0) {
-                    preorderComplex.getPreorderMenuDetails().addAll(set);
+                if (preorderComplex.getDeletedState()) {
+                    Query delQuery = em.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
+                            + "where preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
+                    delQuery.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+                    delQuery.executeUpdate();
                 }
-                if (!preorderComplex.getAmount().equals(complex.getAmount())) {
-                    preorderComplex.setMobile(guardianMobile);
-                    preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
-                    updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
-                    preorderComplex.setAmount(complex.getAmount());
-                }
-                preorderComplex.setLastUpdate(new Date());
-                preorderComplex.setVersion(nextVersion);
-
-                //if (set.size() > 0) {
-                //    preorderComplex.setPreorderMenuDetails(set);
-                //}
-                //if (preorderComplex.getDeletedState()) {
-                //    Query delQuery = em.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
-                //            + "where preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
-                //    delQuery.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
-                //    delQuery.executeUpdate();
-                //}
                 em.merge(preorderComplex);
             }
         }
