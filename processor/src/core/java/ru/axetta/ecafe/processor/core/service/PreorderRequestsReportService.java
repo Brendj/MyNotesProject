@@ -571,12 +571,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         if (!org.getUseWebArm()) {
             pos.setUnitsScale(good.getUnitsScale());
             pos.setNetWeight(good.getNetWeight());
+            pos.setTotalCount(preorderItem.getAmount() * 1000L);
         } else {
             pos.setUnitsScale(UnitScale.UNITS);
             pos.setNetWeight(0L);
+            pos.setTotalCount(preorderItem.getAmount().longValue());
         }
         pos.setCreatedDate(fireTime);
-        pos.setTotalCount(preorderItem.getAmount() * 1000L);
         pos.setDailySampleCount(0L);
         pos.setTempClientsCount(0L);
         pos.setNotified(false);
