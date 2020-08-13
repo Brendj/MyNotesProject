@@ -39,6 +39,8 @@ import java.util.List;
 public class MeshPersonsSyncService {
     public static final String MESH_REST_PERSONS_URL = "/persons?";
     public static final String MESH_REST_PERSONS_EXPAND = "education,categories";
+    public static final String MESH_REST_PERSONS_TOP_PROPEERTY = "ecafe.processing.mesh.rest.persons.top";
+    public static final String TOP_DEFAULT = "50000";
 
     private static final String FILTER_VALUE_ORG = "education.organization_id";
     private static final String FILTER_VALUE_EQUALS = "equal";
@@ -52,8 +54,9 @@ public class MeshPersonsSyncService {
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
 
     public void loadPersons(long idOfOrg, String lastName, String firstName, String patronymic) throws Exception {
-        String parameters = String.format("filter=%s&expand=%s", URLEncoder
-                .encode(getFilter(idOfOrg, lastName, firstName, patronymic), "UTF-8"), getExpand());
+        logger.info("Start load persons from MESH");
+        String parameters = String.format("filter=%s&expand=%s&top=%s", URLEncoder
+                .encode(getFilter(idOfOrg, lastName, firstName, patronymic), "UTF-8"), getExpand(), getTop());
         try {
             byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
             ObjectMapper objectMapper = new ObjectMapper();
@@ -61,6 +64,7 @@ public class MeshPersonsSyncService {
             CollectionType collectionType = typeFactory.constructCollectionType(
                     List.class, ResponsePersons.class);
             List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
+            logger.info(String.format("Found %s persons in MESH", meshResponses.size()));
             Session session = null;
             Transaction transaction = null;
             try {
@@ -76,6 +80,7 @@ public class MeshPersonsSyncService {
                 HibernateUtils.rollback(transaction, logger);
                 HibernateUtils.close(session, logger);
             }
+            logger.info("End load persons from MESH");
         } catch (Exception e) {
             logger.error("Error in load persons from Mesh", e);
         }
@@ -140,6 +145,10 @@ public class MeshPersonsSyncService {
 
     private String getExpand() {
         return MESH_REST_PERSONS_EXPAND;
+    }
+
+    private String getTop() {
+        return RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_PERSONS_TOP_PROPEERTY, TOP_DEFAULT);
     }
 
     private String getFilter(long idOfOrg, String lastName, String firstName, String patronymic) throws Exception {
