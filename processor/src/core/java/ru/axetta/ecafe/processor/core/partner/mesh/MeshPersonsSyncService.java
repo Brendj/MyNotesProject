@@ -87,6 +87,10 @@ public class MeshPersonsSyncService {
             String personguid = person.getPersonId();
             Date birthdate = df.parse(person.getBirthdate());
             Education education = findEducation(person);
+            if (education == null) return;
+            Date endTraining = df.parse(education.getTrainingEndAt());
+            boolean deleted = false;
+            if (endTraining.before(new Date())) deleted = true;
             String classname = education.getClass_().getName();
             String classuid = education.getClassUid();
             String firstname = person.getFirstname();
@@ -116,6 +120,7 @@ public class MeshPersonsSyncService {
             meshSyncPerson.setEducationstageid(educationstageid);
             meshSyncPerson.setGuidnsi(guidnsi);
             meshSyncPerson.setLastupdateRest(new Date());
+            meshSyncPerson.setDeletestate(deleted);
             session.saveOrUpdate(meshSyncPerson);
 
         } catch (Exception e) {
@@ -124,8 +129,13 @@ public class MeshPersonsSyncService {
     }
 
     private Education findEducation(ResponsePersons person) {
-        Collections.sort(person.getEducation());
-        return person.getEducation().get(person.getEducation().size() - 1);
+        try {
+            Collections.sort(person.getEducation());
+            return person.getEducation().get(person.getEducation().size() - 1);
+        } catch (Exception e) {
+            logger.error("Can not find education from person with guid " + person.getPersonId());
+            return null;
+        }
     }
 
     private String getExpand() {

@@ -35,7 +35,6 @@ public class MeshSyncPerson {
         createdate = new Date();
         lastupdate = new Date();
         invaliddata = false;
-        deletestate = false;
     }
 
     public String getPersonguid() {

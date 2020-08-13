@@ -99,8 +99,16 @@ public class Education implements Comparable {
         if (empty(this.getActualFrom()) && empty(item.getActualFrom())) return 0;
         if (!empty(this.getActualFrom()) && empty(item.getActualFrom())) return 1;
         if (empty(this.getActualFrom()) && !empty(item.getActualFrom())) return -1;
-        if (this.getActualFrom().equals(item.getActualFrom())) return 0;
-        return this.getActualFrom().compareTo(item.getActualFrom());
+        if (!this.getActualFrom().equals(item.getActualFrom())) {
+            return this.getActualFrom().compareTo(item.getActualFrom());
+        } else {
+            if (empty(this.getTrainingEndAt()) && empty(item.getTrainingEndAt())) return 0;
+            if (!empty(this.getTrainingEndAt()) && empty(item.getTrainingEndAt())) return 1;
+            if (empty(this.getTrainingEndAt()) && !empty(item.getTrainingEndAt())) return -1;
+            if (this.getTrainingEndAt().equals(item.getTrainingEndAt())) return 0;
+            return this.getTrainingEndAt().compareTo(item.getTrainingEndAt());
+        }
+
     }
 
     @JsonProperty("id")
