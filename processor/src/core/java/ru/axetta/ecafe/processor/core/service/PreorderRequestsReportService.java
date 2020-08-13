@@ -457,11 +457,11 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 "
                             + params.getNativeSQLCondition()
                     + "UNION "
-                    + "SELECT CASE WHEN (wogr.idoforg is null) THEN wco.idoforg ELSE wogr.idoforg END, "             //0
+                    + "SELECT pc.idoforgoncreate, "                                                                         //0
                     + "pc.createddate, "                                                                                    //1
                     + "pc.idofpreordercomplex, "                                                                            //2
                     + "pmd.idofpreordermenudetail, "                                                                        //3
-                    + "pmd.idofgood, "                                                                                              //4
+                    + "pmd.idofgood, "                                                                                      //4
                     + "CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount, "                            //5
                     + "pc.preorderdate AS prDate, "                                                                         //6
                     + "pc.complexprice, "                                                                                   //7
@@ -478,8 +478,6 @@ public class PreorderRequestsReportService extends RecoverableService {
                     + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                     + "LEFT JOIN cf_wt_complexes wc ON wc.idofcomplex = pc.armcomplexid AND wc.deletestate = 0 "
                     + "AND pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wc.begindate) * 1000) AND (EXTRACT(EPOCH FROM wc.enddate) * 1000) "
-                    + "LEFT JOIN cf_wt_complexes_org wco ON wco.idofcomplex = wc.idofcomplex "
-                    + "LEFT JOIN cf_wt_org_group_relations wogr ON wogr.idoforggroup = wc.idoforggroup "
                     + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
                     + "LEFT JOIN cf_wt_dishes wd ON wd.idofdish = pmd.idofdish AND wd.deletestate = 0 "
                     + "AND (pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wd.dateOfBeginMenuIncluding) * 1000) AND (EXTRACT(EPOCH FROM wd.dateOfEndMenuIncluding) * 1000) "
