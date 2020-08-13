@@ -62,7 +62,7 @@ public class GoodRequestRepository {
     }
 
     public boolean isGoodRequestPositionWithoutGood(GoodRequestPosition goodRequestPosition) {
-        String sql = "select grp.good from GoodRequestPosition grp where grp = :goodRequestPosition";
+        String sql = "select grp.good from GoodRequestPosition grp where grp = :goodRequestPosition and grp.good is not null";
         TypedQuery<Good> query = entityManager.createQuery(sql, Good.class);
         query.setParameter("goodRequestPosition", goodRequestPosition);
         List<Good> list = query.getResultList();
