@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.mesh.MeshRestClient;
+import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -266,15 +266,20 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         } else {
             errorMessages = "Выберите организацию";
         }
+        doRefresh();
     }
 
     public void loadMeshRest(long idOfOrg) {
         try {
-            RuntimeContext.getAppContext().getBean(MeshRestClient.class).loadPersons(idOfOrg, nameFilter);
+            RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class).loadPersons(idOfOrg, lastName, firstName, patronymic);
         } catch (Exception e) {
             errorMessages = e.getMessage();
             return;
         }
+    }
+
+    public boolean orgSelected() {
+        return getIdOfOrg() > -1L;
     }
 
     public void doUpdate() {
@@ -427,7 +432,8 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
     }
 
     protected List<ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2> loadChangedItems() {
-        return frontControllerProcessor.loadRegistryChangeItemsV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
+        return frontControllerProcessor.loadRegistryChangeItemsV2_WithFullFIO(getIdOfOrg(), revisionCreateDate,
+                actionFilter, lastName, firstName, patronymic);
     }
 
     private void loadErrors() {

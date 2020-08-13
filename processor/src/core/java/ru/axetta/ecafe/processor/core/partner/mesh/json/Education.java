@@ -1,6 +1,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.mesh.json;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -33,7 +34,7 @@ import java.util.Map;
     "service_type",
     "organization"
 })
-public class Education {
+public class Education implements Comparable {
 
     @JsonProperty("id")
     private Integer id;
@@ -83,6 +84,24 @@ public class Education {
     private Organization organization;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    public boolean empty(String valueActualFrom) {
+        return StringUtils.isEmpty(valueActualFrom) || valueActualFrom.equalsIgnoreCase("null");
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof Education)) {
+            return 1;
+        }
+
+        Education item = (Education) o;
+        if (empty(this.getActualFrom()) && empty(item.getActualFrom())) return 0;
+        if (!empty(this.getActualFrom()) && empty(item.getActualFrom())) return 1;
+        if (empty(this.getActualFrom()) && !empty(item.getActualFrom())) return -1;
+        if (this.getActualFrom().equals(item.getActualFrom())) return 0;
+        return this.getActualFrom().compareTo(item.getActualFrom());
+    }
 
     @JsonProperty("id")
     public Integer getId() {

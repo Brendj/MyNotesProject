@@ -1,33 +1,48 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.And;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.MeshJsonFilter;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class MeshRestClient {
     public static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.rest.address";
-    public static final String MESH_REST_PERSONS_URL = "/persons?";
-    public static final String MESH_REST_PERSONS_EXPAND = "education,categories";
+    public static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.rest.api.key";
 
-    private static final String FILTER_VALUE_ORG = "education.organization_id";
-    private static final String FILTER_VALUE_EQUALS = "equal";
-    private static final String FILTER_VALUE_LASTNAME = "lastname";
-    private static final String FILTER_VALUE_FIRSTNAME = "firstname";
-    private static final String FILTER_VALUE_PATRONYMIC = "patronymic";
+    public byte[] executeRequest(String relativeUrl, String parameters) throws Exception {
+        URL url = new URL(getServiceAddress() + relativeUrl + parameters);
+        GetMethod httpMethod = new GetMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        httpMethod.setQueryString(parameters);
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            if (statusCode == HttpStatus.SC_OK) {
+                InputStream inputStream = httpMethod.getResponseBodyAsStream();
+                return IOUtils.toByteArray(inputStream);
+            } else {
+                throw new Exception("Mesh request has status " + statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
+    }
 
-    public void loadPersons(long idOfOrg, String fio) throws Exception {
-        String parameters = String.format("filter=%s&expand=%s", getFilter(idOfOrg, fio), getExpand());
-        URL url = new URL(getServiceAddress() + MESH_REST_PERSONS_URL + parameters);
+    private HttpClient getHttpClient(URL url) {
+        HttpClient httpClient = new HttpClient();
+        httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort(),
+                new Protocol("https", (ProtocolSocketFactory)new EasySSLProtocolSocketFactory(), 443));
+        return httpClient;
     }
 
     private String getServiceAddress() throws Exception{
@@ -36,49 +51,10 @@ public class MeshRestClient {
         return address;
     }
 
-    private String getExpand() {
-        return MESH_REST_PERSONS_EXPAND;
+    private String getApiKey() throws Exception{
+        String key = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_API_KEY_PROPERTY, "");
+        if (key.equals("")) throw new Exception("MESH API key not specified");
+        return key;
     }
 
-    private String getFilter(long idOfOrg, String fio) throws Exception {
-        Long meshId = DAOService.getInstance().getMeshIdByOrg(idOfOrg);
-        if (meshId == null) throw new Exception("У организации не указан МЭШ ид.");
-        MeshJsonFilter filter = new MeshJsonFilter();
-        List<And> list = new ArrayList<>();
-        And andOrg = new And();
-        andOrg.setField(FILTER_VALUE_ORG);
-        andOrg.setOp(FILTER_VALUE_EQUALS);
-        andOrg.setValue(meshId.toString());
-        list.add(andOrg);
-        List<And> fioFilterList = getFIOFilter(fio);
-        if (fioFilterList != null) list.addAll(fioFilterList);
-        filter.setAnd(list);
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(filter);
-    }
-
-    private List<And> getFIOFilter(String fio) {
-        if (StringUtils.isEmpty(fio)) return null;
-        String[] arr = fio.split(" ");
-        if (arr.length == 0) return null;
-        List<And> list = new ArrayList<>();
-        And andLastname = new And();
-        andLastname.setField(FILTER_VALUE_LASTNAME);
-        andLastname.setOp(FILTER_VALUE_EQUALS);
-        andLastname.setValue(arr[0].trim());
-        list.add(andLastname);
-        if (arr.length < 2) return list;
-        And andFirstname = new And();
-        andFirstname.setField(FILTER_VALUE_FIRSTNAME);
-        andFirstname.setOp(FILTER_VALUE_EQUALS);
-        andFirstname.setValue(arr[1].trim());
-        list.add(andFirstname);
-        if (arr.length < 3) return list;
-        And andPatronymic = new And();
-        andPatronymic.setField(FILTER_VALUE_PATRONYMIC);
-        andPatronymic.setOp(FILTER_VALUE_EQUALS);
-        andPatronymic.setValue(arr[1].trim());
-        list.add(andPatronymic);
-        return list;
-    }
 }

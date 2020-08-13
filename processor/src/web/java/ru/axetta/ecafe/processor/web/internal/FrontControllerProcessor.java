@@ -107,20 +107,25 @@ public class FrontControllerProcessor {
         return loadRegistryChangeItemsV2_ForClassName(idOfOrg, revisionDate, actionFilter, nameFilter, "RegistryChangeEmployee");
     }
 
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_WithFullFIO(long idOfOrg, long revisionDate, Integer actionFilter,
+            String lastName, String firstName, String patronymic) {
+        return loadRegistryChangeItemsV2_ForClassName_WithFullFIO(idOfOrg, revisionDate, actionFilter, lastName, firstName, patronymic, "RegistryChange");
+    }
+
     public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(long idOfOrg, long revisionDate, Integer actionFilter,
             String nameFilter) {
         return loadRegistryChangeItemsV2_ForClassName(idOfOrg, revisionDate, actionFilter, nameFilter, "RegistryChange");
     }
 
-    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_ForClassName(long idOfOrg, long revisionDate, Integer actionFilter,
-            String nameFilter, String className) {
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_ForClassName_WithFullFIO(long idOfOrg, long revisionDate, Integer actionFilter,
+            String lastName, String firstName, String patronymic, String className) {
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy");
 
         try {
             List<RegistryChangeItemV2> itemParams = new LinkedList<>();
 
             List<RegistryChange> changes = DAOService.getInstance()
-                    .getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter, className);
+                    .getLastRegistryChanges_WithFullFIO(idOfOrg, revisionDate, actionFilter, lastName, firstName, patronymic, className);
 
             RegistryChangeItemV2 registryChangeItemV2;
             List<RegistryChangeItemParam> registryChangeItemParams;
@@ -235,6 +240,12 @@ public class FrontControllerProcessor {
             logger.error("Failed to load registry change items form database", e);
             return Collections.EMPTY_LIST;
         }
+    }
+
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_ForClassName(long idOfOrg, long revisionDate, Integer actionFilter,
+            String nameFilter, String className) {
+        return loadRegistryChangeItemsV2_ForClassName_WithFullFIO(idOfOrg, revisionDate, actionFilter,
+                nameFilter, null, null, className);
     }
 
     private List<RegistryChangeRevisionItem> loadRegistryChangeRevisionsByClassName(long idOfOrg, String className) {

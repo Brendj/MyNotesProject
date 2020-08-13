@@ -84,11 +84,11 @@
         <h:panelGrid columns="4" styleClass="borderless-grid">
             <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchPage.doUpdate}"
                                reRender="synchTable,synchTableInfoPanel,revisionInfo,NSIOrgRegistrySynchPage_tabpanel,resultTitle" styleClass="command-button" status="updateStatus"
-                               onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
-            <a4j:commandButton value="Провести полную сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
-                               onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" disabled="#{!NSIOrgRegistrySynchPage.orgSelected()}"/>
+            <a4j:commandButton value="Провести сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" disabled="#{!NSIOrgRegistrySynchPage.orgSelected()}"/>
             <a4j:commandButton value="Актуализировать данные" action="#{NSIOrgRegistrySynchPage.doRefreshMeshRest}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
-                               onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" disabled="#{!NSIOrgRegistrySynchPage.orgSelected()}"/>
             <a4j:status id="updateStatus">
                 <f:facet name="start">
                      <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -96,9 +96,6 @@
             </a4j:status>
         </h:panelGrid>
     </rich:simpleTogglePanel>
-
-    <rich:tabPanel id="NSIOrgRegistrySynchPage_tabpanel" valueChangeListener="#{NSIOrgRegistrySynchPage.doChangePanel}">
-        <rich:tab label="Просмотр изменений"  switchType="ajax" immediate="true" id="browseChangesPanel" reRender="NSIOrgRegistrySynchPage_tabpanel">
 
             <h:panelGrid style="text-align: center" columns="2">
                 <h:panelGroup id="synchTable">
@@ -273,34 +270,5 @@
                     </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
-        </rich:tab>
-        <rich:tab label="Редактирование ошибок" switchType="ajax" rendered="#{NSIOrgRegistrySynchPage.showErrorEditPanel}" immediate="true" id="editErrorsPanel" reRender="NSIOrgRegistrySynchPage_tabpanel">
-            <h:panelGrid columns="2">
-                <h:panelGrid>
-                    <h:selectOneMenu id="displaymodes" value="#{NSIOrgRegistrySynchPage.displayMode}" style="width:150px;"
-                                     rendered="#{!claimCalendarEditPage.changesMade}">
-                        <f:selectItems value="#{NSIOrgRegistrySynchPage.displayModes}"/>
-                        <a4j:support event="onchange" actionListener="#{NSIOrgRegistrySynchPage.doChangeDisplayMode}"
-                                     reRender="synchTableInfoPanel,NSIOrgRegistrySynchPage_tabpanel,errorCommentDescription"/>
-                    </h:selectOneMenu>
-                    <h:selectOneListbox id="subscriptions"
-                                        value="#{NSIOrgRegistrySynchPage.idOfSelectedError}" style="width:200px; heigth: 300px;" size="11">
-                        <f:selectItems value="#{NSIOrgRegistrySynchPage.errors}"/>
-                        <a4j:support ajaxSingle="true" reRender="errorQuestion,errorAnswer,synchTableInfoPanel,errorCommentDescription"
-                                     actionListener="#{NSIOrgRegistrySynchPage.doChangeErrorQuestion}" event="onchange"/>
-                    </h:selectOneListbox>
-                </h:panelGrid>
-                <h:panelGrid>
-                    <h:outputText value="Описание" styleClass="output-text"/>
-                    <h:inputTextarea id="errorQuestion" readonly="true" value="#{NSIOrgRegistrySynchPage.errorMessage}" style="width: 400px; height: 100px;"/>
-                    <h:outputText id="errorCommentDescription" value="Комментарий #{NSIOrgRegistrySynchPage.commentInfo}" styleClass="output-text"/>
-                    <h:inputTextarea id="errorAnswer" value="#{NSIOrgRegistrySynchPage.errorComment}" style="width: 400px; height: 100px;" disabled="#{!NSIOrgRegistrySynchPage.selectedErrorEditable}"/>
-                    <a4j:commandButton value="Принять" action="#{NSIOrgRegistrySynchPage.doComment}"
-                                       styleClass="command-button" status="updateStatus" reRender="synchTableInfoPanel,NSIOrgRegistrySynchPage_tabpanel"
-                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
-                </h:panelGrid>
-            </h:panelGrid>
-        </rich:tab>
-    </rich:tabPanel>
 
 </h:panelGrid>
