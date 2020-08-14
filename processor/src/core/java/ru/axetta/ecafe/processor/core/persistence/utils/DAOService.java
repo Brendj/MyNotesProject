@@ -1739,8 +1739,8 @@ public class DAOService {
         return false;
     }
 
-    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate, Integer actionFilter,
-            String nameFilter, String className) throws Exception {
+    public List<RegistryChange> getLastRegistryChanges_WithFullFIO(long idOfOrg, long revisionDate, Integer actionFilter,
+            String lastName, String firstName, String patronymic, String className) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastRegistryChangeUpdate(idOfOrg, className);
         }
@@ -1748,10 +1748,19 @@ public class DAOService {
             return Collections.EMPTY_LIST;
         }
         String nameStatement = "";
-        if (nameFilter != null && nameFilter.length() > 0) {
-            String filter = nameFilter.trim().toLowerCase().replaceAll(" ", "");
-            nameStatement = " and lower(surname||firstname||secondname) like lower('%" + filter + "%') ";
+        if (!StringUtils.isEmpty(lastName)) {
+            String filter = lastName.trim().toLowerCase().replaceAll(" ", "");
+            nameStatement += " and lower(surname) like lower('%" + filter + "%') ";
         }
+        if (!StringUtils.isEmpty(firstName)) {
+            String filter = firstName.trim().toLowerCase().replaceAll(" ", "");
+            nameStatement += " and lower(firstname) like lower('%" + filter + "%') ";
+        }
+        if (!StringUtils.isEmpty(patronymic)) {
+            String filter = patronymic.trim().toLowerCase().replaceAll(" ", "");
+            nameStatement += " and lower(secondname) like lower('%" + filter + "%') ";
+        }
+
         String actionStatement = "";
         if (actionFilter != null && actionFilter > 0) {
             actionStatement = " and operation=:operation ";
@@ -1766,6 +1775,12 @@ public class DAOService {
             query.setParameter("operation", actionFilter);
         }
         return query.getResultList();
+    }
+
+    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate, Integer actionFilter,
+            String nameFilter, String className) throws Exception {
+        return getLastRegistryChanges_WithFullFIO(idOfOrg, revisionDate, actionFilter,
+                nameFilter, null, null, className);
     }
 
     public long getLastRegistryChangeUpdate(long idOfOrg, String className) throws Exception {
@@ -2948,6 +2963,13 @@ public class DAOService {
 
         q.setParameter("idOfUser", idOfUser);
         return q.getResultList();
+    }
+
+    public Long getMeshIdByOrg(long idOfOrg) {
+        Query query = entityManager.createNativeQuery("select organizationidfromnsi from cf_orgs where IdOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        Object obj = query.getSingleResult();
+        return obj == null ? null : ((BigInteger)obj).longValue();
     }
 
     public WtComplex getWtComplexById(Long idOfComplex) {
