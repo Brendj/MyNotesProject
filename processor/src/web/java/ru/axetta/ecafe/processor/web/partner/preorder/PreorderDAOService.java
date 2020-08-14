@@ -955,7 +955,7 @@ public class PreorderDAOService {
 
         Query queryMenuSelect = em.createQuery("select m from PreorderMenuDetail m "
                 + "where m.client.idOfClient = :idOfClient and m.preorderComplex.idOfPreorderComplex = :idOfPreorderComplex "
-                + "and m.armIdOfMenu IS NULL and m.deletedState = false");
+                + "and m.idOfDish = :idOfDish and m.deletedState = false");
         queryMenuSelect.setParameter("idOfClient", client.getIdOfClient());
 
         for (ComplexListParam complex : list.getComplexes()) {
@@ -1031,6 +1031,7 @@ public class PreorderDAOService {
                         continue;
                     }
                     queryMenuSelect.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+                    queryMenuSelect.setParameter("idOfDish", menuItem.getIdOfMenuDetail());
                     boolean menuSelected = (menuItem.getAmount() > 0);
                     PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail();
                     try {
