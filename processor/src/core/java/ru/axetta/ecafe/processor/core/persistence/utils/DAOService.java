@@ -1750,15 +1750,15 @@ public class DAOService {
         String nameStatement = "";
         if (!StringUtils.isEmpty(lastName)) {
             String filter = lastName.trim().toLowerCase().replaceAll(" ", "");
-            nameStatement = " and lower(surname) like lower('%" + filter + "%') ";
+            nameStatement += " and lower(surname) like lower('%" + filter + "%') ";
         }
         if (!StringUtils.isEmpty(firstName)) {
             String filter = firstName.trim().toLowerCase().replaceAll(" ", "");
-            nameStatement = " and lower(firstname) like lower('%" + filter + "%') ";
+            nameStatement += " and lower(firstname) like lower('%" + filter + "%') ";
         }
         if (!StringUtils.isEmpty(patronymic)) {
             String filter = patronymic.trim().toLowerCase().replaceAll(" ", "");
-            nameStatement = " and lower(secondname) like lower('%" + filter + "%') ";
+            nameStatement += " and lower(secondname) like lower('%" + filter + "%') ";
         }
 
         String actionStatement = "";
