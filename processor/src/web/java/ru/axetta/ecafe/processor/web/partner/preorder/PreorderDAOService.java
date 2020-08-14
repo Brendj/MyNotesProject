@@ -2280,7 +2280,7 @@ public class PreorderDAOService {
             preorderComplex.setComplexPrice(wtComplex.getPrice() == null ? 0L :
                     wtComplex.getPrice().multiply(new BigDecimal(100)).longValue());
             preorderComplex.setModeFree(0);
-            preorderComplex.setModeOfAdd(0);
+            preorderComplex.setModeOfAdd(wtComplex.getComposite() ? 4 : 2);
         } else {
             throw new MenuDetailNotExistsException("Не найден комплекс с ид.=" + idOfComplex.toString());
         }
