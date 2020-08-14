@@ -2,11 +2,8 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений issue 609
+-- Пакет обновлений 223
 
 alter table cf_mh_persons add column lastupdate_rest timestamp without time zone;
 
---новые параметры в конфиг:
---ecafe.processing.mesh.rest.address
---ecafe.processing.mesh.rest.api.key
---ecafe.processing.mesh.rest.persons.top
+--! ФИНАЛИЗИРОВАН 14.08.2020, НЕ МЕНЯТЬ
