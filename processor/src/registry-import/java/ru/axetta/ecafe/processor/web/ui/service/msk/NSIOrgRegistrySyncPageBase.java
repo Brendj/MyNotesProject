@@ -66,7 +66,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
     );
 
     private DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    private boolean fullNameValidation = true;
+    private boolean fullNameValidation = false;
     protected String errorMessages;
     protected String infoMessages;
     protected long revisionCreateDate;
@@ -82,7 +82,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
     private int displayMode;
     protected String nameFilter;
     private long loadedOrgRevisions = -1L;
-    boolean showOnlyClientGoups = true;
+    boolean showOnlyClientGoups = false;
     protected String firstName;
     protected String lastName;
     protected String patronymic;
