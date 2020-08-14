@@ -41,7 +41,7 @@ public class NSIOrgRegistrySynchPage extends NSIOrgRegistrySyncPageBase implemen
     }
 
     public String getPageTitle() {
-        return "Синхронизация организации с Реестрами";
+        return "Интерактивная сверка";
     }
 
     @Override
