@@ -9,7 +9,9 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.And;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Education;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.MeshJsonFilter;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.MeshSyncPerson;
+import ru.axetta.ecafe.processor.core.persistence.MeshTrainingForm;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -17,9 +19,11 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by nuc on 12.08.2020.
@@ -47,6 +48,8 @@ public class MeshPersonsSyncService {
     private static final String FILTER_VALUE_LASTNAME = "lastname";
     private static final String FILTER_VALUE_FIRSTNAME = "firstname";
     private static final String FILTER_VALUE_PATRONYMIC = "patronymic";
+
+    private static final String OUT_ORG_GROUP_PREFIX = "Вне";
 
     @Autowired
     MeshRestClient meshRestClient;
@@ -71,8 +74,9 @@ public class MeshPersonsSyncService {
                 session = RuntimeContext.getInstance().createPersistenceSession();
                 session.setFlushMode(FlushMode.COMMIT);
                 transaction = session.beginTransaction();
+                Map<Integer, MeshTrainingForm> trainingForms = getTrainingForms(session);
                 for (ResponsePersons person : meshResponses) {
-                    processPerson(session, person);
+                    processPerson(session, person, trainingForms);
                 }
                 transaction.commit();
                 transaction = null;
@@ -86,25 +90,56 @@ public class MeshPersonsSyncService {
         }
     }
 
-    private void processPerson(Session session, ResponsePersons person) {
+    private Map<Integer, MeshTrainingForm> getTrainingForms(Session session) {
+        Criteria criteria = session.createCriteria(MeshTrainingForm.class);
+        criteria.add(Restrictions.eq("archive", false));
+        criteria.add(Restrictions.eq("is_deleted", 0));
+        List<MeshTrainingForm> list = criteria.list();
+        Map<Integer, MeshTrainingForm> map = new HashMap<>();
+        for (MeshTrainingForm trainingForm : list) {
+            try {
+                map.put(trainingForm.getId(), trainingForm);
+            } catch (Exception ignore){}
+        }
+        return map;
+    }
+
+    private boolean isHomeStudy(Education education, Map<Integer, MeshTrainingForm> trainingForms) throws Exception {
+        if (education.getActualFrom() == null && education.getEducationFormId() == null)
+            throw new Exception("Arguments educationForm and educationFormId are NULL");
+        Integer id = education.getEducationForm() == null ? education.getEducationFormId() : education.getEducationForm().getId();
+        MeshTrainingForm trainingForm = trainingForms.get(id);
+        if (trainingForm == null) throw new Exception(String.format("TrainingForm by ID %d does exists", id));
+        return trainingForm.getEducation_form().contains(OUT_ORG_GROUP_PREFIX);
+    }
+
+    private void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms) {
+        String personguid = "";
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            String personguid = person.getPersonId();
+            personguid = person.getPersonId();
             Date birthdate = df.parse(person.getBirthdate());
             Education education = findEducation(person);
             if (education == null) return;
             Date endTraining = df.parse(education.getTrainingEndAt());
             boolean deleted = false;
             if (endTraining.before(new Date())) deleted = true;
-            String classname = education.getClass_().getName();
+            String classname = null;
+            Integer parallelid = null;
+            Integer educationstageid = null;
+            if (isHomeStudy(education, trainingForms)) {
+                classname = ClientGroup.Predefined.CLIENT_OUT_ORG.getNameOfGroup();
+            } else {
+                classname = education.getClass_().getName();
+                parallelid = (Integer) (education.getClass_().getParallelId());
+                educationstageid = education.getClass_().getEducationStageId();
+            }
             String classuid = education.getClassUid();
             String firstname = person.getFirstname();
             Integer genderid = person.getGenderId();
             String lastname = person.getLastname();
             Long organizationid = education.getOrganizationId().longValue();
-            Integer parallelid = (Integer)(education.getClass_().getParallelId());
             String patronymic = person.getPatronymic();
-            Integer educationstageid = education.getClass_().getEducationStageId();
             String guidnsi = null;
             try {
                 guidnsi = person.getCategories().get(0).getParameterValues().get(0);
@@ -129,7 +164,7 @@ public class MeshPersonsSyncService {
             session.saveOrUpdate(meshSyncPerson);
 
         } catch (Exception e) {
-            logger.error("Error in process Mesh person: ", e);
+            logger.error(String.format("Error in process Mesh person with guid %s: ", personguid), e);
         }
     }
 
