@@ -64,9 +64,9 @@ CREATE SEQUENCE clientphoto_version_seq;
 select setval('clientphoto_version_seq', (select coalesce(max(version), 0) + 1 from cf_clientphoto));
 
 -- Установка значений для Самрт-Часов
-update cf_cards
-set cardsigncertnum = 16
-where cardtype = 10 and cardsigncertnum is null;
+--update cf_cards
+--set cardsigncertnum = 16
+--where cardtype = 10 and cardsigncertnum is null;
 
 alter table cf_clients
     add column meshguid varchar(36);
