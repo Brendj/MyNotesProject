@@ -252,7 +252,7 @@
                         <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
                                          rendered="#{detail.enableEditShippedQty and detail.needFillShippedQty}"
                                          validatorMessage="Заполните поле Отгрузка">
-                            <f:validateLongRange minimum="1" maximum="9999"/>
+                            <f:validateLongRange minimum="0" maximum="9999"/>
                             <a4j:support event="onchange" action="#{detail.setChangedData(true)}"
                                          reRender="buttons"/>
                         </h:inputTextarea>
@@ -385,15 +385,24 @@
                     </rich:column>
 
                     <%--        Комментарий--%>
+<%--                    <rich:column headerClass="column-header">--%>
+<%--                        <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"--%>
+<%--                                         rows="2" rendered="#{!detail.summaryDay and !detail.total}"--%>
+<%--                                         validatorMessage="Комментарий не может быть больше 128 символов">--%>
+<%--                            <f:validateLength maximum="128"/>--%>
+<%--                            <a4j:support event="onchange"--%>
+<%--                                         action="#{detail.setChangedData(true)}"--%>
+<%--                                         reRender="buttons"/>--%>
+<%--                        </h:inputTextarea>--%>
+<%--                    </rich:column>--%>
+
                     <rich:column headerClass="column-header">
-                        <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
-                                         rows="2" rendered="#{!detail.summaryDay and !detail.total}"
-                                         validatorMessage="Комментарий не может быть больше 128 символов">
-                            <f:validateLength maximum="128"/>
+                        <h:inputText value="#{detail.comments}" styleClass="output-text" id="comment" maxlength="128"
+                                     rendered="#{!detail.summaryDay and !detail.total}">
                             <a4j:support event="onchange"
                                          action="#{detail.setChangedData(true)}"
                                          reRender="buttons"/>
-                        </h:inputTextarea>
+                        </h:inputText>
                     </rich:column>
 
                     <%--        История изменений--%>
