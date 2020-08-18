@@ -18,10 +18,12 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -40,6 +42,11 @@ public class MaintenanceService {
     private int MAXROWS;
     private static final AtomicLong threadCounter = new AtomicLong();
     private static final int daysMinus = 45;
+    private static final String CLEAR_MENU_THREAD_COUNT_PROPERTY = "ecafe.processor.clearmenu.maintenanceservice.thread.count";
+    private static Long currentOrg;
+
+    @Resource(name = "clearMenuExecutor")
+    protected TaskExecutor taskExecutor;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -85,11 +92,23 @@ public class MaintenanceService {
         }
     }
 
-    public void wrapRun() {
+    public void wrapRun() throws Exception {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
         }
-        runVersion2();
+        int tCount = RuntimeContext.getInstance().getPropertiesValue(CLEAR_MENU_THREAD_COUNT_PROPERTY, 1);
+        if (tCount == 1)
+            runVersion2();
+        else
+            runVersion2MultiThread(tCount);
+    }
+
+    public void runVersion2MultiThread(int coreSize) throws Exception {
+        for (int i = 0; i < coreSize; i++) {
+            ClearMenuThreadWrapper wrapper = new ClearMenuThreadWrapper(i);
+            taskExecutor.execute(wrapper);
+            Thread.sleep(10000L); //запуск с разницей в 10 секунд
+        }
     }
 
     public void runVersion2() {
@@ -415,5 +434,18 @@ public class MaintenanceService {
         Query qMenu = entityManager.createNativeQuery("DELETE FROM CF_Menu WHERE idOfMenu = :idOfMenu");
         qMenu.setParameter("idOfMenu", idOfMenu);
         return qMenu.executeUpdate();
+    }
+
+    public static final class ClearMenuThreadWrapper implements Runnable {
+        private int tempTableNumber;
+
+        public ClearMenuThreadWrapper(int tempTableNumber) {
+            this.tempTableNumber = tempTableNumber;
+        }
+
+        @Override
+        public void run() {
+
+        }
     }
 }
