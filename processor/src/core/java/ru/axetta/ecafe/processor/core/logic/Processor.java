@@ -5763,6 +5763,11 @@ public class Processor implements SyncProcessor {
                     if (bOrgIsMenuExchangeSource) {
                         MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
                                 bFirstMenuItem ? MenuExchange.FLAG_ANCHOR_MENU : MenuExchange.FLAG_NONE);
+                        //Удаление объекта из сессии с одинаковым идентификатором
+                        MenuExchange menuExchangeFromSession = (MenuExchange) persistenceSession.get(MenuExchange.class, menuExchange.getCompositeIdOfMenuExchange());
+                        if(menuExchangeFromSession != null) {
+                            persistenceSession.evict(menuExchangeFromSession);
+                        }
                         persistenceSession.saveOrUpdate(menuExchange);
                     }
                     ///
