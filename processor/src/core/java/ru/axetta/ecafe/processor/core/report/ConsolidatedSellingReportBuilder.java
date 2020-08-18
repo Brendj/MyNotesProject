@@ -15,6 +15,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -97,7 +98,8 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
         orderTypes.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
         String query_string = reportProperties.getProperty(ConsolidatedSellingReportBuilder.SHOW_ALL_ORGS).equals("0") ?
                 "select org.idoforg, org.shortnameinfoservice, org.district, org.address, "
-                + "od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder "
+                + "od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder, "
+                + "org.organizationtype "
                 + "from cf_orgs org join cf_orders o on org.idoforg = o.idoforg "
                 + "join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + "left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
@@ -105,7 +107,8 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
                 + org_condition
                 + "order by org.idoforg"
                 :
-                "select org.idoforg, org.shortnameinfoservice, org.district, org.address, query.rprice, query.qty, query.menuorigin, query.menutype, query.ispreorder "
+                "select org.idoforg, org.shortnameinfoservice, org.district, org.address, query.rprice, query.qty, "
+                + "query.menuorigin, query.menutype, query.ispreorder, org.organizationtype "
                 + " from cf_orgs org left join " + " ("
                 + " select org2.idoforg, od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder "
                 + " from cf_orgs org2 join cf_orders o on org2.idoforg = o.idoforg "
@@ -136,6 +139,7 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
             String shortNameInfoService = (String) row[1];
             String district = (String) row[2];
             String address = (String) row[3];
+            String orgType = OrganizationType.fromInteger((Integer) row[9]).toString();
             boolean data_exists = (row[4] != null);
             if (data_exists) {
                 rprice = ((BigInteger) row[4]).longValue();
@@ -146,7 +150,7 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
             }
             ConsolidatedSellingReportItem item = getReportItemByIdOfOrg(result_list, idOfOrg);
             if (item == null) {
-                item = new ConsolidatedSellingReportItem(idOfOrg, shortNameInfoService, district, address, number);
+                item = new ConsolidatedSellingReportItem(idOfOrg, shortNameInfoService, district, address, number, orgType);
                 number++;
                 if (data_exists) addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
                 result_list.add(item);

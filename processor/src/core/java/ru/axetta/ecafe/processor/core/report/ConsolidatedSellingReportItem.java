@@ -18,12 +18,15 @@ public class ConsolidatedSellingReportItem {
     private Long buffetFood;
     private Long totalFood;
     private Long preorderFood;
+    private String orgType;
 
-    public ConsolidatedSellingReportItem(Long idOfOrg, String orgName, String district, String address, int number) {
+    public ConsolidatedSellingReportItem(Long idOfOrg, String orgName, String district, String address, int number,
+            String orgType) {
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
         this.district = district;
         this.address = address;
+        this.orgType = orgType;
         this.complexFood = 0L;
         this.payFood = 0L;
         this.buffetFood = 0L;
@@ -126,5 +129,13 @@ public class ConsolidatedSellingReportItem {
 
     public void setPreorderFood(Long preorderFood) {
         this.preorderFood = preorderFood;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
     }
 }
