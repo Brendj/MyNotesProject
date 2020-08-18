@@ -28,10 +28,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.hibernate.FlushMode;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -827,6 +824,20 @@ public class DTSZNDiscountsReviseService {
         runTaskPart2(null);
     }
 
+    private void runOneClient(Session session, Transaction transaction, Long idOfClient, Long otherDiscountCode) throws Exception {
+        if (null == transaction || !transaction.isActive()) {
+            transaction = session.beginTransaction();
+        }
+
+        Client client = (Client) session.load(Client.class, idOfClient);
+        List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils
+                .getDTISZNDiscountsInfoByClient(session, client);
+        if (!clientInfoList.isEmpty()) {
+            processDiscounts(session, client, clientInfoList, otherDiscountCode);
+        }
+        transaction.commit();
+    }
+
     public void runTaskPart2(Date startDate) throws Exception {
         Session session = null;
         Transaction transaction = null;
@@ -844,29 +855,39 @@ public class DTSZNDiscountsReviseService {
             }
 
             Integer clientCounter = 1;
-
+            List<Long> finalDopProcessing = new ArrayList<>();
+            List<Long> currentProcessing = new ArrayList<>();
             for (Long idOfClient : clientList) {
-                if (null == transaction || !transaction.isActive()) {
-                    transaction = session.beginTransaction();
-                }
-
-                Client client = (Client) session.load(Client.class, idOfClient);
-                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils
-                        .getDTISZNDiscountsInfoByClient(session, client);
-                if (!clientInfoList.isEmpty()) {
-                    processDiscounts(session, client, clientInfoList, otherDiscountCode);
-                }
-                transaction.commit();
-                transaction = null;
-                if (0 == clientCounter % maxRecords) {
-                    session.flush();
+                try {
+                    currentProcessing.add(idOfClient);
+                    runOneClient(session, transaction, idOfClient, otherDiscountCode);
+                    transaction = null;
+                    if (0 == clientCounter % maxRecords) {
+                        session.flush();
+                        session.clear();
+                        currentProcessing.clear();
+                    }
+                    logger.info(String.format("Updating discounts for clients: client %d/%d", clientCounter++,
+                            clientList.size()));
+                } catch (StaleObjectStateException e) {
+                    finalDopProcessing.addAll(currentProcessing);
                     session.clear();
+                } catch (Exception e) {
+                    logger.error(String.format("Error in update discounts for client %s", idOfClient), e);
+                } finally {
+                    HibernateUtils.rollback(transaction, logger);
                 }
-                logger.info(String.format("Updating discounts for clients: client %d/%d", clientCounter++,
-                        clientList.size()));
             }
             session.flush();
             session.clear();
+
+            if (finalDopProcessing.size() > 0) {
+                for (Long idOfClient : finalDopProcessing) {
+                    runOneClient(session, transaction, idOfClient, otherDiscountCode);
+                }
+                session.flush();
+                session.clear();
+            }
 
         } catch (Exception e) {
             logger.error("Error in update discounts", e);
