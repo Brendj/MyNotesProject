@@ -207,7 +207,7 @@ public class DiscountManager {
             }
         }
         if (!douDiscountsExist) return;
-        if (client.isDOUClient()) {
+        if (!client.isDOUClient()) {
             deleteDOUDiscounts(session, client);
             return;
         }
