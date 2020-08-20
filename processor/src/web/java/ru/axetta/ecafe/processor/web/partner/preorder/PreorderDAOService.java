@@ -700,6 +700,7 @@ public class PreorderDAOService {
             query.setParameter("idOfComplex", idOfComplex);
         else {
             MenuDetail md = getMenuDetail(client, idOfMenu, date);
+            if (md == null) return;
             menuDetailName = md.getMenuDetailName();
             menuDetailPrice = md.getPrice();
             itemCode = md.getItemCode();
