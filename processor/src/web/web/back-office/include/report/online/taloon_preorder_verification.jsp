@@ -385,25 +385,25 @@
                     </rich:column>
 
                     <%--        Комментарий--%>
-<%--                    <rich:column headerClass="column-header">--%>
-<%--                        <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"--%>
-<%--                                         rows="2" rendered="#{!detail.summaryDay and !detail.total}"--%>
-<%--                                         validatorMessage="Комментарий не может быть больше 128 символов">--%>
-<%--                            <f:validateLength maximum="128"/>--%>
-<%--                            <a4j:support event="onchange"--%>
-<%--                                         action="#{detail.setChangedData(true)}"--%>
-<%--                                         reRender="buttons"/>--%>
-<%--                        </h:inputTextarea>--%>
-<%--                    </rich:column>--%>
-
                     <rich:column headerClass="column-header">
-                        <h:inputText value="#{detail.comments}" styleClass="output-text" id="comment" maxlength="128"
-                                     rendered="#{!detail.summaryDay and !detail.total}">
+                        <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
+                                         rows="2" rendered="#{!detail.summaryDay and !detail.total}"
+                                         validatorMessage="Комментарий не может быть больше 128 символов">
+                            <f:validateLength maximum="128"/>
                             <a4j:support event="onchange"
                                          action="#{detail.setChangedData(true)}"
                                          reRender="buttons"/>
-                        </h:inputText>
+                        </h:inputTextarea>
                     </rich:column>
+
+<%--                    <rich:column headerClass="column-header">--%>
+<%--                        <h:inputText value="#{detail.comments}" styleClass="output-text" id="comment" maxlength="128"--%>
+<%--                                     rendered="#{!detail.summaryDay and !detail.total}">--%>
+<%--                            <a4j:support event="onchange"--%>
+<%--                                         action="#{detail.setChangedData(true)}"--%>
+<%--                                         reRender="buttons"/>--%>
+<%--                        </h:inputText>--%>
+<%--                    </rich:column>--%>
 
                     <%--        История изменений--%>
                     <rich:column>
