@@ -59,7 +59,7 @@ public class ClientMigrationHistoryService {
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
             discountChange(list);
-            deleteDOUDiscounts(list);
+            //deleteDOUDiscounts(list);
         }
 
         if (isOn(NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG)) {
@@ -101,7 +101,7 @@ public class ClientMigrationHistoryService {
         }
     }
 
-    private void deleteDOUDiscounts(List<ClientMigration> list) {
+    /*private void deleteDOUDiscounts(List<ClientMigration> list) {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -126,7 +126,7 @@ public class ClientMigrationHistoryService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-    }
+    }*/
 
     private void discountChange(List<ClientMigration> list) {
         for (ClientMigration clientMigration : list) {
