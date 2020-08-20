@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -71,7 +70,6 @@ public class CardProcessorService {
             cardActionRequestService.writeRecord(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
         }
     }
-
     public void processBlockRequest(BlockPersonEntranceRequest request) {
         try {
             if (request == null) {
@@ -100,20 +98,14 @@ public class CardProcessorService {
                     processBlockRequest(client, request);
                 }
             } else { // Обработка сотрудников
-                String fio = StringUtils
-                        .join(Arrays.asList(request.getLastName(), request.getFirstName(), request.getMiddleName()),
-                                " ");
-
-                List<Long> clientsIds = clientRepository.getStaffByFIO(fio);
-                if(CollectionUtils.isEmpty(clientsIds)){
+                List<Client> clients = clientRepository.getStaffByFIO(request.getFirstName(),
+                        request.getLastName(), request.getMiddleName(), request.getBirthdate());
+                if(CollectionUtils.isEmpty(clients)){
                     cardActionRequestService.writeRecord(request, "Сотрудник не найден", false);
                     return;
                 }
 
-                for(Long id : clientsIds){
-                    Client client = clientRepository.findById(id)
-                            .orElseThrow(() -> new Exception("По ID клиента получен NULL"));
-
+                for(Client client : clients){
                     processBlockRequest(client, request);
                 }
             }

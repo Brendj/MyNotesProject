@@ -21,7 +21,7 @@ public class CardActionRequestService {
     }
 
     public CardActionRequest findBlockRequestByRequestId(String id) {
-        return cardActionRequestRepository.findByRequestIdAndProcessedAndActionType(id, true, ActionType.block);
+        return cardActionRequestRepository.findByRequestIdAndProcessedAndActionType(id, true, 0);
     }
 
     public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed){

@@ -32,12 +32,12 @@ public class CardService {
     }
 
     public List<Card> getBlockedCard(Client client){
-        return cardRepository.findAllByClientAndLockReasonLikeAndState(client, BLOCK_COMMENT,
+        return cardRepository.findAllByClientAndLockReasonLikeAndState(client.getIdOfClient(), BLOCK_COMMENT,
                 CardState.BLOCKED.getValue());
     }
 
     public List<Card> getActiveCard(Client client){
-        return cardRepository.findAllByClientAndStateNot(client, CardState.BLOCKED.getValue());
+        return cardRepository.findAllActiveCardByClient(client.getIdOfClient());
     }
 
     public void unblockCard(Card c) {
