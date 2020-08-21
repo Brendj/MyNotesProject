@@ -145,11 +145,14 @@ public class ClientMigrationHistoryService {
                 transaction = session.beginTransaction();
                 List<Org> friendlyOrgs = DAOUtils
                         .findFriendlyOrgs(session, clientMigration.getOldOrg().getIdOfOrg());
+                boolean skipClient = false;
                 for (Org o : friendlyOrgs) {
                     if (o.getIdOfOrg().equals(clientMigration.getOrg().getIdOfOrg())) {
-                        continue;
+                        skipClient = true;
+                        break;
                     }
                 }
+                if (skipClient) continue;
                 Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
                 if (DiscountManager.atLeastOneDiscountEligibleToDelete(client)) {
                     DiscountManager.deleteDiscount(client, session);
