@@ -208,7 +208,7 @@ public class DiscountManager {
             }
         }
         if (!douDiscountsExist || client.getOrg().getType().equals(OrganizationType.KINDERGARTEN)) return;
-        if (client.isDOUClient()) {
+        if (client.notDOUClient()) {
             //клиент ДОУ и орга СОШ
             deleteDOUDiscounts(session, client);
             return;
@@ -218,6 +218,7 @@ public class DiscountManager {
             return;
         }
         if (client.getOrg().getType().equals(OrganizationType.SCHOOL)) {
+            //не заполнена возрастная категория и тип ОО = СОШ
             deleteDOUDiscounts(session, client);
         }
     }

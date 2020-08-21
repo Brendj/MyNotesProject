@@ -251,8 +251,8 @@ public class Client {
         }
     }
 
-    public boolean isDOUClient() {
-        return ageTypeGroup != null && ageTypeGroup.toLowerCase().contains(DOU_STRING);
+    public boolean notDOUClient() {
+        return ageTypeGroup == null && !ageTypeGroup.toLowerCase().contains(DOU_STRING);
     }
 
     public Card findActiveCard(Session session, Card failCard) throws Exception {
