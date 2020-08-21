@@ -19,7 +19,7 @@ public class Client {
     private Long idOfClient;
 
     @WhereJoinTable(clause = "deletedstate = false")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "cf_client_guardian",
             joinColumns = @JoinColumn(name = "idofchildren"),

@@ -42,22 +42,22 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
                              @Param("middleName") String middleName,
                                @Param("orgids") List<Long> orgIds);
 
-    @Query(value =
-            "SELECT c.* "
-                    + "FROM cf_clients AS c "
-                    + "         left join cf_orgs AS co ON co.idoforg = c.idoforg "
-                    + "         left join cf_persons AS p ON p.idofperson = c.idofperson "
-                    + "         left join cf_clientgroups AS cc ON c.idoforg = cc.idoforg AND c.idofclientgroup = cc.idofclientgroup "
-                    + "WHERE lower(p.surname) = lower(:lastName) " +
-                    "  and lower(p.firstname) = lower(:firstName) " +
-                    " and co.organizationidfromnsi in (:orgids)"
-                    + "  AND (cc.idofclientgroup BETWEEN 1100000000 AND 1100000029 " // Все от Пед. состава до Тех. персонала
-                    + "       OR cc.idofclientgroup BETWEEN 1100000050 AND 1100000059 " // группа "Другое"
-                    + "       OR cc.idofclientgroup BETWEEN 1100000110 AND 1100000119); ", // Сотрудники других ОО
-            nativeQuery = true)
-    List<Client> getStaffByFIOandOrgIdnoMiddle(@Param("firstName") String firstName,
-                                       @Param("lastName") String lastName,
-                                       @Param("orgids") List<Long> orgIds);
+//    @Query(value =
+//            "SELECT c.* "
+//                    + "FROM cf_clients AS c "
+//                    + "         left join cf_orgs AS co ON co.idoforg = c.idoforg "
+//                    + "         left join cf_persons AS p ON p.idofperson = c.idofperson "
+//                    + "         left join cf_clientgroups AS cc ON c.idoforg = cc.idoforg AND c.idofclientgroup = cc.idofclientgroup "
+//                    + "WHERE lower(p.surname) = lower(:lastName) " +
+//                    "  and lower(p.firstname) = lower(:firstName) " +
+//                    " and co.organizationidfromnsi in (:orgids)"
+//                    + "  AND (cc.idofclientgroup BETWEEN 1100000000 AND 1100000029 " // Все от Пед. состава до Тех. персонала
+//                    + "       OR cc.idofclientgroup BETWEEN 1100000050 AND 1100000059 " // группа "Другое"
+//                    + "       OR cc.idofclientgroup BETWEEN 1100000110 AND 1100000119); ", // Сотрудники других ОО
+//            nativeQuery = true)
+//    List<Client> getStaffByFIOandOrgIdnoMiddle(@Param("firstName") String firstName,
+//                                       @Param("lastName") String lastName,
+//                                       @Param("orgids") List<Long> orgIds);
 
     @Query(value =
             "SELECT c.idofclient "

@@ -12,6 +12,8 @@ import ru.iteco.cardsync.repo.CardActionRequestRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CardActionRequestService {
     private final CardActionRequestRepository cardActionRequestRepository;
@@ -20,8 +22,16 @@ public class CardActionRequestService {
         this.cardActionRequestRepository = cardActionRequestRepository;
     }
 
-    public CardActionRequest findBlockRequestByRequestId(String id) {
+    public List<CardActionRequest> findRequestBlockByRequestId(String id) {
         return cardActionRequestRepository.findByRequestIdAndProcessedAndActionType(id, true, 0);
+    }
+
+    public List<CardActionRequest> findRequestBlockByRequestIdFull(String id) {
+        return cardActionRequestRepository.findByRequestIdAndProcessedAndActionTypeFull(id, 0);
+    }
+
+    public List<CardActionRequest> findRequestUnblockByRequestIdFull(String id) {
+        return cardActionRequestRepository.findByRequestIdAndProcessedAndActionTypeFull(id, 1);
     }
 
     public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed){

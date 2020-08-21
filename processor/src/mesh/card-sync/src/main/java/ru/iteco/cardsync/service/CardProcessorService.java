@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,7 +42,7 @@ public class CardProcessorService {
                 return;
             }
 
-            CardActionRequest blockRequest = cardActionRequestService.findBlockRequestByRequestId(request.getId());
+            CardActionRequest blockRequest = cardActionRequestService.findRequestBlockByRequestId(request.getId()).get(0);
             if (blockRequest == null) {
                 cardActionRequestService.writeRecord(request, "В БД нет запроса на блокировку", false);
                 return;
@@ -106,8 +105,8 @@ public class CardProcessorService {
                 }
                 else
                 {
-                    clients = clientRepository.getStaffByFIOandOrgIdnoMiddle(request.getFirstName(),
-                            request.getLastName(), request.getOrganizationIds());
+                    clients = clientRepository.getStaffByFIOandOrgId(request.getFirstName(),
+                            request.getLastName(), "", request.getOrganizationIds());
                 }
 
                 if(CollectionUtils.isEmpty(clients)){
