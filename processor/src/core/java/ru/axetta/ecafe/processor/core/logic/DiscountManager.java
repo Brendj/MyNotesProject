@@ -207,8 +207,9 @@ public class DiscountManager {
                 break;
             }
         }
-        if (!douDiscountsExist) return;
-        if (!client.isDOUClient()) {
+        if (!douDiscountsExist || client.getOrg().getType().equals(OrganizationType.KINDERGARTEN)) return;
+        if (client.isDOUClient()) {
+            //клиент ДОУ и орга СОШ
             deleteDOUDiscounts(session, client);
             return;
         }
