@@ -3005,10 +3005,10 @@ public class DAOUtils {
     }
 
     public static long nextVersionByTaloonPreorder(Session session){
-        long version = 0L;
+        long version = 1L;
         Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
         Object o = query.uniqueResult();
-        if(o!=null){
+        if(o != null){
             version = Long.valueOf(o.toString()) + 1;
         }
         return version;
