@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -98,8 +99,17 @@ public class CardProcessorService {
                     processBlockRequest(client, request);
                 }
             } else { // Обработка сотрудников
-                List<Client> clients = clientRepository.getStaffByFIO(request.getFirstName(),
-                        request.getLastName(), request.getMiddleName(), request.getBirthdate());
+                List<Client> clients;
+                if (request.getMiddleName() != null && !request.getMiddleName().isEmpty()) {
+                   clients = clientRepository.getStaffByFIOandOrgId(request.getFirstName(),
+                            request.getLastName(), request.getMiddleName(), request.getOrganizationIds());
+                }
+                else
+                {
+                    clients = clientRepository.getStaffByFIOandOrgIdnoMiddle(request.getFirstName(),
+                            request.getLastName(), request.getOrganizationIds());
+                }
+
                 if(CollectionUtils.isEmpty(clients)){
                     cardActionRequestService.writeRecord(request, "Сотрудник не найден", false);
                     return;

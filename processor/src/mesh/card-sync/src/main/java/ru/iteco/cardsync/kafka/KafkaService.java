@@ -5,6 +5,8 @@
 package ru.iteco.cardsync.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.kafka.annotation.PartitionOffset;
+import org.springframework.kafka.annotation.TopicPartition;
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 import ru.iteco.cardsync.service.CardProcessorService;
 
@@ -27,9 +29,9 @@ public class KafkaService {
         this.cardProcessorService = cardProcessorService;
     }
 
-    @KafkaListener(topics = "#{'${kafka.topic.card}'}")
-    /*@KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}", partitionOffsets = {
-            @PartitionOffset(partition = "0", initialOffset = "401")}))//for tests*/
+//    @KafkaListener(topics = "#{'${kafka.topic.card}'}")
+    @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}", partitionOffsets = {
+            @PartitionOffset(partition = "0", initialOffset = "5695579")}))//for tests
     public void meshListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
         log.info(String.format("Offset %d, Partition_ID %d, Received JSON: %s", offset, partitionId, message));

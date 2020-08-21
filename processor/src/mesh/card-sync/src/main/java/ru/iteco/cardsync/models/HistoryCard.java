@@ -13,6 +13,7 @@ public class HistoryCard {
 
     @Id
     @Column(name = "idofhistorycard")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "updatetime", nullable = false)

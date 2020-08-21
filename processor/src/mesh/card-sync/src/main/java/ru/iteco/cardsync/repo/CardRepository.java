@@ -18,7 +18,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "SELECT * "
                     + "FROM cf_cards "
                     + "WHERE idofclient = :idofclient"
-                    + "  AND state = :state and lockreason = :lockReason ", // Только активные карты
+                    + "  AND state = :state and lockreason = :lockReason ",
             nativeQuery = true)
     List<Card> findAllByClientAndLockReasonLikeAndState(@Param("idofclient") Long idofclient,
                                                         @Param("lockReason") String lockReason,

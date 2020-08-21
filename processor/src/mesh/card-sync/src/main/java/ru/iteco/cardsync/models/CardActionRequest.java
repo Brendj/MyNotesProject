@@ -22,7 +22,7 @@ public class CardActionRequest implements Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_cr_cardactionrequests_id_seq")
     @SequenceGenerator(name = "cf_cr_cardactionrequests_id_seq", sequenceName = "cf_cr_cardactionrequests_id_seq", allocationSize = 1)
-    @Column(name = "idcardactionrequest")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "requestid", length = 128, nullable = false)
@@ -89,11 +89,12 @@ public class CardActionRequest implements Auditable {
     static private String ConvertListToString(List<Long> data)
     {
         String rezult = "";
-        for (Long val: data)
-        {
-            rezult = rezult + val + " ";
+        if (!data.isEmpty()) {
+            for (Long val : data) {
+                rezult = rezult + val + " ";
+            }
+            rezult = rezult.substring(0, rezult.length() - 1);
         }
-        rezult = rezult.substring(0, rezult.length()-1);
         return rezult;
     }
 
