@@ -50,8 +50,8 @@ public class ClientMigrationHistoryService {
         if (!isOnBalanceOrDiscount()) { return; }
         logger.info("Start process Org change service");
         Date lastProcess = repository.getDateLastOrgChangeProcess();
-        List<ClientMigration> list = repository.findAllSinceDate(lastProcess);
         Date nextDate = new Date();
+        List<ClientMigration> list = repository.findAllSinceDate(lastProcess);
         int counter = 0;
         if (isOn(NODE_BALANCE_CHANGE_ORG)) {
             balanceChange(list);
@@ -71,11 +71,12 @@ public class ClientMigrationHistoryService {
         }
 
         DAOService.getInstance().updateLastProcessOrgChange(nextDate);
-        logger.info(String.format("End process Org change service. Processed %s client migration records records",
+        logger.info(String.format("End process Org change service. Processed %s client migration records",
                 list.size()));
     }
 
     private void balanceChange(List<ClientMigration> list) {
+        int counter = 0;
         for (ClientMigration clientMigration : list) {
             if (clientMigration.getOldContragent() != null && clientMigration.getNewContragent() != null
                     && !clientMigration.getOldContragent().equals(clientMigration.getNewContragent())) {
@@ -94,11 +95,13 @@ public class ClientMigrationHistoryService {
                                     ClientBalanceHoldCreateStatus.CHANGE_SUPPLIER,
                                     ClientBalanceHoldRequestStatus.CREATED, null, null, null, null, null, null,
                                     null, null, ClientBalanceHoldLastChangeStatus.PROCESSING);
+                    counter++;
                 } catch (Exception e) {
-                    logger.error("Error in processOrgChange service: ", e);
+                    logger.error("Error balanceChange in processOrgChange service: ", e);
                 }
             }
         }
+        if (counter > 0) logger.info(String.format("Processed %s balanceChange records", counter));
     }
 
     /*private void deleteDOUDiscounts(List<ClientMigration> list) {
@@ -129,6 +132,7 @@ public class ClientMigrationHistoryService {
     }*/
 
     private void discountChange(List<ClientMigration> list) {
+        int counter = 0;
         for (ClientMigration clientMigration : list) {
             if (clientMigration.getOldOrg() == null) {
                 continue;
@@ -149,6 +153,7 @@ public class ClientMigrationHistoryService {
                 Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
                 if (DiscountManager.atLeastOneDiscountEligibleToDelete(client)) {
                     DiscountManager.deleteDiscount(client, session);
+                    counter++;
                 }
                 ClientManager.archiveApplicationForFoodWithoutDiscount(client, session);
 
@@ -161,6 +166,7 @@ public class ClientMigrationHistoryService {
                 HibernateUtils.close(session, logger);
             }
         }
+        if (counter > 0) logger.info(String.format("Deleted discounts from %s clients", counter));
     }
 
     private void restrictionsChange(List<ClientMigration> list) {

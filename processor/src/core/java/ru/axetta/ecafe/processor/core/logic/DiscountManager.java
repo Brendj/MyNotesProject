@@ -85,6 +85,7 @@ public class DiscountManager {
         for (CategoryDiscount discount : discounts) {
             if (discount.getEligibleToDelete()) {
                 archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
+                logger.info(String.format("Delete discount id=%s, client id=%s", discount.getIdOfCategoryDiscount(), client.getIdOfClient()));
             } else {
                 discountsAfterRemove.add(discount);
             }
