@@ -2022,8 +2022,8 @@ public class PreorderDAOService {
 
     private boolean allowCreateNewPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail) {
         return preorderMenuDetail.getDeletedState() &&
-                !(preorderMenuDetail.getState().equals(PreorderState.OK)
-                        || preorderMenuDetail.getState().equals(PreorderState.CHANGE_ORG)
+                !(//preorderMenuDetail.getState().equals(PreorderState.OK) ||
+                        preorderMenuDetail.getState().equals(PreorderState.CHANGE_ORG)
                         || preorderMenuDetail.getState().equals(PreorderState.PREORDER_OFF));
     }
 
