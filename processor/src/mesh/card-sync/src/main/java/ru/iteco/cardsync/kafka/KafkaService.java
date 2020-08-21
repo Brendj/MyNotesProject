@@ -46,8 +46,8 @@ public class KafkaService {
         //Проверка на дубли
         //Только 1 раз блокируется и 1 раз разблокируется
         List<CardActionRequest> unblock = cardActionRequestService.findRequestUnblockByRequestIdFull(request.getId());
-        if (!((!cardActionRequestService.findRequestBlockByRequestIdFull(request.getId()).isEmpty() && request.getAction() == ActionType.block)
-                || (!unblock.isEmpty() && request.getAction() == ActionType.unblock && unblock.get(0).getProcessed())))
+        if ((!cardActionRequestService.findRequestBlockByRequestIdFull(request.getId()).isEmpty() && request.getAction() == ActionType.block)
+                || (!unblock.isEmpty() && request.getAction() == ActionType.unblock && unblock.get(0).getProcessed()))
         {
             log.info(String.format("ДУБЛЬ Offset %d, Partition_ID %d, Received JSON: %s", offset, partitionId, message));
         }
