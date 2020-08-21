@@ -1,4 +1,6 @@
-﻿CREATE TABLE public.cf_plan_orders
+﻿
+DROP TABLE IF EXISTS public.cf_plan_orders;
+CREATE TABLE public.cf_plan_orders
 (
     idofplanorder BIGSERIAL PRIMARY KEY,
     idoforg bigint ,

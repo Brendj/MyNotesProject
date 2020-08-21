@@ -17,6 +17,7 @@ import org.apache.commons.lang.NullArgumentException;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -476,6 +477,164 @@ public class SchoolApiService implements ISchoolApiService {
             persistanceSession.update(iacClient);
             return;
         }
+    }
+
+    @Override
+    public List<ClientGroup> getClientGroupsByGroupNamesAndOrgId(List<String> groupsNames, Long orgId)
+            throws Exception {
+        List<ClientGroup> clientGroups = new ArrayList<>();
+        for(String groupName: groupsNames){
+            try{
+                clientGroups.add(getClientGroupByOrgIdAndGroupName(orgId, groupName));
+            }
+            catch (Exception e){
+                logger.error("get clientGroup error: "+e.getMessage());
+                continue;
+            }
+        }
+        return clientGroups;
+    }
+
+    @Override
+    public List<ClientGroup> getClientGroupsForClientManager(List<ClientGroup> clientGroups, Long idOfClient)
+            throws Exception {
+        List<ClientGroup> managerClientGroups = new ArrayList<>();
+        for(ClientGroup clientGroup: clientGroups){
+            Criteria clientGroupManagerCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
+            Criterion groupNameAndClientCriteria = Restrictions.and(
+                    Restrictions.eq("clientGroupName", clientGroup.getGroupName()),
+                    Restrictions.eq("idOfClient",idOfClient)
+            );
+            clientGroupManagerCriteria.add(Restrictions.and(
+                    groupNameAndClientCriteria,
+                    Restrictions.eq("deleted", false)
+            ));
+            ClientGroupManager clientGroupManager = (ClientGroupManager) clientGroupManagerCriteria.uniqueResult();
+            if(clientGroupManager != null){
+                managerClientGroups.add(clientGroup);
+            }
+        }
+        return managerClientGroups;
+    }
+
+    @Override
+    public List<PlanOrderClientDTO> getClientsForGroupAndOrgByCategoryDiscount(ClientGroup clientGroup, Long orgId,
+            CategoryDiscountEnumType categoryDiscountEnumType) throws Exception {
+        List<PlanOrderClientDTO> clientDTOList = new ArrayList<>();
+        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
+        Query query = persistanceSession.createQuery("from Client c "
+                + "join fetch c.clientGroup "
+                + "join fetch c.person "
+                + "join fetch c.categoriesInternal"
+                + "join fetch c.categoriesInternal.discountRulesInternal"
+                + "join fetch c.categoriesInternal.discountRulesInternal.categoryOrgsInternal"
+                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) =: clientGroupName");
+        query.setParameterList("idOfOrgList", getOrgIds(friendlyOrgs));
+        query.setParameter("clientGroupName", clientGroup.getGroupName().toUpperCase());
+        List<Client> clients = query.list();
+        for(Client client: clients){
+            PlanOrderClientDTO planOrderClientDTO = new PlanOrderClientDTO(client);
+            List<CategoryDiscount> filteredCategoryDiscounts = new ArrayList<>();
+            for(CategoryDiscount categoryDiscount: client.getCategories()){
+                if(categoryDiscount.getCategoryType().equals(categoryDiscountEnumType)){
+                    filteredCategoryDiscounts.add(categoryDiscount);
+                }
+            }
+            if(!filteredCategoryDiscounts.isEmpty())
+                clientDTOList.add(planOrderClientDTO);
+        }
+        return clientDTOList;
+    }
+
+    @Override
+    public List<PlanOrderClientDTO> setEnterEventsForClients(List<PlanOrderClientDTO> clients, Date planDate)
+            throws Exception {
+        List<Integer> enterPassDirections = Arrays.asList(EnterEvent.ENTRY, EnterEvent.RE_ENTRY, EnterEvent.DETECTED_INSIDE,
+                EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT);
+        List<Integer> exitPassDirections = Arrays.asList(EnterEvent.DIRECTION_EXIT, EnterEvent.RE_EXIT);
+        Query queryEvent = persistanceSession.createQuery("from EnterEvent"
+                + "where client=:client"
+                + "and day(evtDateTime)=day(:planDate)"
+                + "and month(evtDateTime)=month(:planDate)"
+                + "and year(evtDateTime)=year(:planDate)"
+                + "and passDirection in (:passDirectionsList)"
+                + "order by evtDateTime desc");
+        queryEvent.setParameter("planDate",planDate);
+        queryEvent.setMaxResults(1);
+        for(PlanOrderClientDTO clientDTO: clients){
+            queryEvent.setParameter("client", clientDTO.getClient());
+            queryEvent.setParameter("passDirectionsList", enterPassDirections);
+            EnterEvent enterEvent = (EnterEvent) queryEvent.uniqueResult();
+            clientDTO.setEnterEvent(enterEvent);
+            queryEvent.setParameter("passDirectionsList", exitPassDirections);
+            EnterEvent exitEvent = (EnterEvent) queryEvent.uniqueResult();
+            clientDTO.setExitEvent(exitEvent);
+        }
+        return clients;
+    }
+
+    @Override
+    public List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId) throws Exception {
+        Query complexInfoQuery = persistanceSession.createQuery("from ComplexInfo" + ""
+                + "where org.idOfOrg=:orgId"
+                + "and day(menuDate)=day(:planDate)"
+                + "and month(menuDate)=month(:planDate)"
+                + "and year(menuDate)=year(:planDate)"
+                + "and modeFree=1"
+                + "and idOfComplex in (:complexIds)");
+
+        for(PlanOrderClientDTO client: clients){
+            List<ClientComplexDTO> clientComplexList = new ArrayList<>();
+            HashMap<CategoryDiscount, List<DiscountRule>> filteredDiscountRulesMap = new HashMap<>();
+            List<DiscountRule> clientFilteredDiscountRulesList = new ArrayList<>();
+            for(CategoryDiscount categoryDiscount: client.getFilteredClientCategoryDiscounts()){
+                if(categoryDiscount.getDiscountsRules().isEmpty())
+                    continue;
+                for(DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
+                    if (!orgIsFriendly(orgId, new ArrayList<Org>(discountRule.getCategoryOrgs()))) {
+                        continue;
+                    }
+                    if(clientFilteredDiscountRulesList.isEmpty()){
+                        clientFilteredDiscountRulesList.add(discountRule);
+                        filteredDiscountRulesMap.put(categoryDiscount, new ArrayList<DiscountRule>());
+                        filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
+                    }
+                    else {
+                        for(DiscountRule filteredDiscountRule: clientFilteredDiscountRulesList){
+                            if(filteredDiscountRule.getPriority() < discountRule.getPriority()){
+                                clientFilteredDiscountRulesList.clear();
+                                clientFilteredDiscountRulesList.add(discountRule);
+                                filteredDiscountRulesMap.clear();
+                                filteredDiscountRulesMap.put(categoryDiscount, new ArrayList<DiscountRule>());
+                                filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
+                                break;
+                            }
+                            if(filteredDiscountRule.getPriority() == discountRule.getPriority()){
+                                clientFilteredDiscountRulesList.add(discountRule);
+                                if(filteredDiscountRulesMap.containsKey(categoryDiscount))
+                                    filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
+                                else {
+                                    filteredDiscountRulesMap.put(categoryDiscount, new ArrayList<DiscountRule>());
+                                    filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            for(Map.Entry categoryDiscountEntry: filteredDiscountRulesMap.entrySet()){
+                ClientComplexDTO clientComplexDTO = new ClientComplexDTO()
+            }
+
+        }
+        return clients;
+    }
+
+    @Override
+    public List<PlanOrderClientDTO> createOrUpdatePlanOrderForClientsComplexes(List<PlanOrderClientDTO> clients) throws Exception {
+        return null;
     }
 
     private HashMap<String, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
