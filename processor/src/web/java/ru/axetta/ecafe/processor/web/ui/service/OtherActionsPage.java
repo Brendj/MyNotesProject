@@ -174,7 +174,7 @@ public class OtherActionsPage extends OnlineReportPage {
     public void cleaningMenu() {
         MaintenanceService maintenanceService = new MaintenanceService();
         maintenanceService.run();
-        printMessage("Очистка выполнена. Смотри лог");
+        printMessage("Очистка выполнена");
     }
 
     public void cleaningMenuVersion2() {
@@ -186,7 +186,7 @@ public class OtherActionsPage extends OnlineReportPage {
     public void endBenefitNotification() {
         BenefitService service = RuntimeContext.getAppContext().getBean(BenefitService.class);
         service.runEndBenefit(true);
-        printMessage("Оповещения об окончании срока действия льготы отправлены. Смотри лог");
+        printMessage("Оповещения об окончании срока действия льготы отправлены");
     }
 
     public void runSendEMPEventEMIAS() throws Exception {
