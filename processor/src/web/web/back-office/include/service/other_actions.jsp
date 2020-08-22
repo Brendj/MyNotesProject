@@ -53,8 +53,6 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Очистка таблиц меню - 2" action="#{otherActionsPage.cleaningMenuVersion2}"
                            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-    <a4j:commandButton value="Оповещение об окончании срока действия льготы" action="#{otherActionsPage.endBenefitNotification}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
@@ -84,11 +82,6 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Запустить пересчет показателей СМС" action="#{otherActionsPage.runSmsDeliveryRecalculation}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-
-
-    <a4j:commandButton value="Запустить Автоплатеж" action="#{otherActionsPage.runRegularPayments}"
-                        styleClass="command-button" />
-
     <rich:panel>
         <h:commandButton value="Модифицировать пароли" action="#{otherActionsPage.runPasswordReplacer}"
                          title="Заменяет все пароли == input на номер договора"
@@ -164,10 +157,6 @@
         <h:inputText value="#{otherActionsPage.guidForDiscountsUpdate}" size="50"/>
     </rich:panel>
     <rich:separator align="center" height = "8" width = "75%" />
-    <a4j:commandButton value="Итого за день" action="#{otherActionsPage.runEventNotificationServiceForDaily}" id="runEventNotificationServiceForDaily"
-                           styleClass="command-button" />
-    <a4j:commandButton value="Итого за неделю" action="#{otherActionsPage.runEventNotificationServiceForWeekly}" id="runEventNotificationServiceForWeekly"
-                                                                             styleClass="command-button" />
         <a4j:commandButton value="Выгрузка на FTP МСР" action="#{otherActionsPage.runMSRToFTP()}" id="runMSRToFTP"
                            styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
@@ -259,6 +248,32 @@
         </rich:panel>
         <a4j:commandButton value="Блокировка ЭИ без транзакций" action="#{otherActionsPage.autoBlockCards()}" id="autoBlockCards"
                            styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+        <rich:panel>
+            <f:facet name="header">
+                <h:outputText styleClass="column-header"
+                                                 value="Уведомления" />
+            </f:facet>
+            <h:panelGrid styleClass="borderless-grid" columns="1">
+                <a4j:commandButton value="Итого за день" action="#{otherActionsPage.runEventNotificationServiceForDaily}" id="runEventNotificationServiceForDaily"
+                                   styleClass="command-button" />
+                <a4j:commandButton value="Итого за неделю" action="#{otherActionsPage.runEventNotificationServiceForWeekly}" id="runEventNotificationServiceForWeekly"
+                                   styleClass="command-button" />
+                <a4j:commandButton value="Уведомления по льготам" action="#{otherActionsPage.endBenefitNotification}"
+                                  styleClass="command-button" />
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <a4j:commandButton value="Уведомления по льготам для одного" action="#{otherActionsPage.endBenefitNotification2}" id="notifications"
+                                       styleClass="command-button" onclick="disableButtons(true);" oncomplete="disableButtons(false)" /><br/>
+                    <h:outputText value="Номер заявления для отправки уведомления о проставлении отказа" styleClass="output-text"/>
+                    <h:inputText value="#{otherActionsPage.serviceNumber}"/>
+                    <h:outputText value="Код льготы для уведомления об окончании срока действия льготы" styleClass="output-text"/>
+                    <h:inputText value="#{otherActionsPage.dtisznCode}"/>
+                    <h:outputText value="л/с склиента для уведомления об окончании срока действия льготы" styleClass="output-text"/>
+                    <h:inputText value="#{otherActionsPage.contractId}"/>
+                </h:panelGrid>
+                <a4j:commandButton value="Запустить Автоплатеж и уведомления" action="#{otherActionsPage.runRegularPayments}"
+                                   styleClass="command-button" />
+            </h:panelGrid>
+        </rich:panel>
 
     </h:panelGrid>
 

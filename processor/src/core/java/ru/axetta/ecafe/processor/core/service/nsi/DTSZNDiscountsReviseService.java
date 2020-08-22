@@ -144,9 +144,15 @@ public class DTSZNDiscountsReviseService {
         Integer sourceType = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
 
         switch (sourceType) {
-            case 1: runTaskRest(); break;   //DATA_SOURCE_TYPE_NSI
-            case 2: runTaskDB(); break;     //DATA_SOURCE_TYPE_DB
-            default: runTaskRest(); break;
+            case 1:
+                runTaskRest();
+                break;   //DATA_SOURCE_TYPE_NSI
+            case 2:
+                runTaskDB();
+                break;     //DATA_SOURCE_TYPE_DB
+            default:
+                runTaskRest();
+                break;
         }
     }
 
@@ -180,7 +186,8 @@ public class DTSZNDiscountsReviseService {
 
         do {
             try {
-                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate, guid);
+                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate,
+                        guid);
 
                 session = runtimeContext.createPersistenceSession();
                 session.setFlushMode(FlushMode.MANUAL);
@@ -581,11 +588,14 @@ public class DTSZNDiscountsReviseService {
                         transaction = session.beginTransaction();
                     }
 
-                    Long dtsznCode = (null == applicationForFood.getDtisznCode()) ? OTHER_DISCOUNT_CODE : applicationForFood.getDtisznCode();
+                    Long dtsznCode = (null == applicationForFood.getDtisznCode()) ? OTHER_DISCOUNT_CODE
+                            : applicationForFood.getDtisznCode();
 
-                    info = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(), dtsznCode);
+                    info = DAOUtils
+                            .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(), dtsznCode);
                     if (null == info) {
-                        logger.info(String.format("Application with number = %s skipped for waiting discount", applicationForFood.getServiceNumber()));
+                        logger.info(String.format("Application with number = %s skipped for waiting discount",
+                                applicationForFood.getServiceNumber()));
                         continue;
                     }
                     Boolean isDiscountOk;
@@ -594,13 +604,13 @@ public class DTSZNDiscountsReviseService {
                     if (applicationForFood.getLastUpdate().getTime() >= info.getLastReceivedDate().getTime()) {
                         isDateOk = false;
                     }
-                    isDiscountOk =
-                            info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                                    .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
-                                    && !info.getArchived();
+                    isDiscountOk = info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                            .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) && !info
+                            .getArchived();
 
                     if (!isDateOk) {
-                        logger.info(String.format("Application with number = %s skipped for waiting discount", applicationForFood.getServiceNumber()));
+                        logger.info(String.format("Application with number = %s skipped for waiting discount",
+                                applicationForFood.getServiceNumber()));
                         logger.info(String.format("Updating applications: %d/%d", counter++,
                                 applicationForFoodList.size()));
                         continue;
@@ -611,26 +621,27 @@ public class DTSZNDiscountsReviseService {
 
                     LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
                     //7705
-                    ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null);
+                    ApplicationForFoodStatus status = new ApplicationForFoodStatus(
+                            ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null);
                     applicationForFood = DAOUtils
-                            .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                    status, applicationVersion, historyVersion, false);
+                            .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                    applicationVersion, historyVersion, false);
                     statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                             status.getApplicationForFoodState(), status.getDeclineReason()));
                     if (isDiscountOk) {
                         //1052
                         status = new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null);
                         applicationForFood = DAOUtils
-                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                        status, applicationVersion, historyVersion, false);
+                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                        applicationVersion, historyVersion, false);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason()));
 
                         //1075
                         status = new ApplicationForFoodStatus(ApplicationForFoodState.OK, null);
                         applicationForFood = DAOUtils
-                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                        status, applicationVersion, historyVersion, true);
+                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                        applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason()));
                     } else {
@@ -638,22 +649,24 @@ public class DTSZNDiscountsReviseService {
                         status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
                                 ApplicationForFoodDeclineReason.INFORMATION_CONFLICT);
                         applicationForFood = DAOUtils
-                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                        status, applicationVersion, historyVersion, true);
+                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                        applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason()));
-                        //Отправка уведомления клтенту
+                        //Отправка уведомления клиенту
                         Client client = applicationForFood.getClient();
-                        ClientDtisznDiscountInfo clientDtisznDiscountInfo = DAOUtils
-                                .getDTISZNDiscountInfoByClientAndCode(session, client, applicationForFood.getDtisznCode());
+                        //ClientDtisznDiscountInfo clientDtisznDiscountInfo = DAOUtils
+                        //        .getDTISZNDiscountInfoByClientAndCode(session, client,
+                        //                applicationForFood.getDtisznCode());
                         String[] values = new String[]{
                                 BenefitService.SERVICE_NUMBER, applicationForFood.getServiceNumber(),
                                 BenefitService.DATE, CalendarUtils.dateToString(applicationForFood.getCreatedDate()),
-                                BenefitService.DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
-                                BenefitService.DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
+                                BenefitService.DTISZN_CODE, info.getDtisznCode().toString(),
+                                BenefitService.DTISZN_DESCRIPTION, info.getDtisznDescription()};
                         values = EventNotificationService.attachGenderToValues(client.getGender(), values);
-                        if (forTest)
+                        if (forTest) {
                             values = attachValue(values, "TEST", "true");
+                        }
 
                         List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
                         if (!(guardians == null || guardians.isEmpty())) {
@@ -661,19 +674,21 @@ public class DTSZNDiscountsReviseService {
                             for (Client destGuardian : guardians) {
                                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                                         .sendNotification(destGuardian, client,
-                                                EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                                                EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values,
+                                                new Date());
                             }
-                        }
-                        else
-                        {
+                        } else {
                             //Отправка только клиенту
                             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                                     .sendNotification(client, null,
-                                            EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                                            EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values,
+                                            new Date());
                         }
                     }
-                    logger.info(String.format("Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
-                            isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(), info.getDateEnd().toString()));
+                    logger.info(String.format(
+                            "Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
+                            isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(),
+                            info.getDateEnd().toString()));
                     service.sendStatusesAsync(statusList);
                     logger.info(
                             String.format("Updating applications: %d/%d", counter++, applicationForFoodList.size()));
@@ -703,11 +718,153 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
+    public void updateApplicationForFoodTask(String serviceNumber) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+
+            ApplicationForFood applicationForFood = DAOUtils.getApplicationForFoodListByStatusAndServiceNumber(session,
+                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null), false,
+                    serviceNumber);
+
+            if (applicationForFood == null) {
+                logger.info(
+                        String.format("Application with status 7704 and ServiceNumber %s not found", serviceNumber));
+                return;
+            }
+            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
+            Date fireTime = new Date();
+            ClientDtisznDiscountInfo info = null;
+            try {
+                if (null == transaction || !transaction.isActive()) {
+                    transaction = session.beginTransaction();
+                }
+
+                Long dtsznCode = (null == applicationForFood.getDtisznCode()) ? OTHER_DISCOUNT_CODE
+                        : applicationForFood.getDtisznCode();
+
+                info = DAOUtils
+                        .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(), dtsznCode);
+                if (null == info) {
+                    logger.info(String.format("Application with number = %s skipped for waiting discount",
+                            applicationForFood.getServiceNumber()));
+                    return;
+                }
+                Boolean isDiscountOk;
+                Boolean isDateOk = true;
+
+                if (applicationForFood.getLastUpdate().getTime() >= info.getLastReceivedDate().getTime()) {
+                    isDateOk = false;
+                }
+                isDiscountOk = info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) && !info.getArchived();
+
+                if (!isDateOk) {
+                    logger.info(String.format("Application with number = %s skipped for waiting discount",
+                            applicationForFood.getServiceNumber()));
+                    return;
+                }
+
+                Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+
+                LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
+                //7705
+                ApplicationForFoodStatus status = new ApplicationForFoodStatus(
+                        ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null);
+                applicationForFood = DAOUtils
+                        .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                applicationVersion, historyVersion, false);
+                statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                        status.getApplicationForFoodState(), status.getDeclineReason()));
+                if (isDiscountOk) {
+                    //1052
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null);
+                    applicationForFood = DAOUtils
+                            .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                    applicationVersion, historyVersion, false);
+                    statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                            status.getApplicationForFoodState(), status.getDeclineReason()));
+
+                    //1075
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.OK, null);
+                    applicationForFood = DAOUtils
+                            .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                    applicationVersion, historyVersion, true);
+                    statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                            status.getApplicationForFoodState(), status.getDeclineReason()));
+                } else {
+                    //1080.3
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
+                            ApplicationForFoodDeclineReason.INFORMATION_CONFLICT);
+                    applicationForFood = DAOUtils
+                            .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                    applicationVersion, historyVersion, true);
+                    statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                            status.getApplicationForFoodState(), status.getDeclineReason()));
+                    //Отправка уведомления клиенту
+                    Client client = applicationForFood.getClient();
+                    String[] values = new String[]{
+                            BenefitService.SERVICE_NUMBER, applicationForFood.getServiceNumber(), BenefitService.DATE,
+                            CalendarUtils.dateToString(applicationForFood.getCreatedDate()), BenefitService.DTISZN_CODE,
+                            info.getDtisznCode().toString(), BenefitService.DTISZN_DESCRIPTION,
+                            info.getDtisznDescription()};
+                    values = EventNotificationService.attachGenderToValues(client.getGender(), values);
+                    values = attachValue(values, "TEST", "true");
+
+                    List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+                    if (!(guardians == null || guardians.isEmpty())) {
+                        //Оправка всем представителям
+                        for (Client destGuardian : guardians) {
+                            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                    .sendNotification(destGuardian, client,
+                                            EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values,
+                                            new Date());
+                        }
+                    } else {
+                        //Отправка только клиенту
+                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                .sendNotification(client, null, EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD,
+                                        values, new Date());
+                    }
+                }
+                logger.info(String.format(
+                        "Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
+                        isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(),
+                        info.getDateEnd().toString()));
+                service.sendStatusesAsync(statusList);
+            } catch (Exception e) {
+                logger.error(String.format("Error in updateApplicationsForFoodTask: "
+                                + "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
+                        applicationForFood.getClient().getIdOfClient(), info), e);
+            } finally {
+                if (null != transaction && transaction.isActive()) {
+                    transaction.commit();
+                    transaction = null;
+                }
+            }
+
+            if (null != transaction && transaction.isActive()) {
+                transaction.commit();
+                transaction = null;
+            }
+        } catch (Exception e) {
+            logger.error("Error in update discounts", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     private String[] attachValue(String[] values, String name, String value) {
         String[] newValues = new String[values.length + 2];
         System.arraycopy(values, 0, newValues, 0, values.length);
-        newValues[newValues.length-2] = name;
-        newValues[newValues.length-1] = value;
+        newValues[newValues.length - 2] = name;
+        newValues[newValues.length - 1] = value;
         return newValues;
     }
 
@@ -724,10 +881,10 @@ public class DTSZNDiscountsReviseService {
             Boolean isOk = false;
 
             for (ClientDtisznDiscountInfo info : infoList) {
-                if (((application.getDtisznCode() == null && info.getDtisznCode().equals(0L)) || application.getDtisznCode().equals(info.getDtisznCode()))
-                        && info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)
-                        && CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
-                        && !info.getArchived()) {
+                if (((application.getDtisznCode() == null && info.getDtisznCode().equals(0L)) || application
+                        .getDtisznCode().equals(info.getDtisznCode())) && info.getStatus()
+                        .equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) && !info.getArchived()) {
                     isOk = true;
                     break;
                 }
@@ -810,11 +967,11 @@ public class DTSZNDiscountsReviseService {
 
         if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
             try {
-                DiscountManager
-                        .renewDiscounts(session, client, newDiscounts, oldDiscounts,
-                                DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                DiscountManager.renewDiscounts(session, client, newDiscounts, oldDiscounts,
+                        DiscountChangeHistory.MODIFY_IN_REGISTRY);
             } catch (Exception e) {
-                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()), e);
+                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()),
+                        e);
             }
         }
         updateApplicationForFood(session, client, infoList);
@@ -824,14 +981,14 @@ public class DTSZNDiscountsReviseService {
         runTaskPart2(null);
     }
 
-    private void runOneClient(Session session, Transaction transaction, Long idOfClient, Long otherDiscountCode) throws Exception {
+    private void runOneClient(Session session, Transaction transaction, Long idOfClient, Long otherDiscountCode)
+            throws Exception {
         if (null == transaction || !transaction.isActive()) {
             transaction = session.beginTransaction();
         }
 
         Client client = (Client) session.load(Client.class, idOfClient);
-        List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils
-                .getDTISZNDiscountsInfoByClient(session, client);
+        List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
         if (!clientInfoList.isEmpty()) {
             processDiscounts(session, client, clientInfoList, otherDiscountCode);
         }
@@ -911,7 +1068,7 @@ public class DTSZNDiscountsReviseService {
 
             Query query = session.createSQLQuery(
                     "update cf_client_dtiszn_discount_info set archived = 1, sendnotification = false, version = :version, lastupdate = :lastUpdate "
-                   + "where (lastreceiveddate not between :start and :end or lastreceiveddate is null) and dtiszncode <> :otherDiscountCode");
+                            + "where (lastreceiveddate not between :start and :end or lastreceiveddate is null) and dtiszncode <> :otherDiscountCode");
             query.setParameter("start", CalendarUtils.startOfDay(fireTime).getTime());
             query.setParameter("end", CalendarUtils.endOfDay(fireTime).getTime());
             query.setParameter("version", nextVersion);
@@ -938,10 +1095,14 @@ public class DTSZNDiscountsReviseService {
     }
 
     private boolean isStudent(Client client) {
-        if (client == null) return false;
+        if (client == null) {
+            return false;
+        }
         try {
-            return client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                    || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+            return client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
+                    < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() || client.getClientGroup()
+                    .getCompositeIdOfClientGroup().getIdOfClientGroup()
+                    .equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
         } catch (Exception e) {
             logger.error("Error in isStudent method: ", e);
             return false;
@@ -955,9 +1116,13 @@ public class DTSZNDiscountsReviseService {
             Date deltaDate = null;
             try {
                 deltaDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getReviseLastDate());
-            } catch (Exception ignore) { }
-            if (deltaDate == null) deltaDate = CalendarUtils.addHours(new Date(), -24);
-            discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
+            } catch (Exception ignore) {
+            }
+            if (deltaDate == null) {
+                deltaDate = CalendarUtils.addHours(new Date(), -24);
+            }
+            discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class)
+                    .getDiscountsUpdatedSinceDate(deltaDate);
         } else {
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsByGUID(guid);
             if (discountItemList.getItems().isEmpty()) {
@@ -1106,7 +1271,8 @@ public class DTSZNDiscountsReviseService {
         runTaskPart2(fireTime);
         updateApplicationsForFoodTask(false);
         if (StringUtils.isEmpty(guid) && discountItemList != null && discountItemList.getDate() != null) {
-            DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(discountItemList.getDate()), Option.OPTION_REVISE_LAST_DATE);
+            DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(discountItemList.getDate()),
+                    Option.OPTION_REVISE_LAST_DATE);
         }
     }
 
@@ -1128,7 +1294,8 @@ public class DTSZNDiscountsReviseService {
             for (ClientDtisznDiscountInfo info : list) {
                 try {
                     transaction = session.beginTransaction();
-                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(
+                            info);
                     builder.withArchived(true);
                     builder.save(session, nextVersion);
 
@@ -1147,8 +1314,10 @@ public class DTSZNDiscountsReviseService {
                         continue;
                     }
 
-                    CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
-                    Long isppCode = categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount(); //код льготы ИСПП для льготы из Инфо
+                    CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                            .getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
+                    Long isppCode = categoryDiscountDSZN.getCategoryDiscount()
+                            .getIdOfCategoryDiscount(); //код льготы ИСПП для льготы из Инфо
                     Set<CategoryDiscount> discounts = client.getCategories();
                     Set oldDiscounts = client.getCategories();
                     Integer oldDiscountMode = client.getDiscountMode();
@@ -1160,7 +1329,8 @@ public class DTSZNDiscountsReviseService {
                         }
                     }
                     //String newDiscounts = StringUtils.join(discounts, ",");
-                    Integer newDiscountMode = discounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    Integer newDiscountMode =
+                            discounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
                     if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(discounts)) {
                         try {
@@ -1169,7 +1339,8 @@ public class DTSZNDiscountsReviseService {
                         } catch (Exception e) {
                             transaction.rollback();
                             transaction = null;
-                            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+                            logger.error(String.format("Unexpected discount code for client with id=%d",
+                                    client.getIdOfClient()));
                         }
                     }
 

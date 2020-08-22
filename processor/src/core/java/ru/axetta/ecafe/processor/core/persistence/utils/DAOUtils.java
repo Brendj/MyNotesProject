@@ -4608,6 +4608,27 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static ApplicationForFood getApplicationForFoodListByStatusAndServiceNumber(Session session,
+            ApplicationForFoodStatus status, Boolean isOthers, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("status", status));
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.like("serviceNumber", serviceNumber));
+            if (isOthers) {
+                criteria.add(Restrictions.isNull("dtisznCode"));
+            }
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return null;
+            else
+                return applicationForFoods.get(0);
+        } catch (Exception e)
+        {
+            return null;
+        }
+    }
+
     public static CategoryDiscountDSZN findCategoryDiscountDSZNByETPCode(EntityManager entityManager, Long ETPCode) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryDiscountDSZN where ETPCode=:ETPCode");
         q.setParameter("ETPCode", ETPCode);
@@ -4765,6 +4786,20 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.gt("dateEnd", startDate));
         criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListWithEndBenefitBeetwenDatesAndContractidAndDtszncode
+            (Session session, Date startDate, Date endDate, Long contractId, Long dtszncode) {
+        Client client = findClientByContractId(session, contractId);
+        if (client == null)
+            return new ArrayList<ClientDtisznDiscountInfo>();
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.gt("dateEnd", startDate));
+        criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.eq("dtisznCode", dtszncode));
+        criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
         return (List<ClientDtisznDiscountInfo>) criteria.list();
     }
