@@ -41,11 +41,15 @@ public class CardProcessorService {
             if (request == null) {
                 return;
             }
-
-            CardActionRequest blockRequest = cardActionRequestService.findRequestBlockByRequestId(request.getId()).get(0);
-            if (blockRequest == null) {
+            List<CardActionRequest> blockRequests = cardActionRequestService.findRequestBlockByRequestId(request.getId());
+            CardActionRequest blockRequest;
+            if (blockRequests.isEmpty()) {
                 cardActionRequestService.writeRecord(request, "В БД нет запроса на блокировку", false);
                 return;
+            }
+            else
+            {
+                blockRequest = blockRequests.get(0);
             }
 
             Client client = blockRequest.getClient();
@@ -98,6 +102,11 @@ public class CardProcessorService {
                     processBlockRequest(client, request);
                 }
             } else { // Обработка сотрудников
+                if (request.getOrganizationIds().isEmpty())
+                {
+                    cardActionRequestService.writeRecord(request, "Не указана ОО", false);
+                    return;
+                }
                 List<Client> clients;
                 if (request.getMiddleName() != null && !request.getMiddleName().isEmpty()) {
                    clients = clientRepository.getStaffByFIOandOrgId(request.getFirstName(),
