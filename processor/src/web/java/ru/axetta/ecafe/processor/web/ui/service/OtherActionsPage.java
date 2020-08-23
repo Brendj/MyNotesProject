@@ -69,8 +69,6 @@ public class OtherActionsPage extends OnlineReportPage {
     private Date startDateEMP;
     private Date endDateEMP;
     private Long contractId;
-    private String serviceNumber;
-    private Long dtisznCode;
     private boolean allowGenerateGuardians = true;
 
     private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
@@ -185,31 +183,6 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Процесс запущен");
     }
 
-    public void endBenefitNotification() {
-        BenefitService service = RuntimeContext.getAppContext().getBean(BenefitService.class);
-        service.runEndBenefit(true);
-        try {
-            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask(true);
-        } catch (Exception e) {
-            getLogger().error("Error in runUpdateApplicationsForFoodTask: ", e);
-            printError("Во время выполнения операции произошла ошибка с текстом " + e.getMessage());
-        }
-
-        printMessage("Оповещения об окончании срока действия льготы отправлены");
-    }
-
-    public void endBenefitNotification2() {
-        BenefitService service = RuntimeContext.getAppContext().getBean(BenefitService.class);
-        service.endBenefit(true, contractId, dtisznCode);
-        try {
-            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationForFoodTask(serviceNumber);
-        } catch (Exception e) {
-            printError("Во время выполнения операции произошла ошибка с текстом " + e.getMessage());
-        }
-
-        printMessage("Оповещения об окончании срока действия льготы отправлены");
-    }
-
     public void runSendEMPEventEMIAS() throws Exception {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -276,12 +249,6 @@ public class OtherActionsPage extends OnlineReportPage {
     public void repairNSI() throws Exception {
         RuntimeContext.getAppContext().getBean(NSIRepairService.class).run(); //DEF
         printMessage("Записи из Реестров исправлены");
-    }
-
-    public void runRegularPayments() throws Exception {
-        RegularPaymentSubscriptionService regularPaymentSubscriptionService = RuntimeContext.getInstance()
-                .getRegularPaymentSubscriptionService();
-        regularPaymentSubscriptionService.checkClientBalances();
     }
 
     public void runShowShortLog() throws Exception {
@@ -804,25 +771,6 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
-    public void runEventNotificationServiceForDaily() {
-        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
-        Date today = new Date(System.currentTimeMillis());
-        Date endDate = CalendarUtils.endOfDay(today);
-        Date startDate = CalendarUtils.truncateToDayOfMonth(today);
-        service.run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue(),
-                true);
-    }
-
-    public void runEventNotificationServiceForWeekly() {
-        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
-        Date today = new Date(System.currentTimeMillis());
-        Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
-        Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
-        Date endDate = CalendarUtils.endOfDay(dates[1]);
-        service.run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(),
-                true);
-    }
-
     public void runMSRToFTP() {
         Date endDate = CalendarUtils.endOfDay(new Date());
         Date startDate = CalendarUtils.truncateToDayOfMonth(new Date());
@@ -872,21 +820,5 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
-    }
-
-    public String getServiceNumber() {
-        return serviceNumber;
-    }
-
-    public void setServiceNumber(String serviceNumber) {
-        this.serviceNumber = serviceNumber;
-    }
-
-    public Long getDtisznCode() {
-        return dtisznCode;
-    }
-
-    public void setDtisznCode(Long dtisznCode) {
-        this.dtisznCode = dtisznCode;
     }
 }

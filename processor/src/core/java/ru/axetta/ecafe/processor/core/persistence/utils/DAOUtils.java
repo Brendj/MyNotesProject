@@ -4608,7 +4608,7 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ApplicationForFood getApplicationForFoodListByStatusAndServiceNumber(Session session,
+    public static List<ApplicationForFood> getApplicationForFoodListByStatusAndServiceNumber(Session session,
             ApplicationForFoodStatus status, Boolean isOthers, String serviceNumber) {
         try {
             Criteria criteria = session.createCriteria(ApplicationForFood.class);
@@ -4622,7 +4622,7 @@ public class DAOUtils {
             if (applicationForFoods == null || applicationForFoods.isEmpty())
                 return null;
             else
-                return applicationForFoods.get(0);
+                return applicationForFoods;
         } catch (Exception e)
         {
             return null;
@@ -4786,20 +4786,6 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.gt("dateEnd", startDate));
         criteria.add(Restrictions.lt("dateEnd", endDate));
-        criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
-        return (List<ClientDtisznDiscountInfo>) criteria.list();
-    }
-
-    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListWithEndBenefitBeetwenDatesAndContractidAndDtszncode
-            (Session session, Date startDate, Date endDate, Long contractId, Long dtszncode) {
-        Client client = findClientByContractId(session, contractId);
-        if (client == null)
-            return new ArrayList<ClientDtisznDiscountInfo>();
-        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
-        criteria.add(Restrictions.gt("dateEnd", startDate));
-        criteria.add(Restrictions.lt("dateEnd", endDate));
-        criteria.add(Restrictions.eq("dtisznCode", dtszncode));
-        criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
         return (List<ClientDtisznDiscountInfo>) criteria.list();
     }

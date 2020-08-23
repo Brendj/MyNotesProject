@@ -74,11 +74,8 @@ public class BenefitService {
             logger.error("Failed to schedule notification end benefit service job:", e);
         }
     }
-    public void runEndBenefit(boolean forTest) {
-        endBenefit (forTest, null, null);
-    }
 
-    public void endBenefit(boolean forTest, Long contractId, Long dtisznCode) {
+    public void runEndBenefit(boolean forTest) {
         Date startDate = new Date(System.currentTimeMillis());
         startDate = CalendarUtils.addOneDay(startDate);
         startDate = CalendarUtils.startOfDay(startDate);
@@ -98,16 +95,8 @@ public class BenefitService {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            List<ClientDtisznDiscountInfo> clientDtisznDiscountInfoList;
-            if (contractId == null || dtisznCode == null) {
-                clientDtisznDiscountInfoList = DAOUtils
-                        .getCategoryDiscountListWithEndBenefitBeetwenDates(session, startDate, endDate);
-            }
-            else
-            {
-                clientDtisznDiscountInfoList = DAOUtils
-                        .getCategoryDiscountListWithEndBenefitBeetwenDatesAndContractidAndDtszncode(session, startDate, endDate, contractId, dtisznCode);
-            }
+            List<ClientDtisznDiscountInfo> clientDtisznDiscountInfoList = DAOUtils
+                    .getCategoryDiscountListWithEndBenefitBeetwenDates(session, startDate, endDate);
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo: clientDtisznDiscountInfoList) {
 
                 Client client = clientDtisznDiscountInfo.getClient();
