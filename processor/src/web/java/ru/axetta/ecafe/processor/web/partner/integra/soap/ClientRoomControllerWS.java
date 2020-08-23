@@ -4856,7 +4856,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
             return r;
         }
-        if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 2))
+        if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 1))
         {
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
