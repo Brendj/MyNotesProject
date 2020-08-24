@@ -42,33 +42,30 @@ public class CardProcessorService {
                 return;
             }
             List<CardActionRequest> blockRequests = cardActionRequestService.findRequestBlockByRequestId(request.getId());
-            CardActionRequest blockRequest;
             if (blockRequests.isEmpty()) {
                 cardActionRequestService.writeRecord(request, "В БД нет запроса на блокировку", false);
                 return;
             }
-            else
-            {
-                blockRequest = blockRequests.get(0);
-            }
+            //Для всех клиентов, заблокированных по одному id
+            for (CardActionRequest blockRequest: blockRequests) {
+                Client client = blockRequest.getClient();
+                if (client == null) {
+                    cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
+                    return;
+                }
 
-            Client client = blockRequest.getClient();
-            if (client == null) {
-                cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
-                return;
-            }
+                List<Card> cards = cardService.getBlockedCard(client);
+                if (CollectionUtils.isEmpty(cards)) {
+                    cardActionRequestService.writeRecord(request, "Не найдено карт для разблокировки", false, client);
+                    return;
+                }
 
-            List<Card> cards = cardService.getBlockedCard(client);
-            if (CollectionUtils.isEmpty(cards)) {
-                cardActionRequestService.writeRecord(request, "Не найдено карт для разблокировки", false, client);
-                return;
-            }
+                for (Card c : cards) {
+                    cardService.unblockCard(c);
+                }
 
-            for (Card c : cards) {
-                cardService.unblockCard(c);
+                cardActionRequestService.writeRecord(request, OK, true, client);
             }
-
-            cardActionRequestService.writeRecord(request, OK, true, client);
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
             cardActionRequestService.writeRecord(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
