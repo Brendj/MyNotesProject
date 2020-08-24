@@ -51,13 +51,13 @@ public class CardProcessorService {
                 Client client = blockRequest.getClient();
                 if (client == null) {
                     cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
-                    return;
+                    continue;
                 }
 
                 List<Card> cards = cardService.getBlockedCard(client);
                 if (CollectionUtils.isEmpty(cards)) {
                     cardActionRequestService.writeRecord(request, "Не найдено карт для разблокировки", false, client);
-                    return;
+                    continue;
                 }
 
                 for (Card c : cards) {

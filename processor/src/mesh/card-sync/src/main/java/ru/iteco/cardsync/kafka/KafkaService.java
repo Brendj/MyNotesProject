@@ -39,7 +39,7 @@ public class KafkaService {
 
    // @KafkaListener(topics = "#{'${kafka.topic.card}'}")
     @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}", partitionOffsets = {
-            @PartitionOffset(partition = "0", initialOffset = "5706579")}))//for tests
+            @PartitionOffset(partition = "0", initialOffset = "5709318")}))//for tests
     public void meshListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
         BlockPersonEntranceRequest request = objectMapper.readValue(message, BlockPersonEntranceRequest.class);
