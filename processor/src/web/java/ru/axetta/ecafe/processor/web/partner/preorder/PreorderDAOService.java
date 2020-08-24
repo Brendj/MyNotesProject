@@ -615,10 +615,17 @@ public class PreorderDAOService {
         return menuItemExtList;
     }
 
+    private List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
+        return emReport.createQuery("select dish.categoryItems from WtDish dish where dish = :dish")
+                .setParameter("dish", wtDish)
+                .getResultList();
+    }
+
     public String getMenuGroupByWtDish(WtDish wtDish) {
         StringBuilder sb = new StringBuilder();
-        if (wtDish.getCategoryItems() != null && wtDish.getCategoryItems().size() > 0) {
-            for (WtCategoryItem ci : wtDish.getCategoryItems()) {
+        List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDish);
+        if (items != null && items.size() > 0) {
+            for (WtCategoryItem ci : items) {
                 sb.append(ci.getDescription()).append(",");
             }
             sb.deleteCharAt(sb.length() - 1);
@@ -3078,6 +3085,8 @@ public class PreorderDAOService {
     public List<WtMenu> getWtMenuByDates(Date beginDate, Date endDate, Org org) {
         Query query = emReport.createQuery("SELECT DISTINCT menu FROM WtMenu menu "
                 + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                + "left join fetch menu.menuGroupMenus "
+                + "left join fetch menu.orgs "
                 + "WHERE menu.beginDate <= :beginDate AND menu.endDate >= :endDate "
                 + "AND menu.deleteState = 0 "
                 + "AND (:org IN elements(menu.orgs) OR :org IN elements(orgGroup.orgs))");

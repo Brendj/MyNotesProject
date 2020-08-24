@@ -49,7 +49,7 @@
             <column name="version" sql-type="long"/>
         </property>
 
-        <many-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
             <column name="idOfContragent"/>
         </many-to-one>
 
@@ -64,7 +64,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu"/>
         </set>
 
-        <set name="orgs" lazy="false" table="cf_wt_menu_org">
+        <set name="orgs" lazy="true" table="cf_wt_menu_org">
             <key column="idOfMenu"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
