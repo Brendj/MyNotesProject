@@ -53,7 +53,12 @@ public class CardProcessorService {
                     cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
                     continue;
                 }
-
+                List<Card> cardsActive = cardService.getActiveCard(client, false);
+                if (!cardsActive.isEmpty())
+                {
+                    cardActionRequestService.writeRecord(request, "Есть активные карты на момент разблокировки", false, client);
+                    continue;
+                }
                 List<Card> cards = cardService.getBlockedCard(client);
                 if (CollectionUtils.isEmpty(cards)) {
                     cardActionRequestService.writeRecord(request, "Не найдено карт для разблокировки", false, client);
@@ -131,7 +136,7 @@ public class CardProcessorService {
     }
 
     private void processBlockRequest(Client client, BlockPersonEntranceRequest request) throws Exception {
-        List<Card> cards = cardService.getActiveCard(client);
+        List<Card> cards = cardService.getActiveCard(client, true);
         if (CollectionUtils.isEmpty(cards)) {
             cardActionRequestService
                     .writeRecord(request, "Активных карт нет на момент блокировки", false, client);

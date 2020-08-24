@@ -13,6 +13,7 @@ import ru.iteco.cardsync.repo.HistoryCardRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,8 +37,13 @@ public class CardService {
                 CardState.BLOCKED.getValue());
     }
 
-    public List<Card> getActiveCard(Client client){
-        return cardRepository.findAllActiveCardByClient(client.getIdOfClient());
+    public List<Card> getActiveCard(Client client, boolean full){
+        List<Integer> states = new ArrayList<>();
+        states.add(0);
+        states.add(4);
+        if (full)
+            states.add(1);
+        return cardRepository.findAllActiveCardByClient(client.getIdOfClient(), states);
     }
 
     public void unblockCard(Card c) {

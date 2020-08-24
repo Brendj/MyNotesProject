@@ -28,7 +28,10 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "SELECT * "
                     + "FROM cf_cards "
                     + "WHERE idofclient = :idofclient"
-                    + "  AND state in (0,1,4); ", // Только активные карты
+                    + "  AND state in :states ; ", // Только активные карты
             nativeQuery = true)
-    List<Card> findAllActiveCardByClient(@Param("idofclient") Long idofclient);
+    List<Card> findAllActiveCardByClient(@Param("idofclient") Long idofclient,
+                                         @Param("states") List<Integer> states);
+
+
 }
