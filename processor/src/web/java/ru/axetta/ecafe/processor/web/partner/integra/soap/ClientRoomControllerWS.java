@@ -8047,6 +8047,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
             @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
             @WebParam(name = "degree") Long relation) {
+        //Конвертер
+        roleRepresentative += 1;
+        if (roleRepresentative == 3)
+            roleRepresentative = 0;
+        roleRepresentativePrincipal += 1;
+        if (roleRepresentativePrincipal == 3)
+            roleRepresentativePrincipal = 0;
+
 
         authenticateRequest(null);
 
@@ -8090,11 +8098,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
             }
         }
-
-        //Конвертер
-        roleRepresentative += 1;
-        if (roleRepresentative == 3)
-            roleRepresentative = 0;
 
         Result result = new Result();
         Session session = null;
