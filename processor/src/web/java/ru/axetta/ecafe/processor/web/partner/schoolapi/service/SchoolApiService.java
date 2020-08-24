@@ -575,9 +575,12 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     @Override
-    public List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId,
-            String surname, String firstName, String secondName) throws Exception {
-        Query complexInfoQuery = persistanceSession.createQuery("from ComplexInfo" + ""
+    public List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId) throws Exception {
+        Org org = DAOUtils.findOrg(persistanceSession, orgId);
+        if(org == null)
+            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        Query complexInfoQuery = persistanceSession.createQuery("from ComplexInfo"
                 + "where org.idOfOrg=:orgId"
                 + "and day(menuDate)=day(:planDate)"
                 + "and month(menuDate)=month(:planDate)"
@@ -594,12 +597,9 @@ public class SchoolApiService implements ISchoolApiService {
                 if(categoryDiscount.getDiscountsRules().isEmpty())
                     continue;
                 for(DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-
-                    /*List<?> categoryOrgs = new ArrayList<>(discountRule.getCategoryOrgs());
-                    categoryOrgs.addAll();
-                    if (!orgIsFriendly(orgId, )) {
+                    if(!orgHasCategoryOrg(org.getCategories(), discountRule.getCategoryOrgs())){
                         continue;
-                    }*/
+                    }
                     if(clientFilteredDiscountRulesList.isEmpty()){
                         clientFilteredDiscountRulesList.add(discountRule);
                         filteredDiscountRulesMap.put(categoryDiscount, new ArrayList<DiscountRule>());
@@ -635,7 +635,7 @@ public class SchoolApiService implements ISchoolApiService {
                     List<ComplexInfo> complexInfoList = complexInfoQuery.list();
                     for(ComplexInfo complexInfo: complexInfoList){
                         ClientComplexDTO clientComplexDTO = new ClientComplexDTO(((CategoryDiscount)categoryDiscountEntry).getCategoryName(),
-                                complexInfo, surname, firstName, secondName);
+                                complexInfo, null, null, null);
                         clientComplexList.add(clientComplexDTO);
                     }
                 }
@@ -646,8 +646,73 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     @Override
-    public List<PlanOrderClientDTO> createOrUpdatePlanOrderForClientsComplexes(List<PlanOrderClientDTO> clients) throws Exception {
-        return null;
+    public List<PlanOrderClientDTO> createOrUpdatePlanOrderForClientsComplexes(List<PlanOrderClientDTO> clients,
+            Date planDate, Long orgId, String groupName) throws Exception {
+        Org org = DAOUtils.findOrg(persistanceSession, orgId);
+        if(org == null){
+            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
+        Query planOrderQuery = persistanceSession.createQuery("from PlanOrder"
+                +"where org.idOfOrg=:orgId"
+                + "and client.idOfClient=:clientId"
+                + "and complexInfo.idOfComplexInfo=:idOfComplex"
+                + "and day(planDate)=day(:reqPlanDate)"
+                + "and month(planDate)=month(:reqPlanDate)"
+                + "and year(planDate)=year(:reqPlanDate)");
+        planOrderQuery.setMaxResults(1);
+        planOrderQuery.setParameter("orgId", orgId);
+        planOrderQuery.setParameter("reqPlanDate", planDate);
+
+        for(PlanOrderClientDTO planOrderClientDTO: clients){
+            if(planOrderClientDTO.getClient() == null){
+                clients.remove(planOrderClientDTO);
+                continue;
+            }
+            planOrderQuery.setParameter("clientId",planOrderClientDTO.getClient().getIdOfClient());
+            for(ClientComplexDTO complexDTO: planOrderClientDTO.getComplexes()){
+                planOrderQuery.setParameter("idOfComplex", complexDTO.getComplexInfo().getIdOfComplexInfo());
+                PlanOrder planOrder = (PlanOrder) planOrderQuery.uniqueResult();
+                if(planOrder != null){
+                    if(planOrder.getOrder() == null){
+                        planOrder.setGroupName(groupName);
+                        planOrder.setComplexName(complexDTO.getComplexName());
+                        planOrder.setLastUpdate(new Date());
+                        persistanceSession.update(planOrder);
+                    }
+                }
+                else{
+                    planOrder = new PlanOrder(org, groupName, planOrderClientDTO.getClient(), planDate, complexDTO.getComplexInfo(),
+                            complexDTO.getComplexInfo().getComplexName(),
+                            null, false, null, null);
+                    persistanceSession.save(planOrder);
+                }
+
+                if(planOrder.getOrder() == null){
+                    complexDTO.setOrder(null);
+                }
+                else{
+                    if(planOrder.getOrder().getState() == 0){
+                        complexDTO.setOrder(ClientComplexDTO.ORDER_PAID);
+                    }
+                    else if(planOrder.getOrder().getState() == 1){
+                        complexDTO.setOrder(ClientComplexDTO.ORDER_CANCELLED);
+                    }
+                    else
+                        complexDTO.setOrder(null);
+                }
+                if(planOrder.getUserRequestToPay() != null){
+                    Person person = planOrder.getUserRequestToPay().getPerson();
+                    if(person != null){
+                        complexDTO.setmName(person.getFirstName());
+                        complexDTO.setmSurname(person.getSurname());
+                        complexDTO.setmSecondName(person.getSecondName());
+                    }
+                }
+                complexDTO.setToPay(planOrder.getToPay());
+            }
+        }
+        return clients;
     }
 
     private HashMap<String, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
@@ -994,6 +1059,18 @@ public class SchoolApiService implements ISchoolApiService {
                 orgIds.add(org.getIdOfOrg());
         }
         return orgIds;
+    }
+
+    private boolean orgHasCategoryOrg(Set<CategoryOrg> firstComparable, Set<CategoryOrg> secondComparable){
+        List<Long> secondComparableIds = new ArrayList<>();
+        for(CategoryOrg categoryOrg: secondComparable){
+            secondComparableIds.add(categoryOrg.getIdOfCategoryOrg());
+        }
+        for(CategoryOrg categoryOrg: firstComparable){
+            if(secondComparableIds.contains(categoryOrg.getIdOfCategoryOrg()))
+                return true;
+        }
+        return false;
     }
 
 }

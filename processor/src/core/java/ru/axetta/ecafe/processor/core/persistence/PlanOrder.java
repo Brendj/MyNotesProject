@@ -14,10 +14,10 @@ public class PlanOrder {
     private Date planDate;
     private ComplexInfo complexInfo;
     private String complexName;
-    private User classroomTeacher;
+    private User userRequestToPay;
     private Boolean toPay;
     private Order order;
-    private User productionDirector;
+    private User userConfirmToPay;
     private Date createDate;
     private Date lastUpdate;
 
@@ -26,20 +26,22 @@ public class PlanOrder {
     }
 
     public PlanOrder(Org org, String groupName, Client client, Date planDate, ComplexInfo complexInfo, String complexName,
-            User classroomTeacher, Boolean toPay, Order order, User productionDirector){
+            User userRequestToPay, Boolean toPay, Order order, User userConfirmToPay){
         this.org = org;
         this.groupName = groupName;
         this.client = client;
         this.planDate = planDate;
         this.complexInfo = complexInfo;
         this.complexName = complexName;
-        this.classroomTeacher = classroomTeacher;
+        this.userRequestToPay = userRequestToPay;
         this.toPay = toPay;
         this.order = order;
-        this.productionDirector = productionDirector;
+        this.userConfirmToPay = userConfirmToPay;
         this.createDate = new Date();
         this.lastUpdate = this.createDate;
     }
+
+
 
     public Long getIdOfPlanOrder() {
         return idOfPlanOrder;
@@ -97,12 +99,12 @@ public class PlanOrder {
         this.complexName = complexName;
     }
 
-    public User getClassroomTeacher() {
-        return classroomTeacher;
+    public User getUserRequestToPay() {
+        return userRequestToPay;
     }
 
-    public void setClassroomTeacher(User classroomTeacher) {
-        this.classroomTeacher = classroomTeacher;
+    public void setUserRequestToPay(User classroomTeacher) {
+        this.userRequestToPay = classroomTeacher;
     }
 
     public Boolean getToPay() {
@@ -121,12 +123,12 @@ public class PlanOrder {
         this.order = order;
     }
 
-    public User getProductionDirector() {
-        return productionDirector;
+    public User getUserConfirmToPay() {
+        return userConfirmToPay;
     }
 
-    public void setProductionDirector(User productionDirector) {
-        this.productionDirector = productionDirector;
+    public void setUserConfirmToPay(User userConfirmToPay) {
+        this.userConfirmToPay = userConfirmToPay;
     }
 
     public Date getCreateDate() {

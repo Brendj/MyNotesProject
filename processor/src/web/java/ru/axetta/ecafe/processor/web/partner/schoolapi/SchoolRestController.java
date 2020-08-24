@@ -5,15 +5,14 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.RequestDTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.GroupEmployee;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.GroupInfo;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.PlanOrderClientDTO;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.PlanOrderGroupDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.service.ISchoolApiService;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.service.SchoolApiService;
@@ -41,6 +40,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -701,9 +701,52 @@ public class SchoolRestController {
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            List<ClientGroup> filteredGroups;
+            if(checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER.getIdentification())
+                    || checkRolePermission(authentication,
+                    User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
+                List<ClientGroup> unfilteredGroups = groupManagementService
+                        .getClientGroupsByGroupNamesAndOrgId(groupsList, jwtUserDetails.getIdOfOrg());
+                Client classroomClient = DAOUtils.findClientByContractId(persistenceSession, jwtUserDetails.getContractId());
+                if(classroomClient == null)
+                    throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                            GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+                filteredGroups = groupManagementService.getClientGroupsForClientManager(unfilteredGroups, classroomClient.getIdOfClient());
+            }
+            else if(checkRolePermission(authentication,
+                    User.DefaultRole.PRODUCTION_DIRECTOR.getIdentification())){
+                filteredGroups = groupManagementService.getClientGroupsByGroupNamesAndOrgId(groupsList, jwtUserDetails.getIdOfOrg());
+            }
+            else {
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
+            if(filteredGroups == null || filteredGroups.isEmpty())
+                throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
+            List<PlanOrderGroupDTO> groupsDTOList = new ArrayList<>();
+            for(ClientGroup group: filteredGroups){
+                PlanOrderGroupDTO planOrderGroupDTO = new PlanOrderGroupDTO(group);
+                List<PlanOrderClientDTO> clients = groupManagementService
+                        .getClientsForGroupAndOrgByCategoryDiscount(group, group.getCompositeIdOfClientGroup().getIdOfOrg(),
+                                CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
+                if(clients.isEmpty()){
+                    planOrderGroupDTO.setClients(clients);
+                    groupsDTOList.add(planOrderGroupDTO);
+                    continue;
+                }
+                clients = groupManagementService.setEnterEventsForClients(clients, planDate);
+                clients = groupManagementService.setComplexesForClients(clients, planDate, group.getCompositeIdOfClientGroup().getIdOfOrg());
+                clients = groupManagementService.createOrUpdatePlanOrderForClientsComplexes(clients, planDate,
+                        group.getCompositeIdOfClientGroup().getIdOfOrg(), group.getGroupName());
+                planOrderGroupDTO.setClients(clients);
+                groupsDTOList.add(planOrderGroupDTO);
+            }
+            ResponsePlanOrders responsePlanOrders = new ResponsePlanOrders(planDate);
+            responsePlanOrders.setGroupsList(groupsDTOList);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "OK")).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responsePlanOrders).build();
 
         }
         catch (RequestProcessingException e){

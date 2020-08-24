@@ -10,6 +10,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class ClientComplexDTO {
+    @JsonIgnore
+    public static final String ORDER_PAID = "Оплачен";
+    @JsonIgnore
+    public static final String ORDER_CANCELLED = "Отменен";
+
     @JsonProperty("Discount")
     private String discount;
     @JsonProperty("ComplexName")
@@ -23,7 +28,7 @@ public class ClientComplexDTO {
     @JsonProperty("MSecondName")
     private String mSecondName;
     @JsonProperty("Order")
-    private Boolean order;
+    private String order;
     @JsonIgnore
     private ComplexInfo complexInfo;
 
@@ -36,7 +41,7 @@ public class ClientComplexDTO {
         this.complexInfo = complexInfo;
         this.complexName = complexInfo.getComplexName();
         this.toPay = false;
-        this.order = false;
+        this.order = null;
         this.mSurname = mSurname;
         this.mName = mName;
         this.mSecondName = mSecondName;
@@ -90,11 +95,11 @@ public class ClientComplexDTO {
         this.mSecondName = mSecondName;
     }
 
-    public Boolean getOrder() {
+    public String getOrder() {
         return order;
     }
 
-    public void setOrder(Boolean order) {
+    public void setOrder(String order) {
         this.order = order;
     }
 

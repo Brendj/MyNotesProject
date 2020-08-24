@@ -14,10 +14,10 @@
         <property name="planDate" column="plandate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <many-to-one name="complexInfo" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" column="idofcomplex" fetch="select" insert="false" update="false"/>
         <property name="complexName" column="complexname" type="string" length="256" not-null="false"/>
-        <many-to-one name="classroomTeacher" class="ru.axetta.ecafe.processor.core.persistence.User" column="userclassid" fetch="select" insert="false" update="false"/>
+        <many-to-one name="userRequestToPay" class="ru.axetta.ecafe.processor.core.persistence.User" column="useridrequesttopay" fetch="select" insert="false" update="false"/>
         <property name="toPay" column="topay" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <many-to-one name="order" class="ru.axetta.ecafe.processor.core.persistence.Order" column="idoforder" fetch="select" insert="false" update="false"/>
-        <many-to-one name="productionDirector" class="ru.axetta.ecafe.processor.core.persistence.User" column="userzavid" fetch="select" insert="false" update="false"/>
+        <many-to-one name="userConfirmToPay" class="ru.axetta.ecafe.processor.core.persistence.User" column="useridconfirmtopay" fetch="select" insert="false" update="false"/>
         <property name="createDate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
     </class>
