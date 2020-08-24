@@ -575,7 +575,8 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     @Override
-    public List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId) throws Exception {
+    public List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId,
+            String surname, String firstName, String secondName) throws Exception {
         Query complexInfoQuery = persistanceSession.createQuery("from ComplexInfo" + ""
                 + "where org.idOfOrg=:orgId"
                 + "and day(menuDate)=day(:planDate)"
@@ -583,7 +584,8 @@ public class SchoolApiService implements ISchoolApiService {
                 + "and year(menuDate)=year(:planDate)"
                 + "and modeFree=1"
                 + "and idOfComplex in (:complexIds)");
-
+        complexInfoQuery.setParameter("orgId", orgId);
+        complexInfoQuery.setParameter("planDate", planDate);
         for(PlanOrderClientDTO client: clients){
             List<ClientComplexDTO> clientComplexList = new ArrayList<>();
             HashMap<CategoryDiscount, List<DiscountRule>> filteredDiscountRulesMap = new HashMap<>();
@@ -592,9 +594,12 @@ public class SchoolApiService implements ISchoolApiService {
                 if(categoryDiscount.getDiscountsRules().isEmpty())
                     continue;
                 for(DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-                    if (!orgIsFriendly(orgId, new ArrayList<Org>(discountRule.getCategoryOrgs()))) {
+
+                    /*List<?> categoryOrgs = new ArrayList<>(discountRule.getCategoryOrgs());
+                    categoryOrgs.addAll();
+                    if (!orgIsFriendly(orgId, )) {
                         continue;
-                    }
+                    }*/
                     if(clientFilteredDiscountRulesList.isEmpty()){
                         clientFilteredDiscountRulesList.add(discountRule);
                         filteredDiscountRulesMap.put(categoryDiscount, new ArrayList<DiscountRule>());
@@ -625,9 +630,17 @@ public class SchoolApiService implements ISchoolApiService {
                 }
             }
             for(Map.Entry categoryDiscountEntry: filteredDiscountRulesMap.entrySet()){
-                ClientComplexDTO clientComplexDTO = new ClientComplexDTO()
+                for(DiscountRule categoryDiscountRule: ((List<DiscountRule>) categoryDiscountEntry.getValue())){
+                    complexInfoQuery.setParameter("complexIds",categoryDiscountRule.getComplexIdsFromComplexMap());
+                    List<ComplexInfo> complexInfoList = complexInfoQuery.list();
+                    for(ComplexInfo complexInfo: complexInfoList){
+                        ClientComplexDTO clientComplexDTO = new ClientComplexDTO(((CategoryDiscount)categoryDiscountEntry).getCategoryName(),
+                                complexInfo, surname, firstName, secondName);
+                        clientComplexList.add(clientComplexDTO);
+                    }
+                }
             }
-
+            client.setComplexes(clientComplexList);
         }
         return clients;
     }

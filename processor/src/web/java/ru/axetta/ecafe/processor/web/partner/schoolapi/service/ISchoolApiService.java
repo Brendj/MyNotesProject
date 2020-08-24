@@ -41,6 +41,7 @@ public interface ISchoolApiService {
     List<PlanOrderClientDTO> getClientsForGroupAndOrgByCategoryDiscount(ClientGroup clientGroup, Long orgId,
             CategoryDiscountEnumType categoryDiscountEnumType) throws Exception;
     List<PlanOrderClientDTO> setEnterEventsForClients(List<PlanOrderClientDTO> clients, Date planDate) throws Exception;
-    List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId) throws Exception;
+    List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId,
+            String surname, String firstName, String secondName) throws Exception;
     List<PlanOrderClientDTO> createOrUpdatePlanOrderForClientsComplexes(List<PlanOrderClientDTO> clients) throws Exception;
 }
