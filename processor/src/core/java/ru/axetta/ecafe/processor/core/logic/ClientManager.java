@@ -537,6 +537,8 @@ public class ClientManager {
                 client.setParallel(fieldConfig.getValue(FieldId.PARALLEL));
             }
 
+            DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
+
             client.setUpdateTime(new Date());
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();

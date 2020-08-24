@@ -5027,6 +5027,8 @@ public class Processor implements SyncProcessor {
             }
             client.setDiscountMode(clientParamItem.getDiscountMode());
 
+            DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
+
             client.setClientRegistryVersion(version);
 
             persistenceSession.update(client);

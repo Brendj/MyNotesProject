@@ -1158,6 +1158,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setPassportSeries(this.passportSeries);
         client.setParallel(this.parallel);
 
+        DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
+
         persistenceSession.update(client);
 
         fill(persistenceSession, client);
