@@ -12,15 +12,15 @@ import java.util.Objects;
 import java.util.Set;
 
 //@Entity
-//@Table(name = "cf_wt_category_items")
-public class WtCategoryItem {
+//@Table(name = "cf_wt_categories")
+public class WtCategory {
     public static final int ACTIVE = 0;
     public static final int DELETE = 1;
 
-    //@Id
-    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategoryitem_seq")
-    //@Column(name = "idofcategoryitem")
-    private Long idOfCategoryItem;
+   /*@Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategories_seq")
+    //@Column(name = "idofcategory")*/
+    private Long idOfCategory;
 
     //@Column(name = "createdate")
     private Date createDate;
@@ -50,24 +50,15 @@ public class WtCategoryItem {
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))*/
     private Set<WtDish> dishes = new HashSet<>();
 
-    /*@ManyToOne
-    @JoinColumn(name = "idofwtcategory")*/
-    private WtCategory wtCategory;
+    //@OneToMany
+    private Set<WtCategoryItem> categoryItems = new HashSet<>();
 
-    public WtCategory getWtCategory() {
-        return wtCategory;
+    public Set<WtCategoryItem> getCategoryItems() {
+        return categoryItems;
     }
 
-    public void setWtCategory(WtCategory wtCategory) {
-        this.wtCategory = wtCategory;
-    }
-
-    public Long getIdOfCategoryItem() {
-        return idOfCategoryItem;
-    }
-
-    public void setIdOfCategoryItem(Long idOfCategoryItem) {
-        this.idOfCategoryItem = idOfCategoryItem;
+    public void setCategoryItems(Set<WtCategoryItem> categoryItems) {
+        this.categoryItems = categoryItems;
     }
 
     public Date getCreateDate() {
@@ -134,22 +125,28 @@ public class WtCategoryItem {
         this.deleteState = deleteState;
     }
 
+    public Long getIdOfCategory() {
+        return idOfCategory;
+    }
+
+    public void setIdOfCategory(Long idOfCategory) {
+        this.idOfCategory = idOfCategory;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof WtCategory)) {
             return false;
         }
-        WtCategoryItem that = (WtCategoryItem) o;
-        return Objects.equals(idOfCategoryItem, that.idOfCategoryItem) && Objects.equals(createDate, that.createDate)
-                && Objects.equals(lastUpdate, that.lastUpdate) && Objects.equals(version, that.version) && Objects
-                .equals(guid, that.guid) && Objects.equals(description, that.description);
+        WtCategory that = (WtCategory) o;
+        return Objects.equals(getIdOfCategory(), that.getIdOfCategory());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfCategoryItem, createDate, lastUpdate, version, guid, description);
+        return Objects.hash(getIdOfCategory());
     }
 }
