@@ -288,6 +288,10 @@ public class Client {
             || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue()));
     }
 
+    public boolean isSotrudnik() {
+        return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+    }
+
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
         MessageDigest hash = MessageDigest.getInstance("SHA1");
         ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());

@@ -9865,7 +9865,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             } else if (client.isSotrudnikMsk() && StringUtils.isEmpty(guardianMobile)) {
                 ClientManager.setInformSpecialMenu(session, client, null, version);
-            } else if (client.isSotrudnikMsk() && !StringUtils.isEmpty(guardianMobile)) {
+            } else if ((client.isSotrudnikMsk() || client.isSotrudnik()) && !StringUtils.isEmpty(guardianMobile)) {
                 if (client.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
                     ClientManager.setInformSpecialMenu(session, client, null, version);
                 } else {
