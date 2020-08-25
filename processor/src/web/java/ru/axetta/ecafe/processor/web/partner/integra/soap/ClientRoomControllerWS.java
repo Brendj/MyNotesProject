@@ -4635,6 +4635,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             processSummary(client, dataProcess, objectFactory, session);
                         }
                     });
+                    ClientSummaryResult cs = new ClientSummaryResult();
+                    if (!entry.getValue().equals(ClientCreatedFromType.DEFAULT)) {
+                        dataProcess.getClientSummaryExt()
+                                .setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
+                    }
+                    dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getCode());
                     //////////////////////
                     Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
                     temp = temp-1;
@@ -4642,12 +4648,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         temp = 2;
                     dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
                     /////////////////////
-                    ClientSummaryResult cs = new ClientSummaryResult();
-                    if (!entry.getValue().equals(ClientCreatedFromType.DEFAULT)) {
-                        dataProcess.getClientSummaryExt()
-                                .setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
-                    }
-                    dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getCode());
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
                     cs.description = dataProcess.getDescription();
@@ -4682,7 +4682,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 processClientRepresentativeList(client, data, objectFactory, session);
             }
         });
-
+        //////////////////////
+        for (ClientRepresentative clientRepresentative: data.getClientRepresentativesList().getRep())
+        {
+            Integer temp = clientRepresentative.getRoleRepresentative();
+            temp = temp-1;
+            if (temp == -1)
+                temp = 2;
+            clientRepresentative.setRoleRepresentative(temp);
+        }
+        /////////////////////
         ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
         clientRepresentativesResult.clientRepresentativesList = data.getClientRepresentativesList();
         clientRepresentativesResult.resultCode = RC_OK;
