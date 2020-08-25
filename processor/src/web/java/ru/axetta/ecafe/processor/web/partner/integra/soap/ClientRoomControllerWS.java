@@ -8047,6 +8047,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
             @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
             @WebParam(name = "degree") Long relation) {
+        
+        if (roleRepresentativePrincipal != 0 && roleRepresentativePrincipal != 1)
+        {
+            return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
+        }
+
         //Конвертер
         roleRepresentative += 1;
         if (roleRepresentative == 3)
@@ -8088,8 +8094,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getClientGuardian(clientChild, mobilePhoneCreator);
             for (ClientGuardian clientGuardian : clientGuardians) {
-                if ((clientGuardian.getRepresentType().getCode() == 0 && roleRepresentativePrincipal == 0) || (
-                        clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1)) {
+                if (clientGuardian.getRepresentType().getCode() == 0 ||
+                        clientGuardian.getRepresentType().getCode() == 1) {
                     canAdded = true;
                     break;
                 }
