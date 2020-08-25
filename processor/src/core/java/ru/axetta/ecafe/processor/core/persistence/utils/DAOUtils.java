@@ -4613,6 +4613,45 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<ApplicationForFood> getApplicationForFoodListByStatusAndServiceNumber(Session session,
+            ApplicationForFoodStatus status, Boolean isOthers, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("status", status));
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.eq("serviceNumber", serviceNumber));
+            if (isOthers) {
+                criteria.add(Restrictions.isNull("dtisznCode"));
+            }
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return new ArrayList<ApplicationForFood>();
+            else
+                return applicationForFoods;
+        } catch (Exception e)
+        {
+            logger.error("Error in getApplicationForFoodListByStatusAndServiceNumber ", e);
+            return null;
+        }
+    }
+
+    public static ApplicationForFood getApplicationForFood(Session session, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.ilike("serviceNumber", serviceNumber));
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return new ApplicationForFood();
+            else
+                return applicationForFoods.get(0);
+        } catch (Exception e)
+        {
+            logger.error("Error in getApplicationForFood", e);
+            return null;
+        }
+    }
+
     public static CategoryDiscountDSZN findCategoryDiscountDSZNByETPCode(EntityManager entityManager, Long ETPCode) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryDiscountDSZN where ETPCode=:ETPCode");
         q.setParameter("ETPCode", ETPCode);
