@@ -4630,6 +4630,23 @@ public class DAOUtils {
         }
     }
 
+    public static ApplicationForFood getApplicationForFood(Session session, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.eq("serviceNumber", serviceNumber));
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return new ApplicationForFood();
+            else
+                return applicationForFoods.get(0);
+        } catch (Exception e)
+        {
+            logger.error("Error in getApplicationForFood", e);
+            return null;
+        }
+    }
+
     public static CategoryDiscountDSZN findCategoryDiscountDSZNByETPCode(EntityManager entityManager, Long ETPCode) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryDiscountDSZN where ETPCode=:ETPCode");
         q.setParameter("ETPCode", ETPCode);

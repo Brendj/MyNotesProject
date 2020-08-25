@@ -59,7 +59,7 @@ public class NotificationsPage extends BasicWorkspacePage {
 
     public void applicationDenide() {
         try {
-            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTaskService(true, serviceNumber);
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTaskServiceNotification(serviceNumber);
         } catch (Exception e) {
             printError("Во время выполнения операции произошла ошибка с текстом " + e.getMessage());
         }

@@ -564,6 +564,7 @@ public class DTSZNDiscountsReviseService {
         } while (++currentPage < pagesCount);
         return entityIds;
     }
+
     public void updateApplicationsForFoodTask(boolean forTest) throws Exception {
         updateApplicationsForFoodTaskService(forTest, null);
     }
@@ -581,8 +582,7 @@ public class DTSZNDiscountsReviseService {
                 applicationForFoodList = DAOUtils.getApplicationForFoodListByStatusAndServiceNumber(session,
                         new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null), false,
                         serviceNumber);
-            } else
-            {
+            } else {
                 applicationForFoodList = DAOUtils.getApplicationForFoodListByStatus(session,
                         new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null), false);
             }
@@ -728,6 +728,58 @@ public class DTSZNDiscountsReviseService {
             HibernateUtils.close(session, logger);
         }
     }
+
+    public void updateApplicationsForFoodTaskServiceNotification(String serviceNumber)
+            throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+
+            ApplicationForFood applicationForFood = DAOUtils
+                    .getApplicationForFood(session, serviceNumber);
+
+            Long dtsznCode = (null == applicationForFood.getDtisznCode()) ? OTHER_DISCOUNT_CODE
+                    : applicationForFood.getDtisznCode();
+
+            ClientDtisznDiscountInfo info = DAOUtils
+                    .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(), dtsznCode);
+            //Отправка уведомления клиенту
+            Client client = applicationForFood.getClient();
+            String[] values = new String[]{
+                    BenefitService.SERVICE_NUMBER, applicationForFood.getServiceNumber(), BenefitService.DATE,
+                    CalendarUtils.dateToString(applicationForFood.getCreatedDate()), BenefitService.DTISZN_CODE,
+                    info.getDtisznCode().toString(), BenefitService.DTISZN_DESCRIPTION, info.getDtisznDescription()};
+            values = EventNotificationService.attachGenderToValues(client.getGender(), values);
+            values = attachValue(values, "TEST", "true");
+
+
+            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+            if (!(guardians == null || guardians.isEmpty())) {
+                //Оправка всем представителям
+                for (Client destGuardian : guardians) {
+                    RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                            .sendNotification(destGuardian, client,
+                                    EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                }
+            } else {
+                //Отправка только клиенту
+                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                        .sendNotification(client, null, EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values,
+                                new Date());
+            }
+         } catch(Exception e)
+        {
+            logger.error("Error in update discounts for one Application", e);
+            throw e;
+        } finally
+        {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+}
 
     private String[] attachValue(String[] values, String name, String value) {
         String[] newValues = new String[values.length + 2];
@@ -1276,17 +1328,17 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
-    public static class DTSZNDiscountsReviseServiceJob implements Job {
+public static class DTSZNDiscountsReviseServiceJob implements Job {
 
-        @Override
-        public void execute(JobExecutionContext arg0) throws JobExecutionException {
-            try {
-                RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).run();
-            } catch (JobExecutionException e) {
-                throw e;
-            } catch (Exception e) {
-                logger.error("Failed to run revise 2.0 service job:", e);
-            }
+    @Override
+    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+        try {
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).run();
+        } catch (JobExecutionException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Failed to run revise 2.0 service job:", e);
         }
     }
+}
 }
