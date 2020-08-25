@@ -2237,10 +2237,12 @@ public class ClientManager {
                 DiscountManager.archiveApplicationForFood(session, applicationForFood, version);
             }
             ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, client.getIdOfClient());
-            if (info == null) return;
-            DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
-            builder.withDateEnd(new Date());
-            builder.save(session);
+            if (info != null) {
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(
+                        info);
+                builder.withDateEnd(new Date());
+                builder.save(session);
+            }
             DiscountManager.deleteOtherDiscountForClientWithNoUpdateClient(session, client);
         } catch (Exception e) {
             logger.error("Error in archiveApplicationForFoodIfClientLeaving: ", e);
