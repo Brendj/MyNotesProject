@@ -4634,7 +4634,7 @@ public class DAOUtils {
         try {
             Criteria criteria = session.createCriteria(ApplicationForFood.class);
             criteria.add(Restrictions.eq("archived", false));
-            criteria.add(Restrictions.eq("serviceNumber", serviceNumber));
+            criteria.add(Restrictions.ilike("serviceNumber", serviceNumber));
             List<ApplicationForFood> applicationForFoods = criteria.list();
             if (applicationForFoods == null || applicationForFoods.isEmpty())
                 return new ApplicationForFood();
