@@ -3056,4 +3056,16 @@ public class DAOService {
                 + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idofcomplex in (" + idOfComplexString + ")");
         return q.list();
     }
+
+    public List<WtComplex> getComplexesByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getComplexesByWtDiscountRule(entityManager, discountRule);
+    }
+
+    public List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getCategoryDiscountsByWtDiscountRule(entityManager, discountRule);
+    }
+
+    public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
+    }
 }
