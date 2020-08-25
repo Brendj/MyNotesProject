@@ -4614,17 +4614,18 @@ public class DAOUtils {
             Criteria criteria = session.createCriteria(ApplicationForFood.class);
             criteria.add(Restrictions.eq("status", status));
             criteria.add(Restrictions.eq("archived", false));
-            criteria.add(Restrictions.like("serviceNumber", serviceNumber));
+            criteria.add(Restrictions.ilike("serviceNumber", serviceNumber));
             if (isOthers) {
                 criteria.add(Restrictions.isNull("dtisznCode"));
             }
             List<ApplicationForFood> applicationForFoods = criteria.list();
             if (applicationForFoods == null || applicationForFoods.isEmpty())
-                return null;
+                return new ArrayList<ApplicationForFood>();
             else
                 return applicationForFoods;
         } catch (Exception e)
         {
+            logger.info(String.format("Erron in getApplicationForFoodListByStatusAndServiceNumber: %s", e));
             return null;
         }
     }
