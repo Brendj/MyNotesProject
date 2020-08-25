@@ -4642,6 +4642,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 .setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     }
                     dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getCode());
+                    //////////////////////
+                    Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
+                    temp = temp-1;
+                    if (temp == -1)
+                        temp = 2;
+                    dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    /////////////////////
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
                     cs.description = dataProcess.getDescription();
@@ -4676,7 +4683,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 processClientRepresentativeList(client, data, objectFactory, session);
             }
         });
-
+        //////////////////////
+        for (ClientRepresentative clientRepresentative: data.getClientRepresentativesList().getRep())
+        {
+            Integer temp = clientRepresentative.getRoleRepresentative();
+            temp = temp-1;
+            if (temp == -1)
+                temp = 2;
+            clientRepresentative.setRoleRepresentative(temp);
+        }
+        /////////////////////
         ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
         clientRepresentativesResult.clientRepresentativesList = data.getClientRepresentativesList();
         clientRepresentativesResult.resultCode = RC_OK;
