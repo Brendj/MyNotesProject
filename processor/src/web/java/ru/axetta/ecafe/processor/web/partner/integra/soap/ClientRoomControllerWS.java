@@ -4635,6 +4635,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             processSummary(client, dataProcess, objectFactory, session);
                         }
                     });
+                    //////////////////////
+                    Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
+                    temp = temp-1;
+                    if (temp == -1)
+                        temp = 2;
+                    dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    /////////////////////
                     ClientSummaryResult cs = new ClientSummaryResult();
                     if (!entry.getValue().equals(ClientCreatedFromType.DEFAULT)) {
                         dataProcess.getClientSummaryExt()
