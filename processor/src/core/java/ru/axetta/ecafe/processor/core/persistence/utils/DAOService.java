@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -396,6 +396,15 @@ public class DAOService {
         if (entity != null) {
             entityManager.remove(entity);
         }
+    }
+
+    public void mergeEntity(Object entity) throws Exception {
+        entityManager.merge(entity);
+    }
+
+    public Object detachEntity(Object entity) throws Exception {
+        entityManager.detach(entity);
+        return entity;
     }
 
     public Long getContractIdByCardNo(long lCardId) throws Exception {

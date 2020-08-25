@@ -178,9 +178,11 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
                 StringBuilder sb=new StringBuilder();
                 sb.append("{");
                 for (DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-                    this.idOfRuleList.add(discountRule.getIdOfRule());
-                    sb.append(discountRule.getDescription());
-                    sb.append(";");
+                    if (!discountRule.getDeletedState()) {
+                        this.idOfRuleList.add(discountRule.getIdOfRule());
+                        sb.append(discountRule.getDescription());
+                        sb.append(";");
+                    }
                 }
                 sb.append("} ");
                 this.setFilter(sb.substring(0, sb.length()-1));

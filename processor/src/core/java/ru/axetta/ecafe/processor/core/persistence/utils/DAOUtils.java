@@ -2052,8 +2052,10 @@ public class DAOUtils {
         return (Long) (q.getSingleResult());
     }
 
-    public static List<DiscountRule> listDiscountRules(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from DiscountRule order by priority, idOfRule asc");
+    public static List<DiscountRule> listDiscountRules(EntityManager em, boolean archived) {
+        javax.persistence.Query q = em.createQuery("from DiscountRule where deletedState = :archived "
+                + "order by priority, idOfRule asc");
+        q.setParameter("archived", archived);
         return q.getResultList();
     }
 

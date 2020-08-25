@@ -75,7 +75,7 @@
                   not-null="true"/>
 
         <property name="complexesMap" column="ComplexesMap" type="string" length="512"/>
-
+        <property name="deletedState" column="DeletedState" type="boolean"/>
 
         <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
         <property name="subCategory" column="Subcategory" type="string" length="100" />
