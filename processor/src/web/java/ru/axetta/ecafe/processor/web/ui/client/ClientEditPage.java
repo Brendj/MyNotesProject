@@ -1124,6 +1124,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     .getExternalContext().getRemoteUser());
 
             persistenceSession.save(clientMigration);
+            if (!isFriendlyReplaceOrg) {
+                ClientManager.archiveApplicationForFoodIfClientLeaving(persistenceSession, client, idOfClientGroup);
+            }
         } else {
             if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) ||
                     (this.idOfClientGroup == null && client.getIdOfClientGroup() != null) ||
@@ -1131,19 +1134,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, this.idOfClientGroup,
                         this.clientGroupName, ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
                                 .getExternalContext().getRemoteUser());
-                /*ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
-                if (client.getClientGroup() != null) {
-                    clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-                    clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
-                }
-                clientGroupMigrationHistory.setNewGroupId(this.idOfClientGroup);
-                clientGroupMigrationHistory.setNewGroupName(this.clientGroupName);
-                clientGroupMigrationHistory.setComment(
-                        ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
-                                .getExternalContext().getRemoteUser());
-
-                persistenceSession.save(clientGroupMigrationHistory);*/
-
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }

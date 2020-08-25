@@ -2228,7 +2228,7 @@ public class ClientManager {
         archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
     }
 
-    private static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+    public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
         if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
         try {
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodInoeByClient(session, client);
