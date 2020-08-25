@@ -4625,7 +4625,7 @@ public class DAOUtils {
                 return applicationForFoods;
         } catch (Exception e)
         {
-            logger.error("Error in update discounts", e);
+            logger.error("Error in getApplicationForFoodListByStatusAndServiceNumber ", e);
             return null;
         }
     }
