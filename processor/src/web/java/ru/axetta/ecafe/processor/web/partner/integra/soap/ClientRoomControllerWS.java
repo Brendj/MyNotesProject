@@ -4642,6 +4642,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 .setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     }
                     dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getCode());
+                    //////////////////////
+                    Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
+                    temp = temp-1;
+                    if (temp == -1)
+                        temp = 2;
+                    dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    /////////////////////
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
                     cs.description = dataProcess.getDescription();
@@ -4676,7 +4683,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 processClientRepresentativeList(client, data, objectFactory, session);
             }
         });
-
+        //////////////////////
+        for (ClientRepresentative clientRepresentative: data.getClientRepresentativesList().getRep())
+        {
+            Integer temp = clientRepresentative.getRoleRepresentative();
+            temp = temp-1;
+            if (temp == -1)
+                temp = 2;
+            clientRepresentative.setRoleRepresentative(temp);
+        }
+        /////////////////////
         ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
         clientRepresentativesResult.clientRepresentativesList = data.getClientRepresentativesList();
         clientRepresentativesResult.resultCode = RC_OK;
@@ -8774,6 +8790,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
             @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
             @WebParam(name = "degree") Long relation) {
+        
+        if (roleRepresentativePrincipal != 0 && roleRepresentativePrincipal != 1)
+        {
+            return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
+        }
+
         //Конвертер
         roleRepresentative += 1;
         if (roleRepresentative == 3)
@@ -8815,8 +8837,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getClientGuardian(clientChild, mobilePhoneCreator);
             for (ClientGuardian clientGuardian : clientGuardians) {
-                if ((clientGuardian.getRepresentType().getCode() == 0 && roleRepresentativePrincipal == 0) || (
-                        clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1)) {
+                if (clientGuardian.getRepresentType().getCode() == 0 ||
+                        clientGuardian.getRepresentType().getCode() == 1) {
                     canAdded = true;
                     break;
                 }

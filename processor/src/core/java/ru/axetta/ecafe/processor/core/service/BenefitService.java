@@ -95,8 +95,8 @@ public class BenefitService {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            List<ClientDtisznDiscountInfo> clientDtisznDiscountInfoList =
-                    DAOUtils.getCategoryDiscountListWithEndBenefitBeetwenDates(session, startDate, endDate);
+            List<ClientDtisznDiscountInfo> clientDtisznDiscountInfoList = DAOUtils
+                    .getCategoryDiscountListWithEndBenefitBeetwenDates(session, startDate, endDate);
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo: clientDtisznDiscountInfoList) {
 
                 Client client = clientDtisznDiscountInfo.getClient();

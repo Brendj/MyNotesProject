@@ -830,9 +830,13 @@
                         label="Заявки на посещение" action="#{migrantsPage.show}" reRender="workspaceForm" />
 
     <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
-    <rich:panelMenuItem id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
-                        action="#{otherActionsPage.show}" reRender="workspaceForm"
-                        rendered="#{mainPage.eligibleToServiceAdmin}" />
+    <rich:panelMenuGroup id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
+                         rendered="#{mainPage.eligibleToServiceAdmin}" >
+        <a4j:support event="onclick" action="#{otherActionsPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="notificationsPage" type="ru.axetta.ecafe.processor.web.ui.service.NotificationsPage"--%>
+        <rich:panelMenuItem id="notificationsMenuItem" binding="#{notificationsPage.mainMenuComponent}"
+                            label="Уведомления" action="#{notificationsPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Сверка"
                          rendered="#{mainPage.eligibleToServiceAdmin && mainPage.mskRegistry}">
