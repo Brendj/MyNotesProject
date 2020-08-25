@@ -53,8 +53,14 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
 
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
-        DAOService.getInstance().deleteEntity(confirmDeletePage.getEntity());
-        onShow();
+        try {
+            WtDiscountRule discountRule = (WtDiscountRule) DAOService.getInstance().detachEntity(confirmDeletePage.getEntity());
+            discountRule.setDeletedState(true);
+            DAOService.getInstance().mergeEntity(discountRule);
+            onShow();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getPageFilename() {
@@ -89,7 +95,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     public void reload() {
 
         List<Item> items = new ArrayList<>();
-        List<WtDiscountRule> wtDiscountRuleList = DAOUtils.listWtDiscountRules(em);
+        List<WtDiscountRule> wtDiscountRuleList = DAOUtils.listWtDiscountRules(em, showArchived);
 
         for (WtDiscountRule wtDiscountRule : wtDiscountRuleList) {
 

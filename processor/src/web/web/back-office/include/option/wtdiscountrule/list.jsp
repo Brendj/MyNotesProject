@@ -13,8 +13,8 @@
     out.println("Недостаточно прав для просмотра страницы");
     return;
 } %>
-<%--@elvariable id="wtRuleListPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleListPage"--%>
-<%--@elvariable id="wtRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleEditPage"--%>
+<%--@elvariable id="wtRuleListPage" type="ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule.wtRuleListPage"--%>
+<%--@elvariable id="wtRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule.wtRuleEditPage"--%>
 <h:panelGrid id="ruleListPanel" binding="#{wtRuleListPage.pageComponent}" styleClass="borderless-grid">
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -51,7 +51,7 @@
         </h:selectOneMenu>
 
         <h:outputText escape="false" value="Показывать архивные правила" styleClass="output-text"/>
-        <h:selectBooleanCheckbox value="#{ruleListPage.showArchived}" styleClass="output-text">
+        <h:selectBooleanCheckbox value="#{wtRuleListPage.showArchived}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">

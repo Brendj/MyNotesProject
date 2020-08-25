@@ -2059,9 +2059,17 @@ public class DAOUtils {
         return q.getResultList();
     }
 
-    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from WtDiscountRule order by priority, idOfRule asc");
+    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em, boolean archived) {
+        javax.persistence.Query q = em.createQuery("from WtDiscountRule where deletedState = :archived "
+                + "order by priority, idOfRule asc");
+        q.setParameter("archived", archived);
         return q.getResultList();
+    }
+
+    public static List<WtComplex> getComplexesByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
+        return em.createQuery("select rule.complexes from WtDiscountRule rule where rule = :discountRule")
+                .setParameter("discountRule", discountRule)
+                .getResultList();
     }
 
     public static List getCategoryDiscountListWithIds(EntityManager em, List<Long> idOfCategoryList) {
