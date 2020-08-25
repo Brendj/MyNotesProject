@@ -2241,6 +2241,7 @@ public class ClientManager {
                 DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(
                         info);
                 builder.withDateEnd(new Date());
+                builder.withArchived(true);
                 builder.save(session);
             }
             DiscountManager.deleteOtherDiscountForClientWithNoUpdateClient(session, client);
