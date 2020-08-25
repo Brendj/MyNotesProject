@@ -92,7 +92,7 @@ public class DiscountManager {
         Integer newDiscountMode = client.getDiscountMode();
 
         CategoryDiscount cdOther = getCategoryDiscountByCode(session, otherDiscountCode);
-        Set<CategoryDiscount> newCategories = client.getCategories();
+        Set<CategoryDiscount> newCategories = new HashSet<>(client.getCategories());
         if (!newCategories.contains(cdOther)) {
             newCategories.add(cdOther);
             change = true;
