@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -110,8 +110,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -188,7 +188,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_EDITED_DAY = 700L;
     private static final Long RC_WRONG_GROUP = 710L;
     private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
-    private static final Long RC_REGULAR_ALREADY_DELETED = 712L;
+	private static final Long RC_REGULAR_ALREADY_DELETED = 712L;
+	private static final Long RC_INVALID_CREATOR = 720L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -243,7 +244,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INVALID_INPUT_DATA = "Неверные входные данные";
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
-    private static final String RC_REGULAR_ALREADY_DELETED_DESC = "Для выбранного комплекса или блюда не настроен повтор заказа";
+	private static final String RC_REGULAR_ALREADY_DELETED_DESC = "Для выбранного комплекса или блюда не настроен повтор заказа";
+	private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
+    private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
+    private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -4856,7 +4860,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
             return r;
         }
-        if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 2))
+        if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 1))
         {
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
@@ -5486,12 +5490,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardMobile") String guardMobile, @WebParam(name = "value") Boolean value,
-            @WebParam(name = "roleRepresentative") Integer roleRepresentative) {
+            @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal) {
         authenticateRequest(contractId);
-        return processSetGuardianship(contractId, guardMobile, value, roleRepresentative);
+        return processSetGuardianship(contractId, guardMobile, value, roleRepresentativePrincipal);
     }
 
-    private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value, Integer roleRepresentative) {
+    private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value, Integer roleRepresentativePrincipal) {
         Result result = new Result();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -5502,7 +5506,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
             }
 
-            if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 2)) {
+            if (roleRepresentativePrincipal != null && (roleRepresentativePrincipal < 0 || roleRepresentativePrincipal > 1)) {
                 throw new InvalidDataException("Возможно только законным представителем");
             }
             session = runtimeContext.createPersistenceSession();
@@ -5530,7 +5534,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         cg.setDisabled(value);
                         cg.setVersion(getClientGuardiansResultVersion(session));
                         cg.setLastUpdate(new Date());
-                        cg.setRepresentType(ClientGuardianRepresentType.fromInteger(roleRepresentative));
+                        //cg.setRepresentType(ClientGuardianRepresentType.fromInteger(roleRepresentativePrincipal));
                         session.persist(cg);
                     }
                 }
@@ -8767,17 +8771,58 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "passportSeries") String passportSeries,
             @WebParam(name = "typeCard") Integer typeCard,
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
-            @WebParam(name = "degree") Integer relation) {
+            @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
+            @WebParam(name = "degree") Long relation) {
+        //Конвертер
+        roleRepresentative += 1;
+        if (roleRepresentative == 3)
+            roleRepresentative = 0;
+        roleRepresentativePrincipal += 1;
+        if (roleRepresentativePrincipal == 3)
+            roleRepresentativePrincipal = 0;
+
 
         authenticateRequest(null);
 
+        String mobilePhoneCreator = Client.checkAndConvertMobile(creatorMobile);
         String mobilePhone = Client.checkAndConvertMobile(mobile);
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
-                || childContractId == null) {
+                || childContractId == null || StringUtils.isEmpty(mobilePhoneCreator)) {
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
+        }
+
+        //if (roleRepresentative == null)
+        //{
+        //    return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_TYPE);
+        //}
+
+        //if (roleRepresentativePrincipal == null)
+        //{
+        //    return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_CREATOR_TYPE);
+        //}
+
+        //Проверка на возможность создания
+        if (roleRepresentativePrincipal != null) {
+            boolean canAdded = false;
+            Client clientChild = DAOService.getInstance().getClientByContractId(childContractId);
+            if (clientChild == null) {
+                return new Result(RC_INVALID_DATA, RC_CLIENT_NOT_FOUND_DESC);
+            }
+            List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getClientGuardian(clientChild, mobilePhoneCreator);
+            for (ClientGuardian clientGuardian : clientGuardians) {
+                if ((clientGuardian.getRepresentType().getCode() == 0 && roleRepresentativePrincipal == 0) || (
+                        clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1)) {
+                    canAdded = true;
+                    break;
+                }
+            }
+            if (!canAdded) {
+                return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
+            }
         }
 
         Result result = new Result();
@@ -8841,8 +8886,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ClientGuardian clientGuardian = DAOUtils
                     .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
+                String description = null;
+                if (relation != null) {
+                    description = ClientGuardianRelationType.fromInteger(relation.intValue()).getDescription();
+                }
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian, ClientGuardianRelationType.fromInteger(relation).getDescription(), false, client.getIdOfClient(),
+                        .createClientGuardianInfoTransactionFree(session, guardian, description, false, client.getIdOfClient(),
                                 ClientCreatedFromType.MPGU, roleRepresentative);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
@@ -9245,9 +9294,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
-            @WebParam(name = "CultureName") String CultureName,
-            @WebParam(name = "CultureShortName") String CultureShortName,
-            @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
+            @WebParam(name = "CultureName") String cultureName,
+            @WebParam(name = "CultureShortName") String cultureShortName,
+            @WebParam(name = "CultureAddress") String cultureAddress, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
@@ -9259,15 +9308,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, "Код организации не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(CultureName)) {
+        if (StringUtils.isEmpty(cultureName)) {
             return new Result(RC_INVALID_DATA, "Ниаменование не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(CultureShortName)) {
+        if (StringUtils.isEmpty(cultureShortName)) {
             return new Result(RC_INVALID_DATA, "Краткое наименование не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(CultureAddress)) {
+        if (StringUtils.isEmpty(cultureAddress)) {
             return new Result(RC_INVALID_DATA, "Адрес организации не может быть пустым");
         }
 
@@ -9294,11 +9343,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .saveLastCardActivity(session, card.getIdOfCard(), CardActivityType.ENTER_MUSEUM);
             }
             //здесь сохранение события в таблицу и отправка уведомления
-            if (CultureName != null && CultureName.length() > 255) {
-                CultureName = CultureName.substring(0, 255);
+            if (cultureName != null && cultureName.length() > 255) {
+                cultureName = cultureName.substring(0, 255);
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
-            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureAddress,
+            ExternalEvent event = new ExternalEvent(cl, orgCode, cultureName,
+                    cultureAddress,
                     ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus.intValue()), handler);
             session.save(event);
             transaction.commit();
@@ -9308,7 +9358,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (CalendarUtils.isDateToday(accessTime)) {
                 ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
                         .getBean(ExternalEventNotificationService.class);
-                notificationService.setCultureShortName(CultureShortName);
+                notificationService.setCultureShortName(cultureShortName);
                 notificationService.sendNotification(cl, event);
             }
             return new Result(RC_OK, RC_OK_DESC);
@@ -9865,6 +9915,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             } else if (client.isSotrudnikMsk() && StringUtils.isEmpty(guardianMobile)) {
                 ClientManager.setInformSpecialMenu(session, client, null, version);
+            } else if ((client.isSotrudnikMsk() || client.isSotrudnik()) && !StringUtils.isEmpty(guardianMobile)) {
+                if (client.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
+                    ClientManager.setInformSpecialMenu(session, client, null, version);
+                } else {
+                    result.resultCode = RC_INVALID_DATA;
+                    result.description = RC_INVALID_MOBILE;
+                    return result;
+                }
             } else {
                 result.resultCode = RC_WRONG_GROUP;
                 result.description = RC_WRONG_GROUP_DESC;

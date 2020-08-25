@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -27,6 +28,7 @@ public class DiscountManager {
     private static final Logger logger = LoggerFactory.getLogger(DiscountManager.class);
     public static final String DELETE_COMMENT = "Удаление категории льгот";
     public static final String RESERV_DISCOUNT = "Резерв";
+    private static final String PROPERTY_DOU_DISCOUNT_DELETE = "ecafe.processor.clientMigrationHistory.dou.discountDelete";
 
     public static void saveDiscountHistory(Session session, Client client, Org org,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
@@ -83,6 +85,7 @@ public class DiscountManager {
         for (CategoryDiscount discount : discounts) {
             if (discount.getEligibleToDelete()) {
                 archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
+                logger.info(String.format("Delete discount id=%s, client id=%s", discount.getIdOfCategoryDiscount(), client.getIdOfClient()));
             } else {
                 discountsAfterRemove.add(discount);
             }
@@ -171,7 +174,7 @@ public class DiscountManager {
 
     public static void renewDiscounts(Session session, Client client,
             Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
-            String historyComment) throws Exception {
+            String historyComment, boolean upVersion) throws Exception {
         Integer oldDiscountMode = client.getDiscountMode();
         Integer newDiscountMode =
                 newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
@@ -181,9 +184,43 @@ public class DiscountManager {
                 oldDiscountMode, newDiscountMode, historyComment);
         client.setLastDiscountsUpdate(new Date());
         client.setCategories(newDiscounts);
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-        client.setClientRegistryVersion(clientRegistryVersion);
-        session.update(client);
+        if (upVersion) {
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            client.setClientRegistryVersion(clientRegistryVersion);
+            session.update(client);
+        }
+    }
+
+    public static void renewDiscounts(Session session, Client client,
+            Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
+            String historyComment) throws Exception {
+        renewDiscounts(session, client, newDiscounts, oldDiscounts, historyComment, true);
+    }
+
+    /*Для вызова в коде после изменения или присваивания ageTypeGroup и изменения/присваивания списка категорий льгот*/
+    public static void deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(Session session, Client client) throws Exception {
+        if (!RuntimeContext.getInstance().getPropertiesValue(PROPERTY_DOU_DISCOUNT_DELETE, "false").equals("true")) return;
+        boolean douDiscountsExist = false;
+        for (CategoryDiscount cd : client.getCategories()) {
+            if (cd.getOrgType().equals(CategoryDiscount.KINDERGARTEN_ID)) {
+                douDiscountsExist = true;
+                break;
+            }
+        }
+        if (!douDiscountsExist) return;
+        if (client.notDOUClient()) {
+            //клиент ДОУ и орга СОШ
+            deleteDOUDiscounts(session, client);
+            return;
+        }
+        if (!StringUtils.isEmpty(client.getAgeTypeGroup())) {
+            //Если не дошкол и заполнена возрастная категория, выходим
+            return;
+        }
+        if (client.getOrg().getType().equals(OrganizationType.SCHOOL)) {
+            //не заполнена возрастная категория и тип ОО = СОШ
+            deleteDOUDiscounts(session, client);
+        }
     }
 
     public static void deleteDOUDiscounts(Session session, Client client) throws Exception {
@@ -197,7 +234,7 @@ public class DiscountManager {
         }
         if (newDiscounts.equals(client.getCategories())) return;
         renewDiscounts(session, client, newDiscounts, client.getCategories(),
-                DiscountChangeHistory.MODIFY_BY_TRANSITION);
+                DiscountChangeHistory.MODIFY_BY_TRANSITION, false);
     }
 
     public static void addDiscount(Session session, Client client, CategoryDiscount categoryDiscount, String historyComment) throws Exception {

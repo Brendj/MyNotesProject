@@ -52,6 +52,7 @@ public class Client {
     public static final int INITIAL_DISCOUNT_MODE = DISCOUNT_MODE_NONE;
     public static final int DISCOUNT_MODE_BY_CATEGORY = 3;
     public static final String[] DISCOUNT_MODE_NAMES = {"Отсутствует", "Дотация", "Бесплатно", "Льгота по категориям"};
+    public static final String DOU_STRING = "дошкол";
 
     public static final int GROUP_SCHOOL = 0;
     public static final int GROUP_BEFORE_SCHOOL_OUT = 1;
@@ -250,6 +251,10 @@ public class Client {
         }
     }
 
+    public boolean notDOUClient() {
+        return ageTypeGroup == null || !ageTypeGroup.toLowerCase().contains(DOU_STRING);
+    }
+
     public Card findActiveCard(Session session, Card failCard) throws Exception {
         // Ищем активную карту
         Criteria activeClientCardCriteria = session.createCriteria(Card.class);
@@ -286,6 +291,10 @@ public class Client {
             || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue())
             || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_OTHERS.getValue())
             || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue()));
+    }
+
+    public boolean isSotrudnik() {
+        return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
     }
 
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
