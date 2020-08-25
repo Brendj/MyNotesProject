@@ -763,6 +763,46 @@ public class SchoolRestController {
         }
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ValidateRequest
+    @Path(value = "settopay")
+    public Response setToPay(SetToPayRequestDTO setToPayRequestDTO) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ISchoolApiService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new SchoolApiService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(!checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER.getIdentification())
+                    || !checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "OK")).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: %s", e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
 
     private boolean checkRolePermission(Authentication authentication, Integer idOfGroup) throws Exception {
         checkAuthentication(authentication);

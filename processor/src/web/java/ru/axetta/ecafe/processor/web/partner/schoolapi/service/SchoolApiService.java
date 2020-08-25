@@ -715,6 +715,60 @@ public class SchoolApiService implements ISchoolApiService {
         return clients;
     }
 
+    @Override
+    public List<PlanOrder> getPlanOrdersWithoutOrder(Date planDate, List<Long> contractIds, String complexName)
+            throws Exception {
+        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder"
+                + "where client.contractId in (:contractIds)"
+                + "and complexName=:reqComplexName"
+                + "and order is null"
+                + "and day(planDate)=day(:reqPlanDate)"
+                + "and month(planDate)=month(:reqPlanDate)"
+                + "and year(planDate)=year(:reqPlanDate)");
+        planOrdersQuery.setParameterList("contractIds", contractIds);
+        planOrdersQuery.setParameter("reqComplexName", complexName);
+        planOrdersQuery.setParameter("reqPlanDate",planDate);
+        List<PlanOrder> planOrders = planOrdersQuery.list();
+        return planOrders;
+    }
+
+    @Override
+    public List<PlanOrder> setToPayForPlanOrders(List<PlanOrder> planOrders, Long idOfUser, Boolean toPay)
+            throws Exception {
+        for(PlanOrder planOrder: planOrders){
+            planOrder.setToPay(toPay);
+            planOrder.setUserRequestToPay(DAOUtils.findUser(persistanceSession, idOfUser));
+            planOrder.setLastUpdate(new Date());
+            persistanceSession.update(planOrder);
+        }
+        return planOrders;
+    }
+
+    @Override
+    public List<PlanOrder> getPlanOrdersByToPay(Date planDate, List<Long> contractIds, String complexName,
+            Boolean toPay) throws Exception {
+        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder"
+                + "where client.contractId in (:contractIds)"
+                + "and complexName=:reqComplexName"
+                + "and toPay=:reqToPay"
+                + "and day(planDate)=day(:reqPlanDate)"
+                + "and month(planDate)=month(:reqPlanDate)"
+                + "and year(planDate)=year(:reqPlanDate)");
+        planOrdersQuery.setParameterList("contractIds", contractIds);
+        planOrdersQuery.setParameter("reqComplexName", complexName);
+        planOrdersQuery.setParameter("reqToPay", toPay);
+        planOrdersQuery.setParameter("reqPlanDate", planDate);
+        return planOrdersQuery.list();
+    }
+
+    @Override
+    public List<PlanOrder> createOrderForPlanOrders(List<PlanOrder> planOrders, Boolean orderState, Long idOfUser)
+            throws Exception {
+        List<PlanOrder> updatedPlanOrders = new ArrayList<>();
+
+        return null;
+    }
+
     private HashMap<String, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
         HashMap<String, List<Client>> orderedClients = new LinkedHashMap<>();
         for(Client client: clients){
