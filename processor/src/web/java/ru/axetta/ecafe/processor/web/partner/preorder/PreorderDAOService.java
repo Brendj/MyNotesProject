@@ -616,9 +616,7 @@ public class PreorderDAOService {
     }
 
     private List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
-        return emReport.createQuery("select dish.categoryItems from WtDish dish where dish = :dish")
-                .setParameter("dish", wtDish)
-                .getResultList();
+        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(wtDish);
     }
 
     public String getMenuGroupByWtDish(WtDish wtDish) {
