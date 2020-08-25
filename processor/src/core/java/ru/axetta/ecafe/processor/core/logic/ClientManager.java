@@ -2241,6 +2241,7 @@ public class ClientManager {
             DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
             builder.withDateEnd(new Date());
             builder.save(session);
+            DiscountManager.deleteOtherDiscountForClientWithNoUpdateClient(session, client);
         } catch (Exception e) {
             logger.error("Error in archiveApplicationForFoodIfClientLeaving: ", e);
         }
