@@ -4356,8 +4356,13 @@ public class DAOUtils {
         applicationForFood.setVersion(version);
         applicationForFood.setLastUpdate(new Date());
         session.update(applicationForFood);
-
-        addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, historyVersion);
+        try {
+            addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage());
+        }
         return applicationForFood;
     }
 
