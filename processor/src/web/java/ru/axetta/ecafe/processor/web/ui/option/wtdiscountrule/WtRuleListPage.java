@@ -46,6 +46,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     private String filterOrg = "Не выбрано";
     private List<Long> idOfCategoryOrgList = new ArrayList<>();
     private Set<CategoryOrg> categoryOrgs;
+    private Boolean showArchived = false;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -80,6 +81,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
         subCategory = 0;
         filterOrg = "Не выбрано";
         idOfCategoryOrgList = new ArrayList<>();
+        showArchived = false;
         return this;
     }
 
@@ -232,6 +234,14 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
 
     public void setIdOfCategoryOrgList(List<Long> idOfCategoryOrgList) {
         this.idOfCategoryOrgList = idOfCategoryOrgList;
+    }
+
+    public Boolean getShowArchived() {
+        return showArchived;
+    }
+
+    public void setShowArchived(Boolean showArchived) {
+        this.showArchived = showArchived;
     }
 
     public String getIdOfCategoryOrgListString() {

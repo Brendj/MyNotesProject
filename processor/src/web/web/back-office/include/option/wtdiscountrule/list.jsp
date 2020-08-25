@@ -50,6 +50,10 @@
             <f:selectItems value="#{wtRuleListPage.subCategories}"/>
         </h:selectOneMenu>
 
+        <h:outputText escape="false" value="Показывать архивные правила" styleClass="output-text"/>
+        <h:selectBooleanCheckbox value="#{ruleListPage.showArchived}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
         <h:panelGrid columns="2" styleClass="borderless-grid">
 
             <a4j:commandButton value="Применить" action="#{wtRuleListPage.updatePage}"
