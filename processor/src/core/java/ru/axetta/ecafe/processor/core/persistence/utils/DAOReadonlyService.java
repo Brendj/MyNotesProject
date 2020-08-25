@@ -1098,6 +1098,13 @@ public class DAOReadonlyService {
                 .getResultList();
     }
 
+    public List<WtMenu> getMenuByWtMenuGroup(WtMenuGroup wtMenuGroup) {
+        return entityManager.createQuery("select menu from WtMenu menu left join fetch menu.menuGroupMenus mgm "
+                + "where mgm.menuGroup = :wtMenuGroup ")
+                .setParameter("wtMenuGroup", wtMenuGroup)
+                .getResultList();
+    }
+
     public Boolean checkWorkingDay(Date date) {
         try {
             Query query = entityManager.createQuery(
