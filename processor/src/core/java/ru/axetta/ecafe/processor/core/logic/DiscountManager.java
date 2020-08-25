@@ -58,7 +58,7 @@ public class DiscountManager {
 
         Integer oldDiscountMode = client.getDiscountMode();
         Integer newDiscountMode = client.getDiscountMode();
-        Set<CategoryDiscount> oldCategories = client.getCategories();
+        Set<CategoryDiscount> oldCategories = new HashSet<>(client.getCategories());
         Set<CategoryDiscount> newCategories = client.getCategories();
 
         newCategories.remove(cdOther);
