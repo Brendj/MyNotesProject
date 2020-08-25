@@ -4614,7 +4614,7 @@ public class DAOUtils {
             Criteria criteria = session.createCriteria(ApplicationForFood.class);
             criteria.add(Restrictions.eq("status", status));
             criteria.add(Restrictions.eq("archived", false));
-            criteria.add(Restrictions.ilike("serviceNumber", serviceNumber));
+            criteria.add(Restrictions.eq("serviceNumber", serviceNumber));
             if (isOthers) {
                 criteria.add(Restrictions.isNull("dtisznCode"));
             }
