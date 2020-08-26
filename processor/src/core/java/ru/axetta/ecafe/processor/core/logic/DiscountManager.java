@@ -27,6 +27,7 @@ public class DiscountManager {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscountManager.class);
     public static final String DELETE_COMMENT = "Удаление категории льгот";
+    public static final String DELETE_INOE_COMMENT = "Удалено по причине окончания периода";
     public static final String RESERV_DISCOUNT = "Резерв";
     private static final String PROPERTY_DOU_DISCOUNT_DELETE = "ecafe.processor.clientMigrationHistory.dou.discountDelete";
 
@@ -48,6 +49,37 @@ public class DiscountManager {
         return sb.toString();
     }
 
+    public static void deleteOtherDiscountForClientWithNoUpdateClient(Session session, Client client) throws Exception {
+        Long otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
+        CategoryDiscount cdOther = getCategoryDiscountByCode(session, otherDiscountCode);
+        if (client.getCategories() == null || !client.getCategories().contains(cdOther)) {
+            return;
+        }
+
+        Integer oldDiscountMode = client.getDiscountMode();
+        Integer newDiscountMode = client.getDiscountMode();
+        Set<CategoryDiscount> oldCategories = new HashSet<>(client.getCategories());
+        Set<CategoryDiscount> newCategories = client.getCategories();
+
+        newCategories.remove(cdOther);
+        if (client.getCategories().size() == 0) {
+            newDiscountMode = Client.DISCOUNT_MODE_NONE;
+        }
+        saveDiscountHistory(session, client, client.getOrg(), oldCategories, newCategories,
+                oldDiscountMode, newDiscountMode, DELETE_INOE_COMMENT);
+        client.setCategories(newCategories);
+        client.setLastDiscountsUpdate(new Date());
+        //long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        //client.setClientRegistryVersion(clientRegistryVersion);
+        //session.update(client);
+    }
+
+    private static CategoryDiscount getCategoryDiscountByCode(Session session, Long idOfCategoryDiscount) {
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.eq("idOfCategoryDiscount", idOfCategoryDiscount));
+        return (CategoryDiscount)criteria.uniqueResult();
+    }
+
     public static void addOtherDiscountForClient(Session session, Client client) throws Exception {
         Long otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
 
@@ -59,10 +91,8 @@ public class DiscountManager {
         }
         Integer newDiscountMode = client.getDiscountMode();
 
-        Criteria criteria = session.createCriteria(CategoryDiscount.class);
-        criteria.add(Restrictions.eq("idOfCategoryDiscount", otherDiscountCode));
-        CategoryDiscount cdOther = (CategoryDiscount)criteria.uniqueResult();
-        Set<CategoryDiscount> newCategories = client.getCategories();
+        CategoryDiscount cdOther = getCategoryDiscountByCode(session, otherDiscountCode);
+        Set<CategoryDiscount> newCategories = new HashSet<>(client.getCategories());
         if (!newCategories.contains(cdOther)) {
             newCategories.add(cdOther);
             change = true;

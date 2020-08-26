@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -67,6 +67,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsS
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.*;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderComplexGroup;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderComplexItemExt;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
@@ -110,8 +111,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -4641,6 +4642,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 .setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     }
                     dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getCode());
+                    //////////////////////
+                    Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
+                    temp = temp-1;
+                    if (temp == -1)
+                        temp = 2;
+                    dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    /////////////////////
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
                     cs.description = dataProcess.getDescription();
@@ -4675,7 +4683,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 processClientRepresentativeList(client, data, objectFactory, session);
             }
         });
-
+        //////////////////////
+        for (ClientRepresentative clientRepresentative: data.getClientRepresentativesList().getRep())
+        {
+            Integer temp = clientRepresentative.getRoleRepresentative();
+            temp = temp-1;
+            if (temp == -1)
+                temp = 2;
+            clientRepresentative.setRoleRepresentative(temp);
+        }
+        /////////////////////
         ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
         clientRepresentativesResult.clientRepresentativesList = data.getClientRepresentativesList();
         clientRepresentativesResult.resultCode = RC_OK;
@@ -8773,6 +8790,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
             @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
             @WebParam(name = "degree") Long relation) {
+        
+        if (roleRepresentativePrincipal != 0 && roleRepresentativePrincipal != 1)
+        {
+            return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
+        }
+
         //Конвертер
         roleRepresentative += 1;
         if (roleRepresentative == 3)
@@ -8814,8 +8837,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getClientGuardian(clientChild, mobilePhoneCreator);
             for (ClientGuardian clientGuardian : clientGuardians) {
-                if ((clientGuardian.getRepresentType().getCode() == 0 && roleRepresentativePrincipal == 0) || (
-                        clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1)) {
+                if (clientGuardian.getRepresentType().getCode() == 0 ||
+                        clientGuardian.getRepresentType().getCode() == 1) {
                     canAdded = true;
                     break;
                 }
@@ -10129,12 +10152,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 res = processPreorderComplexesWithWtMenuList(contractId, date);
             }
-            ComplexGroup complexGroup = new ComplexGroup();
-            complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
-            result.setComplexGroup(complexGroup);
+            List<PreorderComplexGroup> list = res.getComplexesWithGroups();
+            if (list != null && list.size() > 0) {
+                ComplexGroup complexGroup = new ComplexGroup();
+                complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
+                result.setComplexGroup(complexGroup);
+            }
             RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getRegularPreordersList(contractId);
-            result.setRegularPreorders(regularPreordersList);
+            if (regularPreordersList.getRegularPreorders() != null && regularPreordersList.getRegularPreorders().size() > 0) {
+                result.setRegularPreorders(regularPreordersList);
+            }
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception e) {

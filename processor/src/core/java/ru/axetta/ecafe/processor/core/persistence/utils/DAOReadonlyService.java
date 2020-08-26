@@ -1080,6 +1080,31 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
+        return entityManager.createQuery("select dish.categoryItems from WtDish dish where dish = :dish")
+                .setParameter("dish", wtDish)
+                .getResultList();
+    }
+
+    public List<WtGroupItem> getGroupItemsByWtDish(WtDish wtDish) {
+        return entityManager.createQuery("select dish.groupItems from WtDish dish where dish = :dish")
+                .setParameter("dish", wtDish)
+                .getResultList();
+    }
+
+    public List<Org> getOrgsByWtMenu(WtMenu wtMenu) {
+        return entityManager.createQuery("select menu.orgs from WtMenu menu where menu = :menu")
+                .setParameter("menu", wtMenu)
+                .getResultList();
+    }
+
+    public List<WtMenu> getMenuByWtMenuGroup(WtMenuGroup wtMenuGroup) {
+        return entityManager.createQuery("select menu from WtMenu menu left join fetch menu.menuGroupMenus mgm "
+                + "where mgm.menuGroup = :wtMenuGroup ")
+                .setParameter("wtMenuGroup", wtMenuGroup)
+                .getResultList();
+    }
+
     public Boolean checkWorkingDay(Date date) {
         try {
             Query query = entityManager.createQuery(

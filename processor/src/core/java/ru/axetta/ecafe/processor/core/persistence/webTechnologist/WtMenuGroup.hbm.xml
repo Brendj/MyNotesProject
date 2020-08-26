@@ -42,11 +42,11 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
-        <many-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
             <column name="idOfContragent"/>
         </many-to-one>
 
-        <set name="menuGroupMenus" inverse="true" cascade="all" lazy="false">
+        <set name="menuGroupMenus" inverse="true" cascade="all" lazy="true">
             <key>
                 <column name="id"/>
             </key>

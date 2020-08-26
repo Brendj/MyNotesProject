@@ -2228,7 +2228,7 @@ public class ClientManager {
         archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
     }
 
-    private static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+    public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
         if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
         try {
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodInoeByClient(session, client);
@@ -2237,10 +2237,14 @@ public class ClientManager {
                 DiscountManager.archiveApplicationForFood(session, applicationForFood, version);
             }
             ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, client.getIdOfClient());
-            if (info == null) return;
-            DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
-            builder.withDateEnd(new Date());
-            builder.save(session);
+            if (info != null) {
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(
+                        info);
+                builder.withDateEnd(new Date());
+                builder.withArchived(true);
+                builder.save(session);
+            }
+            DiscountManager.deleteOtherDiscountForClientWithNoUpdateClient(session, client);
         } catch (Exception e) {
             logger.error("Error in archiveApplicationForFoodIfClientLeaving: ", e);
         }

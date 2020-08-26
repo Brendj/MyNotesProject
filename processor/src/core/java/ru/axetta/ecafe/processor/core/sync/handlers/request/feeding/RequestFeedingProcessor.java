@@ -153,7 +153,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                 ApplicationForFoodHistory history = DAOUtils
                         .getLastApplicationForFoodHistory(session, applicationForFood);
                 RequestFeedingItem resItem = null;
-                if (null == applicationForFood.getDtisznCode()) {
+                if (null == applicationForFood.getDtisznCode()) { //Тип льготы - Иное
                     ClientDtisznDiscountInfo discountInfo = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(),
                                     DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
