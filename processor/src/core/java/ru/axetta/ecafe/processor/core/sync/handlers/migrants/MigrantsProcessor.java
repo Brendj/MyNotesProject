@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,19 +80,34 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
         return result;
     }
 
+    private void updateBatch(List<CompositeIdOfMigrant> list) {
+        Query query = session.createQuery("update Migrant set syncState = :syncState where compositeIdOfMigrant in : list");
+        query.setParameter("syncState", Migrant.NOT_SYNCHRONIZED);
+        query.setParameterList("list", list);
+        query.executeUpdate();
+        list.clear();
+        session.flush();
+    }
+
     private void processCurrentActiveIncomeReqs() throws Exception {
         List<Migrant> currentMigrants = MigrantsUtils.getSyncedMigrantsForOrg(session, migrants.getIdOfOrg());
         List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>();
+        List<CompositeIdOfMigrant> list = new ArrayList<>();
         for(Migrant m : currentMigrants){
             if(!migrants.getCurrentActiveIncome().contains(m.getCompositeIdOfMigrant())){
-                m.setSyncState(Migrant.NOT_SYNCHRONIZED);
-                session.save(m);
+                //m.setSyncState(Migrant.NOT_SYNCHRONIZED);
+                //session.save(m);
+                list.add(m.getCompositeIdOfMigrant());
+                if (list.size() == 100) {
+                    updateBatch(list);
+                }
                 currentMigrantsForSync.add(m);
             }
         }
+        if (list.size() > 0) {
+            updateBatch(list);
+        }
         resolutionsForInRequests.addAll(MigrantsUtils.getResolutionsForMigrants(session, currentMigrantsForSync));
-
-        session.flush();
     }
 
     private void processResOutMigReqHisItems(
