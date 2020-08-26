@@ -81,7 +81,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     }
 
     private void updateBatch(List<CompositeIdOfMigrant> list) {
-        Query query = session.createQuery("update Migrant set syncState = :syncState where compositeIdOfMigrant in : list");
+        Query query = session.createQuery("update Migrant set syncState = :syncState where compositeIdOfMigrant in :list");
         query.setParameter("syncState", Migrant.NOT_SYNCHRONIZED);
         query.setParameterList("list", list);
         query.executeUpdate();
