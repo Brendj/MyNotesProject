@@ -8859,22 +8859,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         //}
 
         //Проверка на возможность создания
-        boolean canAdded = false;
         Client clientChild = DAOService.getInstance().getClientByContractId(childContractId);
         if (clientChild == null) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_NOT_FOUND_DESC);
         }
-        List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getClientGuardian(clientChild, mobilePhoneCreator);
-        for (ClientGuardian clientGuardian : clientGuardians) {
-            if (clientGuardian.getRepresentType().getCode() == 1 || clientGuardian.getRepresentType().getCode() == 2) {
-                canAdded = true;
-                break;
-            }
+        List<Client> clientGuardians = null;
+        try {
+            clientGuardians = DAOReadExternalsService.getInstance()
+                    .findGuardiansByClient(clientChild.getIdOfClient(), null);
+        } catch (Exception e)
+        {
+            clientGuardians = new ArrayList<>();
         }
-        if (!canAdded) {
+
+        if (clientGuardians.isEmpty())
             return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
-        }
+
 
         Result result = new Result();
         Session session = null;
