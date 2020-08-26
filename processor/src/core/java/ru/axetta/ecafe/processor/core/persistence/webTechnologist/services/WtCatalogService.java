@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
@@ -23,9 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 
 @Component
@@ -195,7 +192,6 @@ public class WtCatalogService {
 
             Criteria criteria = session.createCriteria(WtCategory.class);
             criteria.createAlias("user", "u", JoinType.INNER_JOIN);
-            criteria.createAlias("categoryItems", "ci", JoinType.LEFT_OUTER_JOIN);
             criteria.addOrder(Order.asc("createDate"));
             result = criteria.list();
 
@@ -228,45 +224,6 @@ public class WtCatalogService {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.close(session, logger);
-        }
-    }
-
-    public WtCategory createCategory(String description, User user) throws Exception {
-        if (StringUtils.isBlank(description)) {
-            throw new IllegalArgumentException("Invalid description (NULL or is empty)");
-        } else if (user == null) {
-            throw new IllegalArgumentException("User is NULL");
-        }
-
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            WtCategory item = new WtCategory();
-            Long nextVersion = getLastVersionCategory(session) + 1L;
-            Date createdDate = new Date();
-
-            item.setCreateDate(createdDate);
-            item.setLastUpdate(createdDate);
-            item.setUser(user);
-            item.setDescription(description);
-            item.setVersion(nextVersion);
-            item.setGuid(UUID.randomUUID().toString());
-            item.setDeleteState(WtCategoryItem.ACTIVE);
-
-            session.save(item);
-            transaction.commit();
-            transaction = null;
-
-            return item;
-        } catch (Exception e) {
-            logger.error("", e);
-            throw e;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
@@ -377,60 +334,5 @@ public class WtCatalogService {
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;
-    }
-
-    public Boolean catalogItemIsChange(WtCategory item, Session session) {
-        if(item == null){
-            return false;
-        }
-        Query query = session.createSQLQuery(
-                "SELECT description NOT LIKE :newDescription OR deletestate != :deleteState \n"
-                + "FROM cf_wt_categories\n"
-                + "WHERE idofcategory = :idOfCategory"
-        );
-        query.setParameter("newDescription", item.getDescription());
-        query.setParameter("idOfCategory", item.getIdOfCategory());
-        query.setParameter("deleteState", item.getDeleteState());
-        return (Boolean) query.uniqueResult();
-    }
-
-    public WtCategoryItem createCategoryItem(String descriptionForNewCategory, WtCategory selectedItem, User currentUser) throws Exception {
-        if (StringUtils.isBlank(descriptionForNewCategory)) {
-            throw new IllegalArgumentException("Invalid description (NULL or is empty)");
-        } else if (currentUser == null) {
-            throw new IllegalArgumentException("User is NULL");
-        }
-
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            WtCategoryItem item = new WtCategoryItem();
-            Long nextVersion = getLastVersionCategoryItem(session) + 1L;
-            Date createdDate = new Date();
-
-            item.setCreateDate(createdDate);
-            item.setLastUpdate(createdDate);
-            item.setUser(currentUser);
-            item.setDescription(descriptionForNewCategory);
-            item.setVersion(nextVersion);
-            item.setGuid(UUID.randomUUID().toString());
-            item.setDeleteState(WtCategoryItem.ACTIVE);
-            item.setWtCategory(selectedItem);
-
-            session.save(item);
-            transaction.commit();
-            transaction = null;
-
-            return item;
-        } catch (Exception e) {
-            logger.error("", e);
-            throw e;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
     }
 }

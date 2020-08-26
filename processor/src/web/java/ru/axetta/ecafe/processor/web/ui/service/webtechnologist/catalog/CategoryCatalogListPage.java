@@ -56,17 +56,13 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
         descriptionFilter = "";
     }
 
-    public void clearDescriptionForNewCatalog() {
-        descriptionForNewItem = "";
-    }
-
     public void createNewCatalog() {
         if(StringUtils.isBlank(descriptionForNewCategory)){
             printError("Введите описание категории");
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
-            WtCategory item =  service.createCategory(descriptionForNewCategory, currentUser);
+            WtCategory item =  WtCategory.build(descriptionForNewCategory, currentUser);
             catalogListItem.add(item);
         } catch (Exception e){
             logger.error("Can't create new element: ", e);
@@ -76,22 +72,24 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
         }
     }
 
+
     public void createNewItem() {
         if(StringUtils.isBlank(descriptionForNewItem)){
             printError("Введите описание элемента");
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
-            WtCategoryItem item =  service.createCategoryItem(descriptionForNewCategory, selectedItem, currentUser);
-            categoryItemsSelectedCategory.add(item);
+            WtCategoryItem item = WtCategoryItem.build(descriptionForNewItem, selectedItem, currentUser);
+            selectedItem.getCategoryItems().add(item);
         } catch (Exception e){
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать элемент: " + e.getMessage());
         } finally {
-            descriptionForNewCategory = "";
+            descriptionForNewItem = "";
         }
     }
 
+    //TODO: Переработать кнопки удаления на странице. После применения изменений делать перекачку данных
     public void applyChanges() {
         Session session = null;
         Transaction transaction = null;
@@ -102,14 +100,35 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Long nextVersion = service.getLastVersionCategory(session) + 1L;
+            Long nextVersionForCategory = service.getLastVersionCategory(session) + 1L;
+            Long nextVersionForItem = service.getLastVersionCategoryItem(session) + 1L;
             Date updateDate = new Date();
 
             for (WtCategory item : catalogListItem) {
-                if(service.catalogItemIsChange(item, session)) {
-                    item.setLastUpdate(updateDate);
-                    item.setVersion(nextVersion);
-                    session.merge(item);
+                if(item.getIdOfCategory() == null){
+                    item.setVersion(nextVersionForCategory);
+                    session.save(item);
+                } else {
+                    WtCategory categoryFromBD = (WtCategory) session.get(WtCategory.class, item.getIdOfCategory());
+                    if(!categoryFromBD.equals(item)) {
+                        for(WtCategoryItem categoryItem : item.getCategoryItems()){
+                            if(categoryItem.getIdOfCategoryItem() == null){
+                                categoryItem.setVersion(nextVersionForCategory);
+                                session.save(categoryItem);
+                            } else {
+                                WtCategoryItem itemFromBD = (WtCategoryItem) session
+                                        .get(WtCategoryItem.class, categoryItem.getIdOfCategoryItem());
+                                if(!itemFromBD.equals(categoryItem)){
+                                    categoryItem.setLastUpdate(updateDate);
+                                    categoryItem.setVersion(nextVersionForItem);
+                                    session.merge(categoryItem);
+                                }
+                            }
+                        }
+                        item.setLastUpdate(updateDate);
+                        item.setVersion(nextVersionForCategory);
+                        session.merge(item);
+                    }
                 }
             }
 

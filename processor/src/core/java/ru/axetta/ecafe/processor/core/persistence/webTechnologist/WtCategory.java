@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 //@Entity
 //@Table(name = "cf_wt_categories")
@@ -52,6 +49,20 @@ public class WtCategory {
 
     //@OneToMany
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
+
+    public static WtCategory build(String description, User currentUser) {
+        WtCategory item = new WtCategory();
+        Date createdDate = new Date();
+
+        item.setCreateDate(createdDate);
+        item.setLastUpdate(createdDate);
+        item.setUser(currentUser);
+        item.setDescription(description);
+        item.setGuid(UUID.randomUUID().toString());
+        item.setDeleteState(WtCategoryItem.ACTIVE);
+
+        return item;
+    }
 
     public Set<WtCategoryItem> getCategoryItems() {
         return categoryItems;
@@ -142,11 +153,14 @@ public class WtCategory {
             return false;
         }
         WtCategory that = (WtCategory) o;
-        return Objects.equals(getIdOfCategory(), that.getIdOfCategory());
+        return Objects.equals(getIdOfCategory(), that.getIdOfCategory()) && Objects.equals(getGuid(), that.getGuid())
+                && Objects.equals(getDescription(), that.getDescription()) && Objects
+                .equals(getCategoryItems(), that.getCategoryItems())
+                && Objects.equals(getDeleteState(), that.getDeleteState());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIdOfCategory());
+        return Objects.hash(getIdOfCategory(), getGuid(), getDescription(), getCategoryItems(), getDeleteState());
     }
 }

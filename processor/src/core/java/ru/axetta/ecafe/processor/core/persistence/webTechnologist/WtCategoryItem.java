@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 //@Entity
 //@Table(name = "cf_wt_category_items")
@@ -53,6 +50,21 @@ public class WtCategoryItem {
     /*@ManyToOne
     @JoinColumn(name = "idofwtcategory")*/
     private WtCategory wtCategory;
+
+    public static WtCategoryItem build(String description, WtCategory selectedItem, User currentUser) {
+        WtCategoryItem item = new WtCategoryItem();
+        Date createdDate = new Date();
+
+        item.setCreateDate(createdDate);
+        item.setLastUpdate(createdDate);
+        item.setUser(currentUser);
+        item.setDescription(description);
+        item.setGuid(UUID.randomUUID().toString());
+        item.setDeleteState(WtCategoryItem.ACTIVE);
+        item.setWtCategory(selectedItem);
+
+        return item;
+    }
 
     public WtCategory getWtCategory() {
         return wtCategory;
@@ -139,17 +151,17 @@ public class WtCategoryItem {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof WtCategoryItem)) {
             return false;
         }
         WtCategoryItem that = (WtCategoryItem) o;
-        return Objects.equals(idOfCategoryItem, that.idOfCategoryItem) && Objects.equals(createDate, that.createDate)
-                && Objects.equals(lastUpdate, that.lastUpdate) && Objects.equals(version, that.version) && Objects
-                .equals(guid, that.guid) && Objects.equals(description, that.description);
+        return Objects.equals(getIdOfCategoryItem(), that.getIdOfCategoryItem()) && Objects
+                .equals(getGuid(), that.getGuid()) && Objects.equals(getDescription(), that.getDescription())
+                && Objects.equals(getDeleteState(), that.getDeleteState());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfCategoryItem, createDate, lastUpdate, version, guid, description);
+        return Objects.hash(getIdOfCategoryItem(), getGuid(), getDescription(), getDeleteState());
     }
 }
