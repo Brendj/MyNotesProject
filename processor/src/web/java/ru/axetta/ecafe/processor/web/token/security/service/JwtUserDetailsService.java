@@ -44,7 +44,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return new JwtUserDetailsImpl(user, null, null);
+            return new JwtUserDetailsImpl(user);
         }
         catch (Exception e){
             throw e;

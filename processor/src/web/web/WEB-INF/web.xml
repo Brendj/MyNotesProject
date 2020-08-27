@@ -519,7 +519,7 @@
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
             <param-name>resteasy.resources</param-name>
-            <param-value>ru.axetta.ecafe.processor.web.partner.foodpayment.SchoolRestController</param-value>
+            <param-value>ru.axetta.ecafe.processor.web.partner.schoolapi.SchoolRestController</param-value>
         </init-param>
         <init-param>
             <param-name>resteasy.servlet.mapping.prefix</param-name>

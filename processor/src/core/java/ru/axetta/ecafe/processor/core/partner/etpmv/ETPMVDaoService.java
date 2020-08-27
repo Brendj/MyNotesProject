@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.partner.etpmv;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,12 +197,22 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public List<ApplicationForFood> confirmFromAISContingent(String guid, Long nextVersion, Long historyVersion) {
+    public List<ApplicationForFood> confirmFromAISContingent(String guid, String meshGuid, Long nextVersion, Long historyVersion) {
         List<ApplicationForFood> result = new ArrayList<ApplicationForFood>();
         Session session = entityManager.unwrap(Session.class);
+        String condition = "";
+        if (!StringUtils.isEmpty(guid)) {
+            condition = "c.clientGUID = :guid";
+        } else if (!StringUtils.isEmpty(meshGuid)) {
+            condition = "c.meshGUID = :guid";
+        }
         Query query = entityManager.createQuery("select app from ApplicationForFood app "
-                + "where app.client.idOfClient in (select c.idOfClient from Client c where c.clientGUID = :guid) and app.sendToAISContingent = false");
-        query.setParameter("guid", guid);
+                + "where app.client.idOfClient in (select c.idOfClient from Client c where " + condition + ") and app.sendToAISContingent = false");
+        if (!StringUtils.isEmpty(guid)) {
+            query.setParameter("guid", guid);
+        } else if (!StringUtils.isEmpty(meshGuid)) {
+            query.setParameter("guid", meshGuid);
+        }
         List<ApplicationForFood> apps = query.getResultList();
         ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null);
         for (ApplicationForFood applicationForFood : apps) {

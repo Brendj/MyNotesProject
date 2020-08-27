@@ -106,7 +106,7 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runImportRegisterClients() throws Exception {
-        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+        RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                 .run(); //DEF
         printMessage("Импорт клиентов из Реестров выполнен");
     }
@@ -174,13 +174,13 @@ public class OtherActionsPage extends OnlineReportPage {
     public void cleaningMenu() {
         MaintenanceService maintenanceService = new MaintenanceService();
         maintenanceService.run();
-        printMessage("Очистка выполнена. Смотри лог");
+        printMessage("Очистка выполнена");
     }
 
-    public void endBenefitNotification() {
-        BenefitService service = RuntimeContext.getAppContext().getBean(BenefitService.class);
-        service.runEndBenefit(true);
-        printMessage("Оповещения об окончании срока действия льготы отправлены. Смотри лог");
+    public void cleaningMenuVersion2() {
+        MaintenanceService maintenanceService = RuntimeContext.getAppContext().getBean(MaintenanceService.class);
+        maintenanceService.runVersion2();
+        printMessage("Процесс запущен");
     }
 
     public void runSendEMPEventEMIAS() throws Exception {
@@ -249,12 +249,6 @@ public class OtherActionsPage extends OnlineReportPage {
     public void repairNSI() throws Exception {
         RuntimeContext.getAppContext().getBean(NSIRepairService.class).run(); //DEF
         printMessage("Записи из Реестров исправлены");
-    }
-
-    public void runRegularPayments() throws Exception {
-        RegularPaymentSubscriptionService regularPaymentSubscriptionService = RuntimeContext.getInstance()
-                .getRegularPaymentSubscriptionService();
-        regularPaymentSubscriptionService.checkClientBalances();
     }
 
     public void runShowShortLog() throws Exception {
@@ -775,25 +769,6 @@ public class OtherActionsPage extends OnlineReportPage {
             getLogger().error("Error update card uids: ", e);
             printError("Во время обработки дублей клиентов произошла ошибка с текстом " + e.getMessage());
         }
-    }
-
-    public void runEventNotificationServiceForDaily() {
-        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
-        Date today = new Date(System.currentTimeMillis());
-        Date endDate = CalendarUtils.endOfDay(today);
-        Date startDate = CalendarUtils.truncateToDayOfMonth(today);
-        service.run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue(),
-                true);
-    }
-
-    public void runEventNotificationServiceForWeekly() {
-        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
-        Date today = new Date(System.currentTimeMillis());
-        Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
-        Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
-        Date endDate = CalendarUtils.endOfDay(dates[1]);
-        service.run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(),
-                true);
     }
 
     public void runMSRToFTP() {

@@ -278,7 +278,7 @@ public interface ClientRoomController {
     @WebMethod Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardMobile") String guardMobile,
             @WebParam(name = "value") Boolean value,
-            @WebParam(name = "roleRepresentative") Integer roleRepresentative);
+            @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal);
 
     @WebMethod EnterEventStatusListResult getEnterEventStatusListByGUID(@WebParam(name = "guid") List<String> guids);
 
@@ -498,14 +498,18 @@ public interface ClientRoomController {
 
     @WebMethod ClientContractIdResult getContractIdByGUID(@WebParam(name = "GUID") String guid);
 
-    @WebMethod Result addGuardian(@WebParam(name = "firstName") String firstName,
+    @WebMethod
+    Result addGuardian(@WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
             @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
-            @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile,
-            @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "passportSeries") String passportSeries,
+            @WebParam(name = "childContractId") Long childContractId,
+            @WebParam(name = "creatorMobile") String creatorMobile,
+            @WebParam(name = "passportNumber") String passportNumber,
+            @WebParam(name = "passportSeries") String passportSeries,
             @WebParam(name = "typeCard") Integer typeCard,
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
-            @WebParam(name = "degree") Integer relation);
+            @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
+            @WebParam(name = "degree") Long relation);
 
     /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
@@ -598,7 +602,8 @@ public interface ClientRoomController {
     @WebMethod(operationName = "removeRequestForCashOut")
     Result removeRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "idOfRequest") Long idOfRequest);
     @WebMethod(operationName = "checkApplicationForFood")
-    CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid);
+    CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid,
+            @WebParam(name = "meshGuid") String meshGuid);
 
     @WebMethod(operationName = "registerApplicationForFood")
     Result registerApplicationForFood(@WebParam(name = "clientGuid") String clientGuid, @WebParam(name = "categoryDiscount") Long categoryDiscount,

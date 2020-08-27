@@ -177,12 +177,19 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setPerson(person);
                 session.save(person);
             }
-            if(userOrg.idOfOrg != null)
-                user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
-            else
-                user.setOrg(null);
-            if(userIdOfClient != null)
-                user.setClient((Client) session.load(Client.class, userIdOfClient));
+            if(userIdOfClient != null) {
+                Client userClient = (Client) session.load(Client.class, userIdOfClient);
+                user.setClient(userClient);
+                if(userClient != null && userClient.getOrg() != null)
+                    user.setOrg(userClient.getOrg());
+                else {
+                    if(userOrg.idOfOrg != null)
+                        user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+                    else
+                        user.setOrg(null);
+                }
+
+            }
             else
                 user.setClient(null);
             user.setPhone(phone);
@@ -1034,6 +1041,11 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             this.firstName = client.getPerson().getFirstName();
             this.secondName = client.getPerson().getSecondName();
             this.surname = client.getPerson().getSurname();
+            if(client.getOrg() != null)
+            {
+                this.userOrg = new OrgItem(client.getOrg().getIdOfOrg(), client.getOrg().getShortName());
+                this.userOrgName = this.userOrg.getShortName();
+            }
         }
     }
 }

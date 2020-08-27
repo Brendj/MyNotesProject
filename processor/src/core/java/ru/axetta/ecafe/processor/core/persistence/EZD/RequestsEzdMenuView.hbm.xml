@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView" table="cf_ezd_request_new">
+        <cache usage="transactional"/>
+        <id name="id" column="id" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOforg" column="idoforg" type="long" />
+        <property name="guid" column="guid" type="string" length="32"/>
+        <property name="ekisid" column="ekisid" type="long" />
+        <property name="idofcomplex" column="idofcomplex" type="long" />
+        <property name="complexname" column="complexname" type="string" length="32"/>
+        <property name="menuDate" column="menudate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+    </class>
+</hibernate-mapping>
+

@@ -11,16 +11,16 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.net.UnknownServiceException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,9 +31,26 @@ import java.util.List;
  */
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class FrontControllerProcessor {
     private final Logger logger = LoggerFactory.getLogger(FrontControllerProcessor.class);
+    private final ImportClientRegisterService importClientRegisterService = getImportClientRegisterService();
+    private final int REGISTRY_CHANGE_ITEM_PARAM_ROWS_COUNT = 31; // Для инициализации массива в loadRegistryChangeItemsV2_ForClassName
 
+    private ImportClientRegisterService getImportClientRegisterService() {
+        try {
+            if (RuntimeContext.RegistryType.isMsk()) {
+                return RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class);
+            } else if (RuntimeContext.RegistryType.isSpb()) {
+                return RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class);
+            } else {
+                throw new UnknownServiceException("Unknown RegistryType for ImportClientRegisterService");
+            }
+        } catch (Exception e){
+            logger.error("Can't init ImportClientRegisterService, set as Unsupported. Exception:", e);
+            return RuntimeContext.getAppContext().getBean(UnsupportedImportClientRegisterService.class);
+        }
+    }
 
     public List<RegistryChangeItem> loadRegistryChangeItems(long idOfOrg,
             long revisionDate) {
@@ -90,32 +107,37 @@ public class FrontControllerProcessor {
         return loadRegistryChangeItemsV2_ForClassName(idOfOrg, revisionDate, actionFilter, nameFilter, "RegistryChangeEmployee");
     }
 
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_WithFullFIO(long idOfOrg, long revisionDate, Integer actionFilter,
+            String lastName, String firstName, String patronymic) {
+        return loadRegistryChangeItemsV2_ForClassName_WithFullFIO(idOfOrg, revisionDate, actionFilter, lastName, firstName, patronymic, "RegistryChange");
+    }
+
     public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(long idOfOrg, long revisionDate, Integer actionFilter,
             String nameFilter) {
         return loadRegistryChangeItemsV2_ForClassName(idOfOrg, revisionDate, actionFilter, nameFilter, "RegistryChange");
     }
 
-    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_ForClassName(long idOfOrg, long revisionDate, Integer actionFilter,
-            String nameFilter, String className) {
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_ForClassName_WithFullFIO(long idOfOrg, long revisionDate, Integer actionFilter,
+            String lastName, String firstName, String patronymic, String className) {
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy");
 
         try {
-            List<RegistryChangeItemV2> itemParams = new ArrayList<RegistryChangeItemV2>();
+            List<RegistryChangeItemV2> itemParams = new LinkedList<>();
 
             List<RegistryChange> changes = DAOService.getInstance()
-                    .getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter, className);
+                    .getLastRegistryChanges_WithFullFIO(idOfOrg, revisionDate, actionFilter, lastName, firstName, patronymic, className);
 
             RegistryChangeItemV2 registryChangeItemV2;
-
             List<RegistryChangeItemParam> registryChangeItemParams;
 
             for (RegistryChange c : changes) {
                 registryChangeItemV2 = new RegistryChangeItemV2();
-                registryChangeItemParams = new ArrayList<RegistryChangeItemParam>();
+                registryChangeItemParams = new ArrayList<>(REGISTRY_CHANGE_ITEM_PARAM_ROWS_COUNT);
 
                 RegistryChangeItemParam r0 = new RegistryChangeItemParam("idOfOrg", c.getIdOfOrg().toString());
                 registryChangeItemParams.add(r0);
 
-                RegistryChangeItemParam r1 = new RegistryChangeItemParam("idOfMigrateOrgTo",  c.getIdOfMigrateOrgTo() == null ? "-1" : c.getIdOfMigrateOrgTo().toString());
+                RegistryChangeItemParam r1 = new RegistryChangeItemParam("idOfMigrateOrgTo", c.getIdOfMigrateOrgTo() == null ? "-1" : c.getIdOfMigrateOrgTo().toString());
                 registryChangeItemParams.add(r1);
 
                 RegistryChangeItemParam r2 = new RegistryChangeItemParam("idOfMigrateOrgFrom", c.getIdOfMigrateOrgFrom() == null ? "-1" : c.getIdOfMigrateOrgFrom().toString());
@@ -169,8 +191,6 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r18 = new RegistryChangeItemParam("gender", c.getGender() == null ? "" : c.getGender().toString());
                 registryChangeItemParams.add(r18);
 
-                SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
                 RegistryChangeItemParam r19 = new RegistryChangeItemParam("birthDate", c.getBirthDate() == null ? "" : dateTimeFormat.format(new Date(c.getBirthDate())));
                 registryChangeItemParams.add(r19);
 
@@ -180,7 +200,7 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r21 = new RegistryChangeItemParam("genderFrom", c.getGenderFrom() == null ? "" : c.getGenderFrom().toString());
                 registryChangeItemParams.add(r21);
 
-                RegistryChangeItemParam r22 = new RegistryChangeItemParam("birthDateFrom", c.getBirthDateFrom() == null ? "" : c.getBirthDateFrom().toString());
+                RegistryChangeItemParam r22 = new RegistryChangeItemParam("birthDateFrom", c.getBirthDateFrom() == null ? "" : dateTimeFormat.format(c.getBirthDateFrom()));
                 registryChangeItemParams.add(r22);
 
                 RegistryChangeItemParam r23 = new RegistryChangeItemParam("oldDiscounts", c.getCheckBenefitsSafe() ? c.getOldDiscounts()== null ? "" : c.getOldDiscounts() : null);
@@ -222,15 +242,20 @@ public class FrontControllerProcessor {
         }
     }
 
-    private List loadRegistryChangeRevisionsByClassName(long idOfOrg, String className) {
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_ForClassName(long idOfOrg, long revisionDate, Integer actionFilter,
+            String nameFilter, String className) {
+        return loadRegistryChangeItemsV2_ForClassName_WithFullFIO(idOfOrg, revisionDate, actionFilter,
+                nameFilter, null, null, className);
+    }
+
+    private List<RegistryChangeRevisionItem> loadRegistryChangeRevisionsByClassName(long idOfOrg, String className) {
         try {
-            List queryResult = DAOService.getInstance().getRegistryChangeRevisions(idOfOrg, className);
-            if(queryResult == null || queryResult.size() < 1) {
+            List<Object[]> queryResult = DAOService.getInstance().getRegistryChangeRevisions(idOfOrg, className);
+            if(CollectionUtils.isEmpty(queryResult)) {
                 return Collections.EMPTY_LIST;
             }
-            List<RegistryChangeRevisionItem> result = new ArrayList<RegistryChangeRevisionItem>();
-            for(Object o : queryResult) {
-                Object entry [] = (Object[]) o;
+            List<RegistryChangeRevisionItem> result = new ArrayList<>();
+            for(Object[] entry : queryResult) {
                 long date = (Long) entry[0];
                 int type = (Integer) entry[1];
                 result.add(new RegistryChangeRevisionItem(date, type));
@@ -252,15 +277,10 @@ public class FrontControllerProcessor {
 
     public List<RegistryChangeItem> refreshRegistryChangeEmployeeItems(long idOfOrg) throws Exception {
         try {
-                RuntimeContext.getAppContext().getBean("importRegisterEmployeeService", ImportRegisterEmployeeService.class)
+                RuntimeContext.getAppContext().getBean("importRegisterEmployeeService", ImportRegisterMSKEmployeeService.class)
                         .syncEmployeesWithRegistry(idOfOrg, new StringBuffer());
             return loadRegistryChangeEmployeeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
-        } catch (BadOrgGuidsException e) {
-            throw new FrontController.FrontControllerException(e.getMessage());
-        } catch (ServiceTemporaryUnavailableException e) {
-            logger.error("Failed to refresh registry change items", e);
-            throw new FrontController.FrontControllerException(e.getMessage());
-        } catch (RegistryTimeDeltaException e) {
+        } catch (BadOrgGuidsException | ServiceTemporaryUnavailableException | RegistryTimeDeltaException e) {
             logger.error("Failed to refresh registry change items", e);
             throw new FrontController.FrontControllerException(e.getMessage());
         } catch (Exception e) {
@@ -271,20 +291,9 @@ public class FrontControllerProcessor {
 
     public List<RegistryChangeItem> refreshRegistryChangeItems(long idOfOrg) throws Exception {
         try {
-            if(RuntimeContext.RegistryType.isMsk()) {
-                RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
-                        .syncClientsWithRegistry(idOfOrg, false, new StringBuffer(), true);
-            } else if(RuntimeContext.RegistryType.isSpb()) {
-                RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
-                        .syncClientsWithRegistry(idOfOrg);
-            }
+            importClientRegisterService.syncClientsWithRegistry(idOfOrg, false, new StringBuffer(), true);
             return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
-        } catch (BadOrgGuidsException e) {
-            throw new FrontController.FrontControllerException(e.getMessage());
-        } catch (ServiceTemporaryUnavailableException e) {
-            logger.error("Failed to refresh registry change items", e);
-            throw new FrontController.FrontControllerException(e.getMessage());
-        } catch (RegistryTimeDeltaException e) {
+        } catch (BadOrgGuidsException | ServiceTemporaryUnavailableException | RegistryTimeDeltaException e) {
             logger.error("Failed to refresh registry change items", e);
             throw new FrontController.FrontControllerException(e.getMessage());
         } catch (Exception e) {
@@ -294,88 +303,39 @@ public class FrontControllerProcessor {
     }
 
     public List<RegistryChangeItemV2> refreshRegistryChangeItemsV2(long idOfOrg) throws Exception {
-        try {
-            if(RuntimeContext.RegistryType.isMsk()) {
-                RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
-                        .syncClientsWithRegistry(idOfOrg, false, new StringBuffer(), true);
-            } else if(RuntimeContext.RegistryType.isSpb()) {
-                RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
-                        .syncClientsWithRegistry(idOfOrg);
-            }
-            return loadRegistryChangeItemsV2(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
-        } catch (BadOrgGuidsException eGuid) {
-            throw eGuid;
-        }
-        catch (Exception e) {
-            throw e;
-        }
+        importClientRegisterService.syncClientsWithRegistry(idOfOrg, false, new StringBuffer(), true);
+        return loadRegistryChangeItemsV2(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
     }
 
     public List<RegistryChangeItemV2> refreshRegistryChangeEmployeeItemsV2(long idOfOrg) throws Exception {
-        try {
-            RuntimeContext.getAppContext().getBean("importRegisterEmployeeService", ImportRegisterEmployeeService.class)
-                  .syncEmployeesWithRegistry(idOfOrg, new StringBuffer());
-            return loadRegistryChangeItemsEmployeeV2(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
-        } catch (BadOrgGuidsException eGuid) {
-            throw eGuid;
-        }
-        catch (Exception e) {
-            throw e;
-        }
+        RuntimeContext.getAppContext().getBean("importRegisterEmployeeService", ImportRegisterMSKEmployeeService.class)
+              .syncEmployeesWithRegistry(idOfOrg, new StringBuffer());
+        return loadRegistryChangeItemsEmployeeV2(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
     }
 
-    public List<RegistryChangeCallback> proceedRegitryChangeItem(List<Long> changesList,
-                                            int operation,
-                                            boolean fullNameValidation) {
-        if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
+    public List<RegistryChangeCallback> proceedRegistryChangeItem(List<Long> changesList, int operation, boolean fullNameValidation) {
+        if (operation != RegistryChangeItem.APPLY_REGISTRY_CHANGE || CollectionUtils.isEmpty(changesList)) {
             return Collections.EMPTY_LIST;
         }
 
-        List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
+        List<RegistryChangeCallback> result = Collections.EMPTY_LIST;
         try {
-            if(changesList == null || changesList.size() < 1) {
-                return Collections.EMPTY_LIST;
-            }
-
-            if(RuntimeContext.RegistryType.isMsk()) {
-                result = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
-                        .applyRegistryChangeBatch(changesList, fullNameValidation, null);
-            } else {
-                for (Long idOfRegistryChange : changesList) {
-                    try {
-                        RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
-                                    .applyRegistryChange(idOfRegistryChange, fullNameValidation);
-                        result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
-                    } catch (Exception e1) {
-                        logger.error("Error sverka: ", e1);
-                            RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
-                                    .setChangeError(idOfRegistryChange, e1);
-                        result.add(new RegistryChangeCallback(idOfRegistryChange, e1.getMessage()));
-                    }
-                }
-            }
+            result = importClientRegisterService.applyRegistryChangeBatch(changesList, fullNameValidation, null);
         } catch (Exception e) {
             logger.error("Failed to commit registry change item", e);
         }
         return result;
     }
 
-    public List<RegistryChangeCallback> proceedRegitryEmployeeChangeItem(List<Long> changesList,
-            int operation,
-            boolean fullNameValidation,
-            String groupName) {
-        if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
+    public List<RegistryChangeCallback> proceedRegistryEmployeeChangeItem(List<Long> changesList, int operation,
+            boolean fullNameValidation, String groupName) {
+        if (operation != RegistryChangeItem.APPLY_REGISTRY_CHANGE || CollectionUtils.isEmpty(changesList)) {
             return Collections.EMPTY_LIST;
         }
 
-        List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
+        List<RegistryChangeCallback> result = Collections.EMPTY_LIST;
         try {
-            if(changesList == null || changesList.size() < 1) {
-                return Collections.EMPTY_LIST;
-            }
-
-                result = RuntimeContext.getAppContext().getBean("importRegisterEmployeeService", ImportRegisterEmployeeService.class)
-                        .applyRegistryChangeBatch(changesList, fullNameValidation, groupName);
+            result = importClientRegisterService.applyRegistryChangeBatch(changesList, fullNameValidation, groupName);
         } catch (Exception e) {
             logger.error("Failed to commit registry change item", e);
         }
@@ -383,13 +343,14 @@ public class FrontControllerProcessor {
     }
 
     public List<RegistryChangeErrorItem> loadRegistryChangeEmployeeErrorItems(long idOfOrg) {
-        return new ArrayList<RegistryChangeErrorItem>();
+        return new ArrayList<>();
     }
 
     public List<RegistryChangeErrorItem> loadRegistryChangeErrorItems(long idOfOrg) {
         try {
-            List<RegistryChangeErrorItem> items = new ArrayList<RegistryChangeErrorItem>();
+            List<RegistryChangeErrorItem> items = new LinkedList<>();
             List<RegistryChangeError> errors = DAOService.getInstance().getRegistryChangeErrors(idOfOrg);
+
             for (RegistryChangeError e : errors) {
                 String orgName = DAOService.getInstance().findOrById(e.getIdOfOrg()).getOfficialName();
                 RegistryChangeErrorItem i = new RegistryChangeErrorItem(e.getIdOfRegistryChangeError(), e.getIdOfOrg(),
@@ -406,10 +367,7 @@ public class FrontControllerProcessor {
         }
     }
 
-    public String addRegistryChangeError(long idOfOrg,
-            long revisionDate,
-            String error,
-            String errorDetails) {
+    public String addRegistryChangeError(long idOfOrg, long revisionDate, String error, String errorDetails) {
         try {
             DAOService.getInstance().addRegistryChangeError(idOfOrg, revisionDate, error, errorDetails);
             return null;
@@ -419,15 +377,9 @@ public class FrontControllerProcessor {
         }
     }
 
-    public String commentRegistryChangeError(long idOfRegistryChangeError,
-            String comment,
-            String author) {
+    public String commentRegistryChangeError(long idOfRegistryChangeError, String comment, String author) {
         try {
-            if(RuntimeContext.RegistryType.isMsk()) {
-                RegistryChangeError e = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
-            } else if(RuntimeContext.RegistryType.isSpb()) {
-                RegistryChangeError e = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
-            }
+            RegistryChangeError e = importClientRegisterService.getRegistryChangeError(idOfRegistryChangeError);
             DAOService.getInstance().addRegistryChangeErrorComment(idOfRegistryChangeError, comment, author);
             return null;
         } catch (Exception e) {

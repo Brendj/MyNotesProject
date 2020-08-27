@@ -82,7 +82,7 @@
             <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
             <element id="library" level="project" name="xades" />
             <element id="library" level="project" name="jfreechart-1.5.0" />
-            <element id="library" level="project" name="io.jsonwebtoken:jjwt:0.4" />
+            <element id="library" level="project" name="jjwt" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -528,7 +528,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="synctest" />
       </profile>
     </annotationProcessing>
   </component>
@@ -608,6 +607,12 @@
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
         </library>
       </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="postgres@localhost" uuid="1451f6ca-0353-4926-b556-16dbf9094cef">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
     </data-source>
   </component>
   <component name="DependencyValidationManager">
@@ -1608,6 +1613,21 @@
       <user-name>postgres</user-name>
       <schema-mapping />
     </data-source>
+    <data-source name="postgres@localhost" uuid="1451f6ca-0353-4926-b556-16dbf9094cef">
+      <database-info product="PostgreSQL" version="9.3.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" dbms="POSTGRES" exact-version="9.3.4" exact-driver-version="9.1">
+        <identifier-quote-string>&quot;</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>postgres</user-name>
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="database" negative="1">
+            <node kind="schema" negative="1" />
+          </node>
+        </introspection-scope>
+      </schema-mapping>
+    </data-source>
   </component>
   <component name="ideadoc.IdeaDocConfigurationGUI">
     <doccer class="nl.piraya.ideadoc.doccer.DoccerForOverridingMethod" enabled="true">
@@ -1833,18 +1853,6 @@
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="io.jsonwebtoken:jjwt:0.4" type="repository">
-      <properties maven-id="io.jsonwebtoken:jjwt:0.4" />
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/jjwt/jjwt-0.4.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/jjwt/slf4j-api-1.7.6.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/jjwt/jackson-databind-2.4.2.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/jjwt/jackson-annotations-2.4.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/jjwt/jackson-core-2.4.2.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
     <library name="jackson-core-asl-1.9.2">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/rest/jackson-core-asl-1.9.2.jar!/" />
@@ -1914,6 +1922,14 @@
       </CLASSES>
       <JAVADOC />
       <SOURCES />
+    </library>
+    <library name="jjwt">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/../lib/jjwt" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/../lib/jjwt" recursive="false" />
     </library>
     <library name="jsf-impl-1.2_15-jbossorg-2">
       <CLASSES>
@@ -1991,9 +2007,9 @@
         <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.web.servlet-3.0.5.RELEASE.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.test-3.0.5.RELEASE.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/com.springsource.org.aopalliance-1.0.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/spring-security-config-3.0.5.RELEASE.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/spring305/spring-security-core-3.0.5.RELEASE.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/spring305/spring-security-web-3.0.5.RELEASE.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/spring305/spring-security-config-3.0.5.RELEASE.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

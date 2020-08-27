@@ -49,6 +49,8 @@ public enum ClientGuardianRelationType {
     }
 
     public static ClientGuardianRelationType fromInteger(Integer value){
+        if (value == null)
+            return null;
         ClientGuardianRelationType relType = map.get(value);
         if (relType != null) return relType;
         if (value.equals(ADOPTIVE_PARENT)) return GUARDIAN;

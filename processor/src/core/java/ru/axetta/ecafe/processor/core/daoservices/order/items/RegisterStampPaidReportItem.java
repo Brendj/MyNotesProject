@@ -58,6 +58,19 @@ public class RegisterStampPaidReportItem {
         }
     }
 
+    public RegisterStampPaidReportItem(String level3, String level4, Long qty, String date, String number, Date dateTime, Long price) {
+        this.level3 = level3;
+        this.level4 = level4;
+        this.qty = qty;
+        this.date = date;
+        this.number = number;
+        this.dateTime = dateTime;
+        this.price = price;
+        if (price != null) {
+            this.total = price * qty;
+        }
+    }
+
     public Long getPrice() {
         return price;
     }

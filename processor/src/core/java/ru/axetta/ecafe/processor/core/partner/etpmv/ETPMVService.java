@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.partner.etpmv;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
-import generated.contingent.*;
+import generated.contingent.ispp.*;
 import generated.etp.*;
 import generated.etp.ObjectFactory;
 
@@ -335,9 +335,9 @@ public class ETPMVService {
             return;
         }
         initAISContingentService();
-        generated.contingent.ObjectFactory objectFactory = new generated.contingent.ObjectFactory();
+        generated.contingent.ispp.ObjectFactory objectFactory = new generated.contingent.ispp.ObjectFactory();
         SetBenefits setBenefits = objectFactory.createSetBenefits();
-        IsppHeaders isppHeaders = objectFactory.createIsppHeaders();
+        ServiceHeader isppHeaders = objectFactory.createServiceHeader();
         isppHeaders.setUsername(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.username", "ispp"));
         isppHeaders.setPassword(encryptPassword(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.password", "D43!asT7")));
         SetBenefitsRequest setBenefitsRequest = objectFactory.createSetBenefitsRequest();
@@ -349,13 +349,14 @@ public class ETPMVService {
             Child child = objectFactory.createChild();
             child.setBenefitCode(applicationForFood.getDtisznCode() == null ? "0" : applicationForFood.getDtisznCode().toString());
             child.setGuid(applicationForFood.getClient().getClientGUID());
+            child.setMeshGUID(applicationForFood.getClient().getMeshGUID());
             children.getChild().add(child);
             sent_counter++;
             if (children.getChild().size() > AIS_CONTINGENT_MAX_PACKET) {
                 counter++;
                 setBenefitsRequest.setChildren(children);
                 logger.info(String.format("Sending request %s to AIS Contingent", counter));
-                SetBenefitsResponse1 response = port.setBenefits(setBenefits, isppHeaders);
+                SetBenefitsResponseSmall response = port.setBenefits(setBenefits, isppHeaders);
                 logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
                 processResponseFromAISContingent(response);
                 children.getChild().clear();
@@ -364,31 +365,36 @@ public class ETPMVService {
         if (children.getChild().size() > 0) {
             setBenefitsRequest.setChildren(children);
             logger.info(String.format("Sending request %s to AIS Contingent", counter));
-            SetBenefitsResponse1 response = port.setBenefits(setBenefits, isppHeaders);
+            SetBenefitsResponseSmall response = port.setBenefits(setBenefits, isppHeaders);
             logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
             processResponseFromAISContingent(response);
         }
         logger.info(String.format("Finish sending data to AIS Contingent. Sent %s records", sent_counter));
     }
 
-    private void processResponseFromAISContingent(SetBenefitsResponse1 response) throws Exception {
+    private void processResponseFromAISContingent(SetBenefitsResponseSmall response) throws Exception {
         if (response != null && response.getResult() != null && response.getResult().getSuccess() != null) {
             Long nextVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodNextVersion();
             Long historyVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodHistoryNextVersion();
-            for (String guid : response.getResult().getSuccess().getGuid()) {
-                List<ApplicationForFood> apps = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(guid, nextVersion, historyVersion);
+            for (Child child : response.getResult().getSuccess().getChild()) {
+                List<ApplicationForFood> apps = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(child.getGuid(), child.getMeshGUID(),
+                        nextVersion, historyVersion);
                 for (ApplicationForFood applicationForFood : apps) {
                     sendStatus(System.currentTimeMillis() - PAUSE_IN_MILLIS, applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(), null);
                 }
             }
         }
-        if (response != null && response.getResult() != null && response.getResult().getNotFound() != null && response.getResult().getNotFound().getGuid().size() > 0) {
+        if (response != null && response.getResult() != null && response.getResult().getNotFound() != null && response.getResult().getNotFound().getChild().size() > 0) {
             StringBuilder notFoundGuids = new StringBuilder();
-            for (String str : response.getResult().getNotFound().getGuid()) {
-                notFoundGuids.append(str);
+            for (Child child : response.getResult().getNotFound().getChild()) {
+                notFoundGuids.append("Guid: " + emptyIfNull(child.getGuid()) + ", MeshGuid: " + emptyIfNull(child.getMeshGUID()));
             }
             logger.error("Not found guids from AIS Contingent: " + notFoundGuids.toString());
         }
+    }
+
+    private String emptyIfNull(String str) {
+        return str == null ? "" : str;
     }
 
     private String encryptPassword(String source) throws Exception {
