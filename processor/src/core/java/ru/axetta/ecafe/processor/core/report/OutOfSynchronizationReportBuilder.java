@@ -93,7 +93,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                 + "    THEN 'more3Hours'  ELSE 'other' END AS condition, cfor.idoforg,"
                 + "  cfor.shortname, cfor.address, cfor.isworkinsummertime,"
                 + "  cfos.lastAccRegistrySync,  cfos.clientversion,  cfos.remoteaddress, "
-                + "  cfor.statusdetailing, cfor.introductionqueue,  cfor.district "
+                + "  cfor.statusdetailing, cfor.introductionqueue,  cfor.district, cfor.preordersenabled "
                 + " FROM cf_orgs cfor INNER JOIN cf_orgs_sync cfos ON cfor.idoforg = cfos.idoforg "
                 + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList) "
                 + " ORDER BY cfos.lastAccRegistrySync DESC, condition");
@@ -126,7 +126,8 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         rowName((String) object[0], object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue()))),
                         (String) object[8],
                         (String) object[9],
-                        (String) object[10]);
+                        (String) object[10],
+                        (object[11]).equals(1));
                 outOfSynchronizationReportList.add(outOfSynchronizationItem);
             }
         }
