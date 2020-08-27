@@ -291,10 +291,8 @@ public class SyncServlet extends HttpServlet {
             sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
         } finally {
             SyncCollector.registerSyncEnd(syncTime);
-            if (currentSyncWasGranted.get()) {
-                removeSyncInProgress(idOfOrg);
-                permitsForSync.release();
-            }
+            removeSyncInProgress(idOfOrg);
+            if (currentSyncWasGranted.get()) permitsForSync.release();
         }
     }
 
