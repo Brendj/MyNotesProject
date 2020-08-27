@@ -44,7 +44,7 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="idOfDish"/>
         </set>
 
-        <set name="categoryItems" lazy="false">
+        <set name="categoryItems" lazy="false" cascade="all">
             <key column="idOfCategory"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem"/>
         </set>

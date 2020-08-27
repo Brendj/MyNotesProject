@@ -33,6 +33,7 @@ import java.util.List;
 @Scope("session")
 @DependsOn("runtimeContext")
 public class CategoryCatalogListPage extends BasicWorkspacePage {
+
     private static final Logger logger = LoggerFactory.getLogger(CategoryCatalogListPage.class);
 
     private String descriptionFilter;
@@ -41,6 +42,7 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     private List<WtCategory> catalogListItem;
     private List<WtCategoryItem> categoryItemsSelectedCategory;
     private WtCategory selectedItem;
+    private WtCategoryItem selectedCategoryItem;
 
     private WtCatalogService service;
 
@@ -57,14 +59,14 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     }
 
     public void createNewCatalog() {
-        if(StringUtils.isBlank(descriptionForNewCategory)){
+        if (StringUtils.isBlank(descriptionForNewCategory)) {
             printError("Введите описание категории");
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
-            WtCategory item =  WtCategory.build(descriptionForNewCategory, currentUser);
+            WtCategory item = WtCategory.build(descriptionForNewCategory, currentUser);
             catalogListItem.add(item);
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать категорию: " + e.getMessage());
         } finally {
@@ -74,14 +76,14 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
 
 
     public void createNewItem() {
-        if(StringUtils.isBlank(descriptionForNewItem)){
+        if (StringUtils.isBlank(descriptionForNewItem)) {
             printError("Введите описание элемента");
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WtCategoryItem item = WtCategoryItem.build(descriptionForNewItem, selectedItem, currentUser);
             selectedItem.getCategoryItems().add(item);
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать элемент: " + e.getMessage());
         } finally {
@@ -89,7 +91,6 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
         }
     }
 
-    //TODO: Переработать кнопки удаления на странице. После применения изменений делать перекачку данных
     public void applyChanges() {
         Session session = null;
         Transaction transaction = null;
@@ -105,20 +106,24 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
             Date updateDate = new Date();
 
             for (WtCategory item : catalogListItem) {
-                if(item.getIdOfCategory() == null){
+                if (item.getIdOfCategory() == null && item.getDeleteState().equals(WtCategory.ACTIVE)) {
                     item.setVersion(nextVersionForCategory);
+                    for (WtCategoryItem categoryItem : item.getCategoryItems()){
+                        categoryItem.setVersion(nextVersionForCategory);
+                    }
                     session.save(item);
                 } else {
                     WtCategory categoryFromBD = (WtCategory) session.get(WtCategory.class, item.getIdOfCategory());
-                    if(!categoryFromBD.equals(item)) {
-                        for(WtCategoryItem categoryItem : item.getCategoryItems()){
-                            if(categoryItem.getIdOfCategoryItem() == null){
+                    if (!categoryFromBD.equals(item)) {
+                        for (WtCategoryItem categoryItem : item.getCategoryItems()) {
+                            if (categoryItem.getIdOfCategoryItem() == null && categoryItem.getDeleteState()
+                                    .equals(WtCategoryItem.ACTIVE)) {
                                 categoryItem.setVersion(nextVersionForCategory);
                                 session.save(categoryItem);
                             } else {
                                 WtCategoryItem itemFromBD = (WtCategoryItem) session
                                         .get(WtCategoryItem.class, categoryItem.getIdOfCategoryItem());
-                                if(!itemFromBD.equals(categoryItem)){
+                                if (!itemFromBD.equals(categoryItem)) {
                                     categoryItem.setLastUpdate(updateDate);
                                     categoryItem.setVersion(nextVersionForItem);
                                     session.merge(categoryItem);
@@ -134,6 +139,7 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
 
             transaction.commit();
             transaction = null;
+            catalogListItem = service.getAllActiveCategory();
         } catch (Exception e) {
             printError("Не удалось обновить элементы: " + e.getMessage());
             logger.error("Can't update elements", e);
@@ -168,8 +174,8 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
         }
     }
 
-    public List<WtCategoryItem> getItemsForSelectedItem(){
-        if(selectedItem == null){
+    public List<WtCategoryItem> getItemsForSelectedItem() {
+        if (selectedItem == null) {
             categoryItemsSelectedCategory = Collections.emptyList();
         } else {
             categoryItemsSelectedCategory = new LinkedList<>(selectedItem.getCategoryItems());
@@ -177,25 +183,28 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
         return categoryItemsSelectedCategory;
     }
 
-    public void deleteItem() {
+    public void deleteCategory() {
         try {
-            if(selectedItem == null){
+            if (selectedItem == null) {
                 throw new IllegalArgumentException("Selected item is null");
             }
-            selectedItem.setDeleteState(WtCategoryItem.DELETE);
-        } catch (Exception e){
+            selectedItem.setDeleteState(WtCategory.DELETE);
+            for (WtCategoryItem categoryItem : selectedItem.getCategoryItems()){
+                categoryItem.setDeleteState(WtCategoryItem.DELETE);
+            }
+        } catch (Exception e) {
             printError("Не удалось удалить элемент: " + e.getMessage());
             logger.error("Can't delete element", e);
         }
     }
 
-    public void reestablishItem(){
+    public void reestablishCategory() {
         try {
-            if(selectedItem == null){
+            if (selectedItem == null) {
                 throw new IllegalArgumentException("Selected item is null");
             }
-            selectedItem.setDeleteState(WtCategoryItem.ACTIVE);
-        } catch (Exception e){
+            selectedItem.setDeleteState(WtCategory.ACTIVE);
+        } catch (Exception e) {
             printError("Не удалось удалить элемент: " + e.getMessage());
             logger.error("Can't delete element", e);
         }
@@ -218,9 +227,9 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     }
 
     public void updateCatalogList() {
-        try{
+        try {
             catalogListItem = service.findCategoryByDescription(descriptionFilter);
-        }catch (Exception e){
+        } catch (Exception e) {
             printError("Не удалось найти элементы: " + e.getMessage());
             logger.error("", e);
         }
@@ -266,5 +275,37 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
 
     public void setCategoryItemsSelectedCategory(List<WtCategoryItem> categoryItemsSelectedCategory) {
         this.categoryItemsSelectedCategory = categoryItemsSelectedCategory;
+    }
+
+    public void deleteItem() {
+        try {
+            if (selectedCategoryItem == null) {
+                throw new IllegalArgumentException("Selected item is null");
+            }
+            selectedCategoryItem.setDeleteState(WtCategoryItem.DELETE);
+        } catch (Exception e) {
+            printError("Не удалось удалить элемент: " + e.getMessage());
+            logger.error("Can't delete element", e);
+        }
+    }
+
+    public void reestablishItem() {
+        try {
+            if (selectedCategoryItem == null) {
+                throw new IllegalArgumentException("Selected item is null");
+            }
+            selectedCategoryItem.setDeleteState(WtCategoryItem.ACTIVE);
+        } catch (Exception e) {
+            printError("Не удалось удалить элемент: " + e.getMessage());
+            logger.error("Can't delete element", e);
+        }
+    }
+
+    public WtCategoryItem getSelectedCategoryItem() {
+        return selectedCategoryItem;
+    }
+
+    public void setSelectedCategoryItem(WtCategoryItem selectedCategoryItem) {
+        this.selectedCategoryItem = selectedCategoryItem;
     }
 }

@@ -103,14 +103,14 @@
                                          reRender="WtCatalogItemListTable">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
                             <f:setPropertyActionListener value="#{categoryItem}"
-                                                         target="#{categoryCatalogListPage.selectedItem}"/>
+                                                         target="#{categoryCatalogListPage.selectedCategoryItem}"/>
                         </a4j:commandLink>
                         <a4j:commandLink styleClass="command-link" rendered="#{categoryItem.deleteState == 1}"
                                          action="#{categoryCatalogListPage.reestablishItem()}"
                                          reRender="WtCatalogItemListTable">
                             <h:graphicImage value="/images/16x16/true.png" style="border: 0;"/>
                             <f:setPropertyActionListener value="#{categoryItem}"
-                                                         target="#{categoryCatalogListPage.selectedItem}"/>
+                                                         target="#{categoryCatalogListPage.selectedCategoryItem}"/>
                         </a4j:commandLink>
                     </rich:column>
                     <f:facet name="footer">
@@ -189,14 +189,14 @@
                 <h:outputText value="Удалить/Восстановить" escape="true"/>
             </f:facet>
             <a4j:commandLink styleClass="command-link" rendered="#{item.deleteState == 0}"
-                             action="#{categoryCatalogListPage.deleteItem()}"
+                             action="#{categoryCatalogListPage.deleteCategory()}"
                              reRender="webtechnologistcategoryItemCatalogItemListTable">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
                 <f:setPropertyActionListener value="#{item}"
                                              target="#{categoryCatalogListPage.selectedItem}"/>
             </a4j:commandLink>
             <a4j:commandLink styleClass="command-link" rendered="#{item.deleteState == 1}"
-                             action="#{categoryCatalogListPage.reestablishItem()}"
+                             action="#{categoryCatalogListPage.reestablishCategory()}"
                              reRender="webtechnologistcategoryItemCatalogItemListTable">
                 <h:graphicImage value="/images/16x16/true.png" style="border: 0;"/>
                 <f:setPropertyActionListener value="#{item}"
