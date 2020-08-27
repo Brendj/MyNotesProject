@@ -165,11 +165,6 @@ public class ClientMigrationHistoryService {
             query.executeUpdate();
             logger.info("Обновили каталог версии клиентов");
 
-            query = session.createSQLQuery("UPDATE cf_clients SET clientregistryversion=(SELECT clientregistryversion FROM cf_registry) \n"
-                    + "WHERE idofclient IN (SELECT idofclient FROM temp_clients)");
-            count = query.executeUpdate();
-            logger.info(String.format("Обновлена версия у %s клиентов", count));
-
             query = session.createSQLQuery("DELETE FROM cf_clients_categorydiscounts "
                     + "where idofclient in (select idofclient from temp_clients) "
                     + "and idofcategorydiscount in (select idofcategorydiscount from cf_categorydiscounts where organizationtype = :orgType and categorytype = :catType and deletedstate = 0)");
@@ -177,6 +172,12 @@ public class ClientMigrationHistoryService {
             query.setParameter("catType", CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT.getValue());
             count = query.executeUpdate();
             logger.info(String.format("Удалено %s льгот", count));
+
+            query = session.createSQLQuery("UPDATE cf_clients c SET clientregistryversion=(SELECT clientregistryversion FROM cf_registry),"
+                    + "discountmode = (select case when cnt=0 then 0 else 3 end from (select coalesce(count(*), 0) as cnt from cf_clients_categorydiscounts cg where cg.idofclient = c.idofclient) sub) "
+                    + "WHERE idofclient IN (SELECT idofclient FROM temp_clients)");
+            count = query.executeUpdate();
+            logger.info(String.format("Обновлена версия у %s клиентов", count));
 
             query = session.createSQLQuery("INSERT INTO cf_discountchangehistory(idofclient, registrationdate, discountmode, olddiscountmode, "
                     + "categoriesdiscounts, oldcategoriesdiscounts, idoforg, comment) "
