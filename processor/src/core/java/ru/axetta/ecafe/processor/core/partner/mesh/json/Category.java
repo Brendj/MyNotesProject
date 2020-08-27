@@ -30,7 +30,7 @@ public class Category {
     @JsonProperty("category_id")
     private Integer categoryId;
     @JsonProperty("parameter_values")
-    private List<String> parameterValues = null;
+    private List<Object> parameterValues = null;
     @JsonProperty("actual_from")
     private String actualFrom;
     @JsonProperty("actual_to")
@@ -77,12 +77,12 @@ public class Category {
     }
 
     @JsonProperty("parameter_values")
-    public List<String> getParameterValues() {
+    public List<Object> getParameterValues() {
         return parameterValues;
     }
 
     @JsonProperty("parameter_values")
-    public void setParameterValues(List<String> parameterValues) {
+    public void setParameterValues(List<Object> parameterValues) {
         this.parameterValues = parameterValues;
     }
 

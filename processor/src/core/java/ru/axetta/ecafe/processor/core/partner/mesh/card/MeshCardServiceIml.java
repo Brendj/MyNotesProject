@@ -2,22 +2,14 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.service.mesh;
+package ru.axetta.ecafe.processor.core.partner.mesh.card;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 @Component
-@DependsOn("meshRestService")
 public class MeshCardServiceIml implements MeshCardService {
-    private final MeshRestService meshRestService;
-
-    public MeshCardServiceIml(){
-        this.meshRestService = RuntimeContext.getAppContext().getBean(MeshRestService.class);
-    }
 
     @Override
     public int updateCardForClient(String meshGUID, Card card) {

@@ -26,7 +26,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
@@ -36,11 +36,14 @@ import java.util.*;
 /**
  * Created by nuc on 12.08.2020.
  */
+@DependsOn("runtimeContext")
 @Component
 public class MeshPersonsSyncService {
     public static final String MESH_REST_PERSONS_URL = "/persons?";
     public static final String MESH_REST_PERSONS_EXPAND = "education,categories";
     public static final String MESH_REST_PERSONS_TOP_PROPEERTY = "ecafe.processing.mesh.rest.persons.top";
+    public static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.rest.address";
+    public static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.rest.api.key";
     public static final String TOP_DEFAULT = "50000";
 
     private static final String FILTER_VALUE_ORG = "education.organization_id";
@@ -51,8 +54,13 @@ public class MeshPersonsSyncService {
 
     private static final String OUT_ORG_GROUP_PREFIX = "Вне";
 
-    @Autowired
-    MeshRestClient meshRestClient;
+    private final MeshRestClient meshRestClient;
+
+    public MeshPersonsSyncService() throws Exception {
+        String serviceAddress = getServiceAddress();
+        String apiKey = getApiKey();
+        meshRestClient = new MeshRestClient(serviceAddress, apiKey);
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
 
@@ -142,7 +150,7 @@ public class MeshPersonsSyncService {
             String patronymic = person.getPatronymic();
             String guidnsi = null;
             try {
-                guidnsi = person.getCategories().get(0).getParameterValues().get(0);
+                guidnsi = person.getCategories().get(0).getParameterValues().get(0).toString();
             } catch (Exception e) {
                 logger.info("Not found NSI guid for person with mesh guid " + personguid);
             }
@@ -184,6 +192,18 @@ public class MeshPersonsSyncService {
 
     private String getTop() {
         return RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_PERSONS_TOP_PROPEERTY, TOP_DEFAULT);
+    }
+
+    private String getServiceAddress() throws Exception{
+        String address = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_ADDRESS_PROPERTY, "");
+        if (address.equals("")) throw new Exception("MESH REST address not specified");
+        return address;
+    }
+
+    private String getApiKey() throws Exception{
+        String key = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_API_KEY_PROPERTY, "");
+        if (key.equals("")) throw new Exception("MESH API key not specified");
+        return key;
     }
 
     private String getFilter(long idOfOrg, String lastName, String firstName, String patronymic) throws Exception {

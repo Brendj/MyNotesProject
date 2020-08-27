@@ -1,6 +1,5 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -10,17 +9,28 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 
-@Component
 public class MeshRestClient {
-    public static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.rest.address";
-    public static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.rest.api.key";
     private static final Logger logger = LoggerFactory.getLogger(MeshRestClient.class);
+    private final String serviceAddress;
+    private final String apiKey;
+
+    public MeshRestClient(String serviceAddress, String apiKey){
+        this.serviceAddress = serviceAddress;
+        this.apiKey = apiKey;
+    }
+
+    public String getServiceAddress() {
+        return serviceAddress;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
 
     public byte[] executeRequest(String relativeUrl, String parameters) throws Exception {
         URL url = new URL(getServiceAddress() + relativeUrl + parameters);
@@ -57,17 +67,4 @@ public class MeshRestClient {
                 new Protocol("https", (ProtocolSocketFactory)new EasySSLProtocolSocketFactory(), 443));
         return httpClient;
     }
-
-    private String getServiceAddress() throws Exception{
-        String address = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_ADDRESS_PROPERTY, "");
-        if (address.equals("")) throw new Exception("MESH REST address not specified");
-        return address;
-    }
-
-    private String getApiKey() throws Exception{
-        String key = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_API_KEY_PROPERTY, "");
-        if (key.equals("")) throw new Exception("MESH API key not specified");
-        return key;
-    }
-
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.service.mesh;
+package ru.axetta.ecafe.processor.core.partner.mesh.card;
 
 import ru.axetta.ecafe.processor.core.persistence.Card;
 

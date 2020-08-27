@@ -7,11 +7,11 @@ package ru.axetta.ecafe.processor.core.logic;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.MeshCardService;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.MeshCardServiceIml;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.MockService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.mesh.MeshCardService;
-import ru.axetta.ecafe.processor.core.service.mesh.MeshCardServiceIml;
-import ru.axetta.ecafe.processor.core.service.mesh.MockService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
