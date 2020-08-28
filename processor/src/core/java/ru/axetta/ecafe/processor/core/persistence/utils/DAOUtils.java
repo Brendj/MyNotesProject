@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
@@ -3004,10 +3005,10 @@ public class DAOUtils {
     }
 
     public static long nextVersionByTaloonPreorder(Session session){
-        long version = 0L;
+        long version = 1L;
         Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
         Object o = query.uniqueResult();
-        if(o!=null){
+        if(o != null){
             version = Long.valueOf(o.toString()) + 1;
         }
         return version;
@@ -4355,8 +4356,13 @@ public class DAOUtils {
         applicationForFood.setVersion(version);
         applicationForFood.setLastUpdate(new Date());
         session.update(applicationForFood);
-
-        addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, historyVersion);
+        try {
+            addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage());
+        }
         return applicationForFood;
     }
 
@@ -4605,6 +4611,45 @@ public class DAOUtils {
             criteria.add(Restrictions.isNull("dtisznCode"));
         }
         return criteria.list();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodListByStatusAndServiceNumber(Session session,
+            ApplicationForFoodStatus status, Boolean isOthers, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("status", status));
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.eq("serviceNumber", serviceNumber));
+            if (isOthers) {
+                criteria.add(Restrictions.isNull("dtisznCode"));
+            }
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return new ArrayList<ApplicationForFood>();
+            else
+                return applicationForFoods;
+        } catch (Exception e)
+        {
+            logger.error("Error in getApplicationForFoodListByStatusAndServiceNumber ", e);
+            return null;
+        }
+    }
+
+    public static ApplicationForFood getApplicationForFood(Session session, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.ilike("serviceNumber", serviceNumber));
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return new ApplicationForFood();
+            else
+                return applicationForFoods.get(0);
+        } catch (Exception e)
+        {
+            logger.error("Error in getApplicationForFood", e);
+            return null;
+        }
     }
 
     public static CategoryDiscountDSZN findCategoryDiscountDSZNByETPCode(EntityManager entityManager, Long ETPCode) {
@@ -4980,8 +5025,7 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
-    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname,
-            Date startDate) throws Exception {
+    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
         if (orgs != null && !orgs.isEmpty()) {
             List<Long> ids = new ArrayList<>();
@@ -4993,7 +5037,7 @@ public class DAOUtils {
         if (groupname != null) {
             criteria.add(Restrictions.eq("groupname", groupname));
         }
-        criteria.add(Restrictions.gt("menudate", startDate));
+        //criteria.add(Restrictions.gt("menudate", startDate));
         return criteria.list();
     }
 
@@ -5012,9 +5056,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List getAllDateFromProdactionCalendarForEZD(Session persistenceSession) throws Exception {
-        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
-        criteria.add(Restrictions.gt("day", new Date()));
+
+    public static List getAllMenuForEZD(Session persistenceSession,
+            List<Long> idofOrg) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdMenuView.class);
+        criteria.add(Restrictions.gt("menuDate", new Date()));
+        if (idofOrg != null && !idofOrg.isEmpty()) {
+            criteria.add(Restrictions.in("idOforg", idofOrg));
+        }
         return criteria.list();
     }
 
@@ -5100,6 +5149,51 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static long nextVersionByHardwareSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_hardware_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
+            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettings.class);
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
+        return (HardwareSettings) criteria.uniqueResult();
+    }
+
+    public static long nextVersionByTurnstileSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_turnstile_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static TurnstileSettings getTurnstileSettingsRequestByOrgAndId(Session session, Long idOfOrg, String turnstileId) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("turnstileId", turnstileId));
+        return (TurnstileSettings) criteria.uniqueResult();
+    }
+
+    public static HardwareSettingsMT getHardwareSettingsMTByIdAndModuleType(Session session, CompositeIdOfHardwareSettings compositeIdOfHardwareSettings,
+            Integer moduleType) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettingsMT.class).createAlias("hardwareSettings","hs", JoinType.FULL_JOIN);
+        criteria.add(Restrictions.eq("hs.compositeIdOfHardwareSettings",compositeIdOfHardwareSettings));
+        criteria.add(Restrictions.eq("moduleType", moduleType));
+        return (HardwareSettingsMT) criteria.uniqueResult();
+    }
+
     public static List getAllDateFromProdactionCalendarForFutureDates(Session persistenceSession) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
         criteria.add(Restrictions.gt("day", new Date()));
@@ -5119,5 +5213,11 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(CanceledOrder.class);
         criteria.add(Restrictions.eq("idOfTransaction", Long.parseLong(source)));
         return (CanceledOrder) criteria.uniqueResult();
+    }
+
+    public static List<TurnstileSettings> getTurnstileListByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return criteria.list();
     }
 }

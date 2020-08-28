@@ -17,6 +17,8 @@
 <h:panelGrid id="orgEditGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgEditPage.idOfOrg}" styleClass="input-text" />
+    <h:outputText escape="true" value="ID в НСИ-3" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.orgIdFromNsi}" styleClass="input-text" />
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.guid}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />

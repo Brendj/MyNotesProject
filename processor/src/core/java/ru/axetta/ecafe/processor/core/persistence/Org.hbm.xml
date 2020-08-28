@@ -284,6 +284,7 @@
         <property name="municipalDistrict" column="municipal_district" type="string" length="256"/>
         <property name="founder" column="founder" type="string" length="512"/>
         <property name="subordination" column="subordination" type="string" length="512"/>
+        <property name="orgIdFromNsi" column="organizationidfromnsi" type="long"/>
     </class>
 </hibernate-mapping>
 

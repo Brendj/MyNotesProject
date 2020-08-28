@@ -104,8 +104,8 @@ public class RequestFeedingItem {
         if (!DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE.equals(discountInfo.getDtisznCode())) {
             return;
         }
-        this.otherDiscountStartDate = discountInfo.getDateStart();
-        this.otherDiscountEndDate = discountInfo.getDateEnd();
+        this.otherDiscountStartDate = applicationForFood.getDiscountDateStart();
+        this.otherDiscountEndDate = applicationForFood.getDiscountDateEnd();
     }
 
     public static RequestFeedingItem build(Node itemNode, Long idOfOrg) throws Exception {

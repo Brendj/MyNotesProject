@@ -47,6 +47,11 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     private String currentState;
     private String remarksToShow;
 
+    private boolean changedData;
+    private boolean needFillQty;
+    private boolean allowedSetPeriodFirstFlag;
+    private boolean allowedClearPeriodFirstFlag;
+
     private static final Logger logger = LoggerFactory.getLogger(TaloonPreorderVerificationPage.class);
 
     @Override
@@ -90,6 +95,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void apply() throws Exception {
         Session session = null;
+        changedData = false;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             builder.applyChanges(session, items);
@@ -101,6 +107,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void reload() throws Exception {
         Session session = null;
+        changedData = false;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             setItems(builder.getItems(session, startDate, endDate, idOfOrg));
@@ -131,32 +138,20 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
             for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                 for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                     if (detail.equals(currentTaloonPreorderVerificationDetail)) {
-                        if (currentState
-                                .equals(TaloonPreorderVerificationItem.MAKE_CANCEL) && !detail.needFillShippedQty()) {
+                        if (currentState.equals(TaloonPreorderVerificationItem.MAKE_CANCEL)) {
+                            detail.setShippedQty(null);
+                            detail.setShippedSum(0L);
                             detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                         }
                         if (currentState.equals(TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
                             detail.performConfirm();
                         }
-                        break;
+                        return;
                     }
                 }
             }
         }
     }
-
-    //public void confirmPpState() {
-    //    changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
-    //}
-    //
-    //private void changePpState(TaloonPPStatesEnum ppState) {
-    //    TaloonPreorderVerificationItem item;
-    //    this.ppState = ppState;
-    //    item = this.getComplex().getItem();
-    //    if(item != null) {
-    //        item.setPpState();
-    //    }
-    //}
 
     public void confirmPpStateAllDay() {
         changePpStateAllDay(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
@@ -172,22 +167,54 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         }
     }
 
-    public boolean allowedSetPeriodFirstFlag() {
+    public boolean isAllowedSetPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
-            if (item.allowedSetFirstFlag()) {
-                return true;
+            if (item.isAllowedSetFirstFlag()) {
+                return allowedSetPeriodFirstFlag = true;
             }
         }
-        return false;
+        return allowedSetPeriodFirstFlag = false;
     }
 
-    public boolean allowedClearPeriodFirstFlag() {
+    public boolean isAllowedClearPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
-            if (item.allowedClearFirstFlag()) {
-                return true;
+            if (item.isAllowedClearFirstFlag()) {
+                return allowedClearPeriodFirstFlag = true;
             }
         }
-        return false;
+        return allowedClearPeriodFirstFlag = false;
+    }
+
+    public boolean isChangedData() {
+        if (items == null) {
+            return changedData = false;
+        }
+        for (TaloonPreorderVerificationItem item : items) {
+            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                    if (detail.isChangedData()) {
+                        return changedData = true;
+                    }
+                }
+            }
+        }
+        return changedData = false;
+    }
+
+    public boolean isNeedFillQty() {
+        if (items == null) {
+            return needFillQty = false;
+        }
+        for (TaloonPreorderVerificationItem item : items) {
+            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                    if (detail.isNeedFillShippedQty()) {
+                        return needFillQty = true;
+                    }
+                }
+            }
+        }
+        return needFillQty = false;
     }
 
     public boolean isPpStateNotSelected() {

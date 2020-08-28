@@ -40,8 +40,6 @@ public class TaloonPreorderVerificationDetail {
     private Long reservedSum;
     private Integer blockedQty;
     private Long blockedSum;
-    private Integer differedQty;
-    private Long differedSum;
     private TaloonISPPStatesEnum isppState;
     private TaloonPPStatesEnum ppState;
     private String remarks;
@@ -49,14 +47,25 @@ public class TaloonPreorderVerificationDetail {
     private boolean summaryDay;
     private TaloonPreorderVerificationComplex complex;
 
+    private boolean changedData;
+    private boolean enableEditShippedQty;
+    private boolean needFillShippedQty;
+    private boolean allowedSetFirstFlag;
+    private boolean allowedSetSecondFlag;
+    private boolean total;
+    private boolean emptyTotal;
+    private boolean emptyShippedQty;
+    private boolean allowedClearFirstFlag;
+    private boolean allowedClearSecondFlag;
+
     public TaloonPreorderVerificationDetail() {
     }
 
     public TaloonPreorderVerificationDetail(String guid, Long idOfOrg, Long idOfOrgCreated, Date taloonDate,
             Long complexId, String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty,
             Long requestedSum, Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum, Integer reservedQty,
-            Long reservedSum, Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum,
-            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String remarks, String comments,
+            Long reservedSum, Integer blockedQty, Long blockedSum, TaloonISPPStatesEnum isppState,
+            TaloonPPStatesEnum ppState, String remarks, String comments,
             boolean summaryDay) {
         this.guid = guid;
         this.idOfOrg = idOfOrg;
@@ -77,37 +86,11 @@ public class TaloonPreorderVerificationDetail {
         this.reservedSum = reservedSum;
         this.blockedQty = blockedQty;
         this.blockedSum = blockedSum;
-        this.differedQty = differedQty;
-        this.differedSum = differedSum;
         this.isppState = isppState;
         this.ppState = ppState;
         this.remarks = remarks;
         this.comments = comments;
         this.summaryDay = summaryDay;
-    }
-
-    public Long getIdOfOrgCreated() {
-        return idOfOrgCreated;
-    }
-
-    public void setIdOfOrgCreated(Long idOfOrgCreated) {
-        this.idOfOrgCreated = idOfOrgCreated;
-    }
-
-    public Integer getRequestedQty() {
-        return requestedQty;
-    }
-
-    public void setRequestedQty(Integer requestedQty) {
-        this.requestedQty = requestedQty;
-    }
-
-    public Integer getShippedQty() {
-        return shippedQty;
-    }
-
-    public void setShippedQty(Integer shippedQty) {
-        this.shippedQty = shippedQty;
     }
 
     //public void setStrShippedQty(String strShippedQty) {
@@ -121,10 +104,212 @@ public class TaloonPreorderVerificationDetail {
     //        this.shippedQty = null;
     //    }
     //}
-
     //public String getStrShippedQty() {
     //    return strShippedQty;
     //}
+
+    public int getPeriod() {
+        Date currentDate = new Date();
+        Date firstDayOfMonth = CalendarUtils.getFirstDayOfMonth(currentDate);
+        Date minDate = CalendarUtils.getFirstDayOfMonth(currentDate);
+        Date maxDate = CalendarUtils.addDays(CalendarUtils.getLastDayOfMonth(currentDate), 5);
+        int day = CalendarUtils.getDayOfMonth(currentDate);
+        if (day <= 5) {
+            minDate = CalendarUtils.addMonth(firstDayOfMonth, -1);
+        }
+        if (taloonDate.before(minDate)) {
+            return 1;
+        } else if (taloonDate.after(minDate) && taloonDate.before(maxDate)) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
+    public boolean isAllowedSetFirstFlag() {
+        int period = getPeriod();
+        if (period == 1) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
+                    && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
+                return allowedSetFirstFlag = false;
+            } else {
+                return allowedSetFirstFlag = true;
+            }
+        }
+        if (period == 2 || period == 3) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                return allowedSetFirstFlag = false;
+            } else {
+                return allowedSetFirstFlag = true;
+            }
+        }
+        return allowedSetFirstFlag = true;
+    }
+
+    public boolean isAllowedClearFirstFlag() {
+        int period = getPeriod();
+        if (period == 1) {
+            return allowedClearFirstFlag = false;
+        }
+        if (period == 2 || period == 3) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                return allowedClearFirstFlag = false;
+            } else {
+                return allowedClearFirstFlag = true;
+            }
+        }
+        return allowedClearFirstFlag = true;
+    }
+
+    public boolean isAllowedSetSecondFlag() {
+        int period = getPeriod();
+        if (period == 1) {
+            return allowedSetSecondFlag = false;
+        }
+        if (period == 2 || period == 3) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                return allowedSetSecondFlag = false;
+            } else {
+                return allowedSetSecondFlag = true;
+            }
+        }
+        return allowedSetSecondFlag = true;
+    }
+
+    public boolean isAllowedClearSecondFlag() {
+        int period = getPeriod();
+        if (period == 1) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
+                    && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
+                return allowedClearSecondFlag = true;
+            } else {
+                return allowedClearSecondFlag = false;
+            }
+        }
+        if (period == 2 || period == 3) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                return allowedClearSecondFlag = false;
+            } else {
+                return allowedClearSecondFlag = true;
+            }
+        }
+        return allowedClearSecondFlag = true;
+    }
+
+    public boolean isEnableEditShippedQty() {
+        if (summaryDay) {
+            return enableEditShippedQty = false;
+        }
+        Date currentDate = new Date();
+        Date firstMonthDate = CalendarUtils.getFirstDayOfNextMonth(taloonDate);
+        Date redDate = CalendarUtils.addDays(firstMonthDate, 5);
+        if (currentDate.after(redDate)) {
+            return enableEditShippedQty = false;
+        }
+        if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED
+                || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
+            return enableEditShippedQty = true;
+        } else {
+            return enableEditShippedQty = false;
+        }
+    }
+
+    public void performConfirm() {
+        if (this.ppState == null) {
+            return;
+        }
+        this.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+    }
+
+    public String getPpStateToTurnOnFirst() {
+        return MAKE_CONFIRM;
+    }
+
+    public String getPpStateForAllDay() {
+        DateFormat df = new SimpleDateFormat(DAY_FORMAT);
+        return df.format(taloonDate);
+    }
+
+    public String getPpStateToTurnOnSecond() {
+        return MAKE_CANCEL;
+    }
+
+    public String getPpStateToClear() {
+        return MAKE_CLEAR;
+    }
+
+    public boolean taloonDateIsEmpty() {
+        return taloonDate == null;
+    }
+
+    public boolean isIsppStateConfirmed() {
+        return (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED);
+    }
+
+    public boolean isPpStateConfirmed() {
+        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+    }
+
+    public boolean isPpStateCanceled() {
+        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
+    }
+
+    public boolean isPpStateNotSelected() {
+        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+    }
+
+    public boolean isNeedFillShippedQty() {
+        return needFillShippedQty = ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED && (shippedQty == null || shippedQty == 0);
+    }
+
+    public Boolean getRemarksEmpty() {
+        return StringUtils.isEmpty(remarks);
+    }
+
+    public void addQtyAndGet(TaloonPreorderVerificationDetail arg) {
+        this.setRequestedQty(getIntSum(this.getRequestedQty(), arg.getRequestedQty()));
+        this.setRequestedSum(getLongSum(this.getRequestedSum(), arg.getRequestedSum()));
+        this.setSoldQty(getIntSum(this.getSoldQty(), arg.getSoldQty()));
+        this.setSoldSum(getLongSum(this.getSoldSum(), arg.getSoldSum()));
+        this.setShippedQty(getIntSum(this.getShippedQty(), arg.getShippedQty()));
+        this.setShippedSum(getLongSum(this.getShippedSum(), arg.getShippedSum()));
+        this.setReservedQty(getIntSum(this.getReservedQty(), arg.getReservedQty()));
+        this.setReservedSum(getLongSum(this.getReservedSum(), arg.getReservedSum()));
+        this.setBlockedQty(getIntSum(this.getBlockedQty(), arg.getBlockedQty()));
+        this.setBlockedSum(getLongSum(this.getBlockedSum(), arg.getBlockedSum()));
+    }
+
+    private Integer getIntSum(Integer value1, Integer value2) {
+        return (value1 == null ? 0 : value1) + (value2 == null ? 0 : value2);
+    }
+
+    private Long getLongSum(Long value1, Long value2) {
+        return (value1 == null ? 0L : value1) + (value2 == null ? 0L : value2);
+    }
+
+    public void deselectPpState() {
+        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+    }
+
+    public void cancelPpState() {
+        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
+    }
+
+    private void changePpState(TaloonPPStatesEnum ppState) {
+        this.ppState = ppState;
+    }
+
+    public boolean isEmptyTotal() {
+        return emptyTotal = isSummaryDay() && complexId == null && complexName == null && goodsGuid == null && taloonDate == null;
+    }
+
+    public boolean isEmptyShippedQty() {
+        return emptyShippedQty = shippedQty == null || shippedQty == 0;
+    }
+
+    public boolean isTotal() {
+        return total = isSummaryDay() && complexId != null && taloonDate == null;
+    }
 
     public Long getPrice() {
         return price;
@@ -270,22 +455,6 @@ public class TaloonPreorderVerificationDetail {
         this.blockedSum = blockedSum;
     }
 
-    public Integer getDifferedQty() {
-        return differedQty;
-    }
-
-    public void setDifferedQty(Integer differedQty) {
-        this.differedQty = differedQty;
-    }
-
-    public Long getDifferedSum() {
-        return differedSum;
-    }
-
-    public void setDifferedSum(Long differedSum) {
-        this.differedSum = differedSum;
-    }
-
     public Long getComplexId() {
         return complexId;
     }
@@ -318,204 +487,35 @@ public class TaloonPreorderVerificationDetail {
         this.complex = complex;
     }
 
-    public int getPeriod() {
-        Date currentDate = new Date();
-        Date firstDayOfMonth = CalendarUtils.getFirstDayOfMonth(currentDate);
-        Date minDate = CalendarUtils.getFirstDayOfMonth(currentDate);
-        Date maxDate = CalendarUtils.addDays(CalendarUtils.getLastDayOfMonth(currentDate), 5);
-        int day = CalendarUtils.getDayOfMonth(currentDate);
-        if (day <= 5) {
-            minDate = CalendarUtils.addMonth(firstDayOfMonth, -1);
-        }
-        if (taloonDate.before(minDate)) {
-            return 1;
-        } else if (taloonDate.after(minDate) && taloonDate.before(maxDate)) {
-            return 2;
-        } else {
-            return 3;
-        }
+    public Long getIdOfOrgCreated() {
+        return idOfOrgCreated;
     }
 
-    public Boolean allowedSetFirstFlag() {
-        int period = getPeriod();
-        if (period == 1) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
-                    && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        if (period == 2 || period == 3) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        return true;
+    public void setIdOfOrgCreated(Long idOfOrgCreated) {
+        this.idOfOrgCreated = idOfOrgCreated;
     }
 
-    public Boolean allowedClearFirstFlag() {
-        int period = getPeriod();
-        if (period == 1) {
-            return false;
-        }
-        if (period == 2 || period == 3) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        return true;
+    public Integer getRequestedQty() {
+        return requestedQty;
     }
 
-    public Boolean allowedSetSecondFlag() {
-        int period = getPeriod();
-        if (period == 1) {
-            return false;
-        }
-        if (period == 2 || period == 3) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        return true;
+    public void setRequestedQty(Integer requestedQty) {
+        this.requestedQty = requestedQty;
     }
 
-    public Boolean allowedClearSecondFlag() {
-        int period = getPeriod();
-        if (period == 1) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
-                    && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        if (period == 2 || period == 3) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        return true;
+    public Integer getShippedQty() {
+        return shippedQty;
     }
 
-    public Boolean enableEditShippedQty() {
-        if (summaryDay) {
-            return false;
-        }
-        Date currentDate = new Date();
-        Date firstMonthDate = CalendarUtils.getFirstDayOfNextMonth(taloonDate);
-        Date redDate = CalendarUtils.addDays(firstMonthDate, 5);
-        if (currentDate.after(redDate)) {
-            return false;
-        }
-        if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED
-                || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
-            return true;
-        } else {
-            return false;
-        }
+    public void setShippedQty(Integer shippedQty) {
+        this.shippedQty = shippedQty;
     }
 
-    public void performConfirm() {
-        if (this.ppState == null) {
-            return;
-        }
-        this.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+    public boolean isChangedData() {
+        return changedData;
     }
 
-    public String getPpStateToTurnOnFirst() {
-        return MAKE_CONFIRM;
-    }
-
-    public String getPpStateForAllDay() {
-        DateFormat df = new SimpleDateFormat(DAY_FORMAT);
-        return df.format(taloonDate);
-    }
-
-    public String getPpStateToTurnOnSecond() {
-        return MAKE_CANCEL;
-    }
-
-    public String getPpStateToClear() {
-        return MAKE_CLEAR;
-    }
-
-    public boolean taloonDateIsEmpty() {
-        return taloonDate == null;
-    }
-
-    public boolean isIsppStateConfirmed() {
-        return (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED);
-    }
-
-    public boolean isPpStateConfirmed() {
-        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
-    }
-
-    public boolean isPpStateCanceled() {
-        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
-    }
-
-    public boolean isPpStateNotSelected() {
-        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
-    }
-
-    public Boolean needFillShippedQty() {
-        return (shippedQty == null);
-    }
-
-    public Boolean getRemarksEmpty() {
-        return StringUtils.isEmpty(remarks);
-    }
-
-    public void addQtyAndGet(TaloonPreorderVerificationDetail arg) {
-        this.setRequestedQty(getIntSum(this.getRequestedQty(), arg.getRequestedQty()));
-        this.setRequestedSum(getLongSum(this.getRequestedSum(), arg.getRequestedSum()));
-        this.setSoldQty(getIntSum(this.getSoldQty(), arg.getSoldQty()));
-        this.setSoldSum(getLongSum(this.getSoldSum(), arg.getSoldSum()));
-        this.setShippedQty(getIntSum(this.getShippedQty(), arg.getShippedQty()));
-        this.setShippedSum(getLongSum(this.getShippedSum(), arg.getShippedSum()));
-        this.setReservedQty(getIntSum(this.getReservedQty(), arg.getReservedQty()));
-        this.setReservedSum(getLongSum(this.getReservedSum(), arg.getReservedSum()));
-        this.setBlockedQty(getIntSum(this.getBlockedQty(), arg.getBlockedQty()));
-        this.setBlockedSum(getLongSum(this.getBlockedSum(), arg.getBlockedSum()));
-        this.setDifferedQty(getIntSum(this.getDifferedQty(), arg.getDifferedQty()));
-        this.setDifferedSum(getLongSum(this.getDifferedSum(), arg.getDifferedSum()));
-    }
-
-    private Integer getIntSum(Integer value1, Integer value2) {
-        return (value1 == null ? 0 : value1) + (value2 == null ? 0 : value2);
-    }
-
-    private Long getLongSum(Long value1, Long value2) {
-        return (value1 == null ? 0L : value1) + (value2 == null ? 0L : value2);
-    }
-
-    public void deselectPpState() {
-        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
-    }
-
-    public void cancelPpState() {
-        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
-    }
-
-    private void changePpState(TaloonPPStatesEnum ppState) {
-        this.ppState = ppState;
-    }
-
-    public Boolean isEmptyTotal() {
-        return isSummaryDay() && complexId == null && complexName == null && goodsGuid == null && taloonDate == null;
-    }
-
-    public Boolean isTotal() {
-        return isSummaryDay() && complexId != null && taloonDate == null;
+    public void setChangedData(boolean changedData) {
+        this.changedData = changedData;
     }
 }

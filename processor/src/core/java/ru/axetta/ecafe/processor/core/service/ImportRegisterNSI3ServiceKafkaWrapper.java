@@ -60,8 +60,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
         if(!workWithKafka){
             return innerServices.getQueryString();
         } else {
-            return "WITH pupils_info AS (\n"
-                    + "       SELECT DISTINCT ON (p.guidnsi) p.guidnsi AS guid,\n"
+            return " SELECT DISTINCT p.guidnsi AS guid,\n"
                     + "              o.guid AS guidOfOrg,\n"
                     + "              p.firstname,\n"
                     + "              p.patronymic AS secondname,\n"
@@ -79,11 +78,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "                   LEFT JOIN cf_kf_ct_educationlevel AS el ON p.educationstageid = el.id\n"
                     + "                   LEFT JOIN cf_kf_ct_gender AS g ON p.genderid = g.id\n"
                     + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON p.parallelid = prll.id\n"
-                    + "  WHERE p.invaliddata IS FALSE"
-                    + "  ORDER BY p.guidnsi, p.lastupdate DESC\n"
-                    + ") SELECT distinct(pi.*) FROM pupils_info AS pi\n"
-                    + " JOIN cf_orgs AS o ON pi.organizationid = o.organizationIdFromNSI\n"
-                    + " WHERE o.ekisId IN :guids ";
+                    + "  WHERE p.invaliddata IS FALSE and o.ekisId IN :guids";
         }
     }
 

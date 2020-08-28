@@ -61,6 +61,14 @@
         <property name="keepAliveSeconds" value="120"/>
     </bean>
 
+    <!-- Multi thread clear menu executor -->
+    <bean id="clearMenuExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="maxPoolSize" value="10"/>
+        <property name="queueCapacity" value="100"/>
+        <property name="allowCoreThreadTimeOut" value="true"/>
+        <property name="keepAliveSeconds" value="60"/>
+    </bean>
+
     <!--    <jee:jndi-lookup id="dataSource" jndi-name="java:jboss/PostgresDS"/>-->
 
 
@@ -98,7 +106,7 @@
         <task:scheduled ref="SMSService" method="logQueue" fixed-delay="60000"/>
         <task:scheduled ref="ETPMVService" method="resendStatuses" fixed-delay="3600000"/>
         <task:scheduled ref="ETPMVClient" method="watchdogRun" fixed-delay="60000"/>
-        <!--<task:scheduled ref="maintenanceService" method="run" cron="0 * * * * *" />-->
+        <task:scheduled ref="maintenanceService" method="wrapRun" cron="0 0 9 * * ?" />
         <task:scheduled ref="transactionJournalService" method="processTransactionJournalQueue" fixed-delay="10000"/>
         <!--EP-320 <task:scheduled ref="projectStateReportService" method="run" cron="0 20 4 ? * *"/> -->
         <!--        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="45000" />-->

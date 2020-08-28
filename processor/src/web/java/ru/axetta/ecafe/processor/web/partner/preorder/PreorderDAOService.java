@@ -615,10 +615,15 @@ public class PreorderDAOService {
         return menuItemExtList;
     }
 
+    private List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
+        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(wtDish);
+    }
+
     public String getMenuGroupByWtDish(WtDish wtDish) {
         StringBuilder sb = new StringBuilder();
-        if (wtDish.getCategoryItems() != null && wtDish.getCategoryItems().size() > 0) {
-            for (WtCategoryItem ci : wtDish.getCategoryItems()) {
+        List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDish);
+        if (items != null && items.size() > 0) {
+            for (WtCategoryItem ci : items) {
                 sb.append(ci.getDescription()).append(",");
             }
             sb.deleteCharAt(sb.length() - 1);
@@ -867,11 +872,11 @@ public class PreorderDAOService {
                     preorderComplex.setMobile(guardianMobile);
                     preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
+                    preorderComplex.setAmount(complex.getAmount());
+                    preorderComplex.setLastUpdate(new Date());
+                    //preorderComplex.setDeletedState(!complexSelected);
+                    preorderComplex.setVersion(nextVersion);
                 }
-                preorderComplex.setAmount(complex.getAmount());
-                preorderComplex.setLastUpdate(new Date());
-                preorderComplex.setDeletedState(!complexSelected);
-                preorderComplex.setVersion(nextVersion);
 
                 /*if (set.size() > 0) {
                     preorderComplex.setPreorderMenuDetails(set);
@@ -955,7 +960,7 @@ public class PreorderDAOService {
 
         Query queryMenuSelect = em.createQuery("select m from PreorderMenuDetail m "
                 + "where m.client.idOfClient = :idOfClient and m.preorderComplex.idOfPreorderComplex = :idOfPreorderComplex "
-                + "and m.armIdOfMenu IS NULL and m.deletedState = false");
+                + "and m.idOfDish = :idOfDish and m.deletedState = false");
         queryMenuSelect.setParameter("idOfClient", client.getIdOfClient());
 
         for (ComplexListParam complex : list.getComplexes()) {
@@ -1031,6 +1036,7 @@ public class PreorderDAOService {
                         continue;
                     }
                     queryMenuSelect.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+                    queryMenuSelect.setParameter("idOfDish", menuItem.getIdOfMenuDetail());
                     boolean menuSelected = (menuItem.getAmount() > 0);
                     PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail();
                     try {
@@ -1051,15 +1057,30 @@ public class PreorderDAOService {
             }
 
             if (preorderComplex != null) {
-                if (set.size() > 0) {
+                if (preorderComplex.getPreorderMenuDetails() == null) {
                     preorderComplex.setPreorderMenuDetails(set);
                 }
-                if (preorderComplex.getDeletedState()) {
-                    Query delQuery = em.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
-                            + "where preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
-                    delQuery.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
-                    delQuery.executeUpdate();
+                if (set.size() > 0) {
+                    preorderComplex.getPreorderMenuDetails().addAll(set);
                 }
+                if (!preorderComplex.getAmount().equals(complex.getAmount())) {
+                    preorderComplex.setMobile(guardianMobile);
+                    preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
+                    updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
+                    preorderComplex.setAmount(complex.getAmount());
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setVersion(nextVersion);
+                }
+
+                //if (set.size() > 0) {
+                //    preorderComplex.setPreorderMenuDetails(set);
+                //}
+                //if (preorderComplex.getDeletedState()) {
+                //    Query delQuery = em.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
+                //            + "where preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
+                //    delQuery.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+                //    delQuery.executeUpdate();
+                //}
                 em.merge(preorderComplex);
             }
         }
@@ -3062,6 +3083,8 @@ public class PreorderDAOService {
     public List<WtMenu> getWtMenuByDates(Date beginDate, Date endDate, Org org) {
         Query query = emReport.createQuery("SELECT DISTINCT menu FROM WtMenu menu "
                 + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                + "left join fetch menu.menuGroupMenus "
+                + "left join fetch menu.orgs "
                 + "WHERE menu.beginDate <= :beginDate AND menu.endDate >= :endDate "
                 + "AND menu.deleteState = 0 "
                 + "AND (:org IN elements(menu.orgs) OR :org IN elements(orgGroup.orgs))");

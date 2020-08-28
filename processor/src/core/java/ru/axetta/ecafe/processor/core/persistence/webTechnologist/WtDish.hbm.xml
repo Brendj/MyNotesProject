@@ -62,11 +62,11 @@
             <column name="guid" sql-type="varchar(36)" length="36"/>
         </property>
 
-        <many-to-one name="wtAgeGroupItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
+        <many-to-one name="wtAgeGroupItem" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
             <column name="idOfAgeGroupItem"/>
         </many-to-one>
 
-        <many-to-one name="wtTypeProductionItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtTypeOfProductionItem">
+        <many-to-one name="wtTypeProductionItem" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtTypeOfProductionItem">
             <column name="idOfTypeOfProductionItem"/>
         </many-to-one>
 
@@ -94,7 +94,7 @@
             <column name="qty" sql-type="integer"/>
         </property>
 
-        <many-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
             <column name="idOfContragent"/>
         </many-to-one>
 
@@ -102,22 +102,22 @@
             <column name="barcode" sql-type="varchar(16)" length="16"/>
         </property>
 
-        <set name="complexItems" lazy="false" table="cf_wt_complex_items_dish">
+        <set name="complexItems" lazy="true" table="cf_wt_complex_items_dish">
             <key column="idOfDish"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem" column="idOfComplexItem"/>
         </set>
 
-        <set name="categoryItems" lazy="false" table="cf_wt_dish_categoryitem_relationships">
+        <set name="categoryItems" lazy="true" table="cf_wt_dish_categoryitem_relationships">
             <key column="idOfDish"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem" column="idOfCategoryItem"/>
         </set>
 
-        <set name="menuGroupMenus" lazy="false" table="cf_wt_menu_group_dish_relationships">
+        <set name="menuGroupMenus" lazy="true" table="cf_wt_menu_group_dish_relationships">
             <key column="idOfDish"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu" column="idOfMenuMenuGroupRelation"/>
         </set>
 
-        <set name="groupItems" lazy="false" table="cf_wt_dish_groupitem_relationships">
+        <set name="groupItems" lazy="true" table="cf_wt_dish_groupitem_relationships">
             <key column="idOfDish"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem" column="idOfGroupItem"/>
         </set>

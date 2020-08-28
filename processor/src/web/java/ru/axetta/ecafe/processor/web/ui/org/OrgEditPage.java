@@ -71,7 +71,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports1;
     private String mailingListReports2;
     private String guid;
-    private Long ekisId;
+    private Long ekisId = null;
     private String egissoId;
     private ConfigurationProvider configurationProvider;
     private List<Long> idOfOrgList = new ArrayList<Long>();
@@ -139,6 +139,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean preorderlp;
 
     private Boolean useWebArm;
+    private Long orgIdFromNsi = null;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -420,6 +421,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         org.setPreorderlp(preorderlp);
         org.setUseWebArm(useWebArm);
+        org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
 
         session.update(org);
         fill(org);
@@ -576,6 +578,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
         this.useWebArm = org.getUseWebArm();
+        this.orgIdFromNsi = org.getOrgIdFromNsi();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1431,4 +1434,8 @@ public class OrgEditPage extends BasicWorkspacePage
     public void setParticipantOP(Boolean participantOP) {
         this.participantOP = participantOP;
     }
+
+    public Long getOrgIdFromNsi() { return orgIdFromNsi; }
+
+    public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
 }

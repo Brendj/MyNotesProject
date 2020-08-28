@@ -69,7 +69,9 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                     }
 
                     Integer requestedQty = item.getRequestedQty();
-                    Integer shippedQty = item.getShippedQty();
+                    // по умолчанию Отгрузка заполняется значением из поля Заказ ИСПП
+                    Integer shippedQty = item.getShippedQty() == null || item.getShippedQty() == 0 ?
+                            item.getRequestedQty() : item.getShippedQty() ;
                     Integer reservedQty = item.getReservedQty();
                     Integer blockedQty = item.getBlockedQty();
                     TaloonCreatedTypeEnum createdType = item.getCreatedType();
@@ -93,12 +95,12 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                             taloon = new TaloonPreorder(guid, idOfOrg, date, complexId, complexName, goodsName, goodsGuid, idOfOrgCreated,
                                     soldQty, requestedQty, shippedQty, reservedQty, blockedQty, price, createdType,
                                     isppState, ppState, comments);
-                            taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT",
+                            taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид. %s), %3$td.%3$tm.%3$tY %3$tT",
                                     orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date()));
                         } else {
                             String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
                             taloon.setRemarks(rem.concat("\n").concat(String
-                                    .format("Изменено в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
+                                    .format("Изменено в ОО \"%s\" (ид. %s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
                         }
                         taloon.setSoldQty(soldQty);
                         taloon.setRequestedQty(requestedQty);

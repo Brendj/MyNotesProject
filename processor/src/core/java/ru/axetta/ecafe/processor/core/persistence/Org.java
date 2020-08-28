@@ -163,6 +163,7 @@ public class Org implements Serializable {
     private String municipalDistrict;
     private String founder;
     private String subordination;
+    private Long orgIdFromNsi;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1310,4 +1311,8 @@ public class Org implements Serializable {
     public void setSubordination(String subordination) {
         this.subordination = subordination;
     }
+
+    public Long getOrgIdFromNsi() { return orgIdFromNsi; }
+
+    public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
 }

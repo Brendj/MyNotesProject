@@ -7,6 +7,9 @@ package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -60,12 +63,14 @@ public class WtDish {
     @Column(name = "guid")
     private String guid;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idOfAgeGroupItem")
+    @Fetch(value = FetchMode.JOIN)
     private WtAgeGroupItem wtAgeGroupItem;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idOfTypeOfProductionItem")
+    @Fetch(value = FetchMode.JOIN)
     private WtTypeOfProductionItem wtTypeProductionItem;
 
     @ManyToOne
@@ -87,7 +92,7 @@ public class WtDish {
     @Column(name = "qty")
     private String qty;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 

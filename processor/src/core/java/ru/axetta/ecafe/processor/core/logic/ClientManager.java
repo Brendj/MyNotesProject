@@ -309,19 +309,19 @@ public class ClientManager {
             String contractDoc = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_DOC);
             Person contractPerson = client.getContractPerson();
             boolean changed = false;
-            if (contractFirstName != null && StringUtils.isNotEmpty(contractFirstName)) {
+            if (StringUtils.isNotEmpty(contractFirstName)) {
                 contractPerson.setFirstName(contractFirstName);
                 changed = true;
             }
-            if (contractSurname != null && StringUtils.isNotEmpty(contractSurname)) {
+            if (StringUtils.isNotEmpty(contractSurname)) {
                 contractPerson.setSurname(contractSurname);
                 changed = true;
             }
-            if (contractSecondName != null && StringUtils.isNotEmpty(contractSecondName)) {
+            if (StringUtils.isNotEmpty(contractSecondName)) {
                 contractPerson.setSecondName(contractSecondName);
                 changed = true;
             }
-            if (contractDoc != null && StringUtils.isNotEmpty(contractDoc)) {
+            if (StringUtils.isNotEmpty(contractDoc)) {
                 contractPerson.setIdDocument(contractDoc);
                 changed = true;
             }
@@ -482,6 +482,14 @@ public class ClientManager {
                     client.setClientGUID(clientGUID);
                 }
             }
+            if (fieldConfig.getValue(FieldId.MESH_GUID) != null) {
+                String meshGUID = fieldConfig.getValue(FieldId.MESH_GUID);
+                if (meshGUID.isEmpty()) {
+                    client.setMeshGUID(null);
+                } else {
+                    client.setMeshGUID(meshGUID);
+                }
+            }
             //tokens[32])
             if (fieldConfig.getValue(FieldId.GENDER) != null) {
                 client.setGender(Integer.valueOf(fieldConfig.getValue(FieldId.GENDER)));
@@ -528,6 +536,8 @@ public class ClientManager {
             if (fieldConfig.getValue(FieldId.PARALLEL) != null) {
                 client.setParallel(fieldConfig.getValue(FieldId.PARALLEL));
             }
+
+            DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
             client.setUpdateTime(new Date());
 
@@ -1896,7 +1906,18 @@ public class ClientManager {
     }
 
     /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
-    public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile, Boolean value) throws Exception {
+    public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile,
+            Boolean value, Long newVersion) throws Exception {
+        if (guardian != null) {
+            Criteria cr = session.createCriteria(ClientGuardian.class);
+            cr.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
+            cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+            ClientGuardian cg = (ClientGuardian) cr.uniqueResult();
+            cg.setVersion(newVersion);
+            cg.setLastUpdate(new Date());
+            session.update(cg);
+        }
+
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", child));
         criteria.add(Restrictions.eq("guardianInformedSpecialMenu", guardian));
@@ -2207,7 +2228,7 @@ public class ClientManager {
         archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
     }
 
-    private static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+    public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
         if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
         try {
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodInoeByClient(session, client);
@@ -2216,10 +2237,14 @@ public class ClientManager {
                 DiscountManager.archiveApplicationForFood(session, applicationForFood, version);
             }
             ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, client.getIdOfClient());
-            if (info == null) return;
-            DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
-            builder.withDateEnd(new Date());
-            builder.save(session);
+            if (info != null) {
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(
+                        info);
+                builder.withDateEnd(new Date());
+                builder.withArchived(true);
+                builder.save(session);
+            }
+            DiscountManager.deleteOtherDiscountForClientWithNoUpdateClient(session, client);
         } catch (Exception e) {
             logger.error("Error in archiveApplicationForFoodIfClientLeaving: ", e);
         }

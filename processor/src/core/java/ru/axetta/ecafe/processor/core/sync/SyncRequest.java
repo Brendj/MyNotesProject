@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldData;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldRequest;
@@ -30,6 +32,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
@@ -2796,6 +2800,8 @@ public class SyncRequest {
 			builders.add(new EmiasBuilder());
             builders.add(new MenuSupplierBuilder(idOfOrg));
             builders.add(new RequestsSupplierBuilder(idOfOrg));
+            builders.add(new HardwareSettingsRequestBuilder(idOfOrg));
+            builders.add(new TurnstileSettingsRequestBuilder(idOfOrg));
             return builders;
         }
 
@@ -3099,7 +3105,7 @@ public class SyncRequest {
     public GoodRequestEZDRequest getGoodRequestEZDRequest(){
         return this.<GoodRequestEZDRequest>findSection(GoodRequestEZDRequest.class);
     }
-	
+
 	public EmiasRequest getEmiasRequest(){
         return this.<EmiasRequest>findSection(EmiasRequest.class);
     }
@@ -3110,6 +3116,14 @@ public class SyncRequest {
 
     public RequestsSupplier getRequestsSupplier() {
         return this.findSection(RequestsSupplier.class);
+    }
+
+    public HardwareSettingsRequest getHardwareSettingsRequest() {
+        return this.<HardwareSettingsRequest>findSection(HardwareSettingsRequest.class);
+    }
+
+    public TurnstileSettingsRequest getTurnstileSettingsRequest() {
+        return this.<TurnstileSettingsRequest>findSection(TurnstileSettingsRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

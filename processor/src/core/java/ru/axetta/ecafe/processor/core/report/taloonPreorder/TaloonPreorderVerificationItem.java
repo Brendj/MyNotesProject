@@ -24,6 +24,10 @@ public class TaloonPreorderVerificationItem {
     private TaloonPPStatesEnum ppState;
     private List<TaloonPreorderVerificationComplex> complexes = new ArrayList<>();
 
+    private int detailsSize;
+    private boolean allowedSetFirstFlag;
+    private boolean allowedClearFirstFlag;
+
     public TaloonPreorderVerificationItem() {
     }
 
@@ -67,13 +71,13 @@ public class TaloonPreorderVerificationItem {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
                     // согласование - только для записей, у которых нет отказа
-                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) {
+                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.isAllowedSetFirstFlag()) {
                         if (!detail.isPpStateCanceled()) {
                             detail.setPpState(ppState);
                             this.ppState = ppState;
                         }
                     }
-                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED && detail.allowedClearFirstFlag()) {
+                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED && detail.isAllowedClearFirstFlag()) {
                         detail.setPpState(ppState);
                         this.ppState = ppState;
                     }
@@ -83,30 +87,30 @@ public class TaloonPreorderVerificationItem {
     }
 
     // разрешаем, если хотя бы у одной записи разрешен
-    public boolean allowedSetFirstFlag() {
+    public boolean isAllowedSetFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
-                    if (detail.allowedClearFirstFlag()) {
-                        return true;
+                    if (detail.isAllowedClearFirstFlag()) {
+                        return allowedSetFirstFlag = true;
                     }
                 }
             }
         }
-        return false;
+        return allowedSetFirstFlag = false;
     }
 
-    public boolean allowedClearFirstFlag() {
+    public boolean isAllowedClearFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
-                    if (detail.allowedClearFirstFlag()) {
-                        return true;
+                    if (detail.isAllowedClearFirstFlag()) {
+                        return allowedClearFirstFlag = true;
                     }
                 }
             }
         }
-        return false;
+        return allowedClearFirstFlag = false;
     }
 
     public List<TaloonPreorderVerificationComplex> getComplexes() {
@@ -122,7 +126,7 @@ public class TaloonPreorderVerificationItem {
         for (TaloonPreorderVerificationComplex complex : complexes) {
             size += complex.getDetails().size();
         }
-        return size;
+        return detailsSize = size;
     }
 
     public int getRowInItem(int complexId, int rowId) {
@@ -131,6 +135,18 @@ public class TaloonPreorderVerificationItem {
             complexesSize += this.complexes.get(i).getDetails().size();
         }
         return complexesSize + rowId;
+    }
+
+    public String getPpStateToTurnOnFirst() {
+        return MAKE_CONFIRM;
+    }
+
+    public String getPpStateToTurnOnSecond() {
+        return MAKE_CANCEL;
+    }
+
+    public String getPpStateToClear() {
+        return MAKE_CLEAR;
     }
 
 }
