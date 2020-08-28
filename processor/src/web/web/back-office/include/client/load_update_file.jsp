@@ -14,6 +14,26 @@
 <%-- Панель загрузки клиентов из файла --%>
 <h:panelGrid id="clientUpdateFileLoaderPanel" binding="#{mainPage.clientUpdateFileLoadPage.pageComponent}"
              styleClass="borderless-grid">
+    <h:panelGrid columns="2" styleClass="borderless-grid">
+
+        <h:outputText escape="true" value="Организация" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{mainPage.clientUpdateFileLoadPage.org.shortName}" readonly="true" styleClass="input-text"
+                         style="margin-right: 2px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
+        </h:panelGroup>
+    </h:panelGrid>
+    <h:panelGrid columns="1">
+        <h:commandLink action="#{mainPage.clientUpdateFileLoadPage.downloadClients}" id="downloadOrgClients"
+                       value="Выгрузить клиентов организации" styleClass="command-link" disabled="#{!mainPage.clientUpdateFileLoadPage.orgSelected()}"/>
+    </h:panelGrid>
+
+    <h:panelGrid columns="1">
+        <h:outputText value="Загрузка файла:" styleClass="output-text"/>
+    </h:panelGrid>
+
     <rich:fileUpload id="clientUpdateFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                      addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
                      cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
@@ -60,7 +80,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Идентификатор клиента в БД (IdOfClient)" />
+                <h:outputText escape="true" value="Л/с клиента" />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfClient}" styleClass="output-text" />

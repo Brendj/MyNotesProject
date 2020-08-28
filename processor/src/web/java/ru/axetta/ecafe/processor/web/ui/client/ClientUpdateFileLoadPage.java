@@ -5,28 +5,37 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
-import org.hibernate.Transaction;
+import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,10 +44,18 @@ import java.util.*;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
+public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientUpdateFileLoadPage.class);
     private static final long MAX_LINE_NUMBER = 80000;
+
+    public OrgItem getOrg() {
+        return org;
+    }
+
+    public void setOrg(OrgItem org) {
+        this.org = org;
+    }
 
     public static class LineResult {
 
@@ -102,8 +119,94 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
         }
     }
 
+    public static class ClientItem {
+        private final Long contractId;
+        private final String group;
+
+        public ClientItem(Long contractId, String group) {
+            this.contractId = contractId;
+            this.group = group;
+        }
+
+        public Long getContractId() {
+            return contractId;
+        }
+
+        public String getGroup() {
+            return group;
+        }
+    }
+
     private List<LineResult> lineResults = Collections.emptyList();
     private int successLineNumber;
+    private OrgItem org = new OrgItem();
+
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if (null != idOfOrg) {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            this.org = new OrgItem(org);
+        } else {
+            this.org = new OrgItem();
+        }
+    }
+
+    public Boolean orgSelected() {
+        return org.getIdOfOrg() != null;
+    }
+
+    public void downloadClients() {
+        String clients = "\"Номер л/счета\";\"Фамилия\";\"Имя\";"
+                + "\"Отчество\";\"Дата рождения\";"
+                + "\"Текущая группа\";\"Новая группа\"\r\n";
+        clients += getClientsByOrg();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+            facesContext.responseComplete();
+            response.setContentType("application/csv");
+            response.setHeader("Content-disposition", "attachment;filename=\"clients.csv\"");
+            servletOutputStream.write(clients.getBytes(StandardCharsets.UTF_8));
+            servletOutputStream.flush();
+            servletOutputStream.close();
+        } catch (Exception e) {
+            logger.error("Failed export clients : ", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Не удалось сгенерировать список клиентов для загрузки: " + e.getMessage(), null));
+        }
+    }
+
+    private String getClientsByOrg() {
+        String result = "";
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            Query query = session.createQuery("select c from Client c join fetch c.person join fetch c.clientGroup "
+                    + "where c.org.idOfOrg = :org and c.idOfClientGroup < :group order by c.clientGroup.groupName, c.person.surname, c.person.firstName, c.person.secondName");
+            query.setParameter("org", org.getIdOfOrg());
+            query.setParameter("group", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            List<Client> list = query.list();
+            for (Client client : list) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(client.getContractId()).append(";");
+                sb.append(client.getPerson().getSurname()).append(";");
+                sb.append(client.getPerson().getFirstName()).append(";");
+                sb.append(client.getPerson().getSecondName()).append(";");
+                sb.append(client.getBirthDate() == null ? "" : CalendarUtils.dateToString(client.getBirthDate())).append(";");
+                sb.append(client.getClientGroup().getGroupName()).append(";");
+                sb.append(client.getClientGroup().getGroupName()).append("\r\n");
+                result += sb.toString();
+            }
+            transaction.commit();
+            transaction = null;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
 
     public String getPageFilename() {
         return "client/load_update_file";
@@ -142,17 +245,14 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
             int lineNo = 0;
             int successLineNumber = 0;
 
-            ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String currLine = reader.readLine();
+
             while (null != currLine) {
                 if (lineNo==0) {
-                    if (!currLine.startsWith("!")) currLine="!"+currLine;
-                    parseLineConfig(fieldConfig, currLine);
+                    continue; //пропускаем заголовок
                 } else {
-                    LineResult result = updateClient(fieldConfig, currLine, lineNo);
-                    //result = updateClient(runtimeContext, dateFormat, currLine, lineNo, colums);
+                    LineResult result = updateClient(currLine, lineNo);
                     if (result.getResultCode() == 0) {
                         ++successLineNumber;
                     }
@@ -179,79 +279,38 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage {
         fc.checkRequiredFields();
     }
 
-    private LineResult updateClient(ClientManager.ClientFieldConfigForUpdate fieldConfig, String line,
-            int lineNo) {
-        String[] tokens = line.split(";", -1);
+    private LineResult updateClient(String line, int lineNo) {
+        String[] tokens = line.split(";");
+        Session session = null;
+        Transaction transaction = null;
         try {
-            fieldConfig.setValues(tokens);
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Long contractId = new Long(tokens[0]);
+            String prevGroup = tokens[5];
+            String groupName = tokens[6];
+            if (groupName.equals(prevGroup)) return new LineResult(lineNo, 0, "Группа не менялась", contractId);
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) return new LineResult(lineNo, -1, "Клиент не найден", contractId);
+            ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session,
+                    client.getOrg().getIdOfOrg(), groupName);
+            if (clientGroup == null) {
+                clientGroup = DAOUtils.createClientGroup(session, client.getOrg().getIdOfOrg(), groupName);
+            }
+            client.setClientGroup(clientGroup);
+            Long nextClientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+            client.setClientRegistryVersion(nextClientRegistryVersion);
+            session.update(client);
+            transaction.commit();
+            transaction = null;
+            return new LineResult(lineNo, 0, "Ok", contractId);
         } catch (Exception e) {
             return new LineResult(lineNo, 1, e.getMessage(), null);
-        }
-        try {
-            long idOfClient = ClientManager.modifyClient(fieldConfig);
-            return new LineResult(lineNo, 0, "Ok", idOfClient);
-        } catch (Exception e) {
-            return new LineResult(lineNo, -1, "Ошибка: "+e.getMessage(), -1L);
-        }
-
-    }
-
-    /*
-    private LineResult createClient(RuntimeContext runtimeContext, DateFormat dateFormat, String line, int lineNo, String[] colums) {
-        String[] tokens = line.split(";");
-        if (tokens.length < 2) {
-            return new LineResult(lineNo, 1, "Not enough data", null);
-        }
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
-            long contractId = Long.parseLong(tokens[0]);
-
-            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
-            if (client == null) {
-                return new LineResult(lineNo, 20, "Client not found", null);
-            }
-            for (int i=1; i<colums.length; i++){
-                if(colums[i].equalsIgnoreCase("ContractState")){
-                    client.setContractState(Integer.parseInt(tokens[i].trim()));
-                }
-                if(colums[i].equalsIgnoreCase("MobilePhone")){
-                    client.setMobile(tokens[i].trim());
-                }
-                if(colums[i].equalsIgnoreCase("NotifyBySMS")){
-                    client.setNotifyViaSMS(Integer.parseInt(tokens[i].trim())!=0);
-                }
-                if(colums[i].equalsIgnoreCase("PersonFirstName")){
-                    client.getPerson().setFirstName(tokens[i].trim());
-                }
-                if(colums[i].equalsIgnoreCase("PersonSurName")){
-                    client.getPerson().setSurname(tokens[i].trim());
-                }
-                if(colums[i].equalsIgnoreCase("PersonSecondName")){
-                    client.getPerson().setSecondName(tokens[i].trim());
-                }
-            }
-            // "PersonFirstName","PersonSurName","PersonSecondName"};
-            client.setUpdateTime(new Date());
-            client.setClientRegistryVersion(clientRegistryVersion);
-            persistenceSession.update(client);
-            Long idOfClient = client.getIdOfClient();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-
-            return new LineResult(lineNo, 0, "Ok", idOfClient);
-        } catch (Exception e) {
-            logger.debug("Failed to update client", e);
-            return new LineResult(lineNo, 3, e.getMessage(), null);
         } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
-    */
+
 
 }
