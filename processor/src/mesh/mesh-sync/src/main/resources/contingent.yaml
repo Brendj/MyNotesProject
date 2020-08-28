@@ -1,0 +1,3553 @@
+openapi: 3.0.1
+info:
+  title: API МЭШ.Контингент
+  description: Описание REST API МЭШ.Контингент
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: fixme@ktelabs.ru
+  license:
+    name: fixme
+    url: http://fixme
+  version: 0.0.1
+servers:
+- url: /
+- url: http://contingent.mesh.ktelabs.ru
+tags:
+- name: Class
+  description: Операции с классом
+- name: Person
+  description: Операции с персоной
+- name: Create
+  description: Создание данных
+- name: Update
+  description: Обновление данных
+- name: Get
+  description: Получение данных
+- name: Delete
+  description: Удаление данных
+- name: Search
+  description: Поиск данных
+paths:
+  /persons:
+    post:
+      tags:
+      - Person
+      summary: Создание персоны
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInfo'
+            example:
+                id: 0
+                person_id: "00000000-0000-0000-0000-000000000000"
+                lastname: "Агеев"
+                firstname: "Никита"
+                patronymic: "Сергеевич"
+                birthdate: "2000-07-20"
+                birthplace: "Украина, запорожская область, каменский район, хутор далекий, путь не близкий"
+                gender_id: 1
+                citizenship_id: 1
+                validation_state_id: 1
+                validated_at: "2019-09-12T15:34:12.234Z"
+                validation_errors: ""
+                addresses:
+                  - id: 0
+                    address_type_id: 1
+                    validation_state_id: 1
+                    validated_at: "2019-09-12T15:37:12.232Z"
+                    validation_errors: ""
+                    address:
+                      id: 0
+                      address: "000111, г.Москва, ул. Проспект Андропова, д 19/1 к.А, кв. 111/13"
+                      fias_id: "1429aa81-57ea-43c6-95b4-72e3b2bfdf17"
+                      unom: "123321"
+                      flat: "111/13"
+                documents:
+                  - id: 0
+                    document_type_id: 1
+                    series: "II-МЮ"
+                    number: "135676"
+                    subdivision_code: "007-001"
+                    issuer: "ЗАГС Марьинского района, г.Москвы"
+                    issued: "2019-01-05"
+                    validation_state_id: 1
+                    validated_at: "2019-09-12T15:39:12.234Z"
+                    validation_errors: ""
+                contacts:
+                  - id: 0
+                    type_id: 1
+                    data: "9202703203"
+                    validation_state_id: 1
+                    validated_at: "2019-09-19T15:55:12.232Z"
+                    validation_errors: ""
+                categories:
+                  - id: 0
+                    category_id: 7
+                    parameter_values:
+                      - value_1
+                      - value_2
+                    actual_from: '2020-01-02T17:45:28.75+03:00'
+                    actual_to: '2099-01-01T00:00:00+03:00'
+                agents:
+                  - id: 0
+                    agent_type_id: 1
+                    validation_state_id: 1
+                    validated_at: "2019-09-12T15:42:12.234Z"
+                    validation_errors: ""
+                    agent_person:
+                      id: 0
+                      lastname: "Агеева"
+                      firstname: "Никитаа"
+                      patronymic: "Сергеевична"
+                      birthdate: "1938-07-20"
+                      birthplace: "Украина, запорожская область, каменский район, хутор далекий, путь не близкий"
+                      gender_id: 1
+                      citizenship_id: 1
+                      validation_state_id: 1
+                      validated_at: "2019-09-12T15:40:12.234Z"
+                      validation_errors: ""
+                      addresses:
+                        - id: 0
+                          address_type_id: 1
+                          validation_state_id: 1
+                          validated_at: "2019-09-12T15:45:12.234Z"
+                          address:
+                            id: 0
+                            address: "000111, г.Тула, ул. Проспект Андропова, д 19/1 к.А, кв. 111/13"
+                            fias_id: "1429aa81-57ea-43c6-95b4-72e3b2bfdf17"
+                            unom: "123321"
+                            flat: "111/13"
+                      documents:
+                        - id: 0
+                          document_type_id: 2
+                          series: "0123"
+                          number: "321321"
+                          subdivision_code: "007-001"
+                          issuer: "УВД Марьинского района, г.Москвы"
+                          issued: "2018-01-05"
+                          validation_state_id: 1
+                          validated_at: "2019-09-12T15:48:12.234Z"
+                          validation_errors: ""
+                      contacts:
+                        - id: 0
+                          type_id: 1
+                          data: "9202703202"
+                          validation_state_id: 1
+                          validated_at: "2019-09-12T15:51:12.234Z"
+                          validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonInfo'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+      - Person
+      - Search
+      summary: Поиск персон
+      parameters:
+      - in: query
+        name: filter
+        description: сериализованная коллекция /components/schemas/Filter
+        required: true
+        schema:
+          type: string
+          example: '{"and":[{"field":"documents.number","op":"equal","value":"789475"},{"field":"documents.series","op":"like","value":"III"}]}'
+      - in: query
+        name: expand
+        description: Список полей, которые должны быть "раскрыты" в ответе. Перечисляются через запятую. Если параметр не указан, возвращаются только основные данные персоны.
+        schema:
+          type: string
+          example: 'documents,education'
+      - in: query
+        name: top
+        description: Количество возвращаемых записей. Значение по умолчанию задается в параметрах Системы.
+        schema:
+          type: string
+          example: '10'
+      - in: query
+        name: skip
+        description: Количество пропускаемых записей. По умолчанию, 0.
+        schema:
+          type: string
+          example: '0'
+      - in: query
+        name: orderby
+        description: Cписок полей, по которым требуется сортировать, через запятую
+        schema:
+          type: string
+          example: 'lastname'
+      - in: query
+        name: actual_on
+        description: "Дата актуальности данных. По умолчанию, текущая. Пример: 2019-12-01T00:00:00.000Z"
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: training_on
+        description: "Дата нахождения в ОО/классе. Пример: 2019-12-01. По умолчанию, не установлена для возможности искать персоны, которые нигде не обучаются."
+        schema:
+          type: string
+          format: date
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonInfo'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+  /persons/{id}:
+    get:
+      tags:
+      - Person
+      summary: Получить персону по идентификатору
+      parameters:
+      - in: path
+        name: id
+        description: Идентификатор персоны</br> (пример "449ab5bd-4f09-47a0-ba89-70ae2cd49692")
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: query
+        name: actual_on
+        description: Дата актуальности
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: expand
+        description: Список полей, которые должны быть "раскрыты" в ответе. Перечисляются через запятую. Если параметр не указан, возвращаются только основные данные персоны.
+        schema:
+          type: string
+          example: 'documents,education'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonInfo'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+      - Person
+      - Update
+      summary: Изменение основных данных персоны
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInfo'
+            example:
+                person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
+                lastname: "Агеев"
+                firstname: "Никита"
+                patronymic: "Сергеевич"
+                birthdate: "2000-07-20"
+                birthplace: "Украина, запорожская область, каменский район, хутор далекий, путь не близкий"
+                gender_id: 1
+                citizenship_id: 1
+                validation_state_id: 1
+                validated_at: "2019-09-12T16:37:12.232Z"
+                validation_errors: ""
+      parameters:
+      - in: path
+        name: id
+        description: Идентификатор версии персоны
+        required: true
+        schema:
+          type: string
+          example: '618146'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonInfo'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/{person_id}/merges:
+    get:
+      tags:
+      - Person
+      summary: Получить даты слияний персоны с другими. При слиянии персона должна была выступать в качестве основной.
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Даты слияния
+                items:
+                  type: string
+                  format: date-time
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/{person_id}/merge:
+    post:
+      tags:
+      - Person
+      summary: Слияние двух или более персон
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор версии персоны
+        required: true
+        example: 124342
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  ids:
+                    type: array
+                    description: Идентификаторы персоны, которые должны быть слиты с основной персоной
+                    items:
+                      type: integer
+                      format: int64
+            example:
+              ids:
+                - 41133
+                - 23403
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonInfo'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  
+  /persons/{person_id}/unmerge:
+    post:
+      tags:
+      - Person
+      summary: Откат слияния персон
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - merged_at
+              properties:
+                merged_at:
+                  description: Дата/время слияния
+                  type: string
+                  format: date-time
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonInfo'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /persons/{person_id}/category:
+    post:
+      tags:
+        - Create
+        - Person
+      summary: Добавление новых данных о категории
+      parameters:
+        - in: path
+          name: person_id
+          description: Идентификатор персоны
+          required: true
+          schema:
+            type: string
+            example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonCategory'
+            example:
+              id: 0
+              category_id: 7
+              parameter_values:
+                - value_1
+                - value_2
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonCategory'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /persons/{person_id}/category/{id}:
+    put:
+      tags:
+        - Update
+        - Person
+      summary: Изменение данных о категории
+      parameters:
+        - in: path
+          name: person_id
+          description: Идентификатор персоны
+          required: true
+          schema:
+            type: string
+            example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+        - in: path
+          name: id
+          description: Идентификатор связи
+          required: true
+          schema:
+            type: string
+            example: 14
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonCategory'
+            example:
+              id: 5
+              category_id: 7
+              parameter_values:
+                - value_3
+                - value_4
+              actual_to: '2021-01-01T00:00:00+03:00'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonCategory'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Delete
+        - Person
+      summary: Удаление данных о категории персоны
+      parameters:
+        - in: path
+          name: person_id
+          description: Идентификатор персоны
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id
+          description: Идентификатор связи
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /persons/{person_id}/documents:
+    post:
+      tags:
+      - Person
+      - Create
+      summary: Создание нового документа персоны
+      description: 1. ищется персона с указанным id.<br/>2. Создается документ с указанными параметрами.<br/> 3. заполняется таблица person_document.<br/> 4. В результате возвращается созданная структура описания документа<br/>
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonDocument'
+            example:   # Sample object
+              id: 0
+              document_type_id: 1
+              series: "II-МЮ"
+              number: "123123"
+              subdivision_code: "071-001"
+              issuer: "УВД Северозападного административного округа"
+              issued: "2019-07-15"
+              expiration: "2045-07-15"
+              validation_state_id: 1
+              validated_at: "2019-09-12T16:37:12.232Z"
+              validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDocument'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  
+  /persons/{person_id}/documents/{id}:
+    put:
+      tags:
+      - Person
+      - Update
+      summary: Изменение документа персоны
+      description: 1. Находится документ с указанным идентификатором.
+                   2. Проверяется что документ принадлежит персоне с указанным идентификатором
+                   3. Находится запись person_document для указанного документа
+                   4. Поле actual_to присваивается значение системного времени приема запроса
+                   5. Создается новая запись в таблице person_document, где поле actual_from равна системной дате приема запроса. actual_to - в будущем
+                   6. возвращается объект Документ
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор документа
+        required: true
+        schema:
+          type: string
+          example: '5326'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonDocument'
+            example:
+              id: 5326
+              document_type_id: 1
+              series: "II-МЮ"
+              number: "123123"
+              subdivision_code: "071-001"
+              issuer: "УВД Северозападного административного округа"
+              issued: "2019-07-15"
+              expiration: "2045-07-15"
+              validation_state_id: 1
+              validated_at: "2019-09-12T16:37:12.232Z"
+              validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDocument'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+      - Person
+      - Delete
+      summary: Удаление документа персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор документа
+        required: true
+        schema:
+          type: string
+          example: '5326'
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/{person_id}/addresses:
+    post:
+      tags:
+      - Person
+      - Create
+      summary: Создание нового адреса персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны</br> (пример "449ab5bd-4f09-47a0-ba89-70ae2cd49692")
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonAddress'
+            example:
+              id: 0
+              address_type_id: 1
+              validation_state_id: 1
+              validated_at: "2019-09-13T15:18:12.232Z"
+              validation_errors: ""
+              address:
+                id: 0
+                address: "Виноградова Академика ул., дом 1, корпус 1, кв. 110"
+                fias_id: "1429aa81-57ea-43c6-95b4-72e3b2bfdf17"
+                unom: 280190
+                flat: "110"
+                global_id: 1239872
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonAddress'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  
+  /persons/{person_id}/addresses/{id}:
+    put:
+      tags:
+      - Person
+      - Update
+      summary: Изменение адреса персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны</br> (пример "449ab5bd-4f09-47a0-ba89-70ae2cd49692")
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор версии адреса
+        required: true
+        schema:
+          type: string
+          example: '532623'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonAddress'
+            example:
+              id: 532623
+              address_type_id: 1
+              validation_state_id: 1
+              validated_at: "2019-09-17T17:37:12.232Z"
+              validation_errors: ""
+              address:
+                id: 0
+                address: "Виноградова Академика ул., дом 1, корпус 1, кв. 110"
+                fias_id: "1429aa81-57ea-43c6-95b4-72e3b2bfdf17"
+                unom: 280190
+                flat: "110"
+                global_id: 1239872
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonAddress'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+      - Person
+      - Delete
+      summary: Удаление адреса персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны</br> (пример "449ab5bd-4f09-47a0-ba89-70ae2cd49692")
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор версии адреса
+        required: true
+        schema:
+          type: string
+          example: '1232098'
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/{person_id}/contacts:
+    post:
+      tags:
+      - Person
+      - Create
+      summary: Создание нового контакта персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonContact'
+            example:
+              id: 0
+              type_id: 2
+              data: 'ivanov@test.org'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonContact'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  
+  /persons/{person_id}/contacts/{id}:
+    put:
+      tags:
+      - Person
+      - Update
+      summary: Изменение контакта персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор контакта
+        required: true
+        schema:
+          type: string
+          example: '29423'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonContact'
+            example:
+              id: 29423
+              type_id: 1
+              data: '9202703205'
+              validation_state_id: 1
+              validated_at: "2019-09-19T17:37:12.232Z"
+              validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonContact'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+      - Person
+      - Delete
+      summary: Удаление контакта персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор версии контакта
+        required: true
+        schema:
+          type: string
+          example: '29423'
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/{person_id}/ids:
+    put:
+      tags:
+        - Update
+        - Person
+      summary: Изменение идентификаторов персоны
+      parameters:
+        - in: path
+          name: person_id
+          description: Идентификатор персоны
+          required: true
+          schema:
+            type: string
+            example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+            example:
+              id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
+              contingent_id: "49c1a1f3-2daa-4632-91be-87cf42dce63b"
+              sso_id: "1aa5fb27-c8ae-415a-b781-3092c802b36e"
+              msr_id: "294598f0-43cb-4031-a45e-0f90bef25cdb"
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/{person_id}/agents:
+    post:
+      tags:
+      - Person
+      - Create
+      description: Создание нового представителя персоны или добавление существующей персоны в качестве представителя.
+                    Если добавяется существующая персона, agent_person не указывается, вместо нее должен присутствовать атрибут
+                    agent_person_id с идентификатором персоны представителя
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonAgent'
+            examples:
+              newagent:
+                summary: Создание персоны представителя с привязкой к персоне
+                value:
+                  id: 0
+                  agent_type_id: 1
+                  validation_state_id: 1
+                  validated_at: "2019-09-25T17:38:12.232Z"
+                  validation_errors: ""
+                  agent_person:
+                    id: 0
+                    lastname: Агеев
+                    firstname: Кирилл
+                    patronymic: Сергеевич
+                    birthdate: "1983-07-20"
+                    birthplace: "Запорожская область, каменский район, хутор далекий, путь не близкий"
+                    gender_id: 1
+                    citizenship_id: 1
+                    addresses:
+                      - id: 0
+                        address_type_id: 1
+                        validation_state_id: 1
+                        validated_at: "2019-09-19T14:31:12.232Z"
+                        validation_errors: ""
+                        address:
+                          address: "000111, г.Москва, ул. Проспект Андропова, д 19/1 к.А, кв. 111/13"
+                          fias_id: "1429aa81-57ea-43c6-95b4-72e3b2bfdf17"
+                          unom: "123321"
+                          flat: "111/13"
+                    documents:
+                       -  id: 0
+                          document_type_id: 2
+                          series: "1243"
+                          number: "923432"
+                          subdivision_code: "007-001"
+                          issuer: "УВД Марьинского района, г.Москвы"
+                          issued: "2019-01-05"
+                          validation_state_id: 1
+                          validated_at: "2019-09-15T15:23:12.232Z"
+                          validation_errors: ""
+                    contacts:
+                      - id: 0
+                        type_id: 1
+                        data: "777773203"
+                        validation_state_id: 1
+                        validated_at: "2019-09-12T12:37:12.232Z"
+                        validation_errors: ""
+              links_agent:
+                summary: Привязка к персоне существующего представителя
+                value:
+                  id: 0
+                  agent_type_id: 1
+                  agent_person_id: "f2405b24-20bf-4579-97a7-c44c23246e57"
+                  validation_state_id: 1
+                  validated_at: "2019-09-18T15:34:12.232Z"
+                  validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonAgent'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  
+  /persons/{person_id}/agents/{id}:
+    put:
+      tags:
+      - Person
+      - Update
+      summary: Изменение связи персоны и представителя
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор связи с представителем
+        required: true
+        schema:
+          type: string
+          example: 154707
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonAgent'
+            examples:
+              LinkOnly:
+                summary: "Изменение типа представительства"
+                value:
+                  agent_type_id: 1
+              withAgentUpdate:
+                summary: "Изменение связи и основные данные представителя"
+                value:
+                  id: 154707
+                  agent_type_id: 1
+                  validation_state_id: 1
+                  validated_at: "2019-10-18T15:37:12.232Z"
+                  validation_errors: ""
+                  agent_person:
+                    lastname: Агеев
+                    firstname: Кирилл
+                    patronymic: Сергеевич
+                    birthdate: "1983-07-20"
+                    birthplace: "Запорожская область, каменский район, хутор далекий, путь не близкий"
+                    gender_id: 1
+                    citizenship_id: 1
+                    validation_state_id: 1
+                    validated_at: "2019-09-18T16:37:12.232Z"
+                    validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonAgent'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+      - Person
+      - Delete
+      summary: Удаление представителя персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        description: Идентификатор представителя
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  
+  /persons/{person_id}/education:
+    post:
+      tags:
+      - Create
+      - Person
+      summary: Добавление новых данных об обучении
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonEducation'
+            example:
+              id: 0
+              organization_id: 2398304
+              class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
+              education_form_id: 1
+              financing_type_id: 1377
+              service_type_id: 1
+              training_begin_at: '2019-09-01'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonEducation'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /persons/{person_id}/education/{id}:
+    put:
+      tags:
+      - Update
+      - Person
+      summary: Изменение данных об обучении персоны
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+          example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      - in: path
+        name: id
+        description: Идентификатор связи
+        required: true
+        schema:
+          type: string
+          example: 14
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonEducation'
+            example:
+              id: 14
+              organization_id: 2398304
+              class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
+              education_form_id: 1
+              financing_type_id: 1377
+              service_type_id: 1
+              training_begin_at: '2019-09-01'
+              training_end_at: '2019-12-01'
+              notes: 'Примечание'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonEducation'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+      - Delete
+      - Person
+      summary: Удаление данных об обучении персоны. Метод должен использоваться только в случае добавления ошибочной записи об обучении. В случае отчисления необходимо использовать метод PUT.
+      parameters:
+      - in: path
+        name: person_id
+        description: Идентификатор персоны
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        description: Идентификатор связи
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/batch/education:
+    post:
+      tags:
+        - Create
+        - Person
+      summary: Пакетное создание данных об обучении персоны
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PersonEducation'
+            example:
+              - id: 0
+                person_id: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+                organization_id: 2398304
+                class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
+                education_form_id: 1
+                financing_type_id: 1377
+                service_type_id: 1
+                training_begin_at: '2019-09-01'
+                notes: 'Примечание'
+              - id: 0
+                person_id: '63475dca-f6d1-4942-8cee-f128e277ba2d'
+                organization_id: 2398304
+                class_uid: '7fa62cd2-0ba8-4af3-98d4-16386731a4ac'
+                education_form_id: 1
+                financing_type_id: 1377
+                service_type_id: 1
+                training_begin_at: '2019-09-01'
+                notes: 'Примечание'
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - Update
+        - Person
+      summary: Пакетное изменение данных об обучении персоны
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PersonEducation'
+            example:
+              - id: 1230923
+                person_id: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+                organization_id: 2398304
+                class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
+                education_form_id: 1
+                financing_type_id: 1377
+                service_type_id: 1
+                training_begin_at: '2019-09-01'
+                training_end_at: '2019-12-01'
+                notes: 'Примечание'
+              - id: 230493
+                person_id: '63475dca-f6d1-4942-8cee-f128e277ba2d'
+                organization_id: 2398304
+                class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
+                education_form_id: 1
+                financing_type_id: 1377
+                service_type_id: 1
+                training_begin_at: '2019-09-01'
+                training_end_at: '2019-12-01'
+                notes: 'Примечание'
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /persons/{person_id}/preventions:
+    post:
+      tags:
+        - Create
+        - Person
+      summary: Добавление информации об учете персоны
+      parameters:
+        - in: path
+          name: person_id
+          description: Идентификатор персоны
+          required: true
+          schema:
+            type: string
+            example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonPrevention'
+            example:
+              id: 0
+              prevention_type_id: 1
+              started_at: '2019-09-01'
+              started_document_issued: '2019-09-01'
+              started_document_number: '1392'
+              started_reasons: [1,2]
+              validation_state_id: 1
+              validated_at: "2019-09-18T13:18:12.232Z"
+              validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonPrevention'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /persons/{person_id}/preventions/{id}:
+    put:
+      tags:
+        - Update
+        - Person
+      summary: Изменение данных об учете персоны
+      parameters:
+        - in: path
+          name: person_id
+          description: Идентификатор персоны
+          required: true
+          schema:
+            type: string
+            example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+        - in: path
+          name: id
+          description: Идентификатор связи
+          required: true
+          schema:
+            type: string
+            example: 14
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonPrevention'
+            example:
+              id: 14
+              prevention_type_id: 1
+              started_at: '2019-09-01'
+              started_document_issued: '2019-09-01'
+              started_document_number: '1392'
+              started_reasons: [1,2]
+              finished_at: '2019-12-01'
+              finished_document_issued: '2019-12-01'
+              finished_document_number: '1393'
+              finished_reasons: [1]
+              validation_state_id: 1
+              validated_at: "2019-10-14T15:37:12.232Z"
+              validation_errors: ""
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonPrevention'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Delete
+        - Person
+      summary: Удаление информации об учете
+      parameters:
+        - in: path
+          name: person_id
+          description: Идентификатор персоны
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id
+          description: Идентификатор связи
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+  /classes:
+    get:
+      tags:
+      - Class
+      - Get
+      - Search
+      summary: Поиск классов
+      parameters:
+      - in: query
+        name: filter
+        description: сериализованная коллекция /components/schemas/Filter
+        example: '{"and":[{ "field":"organization_id","op":"equal","value":"601161"},{ "field":"name","op":"equal","value":"10-Г"}]}'
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: expand
+        description: Список полей, которые должны быть в ответе, через запятую
+        schema:
+          type: string
+      - in: query
+        name: top
+        description: Количество возвращаемых записей. Значение по умолчанию задается в параметрах Системы.
+        schema:
+          type: string
+      - in: query
+        name: skip
+        description: Количество пропускаемых записей. По умолчанию, 0.
+        schema:
+          type: string
+      - in: query
+        name: orderby
+        description: Cписок полей, по которым требуется сортировать, через запятую
+        schema:
+          type: string
+      - in: query
+        name: actual_on
+        description: Дата актуальности данных. По умолчанию, текущая.
+        schema:
+          type: string
+          format: date-time
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Class'
+        401:
+          $ref: '#/components/responses/401'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+      - Class
+      - Create
+      summary: Создать класс
+      description: Метод создания класса
+      operationId: AddClass
+      requestBody:
+        description: Описание класса, который нужно создать
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Class'
+            example:
+              id: 0
+              uid: "00000000-0000-0000-0000-000000000000"
+              name: "1-А"
+              organization_id: 2398304
+              building_id: 2349871
+              staff_ids: [12376513]
+              academic_year_id: 1
+              open_at: "2018-09-01"
+              close_at: "2019-08-31"
+              parallel_id: 1
+              letter: "А"
+              age_group_id: 1
+              education_stage_id: 1
+              notes: "заметка"
+        required: true
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /classes/{id}:
+    get:
+      tags:
+      - Class
+      - Get
+      summary: Получить класс по идентификатору
+      operationId: GetClassById
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор класса
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: '67de9d79-a189-4c82-a357-73c524adc927'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+      - Class
+      - Update
+      summary: Обновить описание созданного класса
+      operationId: UpdateClass
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор версии класса
+          required: true
+          schema:
+            type: string
+            example: '3257432'
+      requestBody:
+        description: Описание класса, который нужно обновить
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Class'
+            example:
+              id: 3257432
+              name: "1-Б"
+              organization_id: 2398304
+              building_id: 2349871
+              staff_ids: [12367123]
+              uid: "f3762cce-9ec1-4e29-ac8a-566c4972197c"
+              academic_year_id: 1
+              open_at: "2018-09-01"
+              close_at: "2019-08-31"
+              parallel_id: 1
+              letter: "А"
+              age_group_id: 1
+              education_stage_id: 1
+              notes: "заметка"
+        required: true
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+      - Class
+      - Delete
+      summary: Удаление класса
+      description: Помечает класс как удаленный
+      operationId: DeleteClass
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор версии класса
+          required: true
+          schema:
+            type: string
+            example: '1230982'
+      responses:
+        204:
+          description: Класс помечен как удалённый
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /categories:
+    post:
+      tags:
+        - Category
+        - Create
+      summary: Создать категорию
+      description: Метод создания категории
+      operationId: AddCategory
+      requestBody:
+        description: Описание категории, который нужно создать
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+            example:
+              id: 0
+              name: "Категория 1"
+              description: Описание категории
+              parameters:
+                - param_1
+                - param_2
+        required: true
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Category
+        - Get
+        - Search
+      summary: Поиск категории
+      operationId: GetCategories
+      parameters:
+        - in: query
+          name: filter
+          description: сериализованная коллекция /components/schemas/Filter
+          example: '{"or":[{ "field":"name","op":"equal","value":"Категория 1"},{ "field":"name","op":"equal","value":"Категория 2"}]}'
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: top
+          description: Количество возвращаемых записей. Значение по умолчанию задается в параметрах Системы.
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: Количество пропускаемых записей. По умолчанию, 0.
+          schema:
+            type: string
+        - in: query
+          name: orderby
+          description: Cписок полей, по которым требуется сортировать, через запятую
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /categories/{id}:
+    get:
+      tags:
+        - Category
+        - Get
+      summary: Получить категорию по идентификатору
+      operationId: GetCategoryById
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор категории
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: '12345'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - Category
+        - Update
+      summary: Обновить описание созданной категории
+      operationId: UpdateCategory
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор категории
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: '1'
+      requestBody:
+        description: Описание категории, которую нужно обновить
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+            example:
+              id: 1
+              name: "Категория 12345"
+              description: Описание категории после обновления
+              parameters:
+                - param_3
+                - param_4
+        required: true
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - Category
+        - Delete
+      summary: Удаление категории
+      description: Помечает категорию как удаленную
+      operationId: DeleteCategory
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор категории
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: '12345'
+      responses:
+        204:
+          description: Категория помечена как удалённая
+        200:
+          $ref: '#/components/responses/200-Only'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+  /transaction:
+    post:
+      tags:
+        - Transaction
+      summary: Выполнение набора операций в рамках транзакции
+      description: Выполнение набора операций в рамках транзакции
+      operationId: Transaction
+      requestBody:
+        description: Список элементов для выполнения операций в рамках транзакции
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+            example:
+              - method: POST
+                resource: "/person/education"
+                items:
+                  - id: 0
+                    person_id: e1bd6562-fc1f-4916-8697-1e29f060a564
+                    organization_id: 2398304
+                    class_uid: e266b41c-cbec-488b-bb7c-d650970dfbc8
+                    education_form_id: 5
+                    financing_type_id: 1
+                    service_type_id: 1
+                    training_begin_at: '2019-09-01'
+              - method: DELETE
+                resource: "/person/f98e1848-1a0d-4219-97a2-3d242025a680/education/127"
+              - method: PUT
+                resource: "/person/education"
+                items:
+                  - id: 73
+                    person_id: f98e1848-1a0d-4219-97a2-3d242025a680
+                    organization_id: 2398304
+                    class_uid: e266b41c-cbec-488b-bb7c-d650970dfbc8
+                    education_form_id: 5
+                    financing_type_id: 1
+                    service_type_id: 1
+                    training_begin_at: '2020-01-01'
+                    training_end_at: '2020-01-03'
+              - method: POST
+                resource: "/person/education"
+                items:
+                  - person_id: f98e1848-1a0d-4219-97a2-3d242025a680
+                    organization_id: 2398304
+                    class_uid: 385028f2-9443-4135-a63a-17d324bd999e
+                    education_form_id: 5
+                    financing_type_id: 1
+                    service_type_id: 1
+                    training_begin_at: '2020-01-04'
+        required: true
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Идентификатор системы
+      #example: b802d2d5-152b-4807-b4e2-4fea84426eeb
+  schemas:
+    Class:
+      type: object
+      description: Классы/группы ОУ
+      required:
+       - id
+       - uid
+       - name
+       - organization_id
+       - education_stage_id
+       - open_at
+      properties: 
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        uid:
+          type: string
+          format: uuid
+          description: Идентификатор класса
+        name:
+          type: string
+          format: text
+          description: Название
+        organization_id:
+          type: integer
+          format: int64
+          description: Идентификатор образовательной организации (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=13710039">ORGANIZATION_REGISTRY</href>)
+        building_id:
+          type: integer
+          format: int64
+          description: Идентификатор здания (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=37240345">ORGANIZATION_REGISTRY_COM</href>). Значение не контроллируется на наличие здания в реестре.
+        staff_ids:
+          description: Идентификаторы классных руководителей
+          type: array
+          items:
+            type: integer
+            format: int64
+        academic_year_id:
+          type: integer
+          format: int32
+          description: Идентификатор учебного года (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394031">НСИ ACADEMIC_YEAR</a>)
+        open_at:
+          type: string
+          format: date
+          description: Дата открытия класса/группы
+        close_at:
+          type: string
+          format: date
+          description: Дата закрытия классы/группы
+        parallel_id:
+          type: integer
+          format: int32
+          description: Параллель (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394351">PARALLELS</href>)
+        education_stage_id:
+          type: integer
+          format: int32
+          description: Уровень образования (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394370">EDUCATION_LEVEL</href>)
+        letter:
+          type: string
+          format: text
+          description: Буква класса
+        age_group_id:
+          type: integer
+          format: int32
+          description: Справочник возрастных категорий (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394236">AGE_GROUP</href>)
+        notes:
+          type: string
+          format: text
+          description: Примечание
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        parallel:
+          $ref: '#/components/schemas/Parallel'
+        organization:
+          $ref: '#/components/schemas/Organization'
+    Parallel:
+      type: object
+      description: Параллель
+      required:
+        - name
+        - id
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    Organization:
+      type: object
+      description: Образовательная организация
+      required:
+        - global_id
+      properties:
+        global_id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        constituent_entity_id:
+          type: integer
+          format: int32
+          description: Код субъекта РФ
+        status_id:
+          type: integer
+          format: int32
+          description: Статус
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    PreventionType:
+      type: object
+      description: Вид учета
+      required:
+        - id
+        - name
+        - code
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          format: text
+          description: Название
+        code:
+          type: string
+          format: text
+          description: Код
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    ErrorResponse:
+      type: object
+      description: Ответ с ошибкой
+      required: [error, error_description]
+      properties:
+        error_code:
+          type: string
+          minLength: 1
+          description: Код ошибки
+        error_description:
+          type: string
+          minLength: 1
+          description: Описание ошибки
+        details:
+          type: object
+          description: Детали ошибки
+    SearchOrder:
+      type: array
+      description: Описание сортировки по полям результата
+      items:
+        type: object
+        properties:
+          field: 
+            type: string
+            description: Поле, по которому будет проходить сортировка
+          order:
+            description: Направление сортировки
+            type: string
+            enum:
+              - asc
+              - desc
+    Filter:
+      type: object
+      description: Фильтр
+      properties:
+        and:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterCondition'
+        or:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterCondition'
+
+    FilterCondition:
+      type: object
+      description: Элемент фильтра
+      properties:
+        and:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterCondition'
+        or:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterCondition'
+        field:
+          type: string
+          description: Название поля
+        op:
+          description: Операция
+          enum:
+            - equal
+            - like
+            - greater_then
+            - less_then
+            - greater_then_or_equal_to
+            - less_then_or_equal_to
+            - is_null
+            - is_not_null
+            - between
+            - in
+        value:
+          description: Значение. Для операций between ожидается массив из 2х элементов, для операции in - массив из любого количества элементов. Для операций. Для остальных операция ожидается строковое значение
+          type: object
+    Address:
+      type: object
+      description: Адрес
+      required:
+        - id
+        - address
+      properties: 
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        address:
+          type: string
+          description: Адрес строкой
+        fias_id:
+          type: string
+          description: ФИАС код здания
+        unom:
+          type: integer
+          format: int64
+          description: БТИ код здания
+        flat:
+          type: string
+          description: Номер  квартиры
+        global_id:
+          type: integer
+          format: int32
+          description: Идентификатор из НСИ3
+    PersonAddress:
+      type: object
+      description: Адрес персоны
+      required:
+       - id
+       - address_type_id
+      properties: 
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        person_id:
+          type: string
+          format: uuid
+          description: Идентификатор песоны
+        address_id:
+          type: integer
+          format: int64
+          description: Идентификатор адреса
+        address_type_id:
+          type: integer
+          format: int32
+          description: Тип адреса (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18393747">RESIDENCE_FORM</href>)
+        validation_state_id:
+          type: integer
+          format: int32
+          description: Статус проверки
+        validated_at:
+          type: string
+          format: 'date-time'
+          description: Дата проверки
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия связи
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия связи
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        address:
+          $ref: "#/components/schemas/Address"
+        address_type:
+          $ref: "#/components/schemas/AddressType"
+        validation_errors:
+          type: string
+          description: Ошибки валидации из внешних систем
+    Category:
+      type: object
+      description: Категория
+      required:
+       - id
+       - name
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          maxLength: 100
+          description: Название категории
+        description:
+          type: string
+          maxLength: 200
+          description: Описание
+        parameters:
+          type: object
+          description: Произвольный набор параметров категории
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия связи
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия связи
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+    PersonCategory:
+      type: object
+      description: Связь персоны с категорией
+      required:
+        - id
+        - category_id
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        person_id:
+          type: string
+          format: uuid
+          description: Идентификатор персоны
+        category_id:
+          type: integer
+          format: int32
+          description: Идентификатор категории
+        parameter_values:
+          type: object
+          description: Произвольный набор значений параметров
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия связи
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия связи
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+    PersonContact:
+      type: object
+      description: Контакт персоны
+      required:
+        - id
+        - type_id
+        - data
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        person_id:
+          type: string
+          format: uuid
+          description: Идентификатор персоны
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия связи
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия связи
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        type_id:
+          type: integer
+          format: int32
+          description: Тип контакта (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394024">CONTACT_TYPE</href>)
+        data:
+          type: string
+          description: Данные контакта
+        default:
+          type: boolean
+          description: Признак по умолчанию. У персоны может быть только один default контакт каждого типа. При установке контакта основным, остальные контакты данного типа у персоны получают признак default=false.
+        type:
+          $ref: "#/components/schemas/ContactType"
+        validation_state_id:
+          type: integer
+          format: int32
+          description: Статус проверки
+        validated_at:
+          type: string
+          format: 'date-time'
+          description: Дата проверки
+        validation_errors:
+          type: string
+          description: Ошибки валидации из внешних систем
+    PersonPrevention:
+      type: object
+      description: Учет персоны
+      required:
+        - id
+        - prevention_type_id
+        - started_at
+        - started_document_issued
+        - started_document_number
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор версии
+        person_id:
+          type: string
+          format: uuid
+          description: Идентификатор персоны
+        prevention_type_id:
+          type: integer
+          format: int32
+          description: Идентификатор вида учета (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394301">ACCOUNTING_TYPE</a>)
+        started_at:
+          type: string
+          format: date
+          description: Дата постановки на учет
+        started_document_issued:
+          type: string
+          format: date
+          description: Дата документа постановки на учет
+        started_document_number:
+          type: string
+          description: Номер документа постановки на учет
+        started_reasons:
+          description: Причины постановки на учет
+          type: array
+          items:
+            type: integer
+            format: int32
+        finished_at:
+          type: string
+          format: date
+          description: Дата снятия с учета
+        finished_document_issued:
+          type: string
+          format: date
+          description: Дата документа о снятии с учета
+        finished_document_number:
+          type: string
+          description: Номер документа о снятии с учета
+        finished_reasons:
+          description: Причины снятия с учета
+          type: array
+          items:
+            type: integer
+            format: int32
+        validation_state_id:
+          type: integer
+          format: int32
+          description: Статус проверки
+        validated_at:
+          type: string
+          format: 'date-time'
+          description: Дата проверки
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия связи
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия связи
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        prevention_type:
+          $ref: "#/components/schemas/PreventionType"
+        validation_errors:
+          type: string
+          description: Ошибки валидации из внешних систем
+    PersonDocument:
+      type: object
+      description: Связь персон и документов
+      required:
+        - id
+        - document_type_id
+        - number
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        person_id:
+          type: string
+          format: uuid
+          description: Ссылка на уникальный идентификатор персоны
+        validation_state_id:
+          type: integer
+          format: int32
+          description: Статус проверки
+        validated_at:
+          type: string
+          format: 'date-time'
+          description: Дата проверки
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия связи
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия связи
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        document_type_id:
+          type: integer
+          format: int32
+          description: Тип документа (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18393921">TYPE_IDENT_DOC</href>)
+        series:
+          type: string
+          description: Серия
+        number:
+          type: string
+          description: Номер
+        subdivision_code:
+          type: string
+          description: Код подразделения
+        issuer:
+          type: string
+          description: Кем выдан
+        issued:
+          type: string
+          format: date
+          description: Когда выдан
+        expiration:
+          type: string
+          format: date
+          description: Дата истечения срока действия документа
+        document_type:
+          $ref: "#/components/schemas/DocumentType"
+        validation_errors:
+          type: string
+          description: Ошибки валидации из внешних систем
+    Person:
+      type: object
+      description: Песона
+      required:
+       - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор персоны. Заполняется автоматически. При создании персоны заполнять 0000-0000-0000-0000
+          example: '0000-0000-0000-0000'
+        msr_id:
+          type: string
+          format: uuid
+          description: Идентификатор МСР
+        sso_id:
+          type: string
+          format: uuid
+          description: Идентификатор СУДИР
+        contingent_id:
+          type: string
+          format: uuid
+          description: Идентификатор в системе-источнике
+    PersonInfo:
+      type: object
+      description: Основные данные персоны
+      required:
+       - id
+       - person_id
+       - lastname
+       - firstname
+       - birthdate
+       - gender_id
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор 
+        person_id:
+          type: string
+          format: uuid
+          description: Ссылка на идентификатор персоны в рамках системы
+        merged_to:
+          type: string
+          format: uuid
+          description: Ссылка на персону, с которой была слита данная
+        lastname:
+          type: string
+          description: Фамилия
+        firstname:
+          type: string
+          description: Имя
+        patronymic:
+          type: string
+          description: Отчество
+        birthdate:
+          type: string
+          format: date
+          description: Дата рождения
+        birthplace:
+          type: string
+          description: Место рождения
+        snils:
+          type: string
+          description: Номер СНИЛС
+        gender_id:
+          type: integer
+          format: int32
+          description: Пол (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394317">GENDER</href>)
+        citizenship_id:
+          type: integer
+          format: int32
+          description: Код страны по справочнику ОКСМ (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394242">COUNTRY</href>)
+        validation_state_id:
+          type: integer
+          format: int32
+          description: Статус проверки
+        validated_at:
+          type: string
+          format: 'date-time'
+          description: Дата проверки
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии персоны
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии персоны
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        addresses:
+          description: Адреса персоны
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonAddress"
+        documents:
+          description: Документы персоны
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonDocument"
+        contacts:
+          description: Контакты персоны
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonContact"
+        preventions:
+          description: Инфомация о постановках на учет
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonPrevention"
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonCategory"
+        ids:
+          $ref: "#/components/schemas/Person"
+        agents:
+          description: Список представителей
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonAgent"
+        children:
+          description: Список детей
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonAgent"
+        education:
+          description: ОО, в которых персона проходила или проходит обучение
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonEducation'
+        citizenship:
+          $ref: '#/components/schemas/Citizenship'
+        validation_errors:
+          type: string
+          description: Ошибки валидации из внешних систем
+    AddressType:
+      type: object
+      description: Типы адресов
+      required:
+       - id
+       - name
+      properties: 
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    ContactType:
+      type: object
+      description: Тип контакта (телефон, e-mail и т.д.)
+      required:
+       - id
+       - name
+      properties: 
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    Citizenship:
+      type: object
+      description: Гражданство
+      required:
+       - name
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    DocumentType:
+      type: object
+      description: Типы документов
+      required:
+       - id
+       - name
+       - actual_from
+       - actual_to
+      properties: 
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    PersonAgent:
+      type: object
+      description: Связь персоны и представителя
+      required:
+       - id
+       - agent_type_id
+      properties: 
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        person_id:
+          type: string
+          format: uuid
+          description: Идентификатор персоны
+        agent_person_id:
+          type: string
+          format: uuid
+          description: Идентификатор персоны представителя
+        agent_type_id:
+          type: integer
+          format: int32
+          description: Идентификатор типа представительства (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18393963">LEGAL_REPRESENT</href>)
+        validation_state_id:
+          type: integer
+          format: int32
+          description: Статус проверки
+        validated_at:
+          type: string
+          format: 'date-time'
+          description: Дата проверки
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия связи
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия связи
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        agent_type:
+          $ref: "#/components/schemas/AgentType"
+        agent_person:
+          $ref: "#/components/schemas/PersonInfo"
+        validation_errors:
+          type: string
+          description: Ошибки валидации из внешних систем
+    AgentType:
+      type: object
+      description: Типы представительства
+      required:
+       - id
+       - name
+      properties: 
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    PersonEducation:
+      type: object
+      description: Информация об образовании персоны
+      required:
+       - id
+       - person_id
+       - education_form_id
+       - financing_type_id
+       - training_begin_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        person_id:
+          type: string
+          format: uuid
+          description: Ссылка на идентификатор персоны
+        organization_id:
+          type: integer
+          format: int64
+          description: Идентификатор образовательной оранизации (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=13710039">ORGANIZATION_REGISTRY</href>)
+        class_uid:
+          type: string
+          format: uuid
+          description: Идентификатор класса/группы/кружка
+        notes:
+          type: string
+          description: Примечание
+        education_form_id:
+          type: integer
+          format: int32
+          description: Форма обучения (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394215">TRAINING_FORM</href>)
+        financing_type_id:
+          type: integer
+          format: int32
+          description: Вид финансирования (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18396612">FINANCING_TYPE</href>)
+        service_type_id:
+          type: integer
+          format: int32
+          description: Вид услуги (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=23727577">SERVICE_TYPE</href>)
+        deduction_reason_id:
+          type: integer
+          format: int32
+          description: Причина отчисления (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18396842">DEDUCTION_REASON</href>)
+        training_begin_at:
+          type: string
+          format: date
+          description: Дата начала обучения
+        training_end_at:
+          type: string
+          format: date
+          description: Дата окончания обучения
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, создавшую запись
+        updated_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, изменившую запись
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+        class:
+          $ref: "#/components/schemas/Class"
+        education_form:
+          $ref: "#/components/schemas/EducationForm"
+        financing_type:
+          $ref: "#/components/schemas/FinancingType"
+        deduction_reason:
+          $ref: "#/components/schemas/DeductionReason"
+        service_type:
+          $ref: "#/components/schemas/ServiceType"
+        organization:
+          $ref: "#/components/schemas/Organization"
+    EducationForm:
+      type: object
+      description: Справочник формы обучения
+      required:
+       - id
+       - name
+       - actual_from
+       - actual_to
+      properties: 
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название формы обучения
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    EducationStage:
+      type: object
+      description: Уровень образования
+      required:
+       - id
+       - name
+       - actual_from
+       - actual_to
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    FinancingType:
+      type: object
+      description: Вид финансирования
+      required:
+       - id
+       - name
+       - actual_from
+       - actual_to
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    ServiceType:
+      type: object
+      description: Вид услуги
+      required:
+       - id
+       - name
+       - actual_from
+       - actual_to
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    DeductionReason:
+      type: object
+      description: Причина отчисления
+      required:
+       - id
+       - name
+       - actual_from
+       - actual_to
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор
+        name:
+          type: string
+          description: Название
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала действия версии
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания действия версии
+    App:
+      type: object
+      description: Системы-источники
+      required:
+       - id
+       - name
+      properties: 
+        id:
+          type: string
+          format: uuid
+          description: Идентификатор
+        name:
+          type: string
+          format: text
+          description: Название
+        subscription_service:
+          type: string
+          format: text
+          description: Адрес сервиса-подписки
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+    AppRestriction:
+      type: object
+      description: Права доступа к данным
+      required:
+       - id
+       - app_id
+       - restriction
+      properties: 
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        app_id:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника
+        restriction:
+          type: string
+          description: Права доступа к данным (чтение/изменение)
+        created_at:
+          type: string
+          format: date-time
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время изменения
+    Transaction:
+      type: object
+      description: Данные для вызова операции в рамках транзакции
+      required:
+        - resource
+        - method
+      properties:
+        method:
+          type: string
+          enum:
+            - PUT
+            - POST
+            - DELETE
+          description: Метод передачи
+        resource:
+          type: string
+          description: Операция
+        items:
+          type: array
+          items: object
+          description: Данные
+  responses:
+    200-Only:
+      description: OK - операция завершилась успешно
+    400:
+      description: Входные данные не соответствуют формату или данных недостаточно для выполнения операции
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error_code: "0"
+            error_description: "Поле documents.numberr не найдено в модели. Проверьте корректность заполнения фильтра."
+            details: null
+    401:
+      description: Система не авторизована. Требуется проверить заголовок запроса на предмет ключа.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error_code: "401"
+            error_description: "Не указана информация о системе-источнике"
+            details: null
+    404:
+      description: Объект с указанным идентификатором не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    405:
+      description: Возвращается в случае, если метод запроса не поддерживается (Method Not Allowed)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    409:
+      description: При сохранении данных произошел конфликт версий (например, была попытка обновить уже неактуальную версию).
+        В этом случае необходимо выполнить GET запрос и попробовать сохранение снова.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    422:
+      description: Данные не прошли логический контроль. В ответе error_description будет содержать текст на русском языке.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error_code: "422"
+            error_description: "Не удалось создать объект Персона: Уже существует персона с документом серия II-МЮ и номером 135676"
+            details: null
+    500:
+      description: Внутренняя ошибка сервера. Возникает том числе когда переданные идентификаторы не соответствуют справочникам (не прошла операция добавления/изменения записи в БД из-за вторичных ключей).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error_code: "500"
+            error_description: "Internal server error"
+            details: null
