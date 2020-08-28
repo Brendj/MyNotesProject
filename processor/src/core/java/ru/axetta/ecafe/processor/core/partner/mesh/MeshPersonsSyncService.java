@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.And;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.Education;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.MeshJsonFilter;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.MeshSyncPerson;
 import ru.axetta.ecafe.processor.core.persistence.MeshTrainingForm;
@@ -142,7 +139,8 @@ public class MeshPersonsSyncService {
             String patronymic = person.getPatronymic();
             String guidnsi = null;
             try {
-                guidnsi = person.getCategories().get(0).getParameterValues().get(0);
+                Category category = findCategory(person);
+                guidnsi = category.getParameterValues().get(0);
             } catch (Exception e) {
                 logger.info("Not found NSI guid for person with mesh guid " + personguid);
             }
@@ -172,6 +170,19 @@ public class MeshPersonsSyncService {
         try {
             Collections.sort(person.getEducation());
             return person.getEducation().get(person.getEducation().size() - 1);
+        } catch (Exception e) {
+            logger.error("Can not find education from person with guid " + person.getPersonId());
+            return null;
+        }
+    }
+
+    private Category findCategory(ResponsePersons person) {
+        try {
+            Collections.sort(person.getCategories());
+            for (int i = person.getCategories().size() - 1; i > -1; i--) {
+                if (person.getCategories().get(i).getCategoryId() == Category.PROPER_ID) return person.getCategories().get(i);
+            }
+            return null;
         } catch (Exception e) {
             logger.error("Can not find education from person with guid " + person.getPersonId());
             return null;
