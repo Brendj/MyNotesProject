@@ -1,15 +1,10 @@
 package ru.iteco.meshsync.mesh.service.logic;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import ru.iteco.meshsync.EntityType;
 import ru.iteco.client.ApiException;
 import ru.iteco.client.model.PersonCategory;
 import ru.iteco.client.model.PersonEducation;
 import ru.iteco.client.model.PersonInfo;
+import ru.iteco.meshsync.EntityType;
 import ru.iteco.meshsync.error.EducationNotFoundException;
 import ru.iteco.meshsync.error.NoRequiredDataException;
 import ru.iteco.meshsync.error.UnknownActionTypeException;
@@ -20,13 +15,16 @@ import ru.iteco.meshsync.models.EntityChanges;
 import ru.iteco.meshsync.models.Person;
 import ru.iteco.meshsync.repo.PersonRepo;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class MeshService {
@@ -213,8 +211,16 @@ public class MeshService {
     }
 
     private String getLastGuid(PersonInfo info) {
-        List<PersonCategory> personCategories = info.getCategories();
-        if(personCategories == null){
+        if(info.getCategories() == null){
+            return null;
+        }
+        List<PersonCategory> personCategories = new LinkedList<>();
+        for(PersonCategory category : info.getCategories()){
+            if(category.getCategoryId().equals(1)){ // GUID NSI
+                personCategories.add(category);
+            }
+        }
+        if(CollectionUtils.isEmpty(personCategories)){
             return null;
         }
 
