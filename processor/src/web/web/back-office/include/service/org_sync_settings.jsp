@@ -230,6 +230,12 @@
             </f:facet>
             <h:outputText escape="true" value="#{item.libSync.fullInf}" styleClass="output-text" />
         </rich:column>
+        <rich:column sortable="true" headerClass="column-header" rendered="#{orgSyncSettingReportPage.showColumnCards}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Карты" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.cardSync.fullInf}" styleClass="output-text" />
+        </rich:column>
         <rich:column sortable="true" headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />

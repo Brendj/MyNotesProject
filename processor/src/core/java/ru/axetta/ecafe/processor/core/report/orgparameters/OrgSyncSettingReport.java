@@ -44,7 +44,8 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
             ContentType.MENU,
             ContentType.PHOTOS,
             ContentType.SUPPORT_SERVICE,
-            ContentType.LIBRARY
+            ContentType.LIBRARY,
+            ContentType.CARDS
     );
     public static final Integer ALL_TYPES = -1;
 
