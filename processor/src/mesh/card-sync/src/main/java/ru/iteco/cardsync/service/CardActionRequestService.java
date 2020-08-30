@@ -43,9 +43,8 @@ public class CardActionRequestService {
         cardActionRequestRepository.save(request);
     }
 
-    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed,
+    public void writeRecord(CardActionRequest request, String message, boolean processed,
                             CardActionRequest cardActionRequest) {
-        CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
         request.setComment(message);
         request.setProcessed(processed);
         request.setCardActionRequest(cardActionRequest);
@@ -72,15 +71,6 @@ public class CardActionRequestService {
         cardActionRequestRepository.save(request);
     }
 
-    public void writeRecord(CardActionRequest request, Client client, Card card, Client clientChild, String comment) {
-        CardActionClient cardActionClient = new CardActionClient();
-        cardActionClient.setClient(client);
-        cardActionClient.setCard(card);
-        cardActionClient.setClientChild(clientChild);
-        cardActionClient.setComment(comment);
-       // request.getCardActionClients().add(cardActionClient);
-        cardActionRequestRepository.save(request);
-    }
 
     public void writeRecord(CardActionRequest request, String comment, boolean processed) {
         request.setProcessed(processed);

@@ -17,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CardProcessorService {
@@ -27,12 +29,14 @@ public class CardProcessorService {
     private final Logger log = LoggerFactory.getLogger(CardProcessorService.class);
 
     private final CardActionRequestService cardActionRequestService;
+    private final CardActionClientService cardActionClientService;
     private final CardService cardService;
     private final ClientRepository clientRepository;
 
     public CardProcessorService(CardActionRequestService cardActionRequestService, CardService cardService,
-            ClientRepository clientRepository) {
+            ClientRepository clientRepository, CardActionClientService cardActionClientService) {
         this.cardActionRequestService = cardActionRequestService;
+        this.cardActionClientService = cardActionClientService;
         this.cardService = cardService;
         this.clientRepository = clientRepository;
     }
@@ -43,23 +47,27 @@ public class CardProcessorService {
                 return;
             }
 
+            CardActionRequest cardActionRequest = CardActionRequest.buildCardActionRequest(request);
+
             CardActionRequest blockRequests = cardActionRequestService.findRequestBlockByRequestId(request.getId());
             if (blockRequests == null) {
-                cardActionRequestService.writeRecord(request, "В БД нет запроса на блокировку", false);
+                cardActionRequestService.writeRecord(cardActionRequest, "В БД нет запроса на блокировку", false);
                 return;
             }
+
+            cardActionRequestService.writeRecord(cardActionRequest, "Старт разблокировки карт", false);
 
             //Для всех карт, заблокированных по одному id
             for (CardActionClient cardActionClient: blockRequests.getCardActionClients()) {
                 Client client = cardActionClient.getClient();
                 if (client == null) {
-                    cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Не найден клиент для разблокировки карт");
                     continue;
                 }
                 List<Card> cardsActive = cardService.getActiveCard(client, false);
                 if (!cardsActive.isEmpty())
                 {
-                    cardActionRequestService.writeRecord(request, "Есть активные карты на момент разблокировки", false, client);
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Есть активные карты на момент разблокировки");
                     continue;
                 }
                 List<Card> cards = cardService.getBlockedCard(client);
@@ -69,7 +77,7 @@ public class CardProcessorService {
                 }
                 cardService.unblockCard(cardActionClient.getCard());
             }
-            cardActionRequestService.writeRecord(request, OK, true, blockRequests);
+            cardActionRequestService.writeRecord(cardActionRequest, "Карты клиента успешно заблокированы", true, blockRequests);
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
             cardActionRequestService.writeRecord(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
@@ -96,11 +104,11 @@ public class CardProcessorService {
                         cardActionRequestService.writeRecord(request, "Представители не найдены", false, client);
                         return;
                     }
-                    for(Client guardian : client.getGuardians()){
-                        processBlockRequestReal(guardian, request, client);
-                    }
+                    List<Client> guardins = new ArrayList<>();
+                    guardins.addAll(client.getGuardians());
+                    processBlockRequest(request, guardins, client);
                 } else { // Обработка клиента на прямую
-                    processBlockRequest(client, request);
+                    processBlockRequest(request, new ArrayList<Client>(){{ add(client); }}, null);
                 }
             } else { // Обработка сотрудников
                 if (request.getOrganizationIds().isEmpty())
@@ -124,34 +132,35 @@ public class CardProcessorService {
                     return;
                 }
 
-                for(Client client : clients){
-                    processBlockRequest(client, request);
-                }
+                processBlockRequest(request, clients, null);
             }
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
             cardActionRequestService.writeRecord(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
         }
     }
-
-    private void processBlockRequest(Client client, BlockPersonEntranceRequest request) throws Exception {
-        processBlockRequestReal(client, request, null);
+    private void processBlockRequest(BlockPersonEntranceRequest request, List<Client> clients, Client clientChild) throws Exception {
+        CardActionRequest cardActionRequest = CardActionRequest.buildCardActionRequest(request);
+        cardActionRequestService.writeRecord(cardActionRequest, "Старт блокировки карт", false);
+        for(Client client : clients){
+            processBlockRequestForClient(cardActionRequest, client, clientChild);
+        }
+        cardActionRequestService.writeRecord(cardActionRequest, "Карты клиента успешно заблокированы", true);
     }
 
-    private void processBlockRequestReal(Client client, BlockPersonEntranceRequest request, Client clientChild) throws Exception {
+
+    private void processBlockRequestForClient(CardActionRequest cardActionRequest, Client client,
+                                     Client clientChild) throws Exception {
         List<Card> cards = cardService.getActiveCard(client, true);
         if (CollectionUtils.isEmpty(cards)) {
-            cardActionRequestService
-                    .writeRecord(request, "Активных карт нет на момент блокировки", false, client);
+            cardActionClientService
+                    .writeRecord(cardActionRequest, "Активных карт нет на момент блокировки", client);
             return;
         }
-        CardActionRequest requestend = CardActionRequest.buildCardActionRequest(request);
-        cardActionRequestService.writeRecord(requestend, "Старт блокировки карт", false);
-        requestend.setProcessed(false);
+
         for (Card c : cards) {
             cardService.blockCard(c);
-            cardActionRequestService.writeRecord(requestend, client, c, clientChild, "Карта клиента успешно заблокирована");
+            cardActionClientService.writeRecord(cardActionRequest, client, c, clientChild, "Карта клиента успешно заблокирована");
         }
-        cardActionRequestService.writeRecord(requestend, "Карты клиента успешно заблокированы", true);
     }
 }

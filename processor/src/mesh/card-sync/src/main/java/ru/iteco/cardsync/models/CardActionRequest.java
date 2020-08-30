@@ -26,7 +26,7 @@ public class CardActionRequest implements Auditable {
     @Column(name = "idcardactionrequest")
     private Long id;
 
-    @OneToMany(mappedBy="cardActionRequest", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="cardActionRequest", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CardActionClient> cardActionClients;
 
     @Column(name = "requestid", length = 128, nullable = false)
@@ -64,7 +64,7 @@ public class CardActionRequest implements Auditable {
     private Boolean processed;
 
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name="previdcardrequest")
     private CardActionRequest cardActionRequest;
 
