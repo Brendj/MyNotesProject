@@ -23,8 +23,11 @@ public class CardActionRequest implements Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "idcardactionrequest")
     private Long id;
+
+    @OneToMany(mappedBy="cardActionRequest", cascade = CascadeType.ALL)
+    private List<CardActionClient> cardActionClients;
 
     @Column(name = "requestid", length = 128, nullable = false)
     private String requestId;
@@ -60,17 +63,13 @@ public class CardActionRequest implements Auditable {
     @Column(name = "processed", nullable = false)
     private Boolean processed;
 
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="previdcardrequest")
+    private CardActionRequest cardActionRequest;
+
     @Embedded
     private AuditEntity auditEntity;
-
-
-    @ManyToMany(cascade = {CascadeType.ALL})
-    @JoinTable(
-            name = "cf_cr_cardactionclient",
-            joinColumns = { @JoinColumn(name = "requestid") },
-            inverseJoinColumns = { @JoinColumn(name = "requestid") }
-    )
-    private Set<CardActionClient> cardactionclient = new HashSet<>();
 
     public CardActionRequest() {
         // for Hibernate
@@ -210,11 +209,19 @@ public class CardActionRequest implements Auditable {
         this.organizationIds = organizationIds;
     }
 
-    public Set<CardActionClient> getCardactionclient() {
-        return cardactionclient;
+    public List<CardActionClient> getCardActionClients() {
+        return cardActionClients;
     }
 
-    public void setCardactionclient(Set<CardActionClient> cardactionclient) {
-        this.cardactionclient = cardactionclient;
+    public void setCardActionClients(List<CardActionClient> cardActionClients) {
+        this.cardActionClients = cardActionClients;
+    }
+
+    public CardActionRequest getCardActionRequest() {
+        return cardActionRequest;
+    }
+
+    public void setCardActionRequest(CardActionRequest cardActionRequest) {
+        this.cardActionRequest = cardActionRequest;
     }
 }

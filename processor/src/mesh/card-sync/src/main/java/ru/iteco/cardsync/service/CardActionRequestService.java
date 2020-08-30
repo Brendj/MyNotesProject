@@ -4,7 +4,6 @@
 
 package ru.iteco.cardsync.service;
 
-import ru.iteco.cardsync.enums.ActionType;
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 import ru.iteco.cardsync.models.Card;
 import ru.iteco.cardsync.models.CardActionClient;
@@ -14,6 +13,7 @@ import ru.iteco.cardsync.repo.CardActionRequestRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,29 +36,55 @@ public class CardActionRequestService {
         return cardActionRequestRepository.findByRequestIdAndProcessedAndActionTypeFull(id, 1);
     }
 
-    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed){
-        writeRecord(blockPersonEntranceRequest, message, processed, null, null, null);
-    }
-
-    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed, Client client){
-        writeRecord(blockPersonEntranceRequest, message, processed, client, null, null);
-    }
-
-    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed,
-                            Client client, Card card, Client clientChild){
+    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed) {
         CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
         request.setComment(message);
         request.setProcessed(processed);
+        cardActionRequestRepository.save(request);
+    }
 
-        if (client != null || card != null || clientChild != null) {
+    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed,
+                            CardActionRequest cardActionRequest) {
+        CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
+        request.setComment(message);
+        request.setProcessed(processed);
+        request.setCardActionRequest(cardActionRequest);
+        cardActionRequestRepository.save(request);
+    }
+
+
+    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed, Client client) {
+        CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
+        request.setComment(message);
+        request.setProcessed(processed);
+        if (client != null) {
             CardActionClient cardActionClient = new CardActionClient();
-//            cardActionClient.setRequestId(blockPersonEntranceRequest.getId());
             cardActionClient.setClient(client);
-            cardActionClient.setCard(card);
-            cardActionClient.setClientChild(clientChild);
-            request.getCardactionclient().add(cardActionClient);
+            cardActionClient.setCardActionRequest(request);
+            List<CardActionClient> cardActionClients = request.getCardActionClients();
+            if (cardActionClients == null)
+            {
+               cardActionClients = new ArrayList<>();
+            }
+            cardActionClients.add(cardActionClient);
+            request.setCardActionClients(cardActionClients);
         }
+        cardActionRequestRepository.save(request);
+    }
 
+    public void writeRecord(CardActionRequest request, Client client, Card card, Client clientChild, String comment) {
+        CardActionClient cardActionClient = new CardActionClient();
+        cardActionClient.setClient(client);
+        cardActionClient.setCard(card);
+        cardActionClient.setClientChild(clientChild);
+        cardActionClient.setComment(comment);
+       // request.getCardActionClients().add(cardActionClient);
+        cardActionRequestRepository.save(request);
+    }
+
+    public void writeRecord(CardActionRequest request, String comment, boolean processed) {
+        request.setProcessed(processed);
+        request.setComment(comment);
         cardActionRequestRepository.save(request);
     }
 }

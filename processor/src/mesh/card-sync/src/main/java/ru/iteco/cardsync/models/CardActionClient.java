@@ -4,32 +4,21 @@
 
 package ru.iteco.cardsync.models;
 
-import ru.iteco.cardsync.audit.AuditEntity;
-import ru.iteco.cardsync.audit.AuditEntityListener;
-import ru.iteco.cardsync.audit.Auditable;
-import ru.iteco.cardsync.enums.ActionType;
-import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
-
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 @Entity
-@EntityListeners(AuditEntityListener.class)
 @Table(name = "cf_cr_cardactionclient")
-public class CardActionClient {
+public class CardActionClient{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "idcardactionclient")
+    private Long idcardactionclient;
 
-    @Column(name = "requestid", length = 128, nullable = false)
-    private String requestId;
 
-    @ManyToMany(mappedBy = "cardactionclient")
-    private Set<CardActionRequest> cardActionRequests;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="idcardactionrequest")
+    private CardActionRequest cardActionRequest;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idofclient")
@@ -43,34 +32,12 @@ public class CardActionClient {
     @JoinColumn(name = "idofcard")
     private Card card;
 
+    @Column(name = "comment")
+    private String comment;
+
 
     public CardActionClient() {
         // for Hibernate
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
-
-    public Set<CardActionRequest> getCardActionRequests() {
-        return cardActionRequests;
-    }
-
-    public void setCardActionRequests(Set<CardActionRequest> cardActionRequests) {
-        this.cardActionRequests = cardActionRequests;
     }
 
     public Client getClient() {
@@ -95,5 +62,29 @@ public class CardActionClient {
 
     public void setCard(Card card) {
         this.card = card;
+    }
+
+    public CardActionRequest getCardActionRequest() {
+        return cardActionRequest;
+    }
+
+    public void setCardActionRequest(CardActionRequest cardActionRequest) {
+        this.cardActionRequest = cardActionRequest;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Long getIdcardactionclient() {
+        return idcardactionclient;
+    }
+
+    public void setIdcardactionclient(Long idcardactionclient) {
+        this.idcardactionclient = idcardactionclient;
     }
 }

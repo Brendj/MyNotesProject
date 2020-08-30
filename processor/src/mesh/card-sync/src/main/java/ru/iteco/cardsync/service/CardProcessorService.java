@@ -50,7 +50,7 @@ public class CardProcessorService {
             }
 
             //Для всех карт, заблокированных по одному id
-            for (CardActionClient cardActionClient: blockRequests.getCardactionclient()) {
+            for (CardActionClient cardActionClient: blockRequests.getCardActionClients()) {
                 Client client = cardActionClient.getClient();
                 if (client == null) {
                     cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
@@ -67,12 +67,9 @@ public class CardProcessorService {
                     cardActionRequestService.writeRecord(request, "Не найдено карт для разблокировки", false, client);
                     continue;
                 }
-
                 cardService.unblockCard(cardActionClient.getCard());
-
-                cardActionRequestService.writeRecord(request, OK, true, client,
-                        cardActionClient.getCard(), cardActionClient.getClientChild());
             }
+            cardActionRequestService.writeRecord(request, OK, true, blockRequests);
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
             cardActionRequestService.writeRecord(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
@@ -148,10 +145,13 @@ public class CardProcessorService {
                     .writeRecord(request, "Активных карт нет на момент блокировки", false, client);
             return;
         }
+        CardActionRequest requestend = CardActionRequest.buildCardActionRequest(request);
+        cardActionRequestService.writeRecord(requestend, "Старт блокировки карт", false);
+        requestend.setProcessed(false);
         for (Card c : cards) {
             cardService.blockCard(c);
-            cardActionRequestService.writeRecord(request, "Карта клиента успешно заблокирована", true, client, c, clientChild);
+            cardActionRequestService.writeRecord(requestend, client, c, clientChild, "Карта клиента успешно заблокирована");
         }
-
+        cardActionRequestService.writeRecord(requestend, "Карты клиента успешно заблокированы", true);
     }
 }
