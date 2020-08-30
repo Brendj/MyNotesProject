@@ -5,7 +5,6 @@
 package ru.iteco.cardsync.service;
 
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
-import ru.iteco.cardsync.models.Card;
 import ru.iteco.cardsync.models.CardActionClient;
 import ru.iteco.cardsync.models.CardActionRequest;
 import ru.iteco.cardsync.models.Client;
