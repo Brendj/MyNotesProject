@@ -6,6 +6,7 @@ package ru.iteco.cardsync.service;
 
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 import ru.iteco.cardsync.models.Card;
+import ru.iteco.cardsync.models.CardActionClient;
 import ru.iteco.cardsync.models.CardActionRequest;
 import ru.iteco.cardsync.models.Client;
 import ru.iteco.cardsync.repo.ClientRepository;
@@ -41,14 +42,16 @@ public class CardProcessorService {
             if (request == null) {
                 return;
             }
-            List<CardActionRequest> blockRequests = cardActionRequestService.findRequestBlockByRequestId(request.getId());
-            if (blockRequests.isEmpty()) {
+
+            CardActionRequest blockRequests = cardActionRequestService.findRequestBlockByRequestId(request.getId());
+            if (blockRequests == null) {
                 cardActionRequestService.writeRecord(request, "В БД нет запроса на блокировку", false);
                 return;
             }
-            //Для всех клиентов, заблокированных по одному id
-            for (CardActionRequest blockRequest: blockRequests) {
-                Client client = blockRequest.getClient();
+
+            //Для всех карт, заблокированных по одному id
+            for (CardActionClient cardActionClient: blockRequests.getCardactionclient()) {
+                Client client = cardActionClient.getClient();
                 if (client == null) {
                     cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
                     continue;
@@ -65,11 +68,10 @@ public class CardProcessorService {
                     continue;
                 }
 
-                for (Card c : cards) {
-                    cardService.unblockCard(c);
-                }
+                cardService.unblockCard(cardActionClient.getCard());
 
-                cardActionRequestService.writeRecord(request, OK, true, client);
+                cardActionRequestService.writeRecord(request, OK, true, client,
+                        cardActionClient.getCard(), cardActionClient.getClientChild());
             }
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
@@ -98,7 +100,7 @@ public class CardProcessorService {
                         return;
                     }
                     for(Client guardian : client.getGuardians()){
-                        processBlockRequest(guardian, request);
+                        processBlockRequestReal(guardian, request, client);
                     }
                 } else { // Обработка клиента на прямую
                     processBlockRequest(client, request);
@@ -136,6 +138,10 @@ public class CardProcessorService {
     }
 
     private void processBlockRequest(Client client, BlockPersonEntranceRequest request) throws Exception {
+        processBlockRequestReal(client, request, null);
+    }
+
+    private void processBlockRequestReal(Client client, BlockPersonEntranceRequest request, Client clientChild) throws Exception {
         List<Card> cards = cardService.getActiveCard(client, true);
         if (CollectionUtils.isEmpty(cards)) {
             cardActionRequestService
@@ -144,7 +150,8 @@ public class CardProcessorService {
         }
         for (Card c : cards) {
             cardService.blockCard(c);
+            cardActionRequestService.writeRecord(request, "Карта клиента успешно заблокирована", true, client, c, clientChild);
         }
-        cardActionRequestService.writeRecord(request, "Карты клиента успешно заблокированы", true, client);
+
     }
 }

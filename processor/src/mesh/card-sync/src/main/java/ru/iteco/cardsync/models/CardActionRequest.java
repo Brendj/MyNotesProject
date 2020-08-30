@@ -12,7 +12,9 @@ import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @EntityListeners(AuditEntityListener.class)
@@ -52,10 +54,6 @@ public class CardActionRequest implements Auditable {
     @Enumerated(EnumType.ORDINAL)
     private ActionType actionType;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idofclient")
-    private Client client;
-
     @Column(name = "comment", nullable = false)
     private String comment;
 
@@ -64,6 +62,15 @@ public class CardActionRequest implements Auditable {
 
     @Embedded
     private AuditEntity auditEntity;
+
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "cf_cr_cardactionclient",
+            joinColumns = { @JoinColumn(name = "requestid") },
+            inverseJoinColumns = { @JoinColumn(name = "requestid") }
+    )
+    private Set<CardActionClient> cardactionclient = new HashSet<>();
 
     public CardActionRequest() {
         // for Hibernate
@@ -127,14 +134,6 @@ public class CardActionRequest implements Auditable {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public ActionType getActionType() {
@@ -209,5 +208,13 @@ public class CardActionRequest implements Auditable {
 
     public void setOrganizationIds(String organizationIds) {
         this.organizationIds = organizationIds;
+    }
+
+    public Set<CardActionClient> getCardactionclient() {
+        return cardactionclient;
+    }
+
+    public void setCardactionclient(Set<CardActionClient> cardactionclient) {
+        this.cardactionclient = cardactionclient;
     }
 }

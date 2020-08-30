@@ -6,6 +6,8 @@ package ru.iteco.cardsync.service;
 
 import ru.iteco.cardsync.enums.ActionType;
 import ru.iteco.cardsync.kafka.dto.BlockPersonEntranceRequest;
+import ru.iteco.cardsync.models.Card;
+import ru.iteco.cardsync.models.CardActionClient;
 import ru.iteco.cardsync.models.CardActionRequest;
 import ru.iteco.cardsync.models.Client;
 import ru.iteco.cardsync.repo.CardActionRequestRepository;
@@ -22,7 +24,7 @@ public class CardActionRequestService {
         this.cardActionRequestRepository = cardActionRequestRepository;
     }
 
-    public List<CardActionRequest> findRequestBlockByRequestId(String id) {
+    public CardActionRequest findRequestBlockByRequestId(String id) {
         return cardActionRequestRepository.findByRequestIdAndProcessedAndActionType(id, true, 0);
     }
 
@@ -35,14 +37,27 @@ public class CardActionRequestService {
     }
 
     public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed){
-        writeRecord(blockPersonEntranceRequest, message, processed, null);
+        writeRecord(blockPersonEntranceRequest, message, processed, null, null, null);
     }
 
     public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed, Client client){
+        writeRecord(blockPersonEntranceRequest, message, processed, client, null, null);
+    }
+
+    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed,
+                            Client client, Card card, Client clientChild){
         CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
         request.setComment(message);
         request.setProcessed(processed);
-        request.setClient(client);
+
+        if (client != null || card != null || clientChild != null) {
+            CardActionClient cardActionClient = new CardActionClient();
+//            cardActionClient.setRequestId(blockPersonEntranceRequest.getId());
+            cardActionClient.setClient(client);
+            cardActionClient.setCard(card);
+            cardActionClient.setClientChild(clientChild);
+            request.getCardactionclient().add(cardActionClient);
+        }
 
         cardActionRequestRepository.save(request);
     }

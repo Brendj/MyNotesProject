@@ -19,7 +19,7 @@ public interface CardActionRequestRepository extends JpaRepository<CardActionReq
                     + "FROM cf_cr_cardactionrequests "
                     + "WHERE requestid = :requestId and processed = :processed and \"action\" = :atype",
             nativeQuery = true)
-    List<CardActionRequest> findByRequestIdAndProcessedAndActionType(@Param("requestId") String requestId,
+    CardActionRequest findByRequestIdAndProcessedAndActionType(@Param("requestId") String requestId,
                                                                      @Param("processed") Boolean processed,
                                                                      @Param("atype") Integer type);
 
