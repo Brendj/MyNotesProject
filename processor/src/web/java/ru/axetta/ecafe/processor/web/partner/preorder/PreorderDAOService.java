@@ -1438,7 +1438,15 @@ public class PreorderDAOService {
 
         ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            Date currentDate = preorderComplex.getPreorderDate();
+            List<OrgGoodRequest> preorderRequests = getOrgGoodRequests(preorderComplex.getClient().getOrg().getIdOfOrg(),
+                    CalendarUtils.startOfDay(currentDate), CalendarUtils.endOfDay(currentDate));
+            //если на тек день есть заявка, то этот день пропускаем
+            if (orgGoodRequestExists(preorderRequests, CalendarUtils.startOfDayInUTC(currentDate))) {
+                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest exists");
+            } else {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            }
             return null;
         }
         if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {
