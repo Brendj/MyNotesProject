@@ -119,10 +119,10 @@ public class BlockUnblockReportPage extends OnlineReportPage {
         }
         BlockUnblockCardReport.Builder builder = new BlockUnblockCardReport.Builder(templateFilename);
 
-        if (idOfOrg == null) {
-            printError(String.format("Выберите организацию "));
-            return null;
-        }
+        //if (idOfOrg == null) {
+        //    printError(String.format("Выберите организацию "));
+        //    return null;
+        //}
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
