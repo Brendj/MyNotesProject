@@ -198,7 +198,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.discountRuleSet = categoryDiscount.getDiscountsRules();
         this.categoryType = categoryDiscount.getCategoryType().getValue();
         this.organizationType = categoryDiscount.getOrgType();
-        if(categoryDiscount.getDiscountsRules().isEmpty()){
+        if(categoryDiscount.getDiscountsRules().isEmpty() || categoryDiscount.isRulesSetDeleted()){
             this.setFilter("-");
         } else {
             StringBuilder sb=new StringBuilder();

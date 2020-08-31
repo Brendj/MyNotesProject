@@ -172,7 +172,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
             } else {
                 this.setDiscountRate("100%");
             }
-            if(categoryDiscount.getDiscountsRules().isEmpty()){
+            if(categoryDiscount.getDiscountsRules().isEmpty() || categoryDiscount.isRulesSetDeleted()){
                 this.setFilter("-");
             } else {
                 StringBuilder sb=new StringBuilder();
