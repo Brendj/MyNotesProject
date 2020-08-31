@@ -7,7 +7,10 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.idGenerator.IIdGenerator;
+import ru.axetta.ecafe.processor.core.utils.idGenerator.OrganizationUniqueGeneratorId;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.GroupManagementErrors;
@@ -523,13 +526,13 @@ public class SchoolApiService implements ISchoolApiService {
         List<PlanOrderClientDTO> clientDTOList = new ArrayList<>();
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
-        Query query = persistanceSession.createQuery("from Client c "
+        Query query = persistanceSession.createQuery("select distinct c from Client c "
                 + "join fetch c.clientGroup "
                 + "join fetch c.person "
-                + "join fetch c.categoriesInternal"
-                + "join fetch c.categoriesInternal.discountRulesInternal"
-                + "join fetch c.categoriesInternal.discountRulesInternal.categoryOrgsInternal"
-                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) =: clientGroupName");
+                + "left join fetch c.categoriesInternal as ci "
+                + "left join fetch ci.discountRulesInternal as dr "
+                + "left join fetch dr.categoryOrgsInternal "
+                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName)=upper(:clientGroupName)");
         query.setParameterList("idOfOrgList", getOrgIds(friendlyOrgs));
         query.setParameter("clientGroupName", clientGroup.getGroupName().toUpperCase());
         List<Client> clients = query.list();
@@ -537,12 +540,14 @@ public class SchoolApiService implements ISchoolApiService {
             PlanOrderClientDTO planOrderClientDTO = new PlanOrderClientDTO(client);
             List<CategoryDiscount> filteredCategoryDiscounts = new ArrayList<>();
             for(CategoryDiscount categoryDiscount: client.getCategories()){
-                if(categoryDiscount.getCategoryType().equals(categoryDiscountEnumType)){
+                if(categoryDiscount.getCategoryType().getValue().equals(categoryDiscountEnumType.getValue())){
                     filteredCategoryDiscounts.add(categoryDiscount);
                 }
             }
-            if(!filteredCategoryDiscounts.isEmpty())
+            if(!filteredCategoryDiscounts.isEmpty()){
+                planOrderClientDTO.setFilteredClientCategoryDiscounts(filteredCategoryDiscounts);
                 clientDTOList.add(planOrderClientDTO);
+            }
         }
         return clientDTOList;
     }
@@ -553,21 +558,24 @@ public class SchoolApiService implements ISchoolApiService {
         List<Integer> enterPassDirections = Arrays.asList(EnterEvent.ENTRY, EnterEvent.RE_ENTRY, EnterEvent.DETECTED_INSIDE,
                 EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT);
         List<Integer> exitPassDirections = Arrays.asList(EnterEvent.DIRECTION_EXIT, EnterEvent.RE_EXIT);
-        Query queryEvent = persistanceSession.createQuery("from EnterEvent"
-                + "where client=:client"
-                + "and day(evtDateTime)=day(:planDate)"
-                + "and month(evtDateTime)=month(:planDate)"
-                + "and year(evtDateTime)=year(:planDate)"
-                + "and passDirection in (:passDirectionsList)"
+        Date startDate = getDateWithAddDay(planDate, 0);
+        Date endDate = getDateWithAddDay(startDate, 1);
+        Query queryEvent = persistanceSession.createQuery("from EnterEvent "
+                + "where client=:client "
+                + "and evtDateTime>=:startDate and evtDateTime<:endDate "
+                //+ "and to_char(evtDateTime,'yyyy-MM-dd')=:planDate "
+                + "and passDirection in (:passDirectionsList) "
                 + "order by evtDateTime desc");
-        queryEvent.setParameter("planDate",planDate);
-        queryEvent.setMaxResults(1);
+        queryEvent.setParameter("startDate", startDate);
+        queryEvent.setParameter("endDate", endDate);
         for(PlanOrderClientDTO clientDTO: clients){
             queryEvent.setParameter("client", clientDTO.getClient());
-            queryEvent.setParameter("passDirectionsList", enterPassDirections);
+            queryEvent.setParameterList("passDirectionsList", enterPassDirections);
+            queryEvent.setMaxResults(1);
             EnterEvent enterEvent = (EnterEvent) queryEvent.uniqueResult();
             clientDTO.setEnterEvent(enterEvent);
-            queryEvent.setParameter("passDirectionsList", exitPassDirections);
+            queryEvent.setParameterList("passDirectionsList", exitPassDirections);
+            queryEvent.setMaxResults(1);
             EnterEvent exitEvent = (EnterEvent) queryEvent.uniqueResult();
             clientDTO.setExitEvent(exitEvent);
         }
@@ -580,15 +588,16 @@ public class SchoolApiService implements ISchoolApiService {
         if(org == null)
             throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
-        Query complexInfoQuery = persistanceSession.createQuery("from ComplexInfo"
-                + "where org.idOfOrg=:orgId"
-                + "and day(menuDate)=day(:planDate)"
-                + "and month(menuDate)=month(:planDate)"
-                + "and year(menuDate)=year(:planDate)"
-                + "and modeFree=1"
-                + "and idOfComplex in (:complexIds)");
+        Date startDate = getDateWithAddDay(planDate, 0);
+        Date endDate = getDateWithAddDay(startDate, 1);
+        Query complexInfoQuery = persistanceSession.createQuery("from ComplexInfo "
+                + "where org.idOfOrg=:orgId "
+                + "and menuDate>=:startDate and menuDate<:endDate "
+                + "and modeFree=1 "
+                + "and idOfComplex in (:complexIds) ");
         complexInfoQuery.setParameter("orgId", orgId);
-        complexInfoQuery.setParameter("planDate", planDate);
+        complexInfoQuery.setParameter("startDate", startDate);
+        complexInfoQuery.setParameter("endDate", endDate);
         for(PlanOrderClientDTO client: clients){
             List<ClientComplexDTO> clientComplexList = new ArrayList<>();
             HashMap<CategoryDiscount, List<DiscountRule>> filteredDiscountRulesMap = new HashMap<>();
@@ -630,12 +639,13 @@ public class SchoolApiService implements ISchoolApiService {
                 }
             }
             for(Map.Entry categoryDiscountEntry: filteredDiscountRulesMap.entrySet()){
+                CategoryDiscount categoryDiscount = (CategoryDiscount) categoryDiscountEntry.getKey();
                 for(DiscountRule categoryDiscountRule: ((List<DiscountRule>) categoryDiscountEntry.getValue())){
-                    complexInfoQuery.setParameter("complexIds",categoryDiscountRule.getComplexIdsFromComplexMap());
+                    complexInfoQuery.setParameterList("complexIds",categoryDiscountRule.getComplexIdsFromComplexMap());
                     List<ComplexInfo> complexInfoList = complexInfoQuery.list();
                     for(ComplexInfo complexInfo: complexInfoList){
-                        ClientComplexDTO clientComplexDTO = new ClientComplexDTO(((CategoryDiscount)categoryDiscountEntry).getCategoryName(),
-                                complexInfo, null, null, null);
+                        ClientComplexDTO clientComplexDTO = new ClientComplexDTO(categoryDiscount.getCategoryName(),
+                                complexInfo, null, null, null, categoryDiscountRule);
                         clientComplexList.add(clientComplexDTO);
                     }
                 }
@@ -653,16 +663,18 @@ public class SchoolApiService implements ISchoolApiService {
             throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
         }
-        Query planOrderQuery = persistanceSession.createQuery("from PlanOrder"
-                +"where org.idOfOrg=:orgId"
-                + "and client.idOfClient=:clientId"
-                + "and complexInfo.idOfComplexInfo=:idOfComplex"
-                + "and day(planDate)=day(:reqPlanDate)"
-                + "and month(planDate)=month(:reqPlanDate)"
-                + "and year(planDate)=year(:reqPlanDate)");
+        IIdGenerator<Long> uniqueIdGenerator = OrganizationUniqueGeneratorId.getInstance(orgId);
+        Date startDate = getDateWithAddDay(planDate, 0);
+        Date endDate = getDateWithAddDay(startDate, 1);
+        Query planOrderQuery = persistanceSession.createQuery("from PlanOrder "
+                +"where org.idOfOrg=:orgId "
+                + "and client.idOfClient=:clientId "
+                + "and complexInfo.idOfComplexInfo=:idOfComplex "
+                + "and planDate>=:startDate and planDate<:endDate ");
         planOrderQuery.setMaxResults(1);
         planOrderQuery.setParameter("orgId", orgId);
-        planOrderQuery.setParameter("reqPlanDate", planDate);
+        planOrderQuery.setParameter("startDate", startDate);
+        planOrderQuery.setParameter("endDate", endDate);
 
         for(PlanOrderClientDTO planOrderClientDTO: clients){
             if(planOrderClientDTO.getClient() == null){
@@ -677,14 +689,16 @@ public class SchoolApiService implements ISchoolApiService {
                     if(planOrder.getOrder() == null){
                         planOrder.setGroupName(groupName);
                         planOrder.setComplexName(complexDTO.getComplexName());
+                        planOrder.setDiscountRule(complexDTO.getDiscountRule());
                         planOrder.setLastUpdate(new Date());
                         persistanceSession.update(planOrder);
                     }
                 }
                 else{
-                    planOrder = new PlanOrder(org, groupName, planOrderClientDTO.getClient(), planDate, complexDTO.getComplexInfo(),
-                            complexDTO.getComplexInfo().getComplexName(),
-                            null, false, null, null);
+                    ComplexInfo complexInfo = (ComplexInfo) persistanceSession.get(ComplexInfo.class, complexDTO.getComplexInfo().getIdOfComplexInfo());
+                    planOrder = new PlanOrder(uniqueIdGenerator.createId(), org, groupName, planOrderClientDTO.getClient(), planDate, complexInfo,
+                            complexInfo.getComplexName(),
+                            null, false, null, null, complexDTO.getDiscountRule());
                     persistanceSession.save(planOrder);
                 }
 
@@ -693,10 +707,10 @@ public class SchoolApiService implements ISchoolApiService {
                 }
                 else{
                     if(planOrder.getOrder().getState() == 0){
-                        complexDTO.setOrder(ClientComplexDTO.ORDER_PAID);
+                        complexDTO.setOrder(true);
                     }
                     else if(planOrder.getOrder().getState() == 1){
-                        complexDTO.setOrder(ClientComplexDTO.ORDER_CANCELLED);
+                        complexDTO.setOrder(false);
                     }
                     else
                         complexDTO.setOrder(null);
@@ -716,18 +730,54 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     @Override
+    public List<Client> getClientsByContractIdsForOrg(List<Long> contractIds, Long idOfOrg) throws Exception {
+        List<Org> orgs = DAOUtils.findFriendlyOrgs(persistanceSession, idOfOrg);
+        orgs.add(DAOUtils.findOrg(persistanceSession, idOfOrg));
+        List<Long> orgsIds = getOrgIds(orgs);
+        Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
+        clientsCriteria.add(Restrictions.and(
+                Restrictions.in("contractId", contractIds),
+                Restrictions.in("org.idOfOrg", orgsIds)
+        ));
+        return clientsCriteria.list();
+    }
+
+    @Override
+    public List<Client> getClientsByGroupsAndContractIds(List<String > groupsNames, List<Long> contractIds, Long idOfOrg)
+            throws Exception {
+        List<Org> orgs = DAOUtils.findFriendlyOrgs(persistanceSession, idOfOrg);
+        orgs.add(DAOUtils.findOrg(persistanceSession, idOfOrg));
+        List<Long> orgsIds = getOrgIds(orgs);
+        List<String> groupsNamesInUpperCase = new ArrayList<>();
+        for(String groupName: groupsNames){
+            groupsNamesInUpperCase.add(groupName.toUpperCase());
+        }
+        Query query = persistanceSession.createQuery("from Client c "
+                + "join fetch c.clientGroup "
+                + "join fetch c.person "
+                + "where contractId in (:contractsIdsList) "
+                + "and c.org.idOfOrg in (:idOfOrgList) "
+                + "and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
+        query.setParameterList("contractsIdsList", contractIds);
+        query.setParameterList("idOfOrgList", orgsIds);
+        query.setParameterList("nameOfGroupList", groupsNamesInUpperCase);
+        return query.list();
+    }
+
+    @Override
     public List<PlanOrder> getPlanOrdersWithoutOrder(Date planDate, List<Long> contractIds, String complexName)
             throws Exception {
-        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder"
-                + "where client.contractId in (:contractIds)"
-                + "and complexName=:reqComplexName"
-                + "and order is null"
-                + "and day(planDate)=day(:reqPlanDate)"
-                + "and month(planDate)=month(:reqPlanDate)"
-                + "and year(planDate)=year(:reqPlanDate)");
+        Date startDate = getDateWithAddDay(planDate, 0);
+        Date endDate = getDateWithAddDay(startDate, 1);
+        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder "
+                + "where client.contractId in (:contractIds) "
+                + "and complexName=:reqComplexName "
+                + "and order is null "
+                + "and planDate>=:startDate and planDate<:endDate ");
         planOrdersQuery.setParameterList("contractIds", contractIds);
         planOrdersQuery.setParameter("reqComplexName", complexName);
-        planOrdersQuery.setParameter("reqPlanDate",planDate);
+        planOrdersQuery.setParameter("startDate", startDate);
+        planOrdersQuery.setParameter("endDate", endDate);
         List<PlanOrder> planOrders = planOrdersQuery.list();
         return planOrders;
     }
@@ -735,10 +785,15 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public List<PlanOrder> setToPayForPlanOrders(List<PlanOrder> planOrders, Long idOfUser, Boolean toPay)
             throws Exception {
+        User requestUser = DAOUtils.findUser(persistanceSession, idOfUser);
+        Date lastUpdateDate = new Date();
+        if(requestUser == null)
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
         for(PlanOrder planOrder: planOrders){
             planOrder.setToPay(toPay);
-            planOrder.setUserRequestToPay(DAOUtils.findUser(persistanceSession, idOfUser));
-            planOrder.setLastUpdate(new Date());
+            planOrder.setUserRequestToPay(requestUser);
+            planOrder.setLastUpdate(lastUpdateDate);
             persistanceSession.update(planOrder);
         }
         return planOrders;
@@ -747,17 +802,18 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public List<PlanOrder> getPlanOrdersByToPay(Date planDate, List<Long> contractIds, String complexName,
             Boolean toPay) throws Exception {
-        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder"
-                + "where client.contractId in (:contractIds)"
-                + "and complexName=:reqComplexName"
-                + "and toPay=:reqToPay"
-                + "and day(planDate)=day(:reqPlanDate)"
-                + "and month(planDate)=month(:reqPlanDate)"
-                + "and year(planDate)=year(:reqPlanDate)");
+        Date startDate = getDateWithAddDay(planDate, 0);
+        Date endDate = getDateWithAddDay(startDate, 1);
+        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder "
+                + "where client.contractId in (:contractIds) "
+                + "and complexName=:reqComplexName "
+                + "and toPay=:reqToPay "
+                + "and planDate>=:startDate and planDate<:endDate ");
         planOrdersQuery.setParameterList("contractIds", contractIds);
         planOrdersQuery.setParameter("reqComplexName", complexName);
         planOrdersQuery.setParameter("reqToPay", toPay);
-        planOrdersQuery.setParameter("reqPlanDate", planDate);
+        planOrdersQuery.setParameter("startDate", startDate);
+        planOrdersQuery.setParameter("endDate", endDate);
         return planOrdersQuery.list();
     }
 
@@ -765,8 +821,140 @@ public class SchoolApiService implements ISchoolApiService {
     public List<PlanOrder> createOrderForPlanOrders(List<PlanOrder> planOrders, Boolean orderState, Long idOfUser)
             throws Exception {
         List<PlanOrder> updatedPlanOrders = new ArrayList<>();
+        User requestUser = DAOUtils.findUser(persistanceSession, idOfUser);
+        String orderComment = "Льготный план.  Карта не указана Баланс счета после оплаты: 0,00 р. Создано в методе /school/api/v1/planorders пользователем с ID = "+idOfUser;
+        Date lastUpdateDate = new Date();
+        if(requestUser == null)
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        for(PlanOrder planOrder: planOrders){
+            if(planOrder.getOrg() == null)
+                continue;
+            Order planOrderOrder = null;
+            List<OrderDetail> orderDetails = new ArrayList<>();
+            if(orderState){
+                if(planOrder.getOrder() == null || planOrder.getOrder().getState() == Order.STATE_CANCELED){
+                    Long orgId = planOrder.getOrg().getIdOfOrg();
+                    Long idOfRule = null;
+                    if(planOrder.getDiscountRule() != null){
+                        idOfRule = planOrder.getDiscountRule().getIdOfRule();
+                    }
+                    IIdGenerator<Long> orderIdGenerator = OrganizationUniqueGeneratorId.getInstance(orgId);
+                    CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(planOrder.getOrg().getIdOfOrg(), orderIdGenerator.createId());
+                    ComplexInfo planOrderComplex = planOrder.getComplexInfo();
+                    if(planOrderComplex == null)
+                        continue;
+                    planOrderOrder = new Order(compositeIdOfOrder, idOfUser, planOrderComplex.getCurrentPrice(),
+                            0L,  0, 0, new Date(), new Date(), 0, 0,
+                            orderComment, planOrder.getClient(),null,null,null,
+                            planOrder.getOrg().getDefaultSupplier(), OrderTypeEnumType.REDUCED_PRICE_PLAN, null);
+                    List<ComplexInfoDetail> complexInfoDetails = getComplexInfoDetails(planOrderComplex);
+                    String complexItemCode = null;
+                    OrderDetailFRationType orderDetailFRationType = null;
+                    if(planOrderComplex.getGood()!= null){
+                        complexItemCode = planOrderComplex.getGood().getGoodsCode();
+                        if(planOrderComplex.getGood().getGoodType() != null){
+                            orderDetailFRationType = OrderDetailFRationType.fromInteger(planOrderComplex.getGood().getGoodType().getCode());
+                        }
+                    }
+                    if(complexInfoDetails.isEmpty()){
+                        CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                        OrderDetail complexOrderDetail = new OrderDetail(compositeIdOfOrderDetail, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
+                                1, planOrderComplex.getCurrentPrice(), planOrderComplex.getCurrentPrice(), 0,
+                                planOrderComplex.getComplexName(), "","", 0, "",
+                                50, null, null,false, complexItemCode, idOfRule, orderDetailFRationType);
+                        orderDetails.add(complexOrderDetail);
+                        if(planOrderComplex.getGood()!= null){
+                            CompositeIdOfOrderDetail compositeIdOfOrderDetailForGood = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                            Good good = planOrderComplex.getGood();
+                            OrderDetail goodOrderDetail = new OrderDetail(compositeIdOfOrderDetailForGood, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
+                                    1, 0,0,0,"","","",0,
+                                    "",150,null,null, false,
+                                    good.getGoodsCode(), null, orderDetailFRationType);
+                            orderDetails.add(goodOrderDetail);
+                        }
+                    }
+                    else {
+                        MenuDetail complexMenuDetail = complexInfoDetails.get(0).getMenuDetail();
+                        CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                        OrderDetail complexOrderDetail = new OrderDetail(compositeIdOfOrderDetail, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
+                                planOrderComplex.getCurrentPrice(), planOrderComplex.getCurrentPrice(), 0, 0,
+                                planOrderComplex.getComplexName(), complexMenuDetail.getMenuPath(), complexMenuDetail.getGroupName(),
+                                complexMenuDetail.getMenuOrigin(), complexMenuDetail.getMenuDetailOutput(), 50,
+                                complexMenuDetail.getIdOfMenuFromSync(), null, false,
+                                complexItemCode, idOfRule,orderDetailFRationType);
+                        orderDetails.add(complexOrderDetail);
+                        for(ComplexInfoDetail complexInfoDetail: complexInfoDetails){
+                            MenuDetail complexInfoMenuDetail = complexInfoDetail.getMenuDetail();
+                            Good menuGood = getGoodById(complexInfoMenuDetail.getIdOfGood());
+                            if(menuGood != null){
+                                OrderDetailFRationType menuGoodFRationType = null;
+                                if(menuGood.getGoodType() != null){
+                                    menuGoodFRationType = OrderDetailFRationType.fromInteger(menuGood.getGoodType().getCode());
+                                }
+                                CompositeIdOfOrderDetail compositeIdOfOrderDetailForGood = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                                OrderDetail goodOrderDetail = new OrderDetail(compositeIdOfOrderDetailForGood, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
+                                        0, 0, 0, 0,
+                                        menuGood.getFullName(), complexInfoMenuDetail.getMenuPath(), complexInfoMenuDetail.getGroupName(),
+                                        complexInfoMenuDetail.getMenuOrigin(), complexInfoMenuDetail.getMenuDetailOutput(), 50,
+                                        complexInfoMenuDetail.getIdOfMenuFromSync(), null, false,
+                                        menuGood.getGoodsCode(), null, menuGoodFRationType);
+                                orderDetails.add(goodOrderDetail);
+                            }
+                        }
+                    }
 
-        return null;
+                    if(planOrderOrder!= null){
+                        persistanceSession.save(planOrderOrder);
+                        for(OrderDetail orderDetail: orderDetails){
+                            persistanceSession.save(orderDetail);
+                        }
+                        planOrder.setOrder(planOrderOrder);
+                    }
+                    planOrder.setUserConfirmToPay(requestUser);
+                    planOrder.setLastUpdate(lastUpdateDate);
+                    persistanceSession.update(planOrder);
+                    updatedPlanOrders.add(planOrder);
+                }
+                else {
+                    continue;
+                }
+            }
+            else if(planOrder.getOrder().getState() == Order.STATE_COMMITED){
+                String commentForCancelledOrder = "отменен: "+ new Date().toString() + "в методе /school/api/v1/planorders пользователем с ID = " + idOfUser;
+                Order currentPlanOrderOrder = planOrder.getOrder();
+                currentPlanOrderOrder.setState(Order.STATE_CANCELED);
+                currentPlanOrderOrder.setComments(commentForCancelledOrder);
+                persistanceSession.update(currentPlanOrderOrder);
+                planOrder.setUserConfirmToPay(requestUser);
+                planOrder.setLastUpdate(lastUpdateDate);
+                persistanceSession.update(planOrder);
+                updatedPlanOrders.add(planOrder);
+            }
+        }
+        return updatedPlanOrders;
+    }
+
+    private Date getDateWithAddDay(Date date, int days){
+        Calendar dateCal = Calendar.getInstance();
+        dateCal.setTime(date);
+        dateCal.set(Calendar.HOUR_OF_DAY, 0);
+        dateCal.set(Calendar.MINUTE, 0);
+        dateCal.set(Calendar.SECOND, 0);
+        dateCal.set(Calendar.MILLISECOND,0);
+        dateCal.add(Calendar.DATE, days);
+        return dateCal.getTime();
+
+    }
+
+    private List<ComplexInfoDetail> getComplexInfoDetails(ComplexInfo complexInfo) throws Exception{
+        Criteria complexInfoDetailsCriteria = persistanceSession.createCriteria(ComplexInfoDetail.class);
+        complexInfoDetailsCriteria.add(Restrictions.eq("complexInfo.idOfComplexInfo", complexInfo.getIdOfComplexInfo()));
+        return complexInfoDetailsCriteria.list();
+    }
+
+    private Good getGoodById(Long goodId) throws Exception{
+        return (Good) persistanceSession.get(Good.class, goodId);
     }
 
     private HashMap<String, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
@@ -1116,13 +1304,11 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     private boolean orgHasCategoryOrg(Set<CategoryOrg> firstComparable, Set<CategoryOrg> secondComparable){
-        List<Long> secondComparableIds = new ArrayList<>();
-        for(CategoryOrg categoryOrg: secondComparable){
-            secondComparableIds.add(categoryOrg.getIdOfCategoryOrg());
-        }
         for(CategoryOrg categoryOrg: firstComparable){
-            if(secondComparableIds.contains(categoryOrg.getIdOfCategoryOrg()))
-                return true;
+            for(CategoryOrg comparableCategoryOrg: secondComparable){
+                if(categoryOrg.getIdOfCategoryOrg() == comparableCategoryOrg.getIdOfCategoryOrg())
+                    return true;
+            }
         }
         return false;
     }

@@ -104,7 +104,7 @@ public class Order{
         return comments;
     }
 
-    protected void setComments(String comments) {
+    public void setComments(String comments) {
         this.comments = comments;
     }
 

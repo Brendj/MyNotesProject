@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -28,15 +29,17 @@ public class ClientComplexDTO {
     @JsonProperty("MSecondName")
     private String mSecondName;
     @JsonProperty("Order")
-    private String order;
+    private Boolean order;
     @JsonIgnore
     private ComplexInfo complexInfo;
+    @JsonIgnore
+    private DiscountRule discountRule;
 
     public ClientComplexDTO(){
 
     }
 
-    public ClientComplexDTO(String discount, ComplexInfo complexInfo, String mSurname, String mName, String mSecondName){
+    public ClientComplexDTO(String discount, ComplexInfo complexInfo, String mSurname, String mName, String mSecondName, DiscountRule discountRule){
         this.discount = discount;
         this.complexInfo = complexInfo;
         this.complexName = complexInfo.getComplexName();
@@ -45,6 +48,7 @@ public class ClientComplexDTO {
         this.mSurname = mSurname;
         this.mName = mName;
         this.mSecondName = mSecondName;
+        this.discountRule = discountRule;
     }
 
     public String getDiscount() {
@@ -95,11 +99,11 @@ public class ClientComplexDTO {
         this.mSecondName = mSecondName;
     }
 
-    public String getOrder() {
+    public Boolean getOrder() {
         return order;
     }
 
-    public void setOrder(String order) {
+    public void setOrder(Boolean order) {
         this.order = order;
     }
 
@@ -110,4 +114,8 @@ public class ClientComplexDTO {
     public void setComplexInfo(ComplexInfo complexInfo) {
         this.complexInfo = complexInfo;
     }
+
+    public DiscountRule getDiscountRule() { return discountRule; }
+
+    public void setDiscountRule(DiscountRule discountRule) { this.discountRule = discountRule; }
 }

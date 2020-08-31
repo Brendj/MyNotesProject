@@ -9,13 +9,11 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.RequestDTO.*;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.GroupEmployee;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.GroupInfo;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.PlanOrderClientDTO;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.PlanOrderGroupDTO;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.service.ISchoolApiService;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.service.SchoolApiService;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.util.Constants;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.GroupManagementErrors;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
@@ -40,6 +38,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -682,12 +681,21 @@ public class SchoolRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "planorders")
-    public Response planOrders(@QueryParam(value = "PlanDate") Date planDate, @QueryParam(value = "GroupsList") List<String> groupsList) {
+    public Response planOrders(@QueryParam(value = "PlanDate") String planDateString, @QueryParam(value = "GroupsList") List<String> groupsList) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ISchoolApiService groupManagementService;
         try{
+            SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_STRING_FORMAT);
+            Date planDate;
+            try {
+                planDate = format.parse(planDateString);
+            }
+            catch (Exception e){
+                throw new RequestProcessingException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(),
+                        GroupManagementErrors.VALIDATION_ERROR.getErrorMessage()+": дата заполнена неверно");
+            }
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new SchoolApiService(persistenceSession);
@@ -779,14 +787,35 @@ public class SchoolRestController {
             groupManagementService = new SchoolApiService(persistenceSession);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if(!checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER.getIdentification())
-                    || !checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
+                    && !checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
                 throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            List<Client> clients = new ArrayList<>();
+            List<GroupNameDTO> managerGroups = groupManagementService.getManagerGroups(jwtUserDetails.getContractId());
+            List<String> managerGroupsNames = new ArrayList<>();
+            for(GroupNameDTO groupNameDTO: managerGroups){
+                managerGroupsNames.add(groupNameDTO.getGroupName());
+            }
+            clients = groupManagementService.getClientsByGroupsAndContractIds(managerGroupsNames,
+                    setToPayRequestDTO.getContractIds(), jwtUserDetails.getIdOfOrg());
+            if(clients.isEmpty()){
+                throw new RequestProcessingException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorMessage());
+            }
+            List<Long> clientsContractIds = getContractIdsForClients(clients);
+            List<PlanOrder> planOrders = groupManagementService.getPlanOrdersWithoutOrder(setToPayRequestDTO.getPlanDate(),
+                    clientsContractIds, setToPayRequestDTO.getComplexName());
+            if(planOrders.isEmpty()){
+                throw new RequestProcessingException(GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorMessage());
+            }
+            planOrders = groupManagementService.setToPayForPlanOrders(planOrders, jwtUserDetails.getIdOfUser(), setToPayRequestDTO.isToPay());
+            ResponseSetToPay responseSetToPay = new ResponseSetToPay(SetToPayClientDTO.convertFromPlanOrders(planOrders));
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "OK")).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseSetToPay).build();
 
         }
         catch (RequestProcessingException e){
@@ -801,6 +830,79 @@ public class SchoolRestController {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "setorder")
+    public Response setOrder(SetOrderRequestDTO setOrderRequestDTO) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ISchoolApiService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new SchoolApiService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(!checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())
+                    && !checkRolePermission(authentication, User.DefaultRole.PRODUCTION_DIRECTOR.getIdentification())){
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            List<Client> clients = new ArrayList<>();
+            if(checkRolePermission(authentication,User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
+                List<GroupNameDTO> managerGroups = groupManagementService.getManagerGroups(jwtUserDetails.getContractId());
+                List<String> managerGroupsNames = new ArrayList<>();
+                for(GroupNameDTO groupNameDTO: managerGroups){
+                    managerGroupsNames.add(groupNameDTO.getGroupName());
+                }
+                clients = groupManagementService.getClientsByGroupsAndContractIds(managerGroupsNames,
+                        setOrderRequestDTO.getContractIds(), jwtUserDetails.getIdOfOrg());
+            }
+            else if(checkRolePermission(authentication, User.DefaultRole.PRODUCTION_DIRECTOR.getIdentification())){
+                clients = groupManagementService.getClientsByContractIdsForOrg(setOrderRequestDTO.getContractIds(), jwtUserDetails.getIdOfOrg());
+            }
+            List<Long> clientsContractIds = getContractIdsForClients(clients);
+            if(clientsContractIds.isEmpty()){
+                throw new RequestProcessingException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorMessage());
+            }
+            List<PlanOrder> planOrders = groupManagementService.getPlanOrdersByToPay(setOrderRequestDTO.getPlanDate(),
+                    clientsContractIds, setOrderRequestDTO.getComplexName(), true);
+            if(planOrders.isEmpty()){
+                throw new RequestProcessingException(GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorMessage());
+            }
+            planOrders = groupManagementService.createOrderForPlanOrders(planOrders, setOrderRequestDTO.isOrder(), jwtUserDetails.getIdOfUser());
+            ResponseSetOrder responseSetOrder = new ResponseSetOrder(SetOrderClientDTO.convertFromPlanOrders(planOrders));
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseSetOrder).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: %s", e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private List<Long> getContractIdsForClients(List<Client> clients){
+        List<Long> clientsContractsIds = new ArrayList<>();
+        for(Client client: clients){
+            clientsContractsIds.add(client.getContractId());
+        }
+        return clientsContractsIds;
     }
 
 

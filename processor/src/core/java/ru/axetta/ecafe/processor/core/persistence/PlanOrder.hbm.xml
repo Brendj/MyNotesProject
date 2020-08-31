@@ -8,16 +8,22 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.PlanOrder" table="cf_plan_orders">
         <id name="idOfPlanOrder" column="idofplanorder" type="long"></id>
-        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg" fetch="select" insert="false" update="false"/>
-        <property name="groupName" column="groupname" type="string" length="256" nsot-null="false"/>
-        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient" fetch="select" insert="false" update="false"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg" fetch="select"/>
+        <property name="groupName" column="groupname" type="string" length="256" not-null="false"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient" fetch="select"/>
         <property name="planDate" column="plandate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
-        <many-to-one name="complexInfo" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" column="idofcomplex" fetch="select" insert="false" update="false"/>
+        <many-to-one name="complexInfo" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" column="idofcomplex" fetch="select"/>
         <property name="complexName" column="complexname" type="string" length="256" not-null="false"/>
-        <many-to-one name="userRequestToPay" class="ru.axetta.ecafe.processor.core.persistence.User" column="useridrequesttopay" fetch="select" insert="false" update="false"/>
+        <many-to-one name="userRequestToPay" class="ru.axetta.ecafe.processor.core.persistence.User" column="useridrequesttopay" fetch="select"/>
         <property name="toPay" column="topay" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
-        <many-to-one name="order" class="ru.axetta.ecafe.processor.core.persistence.Order" column="idoforder" fetch="select" insert="false" update="false"/>
-        <many-to-one name="userConfirmToPay" class="ru.axetta.ecafe.processor.core.persistence.User" column="useridconfirmtopay" fetch="select" insert="false" update="false"/>
+        <many-to-one name="order" class="ru.axetta.ecafe.processor.core.persistence.Order" fetch="select"
+                     insert="false"
+                     update="false">
+            <column name="idoforg"/>
+            <column name="idoforder"/>
+        </many-to-one>
+        <many-to-one name="userConfirmToPay" class="ru.axetta.ecafe.processor.core.persistence.User" column="useridconfirmtopay" fetch="select"/>
+        <many-to-one name="discountRule" class="ru.axetta.ecafe.processor.core.persistence.DiscountRule" column="idofdiscountrule" fetch="select"/>
         <property name="createDate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
     </class>

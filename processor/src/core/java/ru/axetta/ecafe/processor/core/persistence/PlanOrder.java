@@ -18,6 +18,7 @@ public class PlanOrder {
     private Boolean toPay;
     private Order order;
     private User userConfirmToPay;
+    private DiscountRule discountRule;
     private Date createDate;
     private Date lastUpdate;
 
@@ -25,8 +26,9 @@ public class PlanOrder {
 
     }
 
-    public PlanOrder(Org org, String groupName, Client client, Date planDate, ComplexInfo complexInfo, String complexName,
-            User userRequestToPay, Boolean toPay, Order order, User userConfirmToPay){
+    public PlanOrder(Long idOfPlanOrder, Org org, String groupName, Client client, Date planDate, ComplexInfo complexInfo, String complexName,
+            User userRequestToPay, Boolean toPay, Order order, User userConfirmToPay, DiscountRule discountRule){
+        this.idOfPlanOrder = idOfPlanOrder;
         this.org = org;
         this.groupName = groupName;
         this.client = client;
@@ -39,6 +41,7 @@ public class PlanOrder {
         this.userConfirmToPay = userConfirmToPay;
         this.createDate = new Date();
         this.lastUpdate = this.createDate;
+        this.discountRule = discountRule;
     }
 
 
@@ -146,4 +149,8 @@ public class PlanOrder {
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
+
+    public DiscountRule getDiscountRule() { return discountRule; }
+
+    public void setDiscountRule(DiscountRule discountRule) { this.discountRule = discountRule; }
 }

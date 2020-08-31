@@ -30,7 +30,7 @@ public class PlanOrderClientDTO {
     @JsonProperty("Exit")
     private Date exit = null;
     @JsonProperty("Complexes")
-    private List<ClientComplexDTO> complexes;
+    private List<ClientComplexDTO> complexes = new ArrayList<>();
     @JsonIgnore
     private Client client;
     @JsonIgnore
@@ -38,7 +38,7 @@ public class PlanOrderClientDTO {
     @JsonIgnore
     private EnterEvent exitEvent;
     @JsonIgnore
-    private List<CategoryDiscount> filteredClientCategoryDiscounts;
+    private List<CategoryDiscount> filteredClientCategoryDiscounts = new ArrayList<>();
 
     public PlanOrderClientDTO(){
 
@@ -130,9 +130,8 @@ public class PlanOrderClientDTO {
     }
 
     public void setComplexes(List<ClientComplexDTO> complexes) {
-        this.complexes = complexes;
-        if(complexes == null)
-            this.complexes = new ArrayList<>();
+        if(complexes != null)
+            this.complexes = complexes;
     }
 
     public Client getClient() {
@@ -176,8 +175,7 @@ public class PlanOrderClientDTO {
     }
 
     public void setFilteredClientCategoryDiscounts(List<CategoryDiscount> filteredClientCategoryDiscounts) {
-        this.filteredClientCategoryDiscounts = filteredClientCategoryDiscounts;
-        if(filteredClientCategoryDiscounts == null)
-            this.filteredClientCategoryDiscounts = new ArrayList<>();
+        if(filteredClientCategoryDiscounts != null)
+            this.filteredClientCategoryDiscounts = filteredClientCategoryDiscounts;
     }
 }

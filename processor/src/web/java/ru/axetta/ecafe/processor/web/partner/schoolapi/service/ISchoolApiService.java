@@ -45,8 +45,11 @@ public interface ISchoolApiService {
     List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId) throws Exception;
     List<PlanOrderClientDTO> createOrUpdatePlanOrderForClientsComplexes(List<PlanOrderClientDTO> clients,
             Date planDate, Long orgId, String groupName) throws Exception;
+    List<Client> getClientsByContractIdsForOrg(List<Long> contractIds, Long idOfOrg) throws Exception;
+    List<Client> getClientsByGroupsAndContractIds(List<String> groupsNames, List<Long> contractIds, Long idOfOrg) throws Exception;
     List<PlanOrder> getPlanOrdersWithoutOrder(Date planDate, List<Long> contractIds, String complexName) throws Exception;
     List<PlanOrder> setToPayForPlanOrders(List<PlanOrder> planOrders, Long idOfUser, Boolean toPay) throws Exception;
     List<PlanOrder> getPlanOrdersByToPay(Date planDate, List<Long> contractIds, String complexName, Boolean toPay) throws Exception;
     List<PlanOrder> createOrderForPlanOrders(List<PlanOrder> planOrders, Boolean orderState, Long idOfUser) throws Exception;
+
 }

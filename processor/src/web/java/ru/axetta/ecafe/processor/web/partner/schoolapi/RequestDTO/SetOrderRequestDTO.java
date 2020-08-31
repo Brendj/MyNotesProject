@@ -13,7 +13,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.Date;
 import java.util.List;
 
-public class SetToPayRequestDTO {
+public class SetOrderRequestDTO {
     @JsonProperty("PlanDate")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_STRING_FORMAT)
     private Date planDate;
@@ -21,8 +21,8 @@ public class SetToPayRequestDTO {
     private List<Long> contractIds;
     @JsonProperty("ComplexName")
     private String complexName;
-    @JsonProperty("ToPay")
-    private boolean toPay;
+    @JsonProperty("Order")
+    private boolean order;
 
     public Date getPlanDate() {
         return planDate;
@@ -48,11 +48,11 @@ public class SetToPayRequestDTO {
         this.complexName = complexName;
     }
 
-    public boolean isToPay() {
-        return toPay;
+    public boolean isOrder() {
+        return order;
     }
 
-    public void setToPay(boolean toPay) {
-        this.toPay = toPay;
+    public void setOrder(boolean order) {
+        this.order = order;
     }
 }
