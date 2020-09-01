@@ -97,11 +97,11 @@ public class CardReadOnlyRepository extends BaseJpaDao {
                 .getResultList();
     }
 
-    public List<Card> findByOrgandStateChange(Long statechange, Org org) {
+    public List<Card> findByOrgandStateChange(Long statechange, Long idOfOrg) {
         return entityManager.createQuery("from Card c left join c.cardsync cs where cs.statechange=:statechange"
-                + " and cs.org =:org ", Card.class)
+                + " and cs.org.idOfOrg =:idOfOrg ", Card.class)
                 .setParameter("statechange", statechange)
-                .setParameter("org", org)
+                .setParameter("idOfOrg", idOfOrg)
                 .getResultList();
     }
 
