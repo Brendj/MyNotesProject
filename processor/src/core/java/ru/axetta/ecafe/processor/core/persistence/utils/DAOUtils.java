@@ -2051,14 +2051,36 @@ public class DAOUtils {
         return (Long) (q.getSingleResult());
     }
 
-    public static List<DiscountRule> listDiscountRules(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from DiscountRule order by priority, idOfRule asc");
+    public static List<DiscountRule> listDiscountRules(EntityManager em, boolean archived) {
+        javax.persistence.Query q = em.createQuery("from DiscountRule where deletedState = :archived "
+                + "order by priority, idOfRule asc");
+        q.setParameter("archived", archived);
         return q.getResultList();
     }
 
-    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from WtDiscountRule order by priority, idOfRule asc");
+    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em, boolean archived) {
+        javax.persistence.Query q = em.createQuery("from WtDiscountRule where deletedState = :archived "
+                + "order by priority, idOfRule asc");
+        q.setParameter("archived", archived);
         return q.getResultList();
+    }
+
+    public static List<WtComplex> getComplexesByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
+        return em.createQuery("select rule.complexes from WtDiscountRule rule where rule = :discountRule")
+                .setParameter("discountRule", discountRule)
+                .getResultList();
+    }
+
+    public static List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
+        return em.createQuery("select rule.categoryDiscounts from WtDiscountRule rule where rule = :discountRule")
+                .setParameter("discountRule", discountRule)
+                .getResultList();
+    }
+
+    public static List<CategoryOrg> getCategoryOrgsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
+        return em.createQuery("select rule.categoryOrgs from WtDiscountRule rule where rule = :discountRule")
+                .setParameter("discountRule", discountRule)
+                .getResultList();
     }
 
     public static List getCategoryDiscountListWithIds(EntityManager em, List<Long> idOfCategoryList) {

@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -229,7 +228,8 @@ public class DiscountManager {
 
     /*Для вызова в коде после изменения или присваивания ageTypeGroup и изменения/присваивания списка категорий льгот*/
     public static void deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(Session session, Client client) throws Exception {
-        if (!RuntimeContext.getInstance().getPropertiesValue(PROPERTY_DOU_DISCOUNT_DELETE, "false").equals("true")) return;
+        return; //удаление льгот ДОУ перенесено в ClientMigrationHistoryService.deleteDOUDiscounts
+        /*if (!RuntimeContext.getInstance().getPropertiesValue(PROPERTY_DOU_DISCOUNT_DELETE, "false").equals("true")) return;
         boolean douDiscountsExist = false;
         for (CategoryDiscount cd : client.getCategories()) {
             if (cd.getOrgType().equals(CategoryDiscount.KINDERGARTEN_ID)) {
@@ -250,7 +250,7 @@ public class DiscountManager {
         if (client.getOrg().getType().equals(OrganizationType.SCHOOL)) {
             //не заполнена возрастная категория и тип ОО = СОШ
             deleteDOUDiscounts(session, client);
-        }
+        }*/
     }
 
     public static void deleteDOUDiscounts(Session session, Client client) throws Exception {

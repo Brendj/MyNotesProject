@@ -198,14 +198,16 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.discountRuleSet = categoryDiscount.getDiscountsRules();
         this.categoryType = categoryDiscount.getCategoryType().getValue();
         this.organizationType = categoryDiscount.getOrgType();
-        if(categoryDiscount.getDiscountsRules().isEmpty()){
+        if(categoryDiscount.getDiscountsRules().isEmpty() || categoryDiscount.isRulesSetDeleted()){
             this.setFilter("-");
         } else {
             StringBuilder sb=new StringBuilder();
             for (DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-                this.idOfRuleList.add(discountRule.getIdOfRule());
-                sb.append(discountRule.getDescription());
-                sb.append("; ");
+                if (!discountRule.getDeletedState()) {
+                    this.idOfRuleList.add(discountRule.getIdOfRule());
+                    sb.append(discountRule.getDescription());
+                    sb.append("; ");
+                }
             }
             this.setFilter(sb.substring(0, sb.length()-1));
         }

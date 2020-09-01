@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SyncSettingsJasperReport" pageWidth="2915" pageHeight="30000" columnWidth="2875" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
-	<property name="ireport.zoom" value="1.4641000000000044"/>
-	<property name="ireport.x" value="2922"/>
+	<property name="ireport.zoom" value="0.9090909090909117"/>
+	<property name="ireport.x" value="1367"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -40,6 +40,7 @@
 	<field name="photoSync" class="java.lang.Object"/>
 	<field name="helpRequestsSync" class="java.lang.Object"/>
 	<field name="libSync" class="java.lang.Object"/>
+	<field name="cardSync" class="java.lang.Object"/>
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
@@ -96,7 +97,7 @@
 				<text><![CDATA[Адрес]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="2572" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="2352" y="0" width="303" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -109,7 +110,7 @@
 				<text><![CDATA[Библиотека]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="2269" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="2075" y="0" width="277" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -122,7 +123,7 @@
 				<text><![CDATA[Служба помощи]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1966" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1809" y="0" width="266" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -135,7 +136,7 @@
 				<text><![CDATA[Фотографии]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1663" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1543" y="0" width="266" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -148,7 +149,7 @@
 				<text><![CDATA[Меню]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1360" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1270" y="0" width="273" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -161,7 +162,7 @@
 				<text><![CDATA[Данные по клиентам]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1057" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="1001" y="0" width="269" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -174,7 +175,7 @@
 				<text><![CDATA[Настройки ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="754" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="725" y="0" width="276" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -187,7 +188,7 @@
 				<text><![CDATA[Баланс и проходы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="451" y="0" width="303" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="451" y="0" width="274" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -198,6 +199,19 @@
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Полная]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" stretchType="RelativeToBandHeight" x="2655" y="0" width="220" height="135"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Карты]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -243,7 +257,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="451" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="451" y="0" width="274" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -256,7 +270,7 @@
 				<textFieldExpression><![CDATA[$F{fullSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="754" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="725" y="0" width="276" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -269,7 +283,7 @@
 				<textFieldExpression><![CDATA[$F{accIncSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1057" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1001" y="0" width="269" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -282,7 +296,7 @@
 				<textFieldExpression><![CDATA[$F{orgSettingSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1360" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1270" y="0" width="273" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -295,7 +309,7 @@
 				<textFieldExpression><![CDATA[$F{clientDataSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1663" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1543" y="0" width="266" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -308,7 +322,7 @@
 				<textFieldExpression><![CDATA[$F{menuSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1966" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1809" y="0" width="266" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 					<printWhenExpression><![CDATA[$F{photoSync}.equals(false)]]></printWhenExpression>
 				</reportElement>
@@ -322,7 +336,7 @@
 				<textFieldExpression><![CDATA[$F{photoSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="2269" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="2075" y="0" width="277" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -335,7 +349,7 @@
 				<textFieldExpression><![CDATA[$F{helpRequestsSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="2572" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="2352" y="0" width="303" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 					<printWhenExpression><![CDATA[$F{libSync}.equals(false)]]></printWhenExpression>
 				</reportElement>
@@ -349,7 +363,7 @@
 				<textFieldExpression><![CDATA[$F{libSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" mode="Opaque" x="2572" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" mode="Opaque" x="2352" y="0" width="303" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 					<printWhenExpression><![CDATA[$F{libSync}.equals(true)]]></printWhenExpression>
 				</reportElement>
@@ -363,7 +377,7 @@
 				<textFieldExpression><![CDATA[$F{libSync}.toString()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" mode="Opaque" x="1966" y="0" width="303" height="27" backcolor="#CCCCCC">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" mode="Opaque" x="1809" y="0" width="266" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 					<printWhenExpression><![CDATA[$F{photoSync}.equals(true)]]></printWhenExpression>
 				</reportElement>
@@ -375,6 +389,19 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{photoSync}.toString()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="2655" y="0" width="220" height="27" backcolor="#CCCCCC">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{cardSync}.toString()]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
