@@ -47,7 +47,7 @@ public class CardProcessorService {
         if (blockRequests.isEmpty()) {
             return false;
         }
-        if (blockRequests.get(0).getAudit().getCreateDate().getTime() > new Date(!!!).getTime())
+        if (blockRequests.get(0).getAudit().getCreateDate().getTime() > new Date().getTime())
             return true;
         else
             return false;
@@ -129,6 +129,7 @@ public class CardProcessorService {
                     continue;
                 }
                 cardService.unblockCard(cardActionClient.getCard());
+                cardActionClientService.writeRecord(cardActionRequest, "Карты клиента успешно заблокированы", cardActionClient.getClient());
             }
             cardActionRequestService.writeRecord(cardActionRequest, "Карты клиента успешно заблокированы", true, blockRequests);
         } catch (Exception e) {
@@ -212,8 +213,9 @@ public class CardProcessorService {
         }
 
         for (Card c : cards) {
+            Integer oldState = c.getState();
             cardService.blockCard(c);
-            cardActionClientService.writeRecord(cardActionRequest, client, c, clientChild, "Карта клиента успешно заблокирована");
+            cardActionClientService.writeRecord(cardActionRequest, client, c, clientChild, "Карта клиента успешно заблокирована", oldState);
         }
     }
 }

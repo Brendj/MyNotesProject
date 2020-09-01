@@ -27,13 +27,14 @@ public class CardActionClientService {
         cardActionClientRepository.save(cardActionClient);
     }
 
-    public void writeRecord(CardActionRequest request, Client client, Card card, Client clientChild, String comment) {
+    public void writeRecord(CardActionRequest request, Client client, Card card, Client clientChild, String comment, Integer oldState) {
         CardActionClient cardActionClient = new CardActionClient();
         cardActionClient.setClient(client);
         cardActionClient.setCard(card);
         cardActionClient.setClientChild(clientChild);
         cardActionClient.setComment(comment);
         cardActionClient.setCardActionRequest(request);
+        cardActionClient.setOldcardstate(oldState);
         cardActionClientRepository.save(cardActionClient);
     }
 
