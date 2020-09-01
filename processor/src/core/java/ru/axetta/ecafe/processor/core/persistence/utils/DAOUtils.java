@@ -3050,7 +3050,7 @@ public class DAOUtils {
     public static long nextVersionBySpecialDate(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select sd.version from cf_specialdates as sd order by sd.version desc limit 1 for update");
+                "select sd.version from cf_specialdates as sd order by sd.version desc limit 1");
         Object o = query.uniqueResult();
         if (o != null) {
             version = Long.valueOf(o.toString()) + 1;
