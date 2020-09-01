@@ -21,7 +21,7 @@ create table cf_wt_category_items
         constraint cf_wt_category_items_fk_2
             references cf_users,
     guid            varchar(36)       not null unique,
-    description      varchar(255)      not null
+    description      varchar(255)      not null unique
         constraint cf_wt_category_items_description_check_2
             CHECK (description NOT SIMILAR TO ' *'),
     deletestate      integer default 0,
