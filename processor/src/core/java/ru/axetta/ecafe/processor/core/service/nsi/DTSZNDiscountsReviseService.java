@@ -1065,7 +1065,7 @@ public class DTSZNDiscountsReviseService {
             Integer counter = 0;
             Map<Long, Boolean> orgData = new HashMap<>();
             for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
-                logger.info(String.format("Processing record %s from %s", counter, discountItemList.getItems().size()));
+
                 if (null == transaction || !transaction.isActive()) {
                     transaction = session.beginTransaction();
                 }
@@ -1076,12 +1076,15 @@ public class DTSZNDiscountsReviseService {
                 if (client == null) {
                     client = DAOUtils.findClientByGuid(session, item.getRegistryGUID());
                 }
+                logger.info(String.format("Processing record %s from %s. IdOfClient=%s", counter, discountItemList.getItems().size(),
+                        client == null ? "null" : client.getIdOfClient()));
                 if (null == client || !isStudent(client)) {
                     //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                     if (0 == counter++ % maxRecords) {
                         transaction.commit();
                         transaction = null;
                     }
+                    logger.info("Client is null or !student");
                     continue;
                 }
 
@@ -1112,6 +1115,7 @@ public class DTSZNDiscountsReviseService {
                     discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
                             || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                     session.save(discountInfo);
+                    logger.info("Created ClientDtisznDiscountInfo");
                 } else {
                     if (discountInfo.getDtisznCode().equals(item.getDsznCode().longValue())) {
                         // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
@@ -1154,6 +1158,7 @@ public class DTSZNDiscountsReviseService {
                         }
                         discountInfo.setSource(DATA_SOURCE_TYPE_MARKER_OU);
                         session.merge(discountInfo);
+                        logger.info(String.format("ClientDtisznDiscountInfo OK. wasModified: %s", wasModified ? "true" : "false"));
                     } else {
                         // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
                         // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
@@ -1168,6 +1173,7 @@ public class DTSZNDiscountsReviseService {
                         discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
                                 || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                         session.save(discountInfo);
+                        logger.info("Archived old and created new ClientDtisznDiscountInfo");
                     }
                 }
                 if (0 == counter++ % maxRecords) {
