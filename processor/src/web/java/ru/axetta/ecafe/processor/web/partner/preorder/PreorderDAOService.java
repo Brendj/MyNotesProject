@@ -821,6 +821,7 @@ public class PreorderDAOService {
             }
 
             Set<PreorderMenuDetail> set = new HashSet<PreorderMenuDetail>();
+            boolean menuDetailChanged = false;
             if (complex.getMenuItems() != null) {
                 for (MenuItemParam menuItem : complex.getMenuItems()) {
                     RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
@@ -839,6 +840,10 @@ public class PreorderDAOService {
                     PreorderMenuDetail preorderMenuDetail;
                     try {
                         preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
+                        if (!menuDetailChanged && (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())
+                                || !preorderMenuDetail.getDeletedState().equals(!menuSelected))) {
+                            menuDetailChanged = true;
+                        }
                         if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())) {
                             preorderMenuDetail.setMobile(guardianMobile);
                             preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
@@ -849,6 +854,7 @@ public class PreorderDAOService {
                     } catch (NoResultException e) {
                         preorderMenuDetail = createPreorderMenuDetail(client, preorderComplex, null, date, menuItem.getIdOfMenuDetail(),
                                 menuItem.getAmount(), guardianMobile, mobileGroupOnCreate);
+                        if (!menuDetailChanged) menuDetailChanged = true;
                     }
                     set.add(preorderMenuDetail);
                 }
@@ -886,6 +892,9 @@ public class PreorderDAOService {
                 } else if (!preorderComplex.getDeletedState().equals(deleted)) {
                     preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (menuDetailChanged) {
+                    preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setVersion(nextVersion);
                 }
 
@@ -1033,6 +1042,7 @@ public class PreorderDAOService {
             }
 
             Set<PreorderMenuDetail> set = new HashSet<>();
+            boolean menuDetailChanged = false;
             if (complex.getMenuItems() != null) {
                 for (MenuItemParam menuItem : complex.getMenuItems()) {
                     RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
@@ -1052,6 +1062,10 @@ public class PreorderDAOService {
                     PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail();
                     try {
                         preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
+                        if (!menuDetailChanged && (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())
+                                || !preorderMenuDetail.getDeletedState().equals(!menuSelected))) {
+                            menuDetailChanged = true;
+                        }
                         if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())) {
                             preorderMenuDetail.setMobile(guardianMobile);
                             preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
@@ -1062,6 +1076,7 @@ public class PreorderDAOService {
                     } catch (NoResultException e) {
                             preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, null, date, menuItem.getIdOfMenuDetail(),
                                     menuItem.getAmount(), guardianMobile, mobileGroupOnCreate);
+                            if (!menuDetailChanged) menuDetailChanged = true;
                     }
                     set.add(preorderMenuDetail);
                 }
@@ -1099,6 +1114,9 @@ public class PreorderDAOService {
                 } else if (!preorderComplex.getDeletedState().equals(deleted)) {
                     preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (menuDetailChanged) {
+                    preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setVersion(nextVersion);
                 }
 
