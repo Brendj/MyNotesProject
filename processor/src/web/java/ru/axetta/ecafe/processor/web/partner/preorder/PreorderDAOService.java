@@ -861,11 +861,18 @@ public class PreorderDAOService {
                 if (set.size() > 0) {
                     preorderComplex.getPreorderMenuDetails().addAll(set);
                 }
-                complexSelected = false;
-                for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
-                    if (pmd.getAmount() > 0) {
-                        complexSelected = true;
-                        break;
+
+                boolean deleted = false;
+                if (preorderComplex.getAmount() > 0 && complex.getAmount() == 0) {
+                    deleted = true;
+                }
+                if (preorderComplex.getAmount() == 0) {
+                    deleted = true;
+                    for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+                        if (pmd.getAmount() > 0) {
+                            deleted = false;
+                            break;
+                        }
                     }
                 }
                 if (!preorderComplex.getAmount().equals(complex.getAmount())) {
@@ -874,7 +881,11 @@ public class PreorderDAOService {
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
                     preorderComplex.setAmount(complex.getAmount());
                     preorderComplex.setLastUpdate(new Date());
-                    //preorderComplex.setDeletedState(!complexSelected);
+                    preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (!preorderComplex.getDeletedState().equals(deleted)) {
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setDeletedState(deleted);
                     preorderComplex.setVersion(nextVersion);
                 }
 
@@ -1063,12 +1074,31 @@ public class PreorderDAOService {
                 if (set.size() > 0) {
                     preorderComplex.getPreorderMenuDetails().addAll(set);
                 }
+
+                boolean deleted = false;
+                if (preorderComplex.getAmount() > 0 && complex.getAmount() == 0) {
+                    deleted = true;
+                }
+                if (preorderComplex.getAmount() == 0) {
+                    deleted = true;
+                    for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+                        if (pmd.getAmount() > 0) {
+                            deleted = false;
+                            break;
+                        }
+                    }
+                }
                 if (!preorderComplex.getAmount().equals(complex.getAmount())) {
                     preorderComplex.setMobile(guardianMobile);
                     preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
                     preorderComplex.setAmount(complex.getAmount());
                     preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (!preorderComplex.getDeletedState().equals(deleted)) {
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setDeletedState(deleted);
                     preorderComplex.setVersion(nextVersion);
                 }
 
