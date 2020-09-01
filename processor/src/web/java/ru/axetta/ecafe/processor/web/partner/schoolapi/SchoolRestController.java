@@ -750,7 +750,7 @@ public class SchoolRestController {
                 planOrderGroupDTO.setClients(clients);
                 groupsDTOList.add(planOrderGroupDTO);
             }
-            ResponsePlanOrders responsePlanOrders = new ResponsePlanOrders(planDate);
+            ResponsePlanOrders responsePlanOrders = new ResponsePlanOrders(planDateString);
             responsePlanOrders.setGroupsList(groupsDTOList);
             persistenceTransaction.commit();
             persistenceTransaction = null;
