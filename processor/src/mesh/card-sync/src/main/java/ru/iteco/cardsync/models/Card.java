@@ -5,6 +5,7 @@
 package ru.iteco.cardsync.models;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -30,6 +31,10 @@ public class Card {
 
     @Column(name = "state", nullable = false)
     private Integer state; //TODO переделать маппинг по enum
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcardsync")
+    private List<CardSync> cardSyncs;
 
     public Long getIdOfCard() {
         return idOfCard;
@@ -94,5 +99,13 @@ public class Card {
     @Override
     public int hashCode() {
         return Objects.hash(getIdOfCard());
+    }
+
+    public List<CardSync> getCardSyncs() {
+        return cardSyncs;
+    }
+
+    public void setCardSyncs(List<CardSync> cardSyncs) {
+        this.cardSyncs = cardSyncs;
     }
 }
