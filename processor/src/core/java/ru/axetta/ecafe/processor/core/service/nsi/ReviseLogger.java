@@ -181,6 +181,8 @@ public class ReviseLogger {
             sb.append(item.getUpdatedAt());
             sb.append("\",is_del=\"");
             sb.append(item.getDeleted());
+            sb.append("\",mesh_guid=\"");
+            sb.append(item.getMeshGUID() == null ? "null" : item.getMeshGUID());
             sb.append("\"}");
             if (++counter < size) {
                 sb.append(", ");
