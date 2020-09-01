@@ -1023,10 +1023,10 @@
                                 binding="#{typeOfProductionCatalogListPage.mainMenuComponent}"
                                 label="Вид производства" action="#{typeOfProductionCatalogListPage.show}"
                                 reRender="workspaceForm" />--%>
-            <%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.CategoryItemCatalogListPage"--%>
+            <%--@elvariable id="categoryCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.CategoryCatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
-                                binding="#{categoryItemCatalogListPage.mainMenuComponent}"
-                                label="Категории блюд" action="#{categoryItemCatalogListPage.show}"
+                                binding="#{categoryCatalogListPage.mainMenuComponent}"
+                                label="Категории блюд" action="#{categoryCatalogListPage.show}"
                                 reRender="workspaceForm" />
             <%--@elvariable id="groupItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.GroupItemCatalogListPage"
             <rich:panelMenuItem id="webTechnologistGroupCatalogsItemsList"

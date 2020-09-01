@@ -315,16 +315,19 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         wtDiscountRule.setSubCategory(strSubCategory);
         wtDiscountRule.setDescription(description);
 
+        List<WtComplex> ruleComplexes = new ArrayList<>();
         for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
             if (wtSelectedComplex.isChecked()) {
                 WtComplex complex = wtSelectedComplex.getWtComplex();
-                wtDiscountRule.getComplexes().add(complex);
+                ruleComplexes.add(complex);
             }
         }
+        wtDiscountRule.setComplexes(new HashSet<>(ruleComplexes));
 
         wtDiscountRule.setOperationOr(operationOr);
         wtDiscountRule.setPriority(priority);
         wtDiscountRule.setRate(discountRate);
+        wtDiscountRule.setDeletedState(false);
 
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
 
