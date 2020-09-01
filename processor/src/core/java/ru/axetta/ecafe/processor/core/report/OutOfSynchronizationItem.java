@@ -26,10 +26,11 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
     private String introductionQueue;
     private String district;
     private String isWorkInSummerTime;
+    private String isPreordersEnabled;
 
     public OutOfSynchronizationItem(String condition, Long idOfOrg, String shortName, String address, boolean isWorkInSummerTime,
             String lastSuccessfulBalanceSync, String version, String remoteAddr, Long number, String statusDetailing,
-            String introductionQueue, String district) {
+            String introductionQueue, String district, boolean isPreordersEnabled) {
         this.condition = condition;
         this.idOfOrg = idOfOrg;
         this.shortName = shortName;
@@ -42,6 +43,7 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
         this.statusDetailing = statusDetailing;
         this.introductionQueue = introductionQueue;
         this.district = district;
+        this.isPreordersEnabled = isPreordersEnabled ? "Да" : "Нет";
     }
 
     public OutOfSynchronizationItem() {
@@ -141,6 +143,14 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
 
     public void setIsWorkInSummerTime(String isWorkInSummerTime) {
         this.isWorkInSummerTime = isWorkInSummerTime;
+    }
+
+    public String getIsPreordersEnabled() {
+        return isPreordersEnabled;
+    }
+
+    public void setIsPreordersEnabled(String isPreordersEnabled) {
+        this.isPreordersEnabled = isPreordersEnabled;
     }
 
     @Override

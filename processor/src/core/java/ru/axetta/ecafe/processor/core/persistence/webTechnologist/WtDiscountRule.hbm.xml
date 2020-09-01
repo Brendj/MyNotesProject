@@ -29,17 +29,19 @@
         </property>
         <property name="subCategory" column="subCategory" type="string" length="100" />
 
-        <set name="complexes" lazy="false" table="cf_wt_discountrules_complexes">
+        <property name="deletedState" column="deletedState" type="boolean"/>
+
+        <set name="complexes" lazy="true" table="cf_wt_discountrules_complexes">
             <key column="idOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" column="idOfComplex"/>
         </set>
 
-        <set name="categoryOrgs" lazy="false" table="cf_wt_discountrules_categoryorg">
+        <set name="categoryOrgs" lazy="true" table="cf_wt_discountrules_categoryorg">
             <key column="idOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="idOfCategoryOrg"/>
         </set>
 
-        <set name="categoryDiscounts" lazy="false" table="cf_wt_discountrules_categorydiscount">
+        <set name="categoryDiscounts" lazy="true" table="cf_wt_discountrules_categorydiscount">
             <key column="idOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="idOfCategoryDiscount"/>
         </set>

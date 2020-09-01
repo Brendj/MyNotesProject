@@ -44,11 +44,18 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
     private String filterOrg = "Не выбрано";
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private Set<CategoryOrg> categoryOrgs;
+    private Boolean showArchived = false;
 
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
-        DAOService.getInstance().deleteEntity(confirmDeletePage.getEntity());
-        RuntimeContext.getAppContext().getBean(getClass()).reload();
+        try {
+            DiscountRule discountRule = (DiscountRule) DAOService.getInstance().detachEntity(confirmDeletePage.getEntity());
+            discountRule.setDeletedState(true);
+            DAOService.getInstance().mergeEntity(discountRule);
+            RuntimeContext.getAppContext().getBean(getClass()).reload();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getPageTitle() {
@@ -78,6 +85,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         filter = "Не выбрано";
         subCategory = 0;
         filterOrg = "Не выбрано";
+        showArchived = false;
         idOfCategoryOrgList = new ArrayList<Long>();
         RuntimeContext.getAppContext().getBean(getClass()).reload();
         return this;
@@ -89,7 +97,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
     @Transactional
     public void reload() {
         List<Item> items = new ArrayList<Item>();
-        List<DiscountRule> discountRuleList = DAOUtils.listDiscountRules(em);
+        List<DiscountRule> discountRuleList = DAOUtils.listDiscountRules(em, showArchived);
 
         for (DiscountRule discountRule : discountRuleList) {
 
@@ -235,6 +243,14 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
 
     public String getIdOfCategoryListString() {
         return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
+    }
+
+    public Boolean getShowArchived() {
+        return showArchived;
+    }
+
+    public void setShowArchived(Boolean showArchived) {
+        this.showArchived = showArchived;
     }
 
     public static class Item {
