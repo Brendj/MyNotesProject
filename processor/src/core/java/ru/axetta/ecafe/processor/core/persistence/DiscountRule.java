@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -73,6 +76,7 @@ public class DiscountRule {
     private Set<CategoryOrg> categoryOrgsInternal = new HashSet<CategoryOrg>();
     private String complexesMap;
     private String subCategory;
+    private Boolean deletedState;
 
     public String getComplexesMap() {
         return complexesMap;
@@ -249,6 +253,7 @@ public class DiscountRule {
         this.priority = priority;
         this.operationOr = operationOr;
         this.categoryDiscounts = categoryDiscounts;
+        this.deletedState = false;
     }
 
     public long getIdOfRule() {
@@ -673,6 +678,14 @@ public class DiscountRule {
 
     public void setSubCategory(String subCategory) {
         this.subCategory = subCategory;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 
     @Override

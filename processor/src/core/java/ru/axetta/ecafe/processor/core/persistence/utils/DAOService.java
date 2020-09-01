@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -396,6 +396,15 @@ public class DAOService {
         if (entity != null) {
             entityManager.remove(entity);
         }
+    }
+
+    public void mergeEntity(Object entity) throws Exception {
+        entityManager.merge(entity);
+    }
+
+    public Object detachEntity(Object entity) throws Exception {
+        entityManager.detach(entity);
+        return entity;
     }
 
     public Long getContractIdByCardNo(long lCardId) throws Exception {
@@ -3046,5 +3055,17 @@ public class DAOService {
         org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate, idofagegroupitem from cf_wt_complexes "
                 + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idofcomplex in (" + idOfComplexString + ")");
         return q.list();
+    }
+
+    public List<WtComplex> getComplexesByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getComplexesByWtDiscountRule(entityManager, discountRule);
+    }
+
+    public List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getCategoryDiscountsByWtDiscountRule(entityManager, discountRule);
+    }
+
+    public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
     }
 }
