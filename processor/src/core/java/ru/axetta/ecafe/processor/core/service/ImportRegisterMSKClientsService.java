@@ -1090,9 +1090,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             } else {
                 fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
             }
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
-                    cl == null ? null : cl.getClientGUID(),
-                    updateClient);// fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
+
+            if(clientNotExistsOrCurrent(cl, pupil.getGuid(), session)) {
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
+                        cl == null ? null : cl.getClientGUID(), updateClient);// fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
+            }
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
                     cl == null ? null : cl.getPerson().getSurname(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
@@ -1170,6 +1172,22 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             }
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
+    }
+
+    private boolean clientNotExistsOrCurrent(Client cl, String guid, Session session) {
+        if(cl != null && cl.getClientGUID().equals(guid)){
+            return true;
+        }
+        boolean notExists = true;
+        Client fromDB = DAOUtils.findClientByGuid(session, guid);
+        if (Objects.equals(cl, fromDB)) {
+            return true;
+        }
+        notExists = fromDB == null;
+        if(!notExists){
+            logger.warn(String.format("По GUID NSI-1 %s существует клиент ID:%d", guid, fromDB.getIdOfClient()));
+        }
+        return notExists;
     }
 
     public static class OrgRegistryGUIDInfo {
@@ -1292,6 +1310,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), e.getMessage()));
                 } finally {
                     HibernateUtils.rollback(transaction, logger);
+                    session.flush();
                 }
             }
         } finally {
