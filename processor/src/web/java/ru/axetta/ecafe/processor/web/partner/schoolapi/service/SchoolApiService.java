@@ -877,7 +877,7 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public List<PlanOrder> createOrderForPlanOrders(List<PlanOrder> planOrders, Boolean orderState, Long idOfUser)
             throws Exception {
-        List<PlanOrder> updatedPlanOrders = new ArrayList<>();
+        //List<PlanOrder> updatedPlanOrders = new ArrayList<>();
         User requestUser = DAOUtils.findUser(persistanceSession, idOfUser);
         String orderComment = "Льготный план.  Карта не указана Баланс счета после оплаты: 0,00 р.";
         Date lastUpdateDate = new Date();
@@ -972,26 +972,28 @@ public class SchoolApiService implements ISchoolApiService {
                     planOrder.setUserConfirmToPay(requestUser);
                     planOrder.setLastUpdate(lastUpdateDate);
                     persistanceSession.update(planOrder);
-                    updatedPlanOrders.add(planOrder);
+                    //updatedPlanOrders.add(planOrder);
                 }
                 else {
                     continue;
                 }
             }
-            else if(planOrder.getOrder().getState() == Order.STATE_COMMITED){
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                String commentForCancelledOrder = "(отменен: "+ simpleDateFormat.format(new Date())+")";
-                Order currentPlanOrderOrder = planOrder.getOrder();
-                currentPlanOrderOrder.setState(Order.STATE_CANCELED);
-                currentPlanOrderOrder.setComments(commentForCancelledOrder);
-                persistanceSession.update(currentPlanOrderOrder);
-                planOrder.setUserConfirmToPay(requestUser);
-                planOrder.setLastUpdate(lastUpdateDate);
-                persistanceSession.update(planOrder);
-                updatedPlanOrders.add(planOrder);
+            else{
+                if(planOrder.getOrder() != null && planOrder.getOrder().getState() == Order.STATE_COMMITED) {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                    String commentForCancelledOrder = "(отменен: " + simpleDateFormat.format(new Date()) + ")";
+                    Order currentPlanOrderOrder = planOrder.getOrder();
+                    currentPlanOrderOrder.setState(Order.STATE_CANCELED);
+                    currentPlanOrderOrder.setComments(commentForCancelledOrder);
+                    persistanceSession.update(currentPlanOrderOrder);
+                    planOrder.setUserConfirmToPay(requestUser);
+                    planOrder.setLastUpdate(lastUpdateDate);
+                    persistanceSession.update(planOrder);
+                    //updatedPlanOrders.add(planOrder);
+                }
             }
         }
-        return updatedPlanOrders;
+        return planOrders;
     }
 
     private Date getDateWithAddDay(Date date, int days){
