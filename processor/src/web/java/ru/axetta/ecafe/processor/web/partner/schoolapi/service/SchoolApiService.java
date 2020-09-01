@@ -23,9 +23,11 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SchoolApiService implements ISchoolApiService {
@@ -532,7 +534,7 @@ public class SchoolApiService implements ISchoolApiService {
                 + "left join fetch c.categoriesInternal as ci "
                 + "left join fetch ci.discountRulesInternal as dr "
                 + "left join fetch dr.categoryOrgsInternal "
-                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName)=upper(:clientGroupName)");
+                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName)=upper(:clientGroupName) ");
         query.setParameterList("idOfOrgList", getOrgIds(friendlyOrgs));
         query.setParameter("clientGroupName", clientGroup.getGroupName().toUpperCase());
         List<Client> clients = query.list();
@@ -666,12 +668,15 @@ public class SchoolApiService implements ISchoolApiService {
         IIdGenerator<Long> uniqueIdGenerator = OrganizationUniqueGeneratorId.getInstance(orgId);
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Query planOrderQuery = persistanceSession.createQuery("from PlanOrder "
-                +"where org.idOfOrg=:orgId "
-                + "and client.idOfClient=:clientId "
-                + "and complexInfo.idOfComplexInfo=:idOfComplex "
-                + "and planDate>=:startDate and planDate<:endDate ");
-        planOrderQuery.setMaxResults(1);
+        Query planOrderQuery = persistanceSession.createQuery("from PlanOrder po "
+                /*+ "join fetch po.order "
+                + "join fetch po.complexInfo "
+                + "join fetch po.org "
+                + "join fetch po.client "*/
+                + "where po.org.idOfOrg=:orgId "
+                + "and po.client.idOfClient=:clientId "
+                + "and po.complexInfo.idOfComplexInfo=:idOfComplex "
+                + "and po.planDate>=:startDate and po.planDate<:endDate ");
         planOrderQuery.setParameter("orgId", orgId);
         planOrderQuery.setParameter("startDate", startDate);
         planOrderQuery.setParameter("endDate", endDate);
@@ -684,6 +689,7 @@ public class SchoolApiService implements ISchoolApiService {
             planOrderQuery.setParameter("clientId",planOrderClientDTO.getClient().getIdOfClient());
             for(ClientComplexDTO complexDTO: planOrderClientDTO.getComplexes()){
                 planOrderQuery.setParameter("idOfComplex", complexDTO.getComplexInfo().getIdOfComplexInfo());
+                planOrderQuery.setMaxResults(1);
                 PlanOrder planOrder = (PlanOrder) planOrderQuery.uniqueResult();
                 if(planOrder != null){
                     if(planOrder.getOrder() == null){
@@ -696,7 +702,7 @@ public class SchoolApiService implements ISchoolApiService {
                 }
                 else{
                     ComplexInfo complexInfo = (ComplexInfo) persistanceSession.get(ComplexInfo.class, complexDTO.getComplexInfo().getIdOfComplexInfo());
-                    planOrder = new PlanOrder(uniqueIdGenerator.createId(), org, groupName, planOrderClientDTO.getClient(), planDate, complexInfo,
+                    planOrder = new PlanOrder(uniqueIdGenerator.createId(), org, groupName, planOrderClientDTO.getClient(), new Date(planDate.getTime()), complexInfo,
                             complexInfo.getComplexName(),
                             null, false, null, null, complexDTO.getDiscountRule());
                     persistanceSession.save(planOrder);
@@ -752,12 +758,18 @@ public class SchoolApiService implements ISchoolApiService {
         for(String groupName: groupsNames){
             groupsNamesInUpperCase.add(groupName.toUpperCase());
         }
+        /*Criteria clientCriteria =persistanceSession.createCriteria(Client.class);
+        clientCriteria.add(Restrictions.and(
+                Restrictions.and(
+                        Restrictions.in("contractId", contractIds),
+                        Restrictions.in("org.idOfOrg", orgsIds)
+                ),
+                Restrictions.in("clientGroup.groupName", groupsNames)
+        ));*/
         Query query = persistanceSession.createQuery("from Client c "
                 + "join fetch c.clientGroup "
                 + "join fetch c.person "
-                + "where contractId in (:contractsIdsList) "
-                + "and c.org.idOfOrg in (:idOfOrgList) "
-                + "and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
+                + "where c.contractId in (:contractsIdsList) and c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
         query.setParameterList("contractsIdsList", contractIds);
         query.setParameterList("idOfOrgList", orgsIds);
         query.setParameterList("nameOfGroupList", groupsNamesInUpperCase);
@@ -769,16 +781,39 @@ public class SchoolApiService implements ISchoolApiService {
             throws Exception {
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder "
-                + "where client.contractId in (:contractIds) "
-                + "and complexName=:reqComplexName "
-                + "and order is null "
-                + "and planDate>=:startDate and planDate<:endDate ");
+        Criteria planOrdersCriteria = persistanceSession.createCriteria(PlanOrder.class).createAlias("client", "c",
+                JoinType.LEFT_OUTER_JOIN).createAlias("order","o", JoinType.LEFT_OUTER_JOIN);
+        planOrdersCriteria.add(Restrictions.and(
+                Restrictions.and(
+                        Restrictions.and(
+                                Restrictions.isNull("o.compositeIdOfOrder.idOfOrder"),
+                                Restrictions.eq("complexName", complexName)
+                        ),
+                        Restrictions.and(
+                                Restrictions.ge("planDate", startDate),
+                                Restrictions.lt("planDate", endDate)
+                        )
+                ),
+                Restrictions.in("c.contractId", contractIds)
+        ));
+        /*Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder po "
+                *//*+ "join fetch po.order "
+                + "join fetch po.complexInfo "
+                + "join fetch po.client "
+                + "join fetch po.org "
+                + "join fetch po.userRequestToPay "
+                + "join fetch po.userConfirmToPay "
+                + "join fetch po.discountRule "*//*
+                + "where po.client.contractId in (:contractIds) "
+                + "and po.complexName=:reqComplexName "
+                + "and po.order=:orderNull "
+                + "and po.planDate>=:startDate and po.planDate<:endDate ");
         planOrdersQuery.setParameterList("contractIds", contractIds);
         planOrdersQuery.setParameter("reqComplexName", complexName);
+        planOrdersQuery.setParameter("orderNull", null);
         planOrdersQuery.setParameter("startDate", startDate);
-        planOrdersQuery.setParameter("endDate", endDate);
-        List<PlanOrder> planOrders = planOrdersQuery.list();
+        planOrdersQuery.setParameter("endDate", endDate);*/
+        List<PlanOrder> planOrders = planOrdersCriteria.list();
         return planOrders;
     }
 
@@ -804,17 +839,39 @@ public class SchoolApiService implements ISchoolApiService {
             Boolean toPay) throws Exception {
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder "
-                + "where client.contractId in (:contractIds) "
-                + "and complexName=:reqComplexName "
-                + "and toPay=:reqToPay "
-                + "and planDate>=:startDate and planDate<:endDate ");
+        Criteria planOrdersCriteria = persistanceSession.createCriteria(PlanOrder.class).createAlias("client", "c",
+                JoinType.LEFT_OUTER_JOIN).createAlias("order","o", JoinType.LEFT_OUTER_JOIN);
+        planOrdersCriteria.add(Restrictions.and(
+                Restrictions.and(
+                        Restrictions.and(
+                                Restrictions.eq("toPay", toPay),
+                                Restrictions.eq("complexName", complexName)
+                        ),
+                        Restrictions.and(
+                                Restrictions.ge("planDate", startDate),
+                                Restrictions.lt("planDate", endDate)
+                        )
+                ),
+                Restrictions.in("c.contractId", contractIds)
+        ));
+       /* Query planOrdersQuery = persistanceSession.createQuery("from PlanOrder po "
+               *//* + "join fetch po.order "
+                + "join fetch po.complexInfo "
+                + "join fetch po.client "
+                + "join fetch po.org "
+                + "join fetch po.userRequestToPay "
+                + "join fetch po.userConfirmToPay "
+                + "join fetch po.discountRule "*//*
+                + "where po.client.contractId in (:contractIds) "
+                + "and po.complexName=:reqComplexName "
+                + "and po.toPay=:reqToPay "
+                + "and po.planDate>=:startDate and po.planDate<:endDate ");
         planOrdersQuery.setParameterList("contractIds", contractIds);
         planOrdersQuery.setParameter("reqComplexName", complexName);
         planOrdersQuery.setParameter("reqToPay", toPay);
         planOrdersQuery.setParameter("startDate", startDate);
-        planOrdersQuery.setParameter("endDate", endDate);
-        return planOrdersQuery.list();
+        planOrdersQuery.setParameter("endDate", endDate);*/
+        return planOrdersCriteria.list();
     }
 
     @Override
@@ -822,7 +879,7 @@ public class SchoolApiService implements ISchoolApiService {
             throws Exception {
         List<PlanOrder> updatedPlanOrders = new ArrayList<>();
         User requestUser = DAOUtils.findUser(persistanceSession, idOfUser);
-        String orderComment = "Льготный план.  Карта не указана Баланс счета после оплаты: 0,00 р. Создано в методе /school/api/v1/planorders пользователем с ID = "+idOfUser;
+        String orderComment = "Льготный план.  Карта не указана Баланс счета после оплаты: 0,00 р.";
         Date lastUpdateDate = new Date();
         if(requestUser == null)
             throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
@@ -909,6 +966,7 @@ public class SchoolApiService implements ISchoolApiService {
                         for(OrderDetail orderDetail: orderDetails){
                             persistanceSession.save(orderDetail);
                         }
+                        planOrder.setIdOfOrder(planOrderOrder.getCompositeIdOfOrder().getIdOfOrder());
                         planOrder.setOrder(planOrderOrder);
                     }
                     planOrder.setUserConfirmToPay(requestUser);
@@ -921,7 +979,8 @@ public class SchoolApiService implements ISchoolApiService {
                 }
             }
             else if(planOrder.getOrder().getState() == Order.STATE_COMMITED){
-                String commentForCancelledOrder = "отменен: "+ new Date().toString() + "в методе /school/api/v1/planorders пользователем с ID = " + idOfUser;
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                String commentForCancelledOrder = "(отменен: "+ simpleDateFormat.format(new Date())+")";
                 Order currentPlanOrderOrder = planOrder.getOrder();
                 currentPlanOrderOrder.setState(Order.STATE_CANCELED);
                 currentPlanOrderOrder.setComments(commentForCancelledOrder);
@@ -937,7 +996,7 @@ public class SchoolApiService implements ISchoolApiService {
 
     private Date getDateWithAddDay(Date date, int days){
         Calendar dateCal = Calendar.getInstance();
-        dateCal.setTime(date);
+        dateCal.setTimeInMillis(date.getTime());
         dateCal.set(Calendar.HOUR_OF_DAY, 0);
         dateCal.set(Calendar.MINUTE, 0);
         dateCal.set(Calendar.SECOND, 0);

@@ -16,6 +16,7 @@
         <property name="complexName" column="complexname" type="string" length="256" not-null="false"/>
         <many-to-one name="userRequestToPay" class="ru.axetta.ecafe.processor.core.persistence.User" column="useridrequesttopay" fetch="select"/>
         <property name="toPay" column="topay" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="idOfOrder" column="idoforder" type="long" not-null="false"/>
         <many-to-one name="order" class="ru.axetta.ecafe.processor.core.persistence.Order" fetch="select"
                      insert="false"
                      update="false">

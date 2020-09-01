@@ -855,6 +855,10 @@ public class SchoolRestController {
             List<Client> clients = new ArrayList<>();
             if(checkRolePermission(authentication,User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
                 List<GroupNameDTO> managerGroups = groupManagementService.getManagerGroups(jwtUserDetails.getContractId());
+                if(managerGroups.isEmpty()){
+                    throw new RequestProcessingException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
+                            GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorMessage());
+                }
                 List<String> managerGroupsNames = new ArrayList<>();
                 for(GroupNameDTO groupNameDTO: managerGroups){
                     managerGroupsNames.add(groupNameDTO.getGroupName());

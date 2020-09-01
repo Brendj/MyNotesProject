@@ -9,30 +9,31 @@ CREATE TABLE public.cf_plan_orders
     plandate bigint NOT NULL,
     idofcomplex bigint,
     complexname character varying(256),
-    userclassid bigint,
+    useridrequesttopay bigint,
     topay integer NOT NULL,
     idoforder bigint,
-    userzavid bigint,
+    useridconfirmtopay bigint,
+    idofdiscountrule bigint,
     createdate bigint NOT NULL DEFAULT (date_part('epoch'::text, now()) * (1000)::double precision),
     lastupdate bigint NOT NULL DEFAULT (date_part('epoch'::text, now()) * (1000)::double precision),
     CONSTRAINT planorders_unique_constraint UNIQUE (idoforg, idofclient, plandate, idofcomplex),
-    CONSTRAINT userclassid_fk FOREIGN KEY (userclassid)
+    CONSTRAINT useridrequesttopay_fk FOREIGN KEY (useridrequesttopay)
         REFERENCES public.cf_users (idofuser) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
-    CONSTRAINT userzavid_fk FOREIGN KEY (userzavid)
+    CONSTRAINT useridconfirmtopay_fk FOREIGN KEY (useridconfirmtopay)
         REFERENCES public.cf_users (idofuser) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+   CONSTRAINT idofrule_fk FOREIGN KEY (idofdiscountrule)
+        REFERENCES public.cf_discountrules (idofrule) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
     CONSTRAINT idofclient_fk FOREIGN KEY (idofclient)
         REFERENCES public.cf_clients (idofclient) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
-    CONSTRAINT idoforg_fk FOREIGN KEY (idoforg)
-        REFERENCES public.cf_orgs (idoforg) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID
