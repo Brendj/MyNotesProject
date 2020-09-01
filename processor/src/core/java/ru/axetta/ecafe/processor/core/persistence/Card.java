@@ -68,7 +68,7 @@ public class Card {
     private Set<HistoryCard> historyCards = new HashSet<HistoryCard>();
     private Boolean isLongUid;
     private Integer transitionState;
-    private CardSync cardsync;
+    private Set<CardSync> cardsync;
 
     protected Card() {
         // For Hibernate only
@@ -345,11 +345,11 @@ public class Card {
         this.cardSignCertNum = cardSignCertNum;
     }
 
-    public CardSync getCardsync() {
+    public Set<CardSync> getCardsync() {
         return cardsync;
     }
 
-    public void setCardsync(CardSync cardsync) {
+    public void setCardsync(Set<CardSync> cardsync) {
         this.cardsync = cardsync;
     }
 }

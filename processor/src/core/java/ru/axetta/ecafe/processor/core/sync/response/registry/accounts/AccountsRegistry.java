@@ -23,6 +23,7 @@ public class AccountsRegistry implements AbstractToElement{
     private List<AccountItem> accountItems = new LinkedList<AccountItem>();
     private List<VisitorItem> visitorItems = new LinkedList<VisitorItem>();
     private List<CardsItem> freeCardsItems = new LinkedList<CardsItem>();
+    private List<CardsItem> changedCardItems = new LinkedList<CardsItem>();
 
     public AccountsRegistry() {
     }
@@ -48,6 +49,12 @@ public class AccountsRegistry implements AbstractToElement{
         Element freeCardsItemsElement = document.createElement("FreeCards");
         for (CardsItem item : this.freeCardsItems) {
             freeCardsItemsElement.appendChild(item.toElement(document));
+        }
+        element.appendChild(freeCardsItemsElement);
+
+        Element changedCardsItemsElement = document.createElement("ChangedCards");
+        for (CardsItem item : this.changedCardItems) {
+            changedCardsItemsElement.appendChild(item.toElement(document));
         }
         element.appendChild(freeCardsItemsElement);
         return element;
@@ -78,4 +85,11 @@ public class AccountsRegistry implements AbstractToElement{
     }
 
 
+    public List<CardsItem> getChangedCardItems() {
+        return changedCardItems;
+    }
+
+    public void setChangedCardItems(List<CardsItem> changedCardItems) {
+        this.changedCardItems = changedCardItems;
+    }
 }

@@ -28,6 +28,11 @@ public class CardSync {
         // For Hibernate only
     }
 
+    public CardSync( Org org, Card card){
+        this.org = org;
+        this.card = card;
+    }
+
     public Org getOrg() {
         return org;
     }

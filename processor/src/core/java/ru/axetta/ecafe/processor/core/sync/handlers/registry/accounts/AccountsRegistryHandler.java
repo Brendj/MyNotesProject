@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.CardSync;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
@@ -203,6 +204,20 @@ public class AccountsRegistryHandler {
             for (Client client : clientList) {
                 accountsRegistry.getAccountItems().add(new AccountItem(client));
             }
+        }
+
+        //Обработка карт
+        List<Card> externalChangedCards = CardReadOnlyRepository.getInstance().findByOrgandStateChange(1L, request.getOrg());
+        for (Card card: externalChangedCards)
+        {
+            for (CardSync cardSync: card.getCardsync()) {
+                if (cardSync.getOrg().getIdOfOrg().equals(request.getIdOfOrg()))
+                {
+                    CardWritableRepository.getInstance().updateCardSync(cardSync, 0L);
+                    break;
+                }
+            }
+            accountsRegistry.getChangedCardItems().add(new CardsItem(card));
         }
 
         if (idOfCards.size()> 0){

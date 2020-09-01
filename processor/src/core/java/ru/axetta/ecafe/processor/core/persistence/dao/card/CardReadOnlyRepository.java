@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.dao.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.CardState;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Visitor;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 
 import org.springframework.stereotype.Repository;
@@ -97,6 +94,14 @@ public class CardReadOnlyRepository extends BaseJpaDao {
         return entityManager.createQuery("from Card c where c.cardNo in (:idOfCards) and state=:state ", Card.class)
                 .setParameter("idOfCards", idOfCards)
                 .setParameter("state", state)
+                .getResultList();
+    }
+
+    public List<Card> findByOrgandStateChange(Long statechange, Org org) {
+        return entityManager.createQuery("from Card c left join c.cardsync cs where cs.statechange=:statechange"
+                + " and cs.org =:org ", Card.class)
+                .setParameter("statechange", statechange)
+                .setParameter("org", org)
                 .getResultList();
     }
 

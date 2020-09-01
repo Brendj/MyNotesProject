@@ -445,4 +445,15 @@ public class CardWritableRepository extends WritableJpaDao {
         return q.getResultList();
     }
 
+    public CardSync createCardSync(Org org, Card card, Long changeState) {
+        CardSync cardsync = new CardSync(org,card);
+        cardsync.setStatechange(changeState);
+        entityManager.persist(cardsync);
+        return cardsync;
+    }
+
+    public void updateCardSync(CardSync cardSync, Long changeState) {
+        cardSync.setStatechange(changeState);
+        entityManager.persist(cardSync);
+    }
 }
