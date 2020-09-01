@@ -4,18 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.RequestDTO;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.Constants;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.util.DateHandler;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 import java.util.Date;
 import java.util.List;
 
 public class SetToPayRequestDTO {
     @JsonProperty("PlanDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_STRING_FORMAT)
+    @JsonDeserialize(using = DateHandler.class)
     private Date planDate;
     @JsonProperty("ContractIds")
     private List<Long> contractIds;
