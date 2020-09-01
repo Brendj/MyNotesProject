@@ -39,6 +39,10 @@
             <key column="IdOfCard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order"/>
         </set>
+        <set name="cardsync" inverse="true" cascade="all">
+            <key column="idcardsync"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CardSync"/>
+        </set>
     </class>
 </hibernate-mapping>
 
