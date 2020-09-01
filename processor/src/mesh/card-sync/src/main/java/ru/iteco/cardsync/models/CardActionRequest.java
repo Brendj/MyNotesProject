@@ -69,6 +69,10 @@ public class CardActionRequest implements Auditable {
     @Embedded
     private AuditEntity auditEntity;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idofclient")
+    private Client client;
+
     public CardActionRequest() {
         // for Hibernate
     }
@@ -221,5 +225,13 @@ public class CardActionRequest implements Auditable {
 
     public void setCardActionRequest(CardActionRequest cardActionRequest) {
         this.cardActionRequest = cardActionRequest;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 }
