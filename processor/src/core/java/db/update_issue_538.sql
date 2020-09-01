@@ -23,7 +23,7 @@ create table cf_wt_category_items
     guid            varchar(36)       not null unique,
     description      varchar(255)      not null
         constraint cf_wt_category_items_description_check_2
-            check ((description)::text !~ similar_escape(' *'::text, NULL::text)),
+            CHECK (description NOT SIMILAR TO ' *'),
     deletestate      integer default 0,
     idofcategory bigint not null references cf_wt_categories(idofcategory)
 );
