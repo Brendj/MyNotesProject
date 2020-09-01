@@ -1928,12 +1928,11 @@ public class DAOUtils {
     public static long nextVersionByCategoryDiscountDSZN(EntityManager entityManager) {
         long version = 0L;
         javax.persistence.Query query = entityManager.createNativeQuery(
-                "SELECT cd.version FROM CF_CategoryDiscounts_DSZN AS cd "
-                        + "ORDER BY cd.version DESC LIMIT 1 FOR UPDATE");
+                "SELECT nextval('CF_CategoryDiscounts_DSZN_version_seq')");
         try {
             Object o = query.getSingleResult();
             if (o != null) {
-                version = Long.valueOf(o.toString()) + 1;
+                version = HibernateUtils.getDbLong(o);
             }
         } catch (NoResultException ignore) {
         }
@@ -2964,10 +2963,10 @@ public class DAOUtils {
     public static long nextVersionByClientBalanceHold(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select cbh.version from cf_clientbalance_hold as cbh order by cbh.version desc limit 1 for update");
+                "select nextval('cf_clientbalance_hold_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -2985,10 +2984,10 @@ public class DAOUtils {
     public static long nextVersionByTaloonApproval(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select t.version from cf_taloon_approval as t order by t.version desc limit 1 for update");
+                "select nextval('cf_taloon_approval_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3006,10 +3005,10 @@ public class DAOUtils {
 
     public static long nextVersionByTaloonPreorder(Session session){
         long version = 1L;
-        Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('cf_taloon_preorder_version_seq')");
         Object o = query.uniqueResult();
         if(o != null){
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3017,10 +3016,10 @@ public class DAOUtils {
     public static long nextVersionByComplexSchedule(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select s.version from cf_complex_schedules as s order by s.version desc limit 1 for update");
+                "select nextval('cf_complex_schedules_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3028,10 +3027,10 @@ public class DAOUtils {
     public static long nextVersionByZeroTransaction(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select t.version from cf_zerotransactions as t order by t.version desc limit 1 for update");
+                "select nextval('cf_zerotransactions_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3039,10 +3038,10 @@ public class DAOUtils {
     public static long nextVersionByGroupNameToOrg(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "SELECT g.version FROM cf_GroupNames_To_Orgs AS g ORDER BY g.version DESC LIMIT 1 FOR UPDATE");
+                "SELECT nextval('cf_GroupNames_To_Orgs_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3061,10 +3060,10 @@ public class DAOUtils {
     public static long nextVersionByMenusCalendar(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select sd.version from cf_menus_calendar as sd order by sd.version desc limit 1 for update");
+                "select nextval('cf_menus_calendar_version_seq'");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3105,10 +3104,10 @@ public class DAOUtils {
     public static long nextVersionByInfoMessage(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select m.version from cf_info_messages as m order by m.version desc limit 1 for update");
+                "select nextval('cf_info_messages_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3116,10 +3115,10 @@ public class DAOUtils {
     public static long nextVersionByCardRequest(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select m.version from cf_card_requests as m order by m.version desc limit 1 for update");
+                "select nextval('cf_card_requests_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3207,10 +3206,10 @@ public class DAOUtils {
     public static long nextVersionByExternalEvent(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select e.version from cf_externalevents as e order by e.version desc limit 1 for update");
+                "select nextval('cf_externalevents_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3643,10 +3642,10 @@ public class DAOUtils {
     public static long nextVersionByHelpRequests(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select r.version from cf_helprequests as r order by r.version desc limit 1 for update");
+                "select nextval('cf_helprequests_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -4721,10 +4720,10 @@ public class DAOUtils {
     public static long nextVersionByClientDTISZNDiscountInfo(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select version from cf_client_dtiszn_discount_info order by version desc limit 1 for update");
+                "select nextval('cf_client_dtiszn_discount_info_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -5171,10 +5170,10 @@ public class DAOUtils {
     public static long nextVersionByTurnstileSettingsRequest(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select r.version from cf_turnstile_settings as r order by r.version desc limit 1 for update");
+                "select nextval('cf_turnstile_settings_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
