@@ -920,6 +920,7 @@ public class SchoolApiService implements ISchoolApiService {
                                 1, planOrderComplex.getCurrentPrice(), planOrderComplex.getCurrentPrice(), 0,
                                 planOrderComplex.getComplexName(), "","", 0, "",
                                 50, null, null,false, complexItemCode, idOfRule, orderDetailFRationType);
+                        complexOrderDetail.setGood(planOrderComplex.getGood());
                         orderDetails.add(complexOrderDetail);
                         if(planOrderComplex.getGood()!= null){
                             CompositeIdOfOrderDetail compositeIdOfOrderDetailForGood = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
@@ -928,6 +929,7 @@ public class SchoolApiService implements ISchoolApiService {
                                     1, 0,0,0,"","","",0,
                                     "",150,null,null, false,
                                     good.getGoodsCode(), null, orderDetailFRationType);
+                            goodOrderDetail.setGood(good);
                             orderDetails.add(goodOrderDetail);
                         }
                     }
@@ -940,6 +942,7 @@ public class SchoolApiService implements ISchoolApiService {
                                 complexMenuDetail.getMenuOrigin(), complexMenuDetail.getMenuDetailOutput(), 50,
                                 complexMenuDetail.getIdOfMenuFromSync(), null, false,
                                 complexItemCode, idOfRule,orderDetailFRationType);
+                        complexOrderDetail.setGood(planOrderComplex.getGood());
                         orderDetails.add(complexOrderDetail);
                         for(ComplexInfoDetail complexInfoDetail: complexInfoDetails){
                             MenuDetail complexInfoMenuDetail = complexInfoDetail.getMenuDetail();
@@ -956,6 +959,7 @@ public class SchoolApiService implements ISchoolApiService {
                                         complexInfoMenuDetail.getMenuOrigin(), complexInfoMenuDetail.getMenuDetailOutput(), 50,
                                         complexInfoMenuDetail.getIdOfMenuFromSync(), null, false,
                                         menuGood.getGoodsCode(), null, menuGoodFRationType);
+                                goodOrderDetail.setGood(menuGood);
                                 orderDetails.add(goodOrderDetail);
                             }
                         }
