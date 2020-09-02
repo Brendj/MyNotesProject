@@ -1438,15 +1438,18 @@ public class PreorderDAOService {
 
         ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
-            Date currentDate = preorderComplex.getPreorderDate();
-            List<OrgGoodRequest> preorderRequests = getOrgGoodRequests(preorderComplex.getClient().getOrg().getIdOfOrg(),
-                    CalendarUtils.startOfDay(currentDate), CalendarUtils.endOfDay(currentDate));
-            //если на тек день есть заявка, то этот день пропускаем
-            if (orgGoodRequestExists(preorderRequests, CalendarUtils.startOfDayInUTC(currentDate))) {
-                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest exists");
-            } else {
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            // проверяем существование заявок на комплекс и блюда
+            if (preorderComplex.getIdOfGoodsRequestPosition() != null) {
+                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderComplex exists");
+                return null;
             }
+            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+                if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) {
+                    logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderMenuDetail exists");
+                    return null;
+                }
+            }
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             return null;
         }
         if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {
