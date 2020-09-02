@@ -1436,7 +1436,7 @@ public class PreorderDAOService {
     public List<ModifyMenu> relevancePreordersToMenu(PreorderComplex preorderComplex, long nextVersion) {
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
 
-        ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
+        ComplexInfo complexInfo = getComplexInfo(preorderComplex, preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
             // проверяем существование заявок на комплекс и блюда
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) {
@@ -2461,6 +2461,22 @@ public class PreorderDAOService {
         preorderMenuDetail.setMobile(mobile);
         preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
         return preorderMenuDetail;
+    }
+
+    private ComplexInfo getComplexInfo(PreorderComplex preorderComplex, Integer idOfComplex, Date date) {
+        Query query = emReport.createQuery("select ci from ComplexInfo ci where ci.org.idOfOrg = :idOfOrg "
+                + "and ci.idOfComplex = :idOfComplex and ci.menuDate between :startDate and :endDate");
+        query.setParameter("idOfOrg", preorderComplex.getIdOfOrgOnCreate());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        try {
+            return (ComplexInfo)query.getSingleResult();
+        } catch (Exception e) {
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfPreorderComplex=%s",
+                    idOfComplex, date.getTime(), preorderComplex.getIdOfPreorderComplex()), e);
+            return null;
+        }
     }
 
     private ComplexInfo getComplexInfo(Client client, Integer idOfComplex, Date date) {
