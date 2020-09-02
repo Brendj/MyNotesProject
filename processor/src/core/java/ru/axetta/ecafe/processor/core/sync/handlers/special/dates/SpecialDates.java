@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -30,10 +31,11 @@ public class SpecialDates implements SectionRequest{
         this.items = new ArrayList<SpecialDatesItem>();
         this.idOfOrgOwner = orgOwner;
 
+        List<Long> friendlyOrgs = DAOService.getInstance().findFriendlyOrgsIds(orgOwner);
         Node itemNode = specialDateRequestNode.getFirstChild();
         while (null != itemNode) {
             if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("SD")) {
-                SpecialDatesItem item = SpecialDatesItem.build(itemNode, orgOwner);
+                SpecialDatesItem item = SpecialDatesItem.build(itemNode, orgOwner, friendlyOrgs);
                 getItems().add(item);
             }
             itemNode = itemNode.getNextSibling();

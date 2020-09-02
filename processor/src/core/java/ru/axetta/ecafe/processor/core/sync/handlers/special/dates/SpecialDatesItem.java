@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -13,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,7 +34,7 @@ public class SpecialDatesItem {
     private String errorMessage;
     private Integer resCode;
 
-    public static SpecialDatesItem build(Node itemNode, Long orgOwner) {
+    public static SpecialDatesItem build(Node itemNode, Long orgOwner, List<Long> friendlyOrgs) {
         Long idOfOrg = null;
         Date date = null;
         Boolean isWeekend = null;
@@ -47,14 +46,9 @@ public class SpecialDatesItem {
 
         idOfOrg = getIntValue(itemNode, "IdOfOrg", emSetter, true).longValue();
         try {
-            Org o = DAOService.getInstance().getOrg(idOfOrg);
-            if (o == null) {
-                emSetter.setCompositeErrorMessage(String.format("Org with id=%s not found", idOfOrg));
-            } else {
-                if (!DAOService.getInstance().isOrgFriendly(idOfOrg, orgOwner)) {
-                    emSetter.setCompositeErrorMessage(
-                            String.format("Org id=%s is not friendly to Org id=%s", idOfOrg, orgOwner));
-                }
+            if (!friendlyOrgs.contains(idOfOrg)) {
+                emSetter.setCompositeErrorMessage(
+                        String.format("Org id=%s is not friendly to Org id=%s", idOfOrg, orgOwner));
             }
         } catch (NumberFormatException e){
             emSetter.setCompositeErrorMessage("NumberFormatException OrgId not found");
