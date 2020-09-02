@@ -56,7 +56,7 @@ public class AccountsRegistry implements AbstractToElement{
         for (CardsItem item : this.changedCardItems) {
             changedCardsItemsElement.appendChild(item.toElement(document));
         }
-        element.appendChild(freeCardsItemsElement);
+        element.appendChild(changedCardsItemsElement);
         return element;
     }
 

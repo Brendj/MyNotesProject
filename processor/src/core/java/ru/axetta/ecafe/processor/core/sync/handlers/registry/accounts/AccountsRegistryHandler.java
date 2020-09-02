@@ -181,9 +181,11 @@ public class AccountsRegistryHandler {
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }
-        if ( request.getAccountsRegistryRequest() == null ||  request.getAccountsRegistryRequest().getItems().size()== 0){
+        if (request.getAccountsRegistryRequest() == null){
             return null;
         }
+
+
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
         List<Long> idOfClients = new LinkedList<Long>();
