@@ -1412,7 +1412,7 @@ public class PreorderDAOService {
             Object[] row = (Object[]) obj;
             PreorderComplex preorderComplex = (PreorderComplex) row[0];
             Long idOfOrg = (Long) row[1];
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            if (isGoodRequestExists(preorderComplex)) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
                 nextVersion = nextVersionByPreorderComplex();
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true, false);
@@ -1439,17 +1439,9 @@ public class PreorderDAOService {
         ComplexInfo complexInfo = getComplexInfo(preorderComplex, preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
             // проверяем существование заявок на комплекс и блюда
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) {
-                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderComplex exists");
-                return null;
+            if (!isGoodRequestExists(preorderComplex)) {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             }
-            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) {
-                    logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderMenuDetail exists");
-                    return null;
-                }
-            }
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             return null;
         }
         if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {
@@ -1488,6 +1480,20 @@ public class PreorderDAOService {
         return modifyMenuList;
     }
 
+    private boolean isGoodRequestExists(PreorderComplex preorderComplex) {
+        if (preorderComplex.getIdOfGoodsRequestPosition() != null) {
+            logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderComplex exists");
+            return true;
+        }
+        for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+            if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) {
+                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderMenuDetail exists");
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Transactional
     public void changeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, Long nextVersion) {
         logger.info("Start change localIdOfMenu");
@@ -1523,7 +1529,7 @@ public class PreorderDAOService {
         query.setParameter("date", new Date());
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            if (isGoodRequestExists(preorderComplex)) continue;
             nextVersion = nextVersionByPreorderComplex();
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, false);
         }
