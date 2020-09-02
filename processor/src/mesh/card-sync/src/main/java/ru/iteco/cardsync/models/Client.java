@@ -44,6 +44,9 @@ public class Client {
     @Column(name = "agetypegroup")
     private String ageGroup;
 
+    @Column(name = "idoforg", insertable = false, updatable = false)
+    private Long idoforg;
+
     public String getAgeGroup() {
         return ageGroup;
     }
@@ -107,5 +110,13 @@ public class Client {
     @Override
     public int hashCode() {
         return Objects.hash(idOfClient);
+    }
+
+    public Long getIdoforg() {
+        return idoforg;
+    }
+
+    public void setIdoforg(Long idoforg) {
+        this.idoforg = idoforg;
     }
 }

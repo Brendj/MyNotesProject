@@ -26,6 +26,9 @@ public class CardSync {
     @Column(name = "statechange")
     private Long statechange;
 
+    public CardSync() {
+        // for Hibernate
+    }
 
     @Override
     public boolean equals(Object o) {

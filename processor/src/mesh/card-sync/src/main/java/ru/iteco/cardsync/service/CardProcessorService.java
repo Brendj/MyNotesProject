@@ -9,6 +9,8 @@ import ru.iteco.cardsync.models.Card;
 import ru.iteco.cardsync.models.CardActionClient;
 import ru.iteco.cardsync.models.CardActionRequest;
 import ru.iteco.cardsync.models.Client;
+import ru.iteco.cardsync.repo.CardActionClientRepository;
+import ru.iteco.cardsync.repo.CardSyncRepository;
 import ru.iteco.cardsync.repo.ClientRepository;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,12 +32,15 @@ public class CardProcessorService {
 
     private final CardActionRequestService cardActionRequestService;
     private final CardActionClientService cardActionClientService;
+    private final CardSyncService cardSyncService;
     private final CardService cardService;
     private final ClientRepository clientRepository;
 
     public CardProcessorService(CardActionRequestService cardActionRequestService, CardService cardService,
-            ClientRepository clientRepository, CardActionClientService cardActionClientService) {
+            ClientRepository clientRepository, CardActionClientService cardActionClientService,
+                                CardSyncService cardSyncService) {
         this.cardActionRequestService = cardActionRequestService;
+        this.cardSyncService = cardSyncService;
         this.cardActionClientService = cardActionClientService;
         this.cardService = cardService;
         this.clientRepository = clientRepository;
@@ -47,7 +52,7 @@ public class CardProcessorService {
         if (blockRequests.isEmpty()) {
             return false;
         }
-        if (blockRequests.get(0).getAudit().getCreateDate().getTime() > new Date().getTime())
+        if (blockRequests.get(0).getAudit().getCreateDate().getTime() > new Date(1599036569167L).getTime())
             return true;
         else
             return false;
@@ -216,6 +221,7 @@ public class CardProcessorService {
             Integer oldState = c.getState();
             cardService.blockCard(c);
             cardActionClientService.writeRecord(cardActionRequest, client, c, clientChild, "Карта клиента успешно заблокирована", oldState);
+            cardSyncService.savechangeforCard(c, client.getIdoforg());
         }
     }
 }
