@@ -1,6 +1,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.mesh.json;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -21,7 +22,7 @@ import java.util.Map;
     "created_at",
     "updated_at"
 })
-public class Category {
+public class Category implements Comparable {
 
     @JsonProperty("id")
     private Integer id;
@@ -45,6 +46,27 @@ public class Category {
     private Object updatedAt;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    public static final int PROPER_ID = 1;
+
+    public boolean empty(String valueActualFrom) {
+        return StringUtils.isEmpty(valueActualFrom) || valueActualFrom.equalsIgnoreCase("null");
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof Category)) {
+            return 1;
+        }
+
+        Category item = (Category) o;
+        if (item.getCategoryId() != PROPER_ID) return 1;
+
+        if (empty(this.getCreatedAt()) && empty(item.getCreatedAt())) return 0;
+        if (!empty(this.getCreatedAt()) && empty(item.getCreatedAt())) return 1;
+        if (empty(this.getCreatedAt()) && !empty(item.getCreatedAt())) return -1;
+        return this.getCreatedAt().compareTo(item.getCreatedAt());
+    }
 
     @JsonProperty("id")
     public Integer getId() {

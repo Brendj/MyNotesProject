@@ -46,14 +46,21 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     private String filterOrg = "Не выбрано";
     private List<Long> idOfCategoryOrgList = new ArrayList<>();
     private Set<CategoryOrg> categoryOrgs;
+    private Boolean showArchived = false;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
-        DAOService.getInstance().deleteEntity(confirmDeletePage.getEntity());
-        onShow();
+        try {
+            WtDiscountRule discountRule = (WtDiscountRule) DAOService.getInstance().detachEntity(confirmDeletePage.getEntity());
+            discountRule.setDeletedState(true);
+            DAOService.getInstance().mergeEntity(discountRule);
+            onShow();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getPageFilename() {
@@ -80,6 +87,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
         subCategory = 0;
         filterOrg = "Не выбрано";
         idOfCategoryOrgList = new ArrayList<>();
+        showArchived = false;
         return this;
     }
 
@@ -87,7 +95,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     public void reload() {
 
         List<Item> items = new ArrayList<>();
-        List<WtDiscountRule> wtDiscountRuleList = DAOUtils.listWtDiscountRules(em);
+        List<WtDiscountRule> wtDiscountRuleList = DAOUtils.listWtDiscountRules(em, showArchived);
 
         for (WtDiscountRule wtDiscountRule : wtDiscountRuleList) {
 
@@ -232,6 +240,14 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
 
     public void setIdOfCategoryOrgList(List<Long> idOfCategoryOrgList) {
         this.idOfCategoryOrgList = idOfCategoryOrgList;
+    }
+
+    public Boolean getShowArchived() {
+        return showArchived;
+    }
+
+    public void setShowArchived(Boolean showArchived) {
+        this.showArchived = showArchived;
     }
 
     public String getIdOfCategoryOrgListString() {

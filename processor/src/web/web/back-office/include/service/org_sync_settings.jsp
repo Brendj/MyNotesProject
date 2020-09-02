@@ -156,7 +156,7 @@
     <rich:dataTable id="orgSyncSettingsTable" value="#{orgSyncSettingReportPage.items}" var="item" rows="25"
                     sortMode="single" rowClasses="center-aligned-column" lang="rus" footerClass="data-table-footer">
         <f:facet name="header">
-            <h:outputText escape="true" value="Отчет по образовательным комплексам" />
+            <h:outputText escape="true" value="Отчет по параметрам расписания автоматической синхронизации" />
         </f:facet>
         <rich:column sortable="true" sortBy="#{item.orgName}" headerClass="column-header">
             <f:facet name="header">
@@ -229,6 +229,12 @@
                 <h:outputText escape="true" value="Библиотека" />
             </f:facet>
             <h:outputText escape="true" value="#{item.libSync.fullInf}" styleClass="output-text" />
+        </rich:column>
+        <rich:column sortable="true" headerClass="column-header" rendered="#{orgSyncSettingReportPage.showColumnCards}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Карты" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.cardSync.fullInf}" styleClass="output-text" />
         </rich:column>
         <rich:column sortable="true" headerClass="column-header">
             <f:facet name="header">

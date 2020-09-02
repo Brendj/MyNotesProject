@@ -229,6 +229,13 @@ public class CategoryDiscount {
         }
     }
 
+    public Boolean isRulesSetDeleted() {
+        for (DiscountRule rule : discountRulesInternal) {
+            if (!rule.getDeletedState()) return false;
+        }
+        return true;
+    }
+
     public Boolean getDeletedState() {
         return deletedState;
     }

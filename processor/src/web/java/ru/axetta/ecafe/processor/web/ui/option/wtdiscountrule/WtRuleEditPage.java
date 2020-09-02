@@ -303,8 +303,10 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
     private List<WtSelectedComplex> getNativeComplexes(WtDiscountRule wtDiscountRule) {
         List<WtSelectedComplex> complexes = new ArrayList<>();
-        if (!wtDiscountRule.getComplexes().isEmpty()) {
-            for (WtComplex wtComplex : wtDiscountRule.getComplexes()) {
+        List<WtComplex> ruleComplexes = DAOUtils.getComplexesByWtDiscountRule(em, wtDiscountRule);
+
+        if (!ruleComplexes.isEmpty()) {
+            for (WtComplex wtComplex : ruleComplexes) {
                 WtSelectedComplex wtSelectedComplex = new WtSelectedComplex(wtComplex);
                 wtSelectedComplex.setChecked(true);
                 complexes.add(wtSelectedComplex);

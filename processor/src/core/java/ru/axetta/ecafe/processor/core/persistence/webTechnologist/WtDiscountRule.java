@@ -36,6 +36,9 @@ public class WtDiscountRule {
     @Column(name = "subCategory")
     private String subCategory;
 
+    @Column(name = "deletedState")
+    private Boolean deletedState;
+
     @ManyToMany
     @JoinTable(name = "cf_wt_discountrules_complexes",
             joinColumns = @JoinColumn(name = "idOfRule"),
@@ -124,6 +127,14 @@ public class WtDiscountRule {
 
     public void setCategoryDiscounts(Set<CategoryDiscount> categoryDiscounts) {
         this.categoryDiscounts = categoryDiscounts;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 
     @Override
