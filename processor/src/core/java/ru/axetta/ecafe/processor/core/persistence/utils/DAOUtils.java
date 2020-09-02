@@ -278,6 +278,15 @@ public class DAOUtils {
         return ((Long) l.get(0));
     }
 
+    public static Long getClientIdByGuid(Session session, String guid) {
+        String sql = "select idOfClient from cf_clients where clientGUID=:guid";
+
+        Query q = session.createSQLQuery(sql);
+        q.setParameter("guid", guid);
+
+        return HibernateUtils.getDbLong(q.uniqueResult());
+    }
+
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
     public static List<Client> findNewerClients(Session session, Collection<Org> orgs, long clientRegistryVersion) {
