@@ -130,13 +130,19 @@ public class CardProcessorService {
                 }
                 List<Card> cards = cardService.getBlockedCard(client);
                 if (CollectionUtils.isEmpty(cards)) {
-                    cardActionRequestService.writeRecord(request, "Не найдено карт для разблокировки", false, client);
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Не найдено карт для разблокировки");
                     continue;
                 }
-                cardService.unblockCard(cardActionClient.getCard());
-                cardActionClientService.writeRecord(cardActionRequest, "Карты клиента успешно заблокированы", cardActionClient.getClient());
+                if (cardActionClient.getCard() != null) {
+                    cardService.unblockCard(cardActionClient.getCard());
+                    cardActionClientService.writeRecord(cardActionRequest, "Карты клиента успешно разблокированы", cardActionClient.getClient());
+                }
+                else
+                {
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient.getComment(), cardActionClient.getClient());
+                }
             }
-            cardActionRequestService.writeRecord(cardActionRequest, "Карты клиента успешно заблокированы", true, blockRequests);
+            cardActionRequestService.writeRecord(cardActionRequest, OK, true, blockRequests);
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
             cardActionRequestService.writeRecord(request, "Ошибка при обработке запроса: " + e.getMessage(), false);

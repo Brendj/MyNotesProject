@@ -25,6 +25,6 @@ public interface CardSyncRepository extends JpaRepository<CardSync, Long> {
                     + "FROM cf_card_sync "
                     + "WHERE idofcard = :cardId and idoforg in (:orgIds)",
             nativeQuery = true)
-    List<CardSync> findCardSyncbyCardandOrgs (@Param("card") Long cardId,
+    List<CardSync> findCardSyncbyCardandOrgs (@Param("cardId") Long cardId,
                                           @Param("orgIds") List<Long> orgIds);
 }

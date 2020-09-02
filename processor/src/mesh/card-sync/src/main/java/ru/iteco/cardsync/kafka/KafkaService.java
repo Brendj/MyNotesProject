@@ -36,13 +36,10 @@ public class KafkaService {
         this.cardProcessorService = cardProcessorService;
         this.cardActionRequestService = cardActionRequestService;
     }
+    @KafkaListener(topics = "#{'${kafka.topic.card}'}")
 
- //   @KafkaListener(topics = "#{'${kafka.topic.card}'}")
-//    @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}", partitionOffsets = {
-//            @PartitionOffset(partition = "0", initialOffset = "5709337")}))//for tests
-
-        @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}", partitionOffsets = {
-            @PartitionOffset(partition = "0", initialOffset = "4917003")}))//for tests
+//        @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}", partitionOffsets = {
+//            @PartitionOffset(partition = "0", initialOffset = "830696")}))//for tests
     public void meshListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
         BlockPersonEntranceRequest request = objectMapper.readValue(message, BlockPersonEntranceRequest.class);
