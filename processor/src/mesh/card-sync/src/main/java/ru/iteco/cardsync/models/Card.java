@@ -32,8 +32,8 @@ public class Card {
     @Column(name = "state", nullable = false)
     private Integer state; //TODO переделать маппинг по enum
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idcardsync")
+
+    @OneToMany(mappedBy="card", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CardSync> cardSyncs;
 
     public Long getIdOfCard() {
