@@ -65,25 +65,25 @@ public class CardProcessorService {
             }
             List<CardActionRequest> blockRequests = cardActionRequestService.findRequestBlockByRequestIdOLD(request.getId());
             if (blockRequests.isEmpty()) {
-                cardActionRequestService.writeRecord(request, "В БД нет запроса на блокировку", false);
+                cardActionRequestService.writeRecordOLD(request, "В БД нет запроса на блокировку", false);
                 return;
             }
             //Для всех клиентов, заблокированных по одному id
             for (CardActionRequest blockRequest: blockRequests) {
                 Client client = blockRequest.getClient();
                 if (client == null) {
-                    cardActionRequestService.writeRecord(request, "Не найден клиент для разблокировки карт", false);
+                    cardActionRequestService.writeRecordOLD(request, "Не найден клиент для разблокировки карт", false);
                     continue;
                 }
                 List<Card> cardsActive = cardService.getActiveCard(client, false);
                 if (!cardsActive.isEmpty())
                 {
-                    cardActionRequestService.writeRecord(request, "Есть активные карты на момент разблокировки", false, client);
+                    cardActionRequestService.writeRecordOLD(request, "Есть активные карты на момент разблокировки", false, client);
                     continue;
                 }
                 List<Card> cards = cardService.getBlockedCard(client);
                 if (CollectionUtils.isEmpty(cards)) {
-                    cardActionRequestService.writeRecord(request, "Не найдено карт для разблокировки", false, client);
+                    cardActionRequestService.writeRecordOLD(request, "Не найдено карт для разблокировки", false, client);
                     continue;
                 }
 
@@ -91,7 +91,7 @@ public class CardProcessorService {
                     cardService.unblockCard(c);
                 }
 
-                cardActionRequestService.writeRecord(request, OK, true, client);
+                cardActionRequestService.writeRecordOLD(request, OK, true, client);
             }
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
@@ -166,7 +166,7 @@ public class CardProcessorService {
                 }
                 if (StringUtils.containsIgnoreCase(client.getAgeGroup(), "дошкол")) { // Обработка дошкольников
                     if(CollectionUtils.isEmpty(client.getGuardians())){
-                        cardActionRequestService.writeRecord(request, "Представители не найдены", false, client);
+                        cardActionRequestService.writeRecord(request, "Клиент успешно не обработан","Представители не найдены", false, client);
                         return;
                     }
                     List<Client> guardins = new ArrayList<>();

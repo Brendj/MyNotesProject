@@ -55,13 +55,14 @@ public class CardActionRequestService {
     }
 
 
-    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed, Client client) {
+    public void writeRecord(BlockPersonEntranceRequest blockPersonEntranceRequest, String messageMain, String message, boolean processed, Client client) {
         CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
-        request.setComment(message);
+        request.setComment(messageMain);
         request.setProcessed(processed);
         if (client != null) {
             CardActionClient cardActionClient = new CardActionClient();
             cardActionClient.setClient(client);
+            cardActionClient.setComment(message);
             cardActionClient.setCardActionRequest(request);
             List<CardActionClient> cardActionClients = request.getCardActionClients();
             if (cardActionClients == null)
