@@ -135,7 +135,7 @@ public class CardProcessorService {
                 }
                 if (cardActionClient.getCard() != null) {
                     cardService.unblockCard(cardActionClient.getCard());
-                    cardActionClientService.writeRecord(cardActionRequest, "Карта клиента успешно разблокирована", cardActionClient.getClient());
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Карта клиента успешно разблокирована");
                 }
                 else
                 {
