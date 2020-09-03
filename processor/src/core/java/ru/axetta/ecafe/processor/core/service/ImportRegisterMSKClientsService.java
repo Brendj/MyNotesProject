@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
-import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -502,10 +501,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 }
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.MESH_GUID,
                         getPupilGuid(pupil.getMeshGUID()), cl == null ? null : cl.getMeshGUID(), updateClient);
-                if(clientNotExistsOrCurrent(org.getIdOfOrg(), cl, pupil)) {
-                    updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID,
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID,
                             getPupilGuid(pupil.getGuid()), cl == null ? null : getClientGuid(cl), updateClient);
-                }
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
                         cl == null ? null : cl.getPerson().getSurname(), updateClient);
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
@@ -549,16 +546,22 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         }
                     }
                 }
-                if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !crossFound) {
-                    log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
-                            cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " + emptyIfNull(
-                            cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " + emptyIfNull(
-                            cl.getPerson() == null ? "" : cl.getPerson().getSecondName()) + ", " + emptyIfNull(
-                            cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl
-                            .getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
-                    addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
-                            RegistryChange.FULL_COMPARISON, false);
-                    continue;
+                try {
+                    if (cl != null && !cl.getOrg().getOrgIdFromNsi().equals(pupil.orgId) && !crossFound) {
+                        log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
+                                cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " + emptyIfNull(
+                                cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " + emptyIfNull(
+                                cl.getPerson() == null ? "" : cl.getPerson().getSecondName()) + ", " + emptyIfNull(
+                                cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
+                        addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
+                                RegistryChange.FULL_COMPARISON, false);
+                        continue;
+                    }
+                } catch (Exception e) {
+                    logError(String.format(
+                            "Ошибка при определении признака перевода клиента из ОО в ОО. ID OO клиента %d, ID OO в НСИ-3 в записи разногласий: %d",
+                            cl.getOrg().getIdOfOrg(), pupil.orgId
+                    ), e, logBuffer);
                 }
                 if (!updateClient) {
                     continue;
@@ -956,7 +959,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
 
-    @Transactional
+    /*@Transactional
     public void parseClients(String synchDate, String date, Org org, List<ExpandedPupilInfo> pupils,
             boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
         log(synchDate + "Синхронизация списков начата для " + org.getOfficialName() + (performChanges ? ""
@@ -1080,7 +1083,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     session.save(dbClient);
                 }
             }
-        }*/
+        }
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
@@ -1093,10 +1096,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
             }
 
-            if(clientNotExistsOrCurrent(org.getIdOfOrg(), cl, pupil)) {
-                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
-                        cl == null ? null : cl.getClientGUID(), updateClient);
-            }
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
+                    cl == null ? null : cl.getClientGUID(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
                     cl == null ? null : cl.getPerson().getSurname(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
@@ -1111,7 +1112,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean guidFound = false;
             for (Org o : orgsList) {
-                if (o.getGuid().equals(pupil.getGuidOfOrg())) {
+                if (o.getGuid().equals(pupil.get)) {
                     guidFound = true;
                     break;
                 }
@@ -1174,42 +1175,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             }
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
-    }
-
-    private boolean clientNotExistsOrCurrent(Long idOfOrg, Client cl, ExpandedPupilInfo pupil) {
-        if(StringUtils.isEmpty(pupil.getGuid()) || (cl != null && cl.getClientGUID().equals(pupil.getGuid()))){
-            return true;
-        }
-        boolean notExists = true;
-        Long fromDB = null;
-        Session session = null;
-        try {
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
-            fromDB = DAOUtils.getClientIdByGuid(session, pupil.getGuid());
-        } catch (Exception e){
-            logger.error("", e);
-        } finally {
-            HibernateUtils.close(session, logger);
-        }
-
-        if (cl != null && cl.getIdOfClient().equals(fromDB)) {
-            return true;
-        }
-
-        notExists = fromDB == null;
-        if(!notExists){
-            String message = "Неоднозначность GUID NSI-1";
-            String detail = String.format("По GUID NSI-1 %s существует клиент ID:%d, но измение пришли для клиента MESH GUID %s",
-                    pupil.getGuid(), fromDB, pupil.getMeshGUID());
-            try {
-                DAOService.getInstance().addRegistryChangeError(idOfOrg, new Date().getTime(), message, detail);
-            } catch (Exception e){
-                logger.error("", e);
-            }
-            logger.warn(detail);
-        }
-        return notExists;
-    }
+    }*/
 
     public static class OrgRegistryGUIDInfo {
         Set<String> orgGuids;
@@ -1329,7 +1295,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     logger.error("Error ClientRegistryChange: ", e);
                     setChangeError(change.getIdOfRegistryChange(), e);
                     result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), e.getMessage()));
-                    session.flush();
                 } finally {
                     HibernateUtils.rollback(transaction, logger);
                 }
@@ -1791,6 +1756,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         public String ageTypeGroup;
         public String parallel;
         public String meshGUID;
+        public Long orgId;
 
         public List<GuardianInfo> guardianInfoList = new ArrayList<GuardianInfo>();
 
@@ -1936,6 +1902,15 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             this.leaveDate = pi.leaveDate;
             this.ageTypeGroup = pi.ageTypeGroup;
             this.parallel = pi.parallel;
+            this.orgId = pi.orgId;
+        }
+
+        public Long getOrgId() {
+            return orgId;
+        }
+
+        public void setOrgId(Long organizationId) {
+            this.orgId = organizationId;
         }
 
         public String getGroupDeprecated() {

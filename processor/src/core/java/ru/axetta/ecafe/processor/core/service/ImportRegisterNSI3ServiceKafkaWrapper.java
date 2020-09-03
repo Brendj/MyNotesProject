@@ -61,7 +61,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
             return innerServices.getQueryString();
         } else {
             return " SELECT DISTINCT p.guidnsi AS guid,\n"
-                    + "              o.guid AS guidOfOrg,\n"
+                    + "              '' AS guidOfOrg,\n"
                     + "              p.firstname,\n"
                     + "              p.patronymic AS secondname,\n"
                     + "              p.lastname AS familyName,\n"
@@ -71,7 +71,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              p.classname AS group,\n"
                     + "              p.deletestate AS deleted,\n"
                     + "              el.title AS ageTypeGroup,\n"
-                    + "              p.organizationid,\n"
+                    + "              o.organizationidfromnsi,\n"
                     + "              p.personguid\n"
                     + "       FROM cf_mh_persons AS p\n"
                     + "                   JOIN cf_orgs AS o ON p.organizationid = o.organizationIdFromNSI\n"
@@ -143,6 +143,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                 pupil.group = HibernateUtils.getDbString(row[8]);
                 pupil.deleted = Boolean.parseBoolean(HibernateUtils.getDbString(row[9]));
                 pupil.ageTypeGroup = HibernateUtils.getDbString(row[10]);
+                pupil.orgId = HibernateUtils.getDbLong(row[11]);
                 pupil.meshGUID = HibernateUtils.getDbString(row[12]);
 
                 pupils.add(pupil);
