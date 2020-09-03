@@ -81,4 +81,17 @@ public class CardActionRequestService {
         request.setComment(comment);
         cardActionRequestRepository.save(request);
     }
+
+    public void writeRecordOLD(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed){
+        writeRecordOLD(blockPersonEntranceRequest, message, processed, null);
+    }
+
+    public void writeRecordOLD(BlockPersonEntranceRequest blockPersonEntranceRequest, String message, boolean processed, Client client){
+        CardActionRequest request = CardActionRequest.buildCardActionRequest(blockPersonEntranceRequest);
+        request.setComment(message);
+        request.setProcessed(processed);
+        request.setClient(client);
+
+        cardActionRequestRepository.save(request);
+    }
 }

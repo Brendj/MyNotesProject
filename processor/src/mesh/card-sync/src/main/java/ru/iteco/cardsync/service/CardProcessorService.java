@@ -95,7 +95,7 @@ public class CardProcessorService {
             }
         } catch (Exception e) {
             log.error(String.format("Error when process request %s", request.getId()), e);
-            cardActionRequestService.writeRecord(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
+            cardActionRequestService.writeRecordOLD(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
         }
     }
 
