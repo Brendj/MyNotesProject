@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplierDetailTypeEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -54,7 +55,6 @@ public class PreorderRequestsReportService extends RecoverableService {
     public final Integer PREORDER_REQUEST_TYPE = 3;
     public static final Integer MAX_FORBIDDEN_DAYS = 3;
     public static final int DAY_PREORDER_CHECK = 5;
-    public final Integer POSITION_FEEDING_TYPE = 5;
 
     private Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItems = new HashMap<Long, GoodRequestsChangeAsyncNotificationService.OrgItem>();
 
@@ -532,7 +532,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         pos.setDailySampleCount(0L);
         pos.setTempClientsCount(0L);
         pos.setNotified(false);
-        pos.setFeedingType(POSITION_FEEDING_TYPE);
+        pos.setFeedingType(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_PREORDER.ordinal());
         pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
         if (preorderItem.getComplex()) {
