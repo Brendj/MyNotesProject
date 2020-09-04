@@ -1256,8 +1256,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         Transaction transaction = null;
         List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             List<RegistryChange> registryChangeList = getRegistryChangeList(session, changesList); //получаем список объектов разногласий
+            session.close();
+
             Integer newOperationsCount = 0; //количество созданий нового клиента на весь пакет (Дети + представители)
             Long idOfOrg = null;
             for (RegistryChange change : registryChangeList) {
@@ -1279,17 +1281,19 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
             for (RegistryChange change : registryChangeList) {
                 try {
+                    session = RuntimeContext.getInstance().createPersistenceSession();
                     transaction = session.beginTransaction();
                     applyRegistryChange(session, change, fullNameValidation, iterator, groupName);
                     transaction.commit();
                     transaction = null;
-                    if (change.getIdOfClient() != null) {
+                    session.close();
+                    /*if (change.getIdOfClient() != null) {
                         try {
                             saveClientGuardians(change, iterator);
                         } catch (Exception e) {
                             logger.error("Error creating guardian: ", e);
                         }
-                    }
+                    }*/
                     result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), ""));
                 } catch (Exception e) {
                     logger.error("Error ClientRegistryChange: ", e);
@@ -1297,9 +1301,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), e.getMessage()));
                 } finally {
                     HibernateUtils.rollback(transaction, logger);
+                    HibernateUtils.close(session, logger);
                 }
             }
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;

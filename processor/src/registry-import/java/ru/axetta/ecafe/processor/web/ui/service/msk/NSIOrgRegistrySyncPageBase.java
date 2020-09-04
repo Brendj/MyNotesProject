@@ -233,11 +233,15 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
             //  Ошибка
             //errorMessages = error;
             errorMessages = "";
+            List<String> allErrors = new LinkedList<>();
+
             for(RegistryChangeCallback cb : result) {
-                if(errorMessages.length() > 0) {
-                    errorMessages += "; ";
+                if(StringUtils.isNotEmpty(cb.getError())){
+                    allErrors.add(cb.getError());
                 }
-                errorMessages += cb.getError();
+            }
+            if(!allErrors.isEmpty()) {
+                errorMessages = StringUtils.join(allErrors, "; ");
             }
         }
     }
