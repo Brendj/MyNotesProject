@@ -305,9 +305,8 @@ public class CardService {
         }
         else
         {
-            Org org = DAOService.getInstance().findOrgById(idOfOrg);
-            for (Org friendlyOrg : org.getFriendlyOrg()) {
-                CardWritableRepository.getInstance().updateCardSync(friendlyOrg.getIdOfOrg(), card, changeState);
+            for (Long friendlyOrgid : DAOService.getInstance().findFriendlyOrgsIds(idOfOrg)) {
+                CardWritableRepository.getInstance().updateCardSync(friendlyOrgid, card, changeState);
             }
         }
     }
