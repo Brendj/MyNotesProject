@@ -116,7 +116,9 @@ public class GoodRequestsNewReportService {
         if (!hidePreorders) {
             String sqlQuery =
                     "SELECT distinct ci.idoforg, "
-                            + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
+                            + "   CASE WHEN (pc.amount = 0) AND md.idofgood IS NULL THEN pmd.idofgood "
+                            + "        WHEN (pc.amount = 0) AND md.idofgood IS NOT NULL THEN md.idofgood "
+                            + "        WHEN pc.amount <> 0 THEN ci.idofgood END AS idofgood, "
                             + "   CASE WHEN (pc.amount = 0) THEN false ELSE true END AS iscomplex, "
                             + "   CASE WHEN (pc.amount = 0) THEN gmd.goodscode ELSE gc.goodscode END AS goodscode, "
                             + "   CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%завтрак%') THEN 'breakfast' "
