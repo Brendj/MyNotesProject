@@ -1,12 +1,14 @@
 
 #/processor/build/projects/
+**/.idea*
 *.iml
 *.ipr
 *.war
 /processor/build/projects/atlassian-ide-plugin.xml
-/processor/build/projects/processor.iws
+**/*.iws
+**/dataSources/
 
 # /processor/src/core/java/ru/axetta/ecafe/processor/core/persistence/
 /processor/src/core/java/ru/axetta/ecafe/processor/core/persistence/NewCard.hbm.xml
-/processor/target/
+**/target/
 

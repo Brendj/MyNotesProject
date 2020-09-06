@@ -327,6 +327,7 @@ public class MainPage implements Serializable {
     private final SyncMonitorPage syncMonitorPage = new SyncMonitorPage();
 
     private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
+    private final BlockUnblockReportPage blockUnblockReportPage = new BlockUnblockReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -7444,6 +7445,19 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showBlockUnblockReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = blockUnblockReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set block/unblock card page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
 
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;
@@ -10678,5 +10692,9 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getPreorderPage() {
         return preorderPage;
+    }
+
+    public BlockUnblockReportPage getBlockUnblockReportPage() {
+        return blockUnblockReportPage;
     }
 }

@@ -499,6 +499,11 @@
         <rich:panelMenuItem id="cardSignListMenuItem" binding="#{cardSignCreatePage.mainMenuComponent}"
                             label="Создание" action="#{cardSignCreatePage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
+    <%--@elvariable id="showDetailedEnterEventReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.BlockUnblockReportPage"--%>
+    <rich:panelMenuItem id="blockUnblockCard" binding="#{mainPage.blockUnblockReportPage.mainMenuComponent}"
+                        label="Отчет по блокировке/разблокировке карт" action="#{mainPage.showBlockUnblockReportPage}"
+                        reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 <%--@elvariable id="commodityAccountingGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.CommodityAccountingGroupPage"--%>
