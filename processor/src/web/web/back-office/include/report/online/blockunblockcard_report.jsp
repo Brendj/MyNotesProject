@@ -10,16 +10,13 @@
              styleClass="borderless-grid">
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
-        <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{mainPage.blockUnblockReportPage.getStringIdOfOrgList}"
-                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.blockUnblockReportPage.filter}}" />
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{mainPage.blockUnblockReportPage.filter}" readonly="true"
+                         styleClass="input-text long-field" style="margin-right: 2px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
     </h:panelGrid>
 

@@ -71,6 +71,25 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
 
     }
 
+    public enum CardStateType {
+        ALL("Все"),
+        UNBLOCK("Только разблокированные"),
+        BLOCK("Только заблокированные");
+        private String description;
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        private CardStateType(String description) {
+            this.description = description;
+        }
+    }
+
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
@@ -103,11 +122,6 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
 
-            List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
-            List<Long> idOfClients = parseStringAsLongList(P_ID_OF_CLIENTS);
-            Boolean allFriendlyOrgs = Boolean.parseBoolean(StringUtils.trimToEmpty(reportProperties.getProperty(P_ALL_FRIENDLY_ORGS)));
-            String cardState = reportProperties.getProperty(P_CARD_STATUS);
-
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             calendar.setTime(startTime);
@@ -137,6 +151,58 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 Map<String, Object> parameterMap) throws Exception {
 
             List<BlockUnblockItem> blockUnblockItemList = new ArrayList<>();
+            Org orgLoad;
+            try {
+                orgLoad = (Org) session.load(Org.class, Long.parseLong(StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG))));
+            } catch (Exception e)
+            {
+                orgLoad = null;
+            }
+
+            List<Long> idOfClients = parseStringAsLongList(P_ID_OF_CLIENTS);
+            Boolean allFriendlyOrgs = Boolean.parseBoolean(StringUtils.trimToEmpty(reportProperties.getProperty(P_ALL_FRIENDLY_ORGS)));
+            String cardState = reportProperties.getProperty(P_CARD_STATUS);
+
+
+            String filterOrgs = "";
+            String filterClients = "";
+            String filterStatus = "";
+            if (orgLoad != null) {
+                if (allFriendlyOrgs) {
+                    for (Org org : orgLoad.getFriendlyOrg()) {
+                        filterOrgs += "'" + org.getIdOfOrg() + "',";
+                    }
+                    filterOrgs = filterOrgs.substring(0, filterOrgs.length() - 1);
+                } else {
+                    filterOrgs = "'" + orgLoad.getIdOfOrg() + "'";
+                }
+                filterOrgs = " and co.idoforg in (" + filterOrgs + ") ";
+            }
+            if (idOfClients != null && !idOfClients.isEmpty())
+            {
+                for (Long idClient : idOfClients) {
+                    filterClients += "'" + idClient + "',";
+                }
+                filterClients = filterClients.substring(0, filterClients.length() - 1);
+                filterClients = " and cc.idofclient in (" + filterClients + ") ";
+            }
+            if (cardState != null)
+            {
+                if (cardState.equals(CardStateType.BLOCK.getDescription()))
+                {
+                    filterStatus = "  and ca.state = " + CardState.BLOCKED.getValue() + " ";
+                }
+                else
+                {
+                    if (cardState.equals(CardStateType.UNBLOCK.getDescription()))
+                    {
+                        filterStatus = "  and ca.state = " + CardState.ISSUED.getValue() + " ";
+                    }
+                }
+
+
+            }
+
 
             //Это разблокирование всего
             Query queryUnblock = session.createSQLQuery("select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.address, ccra.firstname,ccra.lastname, ccra.middlename,\n"
@@ -150,7 +216,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
                     + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
                     + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is null and ccra.\"action\" = 1\n" + "union\n"
+                    + "and ccac.idclientchild is null " + filterOrgs + filterClients + filterStatus + " and ccra.\"action\" = 1\n" + "union\n"
                     + "select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.address, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
                     + "ccg.groupname,cp1.firstname as firp,cp1.surname as lastp , cp1.secondname as middp,\n"
                     + "ca.state as cardstate, ca.cardno, ca.cardprintedno, ccarold.createdate as blockdate, ccra.createdate as unblockdate\n"
@@ -165,7 +231,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
                     + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
                     + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is not null and ccra.\"action\" = 1");
+                    + "and ccac.idclientchild is not null " + filterOrgs + filterClients + filterStatus + " and ccra.\"action\" = 1");
 
             List rListUnblock = queryUnblock.list();
             for (Object o : rListUnblock) {
@@ -202,7 +268,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
                     + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is null and ccra.\"action\" = 0\n" + "union\n"
+                    + "and ccac.idclientchild is null " + filterOrgs + filterClients + filterStatus + " and ccra.\"action\" = 0\n" + "union\n"
                     + "select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.address, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
                     + "ccg.groupname,cp1.firstname as firp,cp1.surname as lastp , cp1.secondname as middp,\n"
                     + "ca.state as cardstate, ca.cardno, ca.cardprintedno, ccra.createdate as blockdate\n"
@@ -216,7 +282,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_persons cp1 on cp1.idofperson = cc1.idofperson\n"
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
                     + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is not null and ccra.\"action\" = 0) as vlocked\n"
+                    + "and ccac.idclientchild is not null " + filterOrgs + filterClients + filterStatus + " and ccra.\"action\" = 0) as vlocked\n"
                     + "where vlocked.requestid not in \n" + "(select ccra.requestid\n"
                     + "from cf_cr_cardactionrequests ccra \n"
                     + "left join cf_cr_cardactionclient ccac on ccac.idcardactionrequest = ccra.idcardactionrequest\n"
@@ -224,7 +290,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
                     + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
-                    + "where ccra.processed = true and ca.state is not null \n"
+                    + "where ccra.processed = true  " + filterOrgs + filterClients + filterStatus + "  and ca.state is not null \n"
                     + "and ccac.idclientchild is null and ccra.\"action\" = 1\n" + "union\n" + "select ccra.requestid\n"
                     + "from cf_cr_cardactionrequests ccra \n"
                     + "left join cf_cr_cardactionclient ccac on ccac.idcardactionrequest = ccra.idcardactionrequest\n"
@@ -235,7 +301,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_clients cc1 on cc1.idofclient = ccac.idofclient\n"
                     + "left join cf_persons cp1 on cp1.idofperson = cc1.idofperson\n"
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
-                    + "where ccra.processed = true and ca.state is not null \n"
+                    + "where ccra.processed = true  " + filterOrgs + filterClients + filterStatus + "  and ca.state is not null \n"
                     + "and ccac.idclientchild is not null and ccra.\"action\" = 1)");
 
             List rList = query.list();

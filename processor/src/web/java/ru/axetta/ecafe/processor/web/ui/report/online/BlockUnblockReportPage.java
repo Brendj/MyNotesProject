@@ -8,23 +8,16 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.BlockUnblockCardReport;
-import ru.axetta.ecafe.processor.core.report.DetailedEnterEventReport;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
-import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +36,6 @@ import java.util.*;
 public class BlockUnblockReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(BlockUnblockReportPage.class);
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
 
     private String htmlReport = null;
 
@@ -63,14 +55,12 @@ public class BlockUnblockReportPage extends OnlineReportPage {
 
     private Boolean allFriendlyOrgs;
 
-    private final ClientFilter clientFilter = new ClientFilter();
-
     public List<SelectItem> getStatusFilters() {
         List<SelectItem> filters = new ArrayList<SelectItem>();
         filters.add(new SelectItem(""));
-        filters.add(new SelectItem("Все"));
-        filters.add(new SelectItem("Только заблокированные"));
-        filters.add(new SelectItem("Только разблокированные"));
+        filters.add(new SelectItem(BlockUnblockCardReport.CardStateType.ALL.getDescription()));
+        filters.add(new SelectItem(BlockUnblockCardReport.CardStateType.BLOCK.getDescription()));
+        filters.add(new SelectItem(BlockUnblockCardReport.CardStateType.UNBLOCK.getDescription()));
         return filters;
     }
 
@@ -126,7 +116,7 @@ public class BlockUnblockReportPage extends OnlineReportPage {
         return null;
     }
 
-    public void generateXLS() {
+    public void generateXLS(ActionEvent event) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
         if (templateFilename != null) {
@@ -189,7 +179,9 @@ public class BlockUnblockReportPage extends OnlineReportPage {
 
     private Properties buildProperties() {
         Properties properties = new Properties();
-        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, StringUtils.join(idOfOrgList, ','));
+        if (!filter.equals("Не выбрано")) {
+            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, (null != idOfOrg) ? idOfOrg.toString() : "0");
+        }
 
         List<Long> idClients = new ArrayList<>();
         for (ClientSelectListPage.Item item: getClientList())
@@ -216,10 +208,6 @@ public class BlockUnblockReportPage extends OnlineReportPage {
 
     public String getHtmlReport() {
         return htmlReport;
-    }
-
-    public ClientFilter getClientFilter() {
-        return clientFilter;
     }
 
     public String getCardStatusFilter() {
