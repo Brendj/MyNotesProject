@@ -27,7 +27,7 @@ public class BlockUnblockItem {
     private String firp;
     private String lastp;
     private String middp;
-    private Integer cardstate;
+    private String cardstate;
     private Long cardno;
     private Long cardprintedno;
     private Date blockdate;
@@ -35,7 +35,7 @@ public class BlockUnblockItem {
 
 
     public BlockUnblockItem(String requestId, String shortname, String address, String firstname, String lastname, String middlename,
-            String groupname, String firp, String lastp, String middp, Integer cardstate, Long cardno,
+            String groupname, String firp, String lastp, String middp, String cardstate, Long cardno,
             Long cardprintedno, Date blockdate,Date unblockdate) {
         this.requestId = requestId;
         this.shortname=shortname;
@@ -44,6 +44,12 @@ public class BlockUnblockItem {
         this.lastname=lastname;
         this.middlename=middlename;
         this.groupname=groupname;
+        if (firp == null)
+            firp = "";
+        if (lastp == null)
+            lastp = "";
+        if (middp == null)
+            middp = "";
         this.firp=firp;
         this.lastp=lastp;
         this.middp=middp;
@@ -126,11 +132,11 @@ public class BlockUnblockItem {
         this.middp = middp;
     }
 
-    public Integer getCardstate() {
+    public String getCardstate() {
         return cardstate;
     }
 
-    public void setCardstate(Integer cardstate) {
+    public void setCardstate(String cardstate) {
         this.cardstate = cardstate;
     }
 

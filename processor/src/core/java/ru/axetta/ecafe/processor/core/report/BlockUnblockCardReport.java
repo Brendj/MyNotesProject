@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
@@ -132,6 +133,21 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     jasperPrint, startTime, endTime, orgLoad.getIdOfOrg());
         }
 
+        private String converterTypeCard (Integer type)
+        {
+            if (CardState.ISSUED.getValue() == type)
+                return CardState.ISSUED.getDescription();
+            if (CardState.BLOCKED.getValue() == type)
+                return CardState.BLOCKED.getDescription();
+            if (CardState.TEMPBLOCKED.getValue() == type)
+                return CardState.TEMPBLOCKED.getDescription();
+            if (CardState.TEMPISSUED.getValue() == type)
+                return CardState.TEMPISSUED.getDescription();
+            if (CardState.FREE.getValue() == type)
+                return CardState.FREE.getDescription();
+            return CardState.UNKNOWN.getDescription();
+        }
+
         private JRDataSource createDataSource(Session session, Org org,
                 Map<String, Object> parameterMap) throws Exception {
 
@@ -186,7 +202,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 Date blockdate = new Date(((Timestamp) row[14]).getTime());
                 Date unblockdate = new Date(((Timestamp) row[15]).getTime());
                 BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, shortname, address, firstname, lastname,
-                        middlename, groupname, firp, lastp, middp, cardstate, cardno, cardprintedno, blockdate, unblockdate);
+                        middlename, groupname, firp, lastp, middp, converterTypeCard(cardstate), cardno, cardprintedno, blockdate, unblockdate);
                 blockUnblockItemList.add(blockUnblockItem);
             }
 
@@ -257,7 +273,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 Long cardprintedno = ((BigInteger) row[13]).longValue();
                 Date blockdate = new Date(((Timestamp) row[14]).getTime());
                 BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, shortname, address, firstname, lastname,
-                        middlename, groupname, firp, lastp, middp, cardstate, cardno, cardprintedno, blockdate, null);
+                        middlename, groupname, firp, lastp, middp, converterTypeCard(cardstate), cardno, cardprintedno, blockdate, null);
                 blockUnblockItemList.add(blockUnblockItem);
             }
             return new JRBeanCollectionDataSource(blockUnblockItemList);
