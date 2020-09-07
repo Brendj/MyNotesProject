@@ -2018,7 +2018,7 @@ public class FrontController extends HttpServlet {
         ResponseItem responseItem = new ResponseItem();
         try {
             Card card = CardService.getInstance().unblockOrReturnCard(cardNo, idOfOrg);
-            CardService.getInstance().updateSyncStatus(card, idOfOrg, 0L, false);
+            CardService.getInstance().updateSyncStatus(card, idOfOrg, 0L, true);
             responseItem.code = ResponseItem.OK;
             responseItem.message = ResponseItem.OK_MESSAGE;
         } catch (CardNotFoundException e) {
