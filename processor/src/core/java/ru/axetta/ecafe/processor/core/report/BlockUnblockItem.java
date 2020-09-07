@@ -19,6 +19,7 @@ import java.util.Date;
 public class BlockUnblockItem {
     private String requestId;
     private String shortname;
+    private String address;
     private String firstname;
     private String lastname;
     private String middlename;
@@ -33,11 +34,12 @@ public class BlockUnblockItem {
     private Date unblockdate;
 
 
-    public BlockUnblockItem(String requestId, String shortname,String firstname, String lastname, String middlename,
+    public BlockUnblockItem(String requestId, String shortname, String address, String firstname, String lastname, String middlename,
             String groupname, String firp, String lastp, String middp, Integer cardstate, Long cardno,
             Long cardprintedno, Date blockdate,Date unblockdate) {
         this.requestId = requestId;
         this.shortname=shortname;
+        this.address=address;
         this.firstname=firstname;
         this.lastname=lastname;
         this.middlename=middlename;
@@ -162,5 +164,13 @@ public class BlockUnblockItem {
 
     public void setUnblockdate(Date unblockdate) {
         this.unblockdate = unblockdate;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
