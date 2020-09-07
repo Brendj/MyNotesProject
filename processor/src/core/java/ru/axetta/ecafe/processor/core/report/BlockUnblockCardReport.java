@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by anvarov on 06.04.18.
+ * Created by voinov on 07.09.20.
  */
 public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
 
@@ -57,6 +57,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
     public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
     final public static String P_ID_OF_CLIENTS = "idOfClients";
     final public static String P_ALL_FRIENDLY_ORGS = "friendsOrg";
+    final public static String P_CARD_STATUS = "cardStatus";
 
     private final static Logger logger = LoggerFactory.getLogger(BlockUnblockCardReport.class);
 
@@ -101,36 +102,20 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
 
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
+
+            List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
+            List<Long> idOfClients = parseStringAsLongList(P_ID_OF_CLIENTS);
+            Boolean allFriendlyOrgs = Boolean.parseBoolean(StringUtils.trimToEmpty(reportProperties.getProperty(P_ALL_FRIENDLY_ORGS)));
+            String cardState = reportProperties.getProperty(P_CARD_STATUS);
+
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
-
-            String idOfOrgString = StringUtils
-                    .trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
-            Long idOfOrg = Long.parseLong(idOfOrgString);
-
-            Org orgLoad = (Org) session.load(Org.class, idOfOrg);
-
-            Set<Org> orgs = orgLoad.getFriendlyOrg();
-
-            for (Org orgM : orgs) {
-                if (orgM.isMainBuilding()) {
-                    parameterMap.put("shortNameInfoService", orgM.getShortNameInfoService());
-                    break;
-                } else {
-                    parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
-                }
-            }
-
-            parameterMap.put("beginDate", CalendarUtils.dateShortToString(startTime));
-            parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
-
-
             endTime = CalendarUtils.endOfDay(endTime);
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, orgLoad, parameterMap));
+                    createDataSource(session, parameterMap));
             Date generateEndTime = new Date();
             return new BlockUnblockCardReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                    jasperPrint, startTime, endTime, orgLoad.getIdOfOrg());
+                    jasperPrint, startTime, endTime, null);
         }
 
         private String converterTypeCard (Integer type)
@@ -148,7 +133,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
             return CardState.UNKNOWN.getDescription();
         }
 
-        private JRDataSource createDataSource(Session session, Org org,
+        private JRDataSource createDataSource(Session session,
                 Map<String, Object> parameterMap) throws Exception {
 
             List<BlockUnblockItem> blockUnblockItemList = new ArrayList<>();
@@ -277,6 +262,21 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 blockUnblockItemList.add(blockUnblockItem);
             }
             return new JRBeanCollectionDataSource(blockUnblockItemList);
+        }
+
+        private List<Long> parseStringAsLongList(String propertyName) {
+            String propertyValueString = reportProperties.getProperty(propertyName);
+            String[] propertyValueArray = StringUtils.split(propertyValueString, ',');
+            List<Long> propertyValueList = new ArrayList<Long>();
+            for (String propertyValue : propertyValueArray) {
+                try {
+                    propertyValueList.add(Long.parseLong(propertyValue));
+                } catch (NumberFormatException e) {
+                    logger.error(String.format("Unable to parse propertyValue: property = %s, value = %s", propertyName,
+                            propertyValue), e);
+                }
+            }
+            return propertyValueList;
         }
     }
 }

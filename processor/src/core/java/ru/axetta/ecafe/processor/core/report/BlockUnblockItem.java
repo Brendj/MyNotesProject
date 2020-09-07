@@ -3,17 +3,12 @@
  */
 
 package ru.axetta.ecafe.processor.core.report;
-
-import ru.CryptoPro.JCP.VMInspector.Private;
-
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
- * User: chirikov
- * Date: 25.10.13
- * Time: 14:13
+ * User: Voinov
+ * Date: 07.09.20
  * To change this template use File | Settings | File Templates.
  */
 public class BlockUnblockItem {

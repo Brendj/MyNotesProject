@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -76,15 +77,11 @@ public class BlockUnblockReportPage extends OnlineReportPage {
     public Object buildReportHTML() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
+
         if (templateFilename == null) {
             return null;
         }
         BlockUnblockCardReport.Builder builder = new BlockUnblockCardReport.Builder(templateFilename);
-
-        //if (idOfOrg == null) {
-        //    printError(String.format("Выберите организацию "));
-        //    return null;
-        //}
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -93,9 +90,7 @@ public class BlockUnblockReportPage extends OnlineReportPage {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-
-                builder.setReportProperties(buildProperties(persistenceSession));
-
+                builder.setReportProperties(buildProperties());
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -131,7 +126,7 @@ public class BlockUnblockReportPage extends OnlineReportPage {
         return null;
     }
 
-    public void generateXLS(ActionEvent event) {
+    public void generateXLS() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
         if (templateFilename != null) {
@@ -142,12 +137,7 @@ public class BlockUnblockReportPage extends OnlineReportPage {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-
-                if (idOfOrg == null) {
-                    printError(String.format("Выберите организацию "));
-                }
-
-                builder.setReportProperties(buildProperties(persistenceSession));
+                builder.setReportProperties(buildProperties());
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -197,19 +187,18 @@ public class BlockUnblockReportPage extends OnlineReportPage {
         return templateFilename;
     }
 
-    private Properties buildProperties(Session persistenceSession) throws Exception {
+    private Properties buildProperties() {
         Properties properties = new Properties();
-        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, (null != idOfOrg) ? idOfOrg.toString() : "0");
-        //properties.setProperty(DetailedEnterEventReport.P_ALL_FRIENDLY_ORGS,
-        //        (null != allFriendlyOrgs) ? allFriendlyOrgs.toString() : "0");
-        String idOfClients = "";
-        if (getClientList() != null && getClientList().size() > 0) {
-            for (ClientSelectListPage.Item item : getClientList()) {
-                idOfClients += item.getIdOfClient() + ",";
-            }
-            idOfClients = idOfClients.substring(0, idOfClients.length() - 1);
+        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, StringUtils.join(idOfOrgList, ','));
+
+        List<Long> idClients = new ArrayList<>();
+        for (ClientSelectListPage.Item item: getClientList())
+        {
+            idClients.add(item.getIdOfClient());
         }
-        properties.setProperty(DetailedEnterEventReport.P_ID_OF_CLIENTS, idOfClients);
+        properties.setProperty(BlockUnblockCardReport.P_ID_OF_CLIENTS, StringUtils.join(idClients, ','));
+        properties.setProperty(BlockUnblockCardReport.P_ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
+        properties.setProperty(BlockUnblockCardReport.P_CARD_STATUS, cardStatusFilter);
         return properties;
     }
 
