@@ -343,13 +343,11 @@ public class Manager implements AbstractToElement {
                 final int newLimit = currentLimit - currentResultDOSet.size();
                 if (newLimit > 0) {
                     List<DistributedObject> newResultDOList = findResponseResult(sessionFactory, doClass, newLimit);
-                    if (doSyncClass.getDoClass().getName().contains("GoodRequestPosition")) {
-                        Set<DistributedObject> newCurrentResultDOSet = new HashSet<>(newResultDOList);
-                        newCurrentResultDOSet.addAll(currentResultDOSet);
-                        currentResultDOSet = newCurrentResultDOSet;
-                    } else {
-                        currentResultDOSet.addAll(newResultDOList);
+                    if (doSyncClass.getDoClass().getName().contains("GoodRequestPosition") ||
+                            doSyncClass.getDoClass().getName().contains("GoodRequest")) {
+                        currentResultDOSet.clear();
                     }
+                    currentResultDOSet.addAll(newResultDOList);
                     LOGGER.debug("end findResponseResult");
                     LOGGER.debug("init addConfirms");
                     addConfirms(sessionFactory, classSimpleName, new ArrayList<DistributedObject>(currentResultDOSet));
@@ -463,7 +461,6 @@ public class Manager implements AbstractToElement {
             }
             currentResultDOList = currentResultDOListResult;
         }
-
         return currentResultDOList;
     }
 

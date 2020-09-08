@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
@@ -17,6 +18,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplierDetailTypeEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -54,7 +56,6 @@ public class PreorderRequestsReportService extends RecoverableService {
     public final Integer PREORDER_REQUEST_TYPE = 3;
     public static final Integer MAX_FORBIDDEN_DAYS = 3;
     public static final int DAY_PREORDER_CHECK = 5;
-    public final Integer POSITION_FEEDING_TYPE = 5;
 
     private Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItems = new HashMap<Long, GoodRequestsChangeAsyncNotificationService.OrgItem>();
 
@@ -168,7 +169,8 @@ public class PreorderRequestsReportService extends RecoverableService {
                             List<PreorderItem> preordersByOrg = getPreorderItemsByOrg(idOfOrg, preorderItemList, dateWork); //предзаказы по ОО на дату
                             for (PreorderItem item : preordersByOrg) {
                                 try {
-                                    if (null == item.getIdOfGood()) {
+                                    Org org = DAOUtils.getOrgById(session, idOfOrg);
+                                    if (null == item.getIdOfGood() && !org.getUseWebArm()) {
                                         logger.error(String.format(
                                                 "PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
                                                 item.getIdOfOrg(), item.getCreatedDate().toString()));
@@ -183,7 +185,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                                     long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
                                     if (balanceOnDate < 0L) {
                                         deletePreorderForNotEnoughMoney(session, item);
-                                        logger.info("Delete preorder for not enougn money " + item.toString());
+                                        logger.info("Delete preorder for not enough money " + item.toString());
                                         continue;
                                     }
                                     String guid = createRequestFromPreorder2(session, item, fireTime, number, staff);
@@ -434,7 +436,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "pmd.idofpreordermenudetail, "                                                               //3
                             + "   CASE WHEN (pc.amount = 0) THEN (case when md.idofgood is null then pmd.idofgood else md.idofgood end) ELSE ci.idofgood END AS idofgood, "           //4
                             + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"                 //5
-                            + "   pc.preorderdate, "                                                                       //6
+                            + "   pc.preorderdate AS prDate, "                                                             //6
                             + "pc.complexprice, "                                                                          //7
                             + "pc.amount AS complexamount, "                                                               //8
                             + "pmd.menudetailprice, "                                                                      //9
@@ -443,7 +445,9 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "c.idofclient, "                                                                             //12
                             + "c.idofclientgroup, "                                                                        //13
                             + "pc.usedsum, "                                                                                //14
-                            + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end " //15
+                            + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end, " //15
+                            + "pc.armcomplexid, "                                                                           //16
+                            + "pmd.idofdish "                                                                               //17
                             + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                             + "INNER JOIN cf_complexinfo ci ON pc.idoforgoncreate = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
@@ -452,7 +456,39 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
                             + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 "
                             + params.getNativeSQLCondition()
-                            + "order by pc.preorderdate";
+                    + "UNION "
+                    + "SELECT pc.idoforgoncreate, "                                                                         //0
+                    + "pc.createddate, "                                                                                    //1
+                    + "pc.idofpreordercomplex, "                                                                            //2
+                    + "pmd.idofpreordermenudetail, "                                                                        //3
+                    + "pmd.idofgood, "                                                                                      //4
+                    + "CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount, "                            //5
+                    + "pc.preorderdate AS prDate, "                                                                         //6
+                    + "pc.complexprice, "                                                                                   //7
+                    + "pc.amount AS complexamount, "                                                                        //8
+                    + "pmd.menudetailprice, "                                                                               //9
+                    + "pmd.amount AS menudetailamount, "                                                                    //10
+                    + "c.balance, "                                                                                         //11
+                    + "c.idofclient, "                                                                                      //12
+                    + "c.idofclientgroup, "                                                                                 //13
+                    + "pc.usedsum, "                                                                                        //14
+                    + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end, "   //15
+                    + "pc.armcomplexid, "                                                                                   //16
+                    + "pmd.idofdish "                                                                                       //17
+                    + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+                    + "LEFT JOIN cf_wt_complexes wc ON wc.idofcomplex = pc.armcomplexid AND wc.deletestate = 0 "
+                    + "AND pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wc.begindate) * 1000) AND (EXTRACT(EPOCH FROM wc.enddate) * 1000) "
+                    + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
+                    + "LEFT JOIN cf_wt_dishes wd ON wd.idofdish = pmd.idofdish AND wd.deletestate = 0 "
+                    + "AND (pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wd.dateOfBeginMenuIncluding) * 1000) AND (EXTRACT(EPOCH FROM wd.dateOfEndMenuIncluding) * 1000) "
+                    + "OR (wd.dateOfBeginMenuIncluding IS NULL AND (EXTRACT(EPOCH FROM wd.dateOfEndMenuIncluding) * 1000) >= pc.preorderdate) "
+                    + "OR ((EXTRACT(EPOCH FROM wd.dateOfBeginMenuIncluding) * 1000) <= pc.preorderdate AND wd.dateOfEndMenuIncluding IS NULL) "
+                    + "OR (wd.dateOfBeginMenuIncluding IS NULL AND wd.dateOfEndMenuIncluding IS NULL)) "
+                    + "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
+                    + "AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 "
+                    + "AND (wc.idofcomplex is not null or wd.idofdish is not null)"
+                    + params.getNativeSQLCondition()
+                    + "order by prDate ";
 
             Query query = session.createSQLQuery(sqlQuery);
             query.setParameter("date", CalendarUtils.startOfDayInUTC(dateFrom).getTime());
@@ -479,12 +515,14 @@ public class PreorderRequestsReportService extends RecoverableService {
                 Boolean isComplex = !complexAmount.equals(0);
                 Long idOfClientGroup = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
                 Long usedSum = (null != o[14]) ? ((BigInteger) o[14]).longValue() : 0L;
+                Integer complexId = (null != o[16]) ? (Integer) o [16] : null;
+                Long idOfDish = (null != o[17]) ? ((BigInteger) o [17]).longValue() : null;
 
                 preorderItemList
                         .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
                                 createdDate, idOfGoodsRequest, preorderDate,
                                 complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance,
-                                idOfClient, isDeleted, isComplex, idOfClientGroup, usedSum));
+                                idOfClient, isDeleted, isComplex, idOfClientGroup, usedSum, complexId, idOfDish));
             }
             transaction.commit();
             transaction = null;
@@ -501,9 +539,14 @@ public class PreorderRequestsReportService extends RecoverableService {
         Date now = new Date(System.currentTimeMillis());
         String number = "" + preorderItem.getIdOfOrg() + "-" + new SimpleDateFormat("yyMMdd").format(now) + "-ЗВК-" + num;
 
-        Good good = DAOService.getInstance().getGood(preorderItem.getIdOfGood());
-
-        if (null == good || null == staff)
+        Good good = null;
+        Org org = DAOUtils.getOrgById(session, preorderItem.getIdOfOrg());
+        if (!org.getUseWebArm()) {
+            good = DAOService.getInstance().getGood(preorderItem.getIdOfGood());
+            if (null == good)
+                return null;
+        }
+        if (null == staff)
             return null;
 
         GoodRequest goodRequest = new GoodRequest();
@@ -525,14 +568,22 @@ public class PreorderRequestsReportService extends RecoverableService {
         pos.setGood(good);
         pos.setDeletedState(false);
         pos.setOrgOwner(preorderItem.getIdOfOrg());
-        pos.setUnitsScale(good.getUnitsScale());
-        pos.setNetWeight(good.getNetWeight());
+        if (!org.getUseWebArm()) {
+            pos.setUnitsScale(good.getUnitsScale());
+            pos.setNetWeight(good.getNetWeight());
+            pos.setTotalCount(preorderItem.getAmount() * 1000L);
+        } else {
+            pos.setUnitsScale(UnitScale.UNITS);
+            pos.setNetWeight(0L);
+            pos.setTotalCount(preorderItem.getAmount().longValue());
+        }
         pos.setCreatedDate(fireTime);
-        pos.setTotalCount(preorderItem.getAmount() * 1000L);
         pos.setDailySampleCount(0L);
         pos.setTempClientsCount(0L);
         pos.setNotified(false);
-        pos.setFeedingType(POSITION_FEEDING_TYPE);
+        pos.setComplexId(preorderItem.getComplexId());
+        pos.setIdOfDish(preorderItem.getIdOfDish());
+        pos.setFeedingType(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_PREORDER.ordinal());
         pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
         if (preorderItem.getComplex()) {
@@ -644,10 +695,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         private Boolean isComplex;
         private Long idOfClientGroup;
         private Long usedSum;
+        private Integer complexId;
+        private Long idOfDish;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
                 Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance,
-                Long idOfClient, Boolean isDeleted, Boolean isComplex, Long idOfClientGroup, Long usedSum) {
+                Long idOfClient, Boolean isDeleted, Boolean isComplex, Long idOfClientGroup, Long usedSum, Integer complexId,
+                Long idOfDish) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -663,6 +717,8 @@ public class PreorderRequestsReportService extends RecoverableService {
             this.isComplex = isComplex;
             this.idOfClientGroup = idOfClientGroup;
             this.usedSum = usedSum;
+            this.complexId = complexId;
+            this.idOfDish = idOfDish;
         }
 
         public PreorderItem() {
@@ -787,6 +843,22 @@ public class PreorderRequestsReportService extends RecoverableService {
 
         public void setUsedSum(Long usedSum) {
             this.usedSum = usedSum;
+        }
+
+        public Integer getComplexId() {
+            return complexId;
+        }
+
+        public void setComplexId(Integer complexId) {
+            this.complexId = complexId;
+        }
+
+        public Long getIdOfDish() {
+            return idOfDish;
+        }
+
+        public void setIdOfDish(Long idOfDish) {
+            this.idOfDish = idOfDish;
         }
 
         @Override

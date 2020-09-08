@@ -391,6 +391,7 @@ public class PreorderDAOService {
                     Long complexPrice = (wtComplex.getPrice() == null) ? 0L :
                             wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
                     Integer amount = getAmountForPreorderComplex(client, idOfComplex, startDate, endDate);
+                    boolean isRegular = getRegularSignForPreorderComplex(client, idOfComplex, startDate, endDate);
 
                     PreorderComplexItemExt complexItemExt;
                     PreorderComplexItemExt complexItemExt2 = null;
@@ -398,15 +399,15 @@ public class PreorderDAOService {
                     int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem().intValue();
                     if (isDiscountComplex == 1) {
                         complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
-                                true, amount, wtComplex.getDeleteState(), false);
+                                true, amount, wtComplex.getDeleteState(), isRegular);
                     } else if (isDiscountComplex == 3 && wtDiscComplexes.contains(wtComplex)) {
                         complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
-                                true, amount, wtComplex.getDeleteState(), false);
+                                true, amount, wtComplex.getDeleteState(), isRegular);
                         complexItemExt2 = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
-                                false, amount, wtComplex.getDeleteState(), false);
+                                false, amount, wtComplex.getDeleteState(), isRegular);
                     } else {
                         complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
-                                false, amount, wtComplex.getDeleteState(), false);
+                                false, amount, wtComplex.getDeleteState(), isRegular);
                     }
 
                     // Распределение по группам
@@ -457,16 +458,46 @@ public class PreorderDAOService {
         return (res == null) ? 0 : res.intValue();
     }
 
-    private Integer getAmountForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish) {
+    private boolean getRegularSignForPreorderComplex(Client client, Integer idOfComplex, Date startDate, Date endDate) {
+        Query query = emReport.createQuery("SELECT pc.regularPreorder FROM PreorderComplex pc "
+                + "WHERE pc.client = :client AND pc.preorderDate between :startDate and :endDate "
+                + "AND pc.deletedState = false AND pc.armComplexId = :idOfComplex");
+        query.setParameter("client", client);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+        query.setParameter("idOfComplex", idOfComplex);
+        List<RegularPreorder> res = query.getResultList();
+        return res.size() != 0 && res.get(0) != null;
+    }
+
+    private Integer getAmountForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish,
+            WtComplex wtComplex) {
         Query query = emReport.createQuery("SELECT sum(pmd.amount) FROM PreorderMenuDetail pmd "
+                + "LEFT JOIN pmd.preorderComplex complex "
                 + "WHERE pmd.client = :client AND pmd.preorderDate between :startDate and :endDate "
-                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish");
+                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish AND complex.armComplexId = :idOfComplex");
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         query.setParameter("idOfDish", wtDish.getIdOfDish());
+        query.setParameter("idOfComplex", wtComplex.getIdOfComplex().intValue());
         Long res = (Long) query.getSingleResult();
         return (res == null) ? 0 : res.intValue();
+    }
+
+    private boolean getRegularSignForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish,
+            WtComplex wtComplex) {
+        Query query = emReport.createQuery("SELECT pmd.regularPreorder FROM PreorderMenuDetail pmd "
+                + "LEFT JOIN pmd.preorderComplex complex "
+                + "WHERE pmd.client = :client AND pmd.preorderDate between :startDate and :endDate "
+                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish AND complex.armComplexId = :idOfComplex");
+        query.setParameter("client", client);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+        query.setParameter("idOfDish", wtDish.getIdOfDish());
+        query.setParameter("idOfComplex", wtComplex.getIdOfComplex().intValue());
+        List<RegularPreorder> res = query.getResultList();
+        return res.size() != 0 && res.get(0) != null;
     }
 
     public PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client, Date date) {
@@ -654,9 +685,8 @@ public class PreorderDAOService {
                 menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
                 menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
                 menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-                Integer amount = getAmountForPreorderMenuDetail(client, startDate, endDate, wtDish);
-                menuItemExt.setAmount(amount);
-                menuItemExt.setIsRegular(false);
+                menuItemExt.setAmount(getAmountForPreorderMenuDetail(client, startDate, endDate, wtDish, wtComplex));
+                menuItemExt.setIsRegular(getRegularSignForPreorderMenuDetail(client, startDate, endDate, wtDish, wtComplex));
                 menuItemExt.setAvailableForRegular(false);
                 menuItemExtList.add(menuItemExt);
             }
@@ -1406,7 +1436,7 @@ public class PreorderDAOService {
         query.setParameter("mode", PreorderComplex.COMPLEX_MODE_4);
         preorderAmount += (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) as count1 "
+        query = emReport.createQuery("select coalesce(sum(case when pos.unitsScale = 3 then pos.totalCount else div(pos.totalCount, 1000) end), 0) as count1 "
                 + "from PreorderComplex pc, Org o, GoodRequestPosition pos "
                 + "where o.idOfOrg = pc.idOfOrgOnCreate "
                 + "and pc.idOfGoodsRequestPosition = pos.globalId "
@@ -1415,7 +1445,7 @@ public class PreorderDAOService {
         query.setParameter("date", date);
         Long pcAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) "
+        query = emReport.createQuery("select coalesce(sum(case when pos.unitsScale = 3 then pos.totalCount else div(pos.totalCount, 1000) end), 0) "
                 + "from PreorderComplex pc, PreorderMenuDetail pmd, Org o, GoodRequestPosition pos "
                 + "where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
                 + "and pmd.idOfGoodsRequestPosition = pos.globalId "
@@ -1425,7 +1455,9 @@ public class PreorderDAOService {
         query.setParameter("date", date);
         Long pmdAmount = (Long)query.getSingleResult();
 
-        Long goodRequestAmount = (pcAmount + pmdAmount) / 1000L;
+        // для нового меню делить на 1000 не нужно!
+        //Long goodRequestAmount = (pcAmount + pmdAmount) / 1000L;
+        Long goodRequestAmount = pcAmount + pmdAmount;
 
         query = em.createQuery("select pc from PreorderCheck pc where pc.date = :date order by createdDate desc");
         query.setParameter("date", date);
@@ -1460,7 +1492,7 @@ public class PreorderDAOService {
             Object[] row = (Object[]) obj;
             PreorderComplex preorderComplex = (PreorderComplex) row[0];
             Long idOfOrg = (Long) row[1];
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            if (isGoodRequestExists(preorderComplex)) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
                 nextVersion = nextVersionByPreorderComplex();
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true, false);
@@ -1484,15 +1516,10 @@ public class PreorderDAOService {
     public List<ModifyMenu> relevancePreordersToMenu(PreorderComplex preorderComplex, long nextVersion) {
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
 
-        ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
+        ComplexInfo complexInfo = getComplexInfo(preorderComplex, preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
-            Date currentDate = preorderComplex.getPreorderDate();
-            List<OrgGoodRequest> preorderRequests = getOrgGoodRequests(preorderComplex.getClient().getOrg().getIdOfOrg(),
-                    CalendarUtils.startOfDay(currentDate), CalendarUtils.endOfDay(currentDate));
-            //если на тек день есть заявка, то этот день пропускаем
-            if (orgGoodRequestExists(preorderRequests, CalendarUtils.startOfDayInUTC(currentDate))) {
-                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest exists");
-            } else {
+            // проверяем существование заявок на комплекс и блюда
+            if (!isGoodRequestExists(preorderComplex)) {
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             }
             return null;
@@ -1533,6 +1560,68 @@ public class PreorderDAOService {
         return modifyMenuList;
     }
 
+    private boolean isGoodRequestExists(PreorderComplex preorderComplex) {
+        if (preorderComplex.getIdOfGoodsRequestPosition() != null) {
+            logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderComplex exists");
+            return true;
+        }
+        for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+            if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) {
+                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderMenuDetail exists");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional
+    public void relevancePreordersToWtMenu(PreorderComplex preorderComplex, long nextVersion) {
+        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        Date preorderDate = preorderComplex.getPreorderDate();
+
+        WtComplex wtComplex = getWtComplex(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderDate);
+
+        if (wtComplex == null) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            return;
+        }
+
+        // Определяем подходящий состав комплекса
+        WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, CalendarUtils.startOfDay(preorderDate));
+        List<WtDish> wtDishes = new ArrayList<>();
+        if (complexItem != null) {
+            wtDishes = DAOReadExternalsService.getInstance()
+                    .getWtDishesByComplexItemAndDates(complexItem, CalendarUtils.startOfDay(preorderDate), CalendarUtils.endOfDay(preorderDate));
+        }
+        if (complexItem == null || preorderComplex.getPreorderMenuDetails().size() == 0 || wtDishes.size() == 0) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+            return;
+        }
+
+        if (preorderComplex.getAmount() > 0) {
+            if (!preorderComplex.getComplexPrice().equals(wtComplex.getPrice().multiply(new BigDecimal(100)).longValue())) {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
+                return;
+            }
+        } else {
+            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+                if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
+                if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
+                    WtDish wtDish = getWtDishByItemCodeAndId(complexItem, preorderDate, preorderMenuDetail.getIdOfDish());
+                    if (wtDish == null) {
+                        testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+                        break;
+                    } else {
+                        if (!preorderMenuDetail.getMenuDetailPrice().equals(wtDish.getPrice().multiply(new BigDecimal(100)).longValue())) {
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Transactional
     public void changeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, Long nextVersion) {
         logger.info("Start change localIdOfMenu");
@@ -1568,7 +1657,7 @@ public class PreorderDAOService {
         query.setParameter("date", new Date());
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            if (isGoodRequestExists(preorderComplex)) continue;
             nextVersion = nextVersionByPreorderComplex();
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, false);
         }
@@ -1823,7 +1912,8 @@ public class PreorderDAOService {
                         continue;
                     }
                 }
-                PreorderMenuDetail preorderMenuDetail = findPreorderMenuDetail(currentDate, regularPreorder.getClient(), menuDetail.getLocalIdOfMenu());
+                PreorderMenuDetail preorderMenuDetail = findPreorderMenuDetail(currentDate, regularPreorder.getClient(),
+                        menuDetail.getLocalIdOfMenu());
                 if ((preorderMenuDetail == null || (preorderMenuDetail != null && allowCreateNewPreorderMenuDetail(preorderMenuDetail)))
                         && !forcePreorderMenuDetailExists(regularPreorder, currentDate)) {
                     //на искомую дату нет предзаказа, надо создавать
@@ -1841,8 +1931,10 @@ public class PreorderDAOService {
             }
             Set<PreorderMenuDetail> set = createPreorderMenuDetails(menuDetails, regularPreorder.getClient(),
                     complexInfo.getMenuDate(), preorderComplex, regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
-            preorderComplex.setPreorderMenuDetails(set);
-            preorderComplex.setVersion(nextVersion);
+            if (set.size() > 0) {
+                preorderComplex.setPreorderMenuDetails(set);
+                preorderComplex.setVersion(nextVersion);
+            }
             em.merge(preorderComplex);
             currentDate = CalendarUtils.addDays(currentDate, 1);
         }
@@ -2013,8 +2105,10 @@ public class PreorderDAOService {
 
             Set<PreorderMenuDetail> set = createPreorderWtMenuDetails(wtDishes, regularPreorder.getClient(),
                     currentDate, preorderComplex, regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
-            preorderComplex.setPreorderMenuDetails(set);
-            preorderComplex.setVersion(nextVersion);
+            if (set.size() > 0) {
+                preorderComplex.setPreorderMenuDetails(set);
+                preorderComplex.setVersion(nextVersion);
+            }
             em.merge(preorderComplex);
             currentDate = CalendarUtils.addDays(currentDate, 1);
         }
@@ -2051,6 +2145,7 @@ public class PreorderDAOService {
         return em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd "
                 + "left join pmd.preorderComplex pc "
                 + "where pmd.client = :client and pmd.preorderDate = :date and "
+                //+ "pmd.regularPreorder is null and "
                 + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish and pmd.deletedState = false")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("date", date)
@@ -2068,8 +2163,8 @@ public class PreorderDAOService {
 
     private boolean allowCreateNewPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail) {
         return preorderMenuDetail.getDeletedState() &&
-                !(preorderMenuDetail.getState().equals(PreorderState.OK)
-                        || preorderMenuDetail.getState().equals(PreorderState.CHANGE_ORG)
+                !(//preorderMenuDetail.getState().equals(PreorderState.OK) ||
+                        preorderMenuDetail.getState().equals(PreorderState.CHANGE_ORG)
                         || preorderMenuDetail.getState().equals(PreorderState.PREORDER_OFF));
     }
 
@@ -2209,7 +2304,7 @@ public class PreorderDAOService {
 
     private PreorderMenuDetail findPreorderMenuDetail(Date date, Client client, Long armIdOfMenu) {
         Query query = em.createQuery("select pmd from PreorderMenuDetail pmd "
-                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu");
+                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu ");
         query.setParameter("client", client);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
@@ -2305,9 +2400,9 @@ public class PreorderDAOService {
         if (wtComplex != null) {
             preorderComplex.setComplexName(wtComplex.getName());
             preorderComplex.setComplexPrice(wtComplex.getPrice() == null ? 0L :
-                    wtComplex.getPrice().multiply(new BigDecimal(100)) .longValue());
+                    wtComplex.getPrice().multiply(new BigDecimal(100)).longValue());
             preorderComplex.setModeFree(0);
-            preorderComplex.setModeOfAdd(0);
+            preorderComplex.setModeOfAdd(wtComplex.getComposite() ? 4 : 2);
         } else {
             throw new MenuDetailNotExistsException("Не найден комплекс с ид.=" + idOfComplex.toString());
         }
@@ -2506,6 +2601,22 @@ public class PreorderDAOService {
         preorderMenuDetail.setMobile(mobile);
         preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
         return preorderMenuDetail;
+    }
+
+    private ComplexInfo getComplexInfo(PreorderComplex preorderComplex, Integer idOfComplex, Date date) {
+        Query query = emReport.createQuery("select ci from ComplexInfo ci where ci.org.idOfOrg = :idOfOrg "
+                + "and ci.idOfComplex = :idOfComplex and ci.menuDate between :startDate and :endDate");
+        query.setParameter("idOfOrg", preorderComplex.getIdOfOrgOnCreate());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        try {
+            return (ComplexInfo)query.getSingleResult();
+        } catch (Exception e) {
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfPreorderComplex=%s",
+                    idOfComplex, date.getTime(), preorderComplex.getIdOfPreorderComplex()), e);
+            return null;
+        }
     }
 
     private ComplexInfo getComplexInfo(Client client, Integer idOfComplex, Date date) {
