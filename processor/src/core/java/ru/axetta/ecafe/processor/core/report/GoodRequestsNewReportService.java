@@ -116,7 +116,9 @@ public class GoodRequestsNewReportService {
         if (!hidePreorders) {
             String sqlQuery =
                     "SELECT distinct ci.idoforg, "
-                            + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
+                            + "   CASE WHEN (pc.amount = 0) AND md.idofgood IS NULL THEN pmd.idofgood "
+                            + "        WHEN (pc.amount = 0) AND md.idofgood IS NOT NULL THEN md.idofgood "
+                            + "        WHEN pc.amount <> 0 THEN ci.idofgood END AS idofgood, "
                             + "   CASE WHEN (pc.amount = 0) THEN false ELSE true END AS iscomplex, "
                             + "   CASE WHEN (pc.amount = 0) THEN gmd.goodscode ELSE gc.goodscode END AS goodscode, "
                             + "   CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%завтрак%') THEN 'breakfast' "
@@ -128,11 +130,11 @@ public class GoodRequestsNewReportService {
                             + "   CASE WHEN (pc.amount = 0) THEN pmd.menudetailprice ELSE pc.complexprice "
                             + "         END AS price "
                             + "FROM cf_preorder_complex pc "
-                            + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
-                            + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
+                        //    + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+                            + "INNER JOIN cf_complexinfo ci ON ci.menudate = pc.preorderdate " // c.idoforg = ci.idoforg AND
                             + "   AND ci.idofcomplex = pc.armcomplexid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
-                            + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
+                            + "LEFT JOIN cf_menu m ON ci.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
                             + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
                             + "LEFT JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
                             + "LEFT JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
