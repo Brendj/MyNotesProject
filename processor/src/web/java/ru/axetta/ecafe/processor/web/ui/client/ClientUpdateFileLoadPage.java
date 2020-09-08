@@ -250,6 +250,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
             while (null != currLine) {
                 if (lineNo==0) {
+                    ++lineNo;
                     continue; //пропускаем заголовок
                 } else {
                     LineResult result = updateClient(currLine, lineNo);
