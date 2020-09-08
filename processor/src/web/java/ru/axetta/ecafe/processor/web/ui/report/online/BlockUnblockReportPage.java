@@ -57,7 +57,6 @@ public class BlockUnblockReportPage extends OnlineReportPage {
 
     public List<SelectItem> getStatusFilters() {
         List<SelectItem> filters = new ArrayList<SelectItem>();
-        filters.add(new SelectItem(""));
         filters.add(new SelectItem(BlockUnblockCardReport.CardStateType.ALL.getDescription()));
         filters.add(new SelectItem(BlockUnblockCardReport.CardStateType.BLOCK.getDescription()));
         filters.add(new SelectItem(BlockUnblockCardReport.CardStateType.UNBLOCK.getDescription()));
