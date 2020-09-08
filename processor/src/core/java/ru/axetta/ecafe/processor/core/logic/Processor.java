@@ -3942,6 +3942,7 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession.setFlushMode(FlushMode.MANUAL);
             persistenceTransaction = persistenceSession.beginTransaction();
             SpecialDatesProcessor processor = new SpecialDatesProcessor(persistenceSession, specialDates);
             resSpecialDates = processor.process();
