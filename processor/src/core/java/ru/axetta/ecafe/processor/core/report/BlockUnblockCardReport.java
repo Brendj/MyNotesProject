@@ -327,6 +327,18 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                         middlename, groupname, firp, lastp, middp, converterTypeCard(cardstate), cardno, cardprintedno, blockdate, null);
                 blockUnblockItemList.add(blockUnblockItem);
             }
+            Collections.sort(blockUnblockItemList, new Comparator<BlockUnblockItem>() {
+                public int compare(BlockUnblockItem o1, BlockUnblockItem o2) {
+                    if(o1.getRequestId().equals(o2.getRequestId())){
+                        return 0;
+                    } else if(Long.valueOf(o1.getRequestId()) < Long.valueOf(o2.getRequestId())){
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+
             return new JRBeanCollectionDataSource(blockUnblockItemList);
         }
 
