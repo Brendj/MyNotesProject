@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.And;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.Education;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.MeshJsonFilter;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.MeshSyncPerson;
 import ru.axetta.ecafe.processor.core.persistence.MeshTrainingForm;
@@ -26,7 +23,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
@@ -36,14 +33,11 @@ import java.util.*;
 /**
  * Created by nuc on 12.08.2020.
  */
-@DependsOn("runtimeContext")
 @Component
 public class MeshPersonsSyncService {
     public static final String MESH_REST_PERSONS_URL = "/persons?";
     public static final String MESH_REST_PERSONS_EXPAND = "education,categories";
     public static final String MESH_REST_PERSONS_TOP_PROPEERTY = "ecafe.processing.mesh.rest.persons.top";
-    public static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.rest.address";
-    public static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.rest.api.key";
     public static final String TOP_DEFAULT = "50000";
 
     private static final String FILTER_VALUE_ORG = "education.organization_id";
@@ -54,13 +48,8 @@ public class MeshPersonsSyncService {
 
     private static final String OUT_ORG_GROUP_PREFIX = "Вне";
 
-    private final MeshRestClient meshRestClient;
-
-    public MeshPersonsSyncService() throws Exception {
-        String serviceAddress = getServiceAddress();
-        String apiKey = getApiKey();
-        meshRestClient = new MeshRestClient(serviceAddress, apiKey);
-    }
+    @Autowired
+    MeshRestClient meshRestClient;
 
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
 
@@ -150,7 +139,8 @@ public class MeshPersonsSyncService {
             String patronymic = person.getPatronymic();
             String guidnsi = null;
             try {
-                guidnsi = person.getCategories().get(0).getParameterValues().get(0).toString();
+                Category category = findCategory(person);
+                guidnsi = category.getParameterValues().get(0);
             } catch (Exception e) {
                 logger.info("Not found NSI guid for person with mesh guid " + personguid);
             }
@@ -186,24 +176,25 @@ public class MeshPersonsSyncService {
         }
     }
 
+    private Category findCategory(ResponsePersons person) {
+        try {
+            Collections.sort(person.getCategories());
+            for (int i = person.getCategories().size() - 1; i > -1; i--) {
+                if (person.getCategories().get(i).getCategoryId() == Category.PROPER_ID) return person.getCategories().get(i);
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("Can not find education from person with guid " + person.getPersonId());
+            return null;
+        }
+    }
+
     private String getExpand() {
         return MESH_REST_PERSONS_EXPAND;
     }
 
     private String getTop() {
         return RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_PERSONS_TOP_PROPEERTY, TOP_DEFAULT);
-    }
-
-    private String getServiceAddress() throws Exception{
-        String address = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_ADDRESS_PROPERTY, "");
-        if (address.equals("")) throw new Exception("MESH REST address not specified");
-        return address;
-    }
-
-    private String getApiKey() throws Exception{
-        String key = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_API_KEY_PROPERTY, "");
-        if (key.equals("")) throw new Exception("MESH API key not specified");
-        return key;
     }
 
     private String getFilter(long idOfOrg, String lastName, String firstName, String patronymic) throws Exception {

@@ -9,15 +9,15 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import java.util.*;
 
 //@Entity
-//@Table(name = "cf_wt_category_items")
-public class WtCategoryItem {
+//@Table(name = "cf_wt_categories")
+public class WtCategory {
     public static final int ACTIVE = 0;
     public static final int DELETE = 1;
 
-    //@Id
-    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategoryitem_seq")
-    //@Column(name = "idofcategoryitem")
-    private Long idOfCategoryItem;
+   /*@Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategories_seq")
+    //@Column(name = "idofcategory")*/
+    private Long idOfCategory;
 
     //@Column(name = "createdate")
     private Date createDate;
@@ -47,12 +47,11 @@ public class WtCategoryItem {
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))*/
     private Set<WtDish> dishes = new HashSet<>();
 
-    /*@ManyToOne
-    @JoinColumn(name = "idofwtcategory")*/
-    private WtCategory wtCategory;
+    //@OneToMany
+    private Set<WtCategoryItem> categoryItems = new HashSet<>();
 
-    public static WtCategoryItem build(String description, WtCategory selectedItem, User currentUser) {
-        WtCategoryItem item = new WtCategoryItem();
+    public static WtCategory build(String description, User currentUser) {
+        WtCategory item = new WtCategory();
         Date createdDate = new Date();
 
         item.setCreateDate(createdDate);
@@ -61,25 +60,16 @@ public class WtCategoryItem {
         item.setDescription(description);
         item.setGuid(UUID.randomUUID().toString());
         item.setDeleteState(WtCategoryItem.ACTIVE);
-        item.setWtCategory(selectedItem);
 
         return item;
     }
 
-    public WtCategory getWtCategory() {
-        return wtCategory;
+    public Set<WtCategoryItem> getCategoryItems() {
+        return categoryItems;
     }
 
-    public void setWtCategory(WtCategory wtCategory) {
-        this.wtCategory = wtCategory;
-    }
-
-    public Long getIdOfCategoryItem() {
-        return idOfCategoryItem;
-    }
-
-    public void setIdOfCategoryItem(Long idOfCategoryItem) {
-        this.idOfCategoryItem = idOfCategoryItem;
+    public void setCategoryItems(Set<WtCategoryItem> categoryItems) {
+        this.categoryItems = categoryItems;
     }
 
     public Date getCreateDate() {
@@ -146,22 +136,31 @@ public class WtCategoryItem {
         this.deleteState = deleteState;
     }
 
+    public Long getIdOfCategory() {
+        return idOfCategory;
+    }
+
+    public void setIdOfCategory(Long idOfCategory) {
+        this.idOfCategory = idOfCategory;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof WtCategoryItem)) {
+        if (!(o instanceof WtCategory)) {
             return false;
         }
-        WtCategoryItem that = (WtCategoryItem) o;
-        return Objects.equals(getIdOfCategoryItem(), that.getIdOfCategoryItem()) && Objects
-                .equals(getGuid(), that.getGuid()) && Objects.equals(getDescription(), that.getDescription())
+        WtCategory that = (WtCategory) o;
+        return Objects.equals(getIdOfCategory(), that.getIdOfCategory()) && Objects.equals(getGuid(), that.getGuid())
+                && Objects.equals(getDescription(), that.getDescription()) && Objects
+                .equals(getCategoryItems(), that.getCategoryItems())
                 && Objects.equals(getDeleteState(), that.getDeleteState());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIdOfCategoryItem(), getGuid(), getDescription(), getDeleteState());
+        return Objects.hash(getIdOfCategory(), getGuid(), getDescription(), getCategoryItems(), getDeleteState());
     }
 }

@@ -4,18 +4,14 @@ package ru.axetta.ecafe.processor.core.test.synch;/*
 
 import junit.framework.TestCase;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +28,7 @@ public class RegisterSynchTest extends TestCase {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RegisterSynchTest.class);
 
 
-    @Test
+    /*@Test
     public void testInsert() throws Exception {
         System.out.println("-----------------------------------------------------------------------");
         System.out.println("---               Тестирование вставки клиета                       ---");
@@ -96,7 +92,7 @@ public class RegisterSynchTest extends TestCase {
         } catch (Exception e) {
             logger.error("Не удалось протестировать синхронизацию с Реестрами", e);
         }
-    }
+    }*/
 
 
     public void printOrgClients (Org org) {

@@ -101,7 +101,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             if (containWtRule(rule.getIdOfRule())) {
                 continue;
             }
-            if (rule.getCategoryOrgs().isEmpty()) {
+            if (DAOService.getInstance().getCategoryOrgsByWtDiscountRule(rule).isEmpty()) {
                 addWtDCRI(new DiscountCategoryWtRuleItem(rule, idOfOrg, fOrgs));
             }
         }
@@ -153,9 +153,10 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
                 continue;
             }
             boolean bIncludeRule = false;
-            if (rule.getCategoryOrgs().isEmpty()) {
+            List<CategoryOrg> categoryOrgs = DAOService.getInstance().getCategoryOrgsByWtDiscountRule(rule);
+            if (categoryOrgs.isEmpty()) {
                 bIncludeRule = true;
-            } else if (categoryOrgSet.containsAll(rule.getCategoryOrgs())) {
+            } else if (categoryOrgSet.containsAll(categoryOrgs)) {
                 bIncludeRule = true;
             }
             if (bIncludeRule) {
@@ -332,6 +333,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         private String complexesMap;
         private String subCategory;
         private String orgIds;
+        private Boolean deletedState;
 
         public String getComplexesMap() {
             return complexesMap;
@@ -356,6 +358,15 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         public int getPriority() {
             return priority;
         }
+
+        public Boolean getDeletedState() {
+            return deletedState;
+        }
+
+        public void setDeletedState(Boolean deletedState) {
+            this.deletedState = deletedState;
+        }
+
         //
 
         public DiscountCategoryRuleItem(DiscountRule discountRule, Long idOfOrg, List<Long> fOrgs) {
@@ -366,6 +377,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.operationor = discountRule.getOperationOr();
             this.complexesMap = discountRule.getComplexesMap();
             this.subCategory = discountRule.getSubCategory();
+            this.deletedState = discountRule.getDeletedState();
             Set<Long> orgs = new HashSet<Long>();
 
             for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
@@ -395,8 +407,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             element.setAttribute("IdOfRule", Long.toString(this.idOfRule));
             element.setAttribute("Description", this.description);
             element.setAttribute("CategoriesDiscounts", this.categoryDiscounts);
-            // атрибуты Complex0...Complex9 удалены как неактуальные (использовались для АРМ версий
-            // 60 и ниже)
+            // атрибуты Complex0...Complex9 удалены как неактуальные (использовались для АРМ версий 60 и ниже)
             element.setAttribute("Priority", Integer.toString(this.priority));
             element.setAttribute("OperationOr", Boolean.toString(this.operationor));
             if (StringUtils.isNotEmpty(complexesMap)) {
@@ -404,6 +415,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             }
             element.setAttribute("SubCategory", this.subCategory);
             element.setAttribute("OrgIds", this.orgIds);
+            element.setAttribute("D", Boolean.toString(this.deletedState));
             return element;
         }
 
@@ -431,6 +443,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         private String complexesMap;
         private String subCategory;
         private String orgIds;
+        private Boolean deletedState;
 
         public long getIdOfRule() {
             return idOfRule;
@@ -496,6 +509,14 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.complexesMap = complexesMap;
         }
 
+        public Boolean getDeletedState() {
+            return deletedState;
+        }
+
+        public void setDeletedState(Boolean deletedState) {
+            this.deletedState = deletedState;
+        }
+
         public DiscountCategoryWtRuleItem(WtDiscountRule wtDiscountRule, Long idOfOrg, List<Long> fOrgs) {
             this.idOfRule = wtDiscountRule.getIdOfRule();
             this.description = wtDiscountRule.getDescription();
@@ -510,7 +531,8 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.subCategory = wtDiscountRule.getSubCategory();
             Set<Long> orgs = new HashSet<>();
 
-            for (CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()) {
+            List<CategoryOrg> categoryOrgs = DAOService.getInstance().getCategoryOrgsByWtDiscountRule(wtDiscountRule);
+            for (CategoryOrg categoryOrg : categoryOrgs) {
                 for (Org org : categoryOrg.getOrgs()) {
                     if (fOrgs.contains(org.getIdOfOrg())) {
                         orgs.add(org.getIdOfOrg());
@@ -518,10 +540,11 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
                 }
             }
             this.orgIds = StringUtils.join(orgs, ',');
+            this.deletedState = wtDiscountRule.getDeletedState();
         }
 
         private String buildComplexesMap(WtDiscountRule wtDiscountRule) {
-            Set<WtComplex> complexes = wtDiscountRule.getComplexes();
+            List<WtComplex> complexes = DAOService.getInstance().getComplexesByWtDiscountRule(wtDiscountRule);
             StringBuilder sb = new StringBuilder();
             for (WtComplex complex : complexes) {
                 sb.append(complex.getIdOfComplex()).append("=1;");
@@ -530,7 +553,8 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         }
 
         private String buildCategoryDiscounts(WtDiscountRule wtDiscountRule) {
-            Set<CategoryDiscount> categoryDiscounts = wtDiscountRule.getCategoryDiscounts();
+            List<CategoryDiscount> categoryDiscounts = DAOService.getInstance()
+                    .getCategoryDiscountsByWtDiscountRule(wtDiscountRule);
             StringBuilder sb = new StringBuilder();
             int counter = categoryDiscounts.size();
             for (CategoryDiscount category : categoryDiscounts) {
@@ -555,6 +579,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             }
             element.setAttribute("SubCategory", this.subCategory);
             element.setAttribute("OrgIds", this.orgIds);
+            element.setAttribute("D", Boolean.toString(this.deletedState));
             return element;
         }
 

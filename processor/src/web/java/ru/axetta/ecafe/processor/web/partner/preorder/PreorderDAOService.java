@@ -821,6 +821,7 @@ public class PreorderDAOService {
             }
 
             Set<PreorderMenuDetail> set = new HashSet<PreorderMenuDetail>();
+            boolean menuDetailChanged = false;
             if (complex.getMenuItems() != null) {
                 for (MenuItemParam menuItem : complex.getMenuItems()) {
                     RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
@@ -839,6 +840,10 @@ public class PreorderDAOService {
                     PreorderMenuDetail preorderMenuDetail;
                     try {
                         preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
+                        if (!menuDetailChanged && (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())
+                                || !preorderMenuDetail.getDeletedState().equals(!menuSelected))) {
+                            menuDetailChanged = true;
+                        }
                         if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())) {
                             preorderMenuDetail.setMobile(guardianMobile);
                             preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
@@ -849,6 +854,7 @@ public class PreorderDAOService {
                     } catch (NoResultException e) {
                         preorderMenuDetail = createPreorderMenuDetail(client, preorderComplex, null, date, menuItem.getIdOfMenuDetail(),
                                 menuItem.getAmount(), guardianMobile, mobileGroupOnCreate);
+                        if (!menuDetailChanged) menuDetailChanged = true;
                     }
                     set.add(preorderMenuDetail);
                 }
@@ -861,11 +867,18 @@ public class PreorderDAOService {
                 if (set.size() > 0) {
                     preorderComplex.getPreorderMenuDetails().addAll(set);
                 }
-                complexSelected = false;
-                for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
-                    if (pmd.getAmount() > 0) {
-                        complexSelected = true;
-                        break;
+
+                boolean deleted = false;
+                if (preorderComplex.getAmount() > 0 && complex.getAmount() == 0) {
+                    deleted = true;
+                }
+                if (preorderComplex.getAmount() == 0) {
+                    deleted = true;
+                    for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+                        if (pmd.getAmount() > 0) {
+                            deleted = false;
+                            break;
+                        }
                     }
                 }
                 if (!preorderComplex.getAmount().equals(complex.getAmount())) {
@@ -874,7 +887,14 @@ public class PreorderDAOService {
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
                     preorderComplex.setAmount(complex.getAmount());
                     preorderComplex.setLastUpdate(new Date());
-                    //preorderComplex.setDeletedState(!complexSelected);
+                    preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (!preorderComplex.getDeletedState().equals(deleted)) {
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (menuDetailChanged) {
+                    preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setVersion(nextVersion);
                 }
 
@@ -1022,6 +1042,7 @@ public class PreorderDAOService {
             }
 
             Set<PreorderMenuDetail> set = new HashSet<>();
+            boolean menuDetailChanged = false;
             if (complex.getMenuItems() != null) {
                 for (MenuItemParam menuItem : complex.getMenuItems()) {
                     RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
@@ -1041,6 +1062,10 @@ public class PreorderDAOService {
                     PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail();
                     try {
                         preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
+                        if (!menuDetailChanged && (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())
+                                || !preorderMenuDetail.getDeletedState().equals(!menuSelected))) {
+                            menuDetailChanged = true;
+                        }
                         if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())) {
                             preorderMenuDetail.setMobile(guardianMobile);
                             preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
@@ -1051,6 +1076,7 @@ public class PreorderDAOService {
                     } catch (NoResultException e) {
                             preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, null, date, menuItem.getIdOfMenuDetail(),
                                     menuItem.getAmount(), guardianMobile, mobileGroupOnCreate);
+                            if (!menuDetailChanged) menuDetailChanged = true;
                     }
                     set.add(preorderMenuDetail);
                 }
@@ -1063,11 +1089,33 @@ public class PreorderDAOService {
                 if (set.size() > 0) {
                     preorderComplex.getPreorderMenuDetails().addAll(set);
                 }
+
+                boolean deleted = false;
+                if (preorderComplex.getAmount() > 0 && complex.getAmount() == 0) {
+                    deleted = true;
+                }
+                if (preorderComplex.getAmount() == 0) {
+                    deleted = true;
+                    for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+                        if (pmd.getAmount() > 0) {
+                            deleted = false;
+                            break;
+                        }
+                    }
+                }
                 if (!preorderComplex.getAmount().equals(complex.getAmount())) {
                     preorderComplex.setMobile(guardianMobile);
                     preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
                     updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
                     preorderComplex.setAmount(complex.getAmount());
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (!preorderComplex.getDeletedState().equals(deleted)) {
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setDeletedState(deleted);
+                    preorderComplex.setVersion(nextVersion);
+                } else if (menuDetailChanged) {
                     preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setVersion(nextVersion);
                 }
@@ -1438,7 +1486,15 @@ public class PreorderDAOService {
 
         ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            Date currentDate = preorderComplex.getPreorderDate();
+            List<OrgGoodRequest> preorderRequests = getOrgGoodRequests(preorderComplex.getClient().getOrg().getIdOfOrg(),
+                    CalendarUtils.startOfDay(currentDate), CalendarUtils.endOfDay(currentDate));
+            //если на тек день есть заявка, то этот день пропускаем
+            if (orgGoodRequestExists(preorderRequests, CalendarUtils.startOfDayInUTC(currentDate))) {
+                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest exists");
+            } else {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            }
             return null;
         }
         if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {

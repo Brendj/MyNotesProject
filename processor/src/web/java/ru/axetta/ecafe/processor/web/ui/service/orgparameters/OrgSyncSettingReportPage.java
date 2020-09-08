@@ -108,6 +108,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         selectItemList.add(new SelectItem(PHOTOS.getTypeCode(), PHOTOS.toString()));
         selectItemList.add(new SelectItem(SUPPORT_SERVICE.getTypeCode(), SUPPORT_SERVICE.toString()));
         selectItemList.add(new SelectItem(LIBRARY.getTypeCode(), LIBRARY.toString()));
+        selectItemList.add(new SelectItem(CARDS.getTypeCode(), CARDS.toString()));
         return selectItemList;
     }
 
@@ -216,7 +217,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             newSyncSetting = false;
         }
         runEverySecond = modalSelectedContentType.equals(BALANCES_AND_ENTEREVENTS.getTypeCode())
-                || modalSelectedContentType.equals(SUPPORT_SERVICE.getTypeCode());
+                || modalSelectedContentType.equals(SUPPORT_SERVICE.getTypeCode())
+                || modalSelectedContentType.equals(CARDS.getTypeCode());
 
         showConcreteTime2 = modalSelectedContentType.equals(ORGSETTINGS.getTypeCode())
                 || modalSelectedContentType.equals(CLIENTS_DATA.getTypeCode())
@@ -250,6 +252,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                 return item.getHelpRequestsSync().getSetting();
             case LIBRARY:
                 return item.getLibSync().getSetting();
+            case CARDS:
+                return item.getCardSync().getSetting();
             default:
                 return null;
         }
@@ -292,6 +296,9 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                     }
                     if(item.getLibSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
                         manager.saveOrUpdateSettingFromReportPage(session, item.getLibSync().getSetting(), nextVersion);
+                    }
+                    if(item.getCardSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getCardSync().getSetting(), nextVersion);
                     }
                     DAOUtils.setValueForOrgSettingsSyncByOrg(session, item.getOrg().getIdOfOrg(), Boolean.TRUE);
                 }
@@ -462,6 +469,10 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public boolean getShowColumnLib() {
         return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(LIBRARY.getTypeCode());
+    }
+
+    public boolean getShowColumnCards() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(CARDS.getTypeCode());
     }
 
     public OrgSyncSettingReportItem getSelectedItem() {
@@ -647,7 +658,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public boolean disableDistribution() {
         return selectedContentType.equals(BALANCES_AND_ENTEREVENTS.getTypeCode())
-                ||  selectedContentType.equals(SUPPORT_SERVICE.getTypeCode());
+                ||  selectedContentType.equals(SUPPORT_SERVICE.getTypeCode())
+                || selectedContentType.equals(CARDS.getTypeCode());
     }
 
     public boolean modalContentTypeEnable() {
