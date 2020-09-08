@@ -135,6 +135,7 @@ public class CardProcessorService {
                 }
                 if (cardActionClient.getCard() != null) {
                     cardService.unblockCard(cardActionClient.getCard());
+                    cardSyncService.savechangeforCard(cardActionClient.getCard(), client.getIdoforg());
                     cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Карта клиента успешно разблокирована");
                 }
                 else
