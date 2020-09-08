@@ -1490,7 +1490,7 @@ public class PreorderDAOService {
             Object[] row = (Object[]) obj;
             PreorderComplex preorderComplex = (PreorderComplex) row[0];
             Long idOfOrg = (Long) row[1];
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            if (isGoodRequestExists(preorderComplex)) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
                 nextVersion = nextVersionByPreorderComplex();
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true, false);
@@ -1514,15 +1514,10 @@ public class PreorderDAOService {
     public List<ModifyMenu> relevancePreordersToMenu(PreorderComplex preorderComplex, long nextVersion) {
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
 
-        ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
+        ComplexInfo complexInfo = getComplexInfo(preorderComplex, preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
-            Date currentDate = preorderComplex.getPreorderDate();
-            List<OrgGoodRequest> preorderRequests = getOrgGoodRequests(preorderComplex.getClient().getOrg().getIdOfOrg(),
-                    CalendarUtils.startOfDay(currentDate), CalendarUtils.endOfDay(currentDate));
-            //если на тек день есть заявка, то этот день пропускаем
-            if (orgGoodRequestExists(preorderRequests, CalendarUtils.startOfDayInUTC(currentDate))) {
-                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest exists");
-            } else {
+            // проверяем существование заявок на комплекс и блюда
+            if (!isGoodRequestExists(preorderComplex)) {
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             }
             return null;
@@ -1563,6 +1558,20 @@ public class PreorderDAOService {
         return modifyMenuList;
     }
 
+    private boolean isGoodRequestExists(PreorderComplex preorderComplex) {
+        if (preorderComplex.getIdOfGoodsRequestPosition() != null) {
+            logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderComplex exists");
+            return true;
+        }
+        for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+            if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) {
+                logger.info("Preorder can't be deleted " + preorderComplex.toString() + " due to OrgGoodRequest for PreorderMenuDetail exists");
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Transactional
     public void changeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, Long nextVersion) {
         logger.info("Start change localIdOfMenu");
@@ -1598,7 +1607,7 @@ public class PreorderDAOService {
         query.setParameter("date", new Date());
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            if (isGoodRequestExists(preorderComplex)) continue;
             nextVersion = nextVersionByPreorderComplex();
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, false);
         }
@@ -2538,6 +2547,22 @@ public class PreorderDAOService {
         preorderMenuDetail.setMobile(mobile);
         preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
         return preorderMenuDetail;
+    }
+
+    private ComplexInfo getComplexInfo(PreorderComplex preorderComplex, Integer idOfComplex, Date date) {
+        Query query = emReport.createQuery("select ci from ComplexInfo ci where ci.org.idOfOrg = :idOfOrg "
+                + "and ci.idOfComplex = :idOfComplex and ci.menuDate between :startDate and :endDate");
+        query.setParameter("idOfOrg", preorderComplex.getIdOfOrgOnCreate());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        try {
+            return (ComplexInfo)query.getSingleResult();
+        } catch (Exception e) {
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfPreorderComplex=%s",
+                    idOfComplex, date.getTime(), preorderComplex.getIdOfPreorderComplex()), e);
+            return null;
+        }
     }
 
     private ComplexInfo getComplexInfo(Client client, Integer idOfComplex, Date date) {
