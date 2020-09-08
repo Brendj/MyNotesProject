@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.cards;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
@@ -67,6 +69,7 @@ public class CardsOperationsRegistryHandler {
             if (VersionUtils.compareClientVersionForRegisterCard(session, idOfOrg) < 0) {
                 isOldArm = Boolean.TRUE;
             }
+            CardWritableRepository.getInstance().updateCardSync(idOfOrg, DAOUtils.findCardByCardNo(session, o.getCardNo()) , 0L);
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -75,7 +78,6 @@ public class CardsOperationsRegistryHandler {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-
         switch (o.getType()){
             case 0:
                 registryItem = cardService.registerNew(o, idOfOrg);

@@ -47,6 +47,10 @@
         </set>
         <property name="isLongUid" column="IsLongUid" type="boolean"/>
         <property name="transitionState" column="transitionstate" type="integer" not-null="true"/>
+        <set name="cardsync" inverse="true" cascade="all">
+            <key column="idofcard"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CardSync"/>
+        </set>
     </class>
 </hibernate-mapping>
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.CardSync" table="cf_card_sync" >
+        <id name="idcardsync" column="idcardsync" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"/>
+        <many-to-one name="card" class="ru.axetta.ecafe.processor.core.persistence.Card" column="idofcard"
+                     not-null="true"/>
+        <property name="statechange" column="statechange" type="long"/>
+    </class>
+</hibernate-mapping>
+
+
