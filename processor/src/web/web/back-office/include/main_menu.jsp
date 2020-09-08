@@ -1064,10 +1064,10 @@
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
                         onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />--%>
 
-    <rich:panelMenuItem id="ordersMonitoringMenuItem"
+    <%--<rich:panelMenuItem id="ordersMonitoringMenuItem"
                         binding="#{ordersMonitoringReportPage.mainMenuComponent}"
                         label="Заказ питания" action="#{ordersMonitoringReportPage.show}"
-                        reRender="workspaceForm" />
+                        reRender="workspaceForm" />--%>
 
     <%--@elvariable id="monitoringPersistanceCachePage" type="ru.axetta.ecafe.processor.web.ui.monitoring.MonitoringPersistanceCachePage"--%>
     <rich:panelMenuItem id="persistanceCacheItem" binding="#{monitoringPersistanceCachePage.mainMenuComponent}"
