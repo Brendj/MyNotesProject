@@ -5,9 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -77,12 +76,14 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         private final int resultCode;
         private final String resultDescription;
         private final Long idOfClient;
+        private final Long contractId;
 
-        public LineResult(long lineNo, int resultCode, String resultDescription, Long idOfClient) {
+        public LineResult(long lineNo, int resultCode, String resultDescription, Long idOfClient, Long contractId) {
             this.lineNo = lineNo;
             this.resultCode = resultCode;
             this.resultDescription = resultDescription;
             this.idOfClient = idOfClient;
+            this.contractId = contractId;
         }
 
         public long getLineNo() {
@@ -99,6 +100,10 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
         public Long getIdOfClient() {
             return idOfClient;
+        }
+
+        public Long getContractId() {
+            return contractId;
         }
     }
 
@@ -304,25 +309,43 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Long contractId = new Long(tokens[0]);
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) return new LineResult(lineNo, -1, "Клиент не найден", null, contractId);
             String prevGroup = tokens[5];
             String groupName = tokens[6];
-            if (groupName.equals(prevGroup)) return new LineResult(lineNo, 0, "Группа не менялась", contractId);
-            Client client = DAOUtils.findClientByContractId(session, contractId);
-            if (client == null) return new LineResult(lineNo, -1, "Клиент не найден", contractId);
+            if (groupName.equals(prevGroup)) {
+                return new LineResult(lineNo, 0, "Группа не менялась", client.getIdOfClient(), contractId);
+            }
+            if (client.getClientGroup() != null && client.getClientGroup().getGroupName().equals(groupName)) {
+                return new LineResult(lineNo, 0, "Группа не менялась", client.getIdOfClient(), contractId);
+            }
+            String surname = tokens[1];
+            String firstname = tokens[2];
+            String secondname = tokens[3];
             ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session,
                     client.getOrg().getIdOfOrg(), groupName);
             if (clientGroup == null) {
                 clientGroup = DAOUtils.createClientGroup(session, client.getOrg().getIdOfOrg(), groupName);
             }
+
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
+                    clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
             client.setClientGroup(clientGroup);
+            client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             Long nextClientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
             client.setClientRegistryVersion(nextClientRegistryVersion);
+            Person person = client.getPerson();
+            person.setSurname(surname);
+            person.setFirstName(firstname);
+            person.setSecondName(secondname);
+            session.update(person);
             session.update(client);
             transaction.commit();
             transaction = null;
-            return new LineResult(lineNo, 0, "Ok", contractId);
+            return new LineResult(lineNo, 0, "Ok", client.getIdOfClient(), contractId);
         } catch (Exception e) {
-            return new LineResult(lineNo, 1, e.getMessage(), null);
+            return new LineResult(lineNo, 1, e.getMessage(), null, null);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

@@ -86,7 +86,7 @@
                 <h:outputText escape="true" value="Л/с клиента" />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
-                <h:outputText escape="true" value="#{item.idOfClient}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.contractId}" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </a4j:commandLink>
         </rich:column>
