@@ -3442,10 +3442,12 @@ public class MainPage implements Serializable {
             clientUpdateFileLoadPage.updateClients(inputStream, dataSize);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
+            clientUpdateFileLoadPage.setErrorText("");
         } catch (Exception e) {
             logger.error("Failed to update clients from file", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при загрузке/регистрации данных по клиентам: " + e.getMessage(), null));
+            clientUpdateFileLoadPage.setErrorText(e.getMessage());
         } finally {
             close(inputStream);
         }

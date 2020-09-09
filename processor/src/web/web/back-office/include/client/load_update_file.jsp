@@ -56,6 +56,9 @@
     <h:outputText escape="true"
                   value="Обработано: #{mainPage.clientUpdateFileLoadPage.lineResultSize}. Успешно: #{mainPage.clientUpdateFileLoadPage.successLineNumber}"
                   styleClass="output-text" />
+    <h:outputText escape="true"
+                  value="Во время обработки файла произошла ошибка: #{mainPage.clientUpdateFileLoadPage.errorText}"
+                  styleClass="error-output-text" rendered="#{mainPage.clientUpdateFileLoadPage.errorPresent}" />
 
     <rich:dataTable id="clientUpdateLoadResultTable" value="#{mainPage.clientUpdateFileLoadPage.lineResults}" var="item" rows="20"
                     columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column"

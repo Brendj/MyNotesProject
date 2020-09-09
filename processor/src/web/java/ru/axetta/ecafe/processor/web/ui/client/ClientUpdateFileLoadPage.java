@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -48,6 +49,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
     private static final Logger logger = LoggerFactory.getLogger(ClientUpdateFileLoadPage.class);
     private static final long MAX_LINE_NUMBER = 80000;
+    private String errorText = "";
 
     public OrgItem getOrg() {
         return org;
@@ -55,6 +57,18 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
     public void setOrg(OrgItem org) {
         this.org = org;
+    }
+
+    public String getErrorText() {
+        return errorText;
+    }
+
+    public void setErrorText(String errorText) {
+        this.errorText = errorText;
+    }
+
+    public Boolean getErrorPresent() {
+        return !StringUtils.isEmpty(errorText);
     }
 
     public static class LineResult {
@@ -251,6 +265,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
             while (null != currLine) {
                 if (lineNo==0) {
                     ++lineNo;
+                    currLine = reader.readLine();
                     continue; //пропускаем заголовок
                 } else {
                     LineResult result = updateClient(currLine, lineNo);
@@ -280,8 +295,9 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         fc.checkRequiredFields();
     }
 
-    private LineResult updateClient(String line, int lineNo) {
+    private LineResult updateClient(String line, int lineNo) throws Exception {
         String[] tokens = line.split(";");
+        if (tokens.length != 7) throw new Exception("Неправильная структура файла. Ошибка в строке " + lineNo);
         Session session = null;
         Transaction transaction = null;
         try {
