@@ -499,6 +499,11 @@
         <rich:panelMenuItem id="cardSignListMenuItem" binding="#{cardSignCreatePage.mainMenuComponent}"
                             label="Создание" action="#{cardSignCreatePage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
+    <%--@elvariable id="showDetailedEnterEventReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.BlockUnblockReportPage"--%>
+    <rich:panelMenuItem id="blockUnblockCard" binding="#{mainPage.blockUnblockReportPage.mainMenuComponent}"
+                        label="Отчет по блокировке/разблокировке карт" action="#{mainPage.showBlockUnblockReportPage}"
+                        reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 <%--@elvariable id="commodityAccountingGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.CommodityAccountingGroupPage"--%>
@@ -1059,10 +1064,10 @@
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
                         onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />--%>
 
-    <rich:panelMenuItem id="ordersMonitoringMenuItem"
+    <%--<rich:panelMenuItem id="ordersMonitoringMenuItem"
                         binding="#{ordersMonitoringReportPage.mainMenuComponent}"
                         label="Заказ питания" action="#{ordersMonitoringReportPage.show}"
-                        reRender="workspaceForm" />
+                        reRender="workspaceForm" />--%>
 
     <%--@elvariable id="monitoringPersistanceCachePage" type="ru.axetta.ecafe.processor.web.ui.monitoring.MonitoringPersistanceCachePage"--%>
     <rich:panelMenuItem id="persistanceCacheItem" binding="#{monitoringPersistanceCachePage.mainMenuComponent}"

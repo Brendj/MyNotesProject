@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepositor
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
@@ -219,7 +220,7 @@ public class CardService {
         }
     }
 
-    public void unblockOrReturnCard(Long cardNo, Long idOfOrg) throws Exception {
+    public Card unblockOrReturnCard(Long cardNo, Long idOfOrg) throws Exception {
         Card card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
         if (null == card) {
             throw new CardNotFoundException(String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg));
@@ -233,6 +234,7 @@ public class CardService {
         } else {
             throw new CardWrongStateException(String.format("UnblockOrReturnCard error: wrong card state was found - state=%d", card.getState()));
         }
+        return card;
     }
 
     private void unblock(Card card) throws Exception {
@@ -294,6 +296,18 @@ public class CardService {
             }
         } else {
             throw new CardWrongStateException(String.format("Return card error: wrong card state was found - state=%d", card.getState()));
+        }
+    }
+
+    public void updateSyncStatus(Card card, Long idOfOrg, Long changeState, boolean fiendlyOrgs) throws Exception {
+        if (!fiendlyOrgs) {
+            CardWritableRepository.getInstance().updateCardSync(idOfOrg, card, changeState);
+        }
+        else
+        {
+            for (Long friendlyOrgid : DAOService.getInstance().findFriendlyOrgsIds(idOfOrg)) {
+                CardWritableRepository.getInstance().updateCardSync(friendlyOrgid, card, changeState);
+            }
         }
     }
 }

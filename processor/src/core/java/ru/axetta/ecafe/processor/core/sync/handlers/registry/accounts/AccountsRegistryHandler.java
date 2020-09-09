@@ -181,9 +181,11 @@ public class AccountsRegistryHandler {
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }
-        if ( request.getAccountsRegistryRequest() == null ||  request.getAccountsRegistryRequest().getItems().size()== 0){
+        if (request.getAccountsRegistryRequest() == null){
             return null;
         }
+
+
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
         List<Long> idOfClients = new LinkedList<Long>();
@@ -203,6 +205,14 @@ public class AccountsRegistryHandler {
             for (Client client : clientList) {
                 accountsRegistry.getAccountItems().add(new AccountItem(client));
             }
+        }
+
+        //Обработка карт
+        List<Card> externalChangedCards = CardReadOnlyRepository.getInstance().findByOrgandStateChange(1L, request.getIdOfOrg());
+        for (Card card: externalChangedCards)
+        {
+            CardWritableRepository.getInstance().updateCardSync(request.getIdOfOrg(), card , 0L);
+            accountsRegistry.getChangedCardItems().add(new CardsItem(card));
         }
 
         if (idOfCards.size()> 0){

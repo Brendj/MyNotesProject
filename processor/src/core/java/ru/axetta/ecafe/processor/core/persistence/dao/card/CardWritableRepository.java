@@ -445,4 +445,18 @@ public class CardWritableRepository extends WritableJpaDao {
         return q.getResultList();
     }
 
+    public boolean updateCardSync(Long idOforg, Card card, Long changeState) {
+        TypedQuery<CardSync> query = entityManager.createQuery(
+                "from CardSync cs where cs.org.idOfOrg=:idOforg and cs.card=:card", CardSync.class);
+        query.setParameter("idOforg",idOforg);
+        query.setParameter("card", card);
+        List<CardSync> resultList = query.getResultList();
+        if(resultList.size()> 0){
+            CardSync cardSync = query.getResultList().get(0);
+            cardSync.setStatechange(changeState);
+            entityManager.persist(cardSync);
+            return true;
+        }else
+            return false;
+    }
 }

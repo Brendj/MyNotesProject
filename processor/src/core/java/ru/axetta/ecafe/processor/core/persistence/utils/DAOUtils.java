@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4801,8 +4801,10 @@ public class DAOUtils {
         clientGroupList.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
+        boolean useLastReceiveDate = RuntimeContext.getInstance().getConfigProperties().getProperty(DTSZNDiscountsReviseService.FIELD_PROPERTY, "false").equals("true");
+        String field = useLastReceiveDate ? "lastReceivedDate" : "lastUpdate";
         Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
-                + "where (lastUpdate >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+                + "where (" + field + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
         query.setParameter("date", date);
         query.setParameterList("clientGroups", clientGroupList);
         query.setParameter("otherDiscountCode", DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);

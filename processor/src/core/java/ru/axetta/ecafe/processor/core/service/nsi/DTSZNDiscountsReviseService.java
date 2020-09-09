@@ -50,6 +50,7 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansBy
 public class DTSZNDiscountsReviseService {
 
     public static final String NODE = "ecafe.processor.revise.dtszn.node";
+    public static final String FIELD_PROPERTY = "ecafe.processor.revise.dtszn.useLastReceiveDate";
 
     public static final String MODE = "ecafe.processor.revise.dtszn.mode.test";
     public static final String DEFAULT_MODE = "true";
