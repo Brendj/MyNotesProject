@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -3091,7 +3091,7 @@ public class DAOUtils {
     public static long nextVersionByMenusCalendar(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select nextval('cf_menus_calendar_version_seq'");
+                "select nextval('cf_menus_calendar_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
             version = HibernateUtils.getDbLong(o);
