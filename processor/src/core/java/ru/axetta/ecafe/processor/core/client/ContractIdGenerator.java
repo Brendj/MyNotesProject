@@ -42,6 +42,10 @@ public class ContractIdGenerator {
     }
 
     public List<Long> generateTransactionFree (long idOfOrg, int count) throws Exception {
+        //todo тут берем предварительно сгенеренные л/с
+    }
+
+    public List<Long> preGenerateTransactionFree (long idOfOrg, int count) throws Exception {
         Long lastClientContractId = DAOUtils.updateOrgLastContractIdWithPessimisticLock(idOfOrg, count); //org.getLastClientContractId();
 
         Long contractIdSize = null;
@@ -57,10 +61,6 @@ public class ContractIdGenerator {
             throw new IllegalArgumentException("Not available client contractId");
         }
 
-        //org.setLastClientContractId(lastClientContractId);
-        //org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
-        //session.update(org);
-        //session.flush();
         return getNextContractIds(idOfOrg, lastClientContractIds);
     }
 
