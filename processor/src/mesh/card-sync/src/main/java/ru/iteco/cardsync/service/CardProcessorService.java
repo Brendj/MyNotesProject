@@ -52,7 +52,7 @@ public class CardProcessorService {
         if (blockRequests.isEmpty()) {
             return false;
         }
-        if (blockRequests.get(0).getAudit().getCreateDate().getTime() > new Date(1599036569167L).getTime())
+        if (blockRequests.get(0).getAudit().getCreateDate().getTime() > new Date(1599598800000L).getTime())
             return true;
         else
             return false;
