@@ -90,7 +90,7 @@ public class OkuDAOService {
         String[] ageTypeGroupsStringArray = StringUtils.split(ageTypeGroupsRawString, PROPERTY_VALUE_SEPARATOR);
 
         for (String ageTypeGroupString : ageTypeGroupsStringArray) {
-            ageTypeGroupString = ageTypeGroupString.trim();
+            ageTypeGroupString = ageTypeGroupString.trim().toLowerCase();
             if (!StringUtils.isEmpty(ageTypeGroupString)) {
                 ageTypeGroupList.add(ageTypeGroupString);
             } else {
