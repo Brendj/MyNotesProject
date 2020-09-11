@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.BlockUnblockCardReport;
+import ru.axetta.ecafe.processor.core.report.BlockUnblockItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
@@ -54,6 +55,7 @@ public class BlockUnblockReportPage extends OnlineReportPage {
     }
 
     private Boolean allFriendlyOrgs;
+    private List<BlockUnblockItem> items;
 
     public List<SelectItem> getStatusFilters() {
         List<SelectItem> filters = new ArrayList<SelectItem>();
@@ -215,5 +217,13 @@ public class BlockUnblockReportPage extends OnlineReportPage {
 
     public void setCardStatusFilter(String cardStatusFilter) {
         this.cardStatusFilter = cardStatusFilter;
+    }
+
+    public List<BlockUnblockItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<BlockUnblockItem> items) {
+        this.items = items;
     }
 }
