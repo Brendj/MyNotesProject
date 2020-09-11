@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
@@ -757,7 +758,7 @@ public class ClientManager {
                 logger.debug("generate ContractId");
                 if(RuntimeContext.RegistryType.isMsk()) {
                     contractId = runtimeContext.getClientContractIdGenerator()
-                            .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                            .generateTransactionFree(organization.getIdOfOrg());
                 } else if(RuntimeContext.RegistryType.isSpb()) {
                     try {
                         String c = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
@@ -765,7 +766,7 @@ public class ClientManager {
                             contractId = Long.parseLong(c);
                         } else {
                             contractId = runtimeContext.getClientContractIdGenerator()
-                                    .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                                    .generateTransactionFree(organization.getIdOfOrg());
                         }
                     } catch (Exception e) {
                         throw new Exception("Неправильный формат лицевого счета клиента", e);
@@ -912,6 +913,9 @@ public class ClientManager {
             logger.debug("save client");
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
+
+            ContractIdGenerator.updateUsedContractId(persistenceSession, contractId);
+
             ///
             logger.debug("register client card");
             if (fieldConfig.getValue(ClientManager.FieldId.CARD_ID) != null && persistenceTransaction != null) {
@@ -1047,7 +1051,7 @@ public class ClientManager {
         if (iterator != null) contractIdGuardian = iterator.next();
         if (contractIdGuardian == null) {
             contractIdGuardian = runtimeContext.getClientContractIdGenerator()
-                    .generateTransactionFree(org.getIdOfOrg(), session);
+                    .generateTransactionFree(org.getIdOfOrg());
         }
 
         long clientRegistryVersionGuardian = DAOUtils.updateClientRegistryVersion(session);
@@ -1058,6 +1062,7 @@ public class ClientManager {
                 false, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS), contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
                 clientRegistryVersionGuardian, limitGuardian,
                 RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
+
 
         ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
 

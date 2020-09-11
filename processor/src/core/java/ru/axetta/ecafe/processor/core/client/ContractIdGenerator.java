@@ -5,13 +5,13 @@
 package ru.axetta.ecafe.processor.core.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.OrgPreContractId;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +30,7 @@ public class ContractIdGenerator {
     private static final Logger logger = LoggerFactory.getLogger(ContractIdGenerator.class);
     private static final long MIN_ORDER_ID = 0;
     private static final long MAX_ORDER_ID = 99999;
+    private static final int BATCH_COUNT = 100;
 
     private final SessionFactory sessionFactory;
 
@@ -37,15 +38,21 @@ public class ContractIdGenerator {
         this.sessionFactory = sessionFactory;
     }
 
-    public long generateTransactionFree (long idOfOrg, Session session) throws Exception {
+    public long generateTransactionFree (long idOfOrg) throws Exception {
         return generateTransactionFree(idOfOrg, 1).get(0);
     }
 
     public List<Long> generateTransactionFree (long idOfOrg, int count) throws Exception {
-        //todo тут берем предварительно сгенеренные л/с
+        List<Long> list = DAOService.getInstance().getOrgPreContractIdList(idOfOrg, count);
+        while (list.size() < count) {
+            //если в таблице не хватает прегенеренных л/с, то делаем новые
+            generateAndSaveContractIdBatch(idOfOrg, BATCH_COUNT);
+            list = DAOService.getInstance().getOrgPreContractIdList(idOfOrg, count);
+        }
+        return list;
     }
 
-    public List<Long> preGenerateTransactionFree (long idOfOrg, int count) throws Exception {
+    public void generateAndSaveContractIdBatch (long idOfOrg, int count) throws Exception {
         Long lastClientContractId = DAOUtils.updateOrgLastContractIdWithPessimisticLock(idOfOrg, count); //org.getLastClientContractId();
 
         Long contractIdSize = null;
@@ -61,24 +68,17 @@ public class ContractIdGenerator {
             throw new IllegalArgumentException("Not available client contractId");
         }
 
-        return getNextContractIds(idOfOrg, lastClientContractIds);
+        List<Long> contractIds = getNextContractIds(idOfOrg, lastClientContractIds);
+
+        DAOService.getInstance().saveOrgPreContractIds(idOfOrg, contractIds);
     }
 
-    public long generate(long idOfOrg) throws Exception {
-        Transaction transaction = null;
-        Session session = RuntimeContext.getInstance().createPersistenceSession();
-        try {
-            transaction = session.beginTransaction();
-
-            long newClientContractId =generateTransactionFree (idOfOrg, session);
-
-            transaction.commit();
-            transaction = null;
-            return newClientContractId;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
+    public static void updateUsedContractId(Session session, long contractId) {
+        Query query = session.createQuery("select opc from OrgPreContractId opc where opc.contractId = :contractId");
+        query.setParameter("contractId", contractId);
+        OrgPreContractId orgPreContractId = (OrgPreContractId) query.uniqueResult();
+        orgPreContractId.setUsed(true);
+        session.update(orgPreContractId);
     }
 
     protected static List<Long> getNextContractIds(long idOfOrg, List<Long> lastClientContractIds) {

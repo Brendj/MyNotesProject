@@ -430,7 +430,7 @@ public class SchoolApiService implements ISchoolApiService {
             persistanceSession.save(client.getPerson());
             persistanceSession.save(client.getContractPerson());
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
-            long contractId = RuntimeContext.getInstance().getClientContractIdGenerator().generate(client.getOrg().getIdOfOrg());
+            long contractId = RuntimeContext.getInstance().getClientContractIdGenerator().generateTransactionFree(client.getOrg().getIdOfOrg());
             client.setContractId(contractId);
             client.setContractTime(new Date());
             persistanceSession.save(client);

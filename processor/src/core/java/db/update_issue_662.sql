@@ -6,7 +6,7 @@
 
 create table cf_orgs_precontract_ids (
     idOfPreContractId bigserial,
-    version bigint NOT NULL,
+    version bigint NOT NULL DEFAULT 0,
     idOfOrg bigint not null,
     contractId bigint not null,
     used boolean not null default false,
@@ -18,6 +18,7 @@ create table cf_orgs_precontract_ids (
 );
 
 CREATE INDEX cf_orgs_precontract_ids_idoforg_idx ON cf_orgs_precontract_ids USING btree (idOfOrg) WHERE not used;
+CREATE UNIQUE INDEX cf_orgs_precontract_ids_contarctid_idx ON cf_orgs_precontract_ids USING btree (contractId);
 
 COMMENT ON TABLE cf_orgs_precontract_ids IS 'Предварительно рассчитанные номера л/с по организациям';
 COMMENT ON COLUMN cf_orgs_precontract_ids.idOfPreContractId IS 'ID записи';
