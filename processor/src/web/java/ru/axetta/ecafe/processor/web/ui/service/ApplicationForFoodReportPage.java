@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -18,7 +18,6 @@ import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -30,10 +29,7 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.model.SelectItem;
 import javax.persistence.NoResultException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -132,8 +128,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(session, applicationForFood);
-                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient(),
-                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient());
                 if (info != null) {
                     item.setStartDate(info.getDateStart());
                     item.setEndDate(info.getDateEnd());
@@ -242,7 +237,6 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             transaction = session.beginTransaction();
             Long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
             Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
-            Long otherDiscountCode = null;
             for (ApplicationForFoodReportItem item : items) {
                 if (item.isChanged()) {
                     wereChanges = true;
@@ -253,16 +247,13 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                                 status.getApplicationForFoodState(), status.getDeclineReason());
                         pause += RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
                         if (status.getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
-                            if (null == otherDiscountCode) {
-                                otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
-                            }
-                            ClientManager.addOtherDiscountForClient(session, item.getApplicationForFood().getClient(), otherDiscountCode);
+                            DiscountManager.addOtherDiscountForClient(session, item.getApplicationForFood().getClient());
                         }
                     }
                 }
             }
             CategoryDiscountDSZN discountInoe = getDiscountInoe(session);
-            String isppCodeInoe = Long.toString(discountInoe.getCategoryDiscount().getIdOfCategoryDiscount());
+            Long isppCodeInoe = discountInoe.getCategoryDiscount().getIdOfCategoryDiscount();
             Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
             for (ApplicationForFoodReportItem item : deletedItems) {
                 wereChanges = true;
@@ -276,19 +267,14 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 if (applicationForFoodInoeExists(session, client, applicationForFood.getCreatedDate())) continue;
                 Set<CategoryDiscount> discounts = client.getCategories();
                 if (discounts.contains(discountInoe.getCategoryDiscount())) {
-                    String oldDiscounts = client.getCategoriesDiscounts();
-                    String newDiscounts = "";
-                    for (String str : oldDiscounts.split(",")) {
-                        if (!str.equals(isppCodeInoe))
-                            newDiscounts += str + ",";
+                    Set<CategoryDiscount> oldDiscounts = client.getCategories();
+                    Set<CategoryDiscount> newDiscounts = new HashSet<>();
+                    for (CategoryDiscount categoryDiscount : oldDiscounts) {
+                        if (categoryDiscount.getIdOfCategoryDiscount() != isppCodeInoe)
+                            newDiscounts.add(categoryDiscount);
                     }
-                    if (!StringUtils.isEmpty(newDiscounts))
-                        newDiscounts = newDiscounts.substring(0, newDiscounts.length()-1);
-                    Integer oldDiscountMode = client.getDiscountMode();
-                    Integer newDiscountMode =
-                            StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-                    ClientManager
-                            .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, ARCHIEVE_COMMENT);
+                    DiscountManager
+                            .renewDiscounts(session, client, newDiscounts, oldDiscounts, ARCHIEVE_COMMENT);
                 }
                 Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
                 criteria.add(Restrictions.eq("client", client));
@@ -296,22 +282,24 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 criteria.add(Restrictions.eq("dtisznCode", new Long(discountInoe.getCode())));
                 List<ClientDtisznDiscountInfo> list = criteria.list();
                 for (ClientDtisznDiscountInfo info : list) {
-                    info.setLastUpdate(new Date());
-                    info.setArchived(true);
-                    info.setVersion(clientDTISZNDiscountVersion);
-                    session.update(info);
+                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                    builder.withArchived(true);
+                    builder.save(session, clientDTISZNDiscountVersion);
                 }
             }
 
             for (ApplicationForFoodReportItem item : changeDatesItems) {
                 wereChanges = true;
-                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, item.getApplicationForFood().getClient().getIdOfClient(),
-                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
-                info.setDateStart(item.getStartDate());
-                info.setDateEnd(item.getEndDate());
-                info.setLastUpdate(new Date());
-                info.setVersion(clientDTISZNDiscountVersion);
-                session.update(info);
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, item.getApplicationForFood().getClient().getIdOfClient());
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                DAOUtils.updateApplicationForFoodWithVersion(session, item.getApplicationForFood(), item.getApplicationForFood().getStatus(),
+                            nextVersion, historyVersion);
+                builder.withDateStart(item.getStartDate());
+                builder.withDateEnd(item.getEndDate());
+                item.getApplicationForFood().setDiscountDateStart(item.getStartDate());
+                item.getApplicationForFood().setDiscountDateEnd(item.getEndDate());
+                session.update(item.getApplicationForFood());
+                builder.save(session, clientDTISZNDiscountVersion);
             }
             transaction.commit();
             transaction = null;

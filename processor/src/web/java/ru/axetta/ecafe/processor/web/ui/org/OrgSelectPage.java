@@ -34,6 +34,8 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
 
     public void completeOrgSelection(Session session) throws Exception {
         setFilterMode(0);
+        resetAvailableOrganizationTypes();
+
         if (!completeHandlers.empty()) {
             completeHandlers.peek().completeOrgSelection(session, selectedItem.getIdOfOrg());
             completeHandlers.pop();
@@ -42,6 +44,7 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
 
     public void cancelOrgSelection() {
         setFilterMode(0);
+        resetAvailableOrganizationTypes();
         completeHandlers.clear();
     }
 
@@ -52,17 +55,16 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public void fill(Session session, List<Long> idOfMenuSourceOrgList) throws Exception {
-        this.idOfContragent = null;
+        this.idOfSelectedContragent = -1L;
         this.idOfContract = null;
         this.items = retrieveOrgs(session, idOfMenuSourceOrgList);
     }
 
     public void fill(Long idOfContragent, Long idOfContract, Session session, List<Long> idOfMenuSourceOrgList)
             throws Exception {
-        this.idOfContragent = idOfContragent;
+        this.idOfSelectedContragent = idOfContragent;
         this.idOfContract = idOfContract;
         this.filter = "";
-        this.tagFilter = "";
         this.idFilter = "";
         this.items = retrieveOrgs(session, idOfMenuSourceOrgList);
         idFilter = "";
@@ -101,7 +103,6 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public interface CompleteHandler {
-
         void completeOrgSelection(Session session, Long idOfOrg) throws Exception;
     }
 }

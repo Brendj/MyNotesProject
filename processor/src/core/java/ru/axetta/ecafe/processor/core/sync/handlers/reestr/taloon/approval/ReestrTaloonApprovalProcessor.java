@@ -55,8 +55,10 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     String goodsGuid = item.getGoodsGuid();
                     Long price = item.getPrice();
                     if (goodsGuid == null) goodsGuid = "";
-                    TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, date, name, goodsGuid, price);
-                    Integer ordersCount = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date, name, goodsGuid, price);
+                    TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, date, name,
+                            goodsGuid, price);
+                    Integer ordersCount = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date,
+                            name, goodsGuid, price);
                     Integer soldedQty = item.getSoldedQty();
                     if(ordersCount == null || ordersCount == 0 || soldedQty.equals(ordersCount)) {
                         ordersCount = null;
@@ -72,23 +74,27 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     String goodsName = item.getGoodsName();
                     Org orgOwner = (Org)session.load(Org.class, item.getOrgOwnerId());
                     Boolean deletedState = item.getDeletedState();
+                    Long complexId = item.getComplexId();
+                    Boolean byWebSupplier = item.getByWebSupplier();
                     Long taloonNumber = item.getTaloonNumber();
                     Long versionFromClient = item.getVersion();
-                    if ((versionFromClient == null && taloon != null) || (versionFromClient != null && taloon != null && versionFromClient < taloon.getVersion())) {
+                    if ((versionFromClient == null && taloon != null) || (versionFromClient != null && taloon != null
+                            && versionFromClient < taloon.getVersion())) {
                         errorFound = true;
                         item.setResCode(TaloonApprovalItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
                         item.setErrorMessage("Record version conflict");
                     } else {
 
                         if (taloon == null) {
-                            taloon = new TaloonApproval(idOfOrg, idOfOrgCreated, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
+                            taloon = new TaloonApproval(idOfOrg, idOfOrgCreated, date, name, goodsGuid, soldedQty,
+                                    price, createdType, requestedQty, shippedQty,
                                     isppState, ppState, goodsName);
-                            taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT",
+                            taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид. %s), %3$td.%3$tm.%3$tY %3$tT",
                                     orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date()));
                         } else {
                             String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
                             taloon.setRemarks(rem.concat("\n").concat(String
-                                    .format("Изменено в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
+                                    .format("Изменено в ОО \"%s\" (ид. %s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
                         }
                         taloon.setSoldedQty(soldedQty);
                         taloon.setRequestedQty(requestedQty);
@@ -101,6 +107,8 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                         taloon.setVersion(nextVersion);
                         taloon.setDeletedState(deletedState);
                         taloon.setTaloonNumber(taloonNumber);
+                        taloon.setComplexId(complexId);
+                        taloon.setByWebSupplier(byWebSupplier);
 
                         session.saveOrUpdate(taloon);
 
@@ -134,7 +142,8 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
         ReestrTaloonApprovalData result = new ReestrTaloonApprovalData();
         List<ResTaloonApprovalItem> items = new ArrayList<ResTaloonApprovalItem>();
         ResTaloonApprovalItem resItem;
-        List<TaloonApproval> list = DAOUtils.getTaloonApprovalForOrgSinceVersion(session, reestrTaloonApproval.getIdOfOrgOwner(), reestrTaloonApproval.getMaxVersion());
+        List<TaloonApproval> list = DAOUtils.getTaloonApprovalForOrgSinceVersion(session,
+                reestrTaloonApproval.getIdOfOrgOwner(), reestrTaloonApproval.getMaxVersion());
         for (TaloonApproval taloon : list) {
             if (taloon != null) {
                 resItem = new ResTaloonApprovalItem(taloon);

@@ -16,7 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -85,7 +85,8 @@ public class ClientManager {
         CREATED_FROM,
         MIDDLE_GROUP,
         IAC_REG_ID,
-        PARALLEL
+        PARALLEL,
+        MESH_GUID
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -136,6 +137,7 @@ public class ClientManager {
             new FieldProcessor.Def(42, false, false, "Подгруппа", null, FieldId.MIDDLE_GROUP, false),
             new FieldProcessor.Def(43, false, false, "ИАЦ regID", null, FieldId.IAC_REG_ID, true),
             new FieldProcessor.Def(44, false, false, "Параллель", null, FieldId.PARALLEL, true),
+            new FieldProcessor.Def(45, false, false, "GUID MESH", null, FieldId.MESH_GUID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -307,19 +309,19 @@ public class ClientManager {
             String contractDoc = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_DOC);
             Person contractPerson = client.getContractPerson();
             boolean changed = false;
-            if (contractFirstName != null && StringUtils.isNotEmpty(contractFirstName)) {
+            if (StringUtils.isNotEmpty(contractFirstName)) {
                 contractPerson.setFirstName(contractFirstName);
                 changed = true;
             }
-            if (contractSurname != null && StringUtils.isNotEmpty(contractSurname)) {
+            if (StringUtils.isNotEmpty(contractSurname)) {
                 contractPerson.setSurname(contractSurname);
                 changed = true;
             }
-            if (contractSecondName != null && StringUtils.isNotEmpty(contractSecondName)) {
+            if (StringUtils.isNotEmpty(contractSecondName)) {
                 contractPerson.setSecondName(contractSecondName);
                 changed = true;
             }
-            if (contractDoc != null && StringUtils.isNotEmpty(contractDoc)) {
+            if (StringUtils.isNotEmpty(contractDoc)) {
                 contractPerson.setIdDocument(contractDoc);
                 changed = true;
             }
@@ -423,7 +425,7 @@ public class ClientManager {
             if (fieldConfig.getValue(FieldId.COMMENTS) != null) {
                 client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
             }
-            ImportRegisterClientsService.commentsAddsDelete(client, registerCommentsAdds);
+            ImportRegisterMSKClientsService.commentsAddsDelete(client, registerCommentsAdds);
 
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
@@ -436,7 +438,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
+                        ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
@@ -480,6 +482,14 @@ public class ClientManager {
                     client.setClientGUID(clientGUID);
                 }
             }
+            if (fieldConfig.getValue(FieldId.MESH_GUID) != null) {
+                String meshGUID = fieldConfig.getValue(FieldId.MESH_GUID);
+                if (meshGUID.isEmpty()) {
+                    client.setMeshGUID(null);
+                } else {
+                    client.setMeshGUID(meshGUID);
+                }
+            }
             //tokens[32])
             if (fieldConfig.getValue(FieldId.GENDER) != null) {
                 client.setGender(Integer.valueOf(fieldConfig.getValue(FieldId.GENDER)));
@@ -496,24 +506,20 @@ public class ClientManager {
             //token[34]
             if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null && fieldConfig.getValue(FieldId.CHECKBENEFITS) != null) {
                 if(Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS))) {
-                    client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
-
-                    String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
-                    String oldDiscounts = client.getCategoriesDiscounts();
-
+                    Set<CategoryDiscount> newDiscounts = getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT));
                     Integer oldDiscountMode = client.getDiscountMode();
-                    Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    Integer newDiscountMode = newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
-                    client.setCategoriesDiscounts(newDiscounts);
                     client.setDiscountMode(newDiscountMode);
 
-                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-                        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org,
-                                newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-                        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                        persistenceSession.save(discountChangeHistory);
+                    if (!oldDiscountMode.equals(newDiscountMode) || !newDiscounts.equals(client.getCategories())) {
+
+                        DiscountManager.saveDiscountHistory(persistenceSession, client, client.getOrg(), new HashSet<CategoryDiscount>(),
+                                newDiscounts, Client.DISCOUNT_MODE_NONE, Client.DISCOUNT_MODE_BY_CATEGORY, DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                        client.setCategories(newDiscounts);
+
                         client.setLastDiscountsUpdate(new Date());
-                        client.setCategories(getCategoriesSet(persistenceSession, newDiscounts));
+                        client.setCategories(newDiscounts);
                     }
                 }
             }
@@ -531,6 +537,8 @@ public class ClientManager {
                 client.setParallel(fieldConfig.getValue(FieldId.PARALLEL));
             }
 
+            DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
+
             client.setUpdateTime(new Date());
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -541,26 +549,6 @@ public class ClientManager {
             logger.error("Ошибка при обновлении данных клиента", e);
             throw new Exception(e);
         }
-    }
-
-    public static void renewDiscounts(Session session, Client client, String newDiscounts, String oldDiscounts,
-            Integer newDiscountMode, Integer oldDiscountMode, String historyComment) throws Exception {
-        client.setCategoriesDiscounts(newDiscounts);
-        client.setDiscountMode(newDiscountMode);
-
-        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-        discountChangeHistory.setComment(historyComment);
-        session.save(discountChangeHistory);
-        client.setLastDiscountsUpdate(new Date());
-        try {
-            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
-        } catch (Exception e) {
-            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
-        }
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-        client.setClientRegistryVersion(clientRegistryVersion);
-        session.update(client);
     }
 
     public static Set<CategoryDiscount> getCategoriesSet(Session session, String categories) {
@@ -797,11 +785,10 @@ public class ClientManager {
             logger.debug("create client");
             Client client = new Client(organization, person, contractPerson, 0, notifyByEmail, notifyBySms,
                     notifyByPUSH, contractId, contractDate, contractState, password, payForSms, clientRegistryVersion,
-                    limit, expenditureLimit, "", "");
+                    limit, expenditureLimit);
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 724, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
             String fax = fieldConfig.getValue(FieldId.FAX);
             if (mobilePhone != null) {
@@ -817,7 +804,6 @@ public class ClientManager {
                 }
             }
             client.setMobile(mobilePhone);//tokens[14]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 740, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
             client.setFax(fax);//tokens[14]);
             client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
             client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
@@ -841,7 +827,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
+                        ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
@@ -866,21 +852,21 @@ public class ClientManager {
                 if (!StringUtils.isEmpty(middleGroup)) client.setMiddleGroup(middleGroup);
             }
 
-            if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID) != null) {
-                String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
-                if (clientGUID.isEmpty()) {
-                    client.setClientGUID(null);
-                } else {
-                    client.setClientGUID(clientGUID);
-                }
+            String clientGuid = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
+            if (StringUtils.isNotEmpty(clientGuid)) {
+                client.setClientGUID(clientGuid);
+            }
+
+            String meshGuid = fieldConfig.getValue(FieldId.MESH_GUID);
+            if (StringUtils.isNotEmpty(meshGuid)) {
+                client.setMeshGUID(meshGuid);
             }
 
             //tokens[32])
             if (fieldConfig.getValue(FieldId.GENDER) != null) {
                 if (fieldConfig.getValue(FieldId.GENDER).equals("m")) {
                     client.setGender(1);
-                }
-                if (fieldConfig.getValue(FieldId.GENDER).equals("f")) {
+                } else {
                     client.setGender(0);
                 }
             } else {
@@ -898,21 +884,6 @@ public class ClientManager {
             Boolean checkBenefits = false;
             if (fieldConfig.getValue(FieldId.CHECKBENEFITS) != null) {
                 checkBenefits = Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS));
-            }
-
-            //token[34]
-            if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
-                client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
-            } else {
-                client.setCategoriesDiscountsDSZN("");
-            }
-
-            //token[39]
-            if (checkBenefits && StringUtils.isNotEmpty(fieldConfig.getValue(FieldId.BENEFIT))) {
-                client.setCategoriesDiscounts(fieldConfig.getValue(FieldId.BENEFIT));
-                client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
-            } else {
-                client.setCategoriesDiscounts("");
             }
 
             //token[35])
@@ -962,11 +933,10 @@ public class ClientManager {
             }
 
             if (checkBenefits && StringUtils.isNotEmpty(fieldConfig.getValue(FieldId.BENEFIT))) {
-                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, organization, Client.DISCOUNT_MODE_BY_CATEGORY,
-                        Client.DISCOUNT_MODE_NONE, fieldConfig.getValue(FieldId.BENEFIT), "");
-                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                persistenceSession.save(discountChangeHistory);
-                client.setCategories(getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT)));
+                Set<CategoryDiscount> newDiscounts = getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT));
+                DiscountManager.saveDiscountHistory(persistenceSession, client, organization, new HashSet<CategoryDiscount>(),
+                        newDiscounts, Client.DISCOUNT_MODE_NONE, Client.DISCOUNT_MODE_BY_CATEGORY, DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                client.setCategories(newDiscounts);
                 client.setLastDiscountsUpdate(new Date());
                 persistenceSession.update(client);
             }
@@ -1087,7 +1057,7 @@ public class ClientManager {
         Client clientGuardianToSave = new Client(org, personGuardian, contractGuardianPerson, 0, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS),
                 false, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS), contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
                 clientRegistryVersionGuardian, limitGuardian,
-                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "", "");
+                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
 
         ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
 
@@ -1204,13 +1174,8 @@ public class ClientManager {
 
             Client client;
 
-            if (noComment) {
-                client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
-                        persistenceTransaction, null);
-            } else {
-                client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
-                        persistenceTransaction, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
-            }
+            client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
+                persistenceTransaction, noComment ? null : String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -1904,13 +1869,15 @@ public class ClientManager {
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
-        Criteria cr = session.createCriteria(ClientGuardian.class);
-        cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
-        cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
-        ClientGuardian cg = (ClientGuardian)cr.uniqueResult();
-        cg.setVersion(newVersion);
-        cg.setLastUpdate(new Date());
-        session.update(cg);
+        if (guardian != null) {
+            Criteria cr = session.createCriteria(ClientGuardian.class);
+            cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+            cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+            ClientGuardian cg = (ClientGuardian) cr.uniqueResult();
+            cg.setVersion(newVersion);
+            cg.setLastUpdate(new Date());
+            session.update(cg);
+        }
 
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", client));
@@ -1939,7 +1906,18 @@ public class ClientManager {
     }
 
     /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
-    public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile, Boolean value) throws Exception {
+    public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile,
+            Boolean value, Long newVersion) throws Exception {
+        if (guardian != null) {
+            Criteria cr = session.createCriteria(ClientGuardian.class);
+            cr.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
+            cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+            ClientGuardian cg = (ClientGuardian) cr.uniqueResult();
+            cg.setVersion(newVersion);
+            cg.setLastUpdate(new Date());
+            session.update(cg);
+        }
+
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", child));
         criteria.add(Restrictions.eq("guardianInformedSpecialMenu", guardian));
@@ -2217,36 +2195,6 @@ public class ClientManager {
         }
     }
 
-    public static void addOtherDiscountForClient(Session session, Client client, Long otherDiscountCode) throws Exception {
-        String oldDiscounts = client.getCategoriesDiscounts();
-        String newDiscounts = oldDiscounts;
-        if (!StringUtils.isEmpty(newDiscounts)) {
-            newDiscounts += ",";
-        }
-        newDiscounts += otherDiscountCode.toString();
-        client.setCategoriesDiscounts(newDiscounts);
-
-        Integer oldDiscountMode = client.getDiscountMode();
-
-        if (Client.DISCOUNT_MODE_NONE == oldDiscountMode) {
-            client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
-        }
-
-        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                Client.DISCOUNT_MODE_BY_CATEGORY, oldDiscountMode, newDiscounts, oldDiscounts);
-        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_US);
-        session.save(discountChangeHistory);
-        client.setLastDiscountsUpdate(new Date());
-        try {
-            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
-        } catch (Exception e) {
-            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
-        }
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-        client.setClientRegistryVersion(clientRegistryVersion);
-        session.update(client);
-    }
-
     public static void removeExternalIdFromClients(Session session, Long externalId) throws Exception {
         Criteria criteria = session.createCriteria(Client.class);
         criteria.add(Restrictions.eq("externalId", externalId));
@@ -2277,6 +2225,29 @@ public class ClientManager {
 
         session.save(clientGroupMigrationHistory);
         disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+        archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+    }
+
+    public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        try {
+            List<ApplicationForFood> list = DAOUtils.getApplicationForFoodInoeByClient(session, client);
+            Long version = null;
+            for (ApplicationForFood applicationForFood : list) {
+                DiscountManager.archiveApplicationForFood(session, applicationForFood, version);
+            }
+            ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, client.getIdOfClient());
+            if (info != null) {
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(
+                        info);
+                builder.withDateEnd(new Date());
+                builder.withArchived(true);
+                builder.save(session);
+            }
+            DiscountManager.deleteOtherDiscountForClientWithNoUpdateClient(session, client);
+        } catch (Exception e) {
+            logger.error("Error in archiveApplicationForFoodIfClientLeaving: ", e);
+        }
     }
 
     private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
@@ -2333,117 +2304,13 @@ public class ClientManager {
         }
     }
 
-    public static void deleteDiscount(Client client, Session session) throws Exception {
-        Integer oldDiscountMode = client.getDiscountMode();
-        String oldDiscounts = client.getCategoriesDiscounts();
-        Set<CategoryDiscount> discountsAfterRemove = new HashSet<>();
-        Set<CategoryDiscount> discounts = client.getCategories();
-        for (CategoryDiscount discount : discounts) {
-            if (discount.getEligibleToDelete()) {
-                archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
-            } else {
-                discountsAfterRemove.add(discount);
-            }
-        }
-        client.getCategories().clear();
-        if(!discountsAfterRemove.isEmpty()) {
-            client.setCategories(discountsAfterRemove);
-        }
-
-        String newDiscounts = "";
-        for(CategoryDiscount discount : client.getCategories()){
-            if(!newDiscounts.isEmpty()){
-                newDiscounts += ",";
-            }
-            newDiscounts += discount.getIdOfCategoryDiscount();
-        }
-        Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-        if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-            client.setCategoriesDiscounts(newDiscounts);
-            client.setDiscountMode(newDiscountMode);
-            DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                    newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-            discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
-            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
-            session.save(discountChangeHistory);
-            client.setLastDiscountsUpdate(new Date());
-            session.update(client);
-        }
-    }
-
-    public static void archiveDtisznDiscount(Client client, Session session, Long idOfCategoryDiscount) {
-        List<Integer> list = DAOUtils.getDsznCodeListByCategoryDiscountCode(session, idOfCategoryDiscount);
-        Long clientDTISZNDiscountVersion = null;
-        Long applicationForFoodVersion = null;
-
-        for (Integer dsznCode : list) {
-            ClientDtisznDiscountInfo info = DAOUtils
-                    .getDTISZNDiscountInfoByClientAndCode(session, client, dsznCode.longValue());
-            if (null != info) {
-                if (!info.getArchived()) {
-                    info.setArchived(true);
-                    if (null == clientDTISZNDiscountVersion) {
-                        clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-                    }
-                    if (info.isInoe()) {
-                        info.setDateEnd(new Date());
-                    }
-                    info.setVersion(clientDTISZNDiscountVersion);
-                    info.setLastUpdate(new Date());
-                    session.update(info);
-                }
-            }
-            ApplicationForFood food = DAOUtils
-                    .getApplicationForFoodByClientAndCode(session, client, dsznCode.longValue());
-            if (null != food) {
-                if (!food.getArchived()) {
-                    food.setArchived(true);
-                    if (null == applicationForFoodVersion) {
-                        applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                    }
-                    food.setVersion(applicationForFoodVersion);
-                    food.setLastUpdate(new Date());
-                    session.update(food);
-                }
-            }
-        }
-    }
-
     public static void archiveApplicationForFoodWithoutDiscount(Client client, Session session) {
         List<ApplicationForFood> list = DAOUtils.getApplicationForFoodByClient(session, client);
         Long applicationForFoodVersion = null;
 
         for (ApplicationForFood item : list) {
-            if (!item.getArchived() && isEligibleToDelete(session, item)) {
-                item.setArchived(true);
-                if (null == applicationForFoodVersion) {
-                    applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                }
-                item.setVersion(applicationForFoodVersion);
-                item.setLastUpdate(new Date());
-                session.update(item);
-            }
+            DiscountManager.archiveApplicationForFood(session, item, applicationForFoodVersion);
         }
     }
 
-    public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
-        Set<CategoryDiscount> discounts = client.getCategories();
-        for (CategoryDiscount discount : discounts) {
-            if (discount.getEligibleToDelete()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
-        CategoryDiscountDSZN categoryDiscountDSZN;
-        if (item.getDtisznCode() == null) {
-            ///для льготы Иное
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
-        } else {
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
-        }
-        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
-    }
 }

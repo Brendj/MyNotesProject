@@ -8,13 +8,14 @@ import generated.nsiws_delta.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 
@@ -78,36 +79,38 @@ public class NSIDeltaProcessor {
         try {
             Date deltaDate = delta.getDate().toGregorianCalendar().getTime();
             if (CalendarUtils.getDifferenceInDays(deltaDate, new Date()) > DAYS_DELTA_ACTUAL) {
-                ImportRegisterClientsService.log(synchDate + String.format("Дельта не принята по сроку давности %s", deltaDate), logBuffer);
+                ImportRegisterMSKClientsService
+                        .log(synchDate + String.format("Дельта не принята по сроку давности %s", deltaDate), logBuffer);
                 return buildOKResponse();
             }
         } catch (Exception e) {
-            ImportRegisterClientsService.log(synchDate + "Не найдена секция date в дельте", logBuffer);
+            ImportRegisterMSKClientsService.log(synchDate + "Не найдена секция date в дельте", logBuffer);
             return buildFailureResponse("Not found delta date");
         }
 
         //  парсинг
         ContainerDelta containerDelta = unmarshal(delta);
         if(containerDelta == null) {
-            ImportRegisterClientsService.log(synchDate + "Не удалось провести парсинг", logBuffer);
+            ImportRegisterMSKClientsService.log(synchDate + "Не удалось провести парсинг", logBuffer);
             return buildFailureResponse("Invalid type");
         }
         //  анализ
         List<Item> items = containerDelta.getItem();
         if(items.size() < 1) {
-            ImportRegisterClientsService.log(synchDate + "Элементов для изменений не найдено", logBuffer);
+            ImportRegisterMSKClientsService.log(synchDate + "Элементов для изменений не найдено", logBuffer);
             return buildFailureResponse("Items are empty");
         }
 
 
-        ImportRegisterClientsService.log(synchDate + "Всего элементов, подлежащих изменению " + items.size(), logBuffer);
+        ImportRegisterMSKClientsService
+                .log(synchDate + "Всего элементов, подлежащих изменению " + items.size(), logBuffer);
         try {
             parseItems(synchDate, date, ts, items, logBuffer, false);
         } catch (NSIDeltaException nside) {
             logger.error("Failed to parse items", nside);
             return buildFailureResponse("Failed to proceed registry import " + nside.getMessage());
         }
-        ImportRegisterClientsService.log(synchDate + "Загрузка изменений успешно завершена" + items.size(), logBuffer);
+        ImportRegisterMSKClientsService.log(synchDate + "Загрузка изменений успешно завершена" + items.size(), logBuffer);
         return buildOKResponse();
     }
 
@@ -128,19 +131,21 @@ public class NSIDeltaProcessor {
     protected void parseItems(String synchDate, String date, long ts, List<Item> items,
             StringBuffer logBuffer, boolean useFullComparison) throws NSIDeltaException {
         if(useFullComparison) {
-            ImportRegisterClientsService.log(synchDate + "Загрузка изменений с использованием старого метода полной сверки" + items.size(), logBuffer);
-            Map<Org, List<ImportRegisterClientsService.ExpandedPupilInfo>> pupils = mergePupilByOrg(items);
+            ImportRegisterMSKClientsService
+                    .log(synchDate + "Загрузка изменений с использованием старого метода полной сверки" + items.size(), logBuffer);
+            Map<Org, List<ImportRegisterMSKClientsService.ExpandedPupilInfo>> pupils = mergePupilByOrg(items);
             for(Org org : pupils.keySet()) {
                 try {
-                    RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).saveClients
+                    RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class).saveClients
                             (synchDate, date, ts, org, pupils.get(org), logBuffer);
                 } catch (Exception e) {
-                    ImportRegisterClientsService.logError(synchDate + "При синхронизации произошла ошибка", e,
+                    ImportRegisterMSKClientsService.logError(synchDate + "При синхронизации произошла ошибка", e,
                             logBuffer);
                 }
             }
         } else {
-            ImportRegisterClientsService.log(synchDate + "Загрузка изменений с использованием нового метода доверительного к Реестрам" + items.size(), logBuffer);
+            ImportRegisterMSKClientsService
+                    .log(synchDate + "Загрузка изменений с использованием нового метода доверительного к Реестрам" + items.size(), logBuffer);
             for(Item i : items) {
                 DeltaItem deltaItem = new DeltaItem(i);
                 if(deltaItem.isEmpty()) {
@@ -152,19 +157,19 @@ public class NSIDeltaProcessor {
         }
     }
 
-    protected Map<Org, List<ImportRegisterClientsService.ExpandedPupilInfo>> mergePupilByOrg(List<Item> items) {
-        Map<Org, List<ImportRegisterClientsService.ExpandedPupilInfo>> res = new HashMap<Org, List<ImportRegisterClientsService.ExpandedPupilInfo>>();
+    protected Map<Org, List<ImportRegisterMSKClientsService.ExpandedPupilInfo>> mergePupilByOrg(List<Item> items) {
+        Map<Org, List<ImportRegisterMSKClientsService.ExpandedPupilInfo>> res = new HashMap<Org, List<ImportRegisterMSKClientsService.ExpandedPupilInfo>>();
         for(Item i : items) {
             DeltaItem deltaItem = new DeltaItem(i);
             Org org = DAOService.getInstance().getOrgByGuid(deltaItem.getOrgGuid());
 
-            List<ImportRegisterClientsService.ExpandedPupilInfo> orgItems = res.get(org);
+            List<ImportRegisterMSKClientsService.ExpandedPupilInfo> orgItems = res.get(org);
             if(orgItems == null) {
-                orgItems = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
+                orgItems = new ArrayList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
                 res.put(org, orgItems);
             }
 
-            ImportRegisterClientsService.ExpandedPupilInfo epi = new ImportRegisterClientsService.ExpandedPupilInfo();
+            ImportRegisterMSKClientsService.ExpandedPupilInfo epi = new ImportRegisterMSKClientsService.ExpandedPupilInfo();
             epi.firstName = deltaItem.getFirstName();
             epi.secondName = deltaItem.getSecondName();
             epi.familyName = deltaItem.getFamilyName();
@@ -179,37 +184,37 @@ public class NSIDeltaProcessor {
 
     @Transactional
     public long getUpdateTs() {
-        return ImportRegisterClientsService.getLastUncommitedChange(em);
+        return ImportRegisterMSKClientsService.getLastUncommitedChange(em);
     }
 
     @Transactional
     public void saveClientTrustedComparison(String synchDate, String date, long ts,
                                                StringBuffer logBuffer, DeltaItem item) throws NSIDeltaException {
-        ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
+        ImportRegisterMSKClientsService service = RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class);
         if(item.getAction() == Action.ADDED.ordinal()) {
             Org org = DAOService.getInstance().getOrgByGuid(item.getOrgGuid());
             if(org == null) {
-                ImportRegisterClientsService.log(synchDate + "Добавление " + item.getGuid() + ", " +
+                ImportRegisterMSKClientsService.log(synchDate + "Добавление " + item.getGuid() + ", " +
                         item.getFamilyName() + " " + item.getFirstName() + " " +
                         item.getSecondName() + ", " + item.getGroup() + " невозможено - школа " + item.getOrgGuid() + " не найдена", logBuffer);
                 return;
             }
             try {
                 //  log
-                ImportRegisterClientsService.log(synchDate + "Добавление " + item.getGuid() + ", " +
+                ImportRegisterMSKClientsService.log(synchDate + "Добавление " + item.getGuid() + ", " +
                         item.getFamilyName() + " " + item.getFirstName() + " " +
                         item.getSecondName() + ", " + item.getGroup(), logBuffer);
                 //  exec
                 FieldProcessor.Config fieldConfig = buildFieldConfig(item, new ClientManager.ClientFieldConfig());
                 service.addClientChange(ts, org.getIdOfOrg(), null, fieldConfig, null,
-                        ImportRegisterClientsService.CREATE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), org.getChangesDSZN());
+                        ImportRegisterMSKClientsService.CREATE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), org.getChangesDSZN());
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
             }
         } else if(item.getAction() == Action.MODIFIED.ordinal()) {
             Client cl = DAOUtils.findClientByGuid(em, StringUtils.isBlank(item.getGuid()) ? "" : item.getGuid());
             if(cl == null) {
-                ImportRegisterClientsService.log(synchDate + "Невозможно обработать изменение клиента " +
+                ImportRegisterMSKClientsService.log(synchDate + "Невозможно обработать изменение клиента " +
                         emptyIfNull(item.getGuid()) + ", " + emptyIfNull(item.getFamilyName()) + " " +
                         emptyIfNull(item.getFirstName()) + " - не найден", logBuffer);
                 return;
@@ -229,7 +234,8 @@ public class NSIDeltaProcessor {
                 if(!StringUtils.isBlank(emptyIfNull(item.getOrgGuid())) && !cl.getOrg().getGuid().equals(emptyIfNull(item.getOrgGuid()))) {
                     Org newOrg = DAOService.getInstance().getOrgByGuid(item.getOrgGuid());
                     if(newOrg == null) {
-                        ImportRegisterClientsService.log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
+                        ImportRegisterMSKClientsService
+                                .log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
                                 cl.getPerson().getSurname()) + " " +
                                 emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
                                 + ", " +
@@ -238,7 +244,8 @@ public class NSIDeltaProcessor {
                         return;
                     }
                     //  log
-                    ImportRegisterClientsService.log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
+                    ImportRegisterMSKClientsService
+                            .log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
                             cl.getPerson().getSurname()) + " " +
                             emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
                             + ", " +
@@ -246,10 +253,10 @@ public class NSIDeltaProcessor {
                             + " в школу " + newOrg.getIdOfOrg(), logBuffer);
                     //  exec
                     service.addClientChange(ts, cl.getOrg().getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl,
-                            ImportRegisterClientsService.MOVE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
+                            ImportRegisterMSKClientsService.MOVE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
                 } else {
                     //  log
-                    ImportRegisterClientsService.log(synchDate + "Изменение " +
+                    ImportRegisterMSKClientsService.log(synchDate + "Изменение " +
                             emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
                             emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
                             cl.getPerson().getSecondName()) + ", " +
@@ -259,7 +266,7 @@ public class NSIDeltaProcessor {
                             emptyIfNull(item.getSecondName()) + ", " + emptyIfNull(item.getGroup()), logBuffer);
                     //  exec
                     service.addClientChange(ts, cl.getOrg().getIdOfOrg(), null, fieldConfig, cl,
-                            ImportRegisterClientsService.MODIFY_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
+                            ImportRegisterMSKClientsService.MODIFY_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
                 }
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
@@ -267,21 +274,21 @@ public class NSIDeltaProcessor {
         } else if(item.getAction() == Action.DELETED.ordinal()) {
             Client cl = DAOUtils.findClientByGuid(em, StringUtils.isBlank(item.getGuid()) ? "" : item.getGuid());
             if(cl == null) {
-                ImportRegisterClientsService.log(synchDate + "Невозможно обработать удаление клиента " +
+                ImportRegisterMSKClientsService.log(synchDate + "Невозможно обработать удаление клиента " +
                         emptyIfNull(item.getGuid()) + ", " + emptyIfNull(item.getFamilyName()) + " " +
                         emptyIfNull(item.getFirstName()) + " - не найден", logBuffer);
                 return;
             }
             try {
                 //  log
-                ImportRegisterClientsService.log(synchDate + "Удаление " +
+                ImportRegisterMSKClientsService.log(synchDate + "Удаление " +
                         emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
                         emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
                         + ", " +
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()), logBuffer);
                 //  exec
                 service.addClientChange(ts, cl.getOrg().getIdOfOrg(), cl,
-                        ImportRegisterClientsService.DELETE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
+                        ImportRegisterMSKClientsService.DELETE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
             }
@@ -300,7 +307,8 @@ public class NSIDeltaProcessor {
         fieldConfig.setValue(ClientManager.FieldId.GROUP, solveField(item.getGroup(), cl != null && cl.getClientGroup() != null ? cl.getClientGroup().getGroupName() : ""));
         fieldConfig.setValue(ClientManager.FieldId.GENDER, solveField(item.getGender(), cl != null && cl.getGender() != null ? getGenderFromInteger(cl.getGender()) : ""));
         fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, solveField(item.getBirthDate(), cl != null && cl.getBirthDate() != null ? getBirthDateFromDate(cl.getBirthDate()) : ""));
-        fieldConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, solveField(item.getBenefitDSZN(), cl != null ? cl.getCategoriesDiscountsDSZN() : ""));
+        fieldConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, solveField(item.getBenefitDSZN(), cl != null ? DiscountManager
+                .getClientDiscountsDSZNAsString(cl) : ""));
         fieldConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, solveField(item.getAgeTypeGroup(), cl != null ? cl.getAgeTypeGroup() : ""));
         fieldConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, solveField(new Integer(item.getGuardians().size()).toString(), cl != null ? cl.getGuardiansCount() : ""));
         if (item.getGuardians() != null && item.getGuardians().size() > 0 ) {
@@ -345,7 +353,7 @@ public class NSIDeltaProcessor {
         protected String birthDate;
         protected String benefitDSZN;
         protected String ageTypeGroup;
-        protected List<ImportRegisterClientsService.GuardianInfo> guardians;
+        protected List<ImportRegisterMSKClientsService.GuardianInfo> guardians;
         private String groupDeprecated, groupNewWay;
 
         public DeltaItem(Item item) {
@@ -390,9 +398,9 @@ public class NSIDeltaProcessor {
 
                 }
                 else if (attributeName.endsWith("представители")) {
-                    guardians = new ArrayList<ImportRegisterClientsService.GuardianInfo>();
+                    guardians = new ArrayList<ImportRegisterMSKClientsService.GuardianInfo>();
                     for (GroupValue groupValue : at.getGroupValue()) {
-                        ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
+                        ImportRegisterMSKClientsService.GuardianInfo guardianInfo = new ImportRegisterMSKClientsService.GuardianInfo();
 
                         for (Attribute attr1 : groupValue.getAttribute()) {
                             if (attr1.getName().equals("Фамилия представителя")) {
@@ -555,7 +563,7 @@ public class NSIDeltaProcessor {
             return ageTypeGroup;
         }
 
-        public List<ImportRegisterClientsService.GuardianInfo> getGuardians() {
+        public List<ImportRegisterMSKClientsService.GuardianInfo> getGuardians() {
             return guardians;
         }
     }

@@ -14,6 +14,8 @@ public class ApplicationForFood {
     private Client client;
     private Long dtisznCode;
     private Date createdDate;
+    private Date discountDateStart;
+    private Date discountDateEnd;
     private ApplicationForFoodStatus status;
     private String mobile;
     private String applicantName;
@@ -196,5 +198,21 @@ public class ApplicationForFood {
 
     public void setSendToAISContingent(Boolean sendToAISContingent) {
         this.sendToAISContingent = sendToAISContingent;
+    }
+
+    public Date getDiscountDateStart() {
+        return discountDateStart;
+    }
+
+    public void setDiscountDateStart(Date discountDateStart) {
+        this.discountDateStart = discountDateStart;
+    }
+
+    public Date getDiscountDateEnd() {
+        return discountDateEnd;
+    }
+
+    public void setDiscountDateEnd(Date discountDateEnd) {
+        this.discountDateEnd = discountDateEnd;
     }
 }

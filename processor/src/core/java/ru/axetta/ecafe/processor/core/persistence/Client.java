@@ -52,6 +52,7 @@ public class Client {
     public static final int INITIAL_DISCOUNT_MODE = DISCOUNT_MODE_NONE;
     public static final int DISCOUNT_MODE_BY_CATEGORY = 3;
     public static final String[] DISCOUNT_MODE_NAMES = {"Отсутствует", "Дотация", "Бесплатно", "Льгота по категориям"};
+    public static final String DOU_STRING = "дошкол";
 
     public static final int GROUP_SCHOOL = 0;
     public static final int GROUP_BEFORE_SCHOOL_OUT = 1;
@@ -98,8 +99,6 @@ public class Client {
 
     private Long limit;
     private Long expenditureLimit;
-    private String categoriesDiscounts;
-    private String categoriesDiscountsDSZN;
     private Date lastDiscountsUpdate;
     private Date disablePlanCreationDate;
     private Date disablePlanEndDate;
@@ -107,6 +106,7 @@ public class Client {
     private Set<GuardSan> guardSan;
     private Long externalId;
     private String clientGUID;
+    private String meshGUID;
     private Set<Card> cards = new HashSet<Card>();
     private Set<Call> calls = new HashSet<Call>();
     private Set<Notification> notifications = new HashSet<Notification>();
@@ -119,6 +119,7 @@ public class Client {
     //private Set<Circulation> circulations = new HashSet<Circulation>();
     private Set<EnterEvent> enterEvents = new HashSet<EnterEvent>();
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
+    private Set<ClientDtisznDiscountInfo> categoriesDSZNInternal = new HashSet<>();
     private String fax;
     private Boolean canConfirmGroupPayment;
     private Boolean confirmVisualRecognition;
@@ -158,8 +159,7 @@ public class Client {
 
     public Client(Org org, Person person, Person contractPerson, int flags, boolean notifyViaEmail,
             boolean notifyViaSMS, boolean notifyViaPUSH, long contractId, Date contractTime, int contractState,
-            String plainPassword, int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit,
-            String categoriesDiscounts, String categoriesDiscountsDSZN) throws Exception {
+            String plainPassword, int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit) throws Exception {
         this.org = org;
         this.person = person;
         this.contractPerson = contractPerson;
@@ -181,8 +181,6 @@ public class Client {
         this.subBalance1 = 0L;
         this.limit = limit;
         this.expenditureLimit = expenditureLimit;
-        this.categoriesDiscounts = categoriesDiscounts;
-        this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
         this.confirmVisualRecognition = false;
         this.disablePlanCreationDate = null;
@@ -253,6 +251,10 @@ public class Client {
         }
     }
 
+    public boolean notDOUClient() {
+        return ageTypeGroup == null || !ageTypeGroup.toLowerCase().contains(DOU_STRING);
+    }
+
     public Card findActiveCard(Session session, Card failCard) throws Exception {
         // Ищем активную карту
         Criteria activeClientCardCriteria = session.createCriteria(Card.class);
@@ -289,6 +291,10 @@ public class Client {
             || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue())
             || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_OTHERS.getValue())
             || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue()));
+    }
+
+    public boolean isSotrudnik() {
+        return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
     }
 
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
@@ -478,14 +484,6 @@ public class Client {
 
     public void setExpenditureLimit(Long expenditureLimit) {
         this.expenditureLimit = expenditureLimit;
-    }
-
-    public String getCategoriesDiscounts() {
-        return categoriesDiscounts;
-    }
-
-    public void setCategoriesDiscounts(String categoriesDiscounts) {
-        this.categoriesDiscounts = categoriesDiscounts;
     }
 
     public Long getIdOfClient() {
@@ -758,6 +756,14 @@ public class Client {
         this.clientGUID = clientGUID;
     }
 
+    public String getMeshGUID() {
+        return meshGUID;
+    }
+
+    public void setMeshGUID(String meshGUID) {
+        this.meshGUID = meshGUID;
+    }
+
     public Set<Card> getCardsInternal() {
         // For Hibernate only
         return cards;
@@ -889,6 +895,19 @@ public class Client {
     private Set<ClientSms> getClientSmsInternal() {
         // For Hibernate only
         return clientSms;
+    }
+
+    public Set<ClientDtisznDiscountInfo> getCategoriesDSZN() {
+        return Collections.unmodifiableSet(getCategoriesDSZNInternal());
+    }
+
+    private Set<ClientDtisznDiscountInfo> getCategoriesDSZNInternal() {
+        // For Hibernate only
+        return categoriesDSZNInternal;
+    }
+
+    private void setCategoriesDSZNInternal(Set<ClientDtisznDiscountInfo> categoriesDSZNInternal) {
+        this.categoriesDSZNInternal = categoriesDSZNInternal;
     }
 
     private void setClientSmsInternal(Set<ClientSms> clientSms) {
@@ -1044,14 +1063,6 @@ public class Client {
         this.birthDate = birthDate;
     }
 
-    public String getCategoriesDiscountsDSZN() {
-        return categoriesDiscountsDSZN;
-    }
-
-    public void setCategoriesDiscountsDSZN(String benefitDSZN) {
-        this.categoriesDiscountsDSZN = benefitDSZN;
-    }
-
     public Date getLastDiscountsUpdate() {
         return lastDiscountsUpdate;
     }
@@ -1113,7 +1124,7 @@ public class Client {
                 + ", cypheredPassword='" + cypheredPassword + '\'' + ", payForSMS=" + payForSMS + ", freePayMaxCount="
                 + freePayMaxCount + ", freePayCount=" + freePayCount + ", lastFreePayTime=" + lastFreePayTime
                 + ", discountMode=" + discountMode + ", balance=" + balance + ", limit=" + limit + ", expenditureLimit="
-                + expenditureLimit + ", categoriesDiscounts=" + categoriesDiscounts + '}';
+                + expenditureLimit + '}';
     }
 
     public Long getBalanceToNotify() {

@@ -6,50 +6,73 @@ package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 
-import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-@Entity
-@Table(name = "cf_wt_category_items")
+//@Entity
+//@Table(name = "cf_wt_category_items")
 public class WtCategoryItem {
     public static final int ACTIVE = 0;
     public static final int DELETE = 1;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategoryitem_seq")
-    @Column(name = "idofcategoryitem")
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategoryitem_seq")
+    //@Column(name = "idofcategoryitem")
     private Long idOfCategoryItem;
 
-    @Column(name = "createdate")
+    //@Column(name = "createdate")
     private Date createDate;
 
-    @Column(name = "lastupdate")
+    //@Column(name = "lastupdate")
     private Date lastUpdate;
 
-    @Column(name = "version")
+    //@Column(name = "version")
     private Long version;
 
-    @ManyToOne
-    @JoinColumn(name = "idofuser")
+    //@ManyToOne
+    //@JoinColumn(name = "idofuser")
     private User user;
 
-    @Column(name = "guid")
+    //@Column(name = "guid")
     private String guid;
 
-    @Column(name = "description")
+    //@Column(name = "description")
     private String description;
 
-    @Column(name = "deletestate")
+    //@Column(name = "deletestate")
     private Integer deleteState;
 
-    @ManyToMany
-    @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
+    //@ManyToMany
+    /*@JoinTable(name = "cf_wt_dish_categoryitem_relationships",
             joinColumns = @JoinColumn(name = "idOfCategoryItem"),
-            inverseJoinColumns = @JoinColumn(name = "idOfDish"))
+            inverseJoinColumns = @JoinColumn(name = "idOfDish"))*/
     private Set<WtDish> dishes = new HashSet<>();
+
+    /*@ManyToOne
+    @JoinColumn(name = "idofwtcategory")*/
+    private WtCategory wtCategory;
+
+    public static WtCategoryItem build(String description, WtCategory selectedItem, User currentUser) {
+        WtCategoryItem item = new WtCategoryItem();
+        Date createdDate = new Date();
+
+        item.setCreateDate(createdDate);
+        item.setLastUpdate(createdDate);
+        item.setUser(currentUser);
+        item.setDescription(description);
+        item.setGuid(UUID.randomUUID().toString());
+        item.setDeleteState(WtCategoryItem.ACTIVE);
+        item.setWtCategory(selectedItem);
+
+        return item;
+    }
+
+    public WtCategory getWtCategory() {
+        return wtCategory;
+    }
+
+    public void setWtCategory(WtCategory wtCategory) {
+        this.wtCategory = wtCategory;
+    }
 
     public Long getIdOfCategoryItem() {
         return idOfCategoryItem;
@@ -128,17 +151,17 @@ public class WtCategoryItem {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof WtCategoryItem)) {
             return false;
         }
         WtCategoryItem that = (WtCategoryItem) o;
-        return Objects.equals(idOfCategoryItem, that.idOfCategoryItem) && Objects.equals(createDate, that.createDate)
-                && Objects.equals(lastUpdate, that.lastUpdate) && Objects.equals(version, that.version) && Objects
-                .equals(guid, that.guid) && Objects.equals(description, that.description);
+        return Objects.equals(getIdOfCategoryItem(), that.getIdOfCategoryItem()) && Objects
+                .equals(getGuid(), that.getGuid()) && Objects.equals(getDescription(), that.getDescription())
+                && Objects.equals(getDeleteState(), that.getDeleteState());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfCategoryItem, createDate, lastUpdate, version, guid, description);
+        return Objects.hash(getIdOfCategoryItem(), getGuid(), getDescription(), getDeleteState());
     }
 }

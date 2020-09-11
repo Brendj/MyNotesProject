@@ -327,6 +327,7 @@ public class MainPage implements Serializable {
     private final SyncMonitorPage syncMonitorPage = new SyncMonitorPage();
 
     private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
+    private final BlockUnblockReportPage blockUnblockReportPage = new BlockUnblockReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -1849,6 +1850,7 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                orgSelectPage.updateOrgTypesItems();
                 orgSelectPage.fill(idOfContragent, idOfContract, persistenceSession, idOfContragentOrgList);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1898,9 +1900,9 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1941,9 +1943,9 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1980,9 +1982,9 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -2053,6 +2055,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            orgSelectPage.updateOrgTypesItems();
             orgSelectPage.fill(persistenceSession, idOfContragentOrgList);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2140,7 +2143,7 @@ public class MainPage implements Serializable {
     }
 
     public Object updateOrgListSelectPageWithItemDeselection() {
-        if (orgListSelectPage.getSupplierFilter() == 2) {
+        if (orgListSelectPage.getFilterMode() == 2) {
             orgListSelectPage.setDistrictFilterDisabled(true);
         } else {
             orgListSelectPage.setDistrictFilterDisabled(false);
@@ -2151,7 +2154,7 @@ public class MainPage implements Serializable {
     }
 
     public Object updateOrgSelectPageWithItemDeselection() {
-        if (orgSelectPage.getSupplierFilter() == 2) {
+        if (orgSelectPage.getFilterMode() == 2) {
             orgSelectPage.setDistrictFilterDisabled(true);
         } else {
             orgSelectPage.setDistrictFilterDisabled(false);
@@ -2163,6 +2166,7 @@ public class MainPage implements Serializable {
     public Object clearOrgListSelectedItemsList() {
         orgFilterOfSelectOrgListSelectPage = "";
         orgListSelectPage.deselectAllItems();
+        orgListSelectPage.clearSelectedOrgMap();
         updateOrgListSelectPage();
         return null;
     }
@@ -7441,6 +7445,19 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showBlockUnblockReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = blockUnblockReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set block/unblock card page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
 
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;
@@ -10675,5 +10692,9 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getPreorderPage() {
         return preorderPage;
+    }
+
+    public BlockUnblockReportPage getBlockUnblockReportPage() {
+        return blockUnblockReportPage;
     }
 }

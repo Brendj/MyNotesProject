@@ -9,6 +9,7 @@ import generated.spb.register.Pupil;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.partner.spb.SpbClientService;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -47,7 +48,7 @@ import java.util.*;
  */
 @Component
 @Scope("singleton")
-public class ImportRegisterSpbClientsService {
+public class ImportRegisterSpbClientsService implements ImportClientRegisterService {
 
     private static final Logger logger = LoggerFactory.getLogger(ImportRegisterSpbClientsService.class);
 
@@ -113,9 +114,11 @@ public class ImportRegisterSpbClientsService {
         q.executeUpdate();
     }
 
+    @Override
     @Transactional
-    public StringBuffer syncClientsWithRegistry(long idOfOrg) throws Exception {
-        StringBuffer logBuffer = new StringBuffer();
+    public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
+            boolean manualCheckout) throws Exception {
+        logBuffer = new StringBuffer();
         if (!DAOService.getInstance().isSverkaEnabled()) {
             throw new Exception("Service temporary unavailable");
         }
@@ -162,6 +165,23 @@ public class ImportRegisterSpbClientsService {
                     SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());
             processEnd.saveWithSuccess(isSuccessEnd);
         }
+    }
+
+    @Override
+    public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation,
+            String groupName) throws Exception {
+        List<RegistryChangeCallback> result = new LinkedList<>();
+        for (Long idOfRegistryChange : changesList) {
+            try {
+                applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
+            } catch (Exception e1) {
+                logger.error("Error when apply RegistryChange: ", e1);
+                setChangeError(idOfRegistryChange, e1);
+                result.add(new RegistryChangeCallback(idOfRegistryChange, e1.getMessage()));
+            }
+        }
+        return result;
     }
 
     public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
@@ -275,6 +295,7 @@ public class ImportRegisterSpbClientsService {
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                     modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                    modifyConfig.setValue(ClientManager.FieldId.MESH_GUID, change.getMeshGUID());
                     modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
@@ -414,11 +435,11 @@ public class ImportRegisterSpbClientsService {
 
             if(org.getChangesDSZN()) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN, pupil.getBenefit() == null ? null :
-                        pupil.getBenefit().getCode(), cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(),
+                        pupil.getBenefit().getCode(), cl == null ? null : cl.getCategoriesDSZN().size() == 0 ? null : DiscountManager.getClientDiscountsDSZNAsString(cl),
                         updateClient);
                 if(!updateClient) {
-                    updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefit().getCode(), cl == null ? null : cl.getCategoriesDiscounts(),
-                                    categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscounts());
+                    updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefit().getCode(), cl == null ? null : DiscountManager.getClientDiscountsAsString(cl),
+                                    categoryMap, categoryDSZNMap), cl == null ? null : DiscountManager.getClientDiscountsAsString(cl));
                 }
             }
 
@@ -530,11 +551,11 @@ public class ImportRegisterSpbClientsService {
         if(checkBenefits) {
             ch.setBenefitDSZN(clientBenefitDSZN);
             ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
-                    currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
+                    currentClient != null ? DiscountManager.getClientDiscountsAsString(currentClient) : ""), ","));
             if(currentClient != null) {
-                ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-                ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
-                        StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
+                ch.setBenefitDSZNFrom(DiscountManager.getClientDiscountsDSZNAsString(currentClient));
+                ch.setOldDiscounts(StringUtils.isEmpty(DiscountManager.getClientDiscountsAsString(currentClient)) ? "" :
+                        StringUtils.join(new TreeSet<String>(Arrays.asList(DiscountManager.getClientDiscountsAsString(currentClient).split(","))), ","));
             }
         }
 
@@ -578,9 +599,9 @@ public class ImportRegisterSpbClientsService {
             if (currentClient.getBirthDate() != null) {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
-            ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-            ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
-                    StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
+            ch.setBenefitDSZNFrom(DiscountManager.getClientDiscountsDSZNAsString(currentClient));
+            ch.setOldDiscounts(currentClient.getCategories().size() == 0 ? "" :
+                    StringUtils.join(new TreeSet<String>(Arrays.asList(DiscountManager.getClientDiscountsAsString(currentClient).split(","))), ","));
         }
         sess.save(ch);
     }
@@ -610,8 +631,8 @@ public class ImportRegisterSpbClientsService {
         }
         ch.setCheckBenefits(checkBenefits);
         if(checkBenefits) {
-            ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
-            ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
+            ch.setBenefitDSZN(DiscountManager.getClientDiscountsDSZNAsString(currentClient));
+            ch.setNewDiscounts(DiscountManager.getClientDiscountsAsString(currentClient));
         }
         sess.save(ch);
     }
@@ -737,6 +758,7 @@ public class ImportRegisterSpbClientsService {
         return change;
     }
 
+    @Override
     public RegistryChangeError getRegistryChangeError(Long idOfRegistryChangeError) {
         if (idOfRegistryChangeError == null) {
             return null;

@@ -6,14 +6,16 @@ package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
-import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -22,10 +24,7 @@ import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 
 import javax.faces.model.SelectItem;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,41 +35,45 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     protected String region;
     protected String filter;
-    protected String tagFilter;
     protected String idFilter;
-    /*
-           0               - нет фильтра
-           1               - фильтр "только ОУ"
-           4               - фильтр "только ДОУ"
-           5               - фильтр "только СОШ"
-           другое значение - фильтр "только поставщики"
-        */
-    protected int supplierFilter = 0;
-    /*
-           0 - доступны все фильтры
-           1 - доступны только фильтр по ОУ, ДОУ и СОШ
-           2 - доступен только фильтр по поставщикам
-           3 - доступны только фильтры по ОУ, ДОУ, СОШ и по поставщикам
-           4 - доступен только фильтр по ДОУ
-           5 - доступен только фильтр по СОШ
-           6 - доступны все фильтры для всех поставщиков
-        */
-    protected int filterMode = 0;
-    protected boolean allOrgFilterDisabled = false;
-    protected boolean schoolFilterDisabled = false;
-    protected boolean primarySchoolFilterDisabled = false;
-    protected boolean secondarySchoolFilterDisabled = false;
-    protected boolean supplierFilterDisabled = false;
-    protected boolean districtFilterDisabled = false;
-    protected boolean allOrgsFilterDisabled = false;
+    protected Long idOfSelectedContragent;
+    protected List<SelectItem> regions;
+    protected List<SelectItem> contragentsList = Collections.emptyList();
+    protected Integer filterMode = 0;
+    protected Boolean districtFilterDisabled = false;
+
+    // По мере расширения типов ОО необходимо дополнять нижеизложенные группы
+    protected static final List<OrganizationType> ONLY_OO_GROUP = Arrays.asList(
+            OrganizationType.SCHOOL,
+            OrganizationType.KINDERGARTEN,
+            OrganizationType.PROFESSIONAL,
+            OrganizationType.ADDEDEDUCATION
+    );
+
+    protected List<Integer> unsupportedUserRole = Arrays.asList(
+            User.DefaultRole.ADMIN_SECURITY.ordinal(),
+            User.DefaultRole.ADMIN.ordinal(),
+            User.DefaultRole.CARD_OPERATOR.ordinal()
+    );
+
+    protected static final List<OrganizationType> ONLY_SUPPLIERS = Collections
+            .singletonList(OrganizationType.SUPPLIER);
+
+    protected static final List<OrganizationType> ONLY_KIND_OO = Collections
+            .singletonList(OrganizationType.KINDERGARTEN);
+
+    protected static final List<OrganizationType> ONLY_SCHOOLS = Collections
+            .singletonList(OrganizationType.SCHOOL);
+
+    protected List<OrganizationTypeItem> availableOrganizationTypes = buildAvailableOrganizationTypes();
+
     protected List<OrgShortItem> items = Collections.emptyList();
-    protected Long idOfContragent;
     protected Long idOfContract;
 
     @SuppressWarnings("unchecked")
-    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, int supplierFilter,
+    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, List<OrganizationTypeItem> orgTypes,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
-            Long idOfContragent, Long idOfContract) throws Exception {
+            Long idOfContragent, Long idOfContract, boolean onlySupplier) throws Exception {
         Criteria orgCriteria = session.createCriteria(Org.class);
 
         Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
@@ -88,67 +91,51 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             orgCriteria.add(Restrictions.or(shortNameInfoServiceIlike, shortNameOrOfficalNameIlike));
         }
 
-        if (StringUtils.isNotEmpty(tagFilter)) {
-            orgCriteria.add(Restrictions.ilike("tag", tagFilter, MatchMode.ANYWHERE));
-        }
-
-        if (idFilter != null && idFilter.length() > 0) {
-            try {
-                Long id = Long.parseLong(idFilter);
-                orgCriteria.add(Restrictions.eq("id", id));
-            } catch (Exception ignored) {
+        if (StringUtils.isNotBlank(idFilter)) {
+            String[] stringIds = idFilter.split("\\s*,\\s*");
+            List<Long> ids = new LinkedList<>();
+            for(String stringId : stringIds) {
+                try {
+                    ids.add(Long.valueOf(stringId));
+                } catch (Exception ignored) {
+                }
+            }
+            if(CollectionUtils.isNotEmpty(ids)) {
+                orgCriteria.add(Restrictions.in("id", ids));
             }
         }
 
-        if (region != null && region.length() > 0) {
+        if (StringUtils.isNotBlank(region)) {
             orgCriteria.add(Restrictions.eq("district", region));
         }
 
-        if (supplierFilter == 1 && idOfSourceMenuOrgList != null && !idOfSourceMenuOrgList.isEmpty()
-                && idOfSourceMenuOrgList.get(0) != null) {
-            orgCriteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfSourceMenuOrgList));
-        }
+        if(!onlySupplier) {
+            if (CollectionUtils.isNotEmpty(idOfSourceMenuOrgList) && idOfSourceMenuOrgList.get(0) != null) {
+                orgCriteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfSourceMenuOrgList));
+            }
 
-        if (supplierFilter != 6) {
-            if (!CollectionUtils.isEmpty(idOfSupplierList)) {
+            if (CollectionUtils.isNotEmpty(idOfSupplierList)) {
                 orgCriteria.add(Restrictions.in("defaultSupplier.idOfContragent", idOfSupplierList));
+            } else if (idOfContragent != null) {
+                orgCriteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
+            } else if (idOfContract != null) {
+                orgCriteria.add(Restrictions.eq("contractId", "" + idOfContract));
             }
         }
 
-        if (idOfContract != null) {
-            orgCriteria.add(Restrictions.eq("contractId", "" + idOfContract));
-        } else if (idOfContragent != null) {
-            orgCriteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
-        }
-
-        if (supplierFilter != 0 && supplierFilter != 6) {
-            Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
-            List menuExchangeRuleList = destMenuExchangeCriteria.list();
-            HashSet<Long> idOfSourceOrgSet = new HashSet<Long>();
-            for (Object object : menuExchangeRuleList) {
-                MenuExchangeRule menuExchangeRule = (MenuExchangeRule) object;
-                Long idOfSourceOrg = menuExchangeRule.getIdOfSourceOrg();
-                if (idOfSourceOrg != null) {
-                    idOfSourceOrgSet.add(idOfSourceOrg);
+        if(CollectionUtils.isNotEmpty(orgTypes)) {
+            List<OrganizationType> selectedTypes = new LinkedList<>();
+            for(OrganizationTypeItem item : orgTypes){
+                if(!item.selected){
+                    continue;
+                }
+                OrganizationType type = OrganizationType.fromInteger(item.getCode());
+                if(type != null){
+                    selectedTypes.add(type);
                 }
             }
-            if (idOfSourceOrgSet.size() > 0) {
-                Criterion criterion = Restrictions.in("idOfOrg", idOfSourceOrgSet);
-                if (supplierFilter == 1 || supplierFilter == 4 || supplierFilter == 5 || supplierFilter == 2) {
-                    criterion = Restrictions.not(criterion);
-                }
-                if (supplierFilter != 2) {
-                    orgCriteria.add(criterion);
-                }
-            }
-            if (supplierFilter == 4) {
-                orgCriteria.add(Restrictions.eq("type", OrganizationType.KINDERGARTEN));
-            }
-            if (supplierFilter == 5) {
-                orgCriteria.add(Restrictions.eq("type", OrganizationType.SCHOOL));
-            }
-            if (supplierFilter == 2) {
-                orgCriteria.add(Restrictions.eq("type", OrganizationType.SUPPLIER));
+            if(!selectedTypes.isEmpty()) {
+                orgCriteria.add(Restrictions.in("type", selectedTypes));
             }
         }
 
@@ -166,13 +153,24 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     public List<SelectItem> getRegions() {
-        List<String> regions = DAOService.getInstance().getRegions();
-        List<SelectItem> items = new ArrayList<SelectItem>();
-        items.add(new SelectItem(""));
-        for (String reg : regions) {
-            items.add(new SelectItem(reg));
+        if(CollectionUtils.isEmpty(regions)) {
+            List<String> regionsFromDB = DAOService.getInstance().getRegions();
+            regions = new LinkedList<>();
+            regions.add(new SelectItem(""));
+            for (String reg : regionsFromDB) {
+                regions.add(new SelectItem(reg));
+            }
         }
-        return items;
+        return regions;
+    }
+
+    private List<OrganizationTypeItem> buildAvailableOrganizationTypes(){
+        List<OrganizationTypeItem> availableTypes = new LinkedList<>();
+        for (OrganizationType type : OrganizationType.values()) {
+            OrganizationTypeItem item = new OrganizationTypeItem(type);
+            availableTypes.add(item);
+        }
+        return availableTypes;
     }
 
     public String getRegion() {
@@ -183,36 +181,12 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.region = region;
     }
 
-    public boolean isDistrictFilterDisabled() {
-        return districtFilterDisabled;
-    }
-
-    public void setDistrictFilterDisabled(boolean districtFilterDisabled) {
-        this.districtFilterDisabled = districtFilterDisabled;
-    }
-
-    public boolean isAllOrgsFilterDisabled() {
-        return allOrgsFilterDisabled;
-    }
-
-    public void setAllOrgsFilterDisabled(boolean allOrgsFilterDisabled) {
-        this.allOrgsFilterDisabled = allOrgsFilterDisabled;
-    }
-
     public String getFilter() {
         return filter;
     }
 
     public void setFilter(String filter) {
         this.filter = filter;
-    }
-
-    public String getTagFilter() {
-        return tagFilter;
-    }
-
-    public void setTagFilter(String tagFilter) {
-        this.tagFilter = tagFilter;
     }
 
     public String getIdFilter() {
@@ -223,106 +197,93 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.idFilter = idFilter;
     }
 
-    public int getSupplierFilter() {
-        return supplierFilter;
-    }
-
-    public void setSupplierFilter(int supplierFilter) {
-        this.supplierFilter = supplierFilter;
-    }
-
-    public int getFilterMode() {
+    public Integer getFilterMode() {
         return filterMode;
     }
 
-    public void setFilterMode(int filterMode) {
+    public void setFilterMode(Integer filterMode) {
         this.filterMode = filterMode;
-        switch (filterMode) {
-            case 1:
-                setOrgFilterModeParameters(true, false, true, true, true, false, false);
-                setSupplierFilter(1);
-                break;
+    }
+
+    public Boolean getDistrictFilterDisabled() {
+        return districtFilterDisabled;
+    }
+
+    public void setDistrictFilterDisabled(Boolean districtFilterDisabled) {
+        this.districtFilterDisabled = districtFilterDisabled;
+    }
+
+        /*
+           0 - доступны все фильтры
+           1 - доступны только фильтр по ОУ, ДОУ и СОШ
+           2 - доступен только фильтр по поставщикам
+           3 - доступны только фильтры по ОУ, ДОУ, СОШ и по поставщикам
+           4 - доступен только фильтр по ДОУ
+           5 - доступен только фильтр по СОШ
+           6 - доступны все фильтры для всех поставщиков
+        */
+
+    public Boolean disableContragentFilter(){
+        return getFilterMode().equals(2);
+    }
+
+
+    public void updateOrgTypesItems() {
+        switch (getFilterMode()) {
             case 2:
-                setOrgFilterModeParameters(true, true, false, true, true, true, false);
-                setSupplierFilter(2);
+                disableAvailableTypesAndSetSelected(ONLY_SUPPLIERS);
+                districtFilterDisabled = true;
                 break;
             case 3:
-                setOrgFilterModeParameters(true, false, false, false, false, false, false);
-                setSupplierFilter(1);
+                disableAvailableTypesAndSetSelected(CollectionUtils.union(ONLY_OO_GROUP, ONLY_SUPPLIERS));
+                districtFilterDisabled = false;
                 break;
             case 4:
-                setOrgFilterModeParameters(true, true, true, false, true, false, false);
-                setSupplierFilter(4);
+                disableAvailableTypesAndSetSelected(ONLY_KIND_OO);
+                districtFilterDisabled = false;
                 break;
             case 5:
-                setOrgFilterModeParameters(true, true, true, true, false, false, false);
-                setSupplierFilter(5);
+                disableAvailableTypesAndSetSelected(ONLY_SCHOOLS);
+                districtFilterDisabled = false;
                 break;
+            case 1:
             case 6:
-                setOrgFilterModeParameters(false, false, false, false, false, false, false);
-                setSupplierFilter(0);
-                break;
             case 7:
-                setOrgFilterModeParameters(true, false, true, false, false, false, false);
-                setSupplierFilter(1);
-                break;
             default:
-                setOrgFilterModeParameters(false, false, false, false, false, false, false);
-                setSupplierFilter(0);
-                break;
+                disableAvailableTypesAndSetSelected(null);
+                districtFilterDisabled = false;
         }
     }
 
-    public boolean isAllOrgFilterDisabled() {
-        return allOrgFilterDisabled;
+    protected void resetAvailableOrganizationTypes() {
+        for (OrganizationTypeItem item : availableOrganizationTypes) {
+            item.setDisabled(false);
+            item.setSelected(!item.code.equals(OrganizationType.SUPPLIER.getCode()));
+        }
     }
 
-    public void setAllOrgFilterDisabled(boolean allOrgFilterDisabled) {
-        this.allOrgFilterDisabled = allOrgFilterDisabled;
-    }
-
-    public boolean isSchoolFilterDisabled() {
-        return schoolFilterDisabled;
-    }
-
-    public void setSchoolFilterDisabled(boolean schoolFilterDisabled) {
-        this.schoolFilterDisabled = schoolFilterDisabled;
-    }
-
-    public boolean isPrimarySchoolFilterDisabled() {
-        return primarySchoolFilterDisabled;
-    }
-
-    public void setPrimarySchoolFilterDisabled(boolean primarySchoolFilterDisabled) {
-        this.primarySchoolFilterDisabled = primarySchoolFilterDisabled;
-    }
-
-    public boolean isSecondarySchoolFilterDisabled() {
-        return secondarySchoolFilterDisabled;
-    }
-
-    public void setSecondarySchoolFilterDisabled(boolean secondarySchoolFilterDisabled) {
-        this.secondarySchoolFilterDisabled = secondarySchoolFilterDisabled;
-    }
-
-    public boolean isSupplierFilterDisabled() {
-        return supplierFilterDisabled;
-    }
-
-    public void setSupplierFilterDisabled(boolean supplierFilterDisabled) {
-        this.supplierFilterDisabled = supplierFilterDisabled;
-    }
-
-    protected void setOrgFilterModeParameters(boolean allOrgFilterDisabled, boolean schoolFilterDisabled,
-            boolean supplierFilterDisabled, boolean primarySchoolFilterDisabled, boolean secondarySchoolFilterDisabled,
-            boolean districtFilterDisabled, boolean allOrgsFilterDisabled) {
-        this.allOrgFilterDisabled = allOrgFilterDisabled;
-        this.schoolFilterDisabled = schoolFilterDisabled;
-        this.supplierFilterDisabled = supplierFilterDisabled;
-        this.primarySchoolFilterDisabled = primarySchoolFilterDisabled;
-        this.secondarySchoolFilterDisabled = secondarySchoolFilterDisabled;
-        this.districtFilterDisabled = districtFilterDisabled;
-        this.allOrgsFilterDisabled = allOrgsFilterDisabled;
+    private void disableAvailableTypesAndSetSelected(Collection<OrganizationType> targetTypes) {
+        if (CollectionUtils.isEmpty(targetTypes)) {
+            for (OrganizationTypeItem item : availableOrganizationTypes) {
+                item.setDisabled(false);
+            }
+        } else if (targetTypes.size() == 1) {
+            for (OrganizationTypeItem item : availableOrganizationTypes) {
+                OrganizationType currentType = OrganizationType.fromInteger(item.getCode());
+                item.setSelected(targetTypes.contains(currentType));
+                item.setDisabled(true);
+            }
+        } else {
+            for (OrganizationTypeItem item : availableOrganizationTypes) {
+                OrganizationType currentType = OrganizationType.fromInteger(item.getCode());
+                if (targetTypes.contains(currentType)) {
+                    item.setDisabled(true);
+                } else {
+                    item.setSelected(false);
+                    item.setDisabled(true);
+                }
+            }
+        }
     }
 
     public List<OrgShortItem> getItems() {
@@ -342,11 +303,11 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     public Long getIdOfContragent() {
-        return idOfContragent;
+        return idOfSelectedContragent;
     }
 
     public void setIdOfContragent(Long idOfContragent) {
-        this.idOfContragent = idOfContragent;
+        this.idOfSelectedContragent = idOfContragent;
     }
 
     public Long getIdOfContract() {
@@ -357,18 +318,109 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.idOfContract = idOfContract;
     }
 
+    public List<OrganizationTypeItem> getAvailableOrganizationTypes() {
+        return availableOrganizationTypes;
+    }
+
+    public void setAvailableOrganizationTypes(List<OrganizationTypeItem> availableOrganizationTypes) {
+        this.availableOrganizationTypes = availableOrganizationTypes;
+    }
+
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList,
             List<Long> idOfSupplierList) throws Exception {
         deselectAllItems();
-        return retrieveOrgs(session, getFilter(), getTagFilter(), getSupplierFilter(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, idOfSupplierList, null, null);
+        Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
+        return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
+                idOfSourceMenuOrgList, idOfSupplierList, idOfContragent, null, getFilterMode().equals(2));
     }
 
     @SuppressWarnings("unchecked")
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList)
             throws Exception {
         deselectAllItems();
-        return retrieveOrgs(session, getFilter(), getTagFilter(), getSupplierFilter(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, Collections.EMPTY_LIST, null, null);
+        Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
+        return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
+                idOfSourceMenuOrgList, Collections.EMPTY_LIST, idOfContragent, null, getFilterMode().equals(2));
+    }
+
+    public List<SelectItem> getContragentsList() {
+        if (CollectionUtils.isEmpty(contragentsList)) {
+            try {
+                User user = MainPage.getSessionInstance().getCurrentUser();
+                if (unsupportedUserRole.contains(user.getIdOfRole())) {
+                    return Collections.emptyList();
+                }
+
+                List<Contragent> contragents = DAOService.getInstance().contragentsListByUser(user.getIdOfUser());
+                contragentsList = new LinkedList<>();
+
+                contragentsList.add(new SelectItem(-1L, ""));
+                for (Contragent c : contragents) {
+                    SelectItem item = new SelectItem(c.getIdOfContragent(), c.getContragentName());
+                    contragentsList.add(item);
+                }
+            } catch (Exception e) {
+                getLogger().error("Exception when build ContragentList in OrgSelectionBasicPage", e);
+                contragentsList = Collections.emptyList();
+            }
+        }
+        return contragentsList;
+    }
+
+    public void setContragentsList(List<SelectItem> contragentsList) {
+        this.contragentsList = contragentsList;
+    }
+
+    public Long getIdOfSelectedContragent() {
+        return idOfSelectedContragent;
+    }
+
+    public void setIdOfSelectedContragent(Long idOfSelectedContragent) {
+        this.idOfSelectedContragent = idOfSelectedContragent;
+    }
+
+    public static class OrganizationTypeItem {
+        private Boolean selected;
+        private Boolean disabled = false;
+        private String typeName;
+        private Integer code;
+
+        OrganizationTypeItem(OrganizationType type){
+            this.typeName = type.getShortType();
+            this.code = type.getCode();
+            selected = !type.equals(OrganizationType.SUPPLIER);
+        }
+
+        public Boolean getSelected() {
+            return selected;
+        }
+
+        public void setSelected(Boolean selected) {
+            this.selected = selected;
+        }
+
+        public Boolean getDisabled() {
+            return disabled;
+        }
+
+        public void setDisabled(Boolean disabled) {
+            this.disabled = disabled;
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
     }
 }

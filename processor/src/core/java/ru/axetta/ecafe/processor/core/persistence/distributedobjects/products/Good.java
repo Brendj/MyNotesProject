@@ -120,6 +120,17 @@ public class Good extends ConfigurationProviderDistributedObject {
         if (gg == null) {
             throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
         }
+        //Удаление объекта из кеша сессии с одинаковым идентификатором
+        GoodGroup ggFromSession = (GoodGroup) session.get(GoodGroup.class, gg.getGlobalId());
+        if(ggFromSession != null){
+            session.evict(ggFromSession);
+        }
+        //Если конфигурация у провайдера поменялась, то меняем и группы. Чтобы группа соответствовала товару
+        if (gg.getIdOfConfigurationProvider() == null || !gg.getIdOfConfigurationProvider().equals(getIdOfConfigurationProvider()))
+        {
+            gg.setIdOfConfigurationProvider(getIdOfConfigurationProvider());
+            session.update(gg);
+        }
         setGoodGroup(gg);
         Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
         TechnologicalMap tm = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMap.class, session, guidOfTM);

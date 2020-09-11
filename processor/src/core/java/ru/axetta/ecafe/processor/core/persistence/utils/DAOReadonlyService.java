@@ -9,6 +9,9 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
@@ -769,7 +772,7 @@ public class DAOReadonlyService {
         }
     }
 
-public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
+    public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
                     "SELECT gr FROM WtOrgGroup gr " + "WHERE gr.version > :version AND gr.contragent = :contragent AND "
@@ -1004,6 +1007,22 @@ public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contr
         return result != null ? ((BigInteger) result).longValue() : 0L;
     }
 
+    public Boolean isMenuItemAvailable (Long menuId) {
+        Query query = entityManager.createNativeQuery("SELECT count(mg.id) FROM cf_wt_menu_groups mg "
+                + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
+                + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
+                + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
+                + "WHERE m.idofmenu = :idOfMenu AND mgd.idofdish is not null group by mgd.idofdish");
+        query.setParameter("idOfMenu", menuId);
+        List<BigInteger> temp = query.getResultList();
+        for(BigInteger o : temp) {
+            if (o.intValue() > 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Set<WtComplexExcludeDays> getExcludeDaysSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
@@ -1030,6 +1049,149 @@ public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contr
         try {
             List<Boolean> list = entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg")
                     .setParameter("idOfOrg", orgId)
+                    .getResultList();
+            if (list.contains(Boolean.TRUE))
+                return true;
+            else
+                return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+	
+        public Boolean checkExcludeDays(Date date, WtComplex wtComplex) {
+        try {
+            Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                            + "WHERE excludeDays.complex = :complex "
+                            + "AND excludeDays.deleteState = 0");
+            query.setParameter("complex", wtComplex);
+            List<WtComplexExcludeDays> excludeDays = query.getResultList();
+
+            if (excludeDays != null) {
+                for (WtComplexExcludeDays wtExcludeDays : excludeDays) {
+                    if (wtExcludeDays.getDate().getTime() == date.getTime())
+                        return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
+        return entityManager.createQuery("select dish.categoryItems from WtDish dish where dish = :dish")
+                .setParameter("dish", wtDish)
+                .getResultList();
+    }
+
+    public List<WtGroupItem> getGroupItemsByWtDish(WtDish wtDish) {
+        return entityManager.createQuery("select dish.groupItems from WtDish dish where dish = :dish")
+                .setParameter("dish", wtDish)
+                .getResultList();
+    }
+
+    public List<Org> getOrgsByWtMenu(WtMenu wtMenu) {
+        return entityManager.createQuery("select menu.orgs from WtMenu menu where menu = :menu")
+                .setParameter("menu", wtMenu)
+                .getResultList();
+    }
+
+    public List<WtMenu> getMenuByWtMenuGroup(WtMenuGroup wtMenuGroup) {
+        return entityManager.createQuery("select menu from WtMenu menu left join fetch menu.menuGroupMenus mgm "
+                + "where mgm.menuGroup = :wtMenuGroup ")
+                .setParameter("wtMenuGroup", wtMenuGroup)
+                .getResultList();
+    }
+
+    public Boolean checkWorkingDay(Date date) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT calend.flag from ProductionCalendar calend WHERE calend.day "
+                            + "between :dateBegin and :dateEnd");
+            query.setParameter("dateBegin", CalendarUtils.startOfDay(date));
+            query.setParameter("dateEnd", CalendarUtils.endOfDay(date));
+            List<Integer> res = query.getResultList();
+            if (res != null && res.size() > 0) {
+                return res.get(0) == 1;
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Boolean checkLearningDayByOrgAndClientGroup(Date date, Org org, ClientGroup clientGroup) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT sd.isWeekend from SpecialDate sd "
+                            + "WHERE sd.date between :dateBegin and :dateEnd AND sd.deleted = false AND sd.org = :org "
+                            + "AND (sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL)");
+            query.setParameter("dateBegin", CalendarUtils.startOfDay(date));
+            query.setParameter("dateEnd", CalendarUtils.endOfDay(date));
+            query.setParameter("org", org);
+            query.setParameter("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            List<Boolean> res = query.getResultList();
+            if (res != null && res.size() > 0) {
+                return res.get(0);
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Boolean isSixDaysWorkingWeek(Org org, String groupName) {
+        try {
+            Query query = entityManager.createQuery("SELECT gno.isSixDaysWorkWeek FROM GroupNamesToOrgs gno " +
+                    "WHERE gno.idOfOrg = :idOfOrg AND gno.groupName = :groupName");
+            query.setParameter("idOfOrg", org.getIdOfOrg());
+            query.setParameter("groupName", groupName);
+            return (Boolean) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public GoodRequest findGoodRequestByGuid(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT gr from GoodRequest gr where gr.guid = :guid");
+            query.setParameter("guid", guid);
+            return (GoodRequest) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Staff findStaffByGuid(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT s from Staff s where s.guid = :guid");
+            query.setParameter("guid", guid);
+            return (Staff) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public GoodRequestPosition findGoodRequestPositionByGuid(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT grp from GoodRequestPosition grp where grp.guid = :guid");
+            query.setParameter("guid", guid);
+            return (GoodRequestPosition) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+	public boolean isSixWorkWeekOrgAndGroup(Long orgId, String groupName) {
+        boolean resultByOrg = false; //isSixWorkWeek(orgId);
+        try {
+            List<Boolean> list = entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto "
+                    + "where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupname")
+                    .setParameter("idOfOrg", orgId).setParameter("groupname", groupName)
                     .getResultList();
             if (list.contains(Boolean.TRUE))
                 return true;

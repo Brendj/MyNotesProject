@@ -12,9 +12,10 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -27,9 +28,11 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
@@ -184,6 +187,13 @@ public class DAOUtils {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
+    public static Client findClientByMeshGuid(Session persistenceSession, String guid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("meshGUID", guid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
     @SuppressWarnings("unchecked")
     public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
@@ -266,6 +276,15 @@ public class DAOUtils {
             return null;
         }
         return ((Long) l.get(0));
+    }
+
+    public static Long getClientIdByGuid(Session session, String guid) {
+        String sql = "select idOfClient from cf_clients where clientGUID=:guid";
+
+        Query q = session.createSQLQuery(sql);
+        q.setParameter("guid", guid);
+
+        return HibernateUtils.getDbLong(q.uniqueResult());
     }
 
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
@@ -696,6 +715,24 @@ public class DAOUtils {
         return null;
     }
 
+    public static List<ClientGroup> findClientGroupsByGroupNameForAllOrgsIgnoreCase(Session persistenceSession,
+            List<Long> idOfOrgsList, String groupName) throws Exception {
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        return clientGroupCriteria
+                .add(Restrictions.and(Restrictions.eq("groupName", groupName.trim()).ignoreCase(), Restrictions.in("org.idOfOrg", idOfOrgsList)))
+                .list();
+    }
+
+    public static GroupNamesToOrgs findGroupFromGroupNamesToOrgs(Session session, List<Long> idOfOrgsList, String groupName) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        List l = criteria.add(Restrictions.and(Restrictions.eq("groupName", groupName.trim()).ignoreCase(), Restrictions.in("idOfOrg", idOfOrgsList)))
+                .list();
+        if (l.size() > 0) {
+            return (GroupNamesToOrgs) l.get(0);
+        }
+        return null;
+    }
+
     /**
      * производит выборку Группы клиента по номеру организации и имени группы
      * игнорируя регистр имени группы
@@ -907,7 +944,7 @@ public class DAOUtils {
 
     public static List<Org> getOrgsSinceVersion(Session session, long version) throws Exception {
         Criteria criteria = session.createCriteria(Org.class);
-        criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
+        //criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
         criteria.add(Restrictions.gt("orgStructureVersion", version));
         return criteria.list();
     }
@@ -1900,50 +1937,15 @@ public class DAOUtils {
     public static long nextVersionByCategoryDiscountDSZN(EntityManager entityManager) {
         long version = 0L;
         javax.persistence.Query query = entityManager.createNativeQuery(
-                "SELECT cd.version FROM CF_CategoryDiscounts_DSZN AS cd "
-                        + "ORDER BY cd.version DESC LIMIT 1 FOR UPDATE");
+                "SELECT nextval('CF_CategoryDiscounts_DSZN_version_seq')");
         try {
             Object o = query.getSingleResult();
             if (o != null) {
-                version = Long.valueOf(o.toString()) + 1;
+                version = HibernateUtils.getDbLong(o);
             }
         } catch (NoResultException ignore) {
         }
         return version;
-    }
-
-    public static void deleteCategoryDiscount(Session session, long id) {
-        //TODO: разобораться надо ли это с учетом ввода таблицы связи
-        CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
-        Criteria clientCriteria = session.createCriteria(Client.class);
-        Criterion exp1 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
-                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.START));
-        Criterion exp2 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(), MatchMode.END),
-                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.ANYWHERE));
-        Criterion expression = Restrictions.or(exp1, exp2);
-        clientCriteria.add(expression);
-        List<Client> clients = clientCriteria.list();
-        for (Client client : clients) {
-            String categoriesDiscounts = client.getCategoriesDiscounts();
-            if (categoriesDiscounts.contains("," + id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.replace("," + id + ",", ",");
-            } else if (categoriesDiscounts.startsWith(id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.substring((id + ",").length());
-            } else if (categoriesDiscounts.endsWith("," + id)) {
-                categoriesDiscounts = categoriesDiscounts
-                        .substring(0, categoriesDiscounts.length() - ("," + id).length());
-            } else {
-                categoriesDiscounts = categoriesDiscounts.replace("" + id, "");
-            }
-            client.setCategoriesDiscounts(categoriesDiscounts);
-            session.save(client);
-        }
-
-        session.delete(categoryDiscount);
     }
 
     public static void deleteCategoryDiscountDSZN(Session session, Long id, Long nextVersion) {
@@ -2058,14 +2060,36 @@ public class DAOUtils {
         return (Long) (q.getSingleResult());
     }
 
-    public static List<DiscountRule> listDiscountRules(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from DiscountRule order by priority, idOfRule asc");
+    public static List<DiscountRule> listDiscountRules(EntityManager em, boolean archived) {
+        javax.persistence.Query q = em.createQuery("from DiscountRule where deletedState = :archived "
+                + "order by priority, idOfRule asc");
+        q.setParameter("archived", archived);
         return q.getResultList();
     }
 
-    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from WtDiscountRule order by priority, idOfRule asc");
+    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em, boolean archived) {
+        javax.persistence.Query q = em.createQuery("from WtDiscountRule where deletedState = :archived "
+                + "order by priority, idOfRule asc");
+        q.setParameter("archived", archived);
         return q.getResultList();
+    }
+
+    public static List<WtComplex> getComplexesByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
+        return em.createQuery("select rule.complexes from WtDiscountRule rule where rule = :discountRule")
+                .setParameter("discountRule", discountRule)
+                .getResultList();
+    }
+
+    public static List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
+        return em.createQuery("select rule.categoryDiscounts from WtDiscountRule rule where rule = :discountRule")
+                .setParameter("discountRule", discountRule)
+                .getResultList();
+    }
+
+    public static List<CategoryOrg> getCategoryOrgsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
+        return em.createQuery("select rule.categoryOrgs from WtDiscountRule rule where rule = :discountRule")
+                .setParameter("discountRule", discountRule)
+                .getResultList();
     }
 
     public static List getCategoryDiscountListWithIds(EntityManager em, List<Long> idOfCategoryList) {
@@ -2168,8 +2192,14 @@ public class DAOUtils {
         return (Good) criteria.uniqueResult();
     }
 
+    public static WtComplex findWtComplexById(Session session, Long idOfComplex) {
+        Criteria criteria = session.createCriteria(WtComplex.class);
+        criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
+        return (WtComplex) criteria.uniqueResult();
+    }
+
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
-            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode) {
+            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode, Long orderSum) {
         if (!cancelOrder) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
@@ -2180,17 +2210,19 @@ public class DAOUtils {
             preorderComplex = (PreorderComplex) criteria.uniqueResult();
         }
         if (preorderComplex != null) {
-            long sum = orderDetail.getQty() * orderDetail.getRPrice();
+            long sum = orderSum;
             long qty = orderDetail.getQty();
             if (cancelOrder) {
                 sum = -sum;
                 qty = -qty;
             }
-            preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
-            preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
-            session.update(preorderComplex);
+            if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX)) {
+                preorderComplex.setUsedSum(sum);
+                preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
+                session.update(preorderComplex);
+            }
 
-            if (preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) && itemCode != null) {
+            if (preorderComplex.isType4Complex() && itemCode != null) {
                 PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
                 if (pmd != null) {
                     long sum2 = qty * pmd.getMenuDetailPrice();
@@ -2962,10 +2994,10 @@ public class DAOUtils {
     public static long nextVersionByClientBalanceHold(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select cbh.version from cf_clientbalance_hold as cbh order by cbh.version desc limit 1 for update");
+                "select nextval('cf_clientbalance_hold_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -2983,10 +3015,10 @@ public class DAOUtils {
     public static long nextVersionByTaloonApproval(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select t.version from cf_taloon_approval as t order by t.version desc limit 1 for update");
+                "select nextval('cf_taloon_approval_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3003,11 +3035,11 @@ public class DAOUtils {
     }
 
     public static long nextVersionByTaloonPreorder(Session session){
-        long version = 0L;
-        Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
+        long version = 1L;
+        Query query = session.createSQLQuery("select nextval('cf_taloon_preorder_version_seq')");
         Object o = query.uniqueResult();
-        if(o!=null){
-            version = Long.valueOf(o.toString()) + 1;
+        if(o != null){
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3015,10 +3047,10 @@ public class DAOUtils {
     public static long nextVersionByComplexSchedule(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select s.version from cf_complex_schedules as s order by s.version desc limit 1 for update");
+                "select nextval('cf_complex_schedules_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3026,10 +3058,10 @@ public class DAOUtils {
     public static long nextVersionByZeroTransaction(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select t.version from cf_zerotransactions as t order by t.version desc limit 1 for update");
+                "select nextval('cf_zerotransactions_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3037,10 +3069,10 @@ public class DAOUtils {
     public static long nextVersionByGroupNameToOrg(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "SELECT g.version FROM cf_GroupNames_To_Orgs AS g ORDER BY g.version DESC LIMIT 1 FOR UPDATE");
+                "SELECT nextval('cf_GroupNames_To_Orgs_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3048,10 +3080,10 @@ public class DAOUtils {
     public static long nextVersionBySpecialDate(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select sd.version from cf_specialdates as sd order by sd.version desc limit 1 for update");
+                "select nextval('cf_specialdates_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3059,21 +3091,20 @@ public class DAOUtils {
     public static long nextVersionByMenusCalendar(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select sd.version from cf_menus_calendar as sd order by sd.version desc limit 1 for update");
+                "select nextval('cf_menus_calendar_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
 
     public static long nextVersionByClientPhoto(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select cp.version from cf_clientphoto as cp where cp.version is not null order by cp.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('clientphoto_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3104,10 +3135,10 @@ public class DAOUtils {
     public static long nextVersionByInfoMessage(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select m.version from cf_info_messages as m order by m.version desc limit 1 for update");
+                "select nextval('cf_info_messages_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3115,10 +3146,10 @@ public class DAOUtils {
     public static long nextVersionByCardRequest(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select m.version from cf_card_requests as m order by m.version desc limit 1 for update");
+                "select nextval('cf_card_requests_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3206,10 +3237,10 @@ public class DAOUtils {
     public static long nextVersionByExternalEvent(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select e.version from cf_externalevents as e order by e.version desc limit 1 for update");
+                "select nextval('cf_externalevents_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3250,6 +3281,25 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("version", version));
         //criteria.add(Restrictions.eq("deletedState", false));
         return criteria.list();
+    }
+
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Criteria criteria = session.createCriteria(GoodRequest.class);
+        criteria.add(Restrictions.in("orgOwner", orgIds));
+        criteria.add(Restrictions.gt("globalVersion", version));
+        return criteria.list();
+    }
+
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersionWithDishes(Session session, Long idOfOrg,
+            long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Query query = session
+                .createQuery("select distinct gr from GoodRequestPosition grp join grp.goodRequest gr "
+                        + "where gr.orgOwner in (:orgIds) and gr.globalVersion > :version and grp.good is null");
+        query.setParameterList("orgIds", orgIds);
+        query.setParameter("version", version);
+        return query.list();
     }
 
     public static List<ComplexSchedule> getComplexSchedulesForOrgSinceVersion(Session session, Long idOfOrg,
@@ -3623,10 +3673,10 @@ public class DAOUtils {
     public static long nextVersionByHelpRequests(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select r.version from cf_helprequests as r order by r.version desc limit 1 for update");
+                "select nextval('cf_helprequests_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3661,6 +3711,17 @@ public class DAOUtils {
                 + "where pc.version > :version and (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg))");
         query.setParameter("version", version);
         query.setParameter("idOfOrg", orgOwner);
+        return query.list();
+    }
+
+    public static List<PreorderComplex> getPreorderComplexForOrgNewBase(Session session, long orgOwner) throws Exception {
+        Date startDate = CalendarUtils.getFirstDayOfMonth(new Date());
+        startDate = CalendarUtils.addMonth(startDate, -1);
+        Query query = session.createQuery("select pc from PreorderComplex pc "
+                + "where (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg)) "
+                + "and pc.preorderDate > :date and pc.usedAmount = 0 and pc.deletedState = false");
+        query.setParameter("idOfOrg", orgOwner);
+        query.setParameter("date", startDate);
         return query.list();
     }
 
@@ -3854,6 +3915,32 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(GoodRequestPosition.class);
         criteria.add(Restrictions.eq("goodRequest", request));
         return criteria.list();
+    }
+
+    public static List<GoodRequestPosition> getGoodRequestPositionsByGoodRequest(Session session,
+            GoodRequest request) {
+        Query query = session.createSQLQuery("select grp.guid from cf_goods_requests_positions grp "
+                + "inner join cf_goods_requests gr on grp.idofgoodsrequest = gr.idofgoodsrequest "
+                + "where gr.guid = :guid").setParameter("guid", request.getGuid());
+        List<GoodRequestPosition> result = new ArrayList<>();
+        for (Object o : query.list()) {
+            GoodRequestPosition goodRequestPosition = getGoodRequestPositionByGuid(session, o.toString());
+            if (goodRequestPosition != null) {
+                result.add(goodRequestPosition);
+            }
+        }
+        return result;
+    }
+
+    public static GoodRequestPosition getGoodRequestPositionByGuid(Session session, String guid) {
+        try {
+            Query query = session.createQuery("SELECT grp from GoodRequestPosition grp where grp.guid = :guid");
+            query.setParameter("guid", guid);
+            return (GoodRequestPosition) query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Can't find GoodRequestPosition guid=" + guid + ": " + e.getMessage());
+            return null;
+        }
     }
 
     public static GoodRequest findGoodRequestByPreorderInfo(Session session, Long idOfOrg, Date createdDate) {
@@ -4227,10 +4314,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ApplicationForFood getLastApplicationForFoodByClientGuid(Session session, String clientGuid) {
+    public static ApplicationForFood getLastApplicationForFoodByClient(Session session, Client client) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.createAlias("client", "c");
-        criteria.add(Restrictions.eq("c.clientGUID", clientGuid));
+        criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("archived", Boolean.FALSE));
         criteria.addOrder(org.hibernate.criterion.Order.desc("lastUpdate"));
         criteria.setMaxResults(1);
@@ -4300,8 +4386,13 @@ public class DAOUtils {
         applicationForFood.setVersion(version);
         applicationForFood.setLastUpdate(new Date());
         session.update(applicationForFood);
-
-        addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, historyVersion);
+        try {
+            addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage());
+        }
         return applicationForFood;
     }
 
@@ -4410,11 +4501,10 @@ public class DAOUtils {
 
     public static long nextVersionByApplicationForFood(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select apf.version from cf_applications_for_food as apf order by apf.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('application_for_food_id_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -4471,11 +4561,10 @@ public class DAOUtils {
 
     public static long nextVersionByApplicationForFoodHistory(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select apfh.version from cf_applications_for_food_history as apfh order by apfh.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('application_for_food_history_id_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -4554,6 +4643,45 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<ApplicationForFood> getApplicationForFoodListByStatusAndServiceNumber(Session session,
+            ApplicationForFoodStatus status, Boolean isOthers, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("status", status));
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.eq("serviceNumber", serviceNumber));
+            if (isOthers) {
+                criteria.add(Restrictions.isNull("dtisznCode"));
+            }
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return new ArrayList<ApplicationForFood>();
+            else
+                return applicationForFoods;
+        } catch (Exception e)
+        {
+            logger.error("Error in getApplicationForFoodListByStatusAndServiceNumber ", e);
+            return null;
+        }
+    }
+
+    public static ApplicationForFood getApplicationForFood(Session session, String serviceNumber) {
+        try {
+            Criteria criteria = session.createCriteria(ApplicationForFood.class);
+            criteria.add(Restrictions.eq("archived", false));
+            criteria.add(Restrictions.ilike("serviceNumber", serviceNumber));
+            List<ApplicationForFood> applicationForFoods = criteria.list();
+            if (applicationForFoods == null || applicationForFoods.isEmpty())
+                return new ApplicationForFood();
+            else
+                return applicationForFoods.get(0);
+        } catch (Exception e)
+        {
+            logger.error("Error in getApplicationForFood", e);
+            return null;
+        }
+    }
+
     public static CategoryDiscountDSZN findCategoryDiscountDSZNByETPCode(EntityManager entityManager, Long ETPCode) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryDiscountDSZN where ETPCode=:ETPCode");
         q.setParameter("ETPCode", ETPCode);
@@ -4582,12 +4710,11 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient,
-            Long code) {
+    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("archived", false));
-        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("dtisznCode", Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE)));
         List list = criteria.list();
         if (list.size() == 0 || list.size() > 1) {
             return null;
@@ -4624,10 +4751,10 @@ public class DAOUtils {
     public static long nextVersionByClientDTISZNDiscountInfo(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select version from cf_client_dtiszn_discount_info order by version desc limit 1 for update");
+                "select nextval('cf_client_dtiszn_discount_info_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -4674,10 +4801,13 @@ public class DAOUtils {
         clientGroupList.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
+        boolean useLastReceiveDate = RuntimeContext.getInstance().getConfigProperties().getProperty(DTSZNDiscountsReviseService.FIELD_PROPERTY, "false").equals("true");
+        String field = useLastReceiveDate ? "lastReceivedDate" : "lastUpdate";
         Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
-                + "where lastUpdate >= :date and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+                + "where (" + field + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
         query.setParameter("date", date);
         query.setParameterList("clientGroups", clientGroupList);
+        query.setParameter("otherDiscountCode", DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
         return query.list();
     }
 
@@ -4898,6 +5028,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<ApplicationForFood> getApplicationForFoodInoeByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.isNull("dtisznCode"));
+        criteria.add(Restrictions.eq("archived", false));
+        return criteria.list();
+    }
+
     public static ApplicationForFood getApplicationForFoodByClientAndCode(Session session, Client client, Long code) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("client", client));
@@ -4919,8 +5057,7 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
-    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname,
-            Date startDate) throws Exception {
+    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
         if (orgs != null && !orgs.isEmpty()) {
             List<Long> ids = new ArrayList<>();
@@ -4932,7 +5069,7 @@ public class DAOUtils {
         if (groupname != null) {
             criteria.add(Restrictions.eq("groupname", groupname));
         }
-        criteria.add(Restrictions.gt("menudate", startDate));
+        //criteria.add(Restrictions.gt("menudate", startDate));
         return criteria.list();
     }
 
@@ -4951,9 +5088,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List getAllDateFromProdactionCalendarForEZD(Session persistenceSession) throws Exception {
-        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
-        criteria.add(Restrictions.gt("day", new Date()));
+
+    public static List getAllMenuForEZD(Session persistenceSession,
+            List<Long> idofOrg) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdMenuView.class);
+        criteria.add(Restrictions.gt("menuDate", new Date()));
+        if (idofOrg != null && !idofOrg.isEmpty()) {
+            criteria.add(Restrictions.in("idOforg", idofOrg));
+        }
         return criteria.list();
     }
 
@@ -5039,6 +5181,51 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static long nextVersionByHardwareSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_hardware_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
+            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettings.class);
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
+        return (HardwareSettings) criteria.uniqueResult();
+    }
+
+    public static long nextVersionByTurnstileSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select nextval('cf_turnstile_settings_version_seq')");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = HibernateUtils.getDbLong(o);
+        }
+        return version;
+    }
+
+    public static TurnstileSettings getTurnstileSettingsRequestByOrgAndId(Session session, Long idOfOrg, String turnstileId) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("turnstileId", turnstileId));
+        return (TurnstileSettings) criteria.uniqueResult();
+    }
+
+    public static HardwareSettingsMT getHardwareSettingsMTByIdAndModuleType(Session session, CompositeIdOfHardwareSettings compositeIdOfHardwareSettings,
+            Integer moduleType) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettingsMT.class).createAlias("hardwareSettings","hs", JoinType.FULL_JOIN);
+        criteria.add(Restrictions.eq("hs.compositeIdOfHardwareSettings",compositeIdOfHardwareSettings));
+        criteria.add(Restrictions.eq("moduleType", moduleType));
+        return (HardwareSettingsMT) criteria.uniqueResult();
+    }
+
     public static List getAllDateFromProdactionCalendarForFutureDates(Session persistenceSession) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
         criteria.add(Restrictions.gt("day", new Date()));
@@ -5052,5 +5239,23 @@ public class DAOUtils {
         criteria.add(Restrictions.le("date", CalendarUtils.endOfDay(compositeIdOfSpecialDate.getDate())));
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
         return criteria.list();
+    }
+
+    public static CanceledOrder getCancelOrderIdBySource(Session session, String source) {
+        Criteria criteria = session.createCriteria(CanceledOrder.class);
+        criteria.add(Restrictions.eq("idOfTransaction", Long.parseLong(source)));
+        return (CanceledOrder) criteria.uniqueResult();
+    }
+
+    public static List<TurnstileSettings> getTurnstileListByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return criteria.list();
+    }
+
+    public static Org getOrgById(Session session, Long idOfOrg) {
+        Criteria orgCriteria = session.createCriteria(Org.class);
+        orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        return (Org) orgCriteria.uniqueResult();
     }
 }

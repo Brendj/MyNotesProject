@@ -15,6 +15,8 @@
 <h:panelGrid id="orgCreateGrid" binding="#{mainPage.orgCreatePage.pageComponent}" styleClass="borderless-grid" columns="1">
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_basic" styleClass="borderless-grid" columns="2">
+    <h:outputText escape="true" value="ID в НСИ-3" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.orgIdFromNsi}" styleClass="input-text" />
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.guid}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />

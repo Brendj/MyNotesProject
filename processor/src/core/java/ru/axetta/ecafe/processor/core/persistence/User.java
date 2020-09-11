@@ -166,7 +166,11 @@ public class User {
         ADMIN_SECURITY(4, "5. Администратор ИБ"),
         SUPPLIER_REPORT(5, "6. Отчетность поставщика питания"),
         CARD_OPERATOR(6, "7. Оператор по картам"),
-        DIRECTOR(7, "8. Директор школы");
+        DIRECTOR(7, "8. Директор школы"),
+        PRODUCTION_DIRECTOR(8, "9. Заведующий производством"),
+        INFORMATION_SYSTEM_OPERATOR(9,"10. Оператор ИС"),
+        CLASSROOM_TEACHER(10,"11. Классный руководитель"),
+        CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"12. Классный руководитель с оплатой питания");
 
 
         private Integer identification;
@@ -231,6 +235,8 @@ public class User {
     private String department;
     private Long idOfGroup;
     private Boolean isGroup;
+    private Org org;
+    private Client client;
 
     public String getRoleName() {
         return roleName;
@@ -467,6 +473,14 @@ public class User {
     public void setBlockedUntilDate(Date blockedUntilDate) {
         this.blockedUntilDate = blockedUntilDate;
     }
+
+    public Org getOrg() { return org; }
+
+    public void setOrg(Org org) { this.org = org; }
+
+    public Client getClient(){ return client; }
+
+    public void setClient(Client client) { this.client = client; }
 
     /*
     * Если прошел срок, в течение которого было запрещено создавать пользователя с ранее существующим аккаунтом, то

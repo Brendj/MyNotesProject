@@ -4,18 +4,14 @@ package ru.axetta.ecafe.processor.core.test.synch;/*
 
 import junit.framework.TestCase;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +28,7 @@ public class RegisterSynchTest extends TestCase {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RegisterSynchTest.class);
 
 
-    @Test
+    /*@Test
     public void testInsert() throws Exception {
         System.out.println("-----------------------------------------------------------------------");
         System.out.println("---               Тестирование вставки клиета                       ---");
@@ -43,10 +39,10 @@ public class RegisterSynchTest extends TestCase {
             printOrgClients(org);
             printOrgClients(org2);
 
-            List<ImportRegisterClientsService.ExpandedPupilInfo> pupils  = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
-            List<ImportRegisterClientsService.ExpandedPupilInfo> pupils2 = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
-            ImportRegisterClientsService.ExpandedPupilInfo pupil;
-            pupil = new ImportRegisterClientsService.ExpandedPupilInfo(); //  Ничего не меняется
+            List<ImportRegisterMSKClientsService.ExpandedPupilInfo> pupils  = new ArrayList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
+            List<ImportRegisterMSKClientsService.ExpandedPupilInfo> pupils2 = new ArrayList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
+            ImportRegisterMSKClientsService.ExpandedPupilInfo pupil;
+            pupil = new ImportRegisterMSKClientsService.ExpandedPupilInfo(); //  Ничего не меняется
             pupil.firstName = "Петр";
             pupil.secondName = "Петрович";
             pupil.familyName = "Петров";
@@ -54,7 +50,7 @@ public class RegisterSynchTest extends TestCase {
             pupil.group = "6А";
             pupil.setGuidOfOrg("000");
             pupils.add(pupil);
-            pupil = new ImportRegisterClientsService.ExpandedPupilInfo(); //  Перевод в другой класс
+            pupil = new ImportRegisterMSKClientsService.ExpandedPupilInfo(); //  Перевод в другой класс
             pupil.firstName = "Иван";
             pupil.secondName = "Иванович";
             pupil.familyName = "Иванов";
@@ -62,7 +58,7 @@ public class RegisterSynchTest extends TestCase {
             pupil.group = "11А";
             pupil.setGuidOfOrg("000");
             pupils.add(pupil);
-            pupil = new ImportRegisterClientsService.ExpandedPupilInfo(); //  Добавление
+            pupil = new ImportRegisterMSKClientsService.ExpandedPupilInfo(); //  Добавление
             pupil.firstName = "Сергей";
             pupil.secondName = "Сергеевич";
             pupil.familyName = "Сергеев";
@@ -70,7 +66,7 @@ public class RegisterSynchTest extends TestCase {
             pupil.group = "10А";
             pupil.setGuidOfOrg("000");
             pupils.add(pupil);
-            pupil = new ImportRegisterClientsService.ExpandedPupilInfo(); //  Перевод в другую школу
+            pupil = new ImportRegisterMSKClientsService.ExpandedPupilInfo(); //  Перевод в другую школу
             pupil.firstName = "Павел";
             pupil.secondName = "Павлович";
             pupil.familyName = "Павлов";
@@ -80,9 +76,9 @@ public class RegisterSynchTest extends TestCase {
             pupils2.add(pupil); // массив второй школы
 
             System.out.println("---               Синхронизация с массивом данных                   ---");
-            RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).
+            RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class).
                                     parseClients("test", "test", org, pupils, true, null, false);
-            RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).
+            RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class).
                     parseClients("test", "test", org2, pupils2, true, null, false);
             System.out.println("---               Синхронизация окончена                            ---");
 
@@ -96,7 +92,7 @@ public class RegisterSynchTest extends TestCase {
         } catch (Exception e) {
             logger.error("Не удалось протестировать синхронизацию с Реестрами", e);
         }
-    }
+    }*/
 
 
     public void printOrgClients (Org org) {

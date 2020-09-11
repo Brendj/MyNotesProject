@@ -32,6 +32,7 @@ public class RegularPreorder {
     private RegularPreorderState state;
 	private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
 	private Boolean sendeddailynotification;
+    private Long idOfDish;
 
     public RegularPreorder() {
 
@@ -247,5 +248,13 @@ public class RegularPreorder {
 
     public void setSendeddailynotification(Boolean sendeddailynotification) {
         this.sendeddailynotification = sendeddailynotification;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
     }
 }

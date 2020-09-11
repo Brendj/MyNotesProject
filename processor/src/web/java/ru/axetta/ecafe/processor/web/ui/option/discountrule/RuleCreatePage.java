@@ -269,6 +269,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setComplexesMap(complexBuilder.toString());
         discountRule.setPriority(priority);
         discountRule.setOperationOr(operationOr);
+        discountRule.setDeletedState(false);
         discountRule.setCategoryDiscounts(categoryDiscounts);
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (!this.idOfCategoryList.isEmpty()) {

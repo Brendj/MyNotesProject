@@ -4,11 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -38,7 +39,6 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             boolean errorFound;
             Long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
             Long nextHistoryVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
-            Long otherDiscountCode = null;
             for (RequestFeedingItem item : requestFeeding.getItems()) {
                 errorFound = !item.getResCode().equals(RequestFeedingItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
@@ -50,7 +50,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                         logger.error(String.format("Client with id=%d not found", item.getIdOfClient()));
                         continue;
                     }
-                    saveOtherDiscount(session, item, client);
+
                     ApplicationForFoodStatus status = new ApplicationForFoodStatus(
                             ApplicationForFoodState.fromCode(item.getStatus()),
                             ApplicationForFoodDeclineReason.fromInteger(item.getDeclineReason()));
@@ -94,10 +94,9 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING,
                                                 status.getDeclineReason())));
-                                if (null == otherDiscountCode) {
-                                    otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
+                                if (CalendarUtils.betweenDate(new Date(), item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate())) {
+                                    DiscountManager.addOtherDiscountForClient(session, client);
                                 }
-                                ClientManager.addOtherDiscountForClient(session, client, otherDiscountCode);
                             }
 
                             applicationForFood = DAOUtils
@@ -119,6 +118,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             continue;
                         }
                     }
+
+                    saveOtherDiscount(session, item, client, applicationForFood);
 
                     resItem = new ResRequestFeedingItem(applicationForFood, item.getResCode());
                 } else {
@@ -152,7 +153,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                 ApplicationForFoodHistory history = DAOUtils
                         .getLastApplicationForFoodHistory(session, applicationForFood);
                 RequestFeedingItem resItem = null;
-                if (null == applicationForFood.getDtisznCode()) {
+                if (null == applicationForFood.getDtisznCode()) { //Тип льготы - Иное
                     ClientDtisznDiscountInfo discountInfo = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(),
                                     DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
@@ -172,7 +173,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
         return result;
     }
 
-    private void saveOtherDiscount(Session session, RequestFeedingItem item, Client client) {
+    private void saveOtherDiscount(Session session, RequestFeedingItem item, Client client, ApplicationForFood applicationForFood) {
         if (null != item.getDtisznCode() && (null == item.getOtherDiscountStartDate() || null == item
                 .getOtherDiscountEndDate()) || null == item.getOtherDiscountStartDate() || null == item
                 .getOtherDiscountEndDate()) {
@@ -191,13 +192,16 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             if (discountInfo.getArchived() || !discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)
                     || !discountInfo.getDateStart().equals(item.getOtherDiscountStartDate()) || !discountInfo
                     .getDateEnd().equals(item.getOtherDiscountEndDate())) {
-                discountInfo.setArchived(Boolean.FALSE);
-                discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
-                discountInfo.setDateStart(item.getOtherDiscountStartDate());
-                discountInfo.setDateEnd(item.getOtherDiscountEndDate());
-                discountInfo.setLastUpdate(new Date());
-                session.update(discountInfo);
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(discountInfo);
+                builder.withArchived(false);
+                builder.withStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+                builder.withDateStart(item.getOtherDiscountStartDate());
+                builder.withDateEnd(item.getOtherDiscountEndDate());
+                builder.save(session);
             }
         }
+        applicationForFood.setDiscountDateStart(item.getOtherDiscountStartDate());
+        applicationForFood.setDiscountDateEnd(item.getOtherDiscountEndDate());
+        session.update(applicationForFood);
     }
 }

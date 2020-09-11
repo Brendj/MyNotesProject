@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -15,7 +17,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PreorderCalendarItem")
-public class PreorderListWithComplexesGroupResult {
+public class PreorderListWithComplexesGroupResult extends Result {
     @XmlElement(name = "item")
     private List<PreorderComplexGroup> complexesWithGroups;
 

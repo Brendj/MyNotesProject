@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -63,7 +63,7 @@ public class NSIRegistrySyncPage extends BasicWorkspacePage implements OrgSelect
             return;
         }
         try {
-            StringBuffer log = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+            StringBuffer log = RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                     .runSyncForOrg(org.getIdOfOrg(), performChanges);
             syncLog = log == null ? "" : log.toString();
         } catch (Exception e) {

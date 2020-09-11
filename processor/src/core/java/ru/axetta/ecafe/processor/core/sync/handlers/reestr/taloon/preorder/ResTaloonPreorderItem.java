@@ -49,6 +49,8 @@ public class ResTaloonPreorderItem {
     private String errorMessage;
     private Long taloonNumber;
     private String comments;
+    private Long idOfDish;
+    private Boolean byWebSupplier;
 
     public ResTaloonPreorderItem() {
 
@@ -77,6 +79,10 @@ public class ResTaloonPreorderItem {
         this.deletedState = taloon.getDeletedState();
         this.goodsName = taloon.getGoodsName() == null ? "" : taloon.getGoodsName();
         this.comments = taloon.getComments() == null ? "" : taloon.getComments();
+        if (taloon.getIdOfDish() != null) {
+            this.idOfDish = taloon.getIdOfDish();
+        }
+        this.byWebSupplier = taloon.getByWebSupplier();
     }
 
     public ResTaloonPreorderItem(TaloonPreorder taloon, Integer ordersCount, Integer resCode) {
@@ -127,6 +133,10 @@ public class ResTaloonPreorderItem {
             }
             XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
             XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
+            if (idOfDish != null) {
+                XMLUtils.setAttributeIfNotNull(element, "DishId", idOfDish);
+            }
+            XMLUtils.setAttributeIfNotNull(element, "ByWebSupplier", byWebSupplier);
             if(isppState != null) XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
             if(ppState != null) XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState.ordinal());
             // для поддежки старых версий
@@ -325,5 +335,21 @@ public class ResTaloonPreorderItem {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
+    }
+
+    public Boolean getByWebSupplier() {
+        return byWebSupplier;
+    }
+
+    public void setByWebSupplier(Boolean byWebSupplier) {
+        this.byWebSupplier = byWebSupplier;
     }
 }

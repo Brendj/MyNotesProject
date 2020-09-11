@@ -45,6 +45,7 @@ public class ResHelpRequestItem {
         this.declarer = helpRequest.getDeclarer();
         this.phone = helpRequest.getPhone();
         this.requestState = helpRequest.getStatus();
+        this.version = helpRequest.getVersion();
     }
 
     public ResHelpRequestItem(HelpRequest helpRequest, Integer resultCode) {

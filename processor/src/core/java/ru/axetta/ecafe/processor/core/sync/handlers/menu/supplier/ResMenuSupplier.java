@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
@@ -11,11 +12,17 @@ import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,6 +54,8 @@ public class ResMenuSupplier implements AbstractToElement {
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
     SimpleDateFormat dateWithoutTimeFormat = new SimpleDateFormat(dateWithoutTimePattern);
+
+    private static final Logger logger = LoggerFactory.getLogger(ResMenuSupplier.class);
 
     public ResMenuSupplier() {
         orgGroups = new HashSet<>();
@@ -132,7 +141,11 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Element menusElem = document.createElement("Menus");
         for (WtMenu menu : menus) {
-            menusElem.appendChild(menuToElement(document, menu));
+            if (DAOReadonlyService.getInstance().isMenuItemAvailable (menu.getIdOfMenu())) {
+                menusElem.appendChild(menuToElement(document, menu));
+            } else {
+                logger.error("В буфетном меню id=" + menu.getIdOfMenu() + " блюда встречаются больше 1 раза");
+            }
         }
 
         Element complexesElem = document.createElement("Complexes");
@@ -245,7 +258,7 @@ public class ResMenuSupplier implements AbstractToElement {
 
         int price;
         if (dish.getPrice() != null) {
-            price = (int) dish.getPrice().floatValue() * 100; // цена в копейках
+            price = dish.getPrice().multiply(new BigDecimal(100)).intValue(); // цена в копейках
         } else {
             price = 0;
         }
@@ -277,7 +290,8 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "ContragentId", dish.getContragent().getIdOfContragent());
 
         Element categories = document.createElement("Categories");
-        for (WtCategoryItem item : dish.getCategoryItems()) {
+        List<WtCategoryItem> listCategories = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(dish);
+        for (WtCategoryItem item : listCategories) {
             Element elem = document.createElement("CGI");
             XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
             XMLUtils.setAttributeIfNotNull(elem, "CategoryId", item.getIdOfCategoryItem());
@@ -285,7 +299,8 @@ public class ResMenuSupplier implements AbstractToElement {
         }
 
         Element groupItems = document.createElement("GroupItems");
-        for (WtGroupItem item : dish.getGroupItems()) {
+        List<WtGroupItem> listGroups = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getGroupItemsByWtDish(dish);
+        for (WtGroupItem item : listGroups) {
             Element elem = document.createElement("GII");
             XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
             XMLUtils.setAttributeIfNotNull(elem, "GroupItemId", item.getIdOfGroupItem());
@@ -304,9 +319,10 @@ public class ResMenuSupplier implements AbstractToElement {
 
         XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
         XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
-        if (!menuGroup.getMenuGroupMenus().isEmpty()) {
-            List<WtMenuGroupMenu> menuGroupMenus = new ArrayList<>(menuGroup.getMenuGroupMenus());
-            XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroupMenus.get(0));
+        List<WtMenu> menus = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class)
+                .getMenuByWtMenuGroup(menuGroup);
+        if (!menus.isEmpty()) {
+            XMLUtils.setAttributeIfNotNull(element, "MenuId", menus.get(0).getIdOfMenu());
         }
         XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
         XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
@@ -355,7 +371,8 @@ public class ResMenuSupplier implements AbstractToElement {
         }
 
         Element orgs = document.createElement("Orgs");
-        for (Org item : menu.getOrgs()) {
+        List<Org> listOrgs = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getOrgsByWtMenu(menu);
+        for (Org item : listOrgs) {
             Element elem = document.createElement("OGI");
             XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
             XMLUtils.setAttributeIfNotNull(elem, "OrgId", item.getIdOfOrg());
@@ -378,7 +395,7 @@ public class ResMenuSupplier implements AbstractToElement {
 
         int price;
         if (complex.getPrice() != null) {
-            price = (int) complex.getPrice().floatValue() * 100; // цена в копейках
+            price = complex.getPrice().multiply(new BigDecimal(100)).intValue(); // цена в копейках
         } else {
             price = 0;
         }

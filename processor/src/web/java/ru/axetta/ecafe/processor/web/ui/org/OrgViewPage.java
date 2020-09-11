@@ -114,6 +114,8 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     private Boolean useWebArm;
 
+    private Long orgIdFromNsi;
+
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
@@ -297,6 +299,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.preorderlp = org.getPreorderlp();
 
         this.useWebArm = org.getUseWebArm();
+        this.orgIdFromNsi = org.getOrgIdFromNsi();
     }
 
     public String getFilterOrgs() {
@@ -592,11 +595,6 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.statusDetails = statusDetails;
     }
 
-    public Object updateBalance(){
-        for (int i=0;i<10000000;i++);
-        return null;
-    }
-
     public Boolean getPayByCashier() {
         return payByCashier;
     }
@@ -842,4 +840,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     public void setSubordination(String subordination) {
         this.subordination = subordination;
     }
+
+    public Long getOrgIdFromNsi() { return orgIdFromNsi; }
+
+    public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
 }

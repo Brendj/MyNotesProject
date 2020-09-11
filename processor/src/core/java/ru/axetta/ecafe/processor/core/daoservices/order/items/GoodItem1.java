@@ -22,6 +22,7 @@ public class GoodItem1 implements Comparable<GoodItem1>{
     private String pathPart4;
     private String fullName;
     private Long price;
+    private Integer modeOfAdd;
 
     public GoodItem1() {
         this.pathPart1 = "";
@@ -112,5 +113,13 @@ public class GoodItem1 implements Comparable<GoodItem1>{
     @Override
     public int compareTo(GoodItem1 goodItem) {
         return goodItem.getFullName().compareTo(this.fullName);
+    }
+
+    public Integer getModeOfAdd() {
+        return modeOfAdd;
+    }
+
+    public void setModeOfAdd(Integer modeOfAdd) {
+        this.modeOfAdd = modeOfAdd;
     }
 }

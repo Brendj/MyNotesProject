@@ -15,13 +15,13 @@
     <facet type="jpa" name="JPA">
       <configuration>
         <setting name="validation-enabled" value="true" />
-        <setting name="provider-name" value="" />
         <datasource-mapping>
           <factory-entry name="entityManagerFactory" />
           <factory-entry name="org_room" value="cedfba61-0f44-4ced-9708-18045311d229" />
           <factory-entry name="processorPU" />
           <factory-entry name="reportsPU" />
         </datasource-mapping>
+        <naming-strategy-map />
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/../../src/org-room/web/WEB-INF/classes/META-INF/persistence.xml" />
       </configuration>
     </facet>

@@ -10,9 +10,11 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgMainBuildingListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -32,7 +34,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class UserCreatePage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList,
-        OrgMainBuildingListSelectPage.CompleteHandler {
+        OrgMainBuildingListSelectPage.CompleteHandler, OrgSelectPage.CompleteHandler, ClientSelectPage.CompleteHandler  {
 
     protected Long idOfUser;
     protected String userName;
@@ -64,6 +66,10 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     protected String surname;
     protected String secondName;
     protected String department;
+    protected OrgItem userOrg = new OrgItem(null, null);
+    protected String userOrgName = "Не выбрано";
+    protected Long userIdOfClient;
+    protected String userClientName = "Не выбрано";
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -272,6 +278,15 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setPerson(person);
                 session.save(person);
             }
+            if(userIdOfClient != null){
+                Client userClient = (Client) session.load(Client.class, userIdOfClient);
+                user.setClient(userClient);
+                if(userClient != null && userClient.getOrg() != null)
+                    user.setOrg(userClient.getOrg());
+                else if(userOrg.idOfOrg != null)
+                    user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+            }
+
             if (role != null && User.DefaultRole.DEFAULT.equals(role)) {
                 if (StringUtils.isEmpty(roleName)) {
                     this.printError("Заполните имя роли");
@@ -294,6 +309,22 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 if (contragentItems.isEmpty()) {
                     this.printError("Список контрагенотов пуст.");
                     throw new RuntimeException("Contragent list is empty");
+                }
+            }
+            if(role != null && (role.equals(User.DefaultRole.CLASSROOM_TEACHER)
+                    || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT)
+                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR))) {
+                user.setRoleName(role.toString());
+                if(user.getClient() == null){
+                    this.printError("Выберите клиента.");
+                    throw new RuntimeException("Client field is null");
+                }
+            }
+            if(role != null && role.equals(User.DefaultRole.PRODUCTION_DIRECTOR)){
+                user.setRoleName(role.toString());
+                if(user.getOrg() == null){
+                    this.printError("Выберите организацию.");
+                    throw new RuntimeException("Org field is null");
                 }
             }
 
@@ -434,6 +465,28 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         return role.equals(User.DefaultRole.DIRECTOR);
     }
 
+    public Boolean getIsProductionDirector() {
+        if(idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.PRODUCTION_DIRECTOR);
+    }
+
+    public Boolean getIsInformationSystemOperator() {
+        if(idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR);
+    }
+
+    public Boolean getIsClassroomTeacher() {
+        if(idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.CLASSROOM_TEACHER) || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT);
+    }
+
+    public Boolean getIsSchoolApiUser() {
+        return getIsProductionDirector() || getIsInformationSystemOperator() || getIsClassroomTeacher();
+    }
+
     @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
             String classTypes) throws Exception {
@@ -485,6 +538,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     public void setDepartment(String department) {
         this.department = department;
     }
+
 
     public static class ContragentItem {
 
@@ -637,6 +691,23 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         this.organizationId = organizationId;
     }
 
+    public OrgItem getUserOrg() { return userOrg; }
+
+    public void setUserOrg(OrgItem userOrg) { this.userOrg = userOrg; }
+
+    public String getUserOrgName() { return this.userOrgName; }
+
+    public void setUserOrgName(String userOrgName) { this.userOrgName = userOrgName; }
+
+    public Long getUserIdOfClient() { return userIdOfClient; }
+
+    public void setUserIdOfClient(Long userIdOfClient) { this.userIdOfClient = userIdOfClient; }
+
+    public String getUserClientName() { return userClientName; }
+
+    public void setUserClientName(String userClientName) { this.userClientName = userClientName; }
+
+
     @Override
     public void completeOrgMainBuildingListSelection(Session session, List<Org> orgs) throws Exception {
         if (getIsDirector()) {
@@ -653,6 +724,46 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                     organizationsFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
                 }
             }
+        }
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if(idOfOrg == null){
+            this.userOrg = new OrgItem(null, "Не выбрано");
+            this.userOrgName = "Не выбрано";
+        }
+        else {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            this.userOrg = new OrgItem(org.getIdOfOrg(), org.getShortName());
+            this.userOrgName = org.getShortName();
+        }
+    }
+
+    @Override
+    public void completeClientSelection(Session session, Long idOfClient) throws Exception {
+        if(idOfClient == null) {
+            this.userIdOfClient = null;
+            this.userClientName = "Не выбрано";
+            this.firstName = null;
+            this.secondName = null;
+            this.surname = null;
+            this.userOrg = new OrgItem(null,null);
+            this.userOrgName = "Не выбрано";
+        }
+        else {
+            Client client = (Client) session.load(Client.class,idOfClient);
+            this.userIdOfClient = client.getIdOfClient();
+            this.userClientName = client.getPerson().getFullName();
+            this.firstName = client.getPerson().getFirstName();
+            this.secondName = client.getPerson().getSecondName();
+            this.surname = client.getPerson().getSurname();
+            if(client.getOrg() != null)
+            {
+                this.userOrg = new OrgItem(client.getOrg().getIdOfOrg(), client.getOrg().getShortName());
+                this.userOrgName = this.userOrg.getShortName();
+            }
+
         }
     }
 }

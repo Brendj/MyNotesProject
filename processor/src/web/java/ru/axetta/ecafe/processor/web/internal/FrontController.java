@@ -21,7 +21,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
 import ru.axetta.ecafe.processor.core.utils.Base64;
@@ -29,6 +30,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -104,10 +106,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -134,10 +136,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -162,10 +164,10 @@ public class FrontController extends HttpServlet {
             return Collections.EMPTY_LIST;
         }
         Integer af = actionFilter;
-        if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+        if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
             af = null;
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
@@ -183,10 +185,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -212,10 +214,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -308,7 +310,7 @@ public class FrontController extends HttpServlet {
             if (changesList != null && changesList.size() > 0) {
                 if (RuntimeContext.RegistryType.isMsk()) {
                     RegistryChange change = RuntimeContext.getAppContext()
-                            .getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+                            .getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                             .getRegistryChange(changesList.get(0));
                     checkRequestValidity(change.getIdOfOrg());
                 } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -323,7 +325,7 @@ public class FrontController extends HttpServlet {
         }
 
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegitryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
@@ -340,7 +342,7 @@ public class FrontController extends HttpServlet {
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegitryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeEmployeeItem")
@@ -357,7 +359,7 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass ip check", fce);
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegitryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
+                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
@@ -470,7 +472,7 @@ public class FrontController extends HttpServlet {
         RegistryChangeError e = null;
         if (RuntimeContext.RegistryType.isMsk()) {
             e = RuntimeContext.getAppContext()
-                    .getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+                    .getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                     .getRegistryChangeError(idOfRegistryChangeError);
         } else if (RuntimeContext.RegistryType.isSpb()) {
             e = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
@@ -1073,7 +1075,6 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
-        boolean isExistsOrgByIdAndTags; // = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush =
                 RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
         String notifyByEmail =
@@ -1098,12 +1099,6 @@ public class FrontController extends HttpServlet {
                 String orgIdForClient = getClientParamDescValueByName("orgId", cd.getClientDescParams().getParam());
                 if (orgIdForClient == null) {
                     throw new FrontControllerException("Не найден обязательный параметр orgId");
-                }
-                isExistsOrgByIdAndTags = DAOService.getInstance()
-                        .existsOrgByIdAndTags(Long.parseLong(orgIdForClient), "БЛОК_РЕГ_УЧ");
-                if (isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(group)) {
-                    throw new FrontControllerException(
-                            "Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
                 }
 
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
@@ -1246,7 +1241,6 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
-        boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush =
                 RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
         String notifyByEmail =
@@ -1257,10 +1251,6 @@ public class FrontController extends HttpServlet {
             try {
                 //ClientManager.ClientFieldConfig fc = ClientDesc.buildClientFieldConfig(cd);
                 logger.debug("create FieldConfig");
-                if (isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(cd.group)) {
-                    throw new FrontControllerException(
-                            "Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
-                }
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
                 logger.debug("check client params");
                 if (cd.contractSurname != null) {
@@ -1988,6 +1978,38 @@ public class FrontController extends HttpServlet {
         return CalendarUtils.dateTimeToString(new Date());
     }
 
+    @WebMethod(operationName = "getBalancesForPayPlan")
+    public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+        PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            for (PayPlanBalanceItem item : payPlanBalanceList.getItems()) {
+                PayPlanBalanceItem resultItem = new PayPlanBalanceItem(item.getIdOfClient());
+                Client client = DAOReadonlyService.getInstance().findClientById(item.getIdOfClient());
+                if (client == null) throw new Exception("Client not found in getBalancesForPayPlan. IdOfClient = " + item.getIdOfClient());
+                long preorderSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getNotPaidPreordersSum(client, CalendarUtils.startOfDay(new Date()));
+                long resultSum = client.getBalance() - item.getSumma() - preorderSum;
+                resultItem.setSumma(resultSum);
+                result.addItem(resultItem);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error in getBalancesForPayPlan", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name = "cardNo") Long cardNo,
@@ -1995,7 +2017,8 @@ public class FrontController extends HttpServlet {
         //checkRequestValidity(idOfOrg);
         ResponseItem responseItem = new ResponseItem();
         try {
-            CardService.getInstance().unblockOrReturnCard(cardNo, idOfOrg);
+            Card card = CardService.getInstance().unblockOrReturnCard(cardNo, idOfOrg);
+            CardService.getInstance().updateSyncStatus(card, idOfOrg, 0L, true);
             responseItem.code = ResponseItem.OK;
             responseItem.message = ResponseItem.OK_MESSAGE;
         } catch (CardNotFoundException e) {

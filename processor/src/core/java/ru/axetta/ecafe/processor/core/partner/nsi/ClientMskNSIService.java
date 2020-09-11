@@ -13,8 +13,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,25 +35,13 @@ import java.util.*;
 @Component("ClientMskNSIService")
 @Scope("singleton")
 public class ClientMskNSIService extends MskNSIService {
-
     private static final Logger logger = LoggerFactory.getLogger(ClientMskNSIService.class);
-
-    private String getGroup(String currentGroup, String initialGroup) {
-        String group = currentGroup;
-        if (group == null || group.trim().length() == 0) {
-            group = initialGroup;
-        }
-        if (group != null) {
-            group = group.replaceAll("[ -]", "");
-        }
-        return group;
-    }
 
     public void fillTable(BufferedReader bufferedReader) throws Exception {
         //stub
     }
 
-    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+    public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> list = new ArrayList<String>();
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
@@ -64,7 +53,7 @@ public class ClientMskNSIService extends MskNSIService {
         searchByStatus.setAttributeOp("not like");
         searchPredicateInfo.addSearchPredicate(searchByStatus);
 
-        Boolean guidOK;
+        boolean guidOK;
         for (String guid : orgGuids.getOrgGuids()) {
             guidOK = false;
             if (searchPredicateInfo.getSearchPredicates().size() > 1) {
@@ -79,7 +68,7 @@ public class ClientMskNSIService extends MskNSIService {
             searchPredicateInfo.addSearchPredicate(search);
 
             List<Item> queryResults = executeQuery(searchPredicateInfo, -1);
-            ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
+            ImportRegisterMSKClientsService service = RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class);
             for (Item i : queryResults) {
                 for(Attribute attr : i.getAttribute()) {
                     if (attr.getName().equals("GUID Образовательного учреждения")) {
@@ -110,12 +99,12 @@ public class ClientMskNSIService extends MskNSIService {
         return badGuids;
     }
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,
+    public List<ImportRegisterMSKClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
-        List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        List<ImportRegisterMSKClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
-            List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
+            List<ImportRegisterMSKClientsService.ExpandedPupilInfo> iterationPupils = null;
             iterationPupils = getClientsForOrgs(orgGuids.getOrgGuids(), familyName, firstName, secondName, importIteration);
             if (iterationPupils == null) continue;
             if (iterationPupils.size() > 0) {
@@ -126,69 +115,17 @@ public class ClientMskNSIService extends MskNSIService {
             importIteration++;
         }
         /// удалить неимпортируемые группы
-        for (Iterator<ImportRegisterClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
-            ImportRegisterClientsService.ExpandedPupilInfo p = i.next();
-            if (ImportRegisterClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
+        for (Iterator<ImportRegisterMSKClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
+            ImportRegisterMSKClientsService.ExpandedPupilInfo p = i.next();
+            if (ImportRegisterMSKClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
                 i.remove();
             }
         }
         return pupils;
     }
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getClientsForOrgs(Set<String> guids, String familyName,
+    public List<ImportRegisterMSKClientsService.ExpandedPupilInfo> getClientsForOrgs(Set<String> guids, String familyName,
             String firstName, String secondName, int importIteration) throws Exception {
-        /*
-        От Козлова
-        */
-        /*String tbl = getNSIWorkTable();
-        String orgFilter = "";
-        if (guids != null && guids.size() > 0) {
-            for (String guid : guids) {
-                if (orgFilter.length() > 0) {
-                    orgFilter += " or ";
-                }
-                orgFilter += "item['" + tbl + "/GUID образовательного учреждения']='" + guid + "'";
-            }
-        }
-
-        String query = "select " +
-                "item['" + tbl + "/Фамилия'], " +
-                "item['" + tbl + "/Имя'], " +
-                "item['" + tbl + "/Отчество'], " +
-                "item['" + tbl + "/GUID'], " +
-                "item['" + tbl + "/Дата рождения'], " +
-                "item['" + tbl + "/Класс или группа зачисления'], " +
-                "item['" + tbl + "/Дата зачисления'], " +
-                "item['" + tbl + "/Дата отчисления'], " +
-                "item['" + tbl + "/Текущий класс или группа'], " +
-                "item['" + tbl + "/GUID образовательного учреждения'], " +
-                "item['" + tbl + "/Статус записи'] " +
-                "from catalog('Реестр обучаемых') " +
-                "where ";
-        if (orgFilter.length() > 0) {
-            query += " item['" + tbl + "/Статус записи'] not like 'Удален%'";
-            query += " and (" + orgFilter + ")";
-            if (familyName != null && familyName.length() > 0) {
-                query += " and item['" + tbl + "/Фамилия'] like '%" + familyName + "%'";
-            }
-            if (firstName != null && firstName.length() > 0) {
-                query += " and item['" + tbl + "/Имя'] like '%" + firstName + "%'";
-            }
-            if (secondName != null && secondName.length() > 0) {
-                query += " and item['" + tbl + "/Отчество'] like '%" + secondName + "%'";
-            }
-        } else { // при поиске по ФИО используем для быстроты только полное совпадение
-            if (familyName != null && familyName.length() > 0) {
-                query += " item['" + tbl + "/Фамилия'] = '" + familyName + "'";
-            }
-            if (firstName != null && firstName.length() > 0) {
-                query += " and item['" + tbl + "/Имя'] = '" + firstName + "'";
-            }
-            if (secondName != null && secondName.length() > 0) {
-                query += " and item['" + tbl + "/Отчество'] = '" + secondName + "'";
-            }
-        }*/
-
         if(guids == null || guids.size() < 1) {
             throw new Exception("Запрос конитингенту без указания организации запрещен. Необходимо указывать организацию!");
         }
@@ -196,7 +133,7 @@ public class ClientMskNSIService extends MskNSIService {
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр обучаемых");
         String guidCase = "";
-        if (guids != null && guids.size() > 0) {
+        if (CollectionUtils.isNotEmpty(guids)) {
             for (String guid : guids) {
                 if(guidCase.length() > 0) {
                     guidCase += ", ";
@@ -276,9 +213,9 @@ public class ClientMskNSIService extends MskNSIService {
 
         List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
         if (queryResults == null) return null;
-        LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        LinkedList<ImportRegisterMSKClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
         for(Item i : queryResults) {
-            ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
+            ImportRegisterMSKClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterMSKClientsService.ExpandedPupilInfo();
             for(Attribute attr : i.getAttribute()) {
                 if (attr.getName().equals("Фамилия")) {
                     pupilInfo.familyName = attr.getValue().get(0).getValue();
@@ -301,11 +238,9 @@ public class ClientMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Класс")) {
                     pupilInfo.groupNewWay = getGroupFromClassAttribute(attr);
                 }
-
                 if (attr.getName().equals("GUID образовательного учреждения")) {
                     pupilInfo.guidOfOrg = attr.getValue().get(0).getValue();
                 }
-
                 if (attr.getName().equals("Льготы учащегося")) {
                     List<Integer> benefits = new ArrayList<Integer>();
                     for (GroupValue groupValue : attr.getGroupValue()) {
@@ -317,7 +252,6 @@ public class ClientMskNSIService extends MskNSIService {
                                 }
                             }
                         }
-
                     }
                     Collections.sort(benefits);
                     pupilInfo.benefitDSZN = StringUtils.join(benefits, ",");
@@ -326,10 +260,9 @@ public class ClientMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Пол")) {
                     pupilInfo.gender = attr.getValue().get(0).getValue();
                 }
-
                 if (attr.getName().equals("Представители")) {
                     for (GroupValue groupValue : attr.getGroupValue()) {
-                        ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
+                        ImportRegisterMSKClientsService.GuardianInfo guardianInfo = new ImportRegisterMSKClientsService.GuardianInfo();
 
                         for (Attribute attr1 : groupValue.getAttribute()) {
                             if (attr1.getName().equals("Фамилия представителя")) {
@@ -370,7 +303,6 @@ public class ClientMskNSIService extends MskNSIService {
                         }
                     }
                 }
-
                 pupilInfo.guardiansCount = String.valueOf(pupilInfo.getGuardianInfoList().size());
             }
 

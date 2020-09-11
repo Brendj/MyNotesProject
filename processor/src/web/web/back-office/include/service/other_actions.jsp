@@ -51,8 +51,8 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-    <a4j:commandButton value="Оповещение об окончании срока действия льготы" action="#{otherActionsPage.endBenefitNotification}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Очистка таблиц меню - 2" action="#{otherActionsPage.cleaningMenuVersion2}"
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
@@ -82,11 +82,6 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Запустить пересчет показателей СМС" action="#{otherActionsPage.runSmsDeliveryRecalculation}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-
-
-    <a4j:commandButton value="Запустить Автоплатеж" action="#{otherActionsPage.runRegularPayments}"
-                        styleClass="command-button" />
-
     <rich:panel>
         <h:commandButton value="Модифицировать пароли" action="#{otherActionsPage.runPasswordReplacer}"
                          title="Заменяет все пароли == input на номер договора"
@@ -162,10 +157,6 @@
         <h:inputText value="#{otherActionsPage.guidForDiscountsUpdate}" size="50"/>
     </rich:panel>
     <rich:separator align="center" height = "8" width = "75%" />
-    <a4j:commandButton value="Итого за день" action="#{otherActionsPage.runEventNotificationServiceForDaily}" id="runEventNotificationServiceForDaily"
-                           styleClass="command-button" />
-    <a4j:commandButton value="Итого за неделю" action="#{otherActionsPage.runEventNotificationServiceForWeekly}" id="runEventNotificationServiceForWeekly"
-                                                                             styleClass="command-button" />
         <a4j:commandButton value="Выгрузка на FTP МСР" action="#{otherActionsPage.runMSRToFTP()}" id="runMSRToFTP"
                            styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
@@ -204,6 +195,8 @@
                 <a4j:commandButton value="Проверка соответствия меню и предзаказа" action="#{otherActionsPage.relevancePreordersToMenu()}" id="relevancePreordersToMenu"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
                 <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО" action="#{otherActionsPage.relevancePreordersToOrgFlag()}" id="relevancePreordersToOrgFlag"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Пересчет количественных показателей по предзаказам" action="#{otherActionsPage.preordersCheck()}" id="preordersCheck"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
             </h:panelGrid>
         </rich:panel>
@@ -255,7 +248,6 @@
         </rich:panel>
         <a4j:commandButton value="Блокировка ЭИ без транзакций" action="#{otherActionsPage.autoBlockCards()}" id="autoBlockCards"
                            styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-
     </h:panelGrid>
 
     <rich:panel rendered="#{otherActionsPage.isSpb()}">

@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.utils;
 
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeGuardians;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -26,7 +26,7 @@ public class FieldProcessor {
         public String defValue;
         public int realPos=-1;
         public String currentValue;
-        public List<ImportRegisterClientsService.GuardianInfo> objectList;
+        public List<ImportRegisterMSKClientsService.GuardianInfo> objectList;
         public Set<RegistryChangeGuardians> guardiansSet;
         public boolean updatable;
 
@@ -115,7 +115,7 @@ public class FieldProcessor {
             return null;
         }
 
-        public List<ImportRegisterClientsService.GuardianInfo> getValueList(Object id) {
+        public List<ImportRegisterMSKClientsService.GuardianInfo> getValueList(Object id) {
             for (int n = 0; n < currentConfig.length; ++n) {
                 if (currentConfig[n].fieldId == id) {
                     return currentConfig[n].objectList;
@@ -185,7 +185,7 @@ public class FieldProcessor {
             }
         }
 
-        public void setValueList(Object id, List<ImportRegisterClientsService.GuardianInfo> value) throws Exception {
+        public void setValueList(Object id, List<ImportRegisterMSKClientsService.GuardianInfo> value) throws Exception {
             getField(id).objectList = value;
         }
 

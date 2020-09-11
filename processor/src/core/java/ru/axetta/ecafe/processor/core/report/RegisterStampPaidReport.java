@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampPaidReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.WtPaidComplexItem;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -97,6 +98,9 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
                     OrderTypeEnumType.PAY_PLAN);
             Map<Date, Long> numbers = service.findAllRegistryTalonsPaid(org.getIdOfOrg(), startTime, endTime);
 
+            List<WtPaidComplexItem> allComplexes = service.findAllWtComplexesByOrderType(org.getIdOfOrg(), startTime, endTime,
+                    OrderTypeEnumType.PAY_PLAN);
+
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             List<RegisterStampPaidReportItem> result = new ArrayList<RegisterStampPaidReportItem>();
             calendar.setTime(startTime);
@@ -105,7 +109,7 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
             while (endTime.getTime() > calendar.getTimeInMillis()) {
                 Date time = calendar.getTime();
                 String date = timeFormat.format(time);
-                if (allGoods.isEmpty()) {
+                if (allGoods.isEmpty() && allComplexes.isEmpty()) {
                     RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(emptyGoodItem,0L,date, time);
                     RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Итого", CalendarUtils.addDays(endTime, 1));
                     result.add(item);
@@ -113,10 +117,28 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
                 } else {
                     for (GoodItem1 goodItem : allGoods) {
                         String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
-                        Long val = service.buildRegisterStampBodyValueByOrderType(org.getIdOfOrg(), calendar.getTime(),
+                        service.buildRegisterStampPaidReportItem(org.getIdOfOrg(), calendar.getTime(),
+                                goodItem.getFullName(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN, result,
+                                goodItem, date, number, endTime);
+                        /*Long val = service.buildRegisterStampBodyValueByOrderType(org.getIdOfOrg(), calendar.getTime(),
                                 goodItem.getFullName(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN);
                         RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem,val,date,number, time);
                         RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
+                        result.add(item);
+                        result.add(total);*/
+                    }
+
+                    for (WtPaidComplexItem complexItem : allComplexes) {
+                        String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
+                        String dietType = complexItem.getDietType().getDescription();
+                        String ageGroup = complexItem.getAgeGroup().getDescription();
+
+
+                        Long val = service.buildRegisterStampBodyWtMenuValueByOrderType(org.getIdOfOrg(), calendar.getTime(),
+                                complexItem.getIdOfComplex(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN);
+                        RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(ageGroup, dietType, val, date, number, time, complexItem.getPrice());
+                        RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(ageGroup, dietType, val,
+                                "Итого", null, CalendarUtils.addDays(endTime, 1), complexItem.getPrice());
                         result.add(item);
                         result.add(total);
                     }

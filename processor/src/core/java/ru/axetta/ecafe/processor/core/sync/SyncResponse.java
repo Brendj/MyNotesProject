@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ResClientBalanceHoldData;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsData;
@@ -16,6 +18,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSectionForARMAnswer;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.ResHardwareSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -36,6 +39,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ResRe
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplierData;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.ResRequestsSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.ResSyncSettingsSection;
@@ -384,6 +389,7 @@ public class SyncResponse {
             private final boolean confirmVisualRecognition;
             private final int discountMode;
             private final String guid;
+            private final String meshGUID;
             private boolean tempClient;
             private int clientType;
             private final boolean isUseLastEEModeForPlan;
@@ -420,7 +426,7 @@ public class SyncResponse {
                 this.contractState = client.getContractState();
                 this.contractId = client.getContractId();
                 this.freePayMaxCount = client.getFreePayMaxCount();
-                this.categoriesDiscounts = client.getCategoriesDiscounts();
+                this.categoriesDiscounts = DiscountManager.getClientDiscountsAsString(client);
                 this.clientGroup=client.getClientGroup();
                 this.notifyViaEmail=client.isNotifyViaEmail();
                 this.notifyViaSMS=client.isNotifyViaSMS();
@@ -430,12 +436,13 @@ public class SyncResponse {
                 this.confirmVisualRecognition = client.getConfirmVisualRecognition();
                 this.discountMode = client.getDiscountMode();
                 this.guid = client.getClientGUID();
+                this.meshGUID = client.getMeshGUID();
                 this.clientType = clientType;
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
                 this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
                 this.gender = client.getGender();
                 this.birthDate = client.getBirthDate();
-                this.categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
+                this.categoriesDiscountsDSZN = DiscountManager.getClientDiscountsDSZNAsString(client);
                 this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
                 this.disablePlanCreationDate = client.getDisablePlanCreationDate();
                 this.disablePlanEndDate = client.getDisablePlanEndDate();
@@ -594,6 +601,9 @@ public class SyncResponse {
                 }
                 if (null != this.guid) {
                     element.setAttribute("GUID", this.guid);
+                }
+                if(this.meshGUID != null){
+                    element.setAttribute("meshGUID", this.meshGUID);
                 }
                 element.setAttribute("ContractState", Integer.toString(this.contractState));
                 if (null != this.freePayMaxCount) {
@@ -1237,6 +1247,10 @@ public class SyncResponse {
     private EmiasSection emias;
     private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
     private ResMenuSupplier resMenuSupplier;
+    private ResRequestsSupplier resRequestsSupplier;
+    private RequestsSupplierData requestsSupplierData;
+    private ResHardwareSettingsRequest resHardwareSettingsRequest;
+    private ResTurnstileSettingsRequest resTurnstileSettingsRequest;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1261,7 +1275,9 @@ public class SyncResponse {
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
             ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer,
-            ResMenuSupplier resMenuSupplier) {
+            ResMenuSupplier resMenuSupplier, ResRequestsSupplier resRequestsSupplier, RequestsSupplierData requestsSupplierData,
+            ResHardwareSettingsRequest resHardwareSettingsRequest,
+            ResTurnstileSettingsRequest resTurnstileSettingsRequest) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1326,6 +1342,10 @@ public class SyncResponse {
 		this.emias = emias;
         this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
         this.resMenuSupplier = resMenuSupplier;
+        this.resRequestsSupplier = resRequestsSupplier;
+        this.requestsSupplierData = requestsSupplierData;
+        this.resHardwareSettingsRequest = resHardwareSettingsRequest;
+        this.resTurnstileSettingsRequest = resTurnstileSettingsRequest;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1625,7 +1645,7 @@ public class SyncResponse {
         if(orgSetting != null){
             envelopeElement.appendChild(orgSetting.toElement(document));
         }
-		
+
         if(goodRequestEZDSection != null){
             envelopeElement.appendChild(goodRequestEZDSection.toElement(document, timeFormat));
         }
@@ -1633,15 +1653,15 @@ public class SyncResponse {
         if(resSyncSettingsSection != null){
             envelopeElement.appendChild(resSyncSettingsSection.toElement(document));
         }
-		
+
         if(syncSettingsSection != null){
             envelopeElement.appendChild(syncSettingsSection.toElement(document));
         }
-		
+
 		if (emiasSectionForARMAnswer != null) {
             envelopeElement.appendChild(emiasSectionForARMAnswer.toElement(document));
         }
-		
+
         if(emias != null){
             envelopeElement.appendChild(emias.toElement(document));
         }
@@ -1650,6 +1670,21 @@ public class SyncResponse {
             envelopeElement.appendChild(resMenuSupplier.toElement(document));
         }
 
+        if (resRequestsSupplier != null) {
+            envelopeElement.appendChild(resRequestsSupplier.toElement(document));
+        }
+
+        if (requestsSupplierData != null) {
+            envelopeElement.appendChild(requestsSupplierData.toElement(document));
+        }
+
+
+        if (resHardwareSettingsRequest != null) {
+            envelopeElement.appendChild(resHardwareSettingsRequest.toElement(document));
+        }
+        if (resTurnstileSettingsRequest != null) {
+            envelopeElement.appendChild(resTurnstileSettingsRequest.toElement(document));
+        }
     }
 
     public Long getIdOfOrg() {

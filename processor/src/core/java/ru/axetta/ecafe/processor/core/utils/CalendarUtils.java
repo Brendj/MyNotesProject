@@ -464,6 +464,14 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date getFirstDayOfPrevMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MONTH, -1);
+        truncateToMonth(calendar);
+        return calendar.getTime();
+    }
+
     // Возвращает дату последнего дня месяца для заданных года и месяца.
     // Например, для декабря 2012 года вернет дату от "31.12.2012".
     public static Date getDateOfLastDay(int year, int month) {

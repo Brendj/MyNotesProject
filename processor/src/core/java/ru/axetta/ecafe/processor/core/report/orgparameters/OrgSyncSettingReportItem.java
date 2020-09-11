@@ -27,6 +27,7 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
     private SyncInfo photoSync = new SyncInfo(ContentType.PHOTOS);
     private SyncInfo helpRequestsSync = new SyncInfo(ContentType.SUPPORT_SERVICE);
     private SyncInfo libSync = new SyncInfo(ContentType.LIBRARY);
+    private SyncInfo cardSync = new SyncInfo(ContentType.CARDS);
     private Boolean isChange = false;
     private Org org;
 
@@ -61,6 +62,11 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                     break;
                 case LIBRARY:
                     libSync = new SyncInfo(setting);
+                    break;
+                case CARDS:
+                    cardSync = new SyncInfo(setting);
+                    break;
+
             }
         }
         setOrgForAllSetting(org);
@@ -155,6 +161,14 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         this.libSync = libSync;
     }
 
+    public SyncInfo getCardSync() {
+        return cardSync;
+    }
+
+    public void setCardSync(SyncInfo cardSync) {
+        this.cardSync = cardSync;
+    }
+
     @Override
     public int compareTo(OrgSyncSettingReportItem o) {
         return this.orgName.compareTo(o.orgName);
@@ -204,6 +218,11 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
             case LIBRARY:
                 libSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
                         buildTime, limitStartHour, limitEndHour, this.org);
+                break;
+            case CARDS:
+                cardSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+                        buildTime, limitStartHour, limitEndHour, this.org);
+                break;
         }
         isChange = true;
     }
@@ -242,6 +261,11 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
             case LIBRARY:
                 libSync = new SyncInfo(setting);
                 libSync.setState(CHANGED);
+                break;
+            case CARDS:
+                cardSync = new SyncInfo(setting);
+                cardSync.setState(CHANGED);
+                break;
         }
         isChange = true;
     }

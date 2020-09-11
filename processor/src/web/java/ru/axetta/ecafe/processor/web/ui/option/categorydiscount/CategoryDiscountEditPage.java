@@ -47,6 +47,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
     private String filter = "-";
     private List<Long> idOfRuleList = new ArrayList<Long>();
     private Set<DiscountRule> discountRuleSet;
+    private Boolean deletedState;
     
     public static final String DISCOUNT_START = "Платное питание[";
     public static final String DISCOUNT_END = "%]";
@@ -159,8 +160,8 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         OrganizationType[] organizationTypes = OrganizationType.values();
         SelectItem[] items = new SelectItem[3];
         items[0] = new SelectItem(CategoryDiscount.SCHOOL_KINDERGARTEN_ID, CategoryDiscount.SCHOOL_KINDERGARTEN_STRING);
-        items[1] = new SelectItem(0, organizationTypes[0].toString());
-        items[2] = new SelectItem(1, organizationTypes[1].toString());
+        items[1] = new SelectItem(CategoryDiscount.SCHOOL_ID, organizationTypes[0].toString());
+        items[2] = new SelectItem(CategoryDiscount.KINDERGARTEN_ID, organizationTypes[1].toString());
         return items;
     }
 
@@ -197,14 +198,16 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.discountRuleSet = categoryDiscount.getDiscountsRules();
         this.categoryType = categoryDiscount.getCategoryType().getValue();
         this.organizationType = categoryDiscount.getOrgType();
-        if(categoryDiscount.getDiscountsRules().isEmpty()){
+        if(categoryDiscount.getDiscountsRules().isEmpty() || categoryDiscount.isRulesSetDeleted()){
             this.setFilter("-");
         } else {
             StringBuilder sb=new StringBuilder();
             for (DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-                this.idOfRuleList.add(discountRule.getIdOfRule());
-                sb.append(discountRule.getDescription());
-                sb.append("; ");
+                if (!discountRule.getDeletedState()) {
+                    this.idOfRuleList.add(discountRule.getIdOfRule());
+                    sb.append(discountRule.getDescription());
+                    sb.append("; ");
+                }
             }
             this.setFilter(sb.substring(0, sb.length()-1));
         }
@@ -220,25 +223,15 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         }
         this.blockedToChange = categoryDiscount.getBlockedToChange();
         this.eligibleToDelete = categoryDiscount.getEligibleToDelete();
+        this.deletedState = categoryDiscount.getDeletedState();
     }
 
-    /*@Override
-    public void completeRuleListSelection(Map<Long, String> ruleMap) throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
-        if(null != ruleMap){
-            idOfRuleList = new ArrayList<Long>();
-            if(ruleMap.isEmpty()){
-                filter = "Не выбрано";
-            } else{
-                StringBuilder stringBuilder = new StringBuilder();
-                for(Long idOfRule: ruleMap.keySet()){
-                    idOfRuleList.add(idOfRule);
-                    stringBuilder.append(ruleMap.get(idOfRule));
-                    stringBuilder.append(";");
-                }
-                filter = stringBuilder.toString();
-                discountRules=stringBuilder.toString();
-            }
-        }
-    }    */
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
+    }
+
 }

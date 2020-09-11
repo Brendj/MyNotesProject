@@ -30,7 +30,6 @@
                                disabled="#{mainPage.migrantsReportPage.applyUserSettings}"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
-                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
                 <f:setPropertyActionListener value="#{mainPage.migrantsReportPage.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>

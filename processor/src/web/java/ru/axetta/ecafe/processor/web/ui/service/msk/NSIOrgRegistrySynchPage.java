@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("session")
-public class NSIOrgRegistrySynchPage extends NSIOrgRegistrySynchPageBase implements OrgSelectPage.CompleteHandler {
-    Org org;
-    String orgName;
+public class NSIOrgRegistrySynchPage extends NSIOrgRegistrySyncPageBase implements OrgSelectPage.CompleteHandler {
+    private Org org;
+    private String orgName;
 
 
     public String getOrgName() {
@@ -41,7 +41,7 @@ public class NSIOrgRegistrySynchPage extends NSIOrgRegistrySynchPageBase impleme
     }
 
     public String getPageTitle() {
-        return "Синхронизация организации с Реестрами";
+        return "Интерактивная сверка";
     }
 
     @Override

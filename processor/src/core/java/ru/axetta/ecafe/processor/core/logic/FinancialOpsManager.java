@@ -236,7 +236,7 @@ public class FinancialOpsManager {
                 criteria.add(Restrictions.eq("idOfOrderDetail", od.getCompositeIdOfOrderDetail().getIdOfOrderDetail()));
                 PreorderLinkOD link = (PreorderLinkOD)criteria.uniqueResult();
                 if (saveAllPreorderDetails || link != null) {
-                    DAOUtils.savePreorderGuidFromOrderDetail(session, link.getPreorderGuid(), od, true, preorderComplex, od.getItemCode());
+                    DAOUtils.savePreorderGuidFromOrderDetail(session, link.getPreorderGuid(), od, true, preorderComplex, od.getItemCode(), order.getRSum());
                 }
             }
 

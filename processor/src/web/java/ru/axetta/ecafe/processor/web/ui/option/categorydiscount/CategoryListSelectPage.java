@@ -130,6 +130,7 @@ public class CategoryListSelectPage extends BasicPage {
             criteria.add(Restrictions.like("categoryName", filter, MatchMode.ANYWHERE).ignoreCase());
         }
         if(!flag) criteria.add(Restrictions.ge("idOfCategoryDiscount",Long.parseLong("0")));
+        criteria.add(Restrictions.eq("deletedState", false));
         return criteria.list();
     }
 }

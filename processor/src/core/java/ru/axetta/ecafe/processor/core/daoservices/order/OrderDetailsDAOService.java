@@ -6,17 +6,15 @@ package ru.axetta.ecafe.processor.core.daoservices.order;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampElectronicCollationReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
-import ru.axetta.ecafe.processor.core.report.SumQtyAndPriceItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
@@ -75,6 +73,47 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
+    public void buildRegisterStampPaidReportItem(Long idOfOrg, Date start, String fullname,
+            boolean includeActDiscrepancies, OrderTypeEnumType orderTypeEnumType, List<RegisterStampPaidReportItem> result,
+            GoodItem1 goodItem, String date, String number, Date time2) {
+        String sql = "select cast(coalesce(sum(orderdetail.qty), 0) as  bigint) as qty, "
+                + "cast(coalesce(sum(orderdetail.qty * orderdetail.rprice), 0) as bigint) as summa  from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                " and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
+                " cforder.idoforg=:idoforg and orderdetail.MenuDetailName like '" + fullname + "' and " +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " (cforder.ordertype=:orderType or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
+                : " and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate", start.getTime());
+        query.setParameter("orderType", orderTypeEnumType.ordinal());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis() - 1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        Long qty = 0L;
+        Long summa = 0L;
+        if (list.size() > 0) {
+            Object[] row = (Object[])list.get(0);
+            qty = ((BigInteger)row[0]).longValue();
+            summa = ((BigInteger)row[1]).longValue();
+        }
+        boolean showPrice = goodItem.getModeOfAdd() == null || !goodItem.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4); //(qty * goodItem.getPrice()) == summa ? true : false;
+        RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem, qty, date, number, start,
+                showPrice ? goodItem.getPrice() : null, summa);
+        RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,qty,"Итого", null, CalendarUtils.addDays(time2, 1),
+                showPrice ? goodItem.getPrice() : null, summa);
+        result.add(item);
+        result.add(total);
+    }
+
     @SuppressWarnings("unchecked")
     public Long buildRegisterStampBodyValueByOrderType(Long idOfOrg, Date start, String fullname,
             boolean includeActDiscrepancies, OrderTypeEnumType orderTypeEnumType) {
@@ -83,7 +122,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
-                " cforder.idoforg=:idoforg and case good.fullname when '' then orderdetail.MenuDetailName else good.fullname end like '" + fullname + "' and " +
+                " cforder.idoforg=:idoforg and orderdetail.MenuDetailName like '" + fullname + "' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " (cforder.ordertype=:orderType or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
                 : " and orderdetail.qty>=0 ") + " )) ";
@@ -106,6 +145,38 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
+    // для меню веб-технолога
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampBodyWtMenuValueByOrderType(Long idOfOrg, Date start, Long idOfComplex,
+            boolean includeActDiscrepancies, OrderTypeEnumType orderTypeEnumType) {
+        String sql = "select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                " and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
+                " cforder.idoforg=:idoforg and complex.idofcomplex = :idOfComplex and " +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " (cforder.ordertype=:orderType or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
+                : " and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", start.getTime());
+        query.setParameter("orderType", orderTypeEnumType.ordinal());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis() - 1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if (list == null || list.isEmpty() || list.get(0) == null) {
+            return 0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
 
 
     /* Подсчет суточной пробы для льготного питания*/
@@ -193,6 +264,67 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return  (List<GoodItem>) query.list();
     }
 
+
+    @SuppressWarnings("unchecked")
+    // для веб-технолога, добавить отбор комплексов по датам и categoryorgs?
+    public List<WtComplexItem> findAllWtComplexes(Long idOfOrg, Date startTime, Date endTime, Set orderTypes) {
+        String sql = "select distinct complex.idOfComplex as idOfComplex, "
+                + "complex.wtDietType as dietType, "
+                + "complex.wtAgeGroupItem as ageGroup, "
+                + "case ord.orderType when 10 then 1 else 0 end as orderType "
+                + "from OrderDetail details "
+                + "left join details.wtComplex complex "
+                + "left join details.order ord "
+                + "left join ord.org o "
+                + "where ord.state=0 "
+                + "and details.state=0 "
+                + "and ord.orderType in :orderType "
+                + "and details.wtComplex is not null "
+                + "and o.idOfOrg=:idOfOrg "
+                + "and ord.createTime between :startDate and :endDate "
+                + "and details.menuType >= :mintype "
+                + "and details.menuType <=:maxtype";
+        Query query = getSession().createQuery(sql);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameterList("orderType", orderTypes);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(WtComplexItem.class));
+        return  (List<WtComplexItem>) query.list();
+    }
+
+    public List<WtPaidComplexItem> findAllWtComplexesByOrderType(Long idOfOrg, Date startTime, Date endTime,
+            OrderTypeEnumType orderTypeEnumType) {
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<>();
+        orderTypeEnumTypeSet.add(orderTypeEnumType);
+        String sql = "select distinct complex.idOfComplex as idOfComplex, "
+                + "complex.wtDietType as dietType, "
+                + "complex.wtAgeGroupItem as ageGroup, "
+                + "details.RPrice as price "
+                + "from OrderDetail details "
+                + "left join details.wtComplex complex "
+                + "left join details.order ord "
+                + "left join ord.org o "
+                + "where ord.state=0 "
+                + "and details.state=0 "
+                + "and ord.orderType in (:orderType) "
+                + "and details.wtComplex is not null "
+                + "and o.idOfOrg=:idOfOrg "
+                + "and ord.createTime between :startDate and :endDate "
+                + "and details.menuType >= :mintype "
+                + "and details.menuType <=:maxtype";
+        Query query = getSession().createQuery(sql);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameterList("orderType", orderTypeEnumTypeSet);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(WtPaidComplexItem.class));
+        return  (List<WtPaidComplexItem>) query.list();
+    }
 
     /* получаем список всех товаров для льготного питания */
     @SuppressWarnings("unchecked")
@@ -343,17 +475,19 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     public List<GoodItem1> findAllGoodsByOrderType(Long idOfOrg, Date startTime, Date endTime, OrderTypeEnumType orderTypeEnumType){
         Set<Integer> orderTypeEnumTypeSet = new HashSet<Integer>();
         orderTypeEnumTypeSet.add(orderTypeEnumType.ordinal());
-        String sql = "SELECT DISTINCT good1_.IdOfGood AS globalId, "
+        String sql = "SELECT distinct good1_.IdOfGood AS globalId, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 3) ELSE split_part(good1_.FullName, '/', 3) END AS pathPart3, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 4) ELSE split_part(good1_.FullName, '/', 4) END AS pathPart4, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 2) ELSE split_part(good1_.FullName, '/', 2) END AS pathPart2, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 1) ELSE split_part(good1_.FullName, '/', 1) END AS pathPart1, "
-                + "orderdetai0_.MenuDetailName AS fullName, orderdetai0_.rPrice AS price "
+                + "orderdetai0_.MenuDetailName AS fullName, case when pc.modeofadd = 4 then 0 else orderdetai0_.rprice end as price, pc.modeofadd as modeOfAdd "
                 + "FROM CF_OrderDetails orderdetai0_ LEFT OUTER JOIN cf_goods good1_ ON orderdetai0_.IdOfGood=good1_.IdOfGood "
                 + "LEFT OUTER JOIN CF_Orders order2_ ON orderdetai0_.IdOfOrg=order2_.IdOfOrg AND orderdetai0_.IdOfOrder=order2_.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org3_ ON order2_.IdOfOrg=org3_.IdOfOrg "
+                + "left outer join cf_preorder_linkod pp on orderdetai0_.idoforder = pp.idoforder and orderdetai0_.idoforderdetail = pp.idoforderdetail "
+                + "left outer join cf_preorder_complex pc on pp.preorderguid = pc.guid "
                 + "WHERE order2_.State=0 AND orderdetai0_.State=0 AND (order2_.OrderType IN (:orderType)) "
-                + "AND (orderdetai0_.IdOfGood IS NOT NULL) AND org3_.IdOfOrg=:idOfOrg "
+                + "AND (orderdetai0_.IdOfGood IS NOT NULL) AND org3_.IdOfOrg=:idOfOrg and pc.modeofadd is not null "
                 + "AND (order2_.CreatedDate BETWEEN :startDate AND :endDate) AND orderdetai0_.MenuType>=:mintype AND orderdetai0_.MenuType<=:maxtype ORDER BY fullName";
         SQLQuery query = getSession().createSQLQuery(sql);
         query.setParameterList("orderType",orderTypeEnumTypeSet);
@@ -364,7 +498,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate", endTime.getTime());
         query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
         query.addScalar("globalId").addScalar("pathPart3").addScalar("pathPart4").addScalar("pathPart2")
-                .addScalar("pathPart1").addScalar("fullName").addScalar("price");
+                .addScalar("pathPart1").addScalar("fullName").addScalar("price").addScalar("modeOfAdd");
         return  (List<GoodItem1>) query.list();
     }
 
@@ -485,4 +619,68 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return clientReportItems;
     }
 
+    // Подсчет количества для меню веб-технолога
+    public Long buildRegisterStampBodyWtMenuValue(Long idOfOrg, Date start, Long idOfComplex, boolean includeActDiscrepancies) {
+        String sql ="select sum(orderdetail.qty) "
+                + " from cf_orders cforder "
+                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
+                + "     left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex"
+                + " where cforder.state=0 "
+                + "     and orderdetail.state=0 "
+                + "     and cforder.createddate>=:startDate "
+                + "     and cforder.createddate<=:endDate "
+                + "     and orderdetail.socdiscount>0 "
+                + "     and cforder.idoforg=:idoforg "
+                + "     and complex.idofcomplex = :idOfComplex "
+                + "     and orderdetail.menutype>=:mintype "
+                + "     and orderdetail.menutype<=:maxtype "
+                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8"
+                + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if(list==null || list.isEmpty() || list.get(0)==null){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
+    // Подсчет суточной пробы для льготного питания - меню веб-технолога
+    public Long buildRegisterStampDailySampleWtMenuValueNew(Long idOfOrg, Date start, Long idOfComplex) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and" +
+                " cforder.idoforg=:idoforg and complex.idofcomplex = :idOfComplex" +
+                " and cforder.ordertype in (5) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
+        Object res = query.uniqueResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigInteger) res).longValue();
+        }
+    }
 }

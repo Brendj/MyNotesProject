@@ -5,9 +5,12 @@
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 
 import javax.xml.bind.annotation.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -67,6 +70,20 @@ public class MenuWithComplexesExt {
         this.goodType = getGoodType(complexInfo);
         this.modevisible = complexInfo.getModeVisible();
         this.usedspecialmenu = complexInfo.getUsedSpecialMenu();
+    }
+
+    public MenuWithComplexesExt(WtComplex wtComplex, Org org, Date date, int isDiscountComplex) {
+        this.idOfComplexInfo = wtComplex.getIdOfComplex();
+        this.idOfComplex = wtComplex.getIdOfComplex().intValue();
+        this.complexName = wtComplex.getName();
+        this.menuDate = date;
+        this.currentPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice()
+                .multiply(new BigDecimal(100)).longValue();
+        this.usedSubscriptionFeeding = 0;
+        this.usedVariableFeeding = 0;
+        this.isDiscountComplex = isDiscountComplex;
+        this.modevisible = 1;
+        this.usedspecialmenu = org.getPreordersEnabled() && wtComplex.getIsPortal() ? 1 : 0;
     }
 
     private Integer getGoodType(ComplexInfo complexInfo) {

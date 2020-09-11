@@ -597,7 +597,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS, this.notifyViaPUSH,
                 this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
-                clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "", "");
+                clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
 
         client.setAddress(this.address);
         client.setPhone(this.phone);
@@ -630,17 +630,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 clientCategories = clientCategories + categoryDiscount.getIdOfCategoryDiscount() + ",";
             }                            */
 
-        StringBuilder clientCategories = new StringBuilder();
         if(!idOfCategoryList.isEmpty()){
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
             for (Object object: categoryCriteria.list()){
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
-                clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
-                clientCategories.append(",");
                 client.getCategories().add(categoryDiscount);
             }
-            client.setCategoriesDiscounts(clientCategories.substring(0, clientCategories.length()-1));
         }
 
         if(idOfClientGroup != null) {

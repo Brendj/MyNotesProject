@@ -180,6 +180,8 @@
     <h:inputText value="#{mainPage.clientEditPage.externalId}" maxlength="64" styleClass="input-text"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientGUID}" maxlength="64" styleClass="input-text long-field"/>
+    <h:outputText escape="true" value="Идентификатор MESH GUID" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.meshGUID}" maxlength="64" styleClass="input-text long-field"/>
     <h:outputText escape="true" value="Идентификатор REGID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientIacRegId}" maxlength="40" styleClass="input-text long-field"/>
 
@@ -396,7 +398,7 @@
             <a4j:commandButton value="Редактировать" action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                                styleClass="command-link">
-                <f:param name="fullList" value="false" />
+                <f:param name="fullList" value="true" />
                 <f:setPropertyActionListener value="#{mainPage.clientEditPage.idOfCategoryListString}"
                                              target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
             </a4j:commandButton>

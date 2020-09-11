@@ -78,15 +78,50 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
 
                     if(specialDate == null){
                         specialDate = new SpecialDate(compositeId, isWeekend, comment);
+                        specialDate.setIsWeekend(isWeekend);
+                        specialDate.setDeleted(deleted);
+                        specialDate.setComment(comment);
+                        specialDate.setIdOfClientGroup(idOfClientGroup);
+                        specialDate.setOrgOwner(orgOwner);
+                        specialDate.setVersion(nextVersion);
+                        session.save(specialDate);
+                    } else {
+                        boolean wasModified = false;
+                        if (!specialDate.getIsWeekend().equals(isWeekend)) {
+                            specialDate.setIsWeekend(isWeekend);
+                            wasModified = true;
+                        }
+                        if (!specialDate.getDeleted().equals(deleted)) {
+                            specialDate.setDeleted(deleted);
+                            wasModified = true;
+                        }
+                        if (!specialDate.getComment().equals(comment)) {
+                            specialDate.setComment(comment);
+                            wasModified = true;
+                        }
+                        if (!specialDate.getOrgOwner().equals(orgOwner)) {
+                            specialDate.setOrgOwner(orgOwner);
+                            wasModified = true;
+                        }
+                        if (specialDate.getIdOfClientGroup() == null) {
+                            if (idOfClientGroup != null) {
+                                specialDate.setIdOfClientGroup(idOfClientGroup);
+                                wasModified = true;
+                            }
+                        } else {
+                            if (idOfClientGroup == null) {
+                                specialDate.setIdOfClientGroup(idOfClientGroup);
+                                wasModified = true;
+                            } else if (!specialDate.getIdOfClientGroup().equals(idOfClientGroup)) {
+                                specialDate.setIdOfClientGroup(idOfClientGroup);
+                                wasModified = true;
+                            }
+                        }
+                        if (wasModified) {
+                            specialDate.setVersion(nextVersion);
+                            session.update(specialDate);
+                        }
                     }
-                    specialDate.setIsWeekend(isWeekend);
-                    specialDate.setDeleted(deleted);
-                    specialDate.setComment(comment);
-                    specialDate.setIdOfClientGroup(idOfClientGroup);
-                    specialDate.setOrgOwner(orgOwner);
-                    specialDate.setVersion(nextVersion);
-
-                    session.saveOrUpdate(specialDate);
 
                     resItem = new ResSpecialDatesItem(session, specialDate);
                     resItem.setResCode(item.getResCode());
@@ -105,6 +140,7 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                 items.add(resItem);
             }
             session.flush();
+            session.clear();
         }
         catch (Exception e) {
             logger.error("Error saving SpecialDates", e);

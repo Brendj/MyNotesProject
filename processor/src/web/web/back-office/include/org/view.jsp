@@ -14,6 +14,8 @@
 <h:panelGrid id="orgViewGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.idOfOrg}" styleClass="input-text" />
+    <h:outputText escape="true" value="ID в НСИ-3" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.orgIdFromNsi}" styleClass="input-text" />
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.guid}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
@@ -237,7 +239,6 @@
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-    <a4j:commandButton value="Синхронизация балансов" action="#{mainPage.orgViewPage.updateBalance}" styleClass="command-button" />
 </h:panelGrid>
 <a4j:status id="sOrgViewStatus">
     <f:facet name="start">

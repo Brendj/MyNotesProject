@@ -14,10 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contrac
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -59,6 +56,31 @@ public class DAOService {
 
     public static DAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
+    }
+
+    public void createStatTable() {
+        entityManager.createNativeQuery("CREATE TABLE IF NOT EXISTS srv_clear_menu_stat\n"
+                + "(\n"
+                + "    idoforg BIGINT,\n"
+                + "    startdate BIGINT,\n"
+                + "    enddate BIGINT,\n"
+                + "    datefrom BIGINT,\n"
+                + "    amount integer\n"
+                + ");\n"
+                + "COMMENT ON TABLE srv_clear_menu_stat is 'Статистика сервиса очистки меню'")
+                .executeUpdate();
+    }
+
+    public List<Long> getOrgIdsForClearMenu() {
+        List<Long> result = new ArrayList<>();
+        Query q = entityManager.createNativeQuery("select idOfOrg from cf_orgs o "
+                + "where o.idoforg > (select coalesce(max(idoforg), 0) from srv_clear_menu_stat) order by o.idoforg");
+        List list = q.getResultList();
+        for (Object row : list) {
+            Long value = ((BigInteger) row).longValue();
+            result.add(value);
+        }
+        return result;
     }
 
     public List<CategoryDiscount> getCategoryDiscountList() {
@@ -374,6 +396,15 @@ public class DAOService {
         if (entity != null) {
             entityManager.remove(entity);
         }
+    }
+
+    public void mergeEntity(Object entity) throws Exception {
+        entityManager.merge(entity);
+    }
+
+    public Object detachEntity(Object entity) throws Exception {
+        entityManager.detach(entity);
+        return entity;
     }
 
     public Long getContractIdByCardNo(long lCardId) throws Exception {
@@ -1717,8 +1748,8 @@ public class DAOService {
         return false;
     }
 
-    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate, Integer actionFilter,
-            String nameFilter, String className) throws Exception {
+    public List<RegistryChange> getLastRegistryChanges_WithFullFIO(long idOfOrg, long revisionDate, Integer actionFilter,
+            String lastName, String firstName, String patronymic, String className) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastRegistryChangeUpdate(idOfOrg, className);
         }
@@ -1726,10 +1757,19 @@ public class DAOService {
             return Collections.EMPTY_LIST;
         }
         String nameStatement = "";
-        if (nameFilter != null && nameFilter.length() > 0) {
-            String filter = nameFilter.trim().toLowerCase().replaceAll(" ", "");
-            nameStatement = " and lower(surname||firstname||secondname) like lower('%" + filter + "%') ";
+        if (!StringUtils.isEmpty(lastName)) {
+            String filter = lastName.trim().toLowerCase().replaceAll(" ", "");
+            nameStatement += " and lower(surname) like lower('%" + filter + "%') ";
         }
+        if (!StringUtils.isEmpty(firstName)) {
+            String filter = firstName.trim().toLowerCase().replaceAll(" ", "");
+            nameStatement += " and lower(firstname) like lower('%" + filter + "%') ";
+        }
+        if (!StringUtils.isEmpty(patronymic)) {
+            String filter = patronymic.trim().toLowerCase().replaceAll(" ", "");
+            nameStatement += " and lower(secondname) like lower('%" + filter + "%') ";
+        }
+
         String actionStatement = "";
         if (actionFilter != null && actionFilter > 0) {
             actionStatement = " and operation=:operation ";
@@ -1746,6 +1786,12 @@ public class DAOService {
         return query.getResultList();
     }
 
+    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate, Integer actionFilter,
+            String nameFilter, String className) throws Exception {
+        return getLastRegistryChanges_WithFullFIO(idOfOrg, revisionDate, actionFilter,
+                nameFilter, null, null, className);
+    }
+
     public long getLastRegistryChangeUpdate(long idOfOrg, String className) throws Exception {
         String tableName = className.equals("RegistryChange") ? "cf_registrychange" : "cf_registrychange_employee";
         Query q = entityManager
@@ -1755,9 +1801,9 @@ public class DAOService {
         return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
     }
 
-    public List getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
-        Query query = entityManager.createQuery("select distinct createDate, type from " + className
-                + " where idOfOrg=:idOfOrg order by createDate desc");
+    public List<Object[]> getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
+        Query query = entityManager.createQuery(
+                "select distinct createDate, type from " + className + " where idOfOrg=:idOfOrg order by createDate desc");
         query.setParameter("idOfOrg", idOfOrg);
         return query.getResultList();
     }
@@ -2502,6 +2548,15 @@ public class DAOService {
     }
 
     @Transactional
+    public String getDeletedLastedDateMenu() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_LAST_DELATED_DATE_MENU);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Transactional
     public void setOnlineOptionValue(String value, int option) {
         String str_query = "select optiontext from cf_options where idofoption = :idofoption";
         Query q = entityManager.createNativeQuery(str_query);
@@ -2911,4 +2966,106 @@ public class DAOService {
         return q.executeUpdate() > 0;
     }
 
+	public List<Contragent> contragentsListByUser(Long idOfUser) {
+        Query q = entityManager.createQuery("select c from User u inner join u.contragents c"
+                + " where u.idOfUser = :idOfUser order by c.contragentName");
+
+        q.setParameter("idOfUser", idOfUser);
+        return q.getResultList();
+    }
+
+    public Long getMeshIdByOrg(long idOfOrg) {
+        Query query = entityManager.createNativeQuery("select organizationidfromnsi from cf_orgs where IdOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        Object obj = query.getSingleResult();
+        return obj == null ? null : ((BigInteger)obj).longValue();
+    }
+
+    public WtComplex getWtComplexById(Long idOfComplex) {
+        Query query = entityManager.createQuery("select complex from WtComplex complex "
+                + "where complex.idOfComplex = :idOfComplex");
+        query.setParameter("idOfComplex", idOfComplex);
+        try {
+            return (WtComplex) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public WtDish getWtDishById(Long idOfDish) {
+        Query query = entityManager.createQuery("SELECT dish FROM WtDish dish "
+                + "where dish.idOfDish = :idOfDish");
+        query.setParameter("idOfDish", idOfDish);
+        try {
+            return (WtDish) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
+	//Список союзов организаций, кужа входит данная организация
+    public List<Long> getOrgGroupsbyOrgForWEBARM(Long idOforg) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(" select idoforggroup from cf_wt_org_group_relations "
+                + "  where idoforg = " + idOforg);
+        List<BigInteger> list = (List<BigInteger>) q.list();
+        List<Long> result = new ArrayList<>();
+        for (BigInteger value: list)
+        {
+            result.add(value.longValue());
+        }
+        return result;
+    }
+
+    public List<Long> getComplexesByOrgForWEBARM(Long idOforg) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(" select idofcomplex from cf_wt_complexes_org where idoforg = "
+                + idOforg);
+        List<BigInteger> list = (List<BigInteger>) q.list();
+        List<Long> result = new ArrayList<>();
+        for (BigInteger value: list)
+        {
+            result.add(value.longValue());
+        }
+        return result;
+    }
+    public List getComplexesByGroupForWEBARM(List<Long> idOfgroups) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        String groupString = "";
+        for (Long groupid: idOfgroups)
+        {
+            groupString = groupString + "'" + groupid.toString() + "',";
+        }
+        groupString = groupString.substring(0,groupString.length()-1);
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate, idofagegroupitem from cf_wt_complexes "
+                        + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idoforggroup in (" + groupString + ")");
+        return q.list();
+    }
+
+    public List getComplexesByComplexForWEBARM(List<Long> idOfComplexes) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        String idOfComplexString = "";
+        for (Long idOfComplex: idOfComplexes)
+        {
+            idOfComplexString = idOfComplexString + "'" + idOfComplex.toString() + "',";
+        }
+        idOfComplexString = idOfComplexString.substring(0,idOfComplexString.length()-1);
+        org.hibernate.Query q = session.createSQLQuery("select idofcomplex, name, begindate, enddate, idofagegroupitem from cf_wt_complexes "
+                + "where idofcomplexgroupitem in (1,3) and deletestate=0 and idofcomplex in (" + idOfComplexString + ")");
+        return q.list();
+    }
+
+    public List<WtComplex> getComplexesByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getComplexesByWtDiscountRule(entityManager, discountRule);
+    }
+
+    public List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getCategoryDiscountsByWtDiscountRule(entityManager, discountRule);
+    }
+
+    public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
+        return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
+    }
 }

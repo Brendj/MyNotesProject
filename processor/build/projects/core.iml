@@ -9,6 +9,7 @@
           <factory-entry name="BASIC_LOCAL" value="675cc7d7-470a-4806-b8d4-13d87d189397" />
           <factory-entry name="entityManagerFactory" value="675cc7d7-470a-4806-b8d4-13d87d189397" />
         </datasource-mapping>
+        <naming-strategy-map />
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/../../src/core/test/META-INF/persistence.xml" />
       </configuration>
     </facet>
@@ -20,7 +21,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../target/production/core" />
     <output-test url="file://$MODULE_DIR$/../../target/test/core" />
     <exclude-output />
@@ -152,5 +153,6 @@
     <orderEntry type="library" name="xercesImpl-2.9.1-jbossas-1" level="project" />
     <orderEntry type="library" name="bcpkix-jdk15on-1.50" level="project" />
     <orderEntry type="library" name="httpclient-4.1.2" level="project" />
+    <orderEntry type="library" name="jjwt" level="project" />
   </component>
 </module>
