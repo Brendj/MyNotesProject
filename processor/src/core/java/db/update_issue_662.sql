@@ -11,6 +11,7 @@ create table cf_orgs_precontract_ids (
     contractId bigint not null,
     used boolean not null default false,
     createddate bigint,
+    useddate bigint,
     CONSTRAINT cf_orgs_precontract_ids_pk PRIMARY KEY (idOfPreContractId),
     CONSTRAINT cf_orgs_precontract_ids_idoforg_fk FOREIGN KEY (idoforg)
     REFERENCES cf_orgs (idoforg) MATCH SIMPLE

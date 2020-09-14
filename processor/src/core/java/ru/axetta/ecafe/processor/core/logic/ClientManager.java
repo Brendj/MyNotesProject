@@ -754,11 +754,13 @@ public class ClientManager {
 
             String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
             long contractId;
+            boolean autoContractId = false;
             if (StringUtils.equals(contractIdText, "AUTO")) {
                 logger.debug("generate ContractId");
                 if(RuntimeContext.RegistryType.isMsk()) {
                     contractId = runtimeContext.getClientContractIdGenerator()
                             .generateTransactionFree(organization.getIdOfOrg());
+                    autoContractId = true;
                 } else if(RuntimeContext.RegistryType.isSpb()) {
                     try {
                         String c = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
@@ -767,6 +769,7 @@ public class ClientManager {
                         } else {
                             contractId = runtimeContext.getClientContractIdGenerator()
                                     .generateTransactionFree(organization.getIdOfOrg());
+                            autoContractId = true;
                         }
                     } catch (Exception e) {
                         throw new Exception("Неправильный формат лицевого счета клиента", e);
@@ -914,7 +917,7 @@ public class ClientManager {
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
 
-            ContractIdGenerator.updateUsedContractId(persistenceSession, contractId);
+            if (autoContractId) ContractIdGenerator.updateUsedContractId(persistenceSession, contractId);
 
             ///
             logger.debug("register client card");
@@ -1093,6 +1096,7 @@ public class ClientManager {
         clientGuardianToSave.setPassportNumber(passportNumber);
         clientGuardianToSave.setPassportSeries(passportSeries);
         session.persist(clientGuardianToSave);
+        ContractIdGenerator.updateUsedContractId(session, contractIdGuardian);
         return clientGuardianToSave;
     }
 

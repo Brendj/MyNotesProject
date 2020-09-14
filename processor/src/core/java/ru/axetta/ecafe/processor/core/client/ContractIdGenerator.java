@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,6 +79,7 @@ public class ContractIdGenerator {
         query.setParameter("contractId", contractId);
         OrgPreContractId orgPreContractId = (OrgPreContractId) query.uniqueResult();
         orgPreContractId.setUsed(true);
+        orgPreContractId.setUsedDate(new Date());
         session.update(orgPreContractId);
     }
 

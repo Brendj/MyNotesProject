@@ -13,6 +13,7 @@ public class OrgPreContractId {
     private Long contractId;
     private boolean used;
     private Date createdDate;
+    private Date usedDate;
 
     public OrgPreContractId() {
 
@@ -71,5 +72,13 @@ public class OrgPreContractId {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public Date getUsedDate() {
+        return usedDate;
+    }
+
+    public void setUsedDate(Date usedDate) {
+        this.usedDate = usedDate;
     }
 }
