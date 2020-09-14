@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -614,7 +613,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         guardian.setDiscountMode(Client.DISCOUNT_MODE_NONE);
         persistenceSession.persist(guardian);
 
-        ContractIdGenerator.updateUsedContractId(persistenceSession, contractId);
+        RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, org.getIdOfOrg());
 
         ClientMigration clientMigration = new ClientMigration(guardian, org, date);
         persistenceSession.persist(clientMigration);

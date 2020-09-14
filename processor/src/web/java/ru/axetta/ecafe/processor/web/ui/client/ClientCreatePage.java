@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -652,7 +651,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSpecialMenu(this.specialMenu);
 
         persistenceSession.save(client);
-        if (autoContractId) ContractIdGenerator.updateUsedContractId(persistenceSession, this.contractId);
+        if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
 
         ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
         persistenceSession.save(clientMigration);

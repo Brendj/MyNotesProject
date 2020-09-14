@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,9 +35,22 @@ public class ContractIdGenerator {
     private static final int BATCH_COUNT = 100;
 
     private final SessionFactory sessionFactory;
+    private String preContractIdOrgs;
+    private List<Long> preContractIdOrgList = new ArrayList<>();
 
-    public ContractIdGenerator(SessionFactory sessionFactory) {
+    private final String PRE_GENERATE_DEFAULT = "NO";
+    private final String PRE_GENERATE_ALL = "ALL";
+
+    public ContractIdGenerator(Properties properties, SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        this.preContractIdOrgs = properties.getProperty("ecafe.processor.client.contractId.preGenerate", PRE_GENERATE_DEFAULT);
+        try {
+            String[] arr = preContractIdOrgs.split(",");
+            for (String s : arr) {
+                preContractIdOrgList.add(new Long(s));
+            }
+        } catch (Exception e) { }
+        logger.info("PreContractIdOrgs=" + preContractIdOrgs);
     }
 
     public long generateTransactionFree (long idOfOrg) throws Exception {
@@ -53,8 +67,14 @@ public class ContractIdGenerator {
         return list;
     }
 
-    public void generateAndSaveContractIdBatch (long idOfOrg, int count) throws Exception {
-        Long lastClientContractId = DAOUtils.updateOrgLastContractIdWithPessimisticLock(idOfOrg, count); //org.getLastClientContractId();
+    private boolean usePreContractIds(long idOfOrg) {
+        if (preContractIdOrgs.equals(PRE_GENERATE_DEFAULT)) return false;
+        if (preContractIdOrgs.equals(PRE_GENERATE_ALL)) return true;
+        return preContractIdOrgList.contains(idOfOrg);
+    }
+
+    private List<Long> generateTransactionFreeOldWay(long idOfOrg, int count) throws Exception {
+        Long lastClientContractId = DAOUtils.updateOrgLastContractIdWithPessimisticLock(idOfOrg, count);
 
         Long contractIdSize = null;
         String s = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.client.contractIdSize");
@@ -69,12 +89,16 @@ public class ContractIdGenerator {
             throw new IllegalArgumentException("Not available client contractId");
         }
 
-        List<Long> contractIds = getNextContractIds(idOfOrg, lastClientContractIds);
+        return getNextContractIds(idOfOrg, lastClientContractIds);
+    }
 
+    public void generateAndSaveContractIdBatch (long idOfOrg, int count) throws Exception {
+        List<Long> contractIds = generateTransactionFreeOldWay(idOfOrg, count);
         DAOService.getInstance().saveOrgPreContractIds(idOfOrg, contractIds);
     }
 
-    public static void updateUsedContractId(Session session, long contractId) {
+    public void updateUsedContractId(Session session, long contractId, long idOfOrg) {
+        if (!usePreContractIds(idOfOrg)) return;
         Query query = session.createQuery("select opc from OrgPreContractId opc where opc.contractId = :contractId");
         query.setParameter("contractId", contractId);
         OrgPreContractId orgPreContractId = (OrgPreContractId) query.uniqueResult();

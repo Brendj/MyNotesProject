@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -435,7 +434,7 @@ public class SchoolApiService implements ISchoolApiService {
             client.setContractId(contractId);
             client.setContractTime(new Date());
             persistanceSession.save(client);
-            ContractIdGenerator.updateUsedContractId(persistanceSession, contractId);
+            RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistanceSession, contractId, client.getOrg().getIdOfOrg());
             ClientMigration clientMigration = new ClientMigration(client, client.getOrg());
             clientMigration.setComment(comment);
             persistanceSession.save(clientMigration);

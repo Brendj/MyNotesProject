@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
-import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
@@ -917,7 +916,7 @@ public class ClientManager {
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
 
-            if (autoContractId) ContractIdGenerator.updateUsedContractId(persistenceSession, contractId);
+            if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, idOfOrg);
 
             ///
             logger.debug("register client card");
@@ -1096,7 +1095,7 @@ public class ClientManager {
         clientGuardianToSave.setPassportNumber(passportNumber);
         clientGuardianToSave.setPassportSeries(passportSeries);
         session.persist(clientGuardianToSave);
-        ContractIdGenerator.updateUsedContractId(session, contractIdGuardian);
+        RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
     }
 
