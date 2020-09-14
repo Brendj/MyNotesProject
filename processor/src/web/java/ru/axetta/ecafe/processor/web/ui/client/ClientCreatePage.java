@@ -654,7 +654,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSpecialMenu(this.specialMenu);
 
         persistenceSession.save(client);
-        ContractIdGenerator.updateUsedContractId(persistenceSession, this.contractId);
+        if (autoContractId) ContractIdGenerator.updateUsedContractId(persistenceSession, this.contractId);
 
         ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
         persistenceSession.save(clientMigration);
