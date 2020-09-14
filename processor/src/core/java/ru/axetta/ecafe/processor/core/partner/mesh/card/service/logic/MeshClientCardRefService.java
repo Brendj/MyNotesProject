@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardService;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardServiceIml;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MockService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.DependsOn;
+
+@DependsOn("runtimeContext")
+@Service
+public class MeshClientCardRefService {
+    private final Logger log = LoggerFactory.getLogger(MeshClientCardRefService.class);
+
+    private MeshCardService meshCardService;
+
+    @PostConstruct
+    public void initService(){
+        RuntimeContext.RegistryType currentType = RuntimeContext.getInstance().getRegistryType();
+        if(currentType.equals(RuntimeContext.RegistryType.MSK)){
+            this.meshCardService = new MeshCardServiceIml();
+        } else {
+            this.meshCardService = MockService.getInstance();
+        }
+    }
+
+
+}

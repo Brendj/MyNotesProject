@@ -7,25 +7,28 @@ package ru.axetta.ecafe.processor.core.persistence;
 import java.util.Date;
 
 //Связь между клиентом и его картами в МЭШ
-public class ExternalRefCardClient {
+public class MeshClientCardRef {
     private Long idOfRef;
     private Card card;
     private Client client;
-    private Long idOfRefInExternalSystem;
+    private Integer idOfRefInExternalSystem;
     private Boolean deleteState = false;
     private Date createDate;
     private Date lastUpdate;
+    private Boolean isSend = false;
 
-    public ExternalRefCardClient(){
-
+    public MeshClientCardRef(){
     }
 
-    public static ExternalRefCardClient build(Card card, Client client, Long idOfRefInExternalSystem){
+    public static MeshClientCardRef build(Card card, Client client, Integer idOfRefInExternalSystem){
         Date now = new Date();
-        ExternalRefCardClient refCardClient = new ExternalRefCardClient();
+        MeshClientCardRef refCardClient = new MeshClientCardRef();
         refCardClient.setCard(card);
         refCardClient.setClient(client);
-        refCardClient.setIdOfRefInExternalSystem(idOfRefInExternalSystem);
+        if(idOfRefInExternalSystem != null) {
+            refCardClient.setIdOfRefInExternalSystem(idOfRefInExternalSystem);
+            refCardClient.setSend(true);
+        }
         refCardClient.setCreateDate(now);
         refCardClient.setLastUpdate(now);
 
@@ -56,11 +59,11 @@ public class ExternalRefCardClient {
         this.client = client;
     }
 
-    public Long getIdOfRefInExternalSystem() {
+    public Integer getIdOfRefInExternalSystem() {
         return idOfRefInExternalSystem;
     }
 
-    public void setIdOfRefInExternalSystem(Long idOfRefInExternalSystem) {
+    public void setIdOfRefInExternalSystem(Integer idOfRefInExternalSystem) {
         this.idOfRefInExternalSystem = idOfRefInExternalSystem;
     }
 
@@ -86,5 +89,13 @@ public class ExternalRefCardClient {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public Boolean getSend() {
+        return isSend;
+    }
+
+    public void setSend(Boolean send) {
+        isSend = send;
     }
 }

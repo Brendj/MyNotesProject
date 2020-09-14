@@ -6,6 +6,7 @@ import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -100,7 +101,7 @@ public class Category implements Comparable {
 
     @JsonProperty("parameter_values")
     public List<Object> getParameterValues() {
-        return parameterValues;
+        return parameterValues = new LinkedList<>();
     }
 
     @JsonProperty("parameter_values")

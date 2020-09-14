@@ -5,6 +5,8 @@ import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.slf4j.Logger;
@@ -44,6 +46,39 @@ public class MeshRestClient {
             if (statusCode == HttpStatus.SC_OK) {
                 InputStream inputStream = httpMethod.getResponseBodyAsStream();
                 //return IOUtils.toByteArray(inputStream);
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[1024*1024];
+                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+
+                buffer.flush();
+                return buffer.toByteArray();
+            } else {
+                throw new Exception("Mesh request has status " + statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
+    }
+
+    public byte[] executeCreateCategory(String meshGuid, String parameters) throws Exception {
+        URL url = new URL(getServiceAddress() + "/persons/" + meshGuid + "/category");
+        logger.info("Execute request to MESH REST: " + url);
+        PostMethod httpMethod = new PostMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        StringRequestEntity requestEntity = new StringRequestEntity(
+                parameters,
+                "application/json",
+                "UTF-8");
+        httpMethod.setRequestEntity(requestEntity);
+
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            if (statusCode == HttpStatus.SC_OK) {
+                InputStream inputStream = httpMethod.getResponseBodyAsStream();
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 int nRead;
                 byte[] data = new byte[1024*1024];

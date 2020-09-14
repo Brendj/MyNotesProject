@@ -15,6 +15,19 @@ public class Parameter {
     @JsonProperty("value")
     private String value;
 
+    public Parameter(){
+    }
+
+    public Parameter(String name, Object o) {
+        this.name = name;
+        this.value = String.valueOf(o);
+    }
+
+    public Parameter(PropertyField field, Object o) {
+        this.name = field.getFieldName();
+        this.value = String.valueOf(o);
+    }
+
     public String getName() {
         return name;
     }
