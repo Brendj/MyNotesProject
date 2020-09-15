@@ -58,6 +58,9 @@ public class ContractIdGenerator {
     }
 
     public List<Long> generateTransactionFree (long idOfOrg, int count) throws Exception {
+        if (!usePreContractIds(idOfOrg)) {
+            return generateTransactionFreeOldWay(idOfOrg, count);
+        }
         List<Long> list = DAOService.getInstance().getOrgPreContractIdList(idOfOrg, count);
         while (list.size() < count) {
             //если в таблице не хватает прегенеренных л/с, то делаем новые
