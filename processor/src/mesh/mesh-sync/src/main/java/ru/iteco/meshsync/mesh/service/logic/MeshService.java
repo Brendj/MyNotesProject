@@ -74,39 +74,43 @@ public class MeshService {
                 case merge:
                     PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), EXPAND);
                     if (info == null) {
-                        throw new NoRequiredDataException("MESH return NULL");
+                        throw new NoRequiredDataException("MESH-REST return NULL");
                     }
 
-                    if (CollectionUtils.isEmpty(info.getEducation())) {
+                    if (person == null && CollectionUtils.isEmpty(info.getEducation())) {
                         throw new EducationNotFoundException(String
-                                .format("Person %s have no info about Education", entityChanges.getPersonGUID()));
+                                .format("Person %s have no info about Education and not exists in our DB", entityChanges.getPersonGUID()));
                     }
 
                     actualEdu = getLastEducation(info.getEducation());
-                    if (actualEdu.getOrganizationId() == null) {
-                        throw new NoRequiredDataException("OrganizationID in Education is NULL");
-                    }
-                    if(actualEdu.getPropertyClass() == null){
-                        if(actualEdu.getEducationForm() == null && actualEdu.getEducationFormId() == null){
-                            throw new NoRequiredDataException(String
-                                    .format("Person %s have no info about Class and EducationForm",
-                                            entityChanges.getPersonGUID()));
-                        } else {
-                            homeStudy = catalogService.isHomeStudy(actualEdu.getEducationForm(),
-                                    actualEdu.getEducationFormId());
+                    if(actualEdu != null) {
+                        if (actualEdu.getOrganizationId() == null) {
+                            throw new NoRequiredDataException("OrganizationID in Education is NULL");
                         }
-                    }
-                    inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
+                        if (actualEdu.getPropertyClass() == null) {
+                            if (actualEdu.getEducationForm() == null && actualEdu.getEducationFormId() == null) {
+                                throw new NoRequiredDataException(String.format("Person %s have no info about Class and EducationForm",
+                                        entityChanges.getPersonGUID()));
+                            } else {
+                                homeStudy = catalogService.isHomeStudy(actualEdu.getEducationForm(), actualEdu.getEducationFormId());
+                            }
+                        }
+                        inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
 
-                    if (person == null && !inSupportedOrg) {
-                        log.info(String
-                                .format("Person %s in the organization %d, this person no in DB and this OO not support ISPP or no data about OrganizationID from NSI",
-                                        entityChanges.getPersonGUID(), actualEdu.getOrganizationId()));
-                        return true;
-                    }
+                        if (person == null && !inSupportedOrg) {
+                            log.info(String.format(
+                                    "Person %s in the organization %d, this person no in DB and this OO not support ISPP or no data about OrganizationID from NSI",
+                                    entityChanges.getPersonGUID(), actualEdu.getOrganizationId()));
+                            return true;
+                        }
 
-                    String lastGuid = getLastGuid(info);
-                    person = changePerson(person, info, inSupportedOrg, actualEdu, homeStudy, lastGuid);
+                        String lastGuid = getLastGuid(info);
+                        person = changePerson(person, info, inSupportedOrg, actualEdu, homeStudy, lastGuid);
+                    } else if(person != null){
+                        log.warn(String.format("Get Person %s without Education, but he exists in DB, mark as delete",
+                                entityChanges.getPersonGUID()));
+                        person.setDeleteState(true);
+                    }
 
                     info = null;
                     break;
@@ -129,7 +133,7 @@ public class MeshService {
             serviceJournalService.decideAllRowsForPerson(entityChanges.getPersonGUID());
         } catch (EducationNotFoundException e) {
             // Возможно сотрудник ОО
-            log.error(String
+            log.warn(String
                     .format("Catch EducationNotFoundException for Person ID: %s ", entityChanges.getPersonGUID()));
             invalidData = false;
         } catch (ApiException e) {
@@ -144,7 +148,7 @@ public class MeshService {
                 invalidData = true;
             }
         } catch (NoRequiredDataException e){
-            log.error("Catch NoRequiredDataException, person marks as with invalid data Except: " + e.getMessage());
+            log.warn("Catch NoRequiredDataException, person marks as with invalid data Except: " + e.getMessage());
             serviceJournalService.writeError(e, entityChanges.getPersonGUID());
             invalidData = true;
         } catch (Exception e){
@@ -230,7 +234,10 @@ public class MeshService {
     }
 
     private PersonEducation getLastEducation(List<PersonEducation> allEdu){
-        allEdu.sort(Comparator.comparing(PersonEducation::getActualFrom));
+        if(CollectionUtils.isEmpty(allEdu)){
+            return null;
+        }
+        allEdu.sort(Comparator.comparing(PersonEducation::getTrainingEndAt));
         return allEdu.get(allEdu.size() - 1);
     }
 }

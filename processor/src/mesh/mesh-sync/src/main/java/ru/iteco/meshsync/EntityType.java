@@ -9,7 +9,8 @@ public enum EntityType {
     person_education("education"),
     person_ids("ids"),
     category("categories"),
-    person_prevention("prevention");
+    person_prevention("prevention"),
+    validation("validation");
 
     EntityType(String apiField){
         this.apiField = apiField;
