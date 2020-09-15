@@ -13,46 +13,51 @@ import java.util.Date;
  */
 public class BlockUnblockItem {
     private String requestId;
-    private String shortname;
-    private String address;
+    private Date blockdate;
+    private Date unblockdate;
+    private String operation;
+    private String extClientId;
     private String firstname;
     private String lastname;
     private String middlename;
     private String groupname;
+    private Long contractIdp;
     private String firp;
     private String lastp;
     private String middp;
+    private String shortname;
+    private String shortnameinfoservice;
     private String cardstate;
     private Long cardno;
     private Long cardprintedno;
-    private Date blockdate;
-    private Date unblockdate;
 
-
-    public BlockUnblockItem(String requestId, String shortname, String address, String firstname, String lastname, String middlename,
-            String groupname, String firp, String lastp, String middp, String cardstate, Long cardno,
-            Long cardprintedno, Date blockdate,Date unblockdate) {
+    public BlockUnblockItem(String requestId, Date blockdate,Date unblockdate, String operation, String extClientId,
+            String firstname, String lastname, String middlename, String groupname, Long contractIdp, String firp, String lastp,
+            String middp,  String shortname, String shortnameinfoservice, String cardstate, Long cardno, Long cardprintedno) {
         this.requestId = requestId;
-        this.shortname=shortname;
-        this.address=address;
+        this.blockdate=blockdate;
+        this.unblockdate=unblockdate;
+        this.operation=operation;
+        this.extClientId=extClientId;
         this.firstname=firstname;
         this.lastname=lastname;
         this.middlename=middlename;
         this.groupname=groupname;
-        if (firp == null)
-            firp = "";
-        if (lastp == null)
-            lastp = "";
-        if (middp == null)
-            middp = "";
+        this.contractIdp=contractIdp;
         this.firp=firp;
         this.lastp=lastp;
         this.middp=middp;
+        if (firp == null)
+            this.firp = "";
+        if (lastp == null)
+            this.lastp = "";
+        if (middp == null)
+            this.middp = "";
+        this.shortname=shortname;
+        this.shortnameinfoservice=shortnameinfoservice;
         this.cardstate=cardstate;
         this.cardno=cardno;
         this.cardprintedno=cardprintedno;
-        this.blockdate=blockdate;
-        this.unblockdate=unblockdate;
     }
 
     public String getRequestId() {
@@ -167,11 +172,35 @@ public class BlockUnblockItem {
         this.unblockdate = unblockdate;
     }
 
-    public String getAddress() {
-        return address;
+    public String getOperation() {
+        return operation;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
+
+    public String getExtClientId() {
+        return extClientId;
+    }
+
+    public void setExtClientId(String extClientId) {
+        this.extClientId = extClientId;
+    }
+
+    public Long getContractIdp() {
+        return contractIdp;
+    }
+
+    public void setContractIdp(Long contractIdp) {
+        this.contractIdp = contractIdp;
+    }
+
+    public String getShortnameinfoservice() {
+        return shortnameinfoservice;
+    }
+
+    public void setShortnameinfoservice(String shortnameinfoservice) {
+        this.shortnameinfoservice = shortnameinfoservice;
     }
 }
