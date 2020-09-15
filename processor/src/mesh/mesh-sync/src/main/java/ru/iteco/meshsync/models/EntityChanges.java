@@ -1,14 +1,15 @@
 package ru.iteco.meshsync.models;
 
-import org.apache.logging.log4j.util.Strings;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 import ru.iteco.meshsync.ActionType;
 import ru.iteco.meshsync.EntityType;
 import ru.iteco.meshsync.audit.AuditEntity;
 import ru.iteco.meshsync.audit.AuditEntityListener;
 import ru.iteco.meshsync.audit.Auditable;
 import ru.iteco.meshsync.kafka.dto.EntityChangeEventDTO;
+
+import org.apache.logging.log4j.util.Strings;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,7 +19,7 @@ import java.io.Serializable;
 @Table(name = "cf_mh_entity_changes", uniqueConstraints={
         @UniqueConstraint(columnNames={"personGUID", "entity"})
 })
-public class EntityChanges implements Serializable, Auditable {
+public class EntityChanges implements Serializable, Auditable { // legacy code
     @GenericGenerator(
             name = "cf_mh_EntityChanges_seq",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
