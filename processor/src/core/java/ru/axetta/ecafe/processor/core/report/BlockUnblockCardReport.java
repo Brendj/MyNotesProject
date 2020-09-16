@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.MapKeyModel;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
+import ru.axetta.ecafe.processor.core.service.CardBlockUnblockService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -74,9 +75,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
     }
 
     public enum CardStateType {
-        ALL("Все"),
-        UNBLOCK("Только разблокированные"),
-        BLOCK("Только заблокированные");
+        ALL("Все"), UNBLOCK("Только разблокированные"), BLOCK("Только заблокированные");
         private String description;
 
         public String getDescription() {
@@ -93,6 +92,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
     }
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
     }
 
     @Override
@@ -139,14 +139,15 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
             List<BlockUnblockItem> blockUnblockItemList = new ArrayList<>();
             Org orgLoad;
             try {
-                orgLoad = (Org) session.load(Org.class, Long.parseLong(StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG))));
-            } catch (Exception e)
-            {
+                orgLoad = (Org) session.load(Org.class, Long.parseLong(
+                        StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG))));
+            } catch (Exception e) {
                 orgLoad = null;
             }
 
             List<Long> idOfClients = parseStringAsLongList(P_ID_OF_CLIENTS);
-            Boolean allFriendlyOrgs = Boolean.parseBoolean(StringUtils.trimToEmpty(reportProperties.getProperty(P_ALL_FRIENDLY_ORGS)));
+            Boolean allFriendlyOrgs = Boolean
+                    .parseBoolean(StringUtils.trimToEmpty(reportProperties.getProperty(P_ALL_FRIENDLY_ORGS)));
             String cardState = reportProperties.getProperty(P_CARD_STATUS);
 
 
@@ -164,24 +165,18 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 }
                 filterOrgs = " and co.idoforg in (" + filterOrgs + ") ";
             }
-            if (idOfClients != null && !idOfClients.isEmpty())
-            {
+            if (idOfClients != null && !idOfClients.isEmpty()) {
                 for (Long idClient : idOfClients) {
                     filterClients += "'" + idClient + "',";
                 }
                 filterClients = filterClients.substring(0, filterClients.length() - 1);
                 filterClients = " and cc.idofclient in (" + filterClients + ") ";
             }
-            if (cardState != null)
-            {
-                if (cardState.equals(CardStateType.BLOCK.getDescription()))
-                {
+            if (cardState != null) {
+                if (cardState.equals(CardStateType.BLOCK.getDescription())) {
                     filterStatus = "  and ca.state = " + CardState.BLOCKED.getValue() + " ";
-                }
-                else
-                {
-                    if (cardState.equals(CardStateType.UNBLOCK.getDescription()))
-                    {
+                } else {
+                    if (cardState.equals(CardStateType.UNBLOCK.getDescription())) {
                         filterStatus = "  and ca.state = " + CardState.ISSUED.getValue() + " ";
                     }
                 }
@@ -189,37 +184,40 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
 
             }
             //Это разблокирование всего
-            Query queryUnblock = session.createSQLQuery("select ccra.idcardactionrequest, ccra.requestid, co.shortname, "
-                    + "co.shortnameinfoservice, ccra.firstname,ccra.lastname, ccra.middlename,\n"
-                    + "ccg.groupname, null as firp, null as lastp, null as middp, ca.state as cardstate, ca.cardno, ca.cardprintedno,\n"
-                    + "ccarold.createdate as blockdate, ccra.createdate as unblockdate,ccra.\"comment\", \n" + "CASE\n"
-                    + "    WHEN ccra.contingentid is not null THEN ccra.contingentid\n" + "    ELSE ccra.staffid\n"
-                    + "  END idexternal, null as contractp\n" + "from cf_cr_cardactionrequests ccra \n"
-                    + "left join cf_cr_cardactionclient ccac on ccac.idcardactionrequest = ccra.idcardactionrequest\n"
-                    + "left join cf_clients cc on cc.idofclient = ccac.idofclient\n"
-                    + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
-                    + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
-                    + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
-                    + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
-                    + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is null and ccra.\"action\" = 1\n" + "union\n"
-                    + "select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.shortnameinfoservice, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
-                    + "ccg.groupname,cp1.firstname as firp,cp1.surname as lastp , cp1.secondname as middp,\n"
-                    + "ca.state as cardstate, ca.cardno, ca.cardprintedno, ccarold.createdate as blockdate, ccra.createdate as unblockdate,\n"
-                    + "ccra.\"comment\", \n" + "CASE\n"
-                    + "    WHEN ccra.contingentid is not null THEN ccra.contingentid\n" + "    ELSE ccra.staffid\n"
-                    + "  END idexternal, null as contractp\n" + "from cf_cr_cardactionrequests ccra \n"
-                    + "left join cf_cr_cardactionclient ccac on ccac.idcardactionrequest = ccra.idcardactionrequest\n"
-                    + "left join cf_clients cc on cc.idofclient = ccac.idclientchild\n"
-                    + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
-                    + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
-                    + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
-                    + "left join cf_clients cc1 on cc1.idofclient = ccac.idofclient\n"
-                    + "left join cf_persons cp1 on cp1.idofperson = cc1.idofperson\n"
-                    + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
-                    + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
-                    + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is not null and ccra.\"action\" = 1;");
+            Query queryUnblock = session.createSQLQuery(
+                    "select ccra.idcardactionrequest, ccra.requestid, co.shortname, "
+                            + "co.shortnameinfoservice, ccra.firstname,ccra.lastname, ccra.middlename,\n"
+                            + "ccg.groupname, null as firp, null as lastp, null as middp, ca.state as cardstate, ca.cardno, ca.cardprintedno,\n"
+                            + "ccarold.createdate as blockdate, ccra.createdate as unblockdate,ccra.\"comment\", \n"
+                            + "CASE\n" + "    WHEN ccra.contingentid is not null THEN ccra.contingentid\n"
+                            + "    ELSE ccra.staffid\n" + "  END idexternal, null as contractp\n"
+                            + "from cf_cr_cardactionrequests ccra \n"
+                            + "left join cf_cr_cardactionclient ccac on ccac.idcardactionrequest = ccra.idcardactionrequest\n"
+                            + "left join cf_clients cc on cc.idofclient = ccac.idofclient\n"
+                            + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
+                            + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
+                            + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
+                            + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
+                            + "where ccra.processed = true and ca.state is not null \n"
+                            + "and ccac.idclientchild is null and ccra.\"action\" = 1\n" + "union\n"
+                            + "select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.shortnameinfoservice, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
+                            + "ccg.groupname,cp1.firstname as firp,cp1.surname as lastp , cp1.secondname as middp,\n"
+                            + "ca.state as cardstate, ca.cardno, ca.cardprintedno, ccarold.createdate as blockdate, ccra.createdate as unblockdate,\n"
+                            + "ccra.\"comment\", \n" + "CASE\n"
+                            + "    WHEN ccra.contingentid is not null THEN ccra.contingentid\n"
+                            + "    ELSE ccra.staffid\n" + "  END idexternal, null as contractp\n"
+                            + "from cf_cr_cardactionrequests ccra \n"
+                            + "left join cf_cr_cardactionclient ccac on ccac.idcardactionrequest = ccra.idcardactionrequest\n"
+                            + "left join cf_clients cc on cc.idofclient = ccac.idclientchild\n"
+                            + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
+                            + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
+                            + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
+                            + "left join cf_clients cc1 on cc1.idofclient = ccac.idofclient\n"
+                            + "left join cf_persons cp1 on cp1.idofperson = cc1.idofperson\n"
+                            + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
+                            + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
+                            + "where ccra.processed = true and ca.state is not null \n"
+                            + "and ccac.idclientchild is not null and ccra.\"action\" = 1;");
 
             List rListUnblock = queryUnblock.list();
             for (Object o : rListUnblock) {
@@ -245,14 +243,12 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 Long contractId;
                 try {
                     contractId = ((BigInteger) row[18]).longValue();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     contractId = null;
                 }
                 BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, unblockdate, operation,
-                        exId,firstname, lastname, middlename, groupname, contractId, firp, lastp, middp, shortname,
-                        address,converterTypeCard(cardstate), cardno, cardprintedno);
+                        exId, firstname, lastname, middlename, groupname, contractId, firp, lastp, middp, shortname,
+                        address, CardBlockUnblockService.converterTypeCard(cardstate), cardno, cardprintedno);
                 blockUnblockItemList.add(blockUnblockItem);
 
             }
@@ -333,134 +329,63 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 Long contractId;
                 try {
                     contractId = ((BigInteger) row[17]).longValue();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     contractId = null;
                 }
-                BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, null, operation,
-                        exId,firstname, lastname, middlename, groupname, contractId, firp, lastp, middp, shortname,
-                        address,converterTypeCard(cardstate), cardno, cardprintedno);
+                BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, null, operation, exId,
+                        firstname, lastname, middlename, groupname, contractId, firp, lastp, middp, shortname, address,
+                        CardBlockUnblockService.converterTypeCard(cardstate), cardno, cardprintedno);
                 blockUnblockItemList.add(blockUnblockItem);
             }
 
-            ////////////////////
-    //        //Это блокирование старого всего
-    //Date test1 = new Date();
-    //        List<BlockUnblockItem> blockUnblockItemListOLD = new ArrayList<>();
-    //        Query queryOld = session.createSQLQuery("select ccra.idcardactionrequest, ccra.requestid, ccra.contingentid, ccra.staffid,  \n"
-    //                + "ccra.\"comment\", ccg.groupname, cc.contractid, cp.secondname, cp.firstname, cp.surname, co.shortname, co.shortnameinfoservice, \n"
-    //                + "ccrab.createdate as blockdate, ccra.createdate as unblockdate\n"
-    //                + "from cf_cr_cardactionrequests ccra \n"
-    //                + "left join cf_clients cc on cc.idofclient = ccra.idofclient\n"
-    //                + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
-    //                + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
-    //                + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
-    //                + "left join cf_cr_cardactionrequests ccrab on ccrab.requestid = ccra.requestid and ccrab.\"action\" = 0\n"
-    //                + "where ccra.idofclient is not null and ccra.\"action\" = 1 and cc.contractid is not null\n"
-    //                + "union\n"
-    //                + "select ccra.idcardactionrequest, ccra.requestid, ccra.contingentid, ccra.staffid,  \n"
-    //                + "ccra.\"comment\", ccg.groupname, cc.contractid, cp.secondname, cp.firstname, cp.surname, co.shortname, co.shortnameinfoservice, \n"
-    //                + "ccra.createdate as blockdate, null as unblockdate\n" + "from cf_cr_cardactionrequests ccra \n"
-    //                + "left join cf_clients cc on cc.idofclient = ccra.idofclient\n"
-    //                + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
-    //                + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
-    //                + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
-    //                + "where ccra.idofclient is not null and ccra.\"action\" = 0 and cc.contractid is not null and ccra.requestid not in (select ccra.requestid\n"
-    //                + "from cf_cr_cardactionrequests ccra\n"
-    //                + "where ccra.idofclient is not null and ccra.\"action\" = 1)");
-    //
-    //        List rListOld = queryOld.list();
-    //
-    //        for (Object o : rListOld) {
-    //            Object[] row = (Object[]) o;
-    //            Long idcardactionrequest = ((BigInteger) row[0]).longValue();
-    //            String requestId = (String) row[1];
-    //            String contingentId = (String) row[2];
-    //            String staffId = (String) row[3];
-    //            String operation = (String) row[4];
-    //            String groupname = (String) row[5];
-    //            Long contractId = ((BigInteger) row[6]).longValue();
-    //            String lastname = (String) row[7];
-    //            String firstname = (String) row[8];
-    //            String middlename = (String) row[9];
-    //            String shortname = (String) row[10];
-    //            String shortnameinfoservice = (String) row[11];
-    //            Date blockdate = new Date(((Timestamp) row[12]).getTime());
-    //            Date unblockdate;
-    //            try {
-    //                unblockdate = new Date(((Timestamp) row[13]).getTime());
-    //            } catch (Exception e) {
-    //                unblockdate = null;
-    //            }
-    //
-    //            if (staffId != null)
-    //            {
-    //                Client cl =  DAOUtils.findClientByContractId(session, contractId);
-    //                if (cl.getCards() != null) {
-    //                    for (Card card : cl.getCards()) {
-    //                        if (card.getState() == CardState.BLOCKED.getValue()) {
-    //
-    //                            BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, unblockdate,
-    //                                    operation, staffId, firstname, lastname, middlename, groupname, contractId,"","","",
-    //                                    shortname, shortnameinfoservice, converterTypeCard(card.getState()), card.getCardNo(),
-    //                                    card.getCardPrintedNo());
-    //                            blockUnblockItemListOLD.add(blockUnblockItem);
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //            else {
-    //                if (contingentId != null) {
-    //                    Client cl = DAOUtils.findClientByMeshGuid(session, contingentId);
-    //                    if (cl != null) {
-    //                        if (cl.getAgeTypeGroup() != null && StringUtils
-    //                                .containsIgnoreCase(cl.getAgeTypeGroup(), "дошкол")) {
-    //                            Client guard = DAOUtils.findClientByContractId(session, contractId);
-    //                            if (guard != null) {
-    //                                if (guard.getCards() != null) {
-    //                                    for (Card card : guard.getCards()) {
-    //                                        if (card.getState() == CardState.BLOCKED.getValue()) {
-    //                                            BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId,
-    //                                                    blockdate, unblockdate, operation, contingentId, cl.getPerson().getFirstName(), cl.getPerson().getSurname(),
-    //                                                    cl.getPerson().getSecondName(), groupname, contractId,
-    //                                                    guard.getPerson().getFirstName(), guard.getPerson().getSurname(),
-    //                                                    guard.getPerson().getSecondName(), shortname,
-    //                                                    shortnameinfoservice, converterTypeCard(card.getState()), card.getCardNo(), card.getCardPrintedNo());
-    //                                            blockUnblockItemListOLD.add(blockUnblockItem);
-    //                                        }
-    //                                    }
-    //                                }
-    //                            }
-    //                        } else {
-    //                            if (cl.getCards() != null) {
-    //                                for (Card card : cl.getCards()) {
-    //                                    if (card.getState() == CardState.BLOCKED.getValue()) {
-    //
-    //                                        BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId,
-    //                                                blockdate, unblockdate, operation, contingentId, firstname, lastname,
-    //                                                middlename, groupname, contractId, "", "", "", shortname,
-    //                                                shortnameinfoservice, converterTypeCard(card.getState()), card.getCardNo(),
-    //                                                card.getCardPrintedNo());
-    //                                        blockUnblockItemListOLD.add(blockUnblockItem);
-    //                                    }
-    //                                }
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //
-    //        }
-    //        Date test2 = new Date();
-    //
-    //        blockUnblockItemList.addAll(blockUnblockItemListOLD);
-            ///////////////////////
+            //////////////////
+            //Это блокирование старого всего
+            Date test1 = new Date();
+            //Это блокирование всего исключая то, что успешно разблокировано
+            Query queryold = session.createSQLQuery("select * from cf_cr_cardactionitems");
+
+            List rListOld = queryold.list();
+
+            for (Object o : rListOld) {
+                Object[] row = (Object[]) o;
+                String requestId = (String) row[0];
+                Date blockdate = new Date(((BigInteger) row[1]).longValue());
+                Date unblockdate = new Date(((BigInteger) row[2]).longValue());
+                String operation = (String) row[3];
+                String exId = (String) row[4];
+                String firstname = (String) row[5];
+                String lastname = (String) row[6];
+                String middlename = (String) row[7];
+                String groupname = (String) row[8];
+                Long contractId;
+                try {
+                    contractId = ((BigInteger) row[9]).longValue();
+                } catch (Exception e) {
+                    contractId = null;
+                }
+                String firp = (String) row[10];
+                String lastp = (String) row[11];
+                String middp = (String) row[12];
+                String shortname = (String) row[13];
+                String address = (String) row[14];
+                String cardstate = (String) row[15];
+                Long cardno = ((BigInteger) row[16]).longValue();
+                Long cardprintedno = ((BigInteger) row[17]).longValue();
+
+                BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, unblockdate, operation, exId,
+                        firstname, lastname, middlename, groupname, contractId, firp, lastp, middp, shortname, address,
+                        cardstate, cardno, cardprintedno);
+                blockUnblockItemList.add(blockUnblockItem);
+            }
+            Date test2 = new Date();
+
+          //  blockUnblockItemList.addAll(blockUnblockItemListOLD);
+            /////////////////////
             Collections.sort(blockUnblockItemList, new Comparator<BlockUnblockItem>() {
                 public int compare(BlockUnblockItem o1, BlockUnblockItem o2) {
-                    if(o1.getRequestId().equals(o2.getRequestId())){
+                    if (o1.getRequestId().equals(o2.getRequestId())) {
                         return 0;
-                    } else if(Long.valueOf(o1.getRequestId()) < Long.valueOf(o2.getRequestId())){
+                    } else if (Long.valueOf(o1.getRequestId()) < Long.valueOf(o2.getRequestId())) {
                         return 1;
                     } else {
                         return -1;
@@ -468,21 +393,6 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 }
             });
             return blockUnblockItemList;
-        }
-
-        private String converterTypeCard (Integer type)
-        {
-            if (CardState.ISSUED.getValue() == type)
-                return CardState.ISSUED.getDescription();
-            if (CardState.BLOCKED.getValue() == type)
-                return CardState.BLOCKED.getDescription();
-            if (CardState.TEMPBLOCKED.getValue() == type)
-                return CardState.TEMPBLOCKED.getDescription();
-            if (CardState.TEMPISSUED.getValue() == type)
-                return CardState.TEMPISSUED.getDescription();
-            if (CardState.FREE.getValue() == type)
-                return CardState.FREE.getDescription();
-            return CardState.UNKNOWN.getDescription();
         }
 
         private List<Long> parseStringAsLongList(String propertyName) {
