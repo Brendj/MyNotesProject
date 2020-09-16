@@ -1867,7 +1867,7 @@ public class PreorderDAOService {
             if (complexInfo == null) {
                 if (preorderComplex != null && !preorderComplex.getDeletedState()) {
                     //предзаказ есть, но комплекса нет - удаляем ранее сгенерированный предзаказ
-                    logger.info("Delete by complex not exists");
+                    logger.info("Deleting preorderComplex due to the complex does not exist");
                     deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED);
                 } else {
                     logger.info("Not generate by complex not exists");
@@ -1919,8 +1919,12 @@ public class PreorderDAOService {
                 if (preorderComplex != null && !preorderComplex.getDeletedState() && menuDetail == null) {
                     menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
-                        logger.info("Not found menu detail");
-                        deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED); //не нашли блюдо из предзаказа - удаляем предзаказ
+                        if (isActualPreorderMenuDetailExists(preorderComplex)) {
+                            logger.info("Not found menu detail, another menu details exist");
+                        } else {
+                            logger.info("Not found menu detail, deleting preorderComplex");
+                            deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED); //не нашли блюдо из предзаказа - удаляем предзаказ
+                        }
                         currentDate = CalendarUtils.addDays(currentDate, 1);
                         continue;
                     }
@@ -2220,6 +2224,13 @@ public class PreorderDAOService {
         }
         preorderComplex.deleteByReason(nextVersion, true, preorderState);
         em.merge(preorderComplex);
+    }
+
+    private boolean isActualPreorderMenuDetailExists(PreorderComplex preorderComplex) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (!pmd.getDeletedState()) return true;
+        }
+       return false;
     }
 
     @Transactional
