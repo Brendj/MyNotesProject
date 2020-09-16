@@ -7,11 +7,13 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.util.Constants;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,9 +28,9 @@ public class PlanOrderClientDTO {
     @JsonProperty("SecondName")
     private String secondName;
     @JsonProperty("Enter")
-    private Date enter = null;
+    private String enter = null;
     @JsonProperty("Exit")
-    private Date exit = null;
+    private String exit = null;
     @JsonProperty("Complexes")
     private List<ClientComplexDTO> complexes = new ArrayList<>();
     @JsonIgnore
@@ -39,6 +41,8 @@ public class PlanOrderClientDTO {
     private EnterEvent exitEvent;
     @JsonIgnore
     private List<CategoryDiscount> filteredClientCategoryDiscounts = new ArrayList<>();
+
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.DATE_STRING_FORMAT);
 
     public PlanOrderClientDTO(){
 
@@ -57,10 +61,10 @@ public class PlanOrderClientDTO {
             this.secondName = client.getPerson().getSecondName();
         }
         if(enterEvent != null){
-            this.enter = enterEvent.getEvtDateTime();
+            this.enter = simpleDateFormat.format(enterEvent.getEvtDateTime());
         }
         if(exitEvent != null){
-            this.exit = exitEvent.getEvtDateTime();
+            this.exit = simpleDateFormat.format(exitEvent.getEvtDateTime());
         }
     }
 
@@ -109,20 +113,20 @@ public class PlanOrderClientDTO {
         this.secondName = secondName;
     }
 
-    public Date getEnter() {
+    public String getEnter() {
         return enter;
     }
 
     public void setEnter(Date enter) {
-        this.enter = enter;
+        this.enter = simpleDateFormat.format(enter);
     }
 
-    public Date getExit() {
+    public String getExit() {
         return exit;
     }
 
     public void setExit(Date exit) {
-        this.exit = exit;
+        this.exit = simpleDateFormat.format(exit);
     }
 
     public List<ClientComplexDTO> getComplexes() {
@@ -156,7 +160,7 @@ public class PlanOrderClientDTO {
 
     public void setEnterEvent(EnterEvent enterEvent) {
         if(enterEvent != null)
-            this.enter = enterEvent.getEvtDateTime();
+            this.enter = simpleDateFormat.format(enterEvent.getEvtDateTime());
         this.enterEvent = enterEvent;
     }
 
@@ -166,7 +170,7 @@ public class PlanOrderClientDTO {
 
     public void setExitEvent(EnterEvent exitEvent) {
         if(exitEvent != null)
-            this.exit = exitEvent.getEvtDateTime();
+            this.exit = simpleDateFormat.format(exitEvent.getEvtDateTime());
         this.exitEvent = exitEvent;
     }
 

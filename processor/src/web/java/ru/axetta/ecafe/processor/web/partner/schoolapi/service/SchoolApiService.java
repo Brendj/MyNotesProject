@@ -608,7 +608,8 @@ public class SchoolApiService implements ISchoolApiService {
                 if(categoryDiscount.getDiscountsRules().isEmpty())
                     continue;
                 for(DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-                    if(!orgHasCategoryOrg(org.getCategories(), discountRule.getCategoryOrgs())){
+                    if(discountRule.getCategoryOrgs() != null && !discountRule.getCategoryOrgs().isEmpty()
+                            && !orgHasCategoryOrg(org.getCategories(), discountRule.getCategoryOrgs())){
                         continue;
                     }
                     if(clientFilteredDiscountRulesList.isEmpty()){
