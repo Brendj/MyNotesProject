@@ -47,6 +47,8 @@ public class CardBlockUnblockService {
 
 
     final static String SYNC_BLOCKCARD = "SyncCard";
+    public static final String UNBLOCK_COMMENT = "Режим самоизоляции снят";
+    public static final String BLOCK_COMMENT = "Для владельца идентификатора действует режим самоизоляции";
 
     public static class SyncBlockOld implements Job {
 
@@ -68,7 +70,7 @@ public class CardBlockUnblockService {
 
 
     public void scheduleSync() throws Exception {
-        String syncScheduleSync = "0 0 0/1 ? * * *";
+        String syncScheduleSync = "0 0 * ? * *";
         try {
             JobDetail jobDetailSync = new JobDetail(SYNC_BLOCKCARD, Scheduler.DEFAULT_GROUP, SyncBlockOld.class);
             SchedulerFactory sfb = new StdSchedulerFactory();
@@ -91,7 +93,7 @@ public class CardBlockUnblockService {
         Query queryOld = session.createSQLQuery(
                 "select ccra.idcardactionrequest, ccra.requestid, ccra.contingentid, ccra.staffid,  \n"
                         + "ccra.\"comment\", ccg.groupname, cc.contractid, cp.secondname, cp.firstname, cp.surname, co.shortname, co.shortnameinfoservice, \n"
-                        + "ccrab.createdate as blockdate, ccra.createdate as unblockdate\n"
+                        + "ccrab.createdate as blockdate, ccra.createdate as unblockdate, cc.idofclient, co.idoforg \n"
                         + "from cf_cr_cardactionrequests ccra \n"
                         + "left join cf_clients cc on cc.idofclient = ccra.idofclient\n"
                         + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
@@ -102,7 +104,7 @@ public class CardBlockUnblockService {
                         + "union\n"
                         + "select ccra.idcardactionrequest, ccra.requestid, ccra.contingentid, ccra.staffid,  \n"
                         + "ccra.\"comment\", ccg.groupname, cc.contractid, cp.secondname, cp.firstname, cp.surname, co.shortname, co.shortnameinfoservice, \n"
-                        + "ccra.createdate as blockdate, null as unblockdate\n"
+                        + "ccra.createdate as blockdate, null as unblockdate, cc.idofclient, co.idoforg \n"
                         + "from cf_cr_cardactionrequests ccra \n"
                         + "left join cf_clients cc on cc.idofclient = ccra.idofclient\n"
                         + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
@@ -116,18 +118,16 @@ public class CardBlockUnblockService {
         Integer count;
         try {
             count = Integer.valueOf(DAOService.getInstance().getLastCountBlocked());
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             count = 0;
         }
-        if (count == rListOld.size())
-        {
+        if (count == rListOld.size()) {
             return;
         }
-        DAOService.getInstance().setOnlineOptionValue(String.valueOf(rListOld.size()), Option.OPTION_LAST_COUNT_CARD_BLOCK);
+        DAOService.getInstance()
+                .setOnlineOptionValue(String.valueOf(rListOld.size()), Option.OPTION_LAST_COUNT_CARD_BLOCK);
 
-        for (Object o : rListOld)
-        {
+        for (Object o : rListOld) {
             Object[] row = (Object[]) o;
             Long idcardactionrequest = ((BigInteger) row[0]).longValue();
             String requestId = (String) row[1];
@@ -148,19 +148,26 @@ public class CardBlockUnblockService {
             } catch (Exception e) {
                 unblockdate = null;
             }
+            Long idofclient = ((BigInteger) row[14]).longValue();
+            Long idoforg = ((BigInteger) row[15]).longValue();
 
 
             if (staffId != null) {
                 Client cl = DAOUtils.findClientByContractId(session, contractId);
-                if (cl.getCards() != null) {
-                    for (Card card : cl.getCards()) {
-                        if (card.getState() == CardState.BLOCKED.getValue()) {
+                if (cl != null) {
+                    if (cl.getCards() != null) {
+                        for (Card card : cl.getCards()) {
+                            if (card.getLockReason() != null) {
+                                if ((card.getState() == CardState.BLOCKED.getValue() && card.getLockReason().equals(BLOCK_COMMENT)) || (card.getState() == CardState.ISSUED.getValue()
+                                        && card.getLockReason().equals(UNBLOCK_COMMENT))) {
 
-                            BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, unblockdate,
-                                    operation, staffId, firstname, lastname, middlename, groupname, contractId, "", "",
-                                    "", shortname, shortnameinfoservice, converterTypeCard(card.getState()),
-                                    card.getCardNo(), card.getCardPrintedNo());
-                            blockUnblockItemListOLD.add(blockUnblockItem);
+                                    BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate,
+                                            unblockdate, operation, staffId, firstname, lastname, middlename, groupname,
+                                            contractId, "", "", "", shortname, shortnameinfoservice, converterTypeCard(card.getState()), card.getCardNo(),
+                                            card.getCardPrintedNo(), idofclient, idoforg);
+                                    blockUnblockItemListOLD.add(blockUnblockItem);
+                                }
+                            }
                         }
                     }
                 }
@@ -174,16 +181,19 @@ public class CardBlockUnblockService {
                             if (guard != null) {
                                 if (guard.getCards() != null) {
                                     for (Card card : guard.getCards()) {
-                                        if (card.getState() == CardState.BLOCKED.getValue()) {
-                                            BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId,
-                                                    blockdate, unblockdate, operation, contingentId,
-                                                    cl.getPerson().getFirstName(), cl.getPerson().getSurname(),
-                                                    cl.getPerson().getSecondName(), groupname, contractId,
-                                                    guard.getPerson().getFirstName(), guard.getPerson().getSurname(),
-                                                    guard.getPerson().getSecondName(), shortname, shortnameinfoservice,
-                                                    converterTypeCard(card.getState()), card.getCardNo(),
-                                                    card.getCardPrintedNo());
-                                            blockUnblockItemListOLD.add(blockUnblockItem);
+                                        if (card.getLockReason() != null) {
+                                            if ((card.getState() == CardState.BLOCKED.getValue() && card.getLockReason()
+                                                    .equals(BLOCK_COMMENT)) || (card.getState() == CardState.ISSUED.getValue() && card
+                                                    .getLockReason().equals(UNBLOCK_COMMENT))) {
+                                                BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId,
+                                                        blockdate, unblockdate, operation, contingentId, cl.getPerson().getFirstName(), cl.getPerson().getSurname(),
+                                                        cl.getPerson().getSecondName(), groupname, contractId,
+                                                        guard.getPerson().getFirstName(), guard.getPerson().getSurname(),
+                                                        guard.getPerson().getSecondName(), shortname,
+                                                        shortnameinfoservice, converterTypeCard(card.getState()), card.getCardNo(),
+                                                        card.getCardPrintedNo(), idofclient, idoforg);
+                                                blockUnblockItemListOLD.add(blockUnblockItem);
+                                            }
                                         }
                                     }
                                 }
@@ -191,14 +201,17 @@ public class CardBlockUnblockService {
                         } else {
                             if (cl.getCards() != null) {
                                 for (Card card : cl.getCards()) {
-                                    if (card.getState() == CardState.BLOCKED.getValue()) {
+                                    if (card.getLockReason() != null) {
+                                        if ((card.getState() == CardState.BLOCKED.getValue() && card.getLockReason().equals(BLOCK_COMMENT)) || (
+                                                card.getState() == CardState.ISSUED.getValue() && card.getLockReason().equals(UNBLOCK_COMMENT))) {
 
-                                        BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate,
-                                                unblockdate, operation, contingentId, firstname, lastname, middlename,
-                                                groupname, contractId, "", "", "", shortname, shortnameinfoservice,
-                                                converterTypeCard(card.getState()), card.getCardNo(),
-                                                card.getCardPrintedNo());
-                                        blockUnblockItemListOLD.add(blockUnblockItem);
+                                            BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId,
+                                                    blockdate, unblockdate, operation, contingentId, firstname, lastname, middlename,
+                                                    groupname, contractId, "", "", "", shortname, shortnameinfoservice,
+                                                    converterTypeCard(card.getState()), card.getCardNo(), card.getCardPrintedNo(),
+                                                    idofclient, idoforg);
+                                            blockUnblockItemListOLD.add(blockUnblockItem);
+                                        }
                                     }
                                 }
                             }
@@ -208,21 +221,25 @@ public class CardBlockUnblockService {
             }
         }
         Query query;
-        query = session.createSQLQuery(
-                "TRUNCATE table cf_cr_cardactionitems");
+        query = session.createSQLQuery("TRUNCATE table cf_cr_cardactionitems");
         query.executeUpdate();
         for (BlockUnblockItem blockUnblockItem : blockUnblockItemListOLD) {
             query = session.createSQLQuery(
-                    "insert into cf_cr_cardactionitems(requestId, blockdate, unblockdate, operation, " + "extClientId, firstname, lastname, middlename, groupname, contractIdp, firp, lastp, middp, shortname,"
-                            + "shortnameinfoservice, cardstate, cardno, cardprintedno) " + "values(:requestId, :blockdate, :unblockdate, :operation, "
-                            + ":extClientId, :firstname, :lastname, :middlename, :groupname, :contractIdp, " + ":firp, :lastp, :middp, :shortname, "
-                            + " :shortnameinfoservice, :cardstate, :cardno, :cardprintedno)");
+                    "insert into cf_cr_cardactionitems(requestId, blockdate, unblockdate, operation, "
+                            + "extClientId, firstname, lastname, middlename, groupname, contractIdp, firp, lastp, middp, shortname,"
+                            + "shortnameinfoservice, cardstate, cardno, cardprintedno, idofclient, idoforg) "
+                            + "values(:requestId, :blockdate, :unblockdate, :operation, "
+                            + ":extClientId, :firstname, :lastname, :middlename, :groupname, :contractIdp, "
+                            + ":firp, :lastp, :middp, :shortname, "
+                            + " :shortnameinfoservice, :cardstate, :cardno, :cardprintedno, :idofclient,"
+                            + ":idoforg)");
             query.setParameter("requestId", blockUnblockItem.getRequestId());
             query.setParameter("blockdate", blockUnblockItem.getBlockdate().getTime());
-            if (blockUnblockItem.getUnblockdate() == null)
+            if (blockUnblockItem.getUnblockdate() == null) {
                 query.setParameter("unblockdate", 0L);
-            else
+            } else {
                 query.setParameter("unblockdate", blockUnblockItem.getUnblockdate().getTime());
+            }
             query.setParameter("operation", blockUnblockItem.getOperation());
             query.setParameter("extClientId", blockUnblockItem.getExtClientId());
             query.setParameter("firstname", blockUnblockItem.getFirstname());
@@ -236,17 +253,22 @@ public class CardBlockUnblockService {
             query.setParameter("shortname", blockUnblockItem.getShortname());
             query.setParameter("shortnameinfoservice", blockUnblockItem.getShortnameinfoservice());
             query.setParameter("cardstate", blockUnblockItem.getCardstate());
-            if (blockUnblockItem.getCardno() == null)
+            if (blockUnblockItem.getCardno() == null) {
                 query.setParameter("cardno", 0L);
-            else
+            } else {
                 query.setParameter("cardno", blockUnblockItem.getCardno());
-            if (blockUnblockItem.getCardprintedno() == null)
+            }
+            if (blockUnblockItem.getCardprintedno() == null) {
                 query.setParameter("cardprintedno", 0L);
-            else
+            } else {
                 query.setParameter("cardprintedno", blockUnblockItem.getCardprintedno());
+            }
+            query.setParameter("idofclient", blockUnblockItem.getIdofclient());
+            query.setParameter("idoforg", blockUnblockItem.getIdoforg());
             query.executeUpdate();
         }
     }
+
     public static String converterTypeCard(Integer type) {
         if (CardState.ISSUED.getValue() == type) {
             return CardState.ISSUED.getDescription();

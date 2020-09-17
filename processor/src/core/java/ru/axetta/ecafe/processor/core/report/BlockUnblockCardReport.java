@@ -180,8 +180,6 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                         filterStatus = "  and ca.state = " + CardState.ISSUED.getValue() + " ";
                     }
                 }
-
-
             }
             //Это разблокирование всего
             Query queryUnblock = session.createSQLQuery(
@@ -199,7 +197,8 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
                             + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
                             + "where ccra.processed = true and ca.state is not null \n"
-                            + "and ccac.idclientchild is null and ccra.\"action\" = 1\n" + "union\n"
+                            + "and ccac.idclientchild is null " + filterOrgs + filterStatus + filterClients
+                            + " and ccra.\"action\" = 1\n" + "union\n"
                             + "select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.shortnameinfoservice, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
                             + "ccg.groupname,cp1.firstname as firp,cp1.surname as lastp , cp1.secondname as middp,\n"
                             + "ca.state as cardstate, ca.cardno, ca.cardprintedno, ccarold.createdate as blockdate, ccra.createdate as unblockdate,\n"
@@ -216,8 +215,8 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_persons cp1 on cp1.idofperson = cc1.idofperson\n"
                             + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
                             + "left join cf_cr_cardactionrequests ccarold on ccra.previdcardrequest = ccarold.idcardactionrequest\n"
-                            + "where ccra.processed = true and ca.state is not null \n"
-                            + "and ccac.idclientchild is not null and ccra.\"action\" = 1;");
+                            + "where ccra.processed = true and ca.state is not null " + filterOrgs + filterStatus
+                            + filterClients + " \n" + " and ccac.idclientchild is not null and ccra.\"action\" = 1;");
 
             List rListUnblock = queryUnblock.list();
             for (Object o : rListUnblock) {
@@ -266,8 +265,8 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_orgs co on co.idoforg = cc.idoforg\n"
                     + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = cc.idoforg\n"
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
-                    + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is null and ccra.\"action\" = 0\n" + "union\n"
+                    + "where ccra.processed = true and ca.state is not null \n" + "and ccac.idclientchild is null "
+                    + filterOrgs + filterStatus + filterClients + " and ccra.\"action\" = 0\n" + "union\n"
                     + "select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.shortnameinfoservice, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
                     + "ccg.groupname,cp1.firstname as firp,cp1.surname as lastp , cp1.secondname as middp,\n"
                     + "ca.state as cardstate, ca.cardno, ca.cardprintedno, ccra.createdate as blockdate,\n"
@@ -282,8 +281,8 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_clients cc1 on cc1.idofclient = ccac.idofclient\n"
                     + "left join cf_persons cp1 on cp1.idofperson = cc1.idofperson\n"
                     + "left join cf_cards ca on ca.idofcard = ccac.idofcard\n"
-                    + "where ccra.processed = true and ca.state is not null \n"
-                    + "and ccac.idclientchild is not null and ccra.\"action\" = 0) as vlocked\n"
+                    + "where ccra.processed = true and ca.state is not null \n" + "and ccac.idclientchild is not null "
+                    + filterOrgs + filterStatus + filterClients + " and ccra.\"action\" = 0) as vlocked\n"
                     + "where vlocked.requestid not in \n" + "(select ccra.requestid\n"
                     + "from cf_cr_cardactionrequests ccra \n"
                     + "left join cf_cr_cardactionclient ccac on ccac.idcardactionrequest = ccra.idcardactionrequest\n"
@@ -338,11 +337,41 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 blockUnblockItemList.add(blockUnblockItem);
             }
 
-            //////////////////
             //Это блокирование старого всего
-            Date test1 = new Date();
-            //Это блокирование всего исключая то, что успешно разблокировано
-            Query queryold = session.createSQLQuery("select * from cf_cr_cardactionitems");
+            String filterOrgs1 = "";
+            String filterClients1 = "";
+            String filterStatus1 = "";
+            if (orgLoad != null) {
+                if (allFriendlyOrgs) {
+                    for (Org org : orgLoad.getFriendlyOrg()) {
+                        filterOrgs1 += "'" + org.getIdOfOrg() + "',";
+                    }
+                    filterOrgs1 = filterOrgs1.substring(0, filterOrgs1.length() - 1);
+                } else {
+                    filterOrgs1 = "'" + orgLoad.getIdOfOrg() + "'";
+                }
+                filterOrgs1 = " and idoforg in (" + filterOrgs1 + ") ";
+            }
+            if (idOfClients != null && !idOfClients.isEmpty()) {
+                for (Long idClient : idOfClients) {
+                    filterClients1 += "'" + idClient + "',";
+                }
+                filterClients1 = filterClients1.substring(0, filterClients1.length() - 1);
+                filterClients1 = " and idofclient in (" + filterClients1 + ") ";
+            }
+            if (cardState != null) {
+                if (cardState.equals(CardStateType.BLOCK.getDescription())) {
+                    filterStatus1 = "  and cardstate = " + CardState.BLOCKED.getDescription() + " ";
+                } else {
+                    if (cardState.equals(CardStateType.UNBLOCK.getDescription())) {
+                        filterStatus1 = "  and cardstate = " + CardState.ISSUED.getDescription() + " ";
+                    }
+                }
+            }
+
+            Query queryold = session.createSQLQuery(
+                    "select * from cf_cr_cardactionitems where requestid is not null " + filterOrgs1 + filterStatus1
+                            + filterClients1);
 
             List rListOld = queryold.list();
 
@@ -368,19 +397,17 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
                 String middp = (String) row[12];
                 String shortname = (String) row[13];
                 String address = (String) row[14];
-                String cardstate = (String) row[15];
+                String cardstater = (String) row[15];
                 Long cardno = ((BigInteger) row[16]).longValue();
                 Long cardprintedno = ((BigInteger) row[17]).longValue();
 
-                BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, unblockdate, operation, exId,
-                        firstname, lastname, middlename, groupname, contractId, firp, lastp, middp, shortname, address,
-                        cardstate, cardno, cardprintedno);
+
+                BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate, unblockdate, operation,
+                        exId, firstname, lastname, middlename, groupname, contractId, firp, lastp, middp, shortname,
+                        address, cardstater, cardno, cardprintedno);
                 blockUnblockItemList.add(blockUnblockItem);
             }
-            Date test2 = new Date();
 
-          //  blockUnblockItemList.addAll(blockUnblockItemListOLD);
-            /////////////////////
             Collections.sort(blockUnblockItemList, new Comparator<BlockUnblockItem>() {
                 public int compare(BlockUnblockItem o1, BlockUnblockItem o2) {
                     if (o1.getRequestId().equals(o2.getRequestId())) {

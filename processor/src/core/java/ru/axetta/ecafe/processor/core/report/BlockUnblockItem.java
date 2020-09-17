@@ -3,6 +3,8 @@
  */
 
 package ru.axetta.ecafe.processor.core.report;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -15,6 +17,8 @@ public class BlockUnblockItem {
     private String requestId;
     private Date blockdate;
     private Date unblockdate;
+    private String blockdateString;
+    private String unblockdateString;
     private String operation;
     private String extClientId;
     private String firstname;
@@ -30,6 +34,53 @@ public class BlockUnblockItem {
     private String cardstate;
     private Long cardno;
     private Long cardprintedno;
+    private Long idofclient;
+    private Long idoforg;
+    private Format formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+
+    public BlockUnblockItem(String requestId, Date blockdate,Date unblockdate, String operation, String extClientId,
+            String firstname, String lastname, String middlename, String groupname, Long contractIdp, String firp, String lastp,
+            String middp,  String shortname, String shortnameinfoservice, String cardstate, Long cardno,
+            Long cardprintedno, Long idofclient, Long idoforg) {
+        this.idofclient = idofclient;
+        this.idoforg = idoforg;
+        this.requestId = requestId;
+        this.blockdate=blockdate;
+        this.unblockdate=unblockdate;
+        this.blockdateString=formatter.format(blockdate);
+        if (unblockdate != null)
+        {
+            Long dateL = unblockdate.getTime();
+            if (dateL.equals(0L))
+                this.unblockdateString="";
+            else
+                this.unblockdateString=formatter.format(unblockdate);
+        }
+        else
+            this.unblockdateString="";
+        this.operation=operation;
+        this.extClientId=extClientId;
+        this.firstname=firstname;
+        this.lastname=lastname;
+        this.middlename=middlename;
+        this.groupname=groupname;
+        this.contractIdp=contractIdp;
+        this.firp=firp;
+        this.lastp=lastp;
+        this.middp=middp;
+        if (firp == null)
+            this.firp = "";
+        if (lastp == null)
+            this.lastp = "";
+        if (middp == null)
+            this.middp = "";
+        this.shortname=shortname;
+        this.shortnameinfoservice=shortnameinfoservice;
+        this.cardstate=cardstate;
+        this.cardno=cardno;
+        this.cardprintedno=cardprintedno;
+    }
 
     public BlockUnblockItem(String requestId, Date blockdate,Date unblockdate, String operation, String extClientId,
             String firstname, String lastname, String middlename, String groupname, Long contractIdp, String firp, String lastp,
@@ -37,6 +88,17 @@ public class BlockUnblockItem {
         this.requestId = requestId;
         this.blockdate=blockdate;
         this.unblockdate=unblockdate;
+        this.blockdateString=formatter.format(blockdate);
+        if (unblockdate != null)
+        {
+            Long dateL = unblockdate.getTime();
+            if (dateL.equals(0L))
+                this.unblockdateString="";
+            else
+                this.unblockdateString=formatter.format(unblockdate);
+        }
+        else
+            this.unblockdateString="";
         this.operation=operation;
         this.extClientId=extClientId;
         this.firstname=firstname;
@@ -202,5 +264,37 @@ public class BlockUnblockItem {
 
     public void setShortnameinfoservice(String shortnameinfoservice) {
         this.shortnameinfoservice = shortnameinfoservice;
+    }
+
+    public String getBlockdateString() {
+        return blockdateString;
+    }
+
+    public void setBlockdateString(String blockdateString) {
+        this.blockdateString = blockdateString;
+    }
+
+    public String getUnblockdateString() {
+        return unblockdateString;
+    }
+
+    public void setUnblockdateString(String unblockdateString) {
+        this.unblockdateString = unblockdateString;
+    }
+
+    public Long getIdofclient() {
+        return idofclient;
+    }
+
+    public void setIdofclient(Long idofclient) {
+        this.idofclient = idofclient;
+    }
+
+    public Long getIdoforg() {
+        return idoforg;
+    }
+
+    public void setIdoforg(Long idoforg) {
+        this.idoforg = idoforg;
     }
 }

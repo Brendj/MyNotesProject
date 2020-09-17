@@ -70,21 +70,30 @@
                         footerClass="data-table-footer" columnClasses="center-aligned-column" reRender="lastOrgUpdateTime">
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Идентификатор записи по запросу"/>
+                    <h:panelGroup>
+                        <h:outputText escape="false" value="Идентификатор"/><br/>
+                        <h:outputText escape="false" value="записи по запросу"/>
+                    </h:panelGroup>
                 </f:facet>
                 <h:outputText escape="true" value="#{item.requestId}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Дата блокировки по запросу"/>
+                    <h:panelGroup>
+                        <h:outputText escape="false" value="Дата блокировки"/><br/>
+                        <h:outputText escape="false" value="по запросу"/>
+                    </h:panelGroup>
                 </f:facet>
-                <h:outputText escape="true" value="#{item.blockdate}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.blockdateString}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Дата разблокировки по запросу" />
+                    <h:panelGroup>
+                        <h:outputText escape="false" value="Дата разблокировки"/><br/>
+                        <h:outputText escape="false" value="по запросу"/>
+                    </h:panelGroup>
                 </f:facet>
-                <h:outputText escape="true" value="#{item.unblockdate}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.unblockdateString}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
@@ -94,15 +103,21 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Ид. обучающегося/сотрудника" />
+                    <h:panelGroup>
+                        <h:outputText escape="false" value="Ид. обучающегося/"/><br/>
+                        <h:outputText escape="false" value="сотрудника"/>
+                    </h:panelGroup>
                 </f:facet>
                 <h:outputText escape="true" value="#{item.extClientId}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="ФИО обучающегося/сотрудника"/>
+                    <h:panelGroup>
+                        <h:outputText escape="false" value="ФИО обучающегося/"/><br/>
+                        <h:outputText escape="false" value="сотрудника"/>
+                    </h:panelGroup>
                 </f:facet>
-                <h:outputText escape="true" value="#{item.firstname}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.lastname} #{item.firstname} #{item.middlename}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
@@ -120,7 +135,7 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="ФИО представителя" />
                 </f:facet>
-                <h:outputText escape="true" value="#{item.firp}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.lastp} #{item.firp} #{item.middp}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
