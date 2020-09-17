@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConsolidatedSellingReport" pageWidth="1200" pageHeight="842" columnWidth="1160" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="77bf6eb6-db91-4908-a771-8b6813de848b">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConsolidatedSellingReport" pageWidth="1308" pageHeight="842" columnWidth="1268" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="77bf6eb6-db91-4908-a771-8b6813de848b">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -14,6 +14,7 @@
 	<field name="payFood" class="java.lang.Long"/>
 	<field name="buffetFood" class="java.lang.Long"/>
 	<field name="totalFood" class="java.lang.Long"/>
+	<field name="preorderFood" class="java.lang.Long"/>
 	<field name="orgType" class="java.lang.String"/>
 	<variable name="startDate" class="java.lang.String" calculation="First">
 		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></variableExpression>
@@ -38,20 +39,23 @@
 		<variableExpression><![CDATA[$F{totalFood}]]></variableExpression>
 		<initialValueExpression><![CDATA[$F{totalFood}]]></initialValueExpression>
 	</variable>
+	<variable name="totalPreorderFood" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{preorderFood}]]></variableExpression>
+	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="94" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="1131" height="20" uuid="728f2822-2156-4fac-bc25-d1ab33c99ba5"/>
+				<reportElement x="0" y="0" width="1239" height="20" uuid="728f2822-2156-4fac-bc25-d1ab33c99ba5"/>
 				<textElement textAlignment="Center">
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[Сводный отчет по реализации ]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement x="0" y="20" width="1131" height="20" uuid="aa2f0534-473c-46e5-aa55-38455ec38a70"/>
+				<reportElement x="0" y="20" width="1239" height="20" uuid="aa2f0534-473c-46e5-aa55-38455ec38a70"/>
 				<textElement textAlignment="Center">
 					<font size="12" isBold="false"/>
 				</textElement>
@@ -69,7 +73,7 @@
 				<textFieldExpression><![CDATA["№"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="32" y="52" width="49" height="42" uuid="461f8073-826e-4827-bd59-4f90c6d9a029"/>
+				<reportElement x="32" y="52" width="61" height="42" uuid="461f8073-826e-4827-bd59-4f90c6d9a029"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -80,7 +84,7 @@
 				<textFieldExpression><![CDATA["Ид. орг."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="173" y="52" width="185" height="42" uuid="b97c6543-2943-4542-9c27-9088161178be"/>
+				<reportElement x="190" y="52" width="172" height="42" uuid="b97c6543-2943-4542-9c27-9088161178be"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -91,7 +95,7 @@
 				<textFieldExpression><![CDATA["Наименование организации"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="358" y="52" width="135" height="42" uuid="f040b0bf-2d20-4ad9-a520-9edf28910c99"/>
+				<reportElement x="362" y="52" width="96" height="42" uuid="f040b0bf-2d20-4ad9-a520-9edf28910c99"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -102,7 +106,7 @@
 				<textFieldExpression><![CDATA["Округ"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="493" y="52" width="231" height="42" uuid="96e90b8c-c725-40a5-8091-6aa8ce24eed4"/>
+				<reportElement x="458" y="52" width="241" height="42" uuid="96e90b8c-c725-40a5-8091-6aa8ce24eed4"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -113,7 +117,7 @@
 				<textFieldExpression><![CDATA["Адрес"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="724" y="52" width="109" height="42" uuid="8d8697e6-35fe-4c3e-8efa-8db9798c4f27"/>
+				<reportElement x="699" y="52" width="108" height="42" uuid="8d8697e6-35fe-4c3e-8efa-8db9798c4f27"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -124,7 +128,7 @@
 				<textFieldExpression><![CDATA["Комплексное платное питание (руб.)"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="833" y="52" width="95" height="42" uuid="7040d619-a7e4-4d94-a37f-6869fe288cc3"/>
+				<reportElement x="915" y="52" width="108" height="42" uuid="7040d619-a7e4-4d94-a37f-6869fe288cc3"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -135,7 +139,7 @@
 				<textFieldExpression><![CDATA["Коммерческое питание (руб.)"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="928" y="52" width="95" height="42" uuid="ea1e0ec6-2303-433a-812a-4ccedbdd2943"/>
+				<reportElement x="1023" y="52" width="108" height="42" uuid="ea1e0ec6-2303-433a-812a-4ccedbdd2943"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -146,7 +150,7 @@
 				<textFieldExpression><![CDATA["Буфет (без коммерческого питания)"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1023" y="52" width="108" height="42" uuid="0cfe3029-1743-45cd-b039-39e96c610619"/>
+				<reportElement x="1131" y="52" width="108" height="42" uuid="0cfe3029-1743-45cd-b039-39e96c610619"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -157,7 +161,18 @@
 				<textFieldExpression><![CDATA["Итого общее (руб.)"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="81" y="52" width="92" height="42" uuid="5ecf7873-463e-41c6-9b64-945b9c5e5dae"/>
+				<reportElement x="807" y="52" width="108" height="42" uuid="8d8697e6-35fe-4c3e-8efa-8db9798c4f27"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Предзаказ питания (руб.)"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="93" y="52" width="97" height="42" uuid="19715d70-f6a4-4274-80b8-c00410014656"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -183,7 +198,7 @@
 				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="32" y="0" width="49" height="20" uuid="c854a48a-266b-4ee2-b511-b7340ab13a6a"/>
+				<reportElement stretchType="RelativeToBandHeight" x="32" y="0" width="61" height="20" uuid="c854a48a-266b-4ee2-b511-b7340ab13a6a"/>
 				<box leftPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -193,7 +208,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="173" y="0" width="185" height="20" uuid="28cb9128-e23f-4dc5-bbc4-d0fa0a89f993"/>
+				<reportElement stretchType="RelativeToBandHeight" x="190" y="0" width="172" height="20" uuid="28cb9128-e23f-4dc5-bbc4-d0fa0a89f993"/>
 				<box leftPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -203,7 +218,7 @@
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="358" y="0" width="135" height="20" uuid="ae37dc17-b470-4f8a-9ddb-65e9e3ef5c95"/>
+				<reportElement stretchType="RelativeToBandHeight" x="362" y="0" width="96" height="20" uuid="ae37dc17-b470-4f8a-9ddb-65e9e3ef5c95"/>
 				<box leftPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -213,7 +228,7 @@
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="493" y="0" width="231" height="20" uuid="37afca3e-00f7-4422-ae3a-f4a2b34e77c8"/>
+				<reportElement stretchType="RelativeToBandHeight" x="458" y="0" width="241" height="20" uuid="37afca3e-00f7-4422-ae3a-f4a2b34e77c8"/>
 				<box leftPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -223,7 +238,7 @@
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="724" y="0" width="109" height="20" uuid="f27703e5-ec19-440e-a777-afebe974ba32"/>
+				<reportElement stretchType="RelativeToBandHeight" x="699" y="0" width="108" height="20" uuid="f27703e5-ec19-440e-a777-afebe974ba32"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -234,7 +249,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{complexFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="833" y="0" width="95" height="20" uuid="f2b6dd2d-7399-4c65-be80-7c354bbda0c6"/>
+				<reportElement stretchType="RelativeToBandHeight" x="915" y="0" width="108" height="20" uuid="f2b6dd2d-7399-4c65-be80-7c354bbda0c6"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -245,7 +260,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{payFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="928" y="0" width="95" height="20" uuid="113e697f-2e9f-44f0-98bf-cd7e1bcfaf49"/>
+				<reportElement stretchType="RelativeToBandHeight" x="1023" y="0" width="108" height="20" uuid="113e697f-2e9f-44f0-98bf-cd7e1bcfaf49"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -256,7 +271,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{buffetFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="1023" y="0" width="108" height="20" uuid="7ecb2a09-0f8e-4a28-b13b-d06f31ba18c2"/>
+				<reportElement stretchType="RelativeToBandHeight" x="1131" y="0" width="108" height="20" uuid="7ecb2a09-0f8e-4a28-b13b-d06f31ba18c2"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -267,7 +282,18 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{totalFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="81" y="0" width="92" height="20" uuid="68bbe37c-9c86-43dd-a4b9-19ad93b15d77"/>
+				<reportElement stretchType="RelativeToBandHeight" x="807" y="0" width="108" height="20" uuid="f27703e5-ec19-440e-a777-afebe974ba32"/>
+				<box rightPadding="5">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{preorderFood}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="93" y="0" width="97" height="20" uuid="16a1ff93-f3a5-41db-8d09-ce24ae9e375f"/>
 				<box leftPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -284,7 +310,7 @@
 	<summary>
 		<band height="42" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="724" y="0" width="109" height="20" uuid="73098f00-77ea-4773-8400-ae9e02f2a233"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="699" y="0" width="108" height="20" uuid="73098f00-77ea-4773-8400-ae9e02f2a233"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -295,7 +321,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalComplexFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="833" y="0" width="95" height="20" uuid="1ed704d0-f525-4d7f-903c-630b0b2d64b9"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="915" y="0" width="108" height="20" uuid="1ed704d0-f525-4d7f-903c-630b0b2d64b9"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -306,7 +332,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalPayFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="928" y="0" width="95" height="20" uuid="91b98ce0-d61d-434c-9c0f-1104b93defcc"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="1023" y="0" width="108" height="20" uuid="91b98ce0-d61d-434c-9c0f-1104b93defcc"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -317,7 +343,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalBuffetFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="1023" y="0" width="108" height="20" uuid="54e398ff-8242-4e15-b1fe-ee14ce3e8287"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="1131" y="0" width="108" height="20" uuid="54e398ff-8242-4e15-b1fe-ee14ce3e8287"/>
 				<box rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -328,7 +354,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalTotalFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="626" y="0" width="98" height="20" uuid="b84b1c44-8487-41a6-977a-50397f5834cf"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="600" y="0" width="99" height="20" uuid="b84b1c44-8487-41a6-977a-50397f5834cf"/>
 				<box leftPadding="0" rightPadding="5">
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -340,6 +366,17 @@
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="600" height="20" uuid="748fb4fb-5c95-47bd-aada-20ca7df80399"/>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="807" y="0" width="108" height="20" uuid="73098f00-77ea-4773-8400-ae9e02f2a233"/>
+				<box rightPadding="5">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalPreorderFood}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

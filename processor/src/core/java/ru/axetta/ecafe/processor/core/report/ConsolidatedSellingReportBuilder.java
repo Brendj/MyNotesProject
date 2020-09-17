@@ -98,23 +98,25 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
         orderTypes.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
         String query_string = reportProperties.getProperty(ConsolidatedSellingReportBuilder.SHOW_ALL_ORGS).equals("0") ?
                 "select org.idoforg, org.shortnameinfoservice, org.district, org.address, "
-                + "od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder, "
+                + "od.rprice, od.qty, od.menuorigin, od.menutype, pl.preorderguid is not NULL as ispreorder, "
                 + "org.organizationtype "
                 + "from cf_orgs org join cf_orders o on org.idoforg = o.idoforg "
                 + "join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + "left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
                 + "where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
+                + "and (pl.idofpreorderlinkod is null or (pl.idofpreorderlinkod is not NULL and pl.preorderguid is not NULL)) "
                 + org_condition
                 + "order by org.idoforg"
                 :
                 "select org.idoforg, org.shortnameinfoservice, org.district, org.address, query.rprice, query.qty, "
                 + "query.menuorigin, query.menutype, query.ispreorder, org.organizationtype "
                 + " from cf_orgs org left join " + " ("
-                + " select org2.idoforg, od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder "
+                + " select org2.idoforg, od.rprice, od.qty, od.menuorigin, od.menutype, pl.preorderguid is not NULL as ispreorder "
                 + " from cf_orgs org2 join cf_orders o on org2.idoforg = o.idoforg "
                 + " join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + " left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
                 + " where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
+                + "and (pl.idofpreorderlinkod is null or (pl.idofpreorderlinkod is not NULL and pl.preorderguid is not NULL)) "
                 + org2_condition
                 + " and org2.state = 1 "
                 + " ) as query on org.idoforg = query.idoforg"

@@ -40,7 +40,7 @@ public class PreorderOperationsService {
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(params);
             logger.info("Successful end process relevance preorders");
         } catch(Exception e) {
-            logger.error("Error in process relevance preorders");
+            logger.error("Error in process relevance preorders ", e);
         }
     }
 
@@ -63,9 +63,10 @@ public class PreorderOperationsService {
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
         for (PreorderComplex preorderComplex : list) {
             try {
-                logger.info(String.format("Start processing record %s from %s", ++counter, list.size()));
-                if (preorderComplex.getIdOfGoodsRequestPosition() != null)
-                    continue;
+                logger.info(String.format("Start processing record %s from %s, idOfPreorderComplex=%s", ++counter, list.size(), preorderComplex.getIdOfPreorderComplex()));
+                // проверка с логированием перенесена в relevancePreordersToMenu
+                //if (preorderComplex.getIdOfGoodsRequestPosition() != null)
+                //    continue;
                 nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
                 Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .getOrgByContractId(preorderComplex.getClient().getContractId());
