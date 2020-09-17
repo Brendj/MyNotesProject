@@ -18,6 +18,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.richfaces.event.UploadEvent;
+import org.richfaces.model.UploadItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +28,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -241,6 +241,45 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
     public int getSuccessLineNumber() {
         return successLineNumber;
+    }
+
+    public void uploadGroupChange(UploadEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        UploadItem item = event.getUploadItem();
+        InputStream inputStream = null;
+        long dataSize = 0;
+        try {
+            if (item.isTempFile()) {
+                File file = item.getFile();
+                dataSize = file.length();
+                inputStream = new FileInputStream(file);
+            } else {
+                byte[] data = item.getData();
+                dataSize = data.length;
+                inputStream = new ByteArrayInputStream(data);
+            }
+            updateGroupChanges(inputStream, dataSize);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
+            setErrorText("");
+        } catch (Exception e) {
+            logger.error("Failed to update clients from file", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных по клиентам: " + e.getMessage(), null));
+            setErrorText(e.getMessage());
+        } finally {
+            if (null != inputStream) {
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                    logger.error("failed to close input stream", e);
+                }
+            }
+        }
+    }
+
+    private void updateGroupChanges(InputStream inputStream, long dataSize) throws Exception {
+
     }
 
     public void fill(Session persistenceSession) throws Exception {

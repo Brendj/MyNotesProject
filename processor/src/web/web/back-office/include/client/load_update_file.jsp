@@ -25,6 +25,8 @@
                                styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
     </h:panelGrid>
+<rich:tabPanel>
+    <rich:tab label="Обновление из файла">
     <h:panelGrid columns="1">
         <h:commandLink action="#{mainPage.clientUpdateFileLoadPage.downloadClients}" id="downloadOrgClients"
                        value="Выгрузить клиентов организации" styleClass="command-link" disabled="#{!mainPage.clientUpdateFileLoadPage.orgSelected()}"/>
@@ -106,5 +108,31 @@
 
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientUpdateLoadResultCSVList}"
                      styleClass="command-button" />
+    </rich:tab>
+    <rich:tab label="Изменение группы">
+        <h:panelGrid columns="1">
+            <h:outputText value="Загрузка файла:" styleClass="output-text"/>
+        </h:panelGrid>
 
+        <rich:fileUpload id="clientUpdateGroupFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
+                         addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
+                         cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
+                         stopButtonClassDisabled="upload-command-button-diasbled" uploadButtonClass="upload-command-button"
+                         uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
+                         fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
+                         fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
+                         stopControlLabel="Остановить" stopEntryControlLabel="Остановить" addControlLabel="Добавить файл"
+                         clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
+                         cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
+                         uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
+                         fileUploadListener="#{mainPage.clientUpdateFileLoadPage.uploadGroupChange}">
+            <f:facet name="label">
+                <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
+            </f:facet>
+            <a4j:support event="onuploadcomplete" reRender="clientUpdateFileLoaderPanel" />
+            <a4j:support event="onclear" reRender="clientUpdateFileLoaderPanel" />
+        </rich:fileUpload>
+
+    </rich:tab>
+</rich:tabPanel>
 </h:panelGrid>
