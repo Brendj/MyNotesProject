@@ -2200,7 +2200,7 @@ public class DAOUtils {
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
             boolean cancelOrder, PreorderComplex preorderComplex, String itemCode, Long orderSum) {
-        if (!cancelOrder) {
+        if (!cancelOrder && (guid != null) && !guid.isEmpty()) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
         }
