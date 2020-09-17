@@ -585,7 +585,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         if (autoContractId) {
-            this.contractId = runtimeContext.getClientContractIdGenerator().generate(this.org.getIdOfOrg());
+            this.contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(this.org.getIdOfOrg());
         }
 
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -601,9 +601,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         client.setAddress(this.address);
         client.setPhone(this.phone);
-        getLogger().info("class : ClientCreatePage, method : createClient line : 541, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
         client.setMobile(this.mobile);
-        getLogger().info("class : ClientCreatePage, method : createClient line : 543, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
         client.setEmail(this.email);
         client.setFax(this.fax);
         client.setRemarks(this.remarks);
@@ -653,6 +651,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSpecialMenu(this.specialMenu);
 
         persistenceSession.save(client);
+        if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
 
         ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
         persistenceSession.save(clientMigration);

@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -181,6 +181,27 @@ public class DAOService {
             }
         }
         return result;
+    }
+
+    public void saveOrgPreContractIds(long idOfOrg, List<Long> list) {
+        String sql = "insert into cf_orgs_precontract_ids(idOfOrg, contractId, createddate) select :idOfOrg, contractid, :date from unnest(array[%s]) contractid";
+        String contractIds = "";
+        for (Long contractId : list) {
+            contractIds += contractId + ",";
+        }
+        contractIds = contractIds.substring(0, contractIds.length()-1);
+        sql = String.format(sql, contractIds);
+        Query query = entityManager.createNativeQuery(sql);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("date", (new Date()).getTime());
+        query.executeUpdate();
+    }
+
+    public List<Long> getOrgPreContractIdList(long idOfOrg, int count) {
+        Query query = entityManager.createQuery("select opc.contractId from OrgPreContractId opc where opc.idOfOrg = :idOfOrg and opc.used = false order by opc.contractId");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setMaxResults(count);
+        return query.getResultList();
     }
 
     @SuppressWarnings("unchecked")

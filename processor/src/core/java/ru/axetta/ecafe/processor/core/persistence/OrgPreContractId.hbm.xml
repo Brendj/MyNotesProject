@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.OrgPreContractId" table="cf_orgs_precontract_ids" optimistic-lock="version">
+        <id name="idOfOrgPreContractId" column="idOfPreContractId" type="long">
+            <generator class="identity"/>
+        </id>
+        <version name="version" column="Version" type="long"/>
+        <property name="idOfOrg" column="idOfOrg" type="long" not-null="true" update="false"/>
+        <property name="contractId" column="contractId" type="long" not-null="true" update="false"/>
+        <property name="used" column="used" type="boolean" not-null="true" />
+        <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
+        <property name="usedDate" column="useddate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+    </class>
+</hibernate-mapping>
+
+

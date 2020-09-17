@@ -613,6 +613,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         guardian.setDiscountMode(Client.DISCOUNT_MODE_NONE);
         persistenceSession.persist(guardian);
 
+        RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, org.getIdOfOrg());
+
         ClientMigration clientMigration = new ClientMigration(guardian, org, date);
         persistenceSession.persist(clientMigration);
 
