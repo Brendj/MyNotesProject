@@ -778,6 +778,7 @@ public class ClientManager {
                 }
             } else {
                 contractId = Long.parseLong(contractIdText);
+                if (RuntimeContext.RegistryType.isMsk()) autoContractId = true;
             }
 
             String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);//tokens[1];
