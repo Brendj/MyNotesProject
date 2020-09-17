@@ -89,6 +89,9 @@ public class CardBlockUnblockService {
     }
 
     public void createOldDateSave(Session session) {
+        if (RuntimeContext.getInstance().getConfigProperties().
+                getProperty("ecafe.processor.card.blocked.work", "TRUE").equals("FALSE"))
+            return;
         List<BlockUnblockItem> blockUnblockItemListOLD = new ArrayList<>();
         Query queryOld = session.createSQLQuery(
                 "select ccra.idcardactionrequest, ccra.requestid, ccra.contingentid, ccra.staffid,  \n"
