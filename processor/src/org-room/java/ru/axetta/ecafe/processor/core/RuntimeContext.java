@@ -11,16 +11,10 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Restrictions;
 import org.quartz.Scheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -39,16 +33,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;
-import java.io.*;
-import java.security.PrivateKey;
-import java.security.cert.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -260,7 +249,7 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating client contract ID generator.");
         }
-        ContractIdGenerator contractIdGenerator = new ContractIdGenerator(sessionFactory);
+        ContractIdGenerator contractIdGenerator = new ContractIdGenerator(properties, sessionFactory);
         if (logger.isDebugEnabled()) {
             logger.debug("Client contract ID generator created.");
         }
