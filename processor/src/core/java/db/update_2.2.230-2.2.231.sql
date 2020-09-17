@@ -2,8 +2,9 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений issue 662
+-- Пакет обновлений 231
 
+--662
 create table cf_orgs_precontract_ids (
     idOfPreContractId bigserial,
     version bigint NOT NULL DEFAULT 0,
@@ -28,3 +29,5 @@ COMMENT ON COLUMN cf_orgs_precontract_ids.idOfOrg IS 'Ссылка на орга
 COMMENT ON COLUMN cf_orgs_precontract_ids.contractId IS 'Номер л/с';
 COMMENT ON COLUMN cf_orgs_precontract_ids.used IS 'Признак, что данный л/с присвоен клиенту';
 COMMENT ON COLUMN cf_orgs_precontract_ids.createddate IS 'Дата-время создания записи';
+
+--! ФИНАЛИЗИРОВАН 17.09.2020, НЕ МЕНЯТЬ
