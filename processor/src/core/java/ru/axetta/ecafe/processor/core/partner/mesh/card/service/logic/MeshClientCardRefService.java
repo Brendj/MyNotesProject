@@ -8,7 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardService;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardServiceIml;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MockService;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,5 +38,22 @@ public class MeshClientCardRefService {
         }
     }
 
+    public void createRef(Card c) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
 
+            MeshClientCardRef ref = meshCardService.createReferenceBetweenClientAndCard(c);
+
+            session.save(ref);
+
+        } catch (Exception e){
+            log.error("", e);
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
+    }
 }

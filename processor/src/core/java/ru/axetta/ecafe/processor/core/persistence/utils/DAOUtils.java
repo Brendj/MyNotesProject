@@ -5265,4 +5265,15 @@ public class DAOUtils {
         orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         return (Org) orgCriteria.uniqueResult();
     }
+
+    public static List<Card> getCreatedCardForMESH(Session session, Date lastProcessing) {
+        Query query = session.createQuery(
+                "from Card as crd"
+                + "inner join Client as c "
+                + "left join MeshClientCardRef as ref "
+                + "with ref.client = c and ref.card = crd "
+                + "where ref.idOfRef is null and crd.issueTime > :lastProc and c.meshGUID is not null");
+        query.setParameter("lastProc", lastProcessing);
+        return query.list();
+    }
 }

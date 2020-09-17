@@ -6,9 +6,12 @@ package ru.axetta.ecafe.processor.core.partner.mesh.card.taskexecutor;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic.MeshClientCardRefService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ejb.DependsOn;
 import java.util.Date;
+import java.util.List;
 
 @DependsOn("runtimeContext")
 @Service
@@ -26,6 +30,7 @@ public class MeshCardNotifyTaskExecutor {
     private static final String JOB_NAME = "MeshCardNotify";
     private String targetNode = "";
     private final Logger log = LoggerFactory.getLogger(MeshCardNotifyTaskExecutor.class);
+    private Scheduler scheduler;
 
     private MeshClientCardRefService meshClientCardRefService;
 
@@ -52,7 +57,7 @@ public class MeshCardNotifyTaskExecutor {
                     MeshCardNotifyTaskExecutor.MeshCardNotify.class);
 
             SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            scheduler = schedulerFactory.getScheduler();
 
             CronTrigger trigger = new CronTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP);
             trigger.setCronExpression(cronExp);
@@ -64,12 +69,41 @@ public class MeshCardNotifyTaskExecutor {
 
     public void run(){
         try {
-            Date lastProcessing = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getDateLastProcessedCard());
+            Date lastProcessing = scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP).getPreviousFireTime();
             if(lastProcessing == null){
                 lastProcessing = new Date();
             }
+            processCreatedCard(lastProcessing);
+            processUpdatedCard(lastProcessing);
+            processBlockedCard(lastProcessing);
+            processCardWithChangedOwner(lastProcessing);
         } catch (Exception e){
             log.error("", e);
         }
+    }
+
+    private void processCardWithChangedOwner(Date lastProcessing) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            List<Card> createdCards = DAOUtils.getCreatedCardForMESH(session, lastProcessing);
+            for(Card c : createdCards){
+                meshClientCardRefService.createRef(c);
+            }
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
+    }
+
+    private void processBlockedCard(Date lastProcessing) throws Exception {
+    }
+
+    private void processUpdatedCard(Date lastProcessing) throws Exception {
+    }
+
+    private void processCreatedCard(Date lastProcessing) throws Exception {
+
     }
 }

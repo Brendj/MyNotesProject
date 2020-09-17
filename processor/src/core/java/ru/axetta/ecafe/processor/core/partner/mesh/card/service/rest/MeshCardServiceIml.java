@@ -13,11 +13,8 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,35 +44,19 @@ public class MeshCardServiceIml implements MeshCardService {
     }
 
     @Override
-    public void createReferenceBetweenClientAndCard(Client client, Card card) {
-        Category category = buildCategory(client.getMeshGUID(), card);
-        Session session = null;
-        Transaction transaction = null;
+    public MeshClientCardRef createReferenceBetweenClientAndCard(Card card) {
+        Category category = buildCategory(card.getClient().getMeshGUID(), card);
         MeshClientCardRef refCardClient = null;
         try {
             String json = ob.writeValueAsString(category);
-            byte[] response = meshRestClient.executeCreateCategory(client.getMeshGUID(), json);
+            byte[] response = meshRestClient.executeCreateCategory(card.getClient().getMeshGUID(), json);
             Category responseCategory = ob.readValue(response, Category.class);
-            refCardClient = MeshClientCardRef.build(card, client, responseCategory.getId());
+            refCardClient = MeshClientCardRef.build(card, responseCategory.getId());
         } catch (Exception e){
-            refCardClient = MeshClientCardRef.build(card, client, null);
+            refCardClient = MeshClientCardRef.build(card, null);
             log.error("Exception, when send POST-request", e);
         }
-
-        try{
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            session.save(refCardClient);
-
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e){
-            log.error("", e);
-        } finally {
-            HibernateUtils.rollback(transaction, log);
-            HibernateUtils.close(session, log);
-        }
+        return refCardClient;
     }
 
     @Override

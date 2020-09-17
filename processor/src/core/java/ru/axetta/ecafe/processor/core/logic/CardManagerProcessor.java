@@ -7,9 +7,6 @@ package ru.axetta.ecafe.processor.core.logic;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
-import ru.axetta.ecafe.processor.core.partner.mesh.card.MeshCardService;
-import ru.axetta.ecafe.processor.core.partner.mesh.card.MeshCardServiceIml;
-import ru.axetta.ecafe.processor.core.partner.mesh.card.MockService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -55,15 +52,6 @@ public class CardManagerProcessor implements CardManager {
     public CardManagerProcessor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
         this.eventNotificator = eventNotificator;
-    }
-
-    private MeshCardService getMeshService() {
-        //Если МСК, то отдать сервис взаимодействия с МЭШ, иначе класс-заглушку
-        if(RuntimeContext.getInstance().getRegistryType().equals(RuntimeContext.RegistryType.MSK)){
-            return RuntimeContext.getAppContext().getBean(MeshCardServiceIml.class);
-        } else {
-            return MockService.getInstance();
-        }
     }
 
     @Override

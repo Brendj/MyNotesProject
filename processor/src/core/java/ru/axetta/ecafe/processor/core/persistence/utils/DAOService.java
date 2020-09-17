@@ -2557,15 +2557,6 @@ public class DAOService {
     }
 
     @Transactional
-    public String getDateLastProcessedCard() {
-        try {
-            return getOnlineOptionValue(Option.OPTION_LAST_PROCESSED_CARD);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    @Transactional
     public void setOnlineOptionValue(String value, int option) {
         String str_query = "select optiontext from cf_options where idofoption = :idofoption";
         Query q = entityManager.createNativeQuery(str_query);

@@ -6,13 +6,14 @@ package ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest;
 
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 
 public interface MeshCardService {
     void updateCardForClient(Client client, Card card);
 
     void deleteReferenceBetweenClientAndCard(Client client, Card card);
 
-    void createReferenceBetweenClientAndCard(Client client, Card card);
+    MeshClientCardRef createReferenceBetweenClientAndCard(Card card);
 
     void changeCardOwner(Client clientFrom, Client clientTo, Card card);
 }

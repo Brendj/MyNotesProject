@@ -20,11 +20,11 @@ public class MeshClientCardRef {
     public MeshClientCardRef(){
     }
 
-    public static MeshClientCardRef build(Card card, Client client, Integer idOfRefInExternalSystem){
+    public static MeshClientCardRef build(Card card, Integer idOfRefInExternalSystem){
         Date now = new Date();
         MeshClientCardRef refCardClient = new MeshClientCardRef();
         refCardClient.setCard(card);
-        refCardClient.setClient(client);
+        refCardClient.setClient(card.getClient());
         if(idOfRefInExternalSystem != null) {
             refCardClient.setIdOfRefInExternalSystem(idOfRefInExternalSystem);
             refCardClient.setSend(true);
