@@ -32,7 +32,7 @@ public class Category implements Comparable {
     @JsonProperty("category_id")
     private Integer categoryId;
     @JsonProperty("parameter_values")
-    private List<Object> parameterValues = null;
+    private List<Object> parameterValues = new LinkedList<>();
     @JsonProperty("actual_from")
     private String actualFrom;
     @JsonProperty("actual_to")
@@ -101,7 +101,7 @@ public class Category implements Comparable {
 
     @JsonProperty("parameter_values")
     public List<Object> getParameterValues() {
-        return parameterValues = new LinkedList<>();
+        return parameterValues;
     }
 
     @JsonProperty("parameter_values")

@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic.MeshClient
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -72,10 +73,10 @@ public class MeshCardNotifyTaskExecutor {
         try {
             Date lastProcessing = scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP).getPreviousFireTime();
             if(lastProcessing == null){
-                lastProcessing = new Date();
+                lastProcessing = CalendarUtils.startOfDay(new Date());
             }
             processCreatedCard(lastProcessing);
-            processUpdatedCard(lastProcessing);
+            //processUpdatedCard(lastProcessing);
             processBlockedCard(lastProcessing);
             processCardWithChangedOwner(lastProcessing);
         } catch (Exception e){

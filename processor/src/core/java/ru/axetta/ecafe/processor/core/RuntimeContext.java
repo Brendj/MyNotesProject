@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.taskexecutor.MeshCardNotifyTaskExecutor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -775,6 +776,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(ESZMigrantsUpdateService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(BenefitService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(MaintenanceService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(MeshCardNotifyTaskExecutor.class).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();

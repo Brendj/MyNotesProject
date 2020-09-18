@@ -51,6 +51,10 @@
             <key column="idofcard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CardSync"/>
         </set>
+        <set name="meshCardClientRef" inverse="true" cascade="all">
+            <key column="idofcard"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef"/>
+        </set>
     </class>
 </hibernate-mapping>
 

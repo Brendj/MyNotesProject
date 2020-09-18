@@ -5267,14 +5267,12 @@ public class DAOUtils {
     }
 
     public static List<Card> getCreatedCardForMESH(Session session, Date lastProcessing) {
-        Query query = session.createQuery(
-                "from Card as crd "
-                + "inner join Client as c "
-                + "left join MeshClientCardRef as ref "
-                + "with ref.client = c and ref.card = crd "
-                + "where ref.idOfRef is null and crd.issueTime > :lastProc and c.meshGUID is not null ");
-        query.setParameter("lastProc", lastProcessing);
-        return query.list();
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria.createAlias("client", "c")
+                .createAlias("meshCardClientRef", "ref", JoinType.NONE)
+                .add(Restrictions
+                        .and(Restrictions.ge("issueTime", lastProcessing), Restrictions.isNotNull("c.meshGUID")));
+        return criteria.list();
     }
 
     public static List<MeshClientCardRef> getCardWithAnyUpdatesForMesh(Session session, Date lastProcessing) {
