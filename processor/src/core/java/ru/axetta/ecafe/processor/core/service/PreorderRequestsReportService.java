@@ -171,9 +171,10 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 try {
                                     Org org = DAOUtils.getOrgById(session, idOfOrg);
                                     if (null == item.getIdOfGood() && !org.getUseWebArm()) {
-                                        logger.error(String.format(
-                                                "PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
-                                                item.getIdOfOrg(), item.getCreatedDate().toString()));
+                                        //logger.error(String.format(
+                                        //        "PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
+                                        //        item.getIdOfOrg(), item.getCreatedDate().toString()));
+                                        logger.error("Preorder without good item was found " + item.toString());
                                         continue;
                                     }
                                     if (isWeekendBySpecialDateAndSixWorkWeek(isWeekend, dateWork, item.getIdOfClientGroup(), idOfOrg, specialDates)

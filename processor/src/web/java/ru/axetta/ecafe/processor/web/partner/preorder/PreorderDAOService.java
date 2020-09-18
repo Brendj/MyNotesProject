@@ -1505,8 +1505,8 @@ public class PreorderDAOService {
             Object[] row = (Object[]) obj;
             PreorderComplex preorderComplex = (PreorderComplex) row[0];
             Long idOfOrg = (Long) row[1];
-            if (isGoodRequestExists(preorderComplex)) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
+                if (isGoodRequestExists(preorderComplex)) continue;
                 nextVersion = nextVersionByPreorderComplex();
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true, false);
                 continue;
@@ -1538,26 +1538,36 @@ public class PreorderDAOService {
             return null;
         }
         if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+            if (!isGoodRequestExists(preorderComplex)) {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+            }
             return null;
         }
         if (preorderComplex.getAmount() > 0) {
             if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
+                if (!isGoodRequestExists(preorderComplex)) {
+                    testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
+                }
                 return null;
             }
         } else {
             for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
+                //if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue; - перенесена ниже
                 if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
                     MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
                             preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
-                        testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+                        if (!isGoodRequestExists(preorderComplex)) {
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false,
+                                    false);
+                        }
                         break;
                     } else {
                         if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
-                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
+                            if (!isGoodRequestExists(preorderComplex)) {
+                                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE,
+                                        false, false);
+                            }
                             break;
                         } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
                             logger.info(String.format("Change localIdOfMenu %s to %s at preorder %s adding to process list",
@@ -1698,9 +1708,9 @@ public class PreorderDAOService {
                     deleteRegularPreorderInternal((Session)em.getDelegate(), preorderComplex.getRegularPreorder(),
                             preorderState, null, RegularPreorderState.CHANGE_BY_SERVICE);
                 }
-                logger.info("Deleted preorder " + preorderComplex.toString() + (forceDelete ? " (force delete = true)" : ""));
+                logger.info("Deleted preorder id=" + preorderComplex.getIdOfPreorderComplex() + " " + preorderComplex.toString() + (forceDelete ? " (force delete = true)" : ""));
             } else {
-                logger.info("Preoder can't be deleted " + preorderComplex.toString());
+                logger.info("Preorder id=" + preorderComplex.getIdOfPreorderComplex() + "can't be deleted " + preorderComplex.toString());
             }
         } catch (Exception e) {
             logger.error("Error in testAndDeletePreorderComplex: ", e);
@@ -1867,7 +1877,7 @@ public class PreorderDAOService {
             if (complexInfo == null) {
                 if (preorderComplex != null && !preorderComplex.getDeletedState()) {
                     //предзаказ есть, но комплекса нет - удаляем ранее сгенерированный предзаказ
-                    logger.info("Delete by complex not exists");
+                    logger.info("Deleting preorderComplex due to the complex does not exist");
                     deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED);
                 } else {
                     logger.info("Not generate by complex not exists");
@@ -1919,8 +1929,12 @@ public class PreorderDAOService {
                 if (preorderComplex != null && !preorderComplex.getDeletedState() && menuDetail == null) {
                     menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
-                        logger.info("Not found menu detail");
-                        deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED); //не нашли блюдо из предзаказа - удаляем предзаказ
+                        if (isActualPreorderMenuDetailExists(preorderComplex)) {
+                            logger.info("Not found menu detail, another menu details exist");
+                        } else {
+                            logger.info("Not found menu detail, deleting preorderComplex");
+                            deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED); //не нашли блюдо из предзаказа - удаляем предзаказ
+                        }
                         currentDate = CalendarUtils.addDays(currentDate, 1);
                         continue;
                     }
@@ -2220,6 +2234,13 @@ public class PreorderDAOService {
         }
         preorderComplex.deleteByReason(nextVersion, true, preorderState);
         em.merge(preorderComplex);
+    }
+
+    private boolean isActualPreorderMenuDetailExists(PreorderComplex preorderComplex) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (!pmd.getDeletedState()) return true;
+        }
+       return false;
     }
 
     @Transactional

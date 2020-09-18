@@ -753,11 +753,13 @@ public class ClientManager {
 
             String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
             long contractId;
+            boolean autoContractId = false;
             if (StringUtils.equals(contractIdText, "AUTO")) {
                 logger.debug("generate ContractId");
                 if(RuntimeContext.RegistryType.isMsk()) {
                     contractId = runtimeContext.getClientContractIdGenerator()
-                            .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                            .generateTransactionFree(organization.getIdOfOrg());
+                    autoContractId = true;
                 } else if(RuntimeContext.RegistryType.isSpb()) {
                     try {
                         String c = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
@@ -765,7 +767,8 @@ public class ClientManager {
                             contractId = Long.parseLong(c);
                         } else {
                             contractId = runtimeContext.getClientContractIdGenerator()
-                                    .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                                    .generateTransactionFree(organization.getIdOfOrg());
+                            autoContractId = true;
                         }
                     } catch (Exception e) {
                         throw new Exception("Неправильный формат лицевого счета клиента", e);
@@ -775,6 +778,7 @@ public class ClientManager {
                 }
             } else {
                 contractId = Long.parseLong(contractIdText);
+                if (RuntimeContext.RegistryType.isMsk()) autoContractId = true;
             }
 
             String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);//tokens[1];
@@ -912,6 +916,9 @@ public class ClientManager {
             logger.debug("save client");
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
+
+            if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, idOfOrg);
+
             ///
             logger.debug("register client card");
             if (fieldConfig.getValue(ClientManager.FieldId.CARD_ID) != null && persistenceTransaction != null) {
@@ -1047,7 +1054,7 @@ public class ClientManager {
         if (iterator != null) contractIdGuardian = iterator.next();
         if (contractIdGuardian == null) {
             contractIdGuardian = runtimeContext.getClientContractIdGenerator()
-                    .generateTransactionFree(org.getIdOfOrg(), session);
+                    .generateTransactionFree(org.getIdOfOrg());
         }
 
         long clientRegistryVersionGuardian = DAOUtils.updateClientRegistryVersion(session);
@@ -1058,6 +1065,7 @@ public class ClientManager {
                 false, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS), contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
                 clientRegistryVersionGuardian, limitGuardian,
                 RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
+
 
         ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
 
@@ -1088,6 +1096,7 @@ public class ClientManager {
         clientGuardianToSave.setPassportNumber(passportNumber);
         clientGuardianToSave.setPassportSeries(passportSeries);
         session.persist(clientGuardianToSave);
+        RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
     }
 

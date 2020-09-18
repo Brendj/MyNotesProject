@@ -45,7 +45,7 @@ public class OkuRestController {
                     .checkClient(contractId, surname);
             RuntimeContext.getAppContext().getBean(OkuDAOService.class).setClientAsUserOP(contractId);
 
-            return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
+            return generateResponse(HttpURLConnection.HTTP_OK, clientData);
         } catch (IllegalArgumentException e) {
             logger.error("Unable to check client", e);
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorResult.badRequest());

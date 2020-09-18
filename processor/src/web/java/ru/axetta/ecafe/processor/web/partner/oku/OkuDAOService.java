@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.oku;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.web.partner.oku.dataflow.Order;
 import ru.axetta.ecafe.processor.web.partner.oku.dataflow.*;
@@ -11,6 +12,7 @@ import ru.axetta.ecafe.processor.web.partner.oku.dataflow.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,21 +31,72 @@ public class OkuDAOService {
     private static final Logger logger = LoggerFactory.getLogger(OkuDAOService.class);
 
     private static List<Long> clientGroupList = new ArrayList<>();
+    private static List<String> ageTypeGroupList = new ArrayList<>();
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager emReport;
 
-    private final int PARALLEL_5 = 5;
-    private final int PARALLEL_12 = 12;
+    @Autowired
+    private RuntimeContext runtimeContext;
+
+    public static final String PREDEFINED_GROUPS_PROPERTY = "ecafe.processor.oku.groups";
+    public static final String NOT_IN_AGETYPEGROUPS_PROPERTY = "ecafe.processor.oku.not.agetypegroups";
+
+    public static final String PROPERTY_VALUE_SEPARATOR = ",";
 
     @PostConstruct
     private void init() {
-        clientGroupList.add(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        clientGroupList.add(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
-        clientGroupList.add(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-        clientGroupList.add(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+        initPredefinedGroups();
+        initAgeTypeGroups();
+    }
+
+    private void initPredefinedGroups() {
+        String predefinedGroupsRawString = runtimeContext.getConfigProperties().getProperty(PREDEFINED_GROUPS_PROPERTY);
+        if (StringUtils.isEmpty(predefinedGroupsRawString)) {
+            clientGroupList.add(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            clientGroupList.add(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+            clientGroupList.add(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            clientGroupList.add(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+        } else {
+            String[] predefinedGroupsStringArray = StringUtils.split(predefinedGroupsRawString, PROPERTY_VALUE_SEPARATOR);
+
+            for (String predefinedGroupString : predefinedGroupsStringArray) {
+                long predefinedGroupLong;
+                try {
+                    predefinedGroupLong = Long.parseLong(predefinedGroupString);
+                } catch (NumberFormatException e) {
+                    logger.error(String.format("Unexpected number of group: %s", predefinedGroupString));
+                    continue;
+                }
+
+                ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(predefinedGroupLong);
+                if (predefined == null) {
+                    logger.error(String.format("Group with id %s not found", predefinedGroupString));
+                    continue;
+                }
+
+                clientGroupList.add(predefined.getValue());
+            }
+        }
+    }
+
+    private void initAgeTypeGroups() {
+        String ageTypeGroupsRawString = runtimeContext.getConfigProperties().getProperty(NOT_IN_AGETYPEGROUPS_PROPERTY);
+        if (StringUtils.isEmpty(ageTypeGroupsRawString))
+            return;
+        ///
+        String[] ageTypeGroupsStringArray = StringUtils.split(ageTypeGroupsRawString, PROPERTY_VALUE_SEPARATOR);
+
+        for (String ageTypeGroupString : ageTypeGroupsStringArray) {
+            ageTypeGroupString = ageTypeGroupString.trim().toLowerCase();
+            if (!StringUtils.isEmpty(ageTypeGroupString)) {
+                ageTypeGroupList.add(ageTypeGroupString);
+            } else {
+                logger.error(String.format("Incorrect value in %s property", NOT_IN_AGETYPEGROUPS_PROPERTY));
+            }
+        }
     }
 
     @Transactional(readOnly = true)
@@ -51,19 +104,13 @@ public class OkuDAOService {
         Query query = emReport.createQuery("select c from Client c join c.person p  join c.org o "
                 + "where c.contractId = :contractId and lower(p.surname) = :surname and o.participantOP = true "
                 + "     and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup in (:clientGroupList) "
-                + "         or ((c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :clientGroupEmployees)"
-                + "             and lower(c.ageTypeGroup) not like :kindergarten and lower(c.ageTypeGroup) like :school "
-                + "             and (cast(c.parallel as integer) between :parallel5 and :parallel12)) "
                 + "         or ((c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :clientGroupEmployees) "
-                + "             and lower(c.ageTypeGroup) not like :kindergarten and lower(c.ageTypeGroup) not like :school))");
+                + "             and lower(c.ageTypeGroup) not in (:notInAgeTypeGroupList)))");
         query.setParameter("contractId", contractId);
         query.setParameter("surname", surname.toLowerCase());
         query.setParameter("clientGroupList", clientGroupList);
         query.setParameter("clientGroupEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        query.setParameter("parallel5", PARALLEL_5);
-        query.setParameter("parallel12", PARALLEL_12);
-        query.setParameter("school", "%школ%");
-        query.setParameter("kindergarten", "%дошкол%");
+        query.setParameter("notInAgeTypeGroupList", ageTypeGroupList);
         query.setMaxResults(1);
         try {
             Client client = (Client) query.getSingleResult();

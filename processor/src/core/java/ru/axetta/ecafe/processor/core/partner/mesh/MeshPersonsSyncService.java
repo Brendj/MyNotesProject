@@ -132,7 +132,15 @@ public class MeshPersonsSyncService {
             personguid = person.getPersonId();
             Date birthdate = df.parse(person.getBirthdate());
             Education education = findEducation(person);
-            if (education == null) return;
+            if (education == null) {
+                MeshSyncPerson meshSyncPerson = (MeshSyncPerson)session.get(MeshSyncPerson.class, personguid);
+                if (meshSyncPerson != null) {
+                    meshSyncPerson.setLastupdateRest(new Date());
+                    meshSyncPerson.setDeletestate(true);
+                    session.update(meshSyncPerson);
+                }
+                return;
+            }
             Date endTraining = df.parse(education.getTrainingEndAt());
             boolean deleted = false;
             if (endTraining.before(new Date())) deleted = true;

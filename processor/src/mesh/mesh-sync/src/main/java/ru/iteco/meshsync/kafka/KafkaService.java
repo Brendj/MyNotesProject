@@ -2,17 +2,18 @@ package ru.iteco.meshsync.kafka;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.iteco.meshsync.EntityType;
+import ru.iteco.meshsync.kafka.dto.EntityChangeEventDTO;
+import ru.iteco.meshsync.mesh.service.DAO.EntityChangesService;
+import ru.iteco.meshsync.mesh.service.logic.MeshService;
+import ru.iteco.meshsync.models.EntityChanges;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
-import ru.iteco.meshsync.EntityType;
-import ru.iteco.meshsync.kafka.dto.EntityChangeEventDTO;
-import ru.iteco.meshsync.mesh.service.DAO.EntityChangesService;
-import ru.iteco.meshsync.mesh.service.logic.MeshService;
-import ru.iteco.meshsync.models.EntityChanges;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,14 +64,8 @@ public class KafkaService {
         dto = null;
         try {
             boolean process = meshService.processEntityChanges(entityChanges);
-            if(!process){
-                entityChangesService.saveForReprocess(entityChanges);
-            } else {
-                entityChangesService.deleteChangesForPersonGUID(entityChanges.getPersonGUID());
-            }
         } catch (Exception e){
             log.error("Can't process message: ", e);
-            entityChangesService.saveForReprocess(entityChanges);
         }
     }
 }

@@ -1400,7 +1400,7 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating client contract ID generator.");
         }
-        ContractIdGenerator contractIdGenerator = new ContractIdGenerator(sessionFactory);
+        ContractIdGenerator contractIdGenerator = new ContractIdGenerator(properties, sessionFactory);
         if (logger.isDebugEnabled()) {
             logger.debug("Client contract ID generator created.");
         }
