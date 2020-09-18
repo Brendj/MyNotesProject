@@ -60,8 +60,8 @@ public class MeshCardServiceIml implements MeshCardService {
     }
 
     @Override
-    public void updateCardForClient(Client client, Card card) {
-
+    public MeshClientCardRef updateCardForClient(MeshClientCardRef ref) {
+        return ref;
     }
 
     @Override

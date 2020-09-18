@@ -46,14 +46,24 @@ public class MeshClientCardRefService {
             transaction = session.beginTransaction();
 
             MeshClientCardRef ref = meshCardService.createReferenceBetweenClientAndCard(c);
-
             session.save(ref);
 
+            transaction.commit();
+            transaction = null;
         } catch (Exception e){
-            log.error("", e);
+            log.error("Can't create Ref", e);
         } finally {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
+        }
+    }
+
+    public MeshClientCardRef updateRef(MeshClientCardRef ref) {
+        try {
+            return meshCardService.updateCardForClient(ref);
+        } catch (Exception e){
+            log.error("Can't create Ref", e);
+            return ref;
         }
     }
 }

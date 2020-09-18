@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh.card.taskexecutor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic.MeshClientCardRefService;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -82,15 +83,36 @@ public class MeshCardNotifyTaskExecutor {
         }
     }
 
-    private void processCardWithChangedOwner(Date lastProcessing) throws Exception {
+    private void processCreatedCard(Date lastProcessing) throws Exception {
         Session session = null;
-        Transaction transaction = null;
         try{
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             List<Card> createdCards = DAOUtils.getCreatedCardForMESH(session, lastProcessing);
             for(Card c : createdCards){
                 meshClientCardRefService.createRef(c);
             }
+        } finally {
+            HibernateUtils.close(session, log);
+        }
+    }
+
+    private void processUpdatedCard(Date lastProcessing) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        Date now = new Date();
+        try{
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<MeshClientCardRef> updatedCards = DAOUtils.getCardWithAnyUpdatesForMesh(session, lastProcessing);
+            for(MeshClientCardRef ref : updatedCards){
+                ref = meshClientCardRefService.updateRef(ref);
+                ref.setLastUpdate(now);
+                session.update(ref);
+            }
+
+            transaction.commit();
+            transaction = null;
         } finally {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
@@ -100,10 +122,7 @@ public class MeshCardNotifyTaskExecutor {
     private void processBlockedCard(Date lastProcessing) throws Exception {
     }
 
-    private void processUpdatedCard(Date lastProcessing) throws Exception {
-    }
-
-    private void processCreatedCard(Date lastProcessing) throws Exception {
+    private void processCardWithChangedOwner(Date lastProcessing) throws Exception {
 
     }
 }

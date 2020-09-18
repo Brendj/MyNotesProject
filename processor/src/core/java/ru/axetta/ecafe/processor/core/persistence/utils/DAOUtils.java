@@ -5268,11 +5268,21 @@ public class DAOUtils {
 
     public static List<Card> getCreatedCardForMESH(Session session, Date lastProcessing) {
         Query query = session.createQuery(
-                "from Card as crd"
+                "from Card as crd "
                 + "inner join Client as c "
                 + "left join MeshClientCardRef as ref "
                 + "with ref.client = c and ref.card = crd "
-                + "where ref.idOfRef is null and crd.issueTime > :lastProc and c.meshGUID is not null");
+                + "where ref.idOfRef is null and crd.issueTime > :lastProc and c.meshGUID is not null ");
+        query.setParameter("lastProc", lastProcessing);
+        return query.list();
+    }
+
+    public static List<MeshClientCardRef> getCardWithAnyUpdatesForMesh(Session session, Date lastProcessing) {
+        Query query = session.createQuery(
+                "from MeshClientCardRef as ref "
+                        + "inner join Client as c "
+                        + "inner join Card as crd "
+                        + "where crd.lastUpdate > :lastProc ");
         query.setParameter("lastProc", lastProcessing);
         return query.list();
     }

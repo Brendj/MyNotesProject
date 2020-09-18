@@ -23,8 +23,8 @@ public class MockService implements MeshCardService {
     }
 
     @Override
-    public void updateCardForClient(Client client, Card card) {
-        // unsupported operation
+    public MeshClientCardRef updateCardForClient(MeshClientCardRef ref) {
+        return ref;
     }
 
     @Override

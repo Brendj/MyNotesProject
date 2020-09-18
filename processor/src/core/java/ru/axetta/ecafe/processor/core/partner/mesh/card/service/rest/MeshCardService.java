@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 
 public interface MeshCardService {
-    void updateCardForClient(Client client, Card card);
+    MeshClientCardRef updateCardForClient(MeshClientCardRef ref);
 
     void deleteReferenceBetweenClientAndCard(Client client, Card card);
 
