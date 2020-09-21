@@ -9678,6 +9678,7 @@ public class MainPage implements Serializable {
             HibernateUtils.close(persistenceSession, logger);
 
         }
+        updateClientListPage();
         return null;
     }
 

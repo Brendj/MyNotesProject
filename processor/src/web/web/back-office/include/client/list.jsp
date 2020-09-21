@@ -11,6 +11,7 @@
 
 <%-- Панель просмотра списка клиентов --%>
 <h:panelGrid id="clientListPanelGrid" binding="#{mainPage.clientListPage.pageComponent}" styleClass="borderless-grid">
+    <a4j:region>
     <rich:simpleTogglePanel label="Фильтр (#{mainPage.clientListPage.clientFilter.status})" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="false" headerClass="filter-panel-header">
 
@@ -271,10 +272,20 @@
                                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                                styleClass="command-link" style="width: 25px;" />
                     <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientFilter.org.shortName}}" />
+                    <h:outputText escape="true" value="Группа" styleClass="output-text" />
+                    <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientListPage.clientFilter.org.isEmpty()}">
+                        <f:param name="idOfOrg" value="#{mainPage.clientListPage.clientFilter.org.idOfOrg}" />
+                        <f:setPropertyActionListener value="#{mainPage.clientListPage.clientFilter.org.idOfOrg}" target="#{mainPage.clientGroupSelectPage.idOfOrg}" />
+                        <f:setPropertyActionListener value="#{null}" target="#{mainPage.clientGroupSelectPage.filter}" />
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientGroupName}}" />
                     <rich:spacer/>
                     <rich:spacer/>
-                    <a4j:commandButton value="Применить" action="#{mainPage.setOrg}"
-                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                    <a4j:commandButton value="Применить" action="#{mainPage.setOrg}" disabled="#{!mainPage.clientListPage.clientGroupSelected()}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" oncomplete="" >
+                    </a4j:commandButton>
                 </h:panelGrid>
             </rich:tab>
             <rich:tab label="Изменение лимита дневных трат">
@@ -307,6 +318,7 @@
         </rich:tabPanel>
     </rich:simpleTogglePanel>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
+</a4j:region>
 </h:panelGrid>
 
 <rich:modalPanel id="removedClientDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
