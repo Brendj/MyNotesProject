@@ -30,7 +30,7 @@ public class BlockUnblockItem {
     private String lastp;
     private String middp;
     private String shortname;
-    private String shortnameinfoservice;
+    private String address;
     private String cardstate;
     private Long cardno;
     private Long cardprintedno;
@@ -41,7 +41,7 @@ public class BlockUnblockItem {
 
     public BlockUnblockItem(String requestId, Date blockdate,Date unblockdate, String operation, String extClientId,
             String firstname, String lastname, String middlename, String groupname, Long contractIdp, String firp, String lastp,
-            String middp,  String shortname, String shortnameinfoservice, String cardstate, Long cardno,
+            String middp,  String shortname, String address, String cardstate, Long cardno,
             Long cardprintedno, Long idofclient, Long idoforg) {
         this.idofclient = idofclient;
         this.idoforg = idoforg;
@@ -76,7 +76,7 @@ public class BlockUnblockItem {
         if (middp == null)
             this.middp = "";
         this.shortname=shortname;
-        this.shortnameinfoservice=shortnameinfoservice;
+        this.address=address;
         this.cardstate=cardstate;
         this.cardno=cardno;
         this.cardprintedno=cardprintedno;
@@ -84,7 +84,7 @@ public class BlockUnblockItem {
 
     public BlockUnblockItem(String requestId, Date blockdate,Date unblockdate, String operation, String extClientId,
             String firstname, String lastname, String middlename, String groupname, Long contractIdp, String firp, String lastp,
-            String middp,  String shortname, String shortnameinfoservice, String cardstate, Long cardno, Long cardprintedno) {
+            String middp,  String shortname, String address, String cardstate, Long cardno, Long cardprintedno) {
         this.requestId = requestId;
         this.blockdate=blockdate;
         this.unblockdate=unblockdate;
@@ -116,7 +116,7 @@ public class BlockUnblockItem {
         if (middp == null)
             this.middp = "";
         this.shortname=shortname;
-        this.shortnameinfoservice=shortnameinfoservice;
+        this.address=address;
         this.cardstate=cardstate;
         this.cardno=cardno;
         this.cardprintedno=cardprintedno;
@@ -258,14 +258,6 @@ public class BlockUnblockItem {
         this.contractIdp = contractIdp;
     }
 
-    public String getShortnameinfoservice() {
-        return shortnameinfoservice;
-    }
-
-    public void setShortnameinfoservice(String shortnameinfoservice) {
-        this.shortnameinfoservice = shortnameinfoservice;
-    }
-
     public String getBlockdateString() {
         return blockdateString;
     }
@@ -296,5 +288,13 @@ public class BlockUnblockItem {
 
     public void setIdoforg(Long idoforg) {
         this.idoforg = idoforg;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String adress) {
+        this.address = adress;
     }
 }

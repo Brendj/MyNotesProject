@@ -183,8 +183,8 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
             }
             //Это разблокирование всего
             Query queryUnblock = session.createSQLQuery(
-                    "select ccra.idcardactionrequest, ccra.requestid, co.shortname, "
-                            + "co.shortnameinfoservice, ccra.firstname,ccra.lastname, ccra.middlename,\n"
+                    "select ccra.idcardactionrequest, ccra.requestid, co.shortnameinfoservice, co.address, "
+                            + " ccra.firstname,ccra.lastname, ccra.middlename,\n"
                             + "ccg.groupname, null as firp, null as lastp, null as middp, ca.state as cardstate, ca.cardno, ca.cardprintedno,\n"
                             + "ccarold.createdate as blockdate, ccra.createdate as unblockdate,ccra.\"comment\", \n"
                             + "CASE\n" + "    WHEN ccra.contingentid is not null THEN ccra.contingentid\n"
@@ -254,7 +254,7 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
 
             //Это блокирование всего исключая то, что успешно разблокировано
             Query query = session.createSQLQuery("select * from (\n"
-                    + "select ccra.idcardactionrequest, ccra.requestid, co.shortname, co.shortnameinfoservice, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
+                    + "select ccra.idcardactionrequest, ccra.requestid, co.shortnameinfoservice, co.address, cp.firstname, cp.surname as lastname, cp.secondname as middlename,\n"
                     + "ccg.groupname, null as firp, null as lastp, null as middp, ca.state as cardstate, ca.cardno, ca.cardprintedno, ccra.createdate as blockdate,\n"
                     + "ccra.\"comment\", \n" + "CASE\n"
                     + "    WHEN ccra.contingentid is not null THEN ccra.contingentid\n" + "    ELSE ccra.staffid\n"

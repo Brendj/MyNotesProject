@@ -147,7 +147,7 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Адрес ОО"/>
                 </f:facet>
-                <h:outputText escape="true" value="#{item.shortnameinfoservice}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.address}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">

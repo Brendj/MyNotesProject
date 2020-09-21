@@ -71,6 +71,7 @@ public class CardBlockUnblockService {
 
     public void scheduleSync() throws Exception {
         String syncScheduleSync = "0 0 * ? * *";
+        //String syncScheduleSync = "0 20 * ? * * *";
         try {
             JobDetail jobDetailSync = new JobDetail(SYNC_BLOCKCARD, Scheduler.DEFAULT_GROUP, SyncBlockOld.class);
             SchedulerFactory sfb = new StdSchedulerFactory();
@@ -95,7 +96,7 @@ public class CardBlockUnblockService {
         List<BlockUnblockItem> blockUnblockItemListOLD = new ArrayList<>();
         Query queryOld = session.createSQLQuery(
                 "select ccra.idcardactionrequest, ccra.requestid, ccra.contingentid, ccra.staffid,  \n"
-                        + "ccra.\"comment\", ccg.groupname, cc.contractid, cp.secondname, cp.firstname, cp.surname, co.shortname, co.shortnameinfoservice, \n"
+                        + "ccra.\"comment\", ccg.groupname, cc.contractid, cp.secondname, cp.firstname, cp.surname, co.shortnameinfoservice, co.address, \n"
                         + "ccrab.createdate as blockdate, ccra.createdate as unblockdate, cc.idofclient, co.idoforg \n"
                         + "from cf_cr_cardactionrequests ccra \n"
                         + "left join cf_clients cc on cc.idofclient = ccra.idofclient\n"
@@ -143,7 +144,7 @@ public class CardBlockUnblockService {
             String firstname = (String) row[8];
             String middlename = (String) row[9];
             String shortname = (String) row[10];
-            String shortnameinfoservice = (String) row[11];
+            String adress = (String) row[11];
             Date blockdate = new Date(((Timestamp) row[12]).getTime());
             Date unblockdate;
             try {
@@ -166,7 +167,7 @@ public class CardBlockUnblockService {
 
                                     BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId, blockdate,
                                             unblockdate, operation, staffId, firstname, lastname, middlename, groupname,
-                                            contractId, "", "", "", shortname, shortnameinfoservice, converterTypeCard(card.getState()), card.getCardNo(),
+                                            contractId, "", "", "", shortname, adress, converterTypeCard(card.getState()), card.getCardNo(),
                                             card.getCardPrintedNo(), idofclient, idoforg);
                                     blockUnblockItemListOLD.add(blockUnblockItem);
                                 }
@@ -193,7 +194,7 @@ public class CardBlockUnblockService {
                                                         cl.getPerson().getSecondName(), groupname, contractId,
                                                         guard.getPerson().getFirstName(), guard.getPerson().getSurname(),
                                                         guard.getPerson().getSecondName(), shortname,
-                                                        shortnameinfoservice, converterTypeCard(card.getState()), card.getCardNo(),
+                                                        adress, converterTypeCard(card.getState()), card.getCardNo(),
                                                         card.getCardPrintedNo(), idofclient, idoforg);
                                                 blockUnblockItemListOLD.add(blockUnblockItem);
                                             }
@@ -210,7 +211,7 @@ public class CardBlockUnblockService {
 
                                             BlockUnblockItem blockUnblockItem = new BlockUnblockItem(requestId,
                                                     blockdate, unblockdate, operation, contingentId, firstname, lastname, middlename,
-                                                    groupname, contractId, "", "", "", shortname, shortnameinfoservice,
+                                                    groupname, contractId, "", "", "", shortname, adress,
                                                     converterTypeCard(card.getState()), card.getCardNo(), card.getCardPrintedNo(),
                                                     idofclient, idoforg);
                                             blockUnblockItemListOLD.add(blockUnblockItem);
@@ -230,11 +231,11 @@ public class CardBlockUnblockService {
             query = session.createSQLQuery(
                     "insert into cf_cr_cardactionitems(requestId, blockdate, unblockdate, operation, "
                             + "extClientId, firstname, lastname, middlename, groupname, contractIdp, firp, lastp, middp, shortname,"
-                            + "shortnameinfoservice, cardstate, cardno, cardprintedno, idofclient, idoforg) "
+                            + "address, cardstate, cardno, cardprintedno, idofclient, idoforg) "
                             + "values(:requestId, :blockdate, :unblockdate, :operation, "
                             + ":extClientId, :firstname, :lastname, :middlename, :groupname, :contractIdp, "
                             + ":firp, :lastp, :middp, :shortname, "
-                            + " :shortnameinfoservice, :cardstate, :cardno, :cardprintedno, :idofclient,"
+                            + " :address, :cardstate, :cardno, :cardprintedno, :idofclient,"
                             + ":idoforg)");
             query.setParameter("requestId", blockUnblockItem.getRequestId());
             query.setParameter("blockdate", blockUnblockItem.getBlockdate().getTime());
@@ -254,7 +255,7 @@ public class CardBlockUnblockService {
             query.setParameter("lastp", blockUnblockItem.getLastp());
             query.setParameter("middp", blockUnblockItem.getMiddp());
             query.setParameter("shortname", blockUnblockItem.getShortname());
-            query.setParameter("shortnameinfoservice", blockUnblockItem.getShortnameinfoservice());
+            query.setParameter("address", blockUnblockItem.getAddress());
             query.setParameter("cardstate", blockUnblockItem.getCardstate());
             if (blockUnblockItem.getCardno() == null) {
                 query.setParameter("cardno", 0L);
