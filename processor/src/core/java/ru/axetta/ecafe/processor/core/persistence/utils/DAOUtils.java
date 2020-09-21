@@ -5276,12 +5276,19 @@ public class DAOUtils {
     }
 
     public static List<MeshClientCardRef> getCardWithAnyUpdatesForMesh(Session session, Date lastProcessing) {
-        Query query = session.createQuery(
-                "from MeshClientCardRef as ref "
-                        + "inner join Client as c "
-                        + "inner join Card as crd "
-                        + "where crd.lastUpdate > :lastProc ");
-        query.setParameter("lastProc", lastProcessing);
-        return query.list();
+        List<Integer> activeStates = Arrays.asList(
+                CardState.FREE.getValue(),
+                CardState.ISSUED.getValue(),
+                CardState.TEMPISSUED.getValue()
+        );
+        Criteria criteria = session.createCriteria(MeshClientCardRef.class);
+        criteria.createAlias("client", "c")
+                .createAlias("card", "crd")
+                .add(Restrictions.and(
+                        Restrictions.eq("crd.updateTime", lastProcessing),
+                        Restrictions.in("crd.state", activeStates)
+                        )
+                );
+        return criteria.list();
     }
 }

@@ -71,12 +71,13 @@ public class MeshCardNotifyTaskExecutor {
 
     public void run(){
         try {
-            Date lastProcessing = scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP).getPreviousFireTime();
+            Trigger trigger = scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP);
+            Date lastProcessing = trigger.getPreviousFireTime();
             if(lastProcessing == null){
                 lastProcessing = CalendarUtils.startOfDay(new Date());
             }
             processCreatedCard(lastProcessing);
-            //processUpdatedCard(lastProcessing);
+            processUpdatedCard(lastProcessing);
             processBlockedCard(lastProcessing);
             processCardWithChangedOwner(lastProcessing);
         } catch (Exception e){
@@ -100,7 +101,6 @@ public class MeshCardNotifyTaskExecutor {
     private void processUpdatedCard(Date lastProcessing) throws Exception {
         Session session = null;
         Transaction transaction = null;
-        Date now = new Date();
         try{
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -108,7 +108,6 @@ public class MeshCardNotifyTaskExecutor {
             List<MeshClientCardRef> updatedCards = DAOUtils.getCardWithAnyUpdatesForMesh(session, lastProcessing);
             for(MeshClientCardRef ref : updatedCards){
                 ref = meshClientCardRefService.updateRef(ref);
-                ref.setLastUpdate(now);
                 session.update(ref);
             }
 

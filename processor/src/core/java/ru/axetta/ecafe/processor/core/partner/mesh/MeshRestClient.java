@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
@@ -101,5 +102,27 @@ public class MeshRestClient {
         httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort(),
                 new Protocol("https", (ProtocolSocketFactory)new EasySSLProtocolSocketFactory(), 443));
         return httpClient;
+    }
+
+    public void executeUpdateCategory(String meshGUID, Integer idOfRefInExternalSystem, String json) throws Exception {
+        URL url = new URL(getServiceAddress() + "/persons/" + meshGUID + "/category/" + idOfRefInExternalSystem);
+        logger.info("Execute request to MESH REST: " + url);
+        PutMethod httpMethod = new PutMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        StringRequestEntity requestEntity = new StringRequestEntity(
+                json,
+                "application/json",
+                "UTF-8");
+        httpMethod.setRequestEntity(requestEntity);
+
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            if (statusCode != HttpStatus.SC_OK) {
+                throw new Exception("Mesh request has status " + statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
     }
 }

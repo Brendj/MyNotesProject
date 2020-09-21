@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MeshCardServiceIml implements MeshCardService {
     private final Logger log = LoggerFactory.getLogger(MeshCardServiceIml.class);
@@ -27,6 +28,7 @@ public class MeshCardServiceIml implements MeshCardService {
     private final SimpleDateFormat sdfForIssueDate = new SimpleDateFormat("yyyy-MM-dd");
     private static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.card.rest.address";
     private static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.card.rest.api.key";
+    private static final Integer CARD_CATEGORY_ID = 1000;
 
     private MeshRestClient meshRestClient;
 
@@ -61,6 +63,18 @@ public class MeshCardServiceIml implements MeshCardService {
 
     @Override
     public MeshClientCardRef updateCardForClient(MeshClientCardRef ref) {
+        Category category = buildCategory(ref.getCard().getClient().getMeshGUID(), ref.getCard());
+        category.setId(ref.getIdOfRefInExternalSystem());
+        try {
+            String json = ob.writeValueAsString(category);
+            meshRestClient.executeUpdateCategory(ref.getClient().getMeshGUID(), ref.getIdOfRefInExternalSystem(), json);
+            ref.setSend(true);
+        } catch (Exception e){
+            ref.setSend(false);
+            log.error("Exception, when send PUT-request", e);
+        } finally {
+            ref.setLastUpdate(new Date());
+        }
         return ref;
     }
 
@@ -86,6 +100,8 @@ public class MeshCardServiceIml implements MeshCardService {
 
     private Category buildCategory(String meshGUID, Card card) {
         Category category = new Category();
+        category.setId(0);
+        category.setCategoryId(CARD_CATEGORY_ID);
         category.setPersonId(meshGUID);
         category.setActualFrom(sdfForActualDates.format(card.getCreateTime()));
         category.setActualTo(sdfForActualDates.format(card.getValidTime()));
