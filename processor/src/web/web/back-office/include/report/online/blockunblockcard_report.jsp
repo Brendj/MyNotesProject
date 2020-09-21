@@ -47,7 +47,7 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Статус блокировки" styleClass="output-text" />
         <h:selectOneMenu id="regionsList" value="#{mainPage.blockUnblockReportPage.cardStatusFilter}"
-                         style="width:120px;">
+                         style="width:200px;">
             <f:selectItems value="#{mainPage.blockUnblockReportPage.statusFilters}" />
         </h:selectOneMenu>
     </h:panelGrid>

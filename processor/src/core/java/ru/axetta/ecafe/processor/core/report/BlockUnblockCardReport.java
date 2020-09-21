@@ -361,10 +361,10 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
             }
             if (cardState != null) {
                 if (cardState.equals(CardStateType.BLOCK.getDescription())) {
-                    filterStatus1 = "  and cardstate = " + CardState.BLOCKED.getDescription() + " ";
+                    filterStatus1 = "  and cardstate = '" + CardState.BLOCKED.getDescription() + "' ";
                 } else {
                     if (cardState.equals(CardStateType.UNBLOCK.getDescription())) {
-                        filterStatus1 = "  and cardstate = " + CardState.ISSUED.getDescription() + " ";
+                        filterStatus1 = "  and cardstate = '" + CardState.ISSUED.getDescription() + "' ";
                     }
                 }
             }
