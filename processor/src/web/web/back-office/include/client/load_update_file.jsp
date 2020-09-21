@@ -25,6 +25,10 @@
                                styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
     </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
 <rich:tabPanel>
     <rich:tab label="Обновление из файла">
     <h:panelGrid columns="1">
@@ -125,13 +129,64 @@
                          clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
                          cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
                          uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
-                         fileUploadListener="#{mainPage.clientUpdateFileLoadPage.uploadGroupChange}">
+                         fileUploadListener="#{mainPage.clientUpdateFileLoadPage.uploadGroupChange}" disabled="#{!mainPage.clientUpdateFileLoadPage.orgSelected()}">
             <f:facet name="label">
                 <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
             </f:facet>
             <a4j:support event="onuploadcomplete" reRender="clientUpdateFileLoaderPanel" />
             <a4j:support event="onclear" reRender="clientUpdateFileLoaderPanel" />
         </rich:fileUpload>
+
+        <h:outputText escape="true"
+                      value="Обработано: #{mainPage.clientUpdateFileLoadPage.lineGroupsResultSize}. Успешно: #{mainPage.clientUpdateFileLoadPage.successLineNumber}"
+                      styleClass="output-text" /><br/>
+        <h:outputText escape="true"
+                      value="Во время обработки файла произошла ошибка: #{mainPage.clientUpdateFileLoadPage.errorTextGroups}"
+                      styleClass="error-output-text" rendered="#{mainPage.clientUpdateFileLoadPage.errorGroupsPresent}" />
+
+        <rich:dataTable id="clientGroupsUpdateLoadResultTable" value="#{mainPage.clientUpdateFileLoadPage.lineGroupsResults}" var="item" rows="20"
+                        columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column"
+                        footerClass="data-table-footer">
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Номер строки файла" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.lineNo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Код результата" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.resultCode}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Сообщение" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.resultDescription}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ФИО клиента" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.fio}" styleClass="output-text" />
+            </rich:column>
+
+            <f:facet name="footer">
+                <rich:datascroller for="clientGroupsUpdateLoadResultTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:datascroller>
+            </f:facet>
+        </rich:dataTable>
+
+        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientUpdateGroupsLoadResultCSVList}"
+                         styleClass="command-button" />
 
     </rich:tab>
 </rich:tabPanel>

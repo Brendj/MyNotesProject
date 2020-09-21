@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -49,6 +50,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
     private static final Logger logger = LoggerFactory.getLogger(ClientUpdateFileLoadPage.class);
     private static final long MAX_LINE_NUMBER = 80000;
     private String errorText = "";
+    private String errorTextGroups = "";
 
     public OrgItem getOrg() {
         return org;
@@ -70,6 +72,26 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         return !StringUtils.isEmpty(errorText);
     }
 
+    public Boolean getErrorGroupsPresent() {
+        return !StringUtils.isEmpty(errorTextGroups);
+    }
+
+    public List<LineResult> getLineGroupsResults() {
+        return lineGroupsResults;
+    }
+
+    public void setLineGroupsResults(List<LineResult> lineGroupsResults) {
+        this.lineGroupsResults = lineGroupsResults;
+    }
+
+    public String getErrorTextGroups() {
+        return errorTextGroups;
+    }
+
+    public void setErrorTextGroups(String errorTextGroups) {
+        this.errorTextGroups = errorTextGroups;
+    }
+
     public static class LineResult {
 
         private final long lineNo;
@@ -77,6 +99,8 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         private final String resultDescription;
         private final Long idOfClient;
         private final Long contractId;
+        private String fio;
+        private final List<Long> involvedClients;
 
         public LineResult(long lineNo, int resultCode, String resultDescription, Long idOfClient, Long contractId) {
             this.lineNo = lineNo;
@@ -84,6 +108,17 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
             this.resultDescription = resultDescription;
             this.idOfClient = idOfClient;
             this.contractId = contractId;
+            this.involvedClients = new ArrayList<>();
+        }
+
+        public LineResult(long lineNo, int resultCode, String resultDescription, String fio, Long idOfClient, List<Long> involvedClients) {
+            this.lineNo = lineNo;
+            this.resultCode = resultCode;
+            this.resultDescription = resultDescription;
+            this.idOfClient = idOfClient;
+            this.contractId = null;
+            this.fio = fio;
+            this.involvedClients = involvedClients;
         }
 
         public long getLineNo() {
@@ -104,6 +139,18 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
         public Long getContractId() {
             return contractId;
+        }
+
+        public String getFio() {
+            return fio;
+        }
+
+        public void setFio(String fio) {
+            this.fio = fio;
+        }
+
+        public List<Long> getInvolvedClients() {
+            return involvedClients;
         }
     }
 
@@ -157,6 +204,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
     }
 
     private List<LineResult> lineResults = Collections.emptyList();
+    private List<LineResult> lineGroupsResults = Collections.emptyList();
     private int successLineNumber;
     private OrgItem org = new OrgItem();
 
@@ -239,12 +287,21 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         return lineResults.size();
     }
 
+    public int getLineGroupsResultSize() {
+        return lineGroupsResults.size();
+    }
+
     public int getSuccessLineNumber() {
         return successLineNumber;
     }
 
     public void uploadGroupChange(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
+        errorTextGroups = "";
+        if (org.getIdOfOrg() == null) {
+            errorTextGroups = "Выберите организацию";
+            return;
+        }
         UploadItem item = event.getUploadItem();
         InputStream inputStream = null;
         long dataSize = 0;
@@ -261,12 +318,12 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
             updateGroupChanges(inputStream, dataSize);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
-            setErrorText("");
+            setErrorTextGroups("");
         } catch (Exception e) {
             logger.error("Failed to update clients from file", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при загрузке/регистрации данных по клиентам: " + e.getMessage(), null));
-            setErrorText(e.getMessage());
+            setErrorTextGroups(e.getMessage());
         } finally {
             if (null != inputStream) {
                 try {
@@ -279,7 +336,124 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
     }
 
     private void updateGroupChanges(InputStream inputStream, long dataSize) throws Exception {
+        lineGroupsResults.clear();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "Windows-1251"));
+        String currLine = reader.readLine();
 
+        int lineNo = 1;
+        int successLineNumber = 0;
+        List<LineResult> lineResults = new ArrayList<LineResult>();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Org orga = DAOService.getInstance().findOrgById(org.getIdOfOrg());
+            while (null != currLine) {
+                LineResult result = updateClientGroup(session, currLine, lineNo, orga);
+                if (result.getResultCode() == 0) {
+                    ++successLineNumber;
+                }
+                lineResults.add(result);
+                currLine = reader.readLine();
+                ++lineNo;
+            }
+
+            this.successLineNumber = successLineNumber;
+
+            List<LineResult> lineResults2 = moveToLeaving(session, orga, lineResults);
+            lineResults.addAll(lineResults2);
+            lineGroupsResults = lineResults;
+
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+
+    }
+
+    private List<LineResult> moveToLeaving(Session session, Org org, List<LineResult> lineResults) throws Exception {
+        List<Long> ids = new ArrayList<>();
+        for (LineResult lineResult : lineResults) {
+            if (lineResult.getInvolvedClients() == null) continue;
+            for (Long id : lineResult.getInvolvedClients()) {
+                ids.add(id);
+            }
+        }
+        List<LineResult> result = new ArrayList<>();
+        List<Client> clients = ClientManager.getStudentsByOrg(session, org);
+        Long nextClientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        for (Client client : clients) {
+            if (clientProcessed(client, ids)) continue;
+            ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+            if (clientGroup == null) {
+                clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+            }
+
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
+                    clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+            client.setClientGroup(clientGroup);
+            client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+
+            client.setClientRegistryVersion(nextClientRegistryVersion);
+            session.update(client);
+            result.add(new LineResult(-1L, 3, "Переведен в выбывшие", client.getPerson().getFullName(), client.getIdOfClient(), null));
+        }
+        return result;
+    }
+
+    private boolean clientProcessed(Client client, List<Long> clientIds) {
+        for (Long idOfClient : clientIds) {
+            if (idOfClient.equals(client.getIdOfClient())) return true;
+        }
+        return false;
+    }
+
+    private LineResult updateClientGroup(Session session, String line, int lineNo, Org orga) throws Exception {
+        String[] tokens = line.split(";");
+        if (tokens.length != 4 && tokens.length != 5) throw new Exception("Неправильная структура файла. Ошибка в строке " + lineNo);
+        try {
+            String surname = tokens[0];
+            String firstname = tokens[1];
+            String secondname = tokens[2];
+            String groupName = tokens[3];
+            if (tokens.length == 5) groupName += tokens[4];
+            String fio = surname + " " + firstname + " " + secondname;
+
+            List<Long> idOfClientList = ClientManager.findClientByFullName(session, orga, surname, firstname, secondname, true);
+            if (idOfClientList.isEmpty()) return new LineResult(lineNo, -1, "Клиент не найден", fio, null, null);
+            if (idOfClientList.size()> 1) {
+                return new LineResult(lineNo, -2, "По ФИО найдено более одного клиента", fio, -2L, idOfClientList);
+            }
+            Long idOfClient = idOfClientList.get(0);
+            Client client = DAOUtils.findClient(session, idOfClient);
+            if (client.getClientGroup() != null && client.getClientGroup().getGroupName().equals(groupName)) {
+                return new LineResult(lineNo, 0, "Группа не менялась", fio, client.getIdOfClient(), idOfClientList);
+            }
+
+            ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, orga.getIdOfOrg(), groupName);
+            if (clientGroup == null) {
+                clientGroup = DAOUtils.createClientGroup(session, orga.getIdOfOrg(), groupName);
+            }
+
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
+                    clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+            client.setClientGroup(clientGroup);
+            client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            Long nextClientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+            client.setClientRegistryVersion(nextClientRegistryVersion);
+            session.update(client);
+            return new LineResult(lineNo, 0, "Ok", fio, client.getIdOfClient(), idOfClientList);
+        } catch (Exception e) {
+            return new LineResult(lineNo, 1, e.getMessage(), null, null, null);
+        }
     }
 
     public void fill(Session persistenceSession) throws Exception {
