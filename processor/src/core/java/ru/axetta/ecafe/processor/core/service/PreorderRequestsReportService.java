@@ -186,7 +186,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                                     long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
                                     if (balanceOnDate < 0L) {
                                         deletePreorderForNotEnoughMoney(session, item);
-                                        logger.info("Delete preorder for not enough money " + item.toString());
+                                        logger.info("Delete preorder for not enough money " + item.toString() + " balance=" + balanceOnDate);
                                         continue;
                                     }
                                     String guid = createRequestFromPreorder2(session, item, fireTime, number, staff);
@@ -357,6 +357,9 @@ public class PreorderRequestsReportService extends RecoverableService {
             }
             long balance = map.get(item.getPreorderDate()) == null ? getActualBalance(map) : map.get(item.getPreorderDate());
             map.put(item.getPreorderDate(), balance - item.getComplexPrice() + item.getUsedSum());
+            logger.info("idOfClient=" + item.getIdOfClient() + " date=" + CalendarUtils.dateToString(item.getPreorderDate()) +
+                         " balance=" + balance + " preorderSum=" + item.getComplexPrice() + " usedSum=" + item.getUsedSum() + " new_balance=" + (
+                        balance - item.getComplexPrice() + item.getUsedSum()));
             result.put(item.getIdOfClient(), map);
         }
         return result;
