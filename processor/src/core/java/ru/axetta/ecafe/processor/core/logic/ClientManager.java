@@ -2241,8 +2241,14 @@ public class ClientManager {
         }
     }
 
-    public static void createClientGroupMigrationHistory(Session session, Client client, Org org, Long idOfClientGroup,
+    public static void createClientGroupMigrationHistoryLite(Session session, Client client, Org org, Long idOfClientGroup,
             String clientGroupName, String comment) {
+        createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
+                clientGroupName, comment, false);
+    }
+
+    public static void createClientGroupMigrationHistoryFull(Session session, Client client, Org org, Long idOfClientGroup,
+            String clientGroupName, String comment, boolean full) {
         ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
         if (client.getClientGroup() != null) {
             clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -2253,8 +2259,16 @@ public class ClientManager {
         clientGroupMigrationHistory.setComment(comment);
 
         session.save(clientGroupMigrationHistory);
-        disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
-        archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+        if (full) {
+            disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+            archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+        }
+    }
+
+    public static void createClientGroupMigrationHistory(Session session, Client client, Org org, Long idOfClientGroup,
+            String clientGroupName, String comment) {
+        createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
+                clientGroupName, comment, true);
     }
 
     public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {

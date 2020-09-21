@@ -395,7 +395,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
                 clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
             }
 
-            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
+            ClientManager.createClientGroupMigrationHistoryLite(session, client, client.getOrg(),
                     clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
             client.setClientGroup(clientGroup);
