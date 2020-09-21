@@ -186,7 +186,8 @@ public class PreorderRequestsReportService extends RecoverableService {
                                     long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
                                     if (balanceOnDate < 0L) {
                                         deletePreorderForNotEnoughMoney(session, item);
-                                        logger.info("Delete preorder for not enough money " + item.toString() + " balance=" + balanceOnDate);
+                                        logger.info("Delete preorder for not enough money " + item.toString() + " balance=" + balanceOnDate
+                                                + "dateWork=" + CalendarUtils.dateToString(dateWork));
                                         continue;
                                     }
                                     String guid = createRequestFromPreorder2(session, item, fireTime, number, staff);
