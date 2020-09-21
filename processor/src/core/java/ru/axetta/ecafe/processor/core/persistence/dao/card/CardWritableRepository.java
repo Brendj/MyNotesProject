@@ -291,6 +291,26 @@ public class CardWritableRepository extends WritableJpaDao {
                 .executeUpdate();
     }
 
+    public int reset(long cardNo, long idOfOrg, String reason) {
+        return entityManager.createQuery("update Card set "
+                + " client = null, "
+                + " state = :state, "
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime, "
+                + " validTime = :validTime, "
+                + " lockReason = :reason "
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
+                .setParameter("state", CardState.FREE.getValue())
+                .setParameter("validTime", new Date())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .setParameter("reason", reason)
+                .executeUpdate();
+    }
+
     public int reset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
         if (!isOldArm) return reset(cardNo, idOfOrg);
         String condition = (idOfClient == null) ? " and org.idOfOrg in :idOfOrgs" : " and client.idOfClient = :idOfClient";
