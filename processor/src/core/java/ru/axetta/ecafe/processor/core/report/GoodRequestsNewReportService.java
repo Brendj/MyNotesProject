@@ -134,12 +134,12 @@ public class GoodRequestsNewReportService {
                            // + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient " //
                             + "INNER JOIN cf_complexinfo ci ON pc.idoforgoncreate = ci.idoforg AND ci.menudate = pc.preorderdate " //
                             + "   AND ci.idofcomplex = pc.armcomplexid "
-                            + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
-                            + "LEFT JOIN cf_menu m ON ci.idoforg = m.idoforg AND pmd.preorderdate = m.menudate " //
-                            + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-                            + "LEFT JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
-                            + "LEFT JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
-                            + "WHERE ci.idOfOrg IN (:orgList) AND ci.menuDate BETWEEN :startDate AND :endDate "
+                            + "inner JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
+                            + "inner JOIN cf_menu m ON ci.idoforg = m.idoforg AND pmd.preorderdate = m.menudate " //
+                            + "inner JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
+                            + "inner JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
+                            + "inner JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
+                            + "WHERE m.idOfOrg IN (:orgList) AND m.menuDate BETWEEN :startDate AND :endDate "
                             + "   AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)";
             //and pc.deletedState = 0 and pmd.deletedState = 0";
 
