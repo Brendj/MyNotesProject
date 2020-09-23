@@ -79,7 +79,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("requestType"), "requestType");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
         criteria.setProjection(projectionList);
-        criteria.add(Property.forName("doneDate").ge(validDate));
+        //criteria.add(Property.forName("doneDate").ge(validDate));
     }
 
     @Override
