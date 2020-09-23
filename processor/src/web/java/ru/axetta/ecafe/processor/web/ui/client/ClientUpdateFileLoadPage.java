@@ -335,10 +335,31 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         }
     }
 
+    private String getInWindows1251OrUTF8(String value) throws Exception {
+        if (value == null) return null;
+        String result = convert(value, charset(value, new String[]{"Windows-1251", "UTF-8"}), "UTF-8");
+        return result.replace(new StringBuilder("").append(Character.toChars(65533)).append(Character.toChars(63)).toString(), "И"); //распознаем букву И
+    }
+
+    private String convert(String value, String fromEncoding, String toEncoding) throws Exception {
+        return new String(value.getBytes(fromEncoding), toEncoding);
+    }
+
+    public String charset(String value, String charsets[]) throws Exception {
+        String probe = "UTF-8";
+        for (String c : charsets) {
+            String str = convert(value, c, probe).replace(new StringBuilder("").append(Character.toChars(65533)).append(Character.toChars(63)).toString(), "И"); //распознаем букву И;
+            if(value.equals(convert(str, probe, c))) {
+                return c;
+            }
+        }
+        throw new Exception("Не удается определить кодировку файла");
+    }
+
     private void updateGroupChanges(InputStream inputStream, long dataSize) throws Exception {
         lineGroupsResults.clear();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "Windows-1251"));
-        String currLine = reader.readLine();
+        String currLine = getInWindows1251OrUTF8(reader.readLine());
 
         int lineNo = 1;
         int successLineNumber = 0;
@@ -356,7 +377,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
                     ++successLineNumber;
                 }
                 lineResults.add(result);
-                currLine = reader.readLine();
+                currLine = getInWindows1251OrUTF8(reader.readLine());
                 ++lineNo;
             }
 
@@ -369,7 +390,8 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
-
+            logger.error("Error in ClientUpdateFileLoadPage: ", e);
+            throw e;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
