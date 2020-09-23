@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest;
 
 import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 
 public class MockService implements MeshCardService {
@@ -24,21 +23,16 @@ public class MockService implements MeshCardService {
 
     @Override
     public MeshClientCardRef updateCardForClient(MeshClientCardRef ref) {
-        return ref;
+        return ref; // unsupported operation
     }
 
     @Override
-    public void deleteReferenceBetweenClientAndCard(Client client, Card card) {
-        // unsupported operation
+    public MeshClientCardRef deleteReferenceBetweenClientAndCard(MeshClientCardRef ref) {
+        return ref; // unsupported operation
     }
 
     @Override
     public MeshClientCardRef createReferenceBetweenClientAndCard(Card card) {
-        return null;
-    }
-
-    @Override
-    public void changeCardOwner(Client clientFrom, Client clientTo, Card card) {
-        // unsupported operation
+        return null; // unsupported operation
     }
 }

@@ -87,13 +87,21 @@ public class MeshCardNotifyTaskExecutor {
 
     private void processCreatedCard(Date lastProcessing) throws Exception {
         Session session = null;
-        try{
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
             List<Card> createdCards = DAOUtils.getCreatedCardForMESH(session, lastProcessing);
             for(Card c : createdCards){
-                meshClientCardRefService.createRef(c);
+                MeshClientCardRef ref = meshClientCardRefService.createRef(c);
+                session.save(ref);
             }
+
+            transaction.commit();
+            transaction = null;
         } finally {
+            HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
         }
     }
@@ -120,9 +128,47 @@ public class MeshCardNotifyTaskExecutor {
     }
 
     private void processBlockedCard(Date lastProcessing) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<MeshClientCardRef> blockedCards = DAOUtils.getBlockedCardForMesh(session, lastProcessing);
+            for(MeshClientCardRef ref : blockedCards){
+                ref = meshClientCardRefService.deleteRef(ref);
+                session.update(ref);
+            }
+
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
     }
 
     private void processCardWithChangedOwner(Date lastProcessing) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
 
+            List<MeshClientCardRef> cardsWithNewOwner = DAOUtils.getCardWithChangedOwner(session, lastProcessing);
+            for(MeshClientCardRef ref : cardsWithNewOwner){
+                ref = meshClientCardRefService.deleteRef(ref);
+                session.update(ref);
+
+                MeshClientCardRef newRef = meshClientCardRefService.createRef(ref.getCard());
+                session.save(newRef);
+            }
+
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
     }
 }

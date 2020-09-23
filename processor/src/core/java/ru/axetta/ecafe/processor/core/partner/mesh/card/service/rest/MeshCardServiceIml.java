@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Parameter;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -65,6 +64,7 @@ public class MeshCardServiceIml implements MeshCardService {
     public MeshClientCardRef updateCardForClient(MeshClientCardRef ref) {
         Category category = buildCategory(ref.getCard().getClient().getMeshGUID(), ref.getCard());
         category.setId(ref.getIdOfRefInExternalSystem());
+        ref.setLastUpdate(new Date());
         try {
             String json = ob.writeValueAsString(category);
             meshRestClient.executeUpdateCategory(ref.getClient().getMeshGUID(), ref.getIdOfRefInExternalSystem(), json);
@@ -79,11 +79,19 @@ public class MeshCardServiceIml implements MeshCardService {
     }
 
     @Override
-    public void deleteReferenceBetweenClientAndCard(Client client, Card card) {
-    }
-
-    @Override
-    public void changeCardOwner(Client clientFrom, Client clientTo, Card card) {
+    public MeshClientCardRef deleteReferenceBetweenClientAndCard(MeshClientCardRef ref) {
+        ref.setLastUpdate(new Date());
+        try {
+            meshRestClient.executeDeleteCategory(ref.getClient().getMeshGUID(), ref.getIdOfRefInExternalSystem());
+            ref.setSend(true);
+            ref.setDeleteState(true);
+        } catch (Exception e){
+            ref.setSend(false);
+            log.error("Exception, when send DELETE-request", e);
+        } finally {
+            ref.setLastUpdate(new Date());
+        }
+        return ref;
     }
 
     private String getServiceAddress() throws Exception{

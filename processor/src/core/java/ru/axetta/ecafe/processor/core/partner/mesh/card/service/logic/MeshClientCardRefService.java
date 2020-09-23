@@ -10,10 +10,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardSer
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MockService;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,29 +35,28 @@ public class MeshClientCardRefService {
         }
     }
 
-    public void createRef(Card c) {
-        Session session = null;
-        Transaction transaction = null;
+    public MeshClientCardRef createRef(Card c) {
+        MeshClientCardRef ref = null;
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            MeshClientCardRef ref = meshCardService.createReferenceBetweenClientAndCard(c);
-            session.save(ref);
-
-            transaction.commit();
-            transaction = null;
+            ref = meshCardService.createReferenceBetweenClientAndCard(c);
         } catch (Exception e){
             log.error("Can't create Ref", e);
-        } finally {
-            HibernateUtils.rollback(transaction, log);
-            HibernateUtils.close(session, log);
         }
+        return ref;
     }
 
     public MeshClientCardRef updateRef(MeshClientCardRef ref) {
         try {
             return meshCardService.updateCardForClient(ref);
+        } catch (Exception e){
+            log.error("Can't create Ref", e);
+            return ref;
+        }
+    }
+
+    public MeshClientCardRef deleteRef(MeshClientCardRef ref) {
+        try {
+            return meshCardService.deleteReferenceBetweenClientAndCard(ref);
         } catch (Exception e){
             log.error("Can't create Ref", e);
             return ref;

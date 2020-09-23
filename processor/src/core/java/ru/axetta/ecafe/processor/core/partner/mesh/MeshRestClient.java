@@ -4,10 +4,7 @@ import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.slf4j.Logger;
@@ -115,6 +112,22 @@ public class MeshRestClient {
                 "UTF-8");
         httpMethod.setRequestEntity(requestEntity);
 
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            if (statusCode != HttpStatus.SC_OK) {
+                throw new Exception("Mesh request has status " + statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
+    }
+
+    public void executeDeleteCategory(String meshGUID, Integer idOfRefInExternalSystem) throws Exception {
+        URL url = new URL(getServiceAddress() + "/persons/" + meshGUID + "/category/" + idOfRefInExternalSystem);
+        logger.info("Execute request to MESH REST: " + url);
+        DeleteMethod httpMethod = new DeleteMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
         try {
             HttpClient httpClient = getHttpClient(url);
             int statusCode = httpClient.executeMethod(httpMethod);

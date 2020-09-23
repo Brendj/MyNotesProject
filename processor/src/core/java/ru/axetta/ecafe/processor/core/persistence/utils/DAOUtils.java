@@ -5281,14 +5281,50 @@ public class DAOUtils {
                 CardState.ISSUED.getValue(),
                 CardState.TEMPISSUED.getValue()
         );
-        Criteria criteria = session.createCriteria(MeshClientCardRef.class);
-        criteria.createAlias("client", "c")
-                .createAlias("card", "crd")
-                .add(Restrictions.and(
-                        Restrictions.eq("crd.updateTime", lastProcessing),
-                        Restrictions.in("crd.state", activeStates)
-                        )
-                );
-        return criteria.list();
+        Query query = session.createQuery("from MeshClientCardRef ref "
+                + "join fetch ref.client as refClient "
+                + "join fetch ref.card as crd "
+                + "join fetch crd.client as crdClient "
+                + "where crd.updateTime > :lastProc and crd.state in (:activeStates) and refClient = crdClient "
+                + "and ref.deleteState = false ");
+        query.setParameter("lastProc", lastProcessing);
+        query.setParameterList("activeStates", activeStates);
+
+        return query.list();
+    }
+
+    public static List<MeshClientCardRef> getBlockedCardForMesh(Session session, Date lastProcessing) {
+        List<Integer> blockedStates = Arrays.asList(
+                CardState.BLOCKED.getValue(),
+                CardState.TEMPBLOCKED.getValue()
+        );
+        Query query = session.createQuery("from MeshClientCardRef ref "
+                + "join fetch ref.client as refClient "
+                + "join fetch ref.card as crd "
+                + "join fetch crd.client as crdClient "
+                + "where crd.updateTime > :lastProc and crd.state in (:blockedStates) and refClient = crdClient "
+                + "and ref.deleteState = false ");
+        query.setParameter("lastProc", lastProcessing);
+        query.setParameterList("blockedStates", blockedStates);
+
+        return query.list();
+    }
+
+    public static List<MeshClientCardRef> getCardWithChangedOwner(Session session, Date lastProcessing) {
+        List<Integer> activeStates = Arrays.asList(
+                CardState.FREE.getValue(),
+                CardState.ISSUED.getValue(),
+                CardState.TEMPISSUED.getValue()
+        );
+        Query query = session.createQuery("from MeshClientCardRef ref "
+                + "join fetch ref.client as refClient "
+                + "join fetch ref.card as crd "
+                + "join fetch crd.client as crdClient "
+                + "where crd.updateTime > :lastProc and crd.state in (:activeStates) and refClient != crdClient "
+                + "and ref.deleteState = false ");
+        query.setParameter("lastProc", lastProcessing);
+        query.setParameterList("activeStates", activeStates);
+
+        return query.list();
     }
 }
