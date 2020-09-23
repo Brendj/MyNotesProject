@@ -776,6 +776,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(ESZMigrantsUpdateService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(BenefitService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(MaintenanceService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(CardBlockUnblockService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(MeshCardNotifyTaskExecutor.class).scheduleSync();
             //
             if (!isTestRunning()) {

@@ -2569,6 +2569,15 @@ public class DAOService {
     }
 
     @Transactional
+    public String getLastCountBlocked() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_LAST_COUNT_CARD_BLOCK);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Transactional
     public String getDeletedLastedDateMenu() {
         try {
             return getOnlineOptionValue(Option.OPTION_LAST_DELATED_DATE_MENU);

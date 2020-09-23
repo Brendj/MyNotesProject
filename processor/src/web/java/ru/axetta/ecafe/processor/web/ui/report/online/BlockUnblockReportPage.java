@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.BlockUnblockCardReport;
+import ru.axetta.ecafe.processor.core.report.BlockUnblockItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
@@ -54,6 +55,7 @@ public class BlockUnblockReportPage extends OnlineReportPage {
     }
 
     private Boolean allFriendlyOrgs;
+    private List<BlockUnblockItem> items;
 
     public List<SelectItem> getStatusFilters() {
         List<SelectItem> filters = new ArrayList<SelectItem>();
@@ -71,16 +73,14 @@ public class BlockUnblockReportPage extends OnlineReportPage {
             return null;
         }
         BlockUnblockCardReport.Builder builder = new BlockUnblockCardReport.Builder(templateFilename);
-
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
         try {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 builder.setReportProperties(buildProperties());
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                items = builder.createDataSource(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {
@@ -91,28 +91,7 @@ public class BlockUnblockReportPage extends OnlineReportPage {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
         }
-
-        if (report != null) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                JRHtmlExporter exporter = new JRHtmlExporter();
-                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
-                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
-                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                exporter.exportReport();
-                htmlReport = os.toString("UTF-8");
-                os.close();
-            } catch (Exception e) {
-                printError("Ошибка при построении отчета: " + e.getMessage());
-                logger.error("Failed build report ", e);
-            }
-        }
-        return null;
+        return items;
     }
 
     public void generateXLS(ActionEvent event) {
@@ -215,5 +194,13 @@ public class BlockUnblockReportPage extends OnlineReportPage {
 
     public void setCardStatusFilter(String cardStatusFilter) {
         this.cardStatusFilter = cardStatusFilter;
+    }
+
+    public List<BlockUnblockItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<BlockUnblockItem> items) {
+        this.items = items;
     }
 }
