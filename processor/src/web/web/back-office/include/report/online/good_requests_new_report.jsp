@@ -48,6 +48,7 @@
                             value="#{mainPage.goodRequestsNewReportPage.contragentStringIdOfOrgList}"
                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                     <f:setPropertyActionListener value="Выбор организации - источника меню" target="#{mainPage.orgFilterPageName}" />
+                    <f:setPropertyActionListener value="true" target="#{mainPage.goodRequestsNewReportPage.changedData}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{mainPage.goodRequestsNewReportPage.contragentFilter}}" />
@@ -64,6 +65,7 @@
                     <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="#{mainPage.goodRequestsNewReportPage.getStringIdOfOrgList}"
                                                  target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                    <f:setPropertyActionListener value="true" target="#{mainPage.goodRequestsNewReportPage.changedData}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{mainPage.goodRequestsNewReportPage.filter}}" />
@@ -151,7 +153,8 @@
 
             <h:outputText escape="true" value="Типы заявок" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.goodRequestsNewReportPage.preorderType}"
-                             styleClass="output-text">
+                             styleClass="output-text" disabled="#{mainPage.goodRequestsNewReportPage.changedData and
+                             mainPage.goodRequestsNewReportPage.checkPreorders()}">
                 <f:converter converterId="preorderTypeConverter" />
                 <f:selectItems value="#{mainPage.goodRequestsNewReportPage.preorderTypeItems}" />
             </h:selectOneMenu>
