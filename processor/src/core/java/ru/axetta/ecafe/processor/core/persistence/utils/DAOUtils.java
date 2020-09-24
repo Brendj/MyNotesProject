@@ -2804,8 +2804,8 @@ public class DAOUtils {
         query.executeUpdate();
         //Очищаем список групп, привязанных к удаленной организации
         Query queryGroup = session.createSQLQuery(
-                "DELETE FROM cf_groupnames_to_orgs WHERE (idoforg=:idOfOrg and mainbuilding=:idOfOrg2) or "
-                        + " (idoforg=:idOfOrg2 and mainbuilding=:idOfOrg)");
+                "DELETE FROM cf_groupnames_to_orgs WHERE (idoforg=:idOfOrg and idofmainorg=:idOfOrg2) or "
+                        + " (idoforg=:idOfOrg2 and idofmainorg=:idOfOrg)");
         queryGroup.setParameter("idOfOrg", idOfOrg);
         queryGroup.setParameter("idOfOrg2", idOfOrg2);
         queryGroup.executeUpdate();
