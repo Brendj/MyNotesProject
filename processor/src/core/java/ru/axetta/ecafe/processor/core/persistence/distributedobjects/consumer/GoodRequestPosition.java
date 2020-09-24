@@ -96,7 +96,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("g.guid"), "guidOfG");
         projectionList.add(Projections.property("p.guid"), "guidOfP");
         criteria.setProjection(projectionList);
-        criteria.add((Restrictions.ge("gr.doneDate", validDate)));
+       //criteria.add((Restrictions.ge("gr.doneDate", validDate)));
     }
 
     @Override

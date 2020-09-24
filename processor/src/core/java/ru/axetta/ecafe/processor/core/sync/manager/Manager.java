@@ -805,6 +805,7 @@ public class Manager implements AbstractToElement {
                     distributedObject.setGlobalVersion(0L);
                     if ((DistributedObject)distributedObject instanceof GoodRequestPosition) {
                         ((GoodRequestPosition) ((DistributedObject) distributedObject)).setTotalCount(0L);
+                        ((GoodRequestPosition) ((DistributedObject) distributedObject)).setDailySampleCount(0L);
                     }
                     processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
@@ -873,6 +874,7 @@ public class Manager implements AbstractToElement {
                     distributedObject.setGlobalVersion(0L);
                     if ((DistributedObject)distributedObject instanceof GoodRequestPosition) {
                         ((GoodRequestPosition) ((DistributedObject) distributedObject)).setTotalCount(0L);
+                        ((GoodRequestPosition) ((DistributedObject) distributedObject)).setDailySampleCount(0L);
                     }
                     processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
