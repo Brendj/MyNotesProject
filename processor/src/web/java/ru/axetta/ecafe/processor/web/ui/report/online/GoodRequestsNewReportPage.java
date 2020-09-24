@@ -326,7 +326,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     }
 
     public boolean  checkPreorders() {
-        if (idOfContragentOrgList.size() > 0 || idOfOrgList.size() > 1) {
+        if (applyUserSettings || idOfContragentOrgList.size() > 0 || idOfOrgList.size() > 1) {
             preorderType = PreordersPresenceTypeEnum.WITHOUT_PREORDERS;
             return true;
         }

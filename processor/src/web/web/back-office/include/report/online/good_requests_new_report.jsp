@@ -73,7 +73,7 @@
             <h:outputText escape="true" value="Формировать по Списку организаций рассылки" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.applyUserSettings}"
                                      styleClass="output-text">
-                <a4j:support event="onclick" reRender="contragetFilter, orgFilter"
+                <a4j:support event="onclick" reRender="goodRequestsNewReportFilterPanelGrid"
                              actionListener="#{mainPage.goodRequestsNewReportPage.applyOfOrgList}" ajaxSingle="true" />
             </h:selectBooleanCheckbox>
             <%--Добавить варниг сообщ--%>
@@ -153,8 +153,8 @@
 
             <h:outputText escape="true" value="Типы заявок" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.goodRequestsNewReportPage.preorderType}"
-                             styleClass="output-text" disabled="#{mainPage.goodRequestsNewReportPage.changedData and
-                             mainPage.goodRequestsNewReportPage.checkPreorders()}">
+                             styleClass="output-text" disabled="#{(mainPage.goodRequestsNewReportPage.checkPreorders() and
+                             mainPage.goodRequestsNewReportPage.changedData) or mainPage.goodRequestsNewReportPage.applyUserSettings}">
                 <f:converter converterId="preorderTypeConverter" />
                 <f:selectItems value="#{mainPage.goodRequestsNewReportPage.preorderTypeItems}" />
             </h:selectOneMenu>
