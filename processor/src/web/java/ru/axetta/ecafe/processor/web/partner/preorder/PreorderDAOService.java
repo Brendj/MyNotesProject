@@ -650,6 +650,10 @@ public class PreorderDAOService {
         return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(wtDish);
     }
 
+    public List<WtMenuGroup> getWtMenuGroupByWtDish(WtDish wtDish) {
+        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getWtMenuGroupByWtDish(wtDish);
+    }
+
     public String getMenuGroupByWtDish(WtDish wtDish) {
         StringBuilder sb = new StringBuilder();
         List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDish);

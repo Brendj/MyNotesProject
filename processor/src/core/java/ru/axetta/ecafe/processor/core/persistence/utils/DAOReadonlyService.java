@@ -1080,6 +1080,13 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<WtMenuGroup> getWtMenuGroupByWtDish(WtDish wtDish) {
+        return entityManager.createQuery("select mg from WtMenuGroup mg "
+                + "left join fetch mg.menuGroupMenus mgm where :dish in elements (mgm.dishes)")
+                .setParameter("dish", wtDish)
+                .getResultList();
+    }
+
     public List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
         return entityManager.createQuery("select dish.categoryItems from WtDish dish where dish = :dish")
                 .setParameter("dish", wtDish)

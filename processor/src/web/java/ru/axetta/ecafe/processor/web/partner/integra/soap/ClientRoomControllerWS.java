@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -111,8 +111,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -2816,7 +2816,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
                 for (WtDish wtDish : wtDishSet) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
+                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
                     menuDateItemExt.getE().add(menuItemExt);
                 }
             }
@@ -3603,7 +3603,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishes != null && wtDishes.size() > 0) {
                 menuDateItemExt.setDate(toXmlDateTime(startDate));
                 for (WtDish wtDish : wtDishes) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
+                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
                     // Добавляем блокировки
                     if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
                         menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
@@ -7193,17 +7193,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
+                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, true);
                 menuItemExtList.add(menuItemExt);
             }
         }
         return menuItemExtList;
     }
 
-    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish) {
+    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish, boolean isGroupByCategory) {
         MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-        String menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getMenuGroupByWtDish(wtDish);
+        String menuGroup = "";
+        if (isGroupByCategory) {
+            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDish(wtDish);
+        } else {
+            List<WtMenuGroup> menuList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(wtDish);
+            if (menuList.size() > 0) {
+                menuGroup = menuList.get(0).getName();
+            }
+        }
         menuItemExt.setGroup(menuGroup);
         menuItemExt.setName(wtDish.getDishName());
         menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
