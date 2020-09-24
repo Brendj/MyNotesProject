@@ -71,7 +71,7 @@ public class CardBlockUnblockService {
 
     public void scheduleSync() throws Exception {
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
-                getProperty("ecafe.processor.card.blocked.cron", "0 0 * ? * *");
+                getProperty("ecafe.processor.card.blocked.cron", "0 10 3 ? * *");
         try {
             JobDetail jobDetailSync = new JobDetail(SYNC_BLOCKCARD, Scheduler.DEFAULT_GROUP, SyncBlockOld.class);
             SchedulerFactory sfb = new StdSchedulerFactory();
