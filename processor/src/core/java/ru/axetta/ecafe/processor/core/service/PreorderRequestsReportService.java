@@ -37,8 +37,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -72,6 +72,13 @@ public class PreorderRequestsReportService extends RecoverableService {
     public void recoveryRun() throws Exception {
         if (!isOn())
             return;
+        SchedulerFactory sfb = new StdSchedulerFactory();
+        Scheduler scheduler = sfb.getScheduler();
+        Trigger trigger = scheduler.getTrigger("PreorderRequestsReport", Scheduler.DEFAULT_GROUP);
+        if (trigger != null) {
+            Date date = trigger.getNextFireTime();
+            if (CalendarUtils.isDateToday(date) && date.after(new Date())) return;
+        }
 
         if (isFinishedToday())
             return;
