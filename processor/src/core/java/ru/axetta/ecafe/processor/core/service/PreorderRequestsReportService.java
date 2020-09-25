@@ -439,8 +439,8 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "pc.createddate, "                                                                           //1
                             + "pc.idofpreordercomplex, "                                                                   //2
                             + "pmd.idofpreordermenudetail, "                                                               //3
-                            + "   CASE WHEN (pc.amount = 0) THEN (case when md.idofgood is null then pmd.idofgood else md.idofgood end) ELSE ci.idofgood END AS idofgood, "           //4
-                            + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"                 //5
+                            + "   CASE WHEN (pc.amount = 0) THEN pmd.idofgood ELSE ci.idofgood END AS idofgood, "           //4
+                            + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount, "                 //5
                             + "   pc.preorderdate AS prDate, "                                                             //6
                             + "pc.complexprice, "                                                                          //7
                             + "pc.amount AS complexamount, "                                                               //8
@@ -456,44 +456,45 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                             + "INNER JOIN cf_complexinfo ci ON pc.idoforgoncreate = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
-                            + "LEFT JOIN cf_menu m ON pc.idoforgoncreate = m.idoforg AND pmd.preorderdate = m.menudate "
-                            + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
+                           // + "LEFT JOIN cf_menu m ON pc.idoforgoncreate = m.idoforg AND pmd.preorderdate = m.menudate "
+                           // + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
                             + "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
                             + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 "
                             + params.getNativeSQLCondition()
-                    + "UNION "
-                    + "SELECT pc.idoforgoncreate, "                                                                         //0
-                    + "pc.createddate, "                                                                                    //1
-                    + "pc.idofpreordercomplex, "                                                                            //2
-                    + "pmd.idofpreordermenudetail, "                                                                        //3
-                    + "pmd.idofgood, "                                                                                      //4
-                    + "CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount, "                            //5
-                    + "pc.preorderdate AS prDate, "                                                                         //6
-                    + "pc.complexprice, "                                                                                   //7
-                    + "pc.amount AS complexamount, "                                                                        //8
-                    + "pmd.menudetailprice, "                                                                               //9
-                    + "pmd.amount AS menudetailamount, "                                                                    //10
-                    + "c.balance, "                                                                                         //11
-                    + "c.idofclient, "                                                                                      //12
-                    + "c.idofclientgroup, "                                                                                 //13
-                    + "pc.usedsum, "                                                                                        //14
-                    + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end, "   //15
-                    + "pc.armcomplexid, "                                                                                   //16
-                    + "pmd.idofdish "                                                                                       //17
-                    + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
-                    + "LEFT JOIN cf_wt_complexes wc ON wc.idofcomplex = pc.armcomplexid AND wc.deletestate = 0 "
-                    + "AND pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wc.begindate) * 1000) AND (EXTRACT(EPOCH FROM wc.enddate) * 1000) "
-                    + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
-                    + "LEFT JOIN cf_wt_dishes wd ON wd.idofdish = pmd.idofdish AND wd.deletestate = 0 "
-                    + "AND (pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wd.dateOfBeginMenuIncluding) * 1000) AND (EXTRACT(EPOCH FROM wd.dateOfEndMenuIncluding) * 1000) "
-                    + "OR (wd.dateOfBeginMenuIncluding IS NULL AND (EXTRACT(EPOCH FROM wd.dateOfEndMenuIncluding) * 1000) >= pc.preorderdate) "
-                    + "OR ((EXTRACT(EPOCH FROM wd.dateOfBeginMenuIncluding) * 1000) <= pc.preorderdate AND wd.dateOfEndMenuIncluding IS NULL) "
-                    + "OR (wd.dateOfBeginMenuIncluding IS NULL AND wd.dateOfEndMenuIncluding IS NULL)) "
-                    + "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
-                    + "AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 "
-                    + "AND (wc.idofcomplex is not null or wd.idofdish is not null)"
-                    + params.getNativeSQLCondition()
                     + "order by prDate ";
+                    //+ "UNION "
+                    //+ "SELECT pc.idoforgoncreate, "                                                                         //0
+                    //+ "pc.createddate, "                                                                                    //1
+                    //+ "pc.idofpreordercomplex, "                                                                            //2
+                    //+ "pmd.idofpreordermenudetail, "                                                                        //3
+                    //+ "pmd.idofgood, "                                                                                      //4
+                    //+ "CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount, "                            //5
+                    //+ "pc.preorderdate AS prDate, "                                                                         //6
+                    //+ "pc.complexprice, "                                                                                   //7
+                    //+ "pc.amount AS complexamount, "                                                                        //8
+                    //+ "pmd.menudetailprice, "                                                                               //9
+                    //+ "pmd.amount AS menudetailamount, "                                                                    //10
+                    //+ "c.balance, "                                                                                         //11
+                    //+ "c.idofclient, "                                                                                      //12
+                    //+ "c.idofclientgroup, "                                                                                 //13
+                    //+ "pc.usedsum, "                                                                                        //14
+                    //+ "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end, "   //15
+                    //+ "pc.armcomplexid, "                                                                                   //16
+                    //+ "pmd.idofdish "                                                                                       //17
+                    //+ "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+                    //+ "LEFT JOIN cf_wt_complexes wc ON wc.idofcomplex = pc.armcomplexid AND wc.deletestate = 0 "
+                    //+ "AND pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wc.begindate) * 1000) AND (EXTRACT(EPOCH FROM wc.enddate) * 1000) "
+                    //+ "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
+                    //+ "LEFT JOIN cf_wt_dishes wd ON wd.idofdish = pmd.idofdish AND wd.deletestate = 0 "
+                    //+ "AND (pc.preorderdate BETWEEN (EXTRACT(EPOCH FROM wd.dateOfBeginMenuIncluding) * 1000) AND (EXTRACT(EPOCH FROM wd.dateOfEndMenuIncluding) * 1000) "
+                    //+ "OR (wd.dateOfBeginMenuIncluding IS NULL AND (EXTRACT(EPOCH FROM wd.dateOfEndMenuIncluding) * 1000) >= pc.preorderdate) "
+                    //+ "OR ((EXTRACT(EPOCH FROM wd.dateOfBeginMenuIncluding) * 1000) <= pc.preorderdate AND wd.dateOfEndMenuIncluding IS NULL) "
+                    //+ "OR (wd.dateOfBeginMenuIncluding IS NULL AND wd.dateOfEndMenuIncluding IS NULL)) "
+                    //+ "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
+                    //+ "AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 "
+                    //+ "AND (wc.idofcomplex is not null or wd.idofdish is not null)"
+                    //+ params.getNativeSQLCondition()
+                    //+ "order by prDate ";
 
             Query query = session.createSQLQuery(sqlQuery);
             query.setParameter("date", CalendarUtils.startOfDayInUTC(dateFrom).getTime());
