@@ -1902,6 +1902,13 @@ public class PreorderDAOService {
         em.merge(preorderComplex);
     }
 
+    private boolean isActualPreorderMenuDetailExists(PreorderComplex preorderComplex) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (!pmd.getDeletedState()) return true;
+        }
+       return false;
+    }
+
     @Transactional
     public List<RegularPreorder> getRegularPreorders(PreorderRequestsReportServiceParam params) {
         Query query = em.createQuery("select r from RegularPreorder r join fetch r.client c "
