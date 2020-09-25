@@ -7204,7 +7204,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
         String menuGroup = "";
         if (isGroupByCategory) {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDish(wtDish);
+            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
         } else {
             menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(wtDish);
         }
