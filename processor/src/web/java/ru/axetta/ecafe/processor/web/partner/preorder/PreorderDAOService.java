@@ -1653,7 +1653,7 @@ public class PreorderDAOService {
             if ((!isWtMenu && complexInfo == null) || (isWtMenu && wtComplex == null)){
                 if (preorderComplex != null && !preorderComplex.getDeletedState()) {
                     //предзаказ есть, но комплекса нет - удаляем ранее сгенерированный предзаказ
-                    logger.info("Delete by complex not exists");
+                    logger.info("Deleting preorderComplex due to the complex does not exist");
                     deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED);
                 } else {
                     logger.info("Not generate by complex not exists");
@@ -1749,9 +1749,12 @@ public class PreorderDAOService {
                         wtDish = getWtDishByItemCodeAndId(complexItem, currentDate, regularPreorder.getIdOfDish());
                     }
                     if ((!isWtMenu && menuDetail == null) || (isWtMenu && wtDish == null)) {
-                        logger.info("Not found menu detail / wtDish");
-                        //не нашли блюдо из предзаказа - удаляем предзаказ
-                        deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED);
+                        if (isActualPreorderMenuDetailExists(preorderComplex)) {
+                            logger.info("Not found menu detail, another menu details exist");
+                        } else {
+                            logger.info("Not found menu detail, deleting preorderComplex");
+                            deletePreorderComplex(preorderComplex, nextVersion, PreorderState.DELETED); //не нашли блюдо из предзаказа - удаляем предзаказ
+                        }
                         currentDate = CalendarUtils.addDays(currentDate, 1);
                         continue;
                     }
