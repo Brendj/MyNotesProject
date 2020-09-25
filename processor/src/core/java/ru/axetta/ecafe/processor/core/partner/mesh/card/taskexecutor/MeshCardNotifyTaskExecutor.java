@@ -92,7 +92,8 @@ public class MeshCardNotifyTaskExecutor {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            List<Card> createdCards = DAOUtils.getCreatedCardForMESH(session, lastProcessing);
+            Date start = CalendarUtils.startOfDay(lastProcessing);
+            List<Card> createdCards = DAOUtils.getCreatedCardForMESH(session, start);
             for(Card c : createdCards){
                 MeshClientCardRef ref = meshClientCardRefService.createRef(c);
                 session.save(ref);
