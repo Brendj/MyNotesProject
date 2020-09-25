@@ -125,9 +125,6 @@ public class EzdController {
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
                 Date startedDate = currentDate;
                 String curGroupName = requestsEzdView.getGroupname();
-                if (curGroupName.equals("1-И")) {
-                    System.out.println("test");
-                }
                 Long curOrg = requestsEzdView.getIdoforg();
                 //Сколько дней пропустить
                 Integer countwait = allIdtoSetiings.get(curOrg);
@@ -156,9 +153,6 @@ public class EzdController {
             for (int i = 0; i < massCorrectDates.size(); i++) {
                 List<Date> dates = massCorrectDates.get((long) i);
                 RequestsEzdView requestsEzdView = requestsEzdViews.get(i);
-                if (requestsEzdView.getGroupname().equals("1-И")) {
-                    System.out.println("test");
-                }
                 Date startedDate = CalendarUtils.addOneDay(dates.get(0));
                 Integer countMax = countDayz;
                 //4.1
@@ -425,7 +419,6 @@ public class EzdController {
                 Integer countMax = countDayz;
                 //4.1
                 boolean flagend = false;
-                ////////////////////////////
                 boolean flag;
                 ProductionCalendar productionCalendarSaved = null;
                 boolean flag2;
@@ -492,7 +485,6 @@ public class EzdController {
                 } while (!flagend);
             }
             //Подготовка окончена, далее сбор самого меню
-            //////////////////////////////////////////////////////////
             List<RequestsEzdMenuView> allMenuForEZD = null;
             allMenuForEZD = DAOUtils.getAllMenuForEZD(persistenceSession, null);
             if (allMenuForEZD == null) {
@@ -710,78 +702,6 @@ public class EzdController {
                     }
                 }
             }
-            ////Хранится последние guid и орг при вычислении дат
-            //String curguidDATES = null;
-            //String curgroupNameDATES = null;
-            //
-            ////Здесь храниться массив возможных дат для текущей комбинации guid + орг
-            //List<Date> datesForThis = new ArrayList<>();
-            //
-
-            //
-
-            //
-
-            //
-            ////Для экономии памяти
-            //String thisOrgGuid;
-            //String thisGroupName;
-            //Long thisIdOfOrg;
-            //Date curDateDates;
-            //Integer countwait;
-            //boolean goodSub;
-            //boolean goodSpec;
-            //Date curDate;
-            //Integer currentCountSpecDate = 0;
-            //
-            ////Количество частей для загрузки
-            //Integer countParts = 10;
-            //try {
-            //    countParts = Integer
-            //            .valueOf(runtimeContext.getConfigProperties().getProperty("ecafe.processor.ezd.parts", "10"));
-            //    if (countParts == null) {
-            //        countParts = 10;
-            //    }
-            //} catch (Exception e) {
-            //    countParts = 10;
-            //}
-            //logger.info(String.format("Данные для ЭЖД будут загружены за %s обращения к БД", countParts.toString()));
-            //
-            //logger.info("Получаем общее количество школ");
-            //List<Org> idOfOrgs = DAOUtils.getAllOrgWithGuid(persistenceSession);
-            //logger.info(String.format("Общее колличество школ - %s", String.valueOf(idOfOrgs.size())));
-            //
-            //logger.info(
-            //        String.format("Максимальный размер памяти - %s", String.valueOf(Runtime.getRuntime().maxMemory())));
-            //Integer count = idOfOrgs.size();
-            //Integer sizeofPart = count / countParts;
-            //
-            //Integer realCountPart;
-            //if (count % countParts != 0) {
-            //    realCountPart = countParts + 1;
-            //} else {
-            //    realCountPart = countParts;
-            //}
-            //
-            ////Максимальное количество частей для загрузки
-            //Integer maxcountParts = 0;
-            //try {
-            //    maxcountParts = Integer
-            //            .valueOf(runtimeContext.getConfigProperties().getProperty("ecafe.processor.ezd.maxparts", "0"));
-            //    if (maxcountParts == null) {
-            //        maxcountParts = 0;
-            //    }
-            //} catch (Exception e) {
-            //    maxcountParts = 0;
-            //}
-            //if (maxcountParts != 0) {
-            //    logger.info(String.format("Будет загружено %s части из %s", maxcountParts.toString(), realCountPart));
-            //}
-            //
-            //for (int i = 0; i < realCountPart; i++) {
-            //    //см в отдельном документе
-            //}
-
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
