@@ -72,17 +72,24 @@ public class PreorderRequestsReportService extends RecoverableService {
     public void recoveryRun() throws Exception {
         if (!isOn())
             return;
+        logger.info("Start recoveryRun for generate preorder requests");
         SchedulerFactory sfb = new StdSchedulerFactory();
         Scheduler scheduler = sfb.getScheduler();
         Trigger trigger = scheduler.getTrigger("PreorderRequestsReport", Scheduler.DEFAULT_GROUP);
         if (trigger != null) {
             Date date = trigger.getNextFireTime();
-            if (CalendarUtils.isDateToday(date) && date.after(new Date())) return;
+            if (CalendarUtils.isDateToday(date) && date.after(new Date())) {
+                logger.info("Do not execute recoveryRun for generate preorder requests. Wrong run time");
+                return;
+            }
         }
 
-        if (isFinishedToday())
+        if (isFinishedToday()) {
+            logger.info("Do not execute recoveryRun for generate preorder requests. Success finish found");
             return;
+        }
 
+        logger.info("Start execute recoveryRun for generate preorder requests.");
         updateStatusFile(new Date(), Status.RUNNING);
         //runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
         runTask();
@@ -413,6 +420,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     }
 
     public void runTask(PreorderRequestsReportServiceParam params, String instance, String firstNode) throws Exception {
+        logger.info("Start runTask for gererate preorder requests");
         //проверки на актуальность предзаказов
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().relevancePreorders(params);
         //генерация предзаказов по регулярному правилу
@@ -423,6 +431,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         if (instance.equals(firstNode)) {
             RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().dailyCheckPreorders();
         }
+        logger.info("Finish runTask for gererate preorder requests");
     }
 
     public String checkIsExistFile() throws Exception {
