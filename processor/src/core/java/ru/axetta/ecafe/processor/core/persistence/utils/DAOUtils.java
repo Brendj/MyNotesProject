@@ -2254,7 +2254,13 @@ public class DAOUtils {
 
     private static PreorderMenuDetail getPreorderMenuDetailByItemCode(PreorderComplex preorderComplex, String itemCode) {
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
-            if (pmd.getItemCode().equals(itemCode)) {
+            if (pmd.getItemCode().equals(itemCode) && !pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        // если нет неудаленных - возвращаем удаленное блюдо
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getItemCode().equals(itemCode) && pmd.getDeletedState()) {
                 return pmd;
             }
         }
