@@ -2797,11 +2797,18 @@ public class DAOUtils {
         return list;
     }
 
-    public static int clearFriendlyOrgByOrg(Session session, Long idOfOrg) {
+    public static void clearFriendlyOrgByOrg(Session session, Long idOfOrg, Long idOfOrg2) {
         Query query = session.createSQLQuery(
                 "DELETE FROM cf_friendly_organization WHERE (currentorg=:idOfOrg or friendlyorg=:idOfOrg) and not (currentorg=friendlyorg)");
         query.setParameter("idOfOrg", idOfOrg);
-        return query.executeUpdate();
+        query.executeUpdate();
+        //Очищаем список групп, привязанных к удаленной организации
+        Query queryGroup = session.createSQLQuery(
+                "DELETE FROM cf_groupnames_to_orgs WHERE (idoforg=:idOfOrg and idofmainorg=:idOfOrg2) or "
+                        + " (idoforg=:idOfOrg2 and idofmainorg=:idOfOrg)");
+        queryGroup.setParameter("idOfOrg", idOfOrg);
+        queryGroup.setParameter("idOfOrg2", idOfOrg2);
+        queryGroup.executeUpdate();
     }
 
     public static HashSet<Org> findOrgById(Session session, List<Long> idOfOrgList) {

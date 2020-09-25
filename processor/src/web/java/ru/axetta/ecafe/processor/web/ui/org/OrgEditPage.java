@@ -307,7 +307,7 @@ public class OrgEditPage extends BasicWorkspacePage
             // Если убрали или внесли организацию в список дружественных, то обновляем версию
             friendlyOrg.removeAll(selectOrg);
             for (Org o: friendlyOrg){
-                int count = DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg());
+                DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg(), org.getIdOfOrg());
                 orgsForVersionUpdate.add(o);
             }
             for (Org o : selectOrg) {
