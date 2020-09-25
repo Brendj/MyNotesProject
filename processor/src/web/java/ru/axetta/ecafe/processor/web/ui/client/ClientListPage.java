@@ -25,7 +25,23 @@ import java.util.*;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
+public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, ClientGroupSelectPage.CompleteHandler {
+
+    public String getClientGroupName() {
+        return clientGroupName;
+    }
+
+    public void setClientGroupName(String clientGroupName) {
+        this.clientGroupName = clientGroupName;
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
+    }
 
     public static class OrgItem {
 
@@ -308,6 +324,8 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
     private List<Item> items = Collections.emptyList();
     private final ClientFilter clientFilter = new ClientFilter();
+    private String clientGroupName = "{}";
+    private Long idOfClientGroup;
     private Long limit = 0L;
     private Long expenditureLimit = 0L;
     private boolean notifyViaSMS = false;
@@ -363,7 +381,31 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if (idOfOrg != null) {
+            if (this.clientFilter.getOrg().getIdOfOrg() == null || this.clientFilter.getOrg().getIdOfOrg() != idOfOrg) {
+                this.idOfClientGroup = null;
+                this.clientGroupName = "";
+            }
+        } else {
+            if (this.clientFilter.getOrg().getIdOfOrg() != null) {
+                this.idOfClientGroup = null;
+                this.clientGroupName = "";
+            }
+        }
+
         this.clientFilter.completeOrgSelection(session, idOfOrg);
+    }
+
+    public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
+        if (null != idOfClientGroup) {
+            this.idOfClientGroup = idOfClientGroup;
+            this.clientGroupName = DAOUtils
+                    .findClientGroup(session, new CompositeIdOfClientGroup(this.clientFilter.getOrg().getIdOfOrg(), idOfClientGroup))
+                    .getGroupName();
+        } else {
+            this.idOfClientGroup = null;
+            this.clientGroupName = "";
+        }
     }
 
     public void fill(Session session) throws Exception {
@@ -433,6 +475,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         printMessage("Данные обновлены.");
     }
 
+    public boolean clientGroupSelected() {
+        return idOfClientGroup != null;
+    }
+
     public void setOrg(Session session) throws Exception{
         Org org = null;
         if (this.getClientFilter().getOrg().getIdOfOrg() != null) {
@@ -440,14 +486,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         if (!(this.items.isEmpty() || org==null)){
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
-            ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
-            if(clientGroup==null){
-                clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
-                if(clientGroup!=null){
-                    clientGroup.setGroupName(ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
-                }
-            }
-            if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
+            ClientGroup clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(session, org.getIdOfOrg(), idOfClientGroup);
             for (Item item : this.items) {
                 Client client =  DAOUtils.findClient(session,item.idOfClient);
                 ClientManager.checkUserOPFlag(session, client.getOrg(), org, clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), client);
