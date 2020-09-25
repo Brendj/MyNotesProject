@@ -371,6 +371,14 @@
             <redirect/>
         </navigation-case>
     </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientUpdateGroupsLoadResultCSVList</from-outcome>
+            <to-view-id>/back-office/client_update_groups_load_result_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
 
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>

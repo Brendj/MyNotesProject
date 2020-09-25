@@ -3492,6 +3492,10 @@ public class MainPage implements Serializable {
         return "showClientUpdateLoadResultCSVList";
     }
 
+    public String showClientUpdateGroupsLoadResultCSVList() {
+        return "showClientUpdateGroupsLoadResultCSVList";
+    }
+
     public String showCardLoadResultCSVList() {
         return "showCardLoadResultCSVList";
     }

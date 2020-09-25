@@ -600,6 +600,7 @@
             <url-pattern>/back-office/sale_csv_list.faces</url-pattern>
             <url-pattern>/back-office/client_load_result_csv_list.faces</url-pattern>
             <url-pattern>/back-office/client_update_load_result_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/client_update_groups_load_result_csv_list.faces</url-pattern>
             <url-pattern>/back-office/card_csv_list.faces</url-pattern>
             <url-pattern>/back-office/card_load_result_csv_list.faces</url-pattern>
             <url-pattern>/back-office/ccaccount_csv_list.faces</url-pattern>
