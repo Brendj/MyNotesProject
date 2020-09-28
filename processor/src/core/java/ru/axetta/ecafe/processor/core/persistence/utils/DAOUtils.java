@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2239,6 +2239,19 @@ public class DAOUtils {
                 }
             }
         }
+    }
+
+    public static PreorderComplex findPreorderComplexByPaymentOrder(Session session, Payment payment) {
+        Criteria criteria = session.createCriteria(PreorderLinkOD.class);
+        criteria.add(Restrictions.eq("idOfOrg", payment.getIdOfOrg()));
+        criteria.add(Restrictions.eq("idOfOrder", payment.getIdOfOrder()));
+        criteria.add(Restrictions.isNotNull("preorderGuid"));
+        List<PreorderLinkOD> list = criteria.list();
+        if (list.size() == 0) return null;
+        PreorderLinkOD preorderLinkOD = list.get(0);
+        Criteria criteria2 = session.createCriteria(PreorderComplex.class);
+        criteria2.add(Restrictions.eq("guid", preorderLinkOD.getPreorderGuid()));
+        return (PreorderComplex) criteria2.uniqueResult();
     }
 
     public static PreorderComplex findPreorderComplexByPayment(Session session, Payment payment) {
