@@ -87,7 +87,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "pc.complexName, cast(pl.qty as bigint) as amount, '' as dish, "
                     + "cast((pc.complexPrice * pl.qty) as bigint), co.createddate as cancelDate, "
                     + "case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
-                    + "ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
+                    + "ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid, "
+                    + "coalesce(pc.usedsum, 0) as usedsum "
                     + "from cf_preorder_complex pc "
                     + "join cf_clients c on pc.idofclient = c.idofclient "
                     + "join cf_orgs o on c.idOfOrg = o.idOfOrg "
@@ -105,7 +106,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " pc.complexName, cast(1 as bigint) as amount, array_to_string(array_agg(pmd.menudetailname), ', ') as dish, "
                     + " cast(sum(pmd.menudetailprice * pmd.amount) as bigint), co.createddate as cancelDate, "
                     + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
-                    + " ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
+                    + " ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid, "
+                    + "coalesce(sum(pmd.usedsum), 0) as usedsum "
                     + " from cf_preorder_menudetail pmd "
                     + " join cf_clients c on pmd.idofclient = c.idofclient "
                     + " join cf_orgs o on c.idOfOrg = o.idOfOrg  "
@@ -124,7 +126,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " o.shortNameInfoService, o.address, c.contractId, pc.preorderDate,"
                     + " pc.complexName, cast((pc.amount - coalesce(q.payed, 0)) as bigint) as amount, '' as dish, cast((pc.complexPrice * (pc.amount - coalesce(q.payed, 0))) as bigint) as complexPrice,"
                     + " cast(null as bigint) as createddate, 'Нет'  as reversed,"
-                    + " cast(null as bigint) as idOfOrder, cast(null as bigint) as orderSum, cast(null as bigint), 'Нет' as isPaid"
+                    + " cast(null as bigint) as idOfOrder, cast(null as bigint) as orderSum, cast(null as bigint), 'Нет' as isPaid, "
+                    + "coalesce(pc.usedsum, 0) as usedsum "
                     + " from cf_preorder_complex pc "
                     + " join cf_clients c on pc.idofclient = c.idofclient "
                     + " join cf_orgs o on c.idOfOrg = o.idOfOrg "
@@ -142,7 +145,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "o.shortNameInfoService, o.address, c.contractId, pc.preorderDate, "
                     + "pc.complexName, cast(1 as bigint) as amount, array_to_string(array_agg(pmd.menudetailname), ', ') as dish, "
                     + "cast(sum(pmd.menudetailprice * pmd.amount) as bigint) as complexPrice, cast(null as bigint) as cancelDate, 'Нет'  as reversed,"
-                    + "cast(null as bigint) as orderDate, cast(null as bigint) as orderSum, cast(null as bigint) as idOfOrder, 'Нет' as isPaid "
+                    + "cast(null as bigint) as orderDate, cast(null as bigint) as orderSum, cast(null as bigint) as idOfOrder, 'Нет' as isPaid, "
+                    + "coalesce(sum(pmd.usedsum), 0) as usedsum "
                     + "from cf_preorder_menudetail pmd "
                     + "join cf_clients c on pmd.idofclient = c.idofclient "
                     + "join cf_orgs o on c.idOfOrg = o.idOfOrg  "
@@ -195,9 +199,10 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                 Long orderSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[14]);
                 Long idOfOrder = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[15]);
                 String isPaid = (String) row[16];
+                Long usedSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[17]);
                 ContragentPreordersReportItem item = new ContragentPreordersReportItem(idOfContragent, contragentName,
                         idOfOrg, orgShortName, orgShortAddress, clientContractId, preorderDate, complexName, amount,
-                        dish, complexPrice, cancelDate, reversed, createdDate, orderSum, idOfOrder, isPaid);
+                        dish, complexPrice, cancelDate, reversed, createdDate, orderSum, idOfOrder, isPaid, usedSum);
                 result.add(item);
             }
             return new JRBeanCollectionDataSource(result);
