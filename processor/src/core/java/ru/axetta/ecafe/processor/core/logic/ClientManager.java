@@ -250,14 +250,25 @@ public class ClientManager {
         return findClientByFullName(persistenceSession, organization, surname, firstName, secondName);
     }
 
+    public static List<Client> getStudentsByOrg(Session session, Org organization) {
+        Query query = session.createQuery("select c from Client c where c.org = :org "
+                + "and (c.idOfClientGroup is null or c.idOfClientGroup < :group_employees or c.idOfClientGroup = :group_displaced)");
+        query.setParameter("org", organization);
+        query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        query.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        return query.list();
+    }
 
-    public static Long findClientByFullName(Session session, Org organization, String surname, String firstName,
-            String secondName) throws Exception {
+    public static List<Long> findClientByFullName(Session session, Org organization, String surname, String firstName,
+            String secondName, boolean onlyStudents) throws Exception {
         String q =
                 "select idOfClient from Client client where (client.org = :org) and (upper(client.person.surname) = :surname) and"
                         + "(upper(client.person.firstName) = :firstName)";
         if (StringUtils.isEmpty(secondName)) {
             q += " and (upper(client.person.secondName) = :secondName) ";
+        }
+        if (onlyStudents) {
+            q += " and (client.idOfClientGroup is null or (client.idOfClientGroup < :group_employees or client.idOfClientGroup = :group_displaced))";
         }
         org.hibernate.Query query = session.createQuery(q);
         query.setParameter("org", organization);
@@ -266,14 +277,23 @@ public class ClientManager {
         if (StringUtils.isEmpty(secondName)) {
             query.setParameter("secondName", StringUtils.upperCase(secondName));
         }
-        query.setMaxResults(2);
-        if (query.list().isEmpty()) {
+        if (onlyStudents) {
+            query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        }
+        return query.list();
+    }
+
+    public static Long findClientByFullName(Session session, Org organization, String surname, String firstName,
+            String secondName) throws Exception {
+        List<Long> list = findClientByFullName(session, organization, surname, firstName, secondName, false);
+        if (list.isEmpty()) {
             return null;
         }
-        if (query.list().size() == 2) {
+        if (list.size() > 1) {
             return -1L;
         }
-        return (Long) query.list().get(0);
+        return list.get(0);
     }
 
     public static long modifyClientTransactionFree(ClientFieldConfigForUpdate fieldConfig, Org org,
@@ -2221,8 +2241,14 @@ public class ClientManager {
         }
     }
 
-    public static void createClientGroupMigrationHistory(Session session, Client client, Org org, Long idOfClientGroup,
+    public static void createClientGroupMigrationHistoryLite(Session session, Client client, Org org, Long idOfClientGroup,
             String clientGroupName, String comment) {
+        createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
+                clientGroupName, comment, false);
+    }
+
+    public static void createClientGroupMigrationHistoryFull(Session session, Client client, Org org, Long idOfClientGroup,
+            String clientGroupName, String comment, boolean full) {
         ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
         if (client.getClientGroup() != null) {
             clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -2233,8 +2259,16 @@ public class ClientManager {
         clientGroupMigrationHistory.setComment(comment);
 
         session.save(clientGroupMigrationHistory);
-        disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
-        archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+        if (full) {
+            disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+            archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+        }
+    }
+
+    public static void createClientGroupMigrationHistory(Session session, Client client, Org org, Long idOfClientGroup,
+            String clientGroupName, String comment) {
+        createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
+                clientGroupName, comment, true);
     }
 
     public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
