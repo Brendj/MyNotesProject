@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPreorderReport" pageWidth="1044" pageHeight="10000" columnWidth="1004" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
 	<property name="ireport.zoom" value="1.8627639691774651"/>
-	<property name="ireport.x" value="596"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
@@ -85,6 +85,7 @@
 	<field name="isPaid" class="java.lang.String">
 		<fieldDescription><![CDATA[isPaid]]></fieldDescription>
 	</field>
+	<field name="usedSum" class="java.lang.Long"/>
 	<sortField name="idOfContragent"/>
 	<variable name="rowsCount" class="java.lang.Long" calculation="Count">
 		<variableExpression><![CDATA[Boolean.TRUE]]></variableExpression>
@@ -910,7 +911,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.format(Locale.US, "%.2f", new BigDecimal($F{complexPrice} / 100.0))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.format(Locale.US, "%,2f", new BigDecimal($F{complexPrice} / 100.0))]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="table" stretchType="RelativeToTallestObject" mode="Transparent" x="182" y="0" width="40" height="17" backcolor="#FFFFFF" uuid="a68f98ee-eacc-495f-9373-dea5a7bfa5f0">
@@ -968,7 +969,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8" isItalic="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{isPaid}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.format(Locale.US, "%,2f", new BigDecimal($F{usedSum} / 100.0))]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="480" y="0" width="54" height="17" uuid="04465fb2-ee56-4766-9ceb-afec57a87369">
