@@ -120,7 +120,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 and o.PreordersEnabled = 1"
                     + " and pmd.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
-                    + idOfContragentCondition + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17"
+                    + idOfContragentCondition + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18"
                     + " UNION "
                     + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                     + " o.shortNameInfoService, o.address, c.contractId, pc.preorderDate,"
@@ -139,7 +139,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " and pc.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
-                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17"
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18"
                     + "union "
                     + "select ctg.idOfContragent, ctg.contragentName, o.idOfOrg,"
                     + "o.shortNameInfoService, o.address, c.contractId, pc.preorderDate, "
@@ -159,7 +159,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " and pc.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
-                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17 )"
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18 )"
                     + " select * from contragent_preorders_table "
                     + simpleCondition
                     + " order by 1, 6 desc, 2, 3, 4 ";
