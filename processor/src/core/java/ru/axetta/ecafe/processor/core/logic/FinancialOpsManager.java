@@ -232,7 +232,7 @@ public class FinancialOpsManager {
                 session.save(od);
             }
 
-            PreorderComplex preorderComplex = DAOUtils.findPreorderComplexByPaymentOrder(session, payment);
+            PreorderComplex preorderComplex = DAOUtils.findPreorderComplexByPaymentOrder(session, order.getCompositeIdOfOrder().getIdOfOrg(), payment);
             if (preorderComplex != null) {
                 Query query = session.createQuery("update PreorderComplex set usedAmount = 0, usedSum = 0 where idOfPreorderComplex = :idOfPreorderComplex");
                 query.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());

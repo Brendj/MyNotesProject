@@ -2241,9 +2241,9 @@ public class DAOUtils {
         }
     }
 
-    public static PreorderComplex findPreorderComplexByPaymentOrder(Session session, Payment payment) {
+    public static PreorderComplex findPreorderComplexByPaymentOrder(Session session, Long idOfOrg, Payment payment) {
         Criteria criteria = session.createCriteria(PreorderLinkOD.class);
-        criteria.add(Restrictions.eq("idOfOrg", payment.getIdOfOrg()));
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("idOfOrder", payment.getIdOfOrder()));
         criteria.add(Restrictions.isNotNull("preorderGuid"));
         List<PreorderLinkOD> list = criteria.list();
