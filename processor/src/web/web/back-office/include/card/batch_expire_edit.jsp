@@ -8,6 +8,8 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditCards()) { out.println("Недостаточно прав для просмотра страницы"); return; } %>
+
 <%-- Панель группового изменения лимита овердрафта --%>
 <h:panelGrid id="cardExpireBatchEditGrid" binding="#{mainPage.cardExpireBatchEditPage.pageComponent}"
              styleClass="borderless-grid">
