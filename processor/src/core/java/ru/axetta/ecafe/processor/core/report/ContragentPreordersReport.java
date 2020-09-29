@@ -199,7 +199,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                 Long orderSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[14]);
                 Long idOfOrder = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[15]);
                 String isPaid = (String) row[16];
-                Long usedSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[17]);
+                Long usedSum = isPaid.equals("Нет") ? 0L : DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[17]);
                 ContragentPreordersReportItem item = new ContragentPreordersReportItem(idOfContragent, contragentName,
                         idOfOrg, orgShortName, orgShortAddress, clientContractId, preorderDate, complexName, amount,
                         dish, complexPrice, cancelDate, reversed, createdDate, orderSum, idOfOrder, isPaid, usedSum);
