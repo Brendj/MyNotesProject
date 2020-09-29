@@ -76,13 +76,13 @@
                                     <h:inputText value="#{mainPage.orgSelectPage.orgIdFromNsi}" size="48" maxlength="10"
                                                  styleClass="input-text">
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
-                                                     reRender="modalOrgSelectorOrgTable" />
+                                                     reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
                                     <h:outputText escape="true" value="ЕКИС Id: " styleClass="output-text" />
                                     <h:inputText value="#{mainPage.orgSelectPage.ekisId}" size="48" maxlength="10"
                                                  styleClass="input-text">
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
-                                                     reRender="modalOrgSelectorOrgTable" />
+                                                     reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
                                     <h:outputText escape="true" value="Округ: " styleClass="output-text" />
                                     <h:selectOneMenu id="regionsList" value="#{mainPage.orgListSelectPage.region}"
