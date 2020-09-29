@@ -44,6 +44,18 @@
                                 <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
                                              reRender="modalOrgSelectorOrgTable" />
                             </h:inputText>
+                            <h:outputText escape="true" value="ID в НСИ-3: " styleClass="output-text" />
+                            <h:inputText value="#{mainPage.orgSelectPage.orgIdFromNsi}" size="48" maxlength="10"
+                                         styleClass="input-text">
+                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                             reRender="modalOrgSelectorOrgTable" />
+                            </h:inputText>
+                            <h:outputText escape="true" value="ЕКИС Id: " styleClass="output-text" />
+                            <h:inputText value="#{mainPage.orgSelectPage.ekisId}" size="48" maxlength="10"
+                                         styleClass="input-text">
+                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                             reRender="modalOrgSelectorOrgTable" />
+                            </h:inputText>
                             <h:outputText escape="true" value="Фильтр по округу: " styleClass="output-text" />
                             <h:selectOneMenu id="regionsList" value="#{mainPage.orgSelectPage.region}"
                                              style="width:325px;"
