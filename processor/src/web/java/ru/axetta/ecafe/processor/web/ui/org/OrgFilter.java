@@ -35,8 +35,9 @@ public class OrgFilter {
     private String tag;
     private String city;
     private String district;
-    private String location;
     private String guid;
+    private Long ekisId;
+    private Long orgIdFromNsi;
 
 
     /**
@@ -85,11 +86,14 @@ public class OrgFilter {
         if (StringUtils.isNotEmpty(district)) {
             criteria.add(Restrictions.like("district", district, MatchMode.ANYWHERE).ignoreCase());
         }
-        if (StringUtils.isNotEmpty(location)) {
-            criteria.add(Restrictions.like("location", location, MatchMode.ANYWHERE).ignoreCase());
-        }
         if (StringUtils.isNotEmpty(guid)) {
             criteria.add(Restrictions.like("guid", guid, MatchMode.ANYWHERE).ignoreCase());
+        }
+        if(ekisId != null && ekisId.compareTo(Long.parseLong("-1")) > 0){
+            criteria.add(Restrictions.eq("ekisId",ekisId));
+        }
+        if(orgIdFromNsi != null && orgIdFromNsi.compareTo(Long.parseLong("-1")) > 0){
+            criteria.add(Restrictions.eq("orgIdFromNsi", orgIdFromNsi));
         }
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
@@ -136,6 +140,8 @@ public class OrgFilter {
         this.idOfOrg = null;
         this.tag = null;
         this.guid = null;
+        this.ekisId = null;
+        this.orgIdFromNsi = null;
     }
 
     public String getOfficialName() {
@@ -178,14 +184,6 @@ public class OrgFilter {
         this.district = district;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public Long getIdOfOrg() {
         return idOfOrg;
     }
@@ -198,4 +196,23 @@ public class OrgFilter {
         }
     }
 
+    public Long getEkisId() { return ekisId; }
+
+    public void setEkisId(Long ekisId) {
+        if (ekisId == null || ekisId == 0) {
+            this.ekisId = null;
+        } else {
+            this.ekisId = ekisId;
+        }
+    }
+
+    public Long getOrgIdFromNsi() { return orgIdFromNsi; }
+
+    public void setOrgIdFromNsi(Long orgIdFromNsi) {
+        if (orgIdFromNsi == null || orgIdFromNsi == 0) {
+            this.orgIdFromNsi = null;
+        } else {
+            this.orgIdFromNsi = orgIdFromNsi;
+        }
+    }
 }

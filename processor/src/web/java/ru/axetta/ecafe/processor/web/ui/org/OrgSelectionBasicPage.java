@@ -36,6 +36,8 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected String region;
     protected String filter;
     protected String idFilter;
+    protected Long ekisId;
+    protected Long orgIdFromNsi;
     protected Long idOfSelectedContragent;
     protected List<SelectItem> regions;
     protected List<SelectItem> contragentsList = Collections.emptyList();
@@ -73,7 +75,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, List<OrganizationTypeItem> orgTypes,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
-            Long idOfContragent, Long idOfContract, boolean onlySupplier) throws Exception {
+            Long idOfContragent, Long idOfContract, boolean onlySupplier, Long ekisId, Long orgIdFromNsi) throws Exception {
         Criteria orgCriteria = session.createCriteria(Org.class);
 
         Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
@@ -103,6 +105,13 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             if(CollectionUtils.isNotEmpty(ids)) {
                 orgCriteria.add(Restrictions.in("id", ids));
             }
+        }
+
+        if(ekisId != null && ekisId.compareTo(Long.parseLong("-1")) > 0){
+            orgCriteria.add(Restrictions.eq("ekisId",ekisId));
+        }
+        if(orgIdFromNsi != null && orgIdFromNsi.compareTo(Long.parseLong("-1")) > 0){
+            orgCriteria.add(Restrictions.eq("orgIdFromNsi", orgIdFromNsi));
         }
 
         if (StringUtils.isNotBlank(region)) {
@@ -195,6 +204,26 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     public void setIdFilter(String idFilter) {
         this.idFilter = idFilter;
+    }
+
+    public Long getEkisId() { return ekisId; }
+
+    public void setEkisId(Long ekisId) {
+        if (ekisId == null || ekisId == 0) {
+            this.ekisId = null;
+        } else {
+            this.ekisId = ekisId;
+        }
+    }
+
+    public Long getOrgIdFromNsi() { return orgIdFromNsi; }
+
+    public void setOrgIdFromNsi(Long orgIdFromNsi) {
+        if (orgIdFromNsi == null || orgIdFromNsi == 0) {
+            this.orgIdFromNsi = null;
+        } else {
+            this.orgIdFromNsi = orgIdFromNsi;
+        }
     }
 
     public Integer getFilterMode() {
@@ -331,7 +360,8 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         deselectAllItems();
         Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, idOfSupplierList, idOfContragent, null, getFilterMode().equals(2));
+                idOfSourceMenuOrgList, idOfSupplierList, idOfContragent, null, getFilterMode().equals(2),
+                getEkisId(), getOrgIdFromNsi());
     }
 
     @SuppressWarnings("unchecked")
@@ -340,7 +370,8 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         deselectAllItems();
         Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, Collections.EMPTY_LIST, idOfContragent, null, getFilterMode().equals(2));
+                idOfSourceMenuOrgList, Collections.EMPTY_LIST, idOfContragent, null, getFilterMode().equals(2),
+                getEkisId(), getOrgIdFromNsi());
     }
 
     public List<SelectItem> getContragentsList() {
