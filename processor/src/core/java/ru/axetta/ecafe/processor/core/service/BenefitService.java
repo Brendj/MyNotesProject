@@ -82,7 +82,7 @@ public class BenefitService {
     public static boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
-        String reqInstance = runtimeContext.getConfigProperties().getProperty(BenefitService.NODE_PROPERTY, "1");
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(BenefitService.NODE_PROPERTY, "6");
         String[] nodes = reqInstance.split(",");
         for (String node : nodes) {
             if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
