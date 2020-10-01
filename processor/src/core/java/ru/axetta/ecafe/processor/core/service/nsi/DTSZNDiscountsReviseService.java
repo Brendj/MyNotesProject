@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.BenefitService;
@@ -684,10 +685,13 @@ public class DTSZNDiscountsReviseService {
                         if (!(guardians == null || guardians.isEmpty())) {
                             //Оправка всем представителям
                             for (Client destGuardian : guardians) {
-                                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                                        .sendNotification(destGuardian, client,
-                                                EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values,
-                                                new Date());
+                                if (DAOReadonlyService.getInstance()
+                                        .allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                                                client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())) {
+                                    RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                            .sendNotification(destGuardian, client, EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values,
+                                                    new Date());
+                                }
                             }
                         } else {
                             //Отправка только клиенту
@@ -761,9 +765,12 @@ public class DTSZNDiscountsReviseService {
             if (!(guardians == null || guardians.isEmpty())) {
                 //Оправка всем представителям
                 for (Client destGuardian : guardians) {
-                    RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                            .sendNotification(destGuardian, client,
-                                    EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                    if (DAOReadonlyService.getInstance()
+                            .allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                                    client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())) {
+                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                .sendNotification(destGuardian, client, EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                    }
                 }
             } else {
                 //Отправка только клиенту
