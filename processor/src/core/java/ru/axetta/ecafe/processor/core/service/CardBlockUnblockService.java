@@ -49,6 +49,7 @@ public class CardBlockUnblockService {
     final static String SYNC_BLOCKCARD = "SyncCard";
     public static final String UNBLOCK_COMMENT = "Режим самоизоляции снят";
     public static final String BLOCK_COMMENT = "Для владельца идентификатора действует режим самоизоляции";
+    public static final String NODE_PROPERTY = "ecafe.processor.card.blocked.node";
 
     public static class SyncBlockOld implements Job {
 
@@ -68,8 +69,23 @@ public class CardBlockUnblockService {
         }
     }
 
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(CardBlockUnblockService.NODE_PROPERTY, "18");
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
+                    && instance.trim().equals(node.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void scheduleSync() throws Exception {
+        if (!isOn())
+            return;
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
                 getProperty("ecafe.processor.card.blocked.cron", "0 10 3 ? * 2/2");
         try {
