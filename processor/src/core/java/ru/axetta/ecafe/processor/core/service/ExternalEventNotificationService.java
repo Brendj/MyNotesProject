@@ -110,7 +110,6 @@ public class ExternalEventNotificationService {
             //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
-                    //Если произошел проход в здание культуры или в здание музея...
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
                             client.getIdOfClient(),
                             ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_MUSEUM.getValue()) && event

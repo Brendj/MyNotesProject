@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -130,9 +131,12 @@ public class BenefitService {
                 if (!(guardians == null || guardians.isEmpty())) {
                     //Оправка всем представителям
                     for (Client destGuardian : guardians) {
-                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                                .sendNotification(destGuardian, client,
-                                        EventNotificationService.NOTIFICATION_END_BENEFIT, values, new Date());
+                        if (ClientManager.allowedGuardianshipNotification(session, destGuardian.getIdOfClient(),
+                                client.getIdOfClient(),
+                                ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())) {
+                            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                    .sendNotification(destGuardian, client, EventNotificationService.NOTIFICATION_END_BENEFIT, values, new Date());
+                        }
                     }
                 }
                 else
