@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -45,6 +46,7 @@ public class BenefitService {
     public final static String DATE="date";
     public final static String SERVICE_NUMBER="ServiceNumber";
     public final static String ID_DISCOUNT_INFO="idDiscountInfo";
+    public static final String NODE_PROPERTY = "ecafe.processor.notification.client.endBenefit.node";
 
 
     public static class NotificationEndBenefit implements Job {
@@ -56,6 +58,8 @@ public class BenefitService {
 
 
     public void scheduleSync() throws Exception {
+        if (!isOn())
+            return;
         String syncScheduleEndBenefit = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.endBenefit", "");
         try {
             JobDetail jobDetailEndBenefit = new JobDetail(JOB_NAME_END_BENEFIT, Scheduler.DEFAULT_GROUP, NotificationEndBenefit.class);
@@ -73,6 +77,20 @@ public class BenefitService {
         } catch(Exception e) {
             logger.error("Failed to schedule notification end benefit service job:", e);
         }
+    }
+
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(BenefitService.NODE_PROPERTY, "1");
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
+                    && instance.trim().equals(node.trim())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void runEndBenefit(boolean forTest) {
