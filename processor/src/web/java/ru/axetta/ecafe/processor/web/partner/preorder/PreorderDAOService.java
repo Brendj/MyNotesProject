@@ -650,7 +650,11 @@ public class PreorderDAOService {
         return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(wtDish);
     }
 
-    public String getMenuGroupByWtDish(WtDish wtDish) {
+    public String getWtMenuGroupByWtDish(WtDish wtDish) {
+        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getWtMenuGroupByWtDish(wtDish);
+    }
+
+    public String getMenuGroupByWtDishAndCategories(WtDish wtDish) {
         StringBuilder sb = new StringBuilder();
         List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDish);
         if (items != null && items.size() > 0) {
@@ -674,7 +678,7 @@ public class PreorderDAOService {
                     .getWtDishesByComplexItemAndDates(complexItem, startDate, endDate);
             for (WtDish wtDish : wtDishes) {
                 PreorderMenuItemExt menuItemExt = new PreorderMenuItemExt(wtDish);
-                menuItemExt.setGroup(getMenuGroupByWtDish(wtDish));
+                menuItemExt.setGroup(getMenuGroupByWtDishAndCategories(wtDish));
                 menuItemExt.setName(wtDish.getDishName());
                 menuItemExt.setFullName(wtDish.getComponentsOfDish());
                 menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
@@ -2622,7 +2626,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setState(PreorderState.OK);
         preorderMenuDetail.setMenuDetailName(wtDish.getComponentsOfDish());
         preorderMenuDetail.setMenuDetailPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
-        preorderMenuDetail.setGroupName(getMenuGroupByWtDish(wtDish));
+        preorderMenuDetail.setGroupName(getMenuGroupByWtDishAndCategories(wtDish));
         preorderMenuDetail.setItemCode(wtDish.getCode());
         preorderMenuDetail.setAvailableNow(0);
         preorderMenuDetail.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
