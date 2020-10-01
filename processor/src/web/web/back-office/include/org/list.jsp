@@ -31,7 +31,15 @@
 
                 <h:outputText escape="true" value="Guid организации" styleClass="output-text" />
                 <h:inputText value="#{mainPage.orgListPage.orgFilter.guid}" maxlength="64"
-                         styleClass="input-text" size="50" />
+                            styleClass="input-text" size="50" />
+
+                <h:outputText escape="true" value="ID в НСИ-3" styleClass="output-text" />
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.orgIdFromNsi}" maxlength="10"
+                            styleClass="input-text" />
+
+                <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.ekisId}" maxlength="10"
+                            styleClass="input-text" />
 
                 <h:outputText escape="true" value="Тэг" styleClass="output-text" />
                 <h:inputText value="#{mainPage.orgListPage.orgFilter.tag}" maxlength="64"
@@ -42,9 +50,6 @@
                              styleClass="input-text" />
                 <h:outputText escape="true" value="Район" styleClass="output-text" />
                 <h:inputText value="#{mainPage.orgListPage.orgFilter.district}" maxlength="64"
-                             styleClass="input-text" />
-                <h:outputText escape="true" value="Локация" styleClass="output-text" />
-                <h:inputText value="#{mainPage.orgListPage.orgFilter.location}" maxlength="64"
                              styleClass="input-text" />
 
         </h:panelGrid>
