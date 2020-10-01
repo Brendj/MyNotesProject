@@ -33,7 +33,7 @@
         <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="false"/>
             <property name="jboss.entity.manager.jndi.name" value="java:/processorPU"/>
             <property name="jboss.entity.manager.factory.jndi.name" value="java:/processorPUFactory"/>

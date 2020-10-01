@@ -6,15 +6,16 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef" table="cf_mh_clientcard_ref">
-        <id name="idOfRef" column="idOfRef" type="long">
-            <generator class="identity" />
+        <id name="idOfCard" column="idOfCard" type="long">
+            <generator class="foreign">
+                <param name="property">card</param>
+            </generator>
         </id>
         <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="idOfRefInExternalSystem" column="idOfRefInExternalSystem" type="integer"/>
-        <property name="deleteState" column="deleteState" type="boolean"/>
         <property name="send" column="isSend" type="boolean"/>
-        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"/>
-        <many-to-one name="card" class="ru.axetta.ecafe.processor.core.persistence.Card" column="idofcard"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient"/>
+        <one-to-one name="card" class="ru.axetta.ecafe.processor.core.persistence.Card" constrained="true" />
     </class>
 </hibernate-mapping>

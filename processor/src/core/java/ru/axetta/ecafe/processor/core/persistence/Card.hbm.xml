@@ -33,6 +33,7 @@
         <property name="cardPrintedNo" column="CardPrintedNo" type="long" update="false"/>
         <property name="externalId" column="ExternalId" type="string" length="32"/>
         <property name="cardSignCertNum" column="CardSignCertNum" type="integer" />
+        <one-to-one name="meshCardClientRef" class="ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef" cascade="all"/>
         <set name="transactionsInternal" inverse="true" cascade="all">
             <key column="IdOfCard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"/>
@@ -50,10 +51,6 @@
         <set name="cardsync" inverse="true" cascade="all">
             <key column="idofcard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CardSync"/>
-        </set>
-        <set name="meshCardClientRef" inverse="true" cascade="all">
-            <key column="idofcard"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef"/>
         </set>
     </class>
 </hibernate-mapping>

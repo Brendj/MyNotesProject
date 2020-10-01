@@ -84,7 +84,6 @@ public class MeshCardServiceIml implements MeshCardService {
         try {
             meshRestClient.executeDeleteCategory(ref.getClient().getMeshGUID(), ref.getIdOfRefInExternalSystem());
             ref.setSend(true);
-            ref.setDeleteState(true);
         } catch (Exception e){
             ref.setSend(false);
             log.error("Exception, when send DELETE-request", e);

@@ -5273,64 +5273,12 @@ public class DAOUtils {
         return (Org) orgCriteria.uniqueResult();
     }
 
-    public static List<Card> getCreatedCardForMESH(Session session, Date lastProcessing) {
-        Criteria criteria = session.createCriteria(Card.class);
-        criteria.createAlias("client", "c")
-                .createAlias("meshCardClientRef", "ref", JoinType.NONE)
-                .add(Restrictions
-                        .and(Restrictions.ge("issueTime", lastProcessing), Restrictions.isNotNull("c.meshGUID")));
-        return criteria.list();
-    }
-
-    public static List<MeshClientCardRef> getCardWithAnyUpdatesForMesh(Session session, Date lastProcessing) {
-        List<Integer> activeStates = Arrays.asList(
-                CardState.FREE.getValue(),
-                CardState.ISSUED.getValue(),
-                CardState.TEMPISSUED.getValue()
+    public static List<Card> getAllCardForMESHByTime(Session session, Date lastProcessing) {
+        Query query = session.createQuery("from Card as crd "
+                + "where (crd.updateTime > :lastProc or crd.issueTime > :lastProc) "
+                + "and crd.client.meshGUID != null "
         );
-        Query query = session.createQuery("from MeshClientCardRef ref "
-                + "join fetch ref.client as refClient "
-                + "join fetch ref.card as crd "
-                + "join fetch crd.client as crdClient "
-                + "where crd.updateTime > :lastProc and crd.state in (:activeStates) and refClient = crdClient "
-                + "and ref.deleteState = false ");
         query.setParameter("lastProc", lastProcessing);
-        query.setParameterList("activeStates", activeStates);
-
-        return query.list();
-    }
-
-    public static List<MeshClientCardRef> getBlockedCardForMesh(Session session, Date lastProcessing) {
-        List<Integer> blockedStates = Arrays.asList(
-                CardState.BLOCKED.getValue(),
-                CardState.TEMPBLOCKED.getValue()
-        );
-        Query query = session.createQuery("from MeshClientCardRef ref "
-                + "join fetch ref.client as refClient "
-                + "join fetch ref.card as crd "
-                + "join fetch crd.client as crdClient "
-                + "where crd.updateTime > :lastProc and crd.state in (:blockedStates) and refClient = crdClient "
-                + "and ref.deleteState = false ");
-        query.setParameter("lastProc", lastProcessing);
-        query.setParameterList("blockedStates", blockedStates);
-
-        return query.list();
-    }
-
-    public static List<MeshClientCardRef> getCardWithChangedOwner(Session session, Date lastProcessing) {
-        List<Integer> activeStates = Arrays.asList(
-                CardState.FREE.getValue(),
-                CardState.ISSUED.getValue(),
-                CardState.TEMPISSUED.getValue()
-        );
-        Query query = session.createQuery("from MeshClientCardRef ref "
-                + "join fetch ref.client as refClient "
-                + "join fetch ref.card as crd "
-                + "join fetch crd.client as crdClient "
-                + "where crd.updateTime > :lastProc and crd.state in (:activeStates) and refClient != crdClient "
-                + "and ref.deleteState = false ");
-        query.setParameter("lastProc", lastProcessing);
-        query.setParameterList("activeStates", activeStates);
 
         return query.list();
     }

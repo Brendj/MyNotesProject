@@ -5,14 +5,14 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.Objects;
 
 //Связь между клиентом и его картами в МЭШ
 public class MeshClientCardRef {
-    private Long idOfRef;
+    private Long idOfCard;
     private Card card;
     private Client client;
     private Integer idOfRefInExternalSystem;
-    private Boolean deleteState = false;
     private Date createDate;
     private Date lastUpdate;
     private Boolean isSend = false;
@@ -35,12 +35,12 @@ public class MeshClientCardRef {
         return refCardClient;
     }
 
-    public Long getIdOfRef() {
-        return idOfRef;
+    public Long getIdOfCard() {
+        return idOfCard;
     }
 
-    public void setIdOfRef(Long idOfRef) {
-        this.idOfRef = idOfRef;
+    public void setIdOfCard(Long idOfRef) {
+        this.idOfCard = idOfRef;
     }
 
     public Card getCard() {
@@ -67,14 +67,6 @@ public class MeshClientCardRef {
         this.idOfRefInExternalSystem = idOfRefInExternalSystem;
     }
 
-    public Boolean getDeleteState() {
-        return deleteState;
-    }
-
-    public void setDeleteState(Boolean deleteState) {
-        this.deleteState = deleteState;
-    }
-
     public Date getCreateDate() {
         return createDate;
     }
@@ -97,5 +89,22 @@ public class MeshClientCardRef {
 
     public void setSend(Boolean send) {
         isSend = send;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MeshClientCardRef ref = (MeshClientCardRef) o;
+        return Objects.equals(idOfCard, ref.idOfCard);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idOfCard);
     }
 }
