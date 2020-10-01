@@ -22,50 +22,6 @@ import java.util.*;
  */
 public class FunctionSelector {
 
-    public static class Item implements Comparable<Item> {
-
-        private boolean selected;
-        private final Long idOfFunction;
-        private final String functionName;
-        private final String functionDesc;
-
-        public boolean isSelected() {
-            return selected;
-        }
-
-        public void setSelected(boolean selected) {
-            this.selected = selected;
-        }
-
-        public Long getIdOfFunction() {
-            return idOfFunction;
-        }
-
-        public String getFunctionName() {
-            return functionName;
-        }
-
-        public String getFunctionDesc() {
-            return functionDesc;
-        }
-
-        public Item(Function function) {
-            this.selected = false;
-            this.idOfFunction = function.getIdOfFunction();
-            this.functionName = function.getFunctionName();
-            this.functionDesc = Function.getFunctionDesc(functionName);
-        }
-
-        @Override
-        public int compareTo(Item o) {
-            int res = this.functionName.compareTo(o.functionName);
-            if (res == 0) {
-                res = this.idOfFunction.compareTo(o.idOfFunction);
-            }
-            return res;
-        }
-    }
-
     private List<Item> onlineReportItems = Collections.emptyList();
     private List<Item> organizationItems = Collections.emptyList();
     private List<Item> contragentItems = Collections.emptyList();
@@ -78,14 +34,25 @@ public class FunctionSelector {
     private List<Item> repositoryItems = Collections.emptyList();
     private List<Item> helpdeskItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
-    private static final String[] userFunctions = new String[]{"viewUser", "editUser", "deleteUser"};
-    private static final String[] notAdminFunctions = new String[]{
-            "cardRprts", "clientRprts", "clientsBenefitsRprt", "electronicReconciliationRprt", "enterEventRprt",
-            "financialControl", "informRprts", "onlineRprtActivity", "onlineRprtBenefit", "onlineRprtComplex",
-            "onlineRprtMeals", "onlineRprtRefill", "onlineRprtRequest", "paidFood", "salesRprt", "statisticDifferences",
-            "subscriptionFeeding", "totalServicesRprt", "transactionsRprt"};
-    private static final String[] securityAdminFunctions = new String[]{
-            "viewUser", "editUser", "deleteUser", "workOption"};
+
+    private static final List<String> userFunctions = Arrays
+            .asList(Function.FUNC_USER_VIEW, Function.FUNC_USER_EDIT, Function.FUNC_USER_DELETE);
+    private static final List<String> notAdminFunctions = Arrays
+            .asList(Function.FUNC_RESTRICT_CARD_REPORTS, Function.FUNC_RESTRICT_CLIENT_REPORTS,
+                    Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT,
+                    Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT, Function.FUNC_RESTRICT_ENTER_EVENT_REPORT,
+                    Function.FUNC_RESTRICT_FINANCIAL_CONTROL, Function.FUNC_RESTRICT_INFORM_REPORTS,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY, Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX, Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
+                    Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SALES_REPORTS,
+                    Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
+                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT
+            );
+    private static final List<String> securityAdminFunctions = Arrays
+            .asList(Function.FUNC_USER_VIEW, Function.FUNC_USER_EDIT, Function.FUNC_USER_DELETE,
+                    Function.FUNC_WORK_OPTION);
+    //private static final List<String>
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
@@ -150,10 +117,9 @@ public class FunctionSelector {
 
     public Set<Function> getMonitoringFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
-        List allFunctions = allFunctionsCriteria.list();
+        List<Function> allFunctions = allFunctionsCriteria.list();
         Set<Function> monitoringFunctions = new HashSet<Function>();
-        for (Object object : allFunctions) {
-            Function function = (Function) object;
+        for (Function function : allFunctions) {
             if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_MONITORING)) {
                 monitoringFunctions.add(function);
             }
@@ -163,16 +129,14 @@ public class FunctionSelector {
 
     public Set<Function> getSupplierFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
-        List allFunctions = allFunctionsCriteria.list();
+        List<Function> allFunctions = allFunctionsCriteria.list();
         Set<Function> supplierFunctions = new HashSet<Function>();
-        for (Object object : allFunctions) {
-            Function function = (Function) object;
+        for (Function function : allFunctions) {
 
             if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_CLIENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_REPORT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
@@ -260,21 +224,22 @@ public class FunctionSelector {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         allFunctionsCriteria.add(Restrictions
                 .not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями
-        List allFunctions = allFunctionsCriteria.list();
-        List<Item> onlineReportItems = new ArrayList<Item>();
-        List<Item> organizationItems = new ArrayList<Item>();
-        List<Item> contragentItems = new ArrayList<Item>();
-        List<Item> clientItems = new ArrayList<Item>();
-        List<Item> visitorItems = new ArrayList<Item>();
-        List<Item> cardItems = new ArrayList<Item>();
-        List<Item> wayBillItems = new ArrayList<Item>();
-        List<Item> serviceItems = new ArrayList<Item>();
-        List<Item> monitorItems = new ArrayList<Item>();
-        List<Item> repositoryItems = new ArrayList<Item>();
-        List<Item> helpdeskItems = new ArrayList<Item>();
-        List<Item> optionsItems = new ArrayList<Item>();
-        for (Object object : allFunctions) {
-            Function function = (Function) object;
+        List<Function> allFunctions = (List<Function>) allFunctionsCriteria.list();
+
+        List<Item> onlineReportItems = new LinkedList<>();
+        List<Item> organizationItems = new LinkedList<>();
+        List<Item> contragentItems = new LinkedList<>();
+        List<Item> clientItems = new LinkedList<>();
+        List<Item> visitorItems = new LinkedList<>();
+        List<Item> cardItems = new LinkedList<>();
+        List<Item> wayBillItems = new LinkedList<>();
+        List<Item> serviceItems = new LinkedList<>();
+        List<Item> monitorItems = new LinkedList<>();
+        List<Item> repositoryItems = new LinkedList<>();
+        List<Item> helpdeskItems = new LinkedList<>();
+        List<Item> optionsItems = new LinkedList<>();
+
+        for (Function function : allFunctions) {
             Item item = new Item(function);
             if (item.getFunctionName().equals("orgEdit") || item.getFunctionName().equals("orgView")) {
                 organizationItems.add(item);
@@ -325,44 +290,46 @@ public class FunctionSelector {
                 onlineReportItems.add(item);
             }
         }
-        this.onlineReportItems = onlineReportItems;
         Collections.sort(onlineReportItems);
-        this.organizationItems = organizationItems;
         Collections.sort(organizationItems);
-        this.contragentItems = contragentItems;
         Collections.sort(contragentItems);
-        this.clientItems = clientItems;
         Collections.sort(clientItems);
+        Collections.sort(cardItems);
+        Collections.sort(serviceItems);
+        Collections.sort(optionsItems);
+
+        this.onlineReportItems = onlineReportItems;
+        this.organizationItems = organizationItems;
+        this.contragentItems = contragentItems;
+        this.clientItems = clientItems;
         this.visitorItems = visitorItems;
         this.cardItems = cardItems;
-        Collections.sort(cardItems);
         this.wayBillItems = wayBillItems;
         this.serviceItems = serviceItems;
-        Collections.sort(serviceItems);
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
         this.optionsItems = optionsItems;
-        Collections.sort(optionsItems);
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
-        List<Item> onlineReportItems = new ArrayList<Item>();
-        List<Item> organizationItems = new ArrayList<Item>();
-        List<Item> contragentItems = new ArrayList<Item>();
-        List<Item> clientItems = new ArrayList<Item>();
-        List<Item> visitorItems = new ArrayList<Item>();
-        List<Item> cardItems = new ArrayList<Item>();
-        List<Item> wayBillItems = new ArrayList<Item>();
-        List<Item> serviceItems = new ArrayList<Item>();
-        List<Item> monitorItems = new ArrayList<Item>();
-        List<Item> repositoryItems = new ArrayList<Item>();
-        List<Item> helpdeskItems = new ArrayList<Item>();
-        List<Item> optionsItems = new ArrayList<Item>();
+        List<Item> onlineReportItems = new LinkedList<>();
+        List<Item> organizationItems = new LinkedList<>();
+        List<Item> contragentItems = new LinkedList<>();
+        List<Item> clientItems = new LinkedList<>();
+        List<Item> visitorItems = new LinkedList<>();
+        List<Item> cardItems = new LinkedList<>();
+        List<Item> wayBillItems = new LinkedList<>();
+        List<Item> serviceItems = new LinkedList<>();
+        List<Item> monitorItems = new LinkedList<>();
+        List<Item> repositoryItems = new LinkedList<>();
+        List<Item> helpdeskItems = new LinkedList<>();
+        List<Item> optionsItems = new LinkedList<>();
+
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
-        List allFunctions = allFunctionsCriteria.list();
-        for (Object object : allFunctions) {
-            Function function = (Function) object;
+        List<Function> allFunctions = allFunctionsCriteria.list();
+
+        for (Function function : allFunctions) {
             Item item = new Item(function);
 
             if (item.getFunctionName().equals("orgEdit") || item.getFunctionName().equals("orgView")) {
@@ -450,25 +417,26 @@ public class FunctionSelector {
                 onlineReportItems.add(item);
             }
         }
-        this.onlineReportItems = onlineReportItems;
         Collections.sort(onlineReportItems);
-        this.organizationItems = organizationItems;
         Collections.sort(organizationItems);
-        this.contragentItems = contragentItems;
         Collections.sort(contragentItems);
-        this.clientItems = clientItems;
         Collections.sort(clientItems);
+        Collections.sort(cardItems);
+        Collections.sort(serviceItems);
+        Collections.sort(optionsItems);
+
+        this.onlineReportItems = onlineReportItems;
+        this.organizationItems = organizationItems;
+        this.contragentItems = contragentItems;
+        this.clientItems = clientItems;
         this.visitorItems = visitorItems;
         this.cardItems = cardItems;
-        Collections.sort(cardItems);
         this.wayBillItems = wayBillItems;
         this.serviceItems = serviceItems;
-        Collections.sort(serviceItems);
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
         this.optionsItems = optionsItems;
-        Collections.sort(optionsItems);
     }
 
     public Set<Function> getSelected(Session session) throws HibernateException {
@@ -558,5 +526,49 @@ public class FunctionSelector {
         }
 
         return selectedFunctions;
+    }
+
+    public static class Item implements Comparable<Item> {
+
+        private boolean selected;
+        private final Long idOfFunction;
+        private final String functionName;
+        private final String functionDesc;
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public void setSelected(boolean selected) {
+            this.selected = selected;
+        }
+
+        public Long getIdOfFunction() {
+            return idOfFunction;
+        }
+
+        public String getFunctionName() {
+            return functionName;
+        }
+
+        public String getFunctionDesc() {
+            return functionDesc;
+        }
+
+        public Item(Function function) {
+            this.selected = false;
+            this.idOfFunction = function.getIdOfFunction();
+            this.functionName = function.getFunctionName();
+            this.functionDesc = Function.getFunctionDesc(functionName);
+        }
+
+        @Override
+        public int compareTo(Item o) {
+            int res = this.functionName.compareTo(o.functionName);
+            if (res == 0) {
+                res = this.idOfFunction.compareTo(o.idOfFunction);
+            }
+            return res;
+        }
     }
 }
