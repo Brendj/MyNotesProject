@@ -66,7 +66,9 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_ONLINE_REPORT_CLIENTS
             );
     private static final List<String> visitorFuncs = Collections.singletonList(Function.FUNC_VISITORDOGM_EDIT);
-    private static final List<String> cardFuncs = Arrays.asList(Function.FUNC_CARD_EDIT, Function.FUNC_CARD_VIEW);
+    private static final List<String> cardFuncs = Arrays
+            .asList(Function.FUNC_CARD_EDIT, Function.FUNC_CARD_VIEW, Function.FUNC_RESTRICT_CARD_SIGNS
+            );
     private static final List<String> wayBillFuncs = Collections.singletonList(Function.FUNC_COMMODITY_ACCOUNTING);
     private static final List<String> serviceFuncs = Arrays
             .asList(
@@ -95,7 +97,7 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT,
                     Function.FUNC_RESTRICT_CARD_REPORTS, Function.FUNC_COUNT_CURRENT_POSITIONS,
                     Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_FEEDING_SETTINGS_ADMIN,
-                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT
             );
 
     public List<Item> getOnlineReportItems() {

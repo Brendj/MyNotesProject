@@ -474,7 +474,8 @@
                         rendered="#{mainPage.eligibleToEditCards}"/>
 
     <%--@elvariable id="cardSignsGroupPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignsGroupPage"--%>
-    <rich:panelMenuGroup id="cardSignsGroupMenu" label="Цифровые подписи" binding="#{cardSignsGroupPage.mainMenuComponent}">
+    <rich:panelMenuGroup id="cardSignsGroupMenu" label="Цифровые подписи" binding="#{cardSignsGroupPage.mainMenuComponent}"
+        rendered="#{mainPage.eligibleToViewCardSign}">
         <%--@elvariable id="cardSignListPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignListPage"--%>
         <%--@elvariable id="cardSignGroupPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignGroupPage"--%>
         <%--@elvariable id="cardSignViewPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignViewPage"--%>
