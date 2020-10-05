@@ -24,11 +24,12 @@ public class ContragentPreordersReportItem {
     private Long orderSum;
     private String idOfOrder;
     private String isPaid;
+    private Long usedSum;
 
     public ContragentPreordersReportItem(Long idOfContragent, String contragentName, Long idOfOrg, String orgShortName,
             String orgShortAddress, Long clientContractId, Date preorderDate, String complexName, Integer amount,
             String dish, Long complexPrice, Date cancelDate, String reversed, Date createdDate,
-            Long orderSum, Long idOfOrder, String isPaid) {
+            Long orderSum, Long idOfOrder, String isPaid, Long usedSum) {
         this.idOfContragent = idOfContragent;
         this.contragentName = contragentName;
         this.idOfOrg = idOfOrg;
@@ -46,6 +47,7 @@ public class ContragentPreordersReportItem {
         this.orderSum = orderSum;
         this.idOfOrder = idOfOrder == null ? "" : idOfOrder.toString();
         this.isPaid = isPaid;
+        this.usedSum = usedSum;
     }
 
     public Long getIdOfContragent() {
@@ -182,5 +184,13 @@ public class ContragentPreordersReportItem {
 
     public void setIsPaid(String isPaid) {
         this.isPaid = isPaid;
+    }
+
+    public Long getUsedSum() {
+        return usedSum;
+    }
+
+    public void setUsedSum(Long usedSum) {
+        this.usedSum = usedSum;
     }
 }
