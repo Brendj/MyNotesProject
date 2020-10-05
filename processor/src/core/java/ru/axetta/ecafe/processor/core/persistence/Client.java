@@ -194,7 +194,7 @@ public class Client {
                 notificationSettings.add(new ClientNotificationSetting(this, predefined.getValue()));
             }
         }*/
-        Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
+        boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         if (enableNotifications) {
             notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()));
             notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
@@ -211,7 +211,7 @@ public class Client {
 
     public boolean hasDiscount() {
         Set<CategoryDiscount> clientDiscounts = this.getCategories();
-        Boolean hasDiscount = false;
+        boolean hasDiscount = false;
         for (CategoryDiscount categoryDiscount : clientDiscounts) {
             if(!categoryDiscount.getCategoryName().toLowerCase().contains("резерв")){
                 hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
@@ -222,12 +222,8 @@ public class Client {
 
     public boolean isDeletedOrLeaving() {
         if (getIdOfClientGroup() == null) return false;
-        if (getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())
-                || getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
-            return true;
-        } else {
-            return false;
-        }
+        return getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())
+                || getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue());
     }
 
     public boolean isLeaving() {
@@ -244,11 +240,7 @@ public class Client {
 
     private boolean isSomeGroup(Long idOfGroup) {
         if (getIdOfClientGroup() == null) return false;
-        if (getIdOfClientGroup().equals(idOfGroup)) {
-            return true;
-        } else {
-            return false;
-        }
+        return getIdOfClientGroup().equals(idOfGroup);
     }
 
     public boolean notDOUClient() {
