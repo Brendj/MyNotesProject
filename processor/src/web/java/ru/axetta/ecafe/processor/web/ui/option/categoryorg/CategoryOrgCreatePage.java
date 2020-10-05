@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -80,6 +81,17 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
 
     @Transactional
     public void createCategoryOrg(){
+        categoryName = categoryName.trim();
+        if (categoryName.equals(""))
+        {
+            printMessage("Неверное название катеории");
+            return;
+        }
+        if (!DAOService.getInstance().getCategoryOrgByCategoryName(categoryName).isEmpty() )
+        {
+            printMessage("Категория с данным названием уже зарегистрирована");
+            return;
+        }
         CategoryOrg currCategoryOrg = new CategoryOrg();
         currCategoryOrg.setCategoryName(categoryName);
         currCategoryOrg.getOrgs().clear();
