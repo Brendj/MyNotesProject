@@ -959,7 +959,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             archiveApplicationForFoodWithoutDiscount(client, persistenceSession);
         }
         ClientManager.checkUserOPFlag(persistenceSession, client.getOrg(), org, this.idOfClientGroup, client);
-        client.setOrg(org);
         client.setPerson(person);
         client.setContractPerson(contractPerson);
         client.setClientRegistryVersion(clientRegistryVersion);
@@ -1140,7 +1139,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         resetNewFlags();
-
+        client.setOrg(org);
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);
         client.setAgeTypeGroup(this.ageTypeGroup);

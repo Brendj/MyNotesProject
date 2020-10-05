@@ -470,7 +470,8 @@
 
     <rich:panelMenuItem id="cardExpireBatchEditMenu" label="Изменить дату валидности"
                         binding="#{mainPage.cardExpireBatchEditPage.mainMenuComponent}"
-                        action="#{mainPage.showCardExpireBatchEditPage}" reRender="workspaceForm" />
+                        action="#{mainPage.showCardExpireBatchEditPage}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToEditCards}"/>
 
     <%--@elvariable id="cardSignsGroupPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignsGroupPage"--%>
     <rich:panelMenuGroup id="cardSignsGroupMenu" label="Цифровые подписи" binding="#{cardSignsGroupPage.mainMenuComponent}">
