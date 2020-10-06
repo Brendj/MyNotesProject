@@ -84,12 +84,12 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
         categoryName = categoryName.trim();
         if (categoryName.equals(""))
         {
-            printMessage("Неверное название катеории");
+            printError("Неверное название категории");
             return;
         }
         if (!DAOService.getInstance().getCategoryOrgByCategoryName(categoryName).isEmpty() )
         {
-            printMessage("Категория с данным названием уже зарегистрирована");
+            printError("Категория с данным названием уже зарегистрирована");
             return;
         }
         CategoryOrg currCategoryOrg = new CategoryOrg();

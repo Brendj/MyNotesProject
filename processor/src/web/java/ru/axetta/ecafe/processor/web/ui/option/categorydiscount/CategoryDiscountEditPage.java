@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -167,6 +168,17 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
 
     @Transactional
     public Object save() {
+        categoryName = categoryName.trim();
+        if (categoryName.equals(""))
+        {
+            printError("Неверное название категории");
+            return null;
+        }
+        if (!DAOService.getInstance().getCategoryDiscountListByCategoryName(categoryName).isEmpty() )
+        {
+            printError("Категория с данным названием уже зарегистрирована");
+            return null;
+        }
         if (discountRate != null && discountRate != 100) {
             description = DISCOUNT_START + discountRate + DISCOUNT_END;
         }

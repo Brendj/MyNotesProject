@@ -157,12 +157,12 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
         categoryName = categoryName.trim();
         if (categoryName.equals(""))
         {
-            printMessage("Неверное название катеории");
+            printError("Неверное название категории");
             return;
         }
         if (!DAOService.getInstance().getCategoryDiscountListByCategoryName(categoryName).isEmpty() )
         {
-            printMessage("Категория с данным названием уже зарегистрирована");
+            printError("Категория с данным названием уже зарегистрирована");
             return;
         }
         /*List<Long> ids = new LinkedList<Long>();
