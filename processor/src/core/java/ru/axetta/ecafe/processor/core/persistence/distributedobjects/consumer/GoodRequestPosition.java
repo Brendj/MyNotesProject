@@ -146,7 +146,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (!gr.getOrgOwner().equals(orgOwner)) {
             orgOwner = gr.getOrgOwner();
         }
-        if (!isGoodDate(session, idOfOrg, gr.getDoneDate(), gr.getRequestType()))
+        if (!isGoodDate(session, orgOwner, gr.getDoneDate(), gr.getRequestType()))
         {
             GoodRequestPosition grp = DAOUtils.findDistributedObjectByRefGUID(GoodRequestPosition.class, session, guid);
             DistributedObjectException distributedObjectException = new DistributedObjectException("CANT_CHANGE_GRP_ON_DATE");
