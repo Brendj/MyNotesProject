@@ -61,6 +61,7 @@ public class BenefitService {
     public void scheduleSync() throws Exception {
         if (!isOn())
             return;
+        logger.info("Start BenefitService schedule");
         String syncScheduleEndBenefit = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.endBenefit", "");
         try {
             JobDetail jobDetailEndBenefit = new JobDetail(JOB_NAME_END_BENEFIT, Scheduler.DEFAULT_GROUP, NotificationEndBenefit.class);
@@ -95,6 +96,7 @@ public class BenefitService {
     }
 
     public void runEndBenefit(boolean forTest) {
+        logger.info("Start NotificationEndBenefit service");
         Date startDate = new Date(System.currentTimeMillis());
         startDate = CalendarUtils.addOneDay(startDate);
         startDate = CalendarUtils.startOfDay(startDate);
