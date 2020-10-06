@@ -74,15 +74,9 @@ public class MeshCardNotifyTaskExecutor {
         Session session = null;
         Transaction transaction = null;
         try {
-            Trigger trigger = scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP);
-            Date lastProcessing = trigger.getPreviousFireTime();
-            if(lastProcessing == null){
-                lastProcessing = CalendarUtils.startOfDay(new Date());
-            }
-
+            Date lastProcessing = getProcessingTime();
             session = RuntimeContext.getInstance().createPersistenceSession();
             List<Card> cards = DAOUtils.getAllCardForMESHByTime(session, lastProcessing);
-
             for(Card c : cards){
                 if(c.getClient() != null && StringUtils.isEmpty(c.getClient().getMeshGUID())){
                     continue;
@@ -126,6 +120,16 @@ public class MeshCardNotifyTaskExecutor {
         } finally {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
+        }
+    }
+
+    private Date getProcessingTime() {
+        try{
+            Trigger trigger = scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP);
+            long  delta = trigger.getNextFireTime().getTime() - trigger.getPreviousFireTime().getTime();
+            return new Date(trigger.getPreviousFireTime().getTime() - delta);
+        } catch (Exception e){
+            return CalendarUtils.startOfDay(new Date());
         }
     }
 }
