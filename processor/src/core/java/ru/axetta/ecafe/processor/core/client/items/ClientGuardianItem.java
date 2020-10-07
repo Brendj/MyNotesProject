@@ -1,9 +1,6 @@
 package ru.axetta.ecafe.processor.core.client.items;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRelationType;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentType;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -193,5 +190,15 @@ public class ClientGuardianItem {
 
     public void setRepresentativeType(Integer representativeType) {
         this.representativeType = representativeType;
+    }
+
+    public void activateNotificationSpecial() {
+        if(this.getEnabled()){
+            for(NotificationSettingItem i : notificationItems){
+                if(i.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())){
+                    i.setEnabled(true);
+                }
+            }
+        }
     }
 }
