@@ -64,8 +64,8 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
     public boolean isGoodDate(Session session, Long idOfOrg, Date dateDone, Integer type) {
         try {
             Date currentDate = new Date();
-            currentDate = CalendarUtils.addOneDay(currentDate);
             currentDate = CalendarUtils.startOfDay(currentDate);
+            //currentDate = CalendarUtils.addOneDay(currentDate);
             dateDone = CalendarUtils.startOfDay(dateDone);
 
             List<ProductionCalendar> productionCalendars = DAOUtils
