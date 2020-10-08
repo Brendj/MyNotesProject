@@ -1660,8 +1660,9 @@ public class ClientManager {
     }
 
     public static List<NotificationSettingItem> getNotificationSettings() {
-        Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
-        List<NotificationSettingItem> notificationSettings = new ArrayList<NotificationSettingItem>();
+        boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
+        boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
+        List<NotificationSettingItem> notificationSettings = new LinkedList<>();
         for (ClientGuardianNotificationSetting.Predefined predefined : ClientGuardianNotificationSetting.Predefined.values()) {
             if (predefined.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                 continue;
@@ -1669,6 +1670,8 @@ public class ClientManager {
             if (predefined.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS) || predefined.equals(
                     ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS)) {
                 notificationSettings.add(new NotificationSettingItem(predefined, enableNotifications));
+            } else if(predefined.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL)){
+                notificationSettings.add(new NotificationSettingItem(predefined, enableSpecialNotification));
             } else {
                 notificationSettings.add(new NotificationSettingItem(predefined));
             }
