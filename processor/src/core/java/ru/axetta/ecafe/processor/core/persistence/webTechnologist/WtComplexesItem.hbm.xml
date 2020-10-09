@@ -25,7 +25,7 @@
             <column name="count_dishes" sql-type="integer"/>
         </property>
 
-        <set name="dishes" lazy="false" table="cf_wt_complex_items_dish">
+        <set name="dishes" lazy="true" table="cf_wt_complex_items_dish">
             <key column="idOfComplexItem"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="idOfDish"/>
         </set>
