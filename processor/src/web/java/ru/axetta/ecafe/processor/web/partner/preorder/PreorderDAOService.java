@@ -3449,6 +3449,7 @@ public class PreorderDAOService {
 
         if (wtComplex.getCycleMotion() != null) {   // комплекс настроен
             // Составляем карту дней цикла
+            List<WtComplexExcludeDays> excludeDays = DAOReadonlyService.getInstance().getExcludeDaysByWtComplex(wtComplex);
             while (currentDate.getTime() <= date.getTime()) {
                 calendar.setTime(currentDate);
                 // смотрим рабочую неделю
@@ -3458,8 +3459,7 @@ public class PreorderDAOService {
                         // 6-дневная рабочая неделя
                         calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
                     // проверка, выпадает ли день на выходные
-                    //Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
-                    Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, wtComplex);
+                    Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, excludeDays);
                     if (!isHoliday) {
                         cycleDates.put(currentDate, count++);
                     }

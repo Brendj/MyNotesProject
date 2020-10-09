@@ -1058,20 +1058,20 @@ public class DAOReadonlyService {
             return false;
         }
     }
-	
-        public Boolean checkExcludeDays(Date date, WtComplex wtComplex) {
-        try {
-            Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
-                            + "WHERE excludeDays.complex = :complex "
-                            + "AND excludeDays.deleteState = 0");
-            query.setParameter("complex", wtComplex);
-            List<WtComplexExcludeDays> excludeDays = query.getResultList();
 
-            if (excludeDays != null) {
-                for (WtComplexExcludeDays wtExcludeDays : excludeDays) {
-                    if (wtExcludeDays.getDate().getTime() == date.getTime())
-                        return true;
-                }
+    public List<WtComplexExcludeDays> getExcludeDaysByWtComplex(WtComplex wtComplex) {
+        Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                + "WHERE excludeDays.complex = :complex "
+                + "AND excludeDays.deleteState = 0");
+        query.setParameter("complex", wtComplex);
+        return query.getResultList();
+    }
+
+    public Boolean checkExcludeDays(Date date, List<WtComplexExcludeDays> excludeDays) {
+        try {
+            for (WtComplexExcludeDays wtExcludeDays : excludeDays) {
+                if (wtExcludeDays.getDate().getTime() == date.getTime())
+                    return true;
             }
             return false;
         } catch (Exception e) {
