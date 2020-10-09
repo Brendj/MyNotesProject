@@ -24,7 +24,7 @@ public class ClientGuardian {
     private Boolean deletedState;
     private Date deleteDate;
     private ClientGuardianRelationType relation;
-    private Set<ClientGuardianNotificationSetting> notificationSettings = new HashSet<ClientGuardianNotificationSetting>();
+    private Set<ClientGuardianNotificationSetting> notificationSettings = new HashSet<>();
     private ClientCreatedFromType createdFrom;
     private Date lastUpdate;
     private CardRequest cardRequest;
@@ -98,12 +98,17 @@ public class ClientGuardian {
         this.setLastUpdate(new Date());
     }
 
-    public void restore(Long version) {
+    public void restore(Long version, boolean enableSpecialNotification) {
         this.setDeletedState(false);
         this.setDisabled(false);
         this.setDeleteDate(null);
         this.setVersion(version);
         this.setLastUpdate(new Date());
+        if(enableSpecialNotification){
+            getNotificationSettings()
+                    .add(new ClientGuardianNotificationSetting(this,
+                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()));
+        }
     }
 
     public Boolean isDisabled() {

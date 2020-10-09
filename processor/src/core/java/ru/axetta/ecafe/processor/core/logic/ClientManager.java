@@ -206,7 +206,7 @@ public class ClientManager {
             String firstName = fieldConfig.getValue(ClientManager.FieldId.NAME);
             String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME);
 
-            long idOfClient = findClientByFullName(persistenceSession, org, surname, firstName, secondName);
+            Long idOfClient = findClientByFullName(persistenceSession, org, surname, firstName, secondName);
             Client client = DAOUtils.findClient(persistenceSession, idOfClient);
             if (client == null) {
                 throw new Exception("Клиент не найден: " + idOfClient);
@@ -1139,12 +1139,15 @@ public class ClientManager {
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
         clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legal_representative));
-        Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
+        boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
+        boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
         if (enableNotifications) {
-            Set<ClientGuardianNotificationSetting> settings = new HashSet<ClientGuardianNotificationSetting>();
-            settings.add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()));
-            settings.add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
-            clientGuardian.setNotificationSettings(settings);
+            clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()));
+            clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
+        }
+        if(enableSpecialNotification){
+            clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian,
+                    ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()));
         }
         clientGuardian.setLastUpdate(new Date());
         session.persist(clientGuardian);
