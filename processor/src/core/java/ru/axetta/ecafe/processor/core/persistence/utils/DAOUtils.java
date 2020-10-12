@@ -2212,29 +2212,22 @@ public class DAOUtils {
         if (preorderComplex != null) {
             long sum = orderSum;
             long qty = orderDetail.getQty();
+            if (cancelOrder) {
+                sum = -sum;
+                qty = -qty;
+            }
             if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX)) {
-                if (cancelOrder) {
-                    preorderComplex.setUsedSum(0L);
-                    preorderComplex.setUsedAmount(0L);
-                } else {
-                    preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
-                    preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
-                }
+                preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
+                preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
                 session.update(preorderComplex);
             }
 
             if (preorderComplex.isType4Complex() && itemCode != null) {
                 PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
                 if (pmd != null) {
-                    if (cancelOrder) {
-                        pmd.setUsedSum(0L);
-                        pmd.setUsedAmount(0L);
-                    }
-                    else {
-                        long sum2 = qty * pmd.getMenuDetailPrice();
-                        pmd.setUsedSum(pmd.getUsedSum() + sum2);
-                        pmd.setUsedAmount(pmd.getUsedAmount() + qty);
-                    }
+                    long sum2 = qty * pmd.getMenuDetailPrice();
+                    pmd.setUsedSum(pmd.getUsedSum() + sum2);
+                    pmd.setUsedAmount(pmd.getUsedAmount() + qty);
                     session.update(pmd);
                 }
             }
