@@ -6237,10 +6237,8 @@ public class Processor implements SyncProcessor {
         SyncResponse.ResEnterEvents resEnterEvents = new SyncResponse.ResEnterEvents();
         Long idOfOrg;
         Map<String, Long> accessories = new HashMap<String, Long>();
-        Date now = new Date();
-        String mod = RuntimeContext.getInstance().getConfigProperties()
-                .getProperty("ecafe.processor.enterevents.invalidtimemod", "NONE");
-
+        String mod = getStrMod();
+        Date now = getTimeWithBuff();
 
         for (EnterEventItem e : enterEvents.getEvents()) {
             try {
@@ -6500,6 +6498,36 @@ public class Processor implements SyncProcessor {
         }
 
         return resEnterEvents;
+    }
+
+    private Date getTimeWithBuff() {
+        String minutesStr;
+        try {
+            minutesStr = RuntimeContext.getInstance().getConfigProperties()
+                    .getProperty("ecafe.processor.enterevents.invalidtimemod.buffertime.minutes", "5");
+            int minutes = Integer.parseInt(minutesStr);
+
+            return CalendarUtils.addMinute(new Date(), minutes);
+        } catch (Exception e){
+            logger.warn("ecafe.processor.enterevents.invalidtimemod.buffertime.minutes has wrong value, set 5 minute");
+            return CalendarUtils.addMinute(new Date(), 5);
+        }
+    }
+
+    private String getStrMod() {
+        String mod;
+        try{
+            mod = RuntimeContext.getInstance().getConfigProperties()
+                    .getProperty("ecafe.processor.enterevents.invalidtimemod", "NONE");
+
+            EnterEventsInvalidTimeMod timeMod = EnterEventsInvalidTimeMod.valueOf(mod);
+            if(timeMod == null) throw new IllegalArgumentException();
+
+            return mod;
+        } catch (IllegalArgumentException e){
+            logger.warn("ecafe.processor.enterevents.invalidtimemod has wrong value, use mod \"NONE\"");
+            return "NONE";
+        }
     }
 
     private Date changeTimeByMode(EnterEventItem e, String modStr, Date now, Date syncTime) {
