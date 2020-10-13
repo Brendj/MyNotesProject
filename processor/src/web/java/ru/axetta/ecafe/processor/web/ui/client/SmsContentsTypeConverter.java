@@ -25,8 +25,10 @@ public class SmsContentsTypeConverter implements Converter {
 
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object object) {
         int value = (Integer) object;
-        if (value >= 0 && value < ClientSms.CONTENTS_TYPE_DESCRIPTION.length) {
-            return ClientSms.CONTENTS_TYPE_DESCRIPTION[value];
+        if (value >= 0 && value < (ClientSms.CONTENTS_TYPE_DESCRIPTION.length + 4)) { //4 - это все ЕМИАС, которые уже включены в 18
+            if (value > 22 && value < 27) //Если это одно из событий ЕМИАС, то это тип SPECIAL
+                value = 18;
+           return ClientSms.CONTENTS_TYPE_DESCRIPTION[value];
         }
         return ClientSms.UNKNOWN_CONTENTS_TYPE_DESCRIPTION;
     }
