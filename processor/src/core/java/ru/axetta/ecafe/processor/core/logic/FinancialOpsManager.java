@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,20 +226,27 @@ public class FinancialOpsManager {
         } else {
             order.setState(Order.STATE_CANCELED);
             session.save(order);
+            PreorderComplex preorderComplex = DAOUtils.findPreorderComplexByPaymentOrder(session,
+                    order.getCompositeIdOfOrder().getIdOfOrg(), payment);
+
             for (OrderDetail od : order.getOrderDetails()) {
                 od.setState(OrderDetail.STATE_CANCELED);
                 session.save(od);
+                if (preorderComplex != null && DAOUtils.hasOrderDetailLink(session,
+                        order.getCompositeIdOfOrder().getIdOfOrg(), payment, preorderComplex.getGuid(), od)) {
+                        DAOUtils.savePreorderGuidFromOrderDetail(session, preorderComplex.getGuid(), od, true,
+                                preorderComplex, od.getItemCode(), order.getRSum());
+                }
             }
 
-            PreorderComplex preorderComplex = DAOUtils.findPreorderComplexByPaymentOrder(session, order.getCompositeIdOfOrder().getIdOfOrg(), payment);
-            if (preorderComplex != null) {
-                Query query = session.createQuery("update PreorderComplex set usedAmount = 0, usedSum = 0 where idOfPreorderComplex = :idOfPreorderComplex");
-                query.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
-                query.executeUpdate();
-                query = session.createQuery("update PreorderMenuDetail set usedSum = 0, usedAmount = 0 where preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
-                query.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
-                query.executeUpdate();
-            }
+            //if (preorderComplex != null) {
+            //    Query query = session.createQuery("update PreorderComplex set usedAmount = 0, usedSum = 0 where idOfPreorderComplex = :idOfPreorderComplex");
+            //    query.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+            //    query.executeUpdate();
+            //    query = session.createQuery("update PreorderMenuDetail set usedSum = 0, usedAmount = 0 where preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
+            //    query.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+            //    query.executeUpdate();
+            //}
 
             CanceledOrder canceledOrder = new CanceledOrder(order, order.getOrg());
 

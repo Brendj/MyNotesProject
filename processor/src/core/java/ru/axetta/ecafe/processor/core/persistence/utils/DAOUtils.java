@@ -2258,6 +2258,15 @@ public class DAOUtils {
         return null;
     }
 
+    public static boolean hasOrderDetailLink(Session session, Long idOfOrg, Payment payment, String guid, OrderDetail od) {
+        Criteria criteria = session.createCriteria(PreorderLinkOD.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("idOfOrder", payment.getIdOfOrder()));
+        criteria.add(Restrictions.eq("preorderGuid", guid));
+        criteria.add(Restrictions.eq("idOfOrderDetail", od.getCompositeIdOfOrderDetail().getIdOfOrderDetail()));
+        return criteria.list().size() > 0;
+    }
+
     private static PreorderMenuDetail getPreorderMenuDetailByItemCode(PreorderComplex preorderComplex, String itemCode) {
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getItemCode().equals(itemCode) && !pmd.getDeletedState()) {
