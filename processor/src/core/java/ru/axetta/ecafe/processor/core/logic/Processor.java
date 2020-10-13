@@ -692,7 +692,8 @@ public class Processor implements SyncProcessor {
                 }
                 saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(),
                         SectionType.ENTER_EVENTS);
-                resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg());
+                resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg(),
+                        request.getSyncTime());
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()), e);
@@ -1716,7 +1717,7 @@ public class Processor implements SyncProcessor {
                 saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(),
                         SectionType.ENTER_EVENTS);
                 SyncResponse.ResEnterEvents resEnterEvents = processSyncEnterEvents(request.getEnterEvents(),
-                        request.getOrg());
+                        request.getOrg(), request.getSyncTime());
                 addToResponseSections(resEnterEvents, responseSections);
             }
         } catch (Exception e) {
@@ -3388,7 +3389,8 @@ public class Processor implements SyncProcessor {
             if (request.getEnterEvents() != null) {
                 saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(),
                         SectionType.ENTER_EVENTS);
-                resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg());
+                resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg(),
+                        request.getSyncTime());
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to process Enter Events, IdOfOrg == %s", request.getIdOfOrg()), e);
@@ -6229,14 +6231,18 @@ public class Processor implements SyncProcessor {
         return new SyncResponse.ResDiary();
     }
 
-    private SyncResponse.ResEnterEvents processSyncEnterEvents(EnterEvents enterEvents, Org org) {
+    private SyncResponse.ResEnterEvents processSyncEnterEvents(EnterEvents enterEvents, Org org, Date syncTime) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         SyncResponse.ResEnterEvents resEnterEvents = new SyncResponse.ResEnterEvents();
         Long idOfOrg;
         Map<String, Long> accessories = new HashMap<String, Long>();
-        for (EnterEventItem e : enterEvents.getEvents()) {
+        Date now = new Date();
+        String mod = RuntimeContext.getInstance().getConfigProperties()
+                .getProperty("ecafe.processor.enterevents.invalidtimemod", "NONE");
 
+
+        for (EnterEventItem e : enterEvents.getEvents()) {
             try {
                 persistenceSession = persistenceSessionFactory.openSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
@@ -6299,7 +6305,6 @@ public class Processor implements SyncProcessor {
                         query.setParameter("evtDateTime", e.getEvtDateTime());
                         query.executeUpdate();
                     }
-                    //Обработали событие от внешней системы
 
                     EnterEvent enterEvent = new EnterEvent();
                     enterEvent.setCompositeIdOfEnterEvent(new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
@@ -6310,7 +6315,12 @@ public class Processor implements SyncProcessor {
                     enterEvent.setIdOfCard(e.getIdOfCard());
                     enterEvent.setClient(clientFromEnterEvent);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
-                    enterEvent.setEvtDateTime(e.getEvtDateTime());
+                    // Проверка корректности времени
+                    if(e.getEvtDateTime().after(now)) {
+                        enterEvent.setEvtDateTime(changeTimeByMode(e, mod, now, syncTime));
+                    } else {
+                        enterEvent.setEvtDateTime(e.getEvtDateTime());
+                    }
                     enterEvent.setIdOfVisitor(e.getIdOfVisitor());
                     enterEvent.setVisitorFullName(e.getVisitorFullName());
                     enterEvent.setDocType(e.getDocType());
@@ -6490,6 +6500,22 @@ public class Processor implements SyncProcessor {
         }
 
         return resEnterEvents;
+    }
+
+    private Date changeTimeByMode(EnterEventItem e, String modStr, Date now, Date syncTime) {
+        EnterEventsInvalidTimeMod mod = EnterEventsInvalidTimeMod.valueOf(modStr);
+
+        switch (mod){
+            case BEGIN_DAY:
+                return CalendarUtils.startOfDay(now);
+            case END_DAY:
+                return CalendarUtils.endOfDay(now);
+            case FROM_PACKET:
+                return syncTime;
+            case NONE:
+            default:
+                return e.getEvtDateTime();
+        }
     }
 
     private boolean enterEventOwnerHaveSmartWatch(Session session, EnterEvent enterEvent) throws Exception {
