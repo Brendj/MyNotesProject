@@ -228,12 +228,14 @@ public class FinancialOpsManager {
             session.save(order);
             PreorderComplex preorderComplex = DAOUtils.findPreorderComplexByPaymentOrder(session,
                     order.getCompositeIdOfOrder().getIdOfOrg(), payment);
+            boolean saveAllPreorderDetails = (preorderComplex != null && preorderComplex.getModeOfAdd()
+                    .equals(PreorderComplex.COMPLEX_MODE_4));
 
             for (OrderDetail od : order.getOrderDetails()) {
                 od.setState(OrderDetail.STATE_CANCELED);
                 session.save(od);
-                if (preorderComplex != null && DAOUtils.hasOrderDetailLink(session,
-                        order.getCompositeIdOfOrder().getIdOfOrg(), payment, preorderComplex.getGuid(), od)) {
+                if (saveAllPreorderDetails || (preorderComplex != null && DAOUtils.hasOrderDetailLink(session,
+                        order.getCompositeIdOfOrder().getIdOfOrg(), payment, preorderComplex.getGuid(), od))) {
                         DAOUtils.savePreorderGuidFromOrderDetail(session, preorderComplex.getGuid(), od, true,
                                 preorderComplex, od.getItemCode(), order.getRSum());
                 }
