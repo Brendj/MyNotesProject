@@ -2212,16 +2212,18 @@ public class DAOUtils {
         if (preorderComplex != null) {
             long sum = orderSum;
             long qty = orderDetail.getQty();
+            long complexRatio = 1L;
             if (cancelOrder) {
                 sum = -sum;
                 qty = -qty;
+                complexRatio = -complexRatio;
             }
             if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() < OrderDetail.TYPE_COMPLEX_MAX)) {
                 preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
                 if (!preorderComplex.isType4Complex()) {
                     preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
                 } else {
-                    preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + 1);
+                    preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + complexRatio);
                 }
                 session.update(preorderComplex);
             }
