@@ -4167,6 +4167,10 @@ public class Processor implements SyncProcessor {
             resultClientGuardianVersion = getClientGuardiansResultVersion();
         }
 
+        boolean enableNotificationSpecial = RuntimeContext.getInstance().getOptionValueBool(
+                Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL
+        );
+
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -4195,13 +4199,18 @@ public class Processor implements SyncProcessor {
                         if (item.getDisabled() || item.isDeleted()) {
                             MigrantsUtils
                                     .disableMigrantRequestIfExists(persistenceSession, idOfOrg, item.getIdOfGuardian());
+                        } else if(enableNotificationSpecial) {
+                            clientGuardian.getNotificationSettings().add(
+                                    new ClientGuardianNotificationSetting(clientGuardian,
+                                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())
+                            );
                         }
                         clientGuardian.setLastUpdate(new Date());
                         persistenceSession.save(clientGuardian);
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
                         if (dbClientGuardian.getDeletedState() && !item.isDeleted()) {
-                            dbClientGuardian.restore(resultClientGuardianVersion);
+                            dbClientGuardian.restore(resultClientGuardianVersion, enableNotificationSpecial);
                         } else if (item.isDeleted()) {
                             dbClientGuardian.delete(resultClientGuardianVersion);
                         }

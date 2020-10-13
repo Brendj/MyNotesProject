@@ -505,6 +505,8 @@
             <h:selectBooleanCheckbox value="#{optionPage.notifyByEmailNewClients}" styleClass="output-text" />
             <h:outputText escape="true" value="Включить флаги \"Оповещать о пополнениях\" и \"Оповещать о проходах\"" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.enableNotificationsOnBalancesAndEE}" styleClass="output-text" />
+            <h:outputText escape="true" value="Включить флаг \"Служебные оповещения\" при создании связки \"Опекун-Ребенок\"" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.enableNotificationsSpecial}" styleClass="output-text" />
         </h:panelGrid>
     </rich:tab>
     <rich:tab label="Личный кабинет">

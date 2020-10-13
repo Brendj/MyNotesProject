@@ -227,7 +227,9 @@
             </f:facet>
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text" />
-                <h:selectBooleanCheckbox value="#{clientGuardian.enabled}" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientGuardian.enabled}" styleClass="output-text" >
+                    <a4j:support reRender="clientGuardianEditTable" event="onchange" action="#{clientGuardian.activateNotificationSpecial()}"/>
+                </h:selectBooleanCheckbox>
 
                 <h:outputText escape="true" value="#{clientGuardian.createdWhereClientGuardianStr}" style="font-size: 8pt;" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
                 <h:outputText value="" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
@@ -317,7 +319,9 @@
             </f:facet>
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text" />
-                <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" >
+                        <a4j:support reRender="clientWardEditTable" event="onchange" action="#{clientWard.activateNotificationSpecial()}"/>
+                </h:selectBooleanCheckbox>
 
                 <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" style="font-size: 8pt;" rendered="#{!clientWard.isCreatedWhereDefault}"/>
                 <h:outputText value="" rendered="#{!clientWard.isCreatedWhereDefault}"/>

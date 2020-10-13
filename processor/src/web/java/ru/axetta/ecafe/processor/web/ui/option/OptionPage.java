@@ -125,6 +125,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean NotifyByPushNewClients;
     private Boolean NotifyByEmailNewClients;
     private Boolean enableNotificationsOnBalancesAndEE;
+    private Boolean enableNotificationsSpecial;
     private Integer DaysRestrictionPaymentDateImport;
     private String RNIPSenderCode;
     private String RNIPSenderName;
@@ -986,6 +987,7 @@ public class OptionPage extends BasicWorkspacePage {
         setNotifyByPushNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS));
         setNotifyByEmailNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS));
         setEnableNotificationsOnBalancesAndEE(runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE));
+        setEnableNotificationsSpecial(runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL));
         DaysRestrictionPaymentDateImport = runtimeContext.getOptionValueInt((Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT));
         RNIPSenderCode = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE);
         RNIPSenderName = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME);
@@ -1222,6 +1224,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS, getNotifyByEmailNewClients());
             runtimeContext.setOptionValue(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE, getEnableNotificationsOnBalancesAndEE());
+            runtimeContext.setOptionValue(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL, getEnableNotificationsSpecial());
             runtimeContext.setOptionValue(Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT, getDaysRestrictionPaymentDateImport());
             runtimeContext.setOptionValue(Option.OPTION_SAVE_SYNC_CALC, reportOn);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_CODE, RNIPSenderCode);
@@ -1447,5 +1450,13 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setCardAutoBlockDays(Integer cardAutoBlockDays) {
         this.cardAutoBlockDays = cardAutoBlockDays;
+    }
+
+    public Boolean getEnableNotificationsSpecial() {
+        return enableNotificationsSpecial;
+    }
+
+    public void setEnableNotificationsSpecial(Boolean enableNotificationsSpecial) {
+        this.enableNotificationsSpecial = enableNotificationsSpecial;
     }
 }
