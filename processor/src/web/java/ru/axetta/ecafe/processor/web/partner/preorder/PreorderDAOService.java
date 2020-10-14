@@ -1109,7 +1109,7 @@ public class PreorderDAOService {
             regularPreorder = (RegularPreorder) query.getSingleResult();
             if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
             if (regularDatesIntersect(regularComplex, regularPreorder)) {
-                deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.DELETED,
+                deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK,
                         guardianMobile, RegularPreorderState.CHANGE_BY_USER);
             }
             regularPreorder = createNewRegular(client, regularComplex, amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,

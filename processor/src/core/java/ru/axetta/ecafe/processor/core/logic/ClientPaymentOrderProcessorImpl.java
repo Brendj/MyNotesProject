@@ -144,7 +144,8 @@ public class ClientPaymentOrderProcessorImpl implements ClientPaymentOrderProces
             persistenceTransaction.commit();
             persistenceTransaction = null;
             if (clientPayment != null) {
-                RuntimeContext.getAppContext().getBean(PaymentNotificator.class).sendNotification(clientPayment, clientPaymentOrder.getClient(), null);
+                RuntimeContext.getAppContext().getBean(PaymentNotificator.class)
+                        .sendNotification(clientPayment, clientPaymentOrder.getClient(), null);
             }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
