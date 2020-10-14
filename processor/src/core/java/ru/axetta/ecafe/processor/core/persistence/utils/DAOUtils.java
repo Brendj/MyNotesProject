@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2199,7 +2199,7 @@ public class DAOUtils {
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
-            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode, Long orderSum) {
+            boolean cancelOrder, PreorderComplex preorderComplex, String guidOfGood, Long orderSum) {
         if (!cancelOrder && (guid != null) && !guid.isEmpty()) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
@@ -2212,29 +2212,28 @@ public class DAOUtils {
         if (preorderComplex != null) {
             long sum = orderSum;
             long qty = orderDetail.getQty();
-            if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX)) {
-                if (cancelOrder) {
-                    preorderComplex.setUsedSum(0L);
-                    preorderComplex.setUsedAmount(0L);
-                } else {
-                    preorderComplex.setUsedSum(sum);
+            long complexRatio = 1L;
+            if (cancelOrder) {
+                sum = -sum;
+                qty = -qty;
+                complexRatio = -complexRatio;
+            }
+            if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() < OrderDetail.TYPE_COMPLEX_MAX)) {
+                preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
+                if (!preorderComplex.isType4Complex()) {
                     preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
+                } else {
+                    preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + complexRatio);
                 }
                 session.update(preorderComplex);
             }
 
-            if (preorderComplex.isType4Complex() && itemCode != null) {
-                PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
+            if (preorderComplex.isType4Complex() && guidOfGood != null && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX) {
+                PreorderMenuDetail pmd = getPreorderMenuDetailByGoodsGuid(session, preorderComplex, guidOfGood);
                 if (pmd != null) {
-                    if (cancelOrder) {
-                        pmd.setUsedSum(0L);
-                        pmd.setUsedAmount(0L);
-                    }
-                    else {
-                        long sum2 = qty * pmd.getMenuDetailPrice();
-                        pmd.setUsedSum(pmd.getUsedSum() + sum2);
-                        pmd.setUsedAmount(pmd.getUsedAmount() + qty);
-                    }
+                    long sum2 = qty * pmd.getMenuDetailPrice();
+                    pmd.setUsedSum(pmd.getUsedSum() + sum2);
+                    pmd.setUsedAmount(pmd.getUsedAmount() + qty);
                     session.update(pmd);
                 }
             }
@@ -2265,6 +2264,15 @@ public class DAOUtils {
         return null;
     }
 
+    public static boolean hasOrderDetailLink(Session session, Long idOfOrg, Payment payment, String guid, OrderDetail od) {
+        Criteria criteria = session.createCriteria(PreorderLinkOD.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("idOfOrder", payment.getIdOfOrder()));
+        criteria.add(Restrictions.eq("preorderGuid", guid));
+        criteria.add(Restrictions.eq("idOfOrderDetail", od.getCompositeIdOfOrderDetail().getIdOfOrderDetail()));
+        return criteria.list().size() > 0;
+    }
+
     private static PreorderMenuDetail getPreorderMenuDetailByItemCode(PreorderComplex preorderComplex, String itemCode) {
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getItemCode().equals(itemCode) && !pmd.getDeletedState()) {
@@ -2274,6 +2282,23 @@ public class DAOUtils {
         // если нет неудаленных - возвращаем удаленное блюдо
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getItemCode().equals(itemCode) && pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        return null;
+    }
+
+    private static PreorderMenuDetail getPreorderMenuDetailByGoodsGuid(Session session, PreorderComplex preorderComplex,
+            String guidOfGood) {
+        Good good = findGoodByGuid(session, guidOfGood);
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfGood().equals(good.getGlobalId()) && !pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        // если нет неудаленных - возвращаем удаленное блюдо
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfGood().equals(good.getGlobalId()) && pmd.getDeletedState()) {
                 return pmd;
             }
         }
