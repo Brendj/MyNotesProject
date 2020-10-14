@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 235
+-- Пакет обновлений 236
 
 --731
 alter table cf_wt_dishes alter column code set not null;
@@ -37,8 +37,8 @@ alter table cf_wt_menu_group_relationships alter column idofmenu set not null;
 
 alter table cf_wt_menu_group_relationships alter column idofmenugroup set not null;
 
-CREATE OR REPLACE FUNCTION dish_inc_version() RETURNS TRIGGER AS
-$$
+CREATE OR REPLACE FUNCTION dish_inc_version() returns trigger
+LANGUAGE 'plpgsql' as '
 DECLARE
   max_version bigint;
 BEGIN
@@ -48,10 +48,9 @@ BEGIN
   END IF;
   NEW.version := max_version + 1;
   RETURN NEW;
-END ;
-$$ language plpgsql;
-CREATE OR REPLACE FUNCTION complex_inc_version() RETURNS TRIGGER AS
-$$
+END ';
+
+CREATE OR REPLACE FUNCTION complex_inc_version() RETURNS trigger LANGUAGE 'plpgsql' AS '
 DECLARE
   max_version bigint;
 BEGIN
@@ -61,10 +60,10 @@ BEGIN
   END IF;
   NEW.version := max_version + 1;
   RETURN NEW;
-END;
-$$ language plpgsql;
-CREATE OR REPLACE FUNCTION exclude_day_inc_version() RETURNS TRIGGER AS
-$$
+end ';
+
+CREATE OR REPLACE FUNCTION exclude_day_inc_version() RETURNS trigger
+LANGUAGE 'plpgsql' AS '
 DECLARE
   max_version bigint;
 BEGIN
@@ -74,10 +73,9 @@ BEGIN
   END IF;
   NEW.version := max_version + 1;
   RETURN NEW;
-END;
-$$ language plpgsql;
-CREATE OR REPLACE FUNCTION menu_inc_version() RETURNS TRIGGER AS
-$$
+end ';
+CREATE OR REPLACE FUNCTION menu_inc_version() RETURNS trigger
+LANGUAGE 'plpgsql' AS '
 DECLARE
   max_version bigint;
 BEGIN
@@ -87,10 +85,9 @@ BEGIN
   END IF;
   NEW.version := max_version + 1;
   RETURN NEW;
-END;
-$$ language plpgsql;
-CREATE OR REPLACE FUNCTION menu_group_inc_version() RETURNS TRIGGER AS
-$$
+end ';
+CREATE OR REPLACE FUNCTION menu_group_inc_version() RETURNS trigger
+LANGUAGE 'plpgsql' AS '
 DECLARE
   max_version bigint;
 BEGIN
@@ -100,10 +97,9 @@ BEGIN
   END IF;
   NEW.version := max_version + 1;
   RETURN NEW;
-END;
-$$ language plpgsql;
-CREATE OR REPLACE FUNCTION org_group_inc_version() RETURNS TRIGGER AS
-$$
+end ';
+CREATE OR REPLACE FUNCTION org_group_inc_version() RETURNS trigger
+LANGUAGE 'plpgsql' AS '
 DECLARE
   max_version bigint;
 BEGIN
@@ -113,8 +109,8 @@ BEGIN
   END IF;
   NEW.version := max_version + 1;
   RETURN NEW;
-END;
-$$ language plpgsql;
+end ';
+
 CREATE TRIGGER dish_inc_version
   BEFORE INSERT OR UPDATE
   ON cf_wt_dishes
