@@ -67,7 +67,9 @@ public class MeshCardServiceIml implements MeshCardService {
         ref.setLastUpdate(new Date());
         try {
             String json = ob.writeValueAsString(category);
-            meshRestClient.executeUpdateCategory(ref.getClient().getMeshGUID(), ref.getIdOfRefInExternalSystem(), json);
+            byte[] response = meshRestClient.executeUpdateCategory(ref.getClient().getMeshGUID(), ref.getIdOfRefInExternalSystem(), json);
+            Category responseCategory = ob.readValue(response, Category.class);
+            ref.setIdOfRefInExternalSystem(responseCategory.getId());
             ref.setSend(true);
         } catch (Exception e){
             ref.setSend(false);
@@ -116,7 +118,9 @@ public class MeshCardServiceIml implements MeshCardService {
         category.getParameterValues().add(new Parameter(CardPropertiesEnum.CARD_UID, card.getCardNo()));
         category.getParameterValues().add(new Parameter(CardPropertiesEnum.CARD_TYPE, Card.TYPE_NAMES[card.getCardType()]));
         category.getParameterValues().add(new Parameter(CardPropertiesEnum.BOARD_CARD_NUMBER, card.getCardPrintedNo()));
-        category.getParameterValues().add(new Parameter(CardPropertiesEnum.ISSUE_DATE, sdfForIssueDate.format(card.getIssueTime())));
+        if(card.getIssueTime() != null) {
+            category.getParameterValues().add(new Parameter(CardPropertiesEnum.ISSUE_DATE, sdfForIssueDate.format(card.getIssueTime())));
+        }
         category.getParameterValues().add(new Parameter(CardPropertiesEnum.ACTION_PERIOD, sdfForIssueDate.format(card.getValidTime())));
         category.getParameterValues().add(new Parameter(CardPropertiesEnum.CARD_STATUS, CardState.fromInteger(card.getState())));
 

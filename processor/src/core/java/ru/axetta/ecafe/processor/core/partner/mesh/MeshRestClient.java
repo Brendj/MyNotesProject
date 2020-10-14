@@ -63,7 +63,7 @@ public class MeshRestClient {
 
     public byte[] executeCreateCategory(String meshGuid, String parameters) throws Exception {
         URL url = new URL(getServiceAddress() + "/persons/" + meshGuid + "/category");
-        logger.info("Execute request to MESH REST: " + url);
+        logger.info("Execute POST request to MESH REST: " + url);
         PostMethod httpMethod = new PostMethod(url.getPath());
         httpMethod.setRequestHeader("X-Api-Key", getApiKey());
         StringRequestEntity requestEntity = new StringRequestEntity(
@@ -101,9 +101,9 @@ public class MeshRestClient {
         return httpClient;
     }
 
-    public void executeUpdateCategory(String meshGUID, Integer idOfRefInExternalSystem, String json) throws Exception {
+    public byte[] executeUpdateCategory(String meshGUID, Integer idOfRefInExternalSystem, String json) throws Exception {
         URL url = new URL(getServiceAddress() + "/persons/" + meshGUID + "/category/" + idOfRefInExternalSystem);
-        logger.info("Execute request to MESH REST: " + url);
+        logger.info("Execute PUT request to MESH REST: " + url);
         PutMethod httpMethod = new PutMethod(url.getPath());
         httpMethod.setRequestHeader("X-Api-Key", getApiKey());
         StringRequestEntity requestEntity = new StringRequestEntity(
@@ -115,7 +115,18 @@ public class MeshRestClient {
         try {
             HttpClient httpClient = getHttpClient(url);
             int statusCode = httpClient.executeMethod(httpMethod);
-            if (statusCode != HttpStatus.SC_OK) {
+            if (statusCode == HttpStatus.SC_OK) {
+                InputStream inputStream = httpMethod.getResponseBodyAsStream();
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[1024*1024];
+                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+
+                buffer.flush();
+                return buffer.toByteArray();
+            } else {
                 throw new Exception("Mesh request has status " + statusCode);
             }
         } finally {
@@ -125,7 +136,7 @@ public class MeshRestClient {
 
     public void executeDeleteCategory(String meshGUID, Integer idOfRefInExternalSystem) throws Exception {
         URL url = new URL(getServiceAddress() + "/persons/" + meshGUID + "/category/" + idOfRefInExternalSystem);
-        logger.info("Execute request to MESH REST: " + url);
+        logger.info("Execute DELETE request to MESH REST: " + url);
         DeleteMethod httpMethod = new DeleteMethod(url.getPath());
         httpMethod.setRequestHeader("X-Api-Key", getApiKey());
         try {
