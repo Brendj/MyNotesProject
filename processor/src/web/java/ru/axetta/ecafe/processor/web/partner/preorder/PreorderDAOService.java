@@ -410,17 +410,17 @@ public class PreorderDAOService {
                                 false, amount, wtComplex.getDeleteState(), isRegular);
                     }
 
-                    // Распределение по группам
-                    String groupName = wtComplex.getWtDietType().getDescription();
-                    PreorderComplexGroup group = groupMap.get(groupName);
-                    if (group == null) {
-                        group = new PreorderComplexGroup(groupName);
-                        groupMap.put(groupName, group);
-                    }
-
                     List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, client, org, startDate,
                             endDate);
                     if (menuItemExtList.size() > 0) {
+                        // Распределение по группам
+                        String groupName = wtComplex.getWtDietType().getDescription();
+                        PreorderComplexGroup group = groupMap.get(groupName);
+                        if (group == null) {
+                            group = new PreorderComplexGroup(groupName);
+                            groupMap.put(groupName, group);
+                        }
+
                         complexItemExt.setMenuItemExtList(menuItemExtList);
                         group.addItem(complexItemExt);
                         list.add(complexItemExt);
