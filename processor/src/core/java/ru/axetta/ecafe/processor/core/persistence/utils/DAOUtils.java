@@ -2199,7 +2199,7 @@ public class DAOUtils {
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
-            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode, Long orderSum) {
+            boolean cancelOrder, PreorderComplex preorderComplex, String guidOfGood, Long orderSum) {
         if (!cancelOrder && (guid != null) && !guid.isEmpty()) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
@@ -2228,8 +2228,8 @@ public class DAOUtils {
                 session.update(preorderComplex);
             }
 
-            if (preorderComplex.isType4Complex() && itemCode != null) {
-                PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
+            if (preorderComplex.isType4Complex() && guidOfGood != null && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX) {
+                PreorderMenuDetail pmd = getPreorderMenuDetailByGoodsGuid(session, preorderComplex, guidOfGood);
                 if (pmd != null) {
                     long sum2 = qty * pmd.getMenuDetailPrice();
                     pmd.setUsedSum(pmd.getUsedSum() + sum2);
@@ -2282,6 +2282,23 @@ public class DAOUtils {
         // если нет неудаленных - возвращаем удаленное блюдо
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getItemCode().equals(itemCode) && pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        return null;
+    }
+
+    private static PreorderMenuDetail getPreorderMenuDetailByGoodsGuid(Session session, PreorderComplex preorderComplex,
+            String guidOfGood) {
+        Good good = findGoodByGuid(session, guidOfGood);
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfGood().equals(good.getGlobalId()) && !pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        // если нет неудаленных - возвращаем удаленное блюдо
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfGood().equals(good.getGlobalId()) && pmd.getDeletedState()) {
                 return pmd;
             }
         }

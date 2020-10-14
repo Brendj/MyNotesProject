@@ -237,7 +237,7 @@ public class FinancialOpsManager {
                 if (saveAllPreorderDetails || (preorderComplex != null && DAOUtils.hasOrderDetailLink(session,
                         order.getCompositeIdOfOrder().getIdOfOrg(), payment, preorderComplex.getGuid(), od))) {
                         DAOUtils.savePreorderGuidFromOrderDetail(session, preorderComplex.getGuid(), od, true,
-                                preorderComplex, od.getItemCode(), order.getRSum());
+                                preorderComplex, od.getGood().getGuid(), order.getRSum());
                 }
             }
 
