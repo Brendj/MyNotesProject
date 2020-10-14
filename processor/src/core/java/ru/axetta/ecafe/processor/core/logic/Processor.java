@@ -4393,12 +4393,12 @@ public class Processor implements SyncProcessor {
                 if (null != cardNo) {
                     card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
                     if (null == card) {
-                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 200,
-                                String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
+                        logger.info(String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
                                         payment.getIdOfOrder(), cardNo));
+                    } else {
+                        RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                                .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ORDER);
                     }
-                    RuntimeContext.getAppContext().getBean(CardBlockService.class)
-                            .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ORDER);
                 }
                 // If client specified - load client from data model
                 Client client = null;
