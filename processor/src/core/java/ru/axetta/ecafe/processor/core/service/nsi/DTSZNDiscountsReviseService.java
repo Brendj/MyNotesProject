@@ -812,8 +812,8 @@ public class DTSZNDiscountsReviseService {
             for (ClientDtisznDiscountInfo info : infoList) {
                 if (((application.getDtisznCode() == null && info.getDtisznCode().equals(0L)) || application
                         .getDtisznCode().equals(info.getDtisznCode())) && info.getStatus()
-                        .equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) && !info.getArchived()) {
+                        .equals(ClientDTISZNDiscountStatus.CONFIRMED) && fireTime.before(info.getDateEnd())
+                        && !info.getArchived()) {
                     isOk = true;
                     break;
                 }
