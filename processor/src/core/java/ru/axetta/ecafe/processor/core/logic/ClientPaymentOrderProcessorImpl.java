@@ -7,10 +7,8 @@ package ru.axetta.ecafe.processor.core.logic;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
-import ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -118,6 +116,7 @@ public class ClientPaymentOrderProcessorImpl implements ClientPaymentOrderProces
 
             ClientPaymentOrder clientPaymentOrder = getClientPaymentOrderReference(persistenceSession,
                     idOfClientPaymentOrder);
+            SecurityJournalBalance journal = SecurityJournalBalance.getSecurityJournalBalanceDataFromPayment(clientPaymentOrder);
             if (!idOfContragent.equals(clientPaymentOrder.getContragent().getIdOfContragent())) {
                 throw new IllegalArgumentException(String.format(
                         "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
@@ -137,6 +136,7 @@ public class ClientPaymentOrderProcessorImpl implements ClientPaymentOrderProces
                     clientPayment = RuntimeContext.getFinancialOpsManager()
                             .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client,
                                     addIdOfPayment);
+                    RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).savePayment(persistenceSession, clientPayment);
                 }
             }
 
@@ -146,6 +146,7 @@ public class ClientPaymentOrderProcessorImpl implements ClientPaymentOrderProces
             if (clientPayment != null) {
                 RuntimeContext.getAppContext().getBean(PaymentNotificator.class)
                         .sendNotification(clientPayment, clientPaymentOrder.getClient(), null);
+                SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, true, "OK", clientPayment);
             }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
