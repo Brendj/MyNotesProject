@@ -1,9 +1,7 @@
 package ru.axetta.ecafe.processor.core.client.items;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRelationType;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentType;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +42,7 @@ public class ClientGuardianItem {
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
-            List notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
+            List<NotificationSettingItem> notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
             ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
             Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType, Boolean allowedPreorders) {
         this.idOfClient = client.getIdOfClient();
@@ -193,5 +191,15 @@ public class ClientGuardianItem {
 
     public void setRepresentativeType(Integer representativeType) {
         this.representativeType = representativeType;
+    }
+
+    public void activateNotificationSpecial() {
+        if(this.getEnabled() && RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL)){
+            for(NotificationSettingItem i : notificationItems){
+                if(i.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())){
+                    i.setEnabled(true);
+                }
+            }
+        }
     }
 }

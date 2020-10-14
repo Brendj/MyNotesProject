@@ -8905,8 +8905,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, mobilePhone);
             for (Client cl : exClients) {
                 if (cl.getClientGroup() == null || cl.getClientGroup().getCompositeIdOfClientGroup()
-                        .getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()) || cl
-                        .getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
+                        .getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()) ||
+                        cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
                         .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
                     continue;
                 }
@@ -8949,8 +8949,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .createClientGuardianInfoTransactionFree(session, guardian, description, false,
                                 client.getIdOfClient(), ClientCreatedFromType.MPGU, roleRepresentative);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
+                boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-                clientGuardian.restore(newGuardiansVersions);
+                clientGuardian.restore(newGuardiansVersions, enableSpecialNotification);
                 clientGuardian.setCreatedFrom(ClientCreatedFromType.MPGU);
                 session.update(clientGuardian);
             }

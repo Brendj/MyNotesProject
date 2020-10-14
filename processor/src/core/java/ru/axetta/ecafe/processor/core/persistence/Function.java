@@ -15,7 +15,9 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class Function {
-
+    // Для добавления новой функции пользователя достаточно строго в конце прописать новые константы.
+    // Значение имени функции должно начинаться с FUNC_, ограничение с FUNC_RESTRICT, описание функции с FUNCD_.
+    // Детали реализации смотри в методе getFuncList().
     public static final String FUNC_USER_VIEW= "viewUser";
     public static final String FUNCD_USER_VIEW = "Просмотр пользователей";
     public static final String FUNC_USER_EDIT= "editUser";
@@ -139,6 +141,8 @@ public class Function {
     public static final String FUNCD_HELPDESK = "Заявки в службу помощи";
     public static final String FUNC_COVERAGENUTRITION = "coverageNutritionRprt";
     public static final String FUNCD_COVERAGENUTRITION = "Отчет по охвату питания";
+    public static final String FUNC_RESTRICT_CARD_SIGNS = "cardSingsRestrict";
+    public static final String FUNCD_RESTRICT_CARD_SIGNS = "Закрыть подраздел 'Цифровые подписи'";
 
     private Long idOfFunction;
     private String functionName;
