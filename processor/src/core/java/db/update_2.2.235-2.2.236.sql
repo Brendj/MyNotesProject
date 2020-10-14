@@ -6,6 +6,8 @@
 
 --731
 alter table cf_wt_dishes alter column code set not null;
+ALTER TABLE cf_wt_dishes ADD idofcategory int8 NULL;
+
 
 create sequence cf_wt_menu_group_id_seq
   maxvalue 2147483648;
