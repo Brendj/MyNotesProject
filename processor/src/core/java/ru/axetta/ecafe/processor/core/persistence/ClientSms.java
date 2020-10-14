@@ -36,9 +36,12 @@ public class ClientSms {
             "Вход в музей", //14 - TYPE_ENTER_MUSEUM_NOTIFICATION
             "Возврат билета в музей", //15 - TYPE_NOENTER_MUSEUM_NOTIFICATION
             "Генерация нового пароля", //16 - TYPE_CLIENT_NEWPASSWORD_NOTIFICATION
-            "Посещение здания культуры", //17 - TYPE_ENTER_CULTURE_NOTIFICATION
-            "Выход из здания культуры", //18 - TYPE_EXIT_CULTURE_NOTIFICATION
-            "Уведомление об окончании подписки на автопополнение л/с" //TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION
+            "Уведомление об окончании подписки на автопополнение л/с", //17 - TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION
+            "Уведомление ЕМИАС", //18 - TYPE_SPECIAL(SICK)
+            "Окончание срока действия льготы", //19 - TYPE_CLIENT_END_BENEFIT_NOTIFICATION
+            "Отказ в предоставлении услуги получения льготного питания", //20 - TYPE_CLIENT_PREFERENTIAL_FOOD_NOTIFICATION
+            "Посещение здания культуры", //21 - TYPE_ENTER_CULTURE_NOTIFICATION
+            "Выход из здания культуры" //22 - TYPE_EXIT_CULTURE_NOTIFICATION
     };
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
@@ -56,16 +59,20 @@ public class ClientSms {
     public static final int TYPE_ENTER_MUSEUM_NOTIFICATION = 14;
     public static final int TYPE_NOENTER_MUSEUM_NOTIFICATION = 15;
     public static final int TYPE_CLIENT_NEWPASSWORD_NOTIFICATION = 16;
+    public static final int TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION = 17;
+
     public static final int TYPE_CLIENT_END_BENEFIT_NOTIFICATION = 19;
     public static final int TYPE_CLIENT_PREFERENTIAL_FOOD_NOTIFICATION = 20;
     public static final int TYPE_ENTER_CULTURE_NOTIFICATION = 21;
     public static final int TYPE_EXIT_CULTURE_NOTIFICATION = 22;
+
+
     public static final int TYPE_NOTIFICATION_START_SICK = 23;
     public static final int TYPE_NOTIFICATION_CANCEL_START_SICK = 24;
     public static final int TYPE_NOTIFICATION_END_SICK = 25;
-    public static final int TYPE_NOTIFICATION_CANCEL_END_SICK = 25;
+    public static final int TYPE_NOTIFICATION_CANCEL_END_SICK = 26;
 
-    public static final int TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION = 17;
+
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;
