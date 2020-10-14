@@ -218,13 +218,11 @@ public class FinancialOpsManager {
 
     protected Contragent getDefaultSupplier(Session session, long idoforg) {
         Org org = (Org) session.get(Org.class, idoforg);
-        Contragent supplier = org.getDefaultSupplier();
-        return supplier;
+        return org.getDefaultSupplier();
     }
 
     public void cancelOrder(Session session, Order order, Payment payment) throws Exception {
-        if (order.getState() != Order.STATE_COMMITED) {
-        } else {
+        if (order.getState() == Order.STATE_COMMITED) {
             order.setState(Order.STATE_CANCELED);
             session.save(order);
             for (OrderDetail od : order.getOrderDetails()) {
@@ -249,7 +247,7 @@ public class FinancialOpsManager {
                 canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
                 ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
             }
-            if (payment != null && 0 != payment.getSummFromCBHR()) {
+            if (payment != null && payment.getSummFromCBHR() != 0) {
                 BalanceHoldTransaction cancelBalanceHoldTransaction = ClientBalanceHoldService
                         .processClientBalanceHoldTransaction(session, payment.getGuidOfCBHR(), payment.getSummFromCBHR(), payment.isCommit());
                 session.save(cancelBalanceHoldTransaction);
@@ -275,7 +273,7 @@ public class FinancialOpsManager {
 
     public ClientPayment createClientPayment(Session session, Client client, Contragent contragent,
             Integer paymentMethod, Long paySum, Date createTime, String idOfPayment, String addPaymentMethod,
-            String addIdOfPayment, Integer subScribeNum)
+            String addIdOfPayment)
             throws Exception {
         ClientPayment clientPayment;
 
@@ -285,13 +283,12 @@ public class FinancialOpsManager {
         }
 
         // регистрируем транзакцию и проводим по балансу
-        if(subScribeNum==null || subScribeNum.equals(0)){
             AccountTransaction accountTransaction;
             if(paymentMethod != null && paymentMethod == ClientPayment.CASHIER_PAYMENT_METHOD){
                 accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                         null, paySum, idOfPayment,
                         AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, null, new Date(), null);
-            }else {
+            } else {
                 accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                         null, paySum, idOfPayment,
                         AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, null, new Date(), null);
@@ -301,22 +298,6 @@ public class FinancialOpsManager {
             clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, pType, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerClientPayment(session, clientPayment);
-        } else {
-            // TODO: логика по субсчетам
-            AccountTransaction accountTransaction;
-            if(paymentMethod != null && paymentMethod == ClientPayment.CASHIER_PAYMENT_METHOD){
-                accountTransaction = ClientAccountManager.processAccountTransaction(session, client, null, paySum, idOfPayment,
-                        AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, new Date(), subScribeNum);
-            }else {
-                accountTransaction = ClientAccountManager.processAccountTransaction(session, client, null, paySum, idOfPayment,
-                    AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date(), subScribeNum);
-            }
-            // регистрируем платеж клиента
-            int pType = (payType == null ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : payType);
-            clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, pType, createTime,
-                    idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
-            registerSubBalance1ClientPayment(session, clientPayment);
-        }
         runtimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).savePayment(session, clientPayment);
         return clientPayment;
     }
