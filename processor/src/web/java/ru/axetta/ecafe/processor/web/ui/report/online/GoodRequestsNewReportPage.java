@@ -69,7 +69,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private Date lastGoodRequestUpdateDateTime;
     private List<SelectItem> preorderTypeItems = readAllPreordersPresenceItems();
     private PreordersPresenceTypeEnum preorderType = PreordersPresenceTypeEnum.WITH_PREORDERS;
-    private Boolean changedData = false;
 
     public enum PreordersPresenceTypeEnum {
         WITH_PREORDERS("Включить предзаказы"),
@@ -323,14 +322,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             return null;
         }
         return templateFilename;
-    }
-
-    public boolean  checkPreorders() {
-        if (applyUserSettings || idOfContragentOrgList.size() > 0 || idOfOrgList.size() > 1) {
-            preorderType = PreordersPresenceTypeEnum.WITHOUT_PREORDERS;
-            return true;
-        }
-        return false;
     }
 
     private boolean validateFormData() {
@@ -609,13 +600,5 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             items.add(new SelectItem(type, type.toString()));
         }
         return items;
-    }
-
-    public Boolean getChangedData() {
-        return changedData;
-    }
-
-    public void setChangedData(Boolean changedData) {
-        this.changedData = changedData;
     }
 }
