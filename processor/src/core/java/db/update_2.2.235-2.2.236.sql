@@ -6,15 +6,6 @@
 
 --731
 alter table cf_wt_dishes alter column code set not null;
-create sequence cf_wt_category_items_idofcategoryitem_seq
-  maxvalue 2147483648;
-
-CREATE SEQUENCE cf_wt_category_items_idofcategoryitem_seq1
-  INCREMENT 1
-  START 126
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  CACHE 1;
 
 create sequence cf_wt_menu_group_id_seq
   maxvalue 2147483648;
