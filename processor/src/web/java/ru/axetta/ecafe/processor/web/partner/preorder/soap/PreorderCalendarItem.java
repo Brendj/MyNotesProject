@@ -26,6 +26,9 @@ public class PreorderCalendarItem {
     @XmlAttribute(name = "address")
     private String address;
 
+    @XmlAttribute(name = "summ")
+    private Long summ;
+
     public PreorderCalendarItem() {
 
     }
@@ -60,5 +63,13 @@ public class PreorderCalendarItem {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Long getSumm() {
+        return summ;
+    }
+
+    public void setSumm(Long summ) {
+        this.summ = summ;
     }
 }

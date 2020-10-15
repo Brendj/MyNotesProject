@@ -9780,10 +9780,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         PreorderCalendar calendar = new PreorderCalendar();
         for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
             PreorderCalendarItem item = new PreorderCalendarItem();
-            item.setDate(toXmlDateTime(CalendarUtils.parseDate(entry.getKey())));
+            today = CalendarUtils.startOfDay(CalendarUtils.parseDate(entry.getKey()));
+            endDate = CalendarUtils.endOfDay(today);
+            item.setDate(toXmlDateTime(today));
             item.setEditForbidden((entry.getValue())[0]);
             item.setPreorderExists((entry.getValue())[1]);
             item.setAddress(preorderDAOService.getAddress((entry.getValue())[2]));
+            Long sum = preorderDAOService.getPreordersSum(client, today, endDate);
+            item.setSumm(sum);
             calendar.getItems().add(item);
         }
         result.setCalendar(calendar);
