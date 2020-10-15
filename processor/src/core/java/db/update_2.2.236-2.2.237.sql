@@ -24,7 +24,7 @@ create table cf_wt_categories
   constraint cf_wt_categories_user_fk foreign key (idofuser)
   references cf_users (idofuser),
   constraint cf_wt_category_items_description_check
-  check ((description)::text !~ similar_escape(' *'::text, NULL::text)),
+  check (cast(description as text) !~ similar_escape(cast(' *' as text), cast(NULL as text))),
   constraint cf_wt_categories_guid_uk
   unique (guid)
 );
@@ -69,7 +69,7 @@ create table cf_wt_category_items
   constraint cf_wt_categories_guid_uk
   unique (guid),
   constraint cf_wt_category_items_description_check
-  check ((description)::text !~ similar_escape(' *'::text, NULL::text))
+  check (cast(description as text) !~ similar_escape(cast(' *' as text), cast(NULL as text)))
 );
 
 comment on column cf_wt_category_items.idofcategoryitem is 'ID записи';
