@@ -5319,7 +5319,7 @@ public class DAOUtils {
 
     public static List<Card> getAllCardForMESHByTime(Session session, Date lastProcessing) {
         Query query = session.createQuery("from Card as crd "
-                + "where (crd.updateTime > :lastProc or crd.issueTime > :lastProc) "
+                + "where (crd.updateTime > :lastProc or crd.createTime > :lastProc) "
         );
         query.setParameter("lastProc", lastProcessing);
 

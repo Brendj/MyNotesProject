@@ -97,13 +97,13 @@ public class MeshCardServiceIml implements MeshCardService {
 
     private String getServiceAddress() throws Exception{
         String address = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_ADDRESS_PROPERTY, "");
-        if (address.equals("")) throw new Exception("MESH REST address not specified");
+        if (address.isEmpty()) throw new Exception("MESH REST address not specified");
         return address;
     }
 
     private String getApiKey() throws Exception{
         String key = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_API_KEY_PROPERTY, "");
-        if (key.equals("")) throw new Exception("MESH API key not specified");
+        if (key.isEmpty()) throw new Exception("MESH API key not specified");
         return key;
     }
 
