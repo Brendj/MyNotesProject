@@ -5,8 +5,9 @@
 -- Пакет обновлений 237
 
 drop table cf_wt_dish_categoryitem_relationships;
-drop table cf_wt_category_items;
+drop table cf_wt_category_items cascade;
 drop table cf_wt_categories;
+alter table cf_wt_dishes drop column idofcategory;
 
 create table cf_wt_categories
 (
