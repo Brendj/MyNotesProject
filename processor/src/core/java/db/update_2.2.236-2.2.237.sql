@@ -7,6 +7,12 @@
 drop table cf_wt_dish_categoryitem_relationships;
 drop table cf_wt_category_items cascade;
 drop table cf_wt_categories;
+
+create sequence cf_wt_category_items_idofcategoryitem_seq
+  maxvalue 2147483648;
+create sequence cf_wt_category_items_idofcategoryitem_seq1
+  maxvalue 2147483648;
+
 alter table cf_wt_dishes drop column idofcategory;
 
 create table cf_wt_categories
