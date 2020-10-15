@@ -45,6 +45,7 @@ public class MaintenanceService {
     private static final AtomicLong threadCounter = new AtomicLong();
     private static final int daysMinus = 45;
     private static final String CLEAR_MENU_THREAD_COUNT_PROPERTY = "ecafe.processor.clearmenu.maintenanceservice.thread.count";
+    private static final String CLEAR_MENU_PRIORITY_ORGS = "ecafe.processor.clearmenu.maintenanceservice.orgs";
     private static final Set<Long> orgsInProgress = Collections.synchronizedSet(new HashSet<Long>());
     private static final Object sync = new Object();
 
@@ -129,7 +130,19 @@ public class MaintenanceService {
         dateTime = CalendarUtils.startOfDay(dateTime);
         try {
             DAOService.getInstance().createStatTable();
-            List<Long> orgList = DAOService.getInstance().getOrgIdsForClearMenu();
+            //Проверяем само значение ключа
+            String orgs = RuntimeContext.getInstance().getPropertiesValue(CLEAR_MENU_PRIORITY_ORGS, "");
+            //Список разрешенных ip
+            String[] orgsId = orgs.split(";");
+            List<Long> orgList = new ArrayList<>();
+            for (String orgId: orgsId)
+            {
+                try {
+                    orgList.add(Long.valueOf(orgId));
+                } catch (Exception e){
+                }
+            }
+            orgList.addAll(DAOService.getInstance().getOrgIdsForClearMenu());
             logger.get().info(String.format("Found %s orgs to clear menu ", orgList.size()));
             for (Long id : orgList) {
                 boolean idUsed;
