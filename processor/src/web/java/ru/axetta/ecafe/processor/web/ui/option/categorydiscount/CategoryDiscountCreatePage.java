@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -151,6 +152,17 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
         if (idOfCategoryDiscount<1) idOfCategoryDiscount=1;
         if (idOfCategoryDiscount<0) {
             printError("Идентификатор должен быть больше 0");
+            return;
+        }
+        categoryName = categoryName.trim();
+        if (categoryName.equals(""))
+        {
+            printError("Неверное название категории");
+            return;
+        }
+        if (!DAOService.getInstance().getCategoryDiscountListByCategoryName(categoryName).isEmpty() )
+        {
+            printError("Категория с данным названием уже зарегистрирована");
             return;
         }
         /*List<Long> ids = new LinkedList<Long>();

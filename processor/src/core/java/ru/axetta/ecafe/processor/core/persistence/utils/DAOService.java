@@ -90,8 +90,8 @@ public class DAOService {
     }
 
     public List<CategoryDiscount> getCategoryDiscountListByCategoryName(String categoryName) {
-        String strQuery = "from CategoryDiscount where lower(categoryName) like lower('%" + categoryName
-                + "%') order by idOfCategoryDiscount";
+        String strQuery = "from CategoryDiscount where lower(categoryName) = lower('" + categoryName
+                + "') order by idOfCategoryDiscount";
         TypedQuery<CategoryDiscount> q = entityManager.createQuery(strQuery, CategoryDiscount.class);
         return q.getResultList();
     }
@@ -1719,6 +1719,13 @@ public class DAOService {
         TypedQuery<CategoryOrg> q = entityManager
                 .createQuery("from CategoryOrg where idOfCategoryOrg in (:idOfCategoryOrgList)", CategoryOrg.class);
         q.setParameter("idOfCategoryOrgList", idOfCategoryOrgList);
+        return q.getResultList();
+    }
+
+    public List<CategoryOrg> getCategoryOrgByCategoryName(String categoryName) {
+        TypedQuery<CategoryOrg> q = entityManager
+                .createQuery("from CategoryOrg where lower(categoryName) = lower(:categoryName)", CategoryOrg.class);
+        q.setParameter("categoryName", categoryName);
         return q.getResultList();
     }
 

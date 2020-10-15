@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -76,9 +77,19 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
 
     @Transactional
     public Object save() throws Exception {
-        if (entity.getCategoryName().equals("")){
-            printError("Введите название категории.");
+        entity.setCategoryName(entity.getCategoryName().trim());
+        if (entity.getCategoryName().equals(""))
+        {
+            printError("Неверное название категории");
             return null;
+        }
+        List<CategoryOrg> categoryOrgs = DAOService.getInstance().getCategoryOrgByCategoryName(entity.getCategoryName());
+        for (CategoryOrg categoryOrg: categoryOrgs)
+        {
+            if (categoryOrg.getIdOfCategoryOrg() != entity.getIdOfCategoryOrg()) {
+                printError("Категория с данным названием уже зарегистрирована");
+                return null;
+            }
         }
         entity =entityManager.merge(entity);
         entity.getOrgs().clear();

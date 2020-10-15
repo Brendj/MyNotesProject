@@ -102,7 +102,7 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
                 + "org.organizationtype "
                 + "from cf_orgs org join cf_orders o on org.idoforg = o.idoforg "
                 + "join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
-                + "left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
+                + "left join cf_preorder_linkod pl on pl.idoforder = o.idoforder and pl.idoforg = o.idoforg "
                 + "where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
                 + "and (pl.idofpreorderlinkod is null or (pl.idofpreorderlinkod is not NULL and pl.preorderguid is not NULL)) "
                 + org_condition
@@ -114,7 +114,7 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
                 + " select org2.idoforg, od.rprice, od.qty, od.menuorigin, od.menutype, pl.preorderguid is not NULL as ispreorder "
                 + " from cf_orgs org2 join cf_orders o on org2.idoforg = o.idoforg "
                 + " join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
-                + " left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
+                + " left join cf_preorder_linkod pl on pl.idoforder = o.idoforder and pl.idoforg = o.idoforg "
                 + " where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
                 + "and (pl.idofpreorderlinkod is null or (pl.idofpreorderlinkod is not NULL and pl.preorderguid is not NULL)) "
                 + org2_condition
