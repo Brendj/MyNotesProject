@@ -210,7 +210,7 @@ public class SecurityJournalBalance {
             SecurityJournalBalance res = new SecurityJournalBalance();
             res.setEventType(SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT);
             res.setEventDate(clientPaymentOrder.getCreateTime());
-            res.setEventInterface(ClientPayment.PAYMENT_METHOD_NAMES[11]); //hardcode 11
+            res.setEventInterface(ClientPayment.PAYMENT_METHOD_NAMES[11]); //hardcode 11 интернет эквайринг
             res.setClient(clientPaymentOrder.getClient());
             res.setServerAddress(serverAddress);
             res.setEventSource(SJBalanceSourceEnum.SJBALANCE_SOURCE_ORDER_PAYMENT);

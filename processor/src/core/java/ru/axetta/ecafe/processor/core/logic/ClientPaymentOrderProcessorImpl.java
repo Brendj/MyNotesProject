@@ -136,6 +136,8 @@ public class ClientPaymentOrderProcessorImpl implements ClientPaymentOrderProces
                     clientPayment = RuntimeContext.getFinancialOpsManager()
                             .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client,
                                     addIdOfPayment);
+                    logger.info(String.format("New client payment from changePaymentOrderStatus: idOfClient=%s, sum=%s",
+                            clientPaymentOrder.getClient().getIdOfClient(), clientPaymentOrder.getPaySum()));
                     RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).savePayment(persistenceSession, clientPayment);
                 }
             }
