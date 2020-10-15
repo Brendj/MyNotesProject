@@ -7,6 +7,12 @@
 drop table cf_wt_dish_categoryitem_relationships;
 drop table cf_wt_category_items cascade;
 drop table cf_wt_categories;
+
+create sequence cf_wt_category_items_idofcategoryitem_seq
+  maxvalue 2147483648;
+create sequence cf_wt_category_items_idofcategoryitem_seq1
+  maxvalue 2147483648;
+
 alter table cf_wt_dishes drop column idofcategory;
 
 create table cf_wt_categories
@@ -24,7 +30,7 @@ create table cf_wt_categories
   constraint cf_wt_categories_user_fk foreign key (idofuser)
   references cf_users (idofuser),
   constraint cf_wt_category_items_description_check
-  check ((description)::text !~ similar_escape(' *'::text, NULL::text)),
+  check (cast(description as text) !~ similar_escape(cast(' *' as text), cast(NULL as text))),
   constraint cf_wt_categories_guid_uk
   unique (guid)
 );
@@ -69,7 +75,7 @@ create table cf_wt_category_items
   constraint cf_wt_categories_guid_uk
   unique (guid),
   constraint cf_wt_category_items_description_check
-  check ((description)::text !~ similar_escape(' *'::text, NULL::text))
+  check (cast(description as text) !~ similar_escape(cast(' *' as text), cast(NULL as text)))
 );
 
 comment on column cf_wt_category_items.idofcategoryitem is 'ID записи';
