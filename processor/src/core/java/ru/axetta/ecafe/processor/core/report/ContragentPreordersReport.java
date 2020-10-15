@@ -77,7 +77,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
         private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
                 List<Long> idOfOrgList, Boolean showOnlyUnpaidItems) throws Exception {
             List<ContragentPreordersReportItem> result = new LinkedList<ContragentPreordersReportItem>();
-            String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
+            String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and pc.idoforgoncreate in (:idOfOrgList) " ;
             String idOfContragentCondition = contragent == null ? "" : " and ctg.idofcontragent = :idOfContragent ";
             String simpleCondition = showOnlyUnpaidItems ? " where isPaid like 'Нет' " : "";
 
