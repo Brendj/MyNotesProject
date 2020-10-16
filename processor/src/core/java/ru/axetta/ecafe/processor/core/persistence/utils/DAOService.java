@@ -2916,7 +2916,10 @@ public class DAOService {
         StringBuilder sb = new StringBuilder();
         List<WtComplex> results = new ArrayList<>();
 
-        sb.append("select wc from WtComplex wc where wc.deleteState = 0");
+        sb.append("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
+                + "left join fetch wc.wtAgeGroupItem ageItem "
+                + "left join fetch wc.wtDietType dietType "
+                + "where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
             sb.append(" and wc.wtComplexGroupItem = :wtComplexGroupItem");
         }
