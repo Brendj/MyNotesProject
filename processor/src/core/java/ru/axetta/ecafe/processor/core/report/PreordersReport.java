@@ -102,14 +102,15 @@ public class PreordersReport extends BasicReportForOrgJob {
             }
             Query query = session.createSQLQuery(
                     "SELECT a.shortnameinfoservice, a.address, a.contractid, a.clientname, a.groupname, a.preorderdate, a.complexamount, a.menudetailamount, "
-                     + "    a.complexname, a.menudetailname, a.complexprice, a.menudetailprice, a.isregularpreorder, a.idofpreordercomplex, a.ispayed "
+                     + "    a.complexname, a.menudetailname, a.complexprice, a.menudetailprice, a.isregularpreorder, a.idofpreordercomplex, a.ispayed, a.comment "
                      + "FROM ("
                      + "    SELECT distinct o.shortnameinfoservice, o.address, "
                      + "        c.contractid, p.surname || ' ' || p.firstname || ' ' || p.secondname AS clientname, cg.groupname, "
                      + "        pc.preorderdate, pc.amount AS complexAmount, 0 AS menudetailAmount, pc.complexname, "
                      + "        '' AS menudetailname, pc.complexPrice, 0 AS menudetailPrice, "
                      + "        pc.idofregularpreorder IS NOT NULL AS isRegularPreorder, "
-                     + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed "
+                     + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed, "
+                     + "        case when pc.idoforgoncreate = c.idoforg then '' else 'переведен в ОО ид ' || c.idoforg end as comment "
                      + "    FROM cf_preorder_complex pc "
                      + "    INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                      + "    INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
@@ -125,7 +126,8 @@ public class PreordersReport extends BasicReportForOrgJob {
                      + " cast(case when pc.usedsum > 0 then pmd.usedamount else pmd.amount end as integer) AS menudetailAmount, pc.complexname, "
                      + "        pmd.menudetailname, pc.complexPrice, pmd.menudetailPrice, "
                      + "        pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder, "
-                     + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed "
+                     + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed, "
+                     + "        case when pc.idoforgoncreate = c.idoforg then '' else 'переведен в ОО ид ' || c.idoforg end as comment "
                      + "    FROM cf_preorder_menudetail pmd "
                      + "    INNER JOIN cf_preorder_complex pc ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
                      + "    INNER JOIN cf_clients c ON c.idofclient = pmd.idofclient "
@@ -149,8 +151,16 @@ public class PreordersReport extends BasicReportForOrgJob {
                 String shortNameInfoService = (String) row[0];
                 String address = (String) row[1];
                 Long contractId = ((BigInteger) row[2]).longValue();
-                String clientName = (String) row[3];
-                String clientGroup = (String) row[4];
+                String comment = (String) row[15];
+                String clientName;
+                String clientGroup;
+                if (comment.isEmpty()) {
+                    clientName = (String) row[3];
+                    clientGroup = (String) row[4];
+                } else {
+                    clientName = (String) row[3] + " (" + comment + ")";
+                    clientGroup = "";
+                }
                 Date preorderDate = new Date(HibernateUtils.getDbLong(row[5]));
                 Integer complexAmount = (Integer) row[6];
                 Integer menudetailAmount = (Integer) row[7];
