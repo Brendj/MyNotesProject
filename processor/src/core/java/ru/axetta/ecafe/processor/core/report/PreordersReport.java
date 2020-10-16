@@ -114,9 +114,9 @@ public class PreordersReport extends BasicReportForOrgJob {
                      + "    INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                      + "    INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                      + "    INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                     + "    INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
+                     + "    INNER JOIN cf_orgs o ON o.idoforg = pc.idoforgoncreate "
                      + "    WHERE pc.amount > 0 and pc.preorderdate between :startDate and :endDate "
-                     + "        and pc.idoforgoncreate = :idOfOrg and coalesce(pc.deletedstate, 0) = 0 "
+                     + "        and o.idoforg = :idOfOrg and coalesce(pc.deletedstate, 0) = 0 "
                      + conditions
                      + "    UNION ALL "
                      + "    SELECT distinct o.shortnameinfoservice, o.address, "
@@ -131,9 +131,9 @@ public class PreordersReport extends BasicReportForOrgJob {
                      + "    INNER JOIN cf_clients c ON c.idofclient = pmd.idofclient "
                      + "    INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                      + "    INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                     + "    INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
+                     + "    INNER JOIN cf_orgs o ON o.idoforg = pc.idoforgoncreate "
                      + "    WHERE pmd.amount > 0 and pc.amount = 0 and pmd.preorderdate between :startDate and :endDate "
-                     + "        and pc.idoforgoncreate = :idOfOrg and coalesce(pmd.deletedstate, 0) = 0 "
+                     + "        and o.idoforg = :idOfOrg and coalesce(pmd.deletedstate, 0) = 0 "
                      + conditions
                      + ") a "
                      + "ORDER BY a.groupname, a.clientname, a.preorderdate, a.idofpreordercomplex, a.complexname, a.menudetailname");
