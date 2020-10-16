@@ -361,4 +361,8 @@ public class Card {
     public void setMeshCardClientRef(MeshClientCardRef meshCardClientRef) {
         this.meshCardClientRef = meshCardClientRef;
     }
+
+    public boolean refNotExistsOrNotSending() {
+        return  getMeshCardClientRef() == null || !getMeshCardClientRef().getSend();
+    }
 }

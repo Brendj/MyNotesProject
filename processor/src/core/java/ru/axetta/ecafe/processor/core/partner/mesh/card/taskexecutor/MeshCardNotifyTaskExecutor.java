@@ -85,7 +85,7 @@ public class MeshCardNotifyTaskExecutor {
                 try {
                     transaction = session.beginTransaction();
 
-                    if(c.getMeshCardClientRef() == null && c.getClient() != null){ // Client exists, but no ref
+                    if(c.refNotExistsOrNotSending() && c.getClient() != null){ // Client exists, but no ref
                         MeshClientCardRef ref = meshClientCardRefService.createRef(c);
                         c.setMeshCardClientRef(ref);
                     } else if(c.getClient() == null){ // Ref exists, but card without owner
@@ -93,15 +93,15 @@ public class MeshCardNotifyTaskExecutor {
                             continue;
                         }
                         MeshClientCardRef ref = meshClientCardRefService.deleteRef(c.getMeshCardClientRef());
-                        session.delete(ref);
-
                         c.setMeshCardClientRef(null);
+
+                        session.delete(ref);
                     } else if(!c.getClient().equals(c.getMeshCardClientRef().getClient())){ // If the card owner has changed
                         MeshClientCardRef oldRef = meshClientCardRefService.deleteRef(c.getMeshCardClientRef());
-                        session.delete(oldRef);
-
                         MeshClientCardRef ref = meshClientCardRefService.createRef(c);
                         c.setMeshCardClientRef(ref);
+
+                        session.delete(oldRef);
                     } else {
                         meshClientCardRefService.updateRef(c.getMeshCardClientRef());
                     }
