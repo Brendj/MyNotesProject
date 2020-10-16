@@ -74,7 +74,7 @@ public class DAOService {
     public List<Long> getOrgIdsForClearMenu() {
         List<Long> result = new ArrayList<>();
         Query q = entityManager.createNativeQuery("select idOfOrg from cf_orgs o "
-                + "where o.idoforg > (select coalesce(max(idoforg), 0) from srv_clear_menu_stat) order by o.idoforg");
+                + "where o.idoforg > (select coalesce(max(idoforg), 0) from srv_clear_menu_stat where automatic = true) order by o.idoforg");
         List list = q.getResultList();
         for (Object row : list) {
             Long value = ((BigInteger) row).longValue();

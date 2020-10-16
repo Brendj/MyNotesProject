@@ -70,7 +70,7 @@ public class OtherActionsPage extends OnlineReportPage {
     private Date endDateEMP;
     private Long contractId;
     private boolean allowGenerateGuardians = true;
-
+    private String orgsforCleaninig;
     private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
 
     private static void close(Closeable resource) {
@@ -90,6 +90,14 @@ public class OtherActionsPage extends OnlineReportPage {
         startDate = CalendarUtils.addDays(new Date(), 2);
         endDateEMP = new Date();
         startDateEMP = CalendarUtils.addDays(endDateEMP, -7);
+    }
+
+    public String getOrgsforCleaninig() {
+        return this.orgsforCleaninig;
+    }
+
+    public void setOrgsforCleaninig(String orgsforCleaninig) {
+        this.orgsforCleaninig = orgsforCleaninig;
     }
 
     public void rubBIExport() throws Exception {
@@ -179,7 +187,8 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void cleaningMenuVersion2() {
         MaintenanceService maintenanceService = RuntimeContext.getAppContext().getBean(MaintenanceService.class);
-        maintenanceService.runVersion2();
+        MaintenanceService.setOrgsforCleaninig(orgsforCleaninig);
+        maintenanceService.runVersion2(false);
         printMessage("Процесс запущен");
     }
 
