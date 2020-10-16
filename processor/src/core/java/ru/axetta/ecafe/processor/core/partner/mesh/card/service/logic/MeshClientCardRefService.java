@@ -49,7 +49,7 @@ public class MeshClientCardRefService {
         try {
             return meshCardService.updateCardForClient(ref);
         } catch (Exception e){
-            log.error("Can't create Ref", e);
+            log.error("Can't update Ref", e);
             return ref;
         }
     }
@@ -58,7 +58,7 @@ public class MeshClientCardRefService {
         try {
             return meshCardService.deleteReferenceBetweenClientAndCard(ref);
         } catch (Exception e){
-            log.error("Can't create Ref", e);
+            log.error("Can't delete Ref", e);
             return ref;
         }
     }
