@@ -106,11 +106,28 @@ public class ClientPassItem implements Comparable {
         this.orgName = event.getOrgName();
         this.enterTime = event.getEvtDateTime();
         this.enterName = event.getEnterName();
+        this.shortAddress = event.getAddress();
+        //Исправление неправильного хранения enterName в БД
+        if (event.getEvtType().equals(ExternalEventType.CULTURE))
+        {
+            if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                this.enterName = String.format("Вход в здание Минкультуры (%s)", getOrgName());
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                this.enterName = String.format("Выход из здания Минкультуры (%s)", getOrgName());
+            }
+        }
         if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
             if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
                 this.direction = getDirection(EnterEvent.ENTRY);
             } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
                 this.direction = getDirection(EnterEvent.PASSAGE_RUFUSAL);
+            }
+        }
+        if (event.getEvtType().equals(ExternalEventType.CULTURE)) {
+            if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                this.direction = getDirection(EnterEvent.ENTRY);
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                this.direction = getDirection(EnterEvent.EXIT);
             }
         }
         this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " ")); // empty row for JSP

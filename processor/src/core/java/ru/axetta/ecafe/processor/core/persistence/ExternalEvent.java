@@ -74,11 +74,19 @@ public class ExternalEvent {
         String name = "";
         if (evtType == null) throw new IllegalArgumentException("Неверный тип события");
         if (evtStatus == null) throw new IllegalArgumentException("Неверный статус");
-        if (evtType.equals(ExternalEventType.MUSEUM) || evtType.equals(ExternalEventType.CULTURE)) {
+        if (evtType.equals(ExternalEventType.MUSEUM)) {
             if (getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
-                name = String.format("Вход (%s)", getOrgName());
+                name = String.format("Вход в музей (%s)", getOrgName());
             } else if (getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
                 name = String.format("Возврат билета (%s)", getOrgName());
+            }
+        }
+
+        if (evtType.equals(ExternalEventType.CULTURE)) {
+            if (getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                name = String.format("Вход в здание Минкультуры (%s)", getOrgName());
+            } else if (getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                name = String.format("Выход из здания Минкультуры (%s)", getOrgName());
             }
         }
         if (name.length() > 255) {
