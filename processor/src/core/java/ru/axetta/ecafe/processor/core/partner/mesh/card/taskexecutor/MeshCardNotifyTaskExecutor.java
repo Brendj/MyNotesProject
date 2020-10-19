@@ -81,7 +81,6 @@ public class MeshCardNotifyTaskExecutor {
                 if(c.getClient() != null && StringUtils.isEmpty(c.getClient().getMeshGUID())){
                     continue;
                 }
-
                 try {
                     transaction = session.beginTransaction();
 
@@ -97,11 +96,7 @@ public class MeshCardNotifyTaskExecutor {
 
                         session.delete(ref);
                     } else if(!c.getClient().equals(c.getMeshCardClientRef().getClient())){ // If the card owner has changed
-                        MeshClientCardRef oldRef = meshClientCardRefService.deleteRef(c.getMeshCardClientRef());
-                        MeshClientCardRef ref = meshClientCardRefService.createRef(c);
-                        c.setMeshCardClientRef(ref);
-
-                        session.delete(oldRef);
+                        meshClientCardRefService.changeRef(c);
                     } else {
                         meshClientCardRefService.updateRef(c.getMeshCardClientRef());
                     }

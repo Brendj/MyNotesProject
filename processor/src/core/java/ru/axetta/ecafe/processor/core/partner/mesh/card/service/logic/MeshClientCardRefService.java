@@ -62,4 +62,21 @@ public class MeshClientCardRefService {
             return ref;
         }
     }
+
+    public void changeRef(Card c) throws Exception {
+        try {
+            meshCardService.deleteReferenceBetweenClientAndCard(c.getMeshCardClientRef());
+            /*if(!c.getMeshCardClientRef().getSend()){
+                throw new Exception("Ref not deleted, process change owner skipped");
+            }*/
+            MeshClientCardRef newRef = meshCardService.createReferenceBetweenClientAndCard(c);
+            c.getMeshCardClientRef().setClient(newRef.getClient());
+            c.getMeshCardClientRef().setIdOfRefInExternalSystem(newRef.getIdOfRefInExternalSystem());
+            c.getMeshCardClientRef().setLastUpdate(newRef.getLastUpdate());
+            c.getMeshCardClientRef().setSend(newRef.getSend());
+        } catch (Exception e){
+            log.error("Can't change Ref", e);
+            throw e;
+        }
+    }
 }
