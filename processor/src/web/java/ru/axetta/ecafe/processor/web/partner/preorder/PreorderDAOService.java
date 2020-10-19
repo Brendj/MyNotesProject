@@ -1103,22 +1103,20 @@ public class PreorderDAOService {
                 query.setParameter("idOfDish", idOfMenu);
             }
         }
-
-        RegularPreorder regularPreorder = null;
-        try {
-            regularPreorder = (RegularPreorder) query.getSingleResult();
-            if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
-            if (regularDatesIntersect(regularComplex, regularPreorder)) {
-                deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK,
-                        guardianMobile, RegularPreorderState.CHANGE_BY_USER);
+        List<RegularPreorder> regularPreorderList = query.getResultList();
+        if (regularPreorderList.size() > 0) {
+            for (RegularPreorder regularPreorderItem : regularPreorderList) {
+                if (regularEquals(regularComplex, regularPreorderItem) && regularPreorderItem.getAmount().equals(amount)) {
+                    return;
+                }
+                if (regularDatesIntersect(regularComplex, regularPreorderItem)) {
+                    deleteRegularPreorderInternal((Session) em.getDelegate(), regularPreorderItem, PreorderState.OK,
+                            guardianMobile, RegularPreorderState.CHANGE_BY_USER);
+                }
             }
-            regularPreorder = createNewRegular(client, regularComplex, amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
-                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
-            em.persist(regularPreorder);
-        } catch (NoResultException e) {
-            regularPreorder = createNewRegular(client, regularComplex, amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
-                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
         }
+        RegularPreorder regularPreorder = createNewRegular(client, regularComplex, amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
+                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
         createPreordersFromRegular(regularPreorder, true);
     }
 
@@ -1133,13 +1131,15 @@ public class PreorderDAOService {
             MenuDetail menuDetail = getMenuDetail(client, idOfMenu, date);
             regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
         }
-        RegularPreorder regularPreorder;
-        try {
-            regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
-        } catch (NoResultException e) {
+        List<RegularPreorder> regularPreorderList = regularPreorderSelect.getResultList();
+        if (regularPreorderList.size() > 0) {
+            for (RegularPreorder regularPreorderItem : regularPreorderList) {
+                deleteRegularPreorderInternal((Session) em.getDelegate(), regularPreorderItem, PreorderState.OK,
+                        guardianMobile, RegularPreorderState.CHANGE_BY_USER);
+            }
+        } else {
             throw new RegularAlreadyDeleted("Для выбранного комплекса или блюда не настроен повтор заказа");
         }
-        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile, RegularPreorderState.CHANGE_BY_USER);
     }
 
     private void deleteWtRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfDish,
