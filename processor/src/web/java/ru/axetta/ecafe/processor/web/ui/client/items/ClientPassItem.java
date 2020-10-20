@@ -107,6 +107,7 @@ public class ClientPassItem implements Comparable {
         this.enterTime = event.getEvtDateTime();
         this.enterName = event.getEnterName();
         this.shortAddress = event.getAddress();
+        this.cardType = getPrintedCardType(event.getCardType() != null ? event.getCardType() : -1);
         //Исправление неправильного хранения enterName в БД
         if (event.getEvtType().equals(ExternalEventType.CULTURE))
         {
