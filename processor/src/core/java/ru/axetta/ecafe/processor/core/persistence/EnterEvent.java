@@ -55,6 +55,7 @@ public class EnterEvent {
     public static final int CHECKED_BY_TEACHER_EXT = 101; //отмечен в классном журнале через внешнюю систему
     public static final int CHECKED_BY_TEACHER_INT = 102; //отмечен учителем внутри здания
     public static final int ENTRY_WITHOUT_CARD = 112; // проход без карты
+    public static final int BLACK_LIST = 202; // Посетитель из черного списка
 
     //eventcode
    //
