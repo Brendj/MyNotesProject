@@ -48,7 +48,6 @@
                             value="#{mainPage.goodRequestsNewReportPage.contragentStringIdOfOrgList}"
                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                     <f:setPropertyActionListener value="Выбор организации - источника меню" target="#{mainPage.orgFilterPageName}" />
-                    <f:setPropertyActionListener value="true" target="#{mainPage.goodRequestsNewReportPage.changedData}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{mainPage.goodRequestsNewReportPage.contragentFilter}}" />
@@ -65,7 +64,6 @@
                     <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="#{mainPage.goodRequestsNewReportPage.getStringIdOfOrgList}"
                                                  target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
-                    <f:setPropertyActionListener value="true" target="#{mainPage.goodRequestsNewReportPage.changedData}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{mainPage.goodRequestsNewReportPage.filter}}" />
@@ -73,7 +71,7 @@
             <h:outputText escape="true" value="Формировать по Списку организаций рассылки" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.applyUserSettings}"
                                      styleClass="output-text">
-                <a4j:support event="onclick" reRender="goodRequestsNewReportFilterPanelGrid"
+                <a4j:support event="onclick" reRender="contragetFilter, orgFilter"
                              actionListener="#{mainPage.goodRequestsNewReportPage.applyOfOrgList}" ajaxSingle="true" />
             </h:selectBooleanCheckbox>
             <%--Добавить варниг сообщ--%>
@@ -153,8 +151,7 @@
 
             <h:outputText escape="true" value="Типы заявок" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.goodRequestsNewReportPage.preorderType}"
-                             styleClass="output-text" disabled="#{(mainPage.goodRequestsNewReportPage.checkPreorders() and
-                             mainPage.goodRequestsNewReportPage.changedData) or mainPage.goodRequestsNewReportPage.applyUserSettings}">
+                             styleClass="output-text">
                 <f:converter converterId="preorderTypeConverter" />
                 <f:selectItems value="#{mainPage.goodRequestsNewReportPage.preorderTypeItems}" />
             </h:selectOneMenu>

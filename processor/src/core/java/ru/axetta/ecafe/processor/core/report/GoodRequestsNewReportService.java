@@ -116,9 +116,7 @@ public class GoodRequestsNewReportService {
         if (!hidePreorders) {
             String sqlQuery =
                     "SELECT distinct ci.idoforg, "
-                            //+ "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
-                            + "   CASE WHEN (pc.amount = 0) AND md.idofgood IS NULL THEN pmd.idofgood "
-                            + "        WHEN (pc.amount = 0) AND md.idofgood IS NOT NULL THEN md.idofgood "
+                            + "   CASE WHEN (pc.amount = 0) THEN pmd.idofgood "
                             + "        WHEN pc.amount <> 0 THEN ci.idofgood END AS idofgood, "
                             + "   CASE WHEN (pc.amount = 0) THEN false ELSE true END AS iscomplex, "
                             + "   CASE WHEN (pc.amount = 0) THEN gmd.goodscode ELSE gc.goodscode END AS goodscode, "
@@ -131,15 +129,12 @@ public class GoodRequestsNewReportService {
                             + "   CASE WHEN (pc.amount = 0) THEN pmd.menudetailprice ELSE pc.complexprice "
                             + "         END AS price "
                             + "FROM cf_preorder_complex pc "
-                           // + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient " //
                             + "INNER JOIN cf_complexinfo ci ON pc.idoforgoncreate = ci.idoforg AND ci.menudate = pc.preorderdate " //
                             + "   AND ci.idofcomplex = pc.armcomplexid "
                             + "inner JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
-                            + "inner JOIN cf_menu m ON ci.idoforg = m.idoforg AND pmd.preorderdate = m.menudate " //
-                            + "inner JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
                             + "inner JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
-                            + "inner JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
-                            + "WHERE m.idOfOrg IN (:orgList) AND m.menuDate BETWEEN :startDate AND :endDate "
+                            + "inner JOIN cf_goods gmd ON gmd.idofgood = pmd.idofgood "
+                            + "WHERE pc.idOfOrgOnCreate IN (:orgList) AND pc.preorderDate BETWEEN :startDate AND :endDate "
                             + "   AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)";
             //and pc.deletedState = 0 and pmd.deletedState = 0";
 
