@@ -51,8 +51,12 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-    <a4j:commandButton value="Очистка таблиц меню - 2" action="#{otherActionsPage.cleaningMenuVersion2}"
-                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+        <rich:panel>
+            <a4j:commandButton value="Очистка таблиц меню - 2" action="#{otherActionsPage.cleaningMenuVersion2}"
+                               reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" /><br />
+            <h:outputText value="Список ид. организаций:" />
+            <h:inputText value="#{otherActionsPage.orgsforCleaninig}" size="50" />
+        </rich:panel>
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
