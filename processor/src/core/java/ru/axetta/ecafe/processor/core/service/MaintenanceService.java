@@ -157,11 +157,15 @@ public class MaintenanceService {
             logger.get().info(String.format("Found %s orgs to clear menu ", orgList.size()));
             for (Long id : orgList) {
                 boolean idUsed;
-                synchronized (sync) {
-                    idUsed = getOrgInProgressUsed(id);
-                    if (!idUsed) orgsInProgress.add(id);
+                if (automatic) {
+                    synchronized (sync) {
+                        idUsed = getOrgInProgressUsed(id);
+                        if (!idUsed)
+                            orgsInProgress.add(id);
+                    }
+                    if (idUsed)
+                        continue;
                 }
-                if (idUsed) continue;
                 Thread.currentThread().setName("ClearMenu_ORG_ID-" + id + "-n" + threadCounter.addAndGet(1));
                 logger.get().info(String.format("Start clear menu for org id = %s", id));
                 try {
@@ -228,7 +232,6 @@ public class MaintenanceService {
 
                     transaction.commit();
                     transaction = null;
-                    orgsInProgress.remove(id);
                     logger.get().info(String.format("End clear menu for org id = %s", id));
                 } catch (Exception e) {
                     logger.get().error(String.format("Error in clear menu version 2 for orgId=%s", id), e);
