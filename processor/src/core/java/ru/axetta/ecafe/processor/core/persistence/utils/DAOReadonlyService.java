@@ -926,7 +926,7 @@ public class DAOReadonlyService {
         Set<WtComplex> complexes = new HashSet<>();
         try {
             Query queryOrgs = entityManager.createQuery(
-                    "SELECT complex from WtComplex complex where complex.version > :version "
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items left join fetch items.dishes dishes where complex.version > :version "
                             + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs)");
             queryOrgs.setParameter("version", version);
             queryOrgs.setParameter("contragent", contragent);
@@ -938,7 +938,7 @@ public class DAOReadonlyService {
             }
 
             Query queryOrgGroups = entityManager.createQuery(
-                    "SELECT complex from WtComplex complex where complex.version > :version "
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items left join fetch items.dishes dishes where complex.version > :version "
                             + "AND complex.contragent = :contragent AND :org IN elements(complex.wtOrgGroup.orgs)");
             queryOrgGroups.setParameter("version", version);
             queryOrgGroups.setParameter("contragent", contragent);
@@ -951,7 +951,7 @@ public class DAOReadonlyService {
 
             for (WtComplex complex : complexes) {
                 Query query = entityManager
-                        .createQuery("SELECT item from WtComplexesItem item where item.wtComplex = :complex");
+                        .createQuery("SELECT item from WtComplexesItem item left join fetch item.dishes dish where item.wtComplex = :complex");
                 query.setParameter("complex", complex);
                 List<WtComplexesItem> items = query.getResultList();
                 if (items != null && items.size() > 0) {
@@ -1058,20 +1058,20 @@ public class DAOReadonlyService {
             return false;
         }
     }
-	
-        public Boolean checkExcludeDays(Date date, WtComplex wtComplex) {
-        try {
-            Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
-                            + "WHERE excludeDays.complex = :complex "
-                            + "AND excludeDays.deleteState = 0");
-            query.setParameter("complex", wtComplex);
-            List<WtComplexExcludeDays> excludeDays = query.getResultList();
 
-            if (excludeDays != null) {
-                for (WtComplexExcludeDays wtExcludeDays : excludeDays) {
-                    if (wtExcludeDays.getDate().getTime() == date.getTime())
-                        return true;
-                }
+    public List<WtComplexExcludeDays> getExcludeDaysByWtComplex(WtComplex wtComplex) {
+        Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                + "WHERE excludeDays.complex = :complex "
+                + "AND excludeDays.deleteState = 0");
+        query.setParameter("complex", wtComplex);
+        return query.getResultList();
+    }
+
+    public Boolean checkExcludeDays(Date date, List<WtComplexExcludeDays> excludeDays) {
+        try {
+            for (WtComplexExcludeDays wtExcludeDays : excludeDays) {
+                if (wtExcludeDays.getDate().getTime() == date.getTime())
+                    return true;
             }
             return false;
         } catch (Exception e) {

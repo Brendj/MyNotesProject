@@ -58,15 +58,15 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
-        <many-to-one name="wtComplexGroupItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem">
+        <many-to-one name="wtComplexGroupItem" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem">
             <column name="idOfComplexGroupItem"/>
         </many-to-one>
 
-        <many-to-one name="wtAgeGroupItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
+        <many-to-one name="wtAgeGroupItem" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
             <column name="idOfAgeGroupItem"/>
         </many-to-one>
 
-        <many-to-one name="wtDietType" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType">
+        <many-to-one name="wtDietType" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType">
             <column name="idOfDietType"/>
         </many-to-one>
 
