@@ -37,7 +37,7 @@ public class PaymentNotificator {
                 contractId = String.valueOf(client.getContractId());
                 balance = client.getBalance();
             } else {
-                contractId = client.getContractId() + "01";
+                contractId = String.valueOf(client.getContractId()) + "01";
                 balance = client.getSubBalance1() == null ? 0L : client.getSubBalance1();
             }
             DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
