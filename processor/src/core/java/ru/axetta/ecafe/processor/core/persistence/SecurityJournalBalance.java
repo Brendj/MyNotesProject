@@ -83,12 +83,7 @@ public class SecurityJournalBalance {
 
     public static SecurityJournalBalance getSecurityJournalBalanceFromOperations(AccountTransaction accountTransaction,
             Client client, SJBalanceTypeEnum eventType, SJBalanceSourceEnum eventSource) {
-        String serverAddress;
-        try {
-            serverAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            serverAddress = null;
-        }
+        String serverAddress = getInetAddress();
         String terminal = null;
         String cert = null;
         Date eventDate = null;
@@ -132,12 +127,7 @@ public class SecurityJournalBalance {
 
     public static SecurityJournalBalance getSecurityJournalBalanceDataFromOrder(Payment payment, Client client,
             SJBalanceTypeEnum eventType, SJBalanceSourceEnum eventSource, Long idOfOrg) {
-        String serverAddress;
-        try {
-            serverAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            serverAddress = null;
-        }
+        String serverAddress = getInetAddress();
         try {
             HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder
                     .getRequestAttributes()).getRequest();
@@ -183,15 +173,65 @@ public class SecurityJournalBalance {
         }
     }
 
-    public static SecurityJournalBalance getSecurityJournalBalanceDataFromPayment(
-            PaymentRequest.PaymentRegistry.Payment payment, Client client) {
-        SJBalanceSourceEnum source;
+    public static SecurityJournalBalance getSecurityJournalBalanceDataFromPayment(ClientPaymentOrder clientPaymentOrder) {
+        SJBalanceSourceEnum source = SJBalanceSourceEnum.SJBALANCE_SOURCE_ORDER_PAYMENT;
+        String serverAddress = getInetAddress();
+        try {
+            HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+            String terminal = null;
+            String protocol = httpServletRequest.getScheme();
+            String parameters = httpServletRequest.getQueryString();
+            String request = httpServletRequest.getScheme()
+                    + "://" +
+                    httpServletRequest.getServerName()
+                    + ":"
+                    + httpServletRequest.getServerPort() +
+                    httpServletRequest.getRequestURI()
+                    + (parameters != null ? "?" + parameters : "")
+                    + " | "
+                    + ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getAttribute("soap");
+            String uri = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRequestURI();
+            String cert = null;
+            SecurityJournalBalance res = SecurityJournalBalance.createSecurityJournalBalance(
+                    SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT,                                   //eventType
+                    clientPaymentOrder.getCreateTime(),                                         //eventdate
+                    source,                                                                     //eventSource
+                    terminal,                                                                   //terminal
+                    protocol,                                                                   //protocol
+                    ClientPayment.PAYMENT_METHOD_NAMES[clientPaymentOrder.getPaymentMethod()],  //eventInterface
+                    clientPaymentOrder.getClient(),                                             //client
+                    request,                                                                    //request
+                    httpServletRequest.getRemoteAddr(),                                         //clientAddress
+                    serverAddress == null ? httpServletRequest.getLocalAddr() : serverAddress,  //serverAddress
+                    cert);                                                                      //certificate
+            return res;
+        } catch (Exception e) {
+            SecurityJournalBalance res = new SecurityJournalBalance();
+            res.setEventType(SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT);
+            res.setEventDate(clientPaymentOrder.getCreateTime());
+            res.setEventInterface(ClientPayment.PAYMENT_METHOD_NAMES[11]); //hardcode 11 интернет эквайринг
+            res.setClient(clientPaymentOrder.getClient());
+            res.setServerAddress(serverAddress);
+            res.setEventSource(SJBalanceSourceEnum.SJBALANCE_SOURCE_ORDER_PAYMENT);
+            return res;
+        }
+    }
+
+    private static String getInetAddress() {
         String serverAddress;
         try {
             serverAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
             serverAddress = null;
         }
+        return serverAddress;
+    }
+
+    public static SecurityJournalBalance getSecurityJournalBalanceDataFromPayment(
+            PaymentRequest.PaymentRegistry.Payment payment, Client client) {
+        SJBalanceSourceEnum source;
+        String serverAddress = getInetAddress();
         try {
             HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 

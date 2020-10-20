@@ -236,6 +236,8 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                     return "запрос на вход";
                 case EnterEvent.QUERY_FOR_EXIT:
                     return "запрос на выход";
+                case EnterEvent.BLACK_LIST:
+                    return "чёрный список";
                 default:
                     return "неизвестный тип";
             }

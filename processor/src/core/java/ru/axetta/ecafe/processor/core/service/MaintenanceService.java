@@ -47,12 +47,21 @@ public class MaintenanceService {
     private static final String CLEAR_MENU_THREAD_COUNT_PROPERTY = "ecafe.processor.clearmenu.maintenanceservice.thread.count";
     private static final Set<Long> orgsInProgress = Collections.synchronizedSet(new HashSet<Long>());
     private static final Object sync = new Object();
+    private static String orgsforCleaninig;
 
     @Resource(name = "clearMenuExecutor")
     protected ThreadPoolTaskExecutor taskExecutor;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
+
+    public static String getOrgsforCleaninig() {
+        return orgsforCleaninig;
+    }
+
+    public static void setOrgsforCleaninig(String orgsforCleaninig) {
+        MaintenanceService.orgsforCleaninig = orgsforCleaninig;
+    }
 
     private MaintenanceService getProxy() {
         return RuntimeContext.getAppContext().getBean(MaintenanceService.class);
@@ -101,7 +110,7 @@ public class MaintenanceService {
         }
         int tCount = RuntimeContext.getInstance().getPropertiesValue(CLEAR_MENU_THREAD_COUNT_PROPERTY, 1);
         if (tCount == 1)
-            runVersion2();
+            runVersion2(true);
         else
             runVersion2MultiThread(tCount);
     }
@@ -122,22 +131,41 @@ public class MaintenanceService {
         return false;
     }
 
-    public void runVersion2() {
+    public void runVersion2(boolean automatic) {
         Session session = null;
         Transaction transaction = null;
         Date dateTime = CalendarUtils.addDays(new Date(), -daysMinus);
         dateTime = CalendarUtils.startOfDay(dateTime);
         try {
             DAOService.getInstance().createStatTable();
-            List<Long> orgList = DAOService.getInstance().getOrgIdsForClearMenu();
+            List<Long> orgList = new ArrayList<>();
+            if (!automatic)
+            {
+                //Список организации для очистки
+                String[] orgsId = orgsforCleaninig.split(";");
+                for (String orgId: orgsId)
+                {
+                    try {
+                        orgList.add(Long.valueOf(orgId));
+                    } catch (Exception e){
+                    }
+                }
+            }
+            else {
+                orgList = DAOService.getInstance().getOrgIdsForClearMenu();
+            }
             logger.get().info(String.format("Found %s orgs to clear menu ", orgList.size()));
             for (Long id : orgList) {
                 boolean idUsed;
-                synchronized (sync) {
-                    idUsed = getOrgInProgressUsed(id);
-                    if (!idUsed) orgsInProgress.add(id);
+                if (automatic) {
+                    synchronized (sync) {
+                        idUsed = getOrgInProgressUsed(id);
+                        if (!idUsed)
+                            orgsInProgress.add(id);
+                    }
+                    if (idUsed)
+                        continue;
                 }
-                if (idUsed) continue;
                 Thread.currentThread().setName("ClearMenu_ORG_ID-" + id + "-n" + threadCounter.addAndGet(1));
                 logger.get().info(String.format("Start clear menu for org id = %s", id));
                 try {
@@ -155,9 +183,10 @@ public class MaintenanceService {
                     query.setParameter("datetime", dateTime.getTime());
                     int rows = query.executeUpdate();
                     if (rows == 0) {
-                        query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg) "
-                                + "values(:idOfOrg)");
+                        query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg, automatic) "
+                                + "values(:idOfOrg, :automatic)");
                         query.setParameter("idOfOrg", id);
+                        query.setParameter("automatic", automatic);
                         query.executeUpdate();
                         transaction.commit();
                         transaction = null;
@@ -191,13 +220,14 @@ public class MaintenanceService {
                     logger.get().info("Deleted from menu");
 
                     Date endDate = new Date();
-                    query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg, startdate, enddate, datefrom, amount) "
-                            + "values(:idOfOrg, :startDate, :endDate, :dateFrom, :amount)");
+                    query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg, startdate, enddate, datefrom, amount, automatic) "
+                            + "values(:idOfOrg, :startDate, :endDate, :dateFrom, :amount, :automatic)");
                     query.setParameter("idOfOrg", id);
                     query.setParameter("startDate", startDate.getTime());
                     query.setParameter("endDate", endDate.getTime());
                     query.setParameter("dateFrom", dateTime.getTime());
                     query.setParameter("amount", rows);
+                    query.setParameter("automatic", automatic);
                     query.executeUpdate();
 
                     transaction.commit();
@@ -459,7 +489,7 @@ public class MaintenanceService {
 
         @Override
         public void run() {
-            RuntimeContext.getAppContext().getBean(MaintenanceService.class).runVersion2();
+            RuntimeContext.getAppContext().getBean(MaintenanceService.class).runVersion2(true);
         }
     }
 }

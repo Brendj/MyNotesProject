@@ -74,7 +74,7 @@ public class DAOService {
     public List<Long> getOrgIdsForClearMenu() {
         List<Long> result = new ArrayList<>();
         Query q = entityManager.createNativeQuery("select idOfOrg from cf_orgs o "
-                + "where o.idoforg > (select coalesce(max(idoforg), 0) from srv_clear_menu_stat) order by o.idoforg");
+                + "where o.idoforg > (select coalesce(max(idoforg), 0) from srv_clear_menu_stat where automatic = true) order by o.idoforg");
         List list = q.getResultList();
         for (Object row : list) {
             Long value = ((BigInteger) row).longValue();
@@ -2913,7 +2913,10 @@ public class DAOService {
 
     public List<WtComplex> getWtComplexesList() {
         TypedQuery<WtComplex> q = entityManager
-                .createQuery("select wc from WtComplex wc where wc.deleteState = 0 order by wc.idOfComplex",
+                .createQuery("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
+                        + "left join fetch wc.wtAgeGroupItem ageItem "
+                        + "left join fetch wc.wtDietType dietType "
+                        + "where wc.deleteState = 0 order by wc.idOfComplex",
                         WtComplex.class);
         return q.getResultList();
     }
@@ -2923,7 +2926,10 @@ public class DAOService {
         StringBuilder sb = new StringBuilder();
         List<WtComplex> results = new ArrayList<>();
 
-        sb.append("select wc from WtComplex wc where wc.deleteState = 0");
+        sb.append("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
+                + "left join fetch wc.wtAgeGroupItem ageItem "
+                + "left join fetch wc.wtDietType dietType "
+                + "where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
             sb.append(" and wc.wtComplexGroupItem = :wtComplexGroupItem");
         }

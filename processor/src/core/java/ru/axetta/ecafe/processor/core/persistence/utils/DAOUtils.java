@@ -2075,8 +2075,19 @@ public class DAOUtils {
     }
 
     public static List<WtComplex> getComplexesByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
-        return em.createQuery("select rule.complexes from WtDiscountRule rule where rule = :discountRule")
+        List<WtComplex> list = em.createQuery("select rule.complexes from WtDiscountRule rule where rule = :discountRule")
                 .setParameter("discountRule", discountRule)
+                .getResultList();
+        if (list.size() == 0) return list;
+        List<Long> ids = new ArrayList<>();
+        for (WtComplex wtComplex : list) {
+            ids.add(wtComplex.getIdOfComplex());
+        }
+        return em.createQuery("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
+                + "left join fetch wc.wtAgeGroupItem ageItem "
+                + "left join fetch wc.wtDietType dietType "
+                + "where wc.idOfComplex in :ids")
+                .setParameter("ids", ids)
                 .getResultList();
     }
 

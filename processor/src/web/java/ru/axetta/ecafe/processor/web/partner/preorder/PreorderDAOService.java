@@ -410,17 +410,17 @@ public class PreorderDAOService {
                                 false, amount, wtComplex.getDeleteState(), isRegular);
                     }
 
-                    // Распределение по группам
-                    String groupName = wtComplex.getWtDietType().getDescription();
-                    PreorderComplexGroup group = groupMap.get(groupName);
-                    if (group == null) {
-                        group = new PreorderComplexGroup(groupName);
-                        groupMap.put(groupName, group);
-                    }
-
                     List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, client, org, startDate,
                             endDate);
                     if (menuItemExtList.size() > 0) {
+                        // Распределение по группам
+                        String groupName = wtComplex.getWtDietType().getDescription();
+                        PreorderComplexGroup group = groupMap.get(groupName);
+                        if (group == null) {
+                            group = new PreorderComplexGroup(groupName);
+                            groupMap.put(groupName, group);
+                        }
+
                         complexItemExt.setMenuItemExtList(menuItemExtList);
                         group.addItem(complexItemExt);
                         list.add(complexItemExt);
@@ -3449,6 +3449,7 @@ public class PreorderDAOService {
 
         if (wtComplex.getCycleMotion() != null) {   // комплекс настроен
             // Составляем карту дней цикла
+            List<WtComplexExcludeDays> excludeDays = DAOReadonlyService.getInstance().getExcludeDaysByWtComplex(wtComplex);
             while (currentDate.getTime() <= date.getTime()) {
                 calendar.setTime(currentDate);
                 // смотрим рабочую неделю
@@ -3458,8 +3459,7 @@ public class PreorderDAOService {
                         // 6-дневная рабочая неделя
                         calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
                     // проверка, выпадает ли день на выходные
-                    //Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
-                    Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, wtComplex);
+                    Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, excludeDays);
                     if (!isHoliday) {
                         cycleDates.put(currentDate, count++);
                     }
