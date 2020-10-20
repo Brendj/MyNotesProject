@@ -216,7 +216,7 @@ public class MaintenanceService {
                     logger.get().info("Deleted from menu");
 
                     Date endDate = new Date();
-                    query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg, startdate, enddate, datefrom, amount) "
+                    query = session.createSQLQuery("insert into srv_clear_menu_stat(idoforg, startdate, enddate, datefrom, amount, automatic) "
                             + "values(:idOfOrg, :startDate, :endDate, :dateFrom, :amount, :automatic)");
                     query.setParameter("idOfOrg", id);
                     query.setParameter("startDate", startDate.getTime());
