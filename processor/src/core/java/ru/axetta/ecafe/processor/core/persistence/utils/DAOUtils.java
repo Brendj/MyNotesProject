@@ -5327,4 +5327,15 @@ public class DAOUtils {
         orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         return (Org) orgCriteria.uniqueResult();
     }
+    public static void saveLiblary(Session session, String guid, Long libraryCode, String libraryName,
+            String libraryAdress, Date accessTime) {
+        Library library = new Library();
+        library.setGuid(guid);
+        library.setLibraryCode(libraryCode);
+        library.setLibraryName(libraryName);
+        library.setLibraryAdress(libraryAdress);
+        library.setAccessTime(accessTime);
+        library.setCreateDate(new Date());
+        session.save(library);
+    }
 }
