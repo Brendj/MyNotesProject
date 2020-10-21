@@ -1801,9 +1801,8 @@ public class PreorderDAOService {
                         em.persist(preorderMenuDetail);
                     }
                 } else if (preorderMenuDetail != null) {
-                    preorderMenuDetail.setAmount(regularPreorder.getAmount());
-                    preorderMenuDetail.setRegularPreorder(regularPreorder);
-                    em.merge(preorderMenuDetail);
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
                 }
             }
 
