@@ -1001,8 +1001,8 @@ public class PreorderDAOService {
 
     private boolean regularDatesIntersect(RegularPreorderParam regularComplex, RegularPreorder regularPreorder) {
         return CalendarUtils.betweenOrEqualDate(regularComplex.getStartDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate())
-                || CalendarUtils.betweenDate(regularComplex.getEndDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate()
-        );
+                || CalendarUtils.betweenOrEqualDate(regularComplex.getEndDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate())
+                || CalendarUtils.betweenOrEqualDate(regularPreorder.getStartDate(), regularComplex.getStartDate(), regularComplex.getEndDate());
     }
 
     private RegularPreorder createNewRegular(Client client, RegularPreorderParam regularComplex,
