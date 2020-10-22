@@ -108,7 +108,7 @@ public class LibraryController {
             Card card = client.findActiveCard(persistenceSession, null);
             if (card != null) {
                 RuntimeContext.getAppContext().getBean(CardBlockService.class)
-                        .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ENTER_MUSEUM);
+                        .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ENTER_LIBRARY);
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
             ExternalEvent event = new ExternalEvent(client, libraryCode, libraryName, libraryAdress,
