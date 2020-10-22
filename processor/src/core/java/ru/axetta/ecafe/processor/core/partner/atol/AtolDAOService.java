@@ -64,8 +64,8 @@ public class AtolDAOService {
     }
 
     private AtolPacket getLastAtolPacket(ClientPaymentAddon clientPaymentAddon) {
-        Query query = entityManager.createQuery("select ap from AtolPacket ap where ap.clientPaymentAddon = :clientPaymentAddon order by ap.createdDate desc");
-        query.setParameter("clientPaymentAddon", clientPaymentAddon);
+        Query query = entityManager.createQuery("select ap from AtolPacket ap where ap.clientPaymentAddon.idOfClientPaymentAddon = :clientPaymentAddon order by ap.createdDate desc");
+        query.setParameter("clientPaymentAddon", clientPaymentAddon.getIdOfClientPaymentAddon());
         query.setMaxResults(1);
         return (AtolPacket)query.getSingleResult();
     }
