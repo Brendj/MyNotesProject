@@ -67,7 +67,7 @@ public class ExternalEvent {
         this.cardType = cardType;
         this.version = handlerVersion.getVersion();
         this.address = libraryAddress;
-        buildEnterName(evtStatus);
+        this.enterName = "Проход в библиотеку";
     }
 
     public ExternalEvent(Client client, String orgCode, String orgName, ExternalEventType evtType,
