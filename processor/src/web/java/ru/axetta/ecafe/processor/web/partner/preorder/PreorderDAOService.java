@@ -887,7 +887,7 @@ public class PreorderDAOService {
                                         false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreate);
                         } else {
                             deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(),
-                                        date, guardianMobile, regularMenuItem.getStartDate(), regularComplex.getEndDate(), isWtMenu);
+                                        date, guardianMobile, regularMenuItem.getStartDate(), regularMenuItem.getEndDate(), isWtMenu);
                         }
                         continue;
                     }
