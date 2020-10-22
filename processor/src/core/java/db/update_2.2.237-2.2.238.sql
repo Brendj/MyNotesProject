@@ -4,4 +4,7 @@
 
 -- Пакет обновлений 238
 
+--734
+ALTER TABLE srv_clear_menu_stat ADD automatic bool NULL DEFAULT true;
+
 --! ФИНАЛИЗИРОВАН 20.10.2020, НЕ МЕНЯТЬ
