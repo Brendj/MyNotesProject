@@ -5,8 +5,9 @@
 package ru.axetta.ecafe.processor.web.partner.library;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -59,7 +60,7 @@ public class LibraryController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
         String guid = "";
-        Long libraryCode = 0L;
+        String libraryCode = "";
         String libraryName = "";
         String libraryAdress = "";
         Date accessTime = new Date(0);
@@ -68,7 +69,7 @@ public class LibraryController {
                 guid = request.getParameterMap().get(key)[0];
             }
             if (key.toLowerCase().equals("librarycode")) {
-                libraryCode = Long.valueOf(request.getParameterMap().get(key)[0]);
+                libraryCode = request.getParameterMap().get(key)[0];
             }
             if (key.toLowerCase().equals("libraryname")) {
                 libraryName = request.getParameterMap().get(key)[0];
@@ -104,7 +105,17 @@ public class LibraryController {
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
-            DAOUtils.saveLiblary(persistenceSession, guid, libraryCode, libraryName, libraryAdress, accessTime);
+            Card card = client.findActiveCard(persistenceSession, null);
+            if (card != null) {
+                RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                        .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ENTER_MUSEUM);
+            }
+            ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
+            ExternalEvent event = new ExternalEvent(client, libraryCode, libraryName, libraryAdress,
+                    ExternalEventType.LIBRARY, accessTime, card == null ? null : card.getCardNo(),
+                    card == null ? null : card.getCardType(), handler);
+            persistenceSession.save(event);
+            //DAOUtils.saveLiblary(persistenceSession, guid, libraryCode, libraryName, libraryAdress, accessTime);
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
