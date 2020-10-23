@@ -1039,11 +1039,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         } else {
             /* очистить список если он не пуст */
-            Set<CategoryDiscount> categories = client.getCategories();
-            for (CategoryDiscount categoryDiscount : categories) {
-                categoryDiscount.getClients().remove(client);
-                persistenceSession.update(categoryDiscount);
-            }
+            client.getCategories().clear();
         }
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
