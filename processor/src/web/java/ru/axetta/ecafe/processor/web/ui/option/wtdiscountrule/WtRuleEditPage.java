@@ -241,7 +241,9 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
             Contragent contragent) {
         Set<WtComplex> wtComplexes = new HashSet<>();
         List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent, wtEntity);
-        wtComplexes.addAll(complexes);
+        if (complexes != null) {
+            wtComplexes.addAll(complexes);
+        }
         return wtComplexes;
     }
 
