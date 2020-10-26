@@ -20,6 +20,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.DependsOn;
@@ -87,6 +88,7 @@ public class MeshClientCardRefService {
         }
     }
 
+    @Transactional
     public void registryCardInMESHByOrgs(List<Org> orgs) throws Exception {
         if(CollectionUtils.isEmpty(orgs)){
             return;
@@ -95,11 +97,11 @@ public class MeshClientCardRefService {
         Transaction transaction = null;
         try{
             session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.getTransaction();
+            transaction = session.beginTransaction();
 
             for(Org o : orgs){
                 try {
-                    log.info(String.format("Begin sending cards for OO %d", o.getIdOfOrg()));
+                    log.info(String.format("Begin sending cards for OO ID %d", o.getIdOfOrg()));
 
                     List<Card> cards = DAOUtils.getNotRegistryInMeshCardsByOrg(session, o);
                     if(CollectionUtils.isEmpty(cards)){
@@ -111,14 +113,15 @@ public class MeshClientCardRefService {
                     for (Card c : cards) {
                         MeshClientCardRef ref = this.createRef(c);
                         c.setMeshCardClientRef(ref);
+
                         session.update(c);
                     }
                     transaction.commit();
 
-                    log.info(String.format("OO %d is processed", o.getIdOfOrg()));
+                    log.info(String.format("OO ID %d is processed", o.getIdOfOrg()));
                 } catch (Exception e){
                     log.error(
-                            String.format("For OO %d catch exception. Further processing of this organization is skipped",
+                            String.format("For OO ID %d catch exception. Further processing of this organization is skipped",
                                     o.getIdOfOrg()), e);
                     transaction.rollback();
                 }
