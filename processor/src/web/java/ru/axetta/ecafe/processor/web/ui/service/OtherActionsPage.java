@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManagerService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
-import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -645,11 +644,6 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void sendToAtol() {
         RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
-    }
-
-    public void autoBlockCards() {
-        RuntimeContext.getAppContext().getBean(CardBlockService.class).run();
-        printMessage("Операция блокировки ЭИ завершена");
     }
 
     public void preorderRequestsManualGenerate() throws Exception {

@@ -5336,4 +5336,16 @@ public class DAOUtils {
 
         return query.list();
     }
+
+    public static List<Card> getNotRegistryInMeshCardsByOrg(Session session, Org org){
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria
+                .createAlias("client", "c", JoinType.INNER_JOIN)
+                .createAlias("org", "o", JoinType.INNER_JOIN)
+                .createAlias("meshCardClientRef", "ref", JoinType.NONE)
+                .add(Restrictions.not(Restrictions.like("c.meshGUID", "")))
+                .add(Restrictions.eq("org", org));
+
+        return criteria.list();
+    }
 }

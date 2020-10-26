@@ -843,6 +843,9 @@
         <%--@elvariable id="notificationsPage" type="ru.axetta.ecafe.processor.web.ui.service.NotificationsPage"--%>
         <rich:panelMenuItem id="notificationsMenuItem" binding="#{notificationsPage.mainMenuComponent}"
                             label="Уведомления" action="#{notificationsPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="cardServicesPage" type="ru.axetta.ecafe.processor.web.ui.service.CardServicesPage"--%>
+        <rich:panelMenuItem id="cardServicesMenuItem" binding="#{cardServicesPage.mainMenuComponent}"
+                            label="Электронные идентификаторы" action="#{cardServicesPage.show}" reRender="workspaceForm"/>
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Сверка"
