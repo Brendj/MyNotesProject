@@ -837,11 +837,8 @@ public class PreorderDAOService {
                                 date, true, null, guardianMobile, mobileGroupOnCreate);
 
                 } else {
-                    if (!isWtMenu) {
-                        deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date, guardianMobile);
-                    } else {
-                        deleteWtRegularPreorder(client, complex.getIdOfComplex(), true, null, date, guardianMobile);
-                    }
+                    deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date,
+                                guardianMobile, regularComplex.getStartDate(), regularComplex.getEndDate(), isWtMenu);
                 }
                 continue;
             }
@@ -889,13 +886,8 @@ public class PreorderDAOService {
                             createRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
                                         false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreate);
                         } else {
-                            if (!isWtMenu) {
-                                deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date,
-                                        guardianMobile);
-                            } else {
-                                deleteWtRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date,
-                                        guardianMobile);
-                            }
+                            deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(),
+                                        date, guardianMobile, regularMenuItem.getStartDate(), regularMenuItem.getEndDate(), isWtMenu);
                         }
                         continue;
                     }
@@ -1009,8 +1001,8 @@ public class PreorderDAOService {
 
     private boolean regularDatesIntersect(RegularPreorderParam regularComplex, RegularPreorder regularPreorder) {
         return CalendarUtils.betweenOrEqualDate(regularComplex.getStartDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate())
-                || CalendarUtils.betweenDate(regularComplex.getEndDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate()
-        );
+                || CalendarUtils.betweenOrEqualDate(regularComplex.getEndDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate())
+                || CalendarUtils.betweenOrEqualDate(regularPreorder.getStartDate(), regularComplex.getStartDate(), regularComplex.getEndDate());
     }
 
     private RegularPreorder createNewRegular(Client client, RegularPreorderParam regularComplex,
@@ -1103,35 +1095,45 @@ public class PreorderDAOService {
                 query.setParameter("idOfDish", idOfMenu);
             }
         }
-
-        RegularPreorder regularPreorder = null;
-        try {
-            regularPreorder = (RegularPreorder) query.getSingleResult();
-            if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
-            if (regularDatesIntersect(regularComplex, regularPreorder)) {
-                deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK,
-                        guardianMobile, RegularPreorderState.CHANGE_BY_USER);
+        List<RegularPreorder> regularPreorderList = query.getResultList();
+        if (regularPreorderList.size() > 0) {
+            for (RegularPreorder regularPreorderItem : regularPreorderList) {
+                if (regularEquals(regularComplex, regularPreorderItem) && regularPreorderItem.getAmount().equals(amount)) {
+                    return;
+                }
+                if (regularDatesIntersect(regularComplex, regularPreorderItem)) {
+                    deleteRegularPreorderInternal((Session) em.getDelegate(), regularPreorderItem, PreorderState.OK,
+                            guardianMobile, RegularPreorderState.CHANGE_BY_USER);
+                }
             }
-            regularPreorder = createNewRegular(client, regularComplex, amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
-                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
-            em.persist(regularPreorder);
-        } catch (NoResultException e) {
-            regularPreorder = createNewRegular(client, regularComplex, amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
-                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
         }
+        RegularPreorder regularPreorder = createNewRegular(client, regularComplex, amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
+                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
         createPreordersFromRegular(regularPreorder, true);
     }
 
-    private void deleteRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfMenu, Date date, String guardianMobile) throws Exception {
+    private void deleteRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfMenu, Date date,
+            String guardianMobile, Date startDate, Date endDate, boolean isWtMenu) throws Exception {
         String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : " and m.itemCode = :itemCode ";
         Query regularPreorderSelect = em.createQuery("select m from RegularPreorder m "
-                + "where m.client = :client " + condition + " and m.deletedState = false");
+                + "where m.client = :client " + condition + " and m.deletedState = false and m.startDate = :startDate "
+                + "and m.endDate = :endDate");
         regularPreorderSelect.setParameter("client", client);
+        regularPreorderSelect.setParameter("startDate", startDate);
+        regularPreorderSelect.setParameter("endDate", endDate);
         if (isComplex)
             regularPreorderSelect.setParameter("idOfComplex", idOfComplex);
         else {
-            MenuDetail menuDetail = getMenuDetail(client, idOfMenu, date);
-            regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
+            if (!isWtMenu) {
+                MenuDetail menuDetail = getMenuDetail(client, idOfMenu, date);
+                regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
+            } else {
+                WtDish wtDish = getWtDish(idOfMenu, date);
+                if (wtDish == null) {
+                    throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfMenu.toString());
+                }
+                regularPreorderSelect.setParameter("idOfDish", idOfMenu);
+            }
         }
         RegularPreorder regularPreorder;
         try {
@@ -1139,26 +1141,8 @@ public class PreorderDAOService {
         } catch (NoResultException e) {
             throw new RegularAlreadyDeleted("Для выбранного комплекса или блюда не настроен повтор заказа");
         }
-        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile, RegularPreorderState.CHANGE_BY_USER);
-    }
-
-    private void deleteWtRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfDish,
-            Date date, String guardianMobile) throws Exception {
-        String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : " and m.idOfDish = :idOfDish ";
-        Query regularPreorderSelect = em.createQuery("select m from RegularPreorder m "
-                + "where m.client = :client " + condition + " and m.deletedState = false");
-        regularPreorderSelect.setParameter("client", client);
-        if (isComplex)
-            regularPreorderSelect.setParameter("idOfComplex", idOfComplex);
-        else {
-            WtDish wtDish = getWtDish(idOfDish, date);
-            if (wtDish == null) {
-                throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfDish.toString());
-            }
-            regularPreorderSelect.setParameter("idOfDish", idOfDish);
-        }
-        RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
-        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile, RegularPreorderState.CHANGE_BY_USER);
+        deleteRegularPreorderInternal((Session) em.getDelegate(), regularPreorder, PreorderState.OK,
+                guardianMobile, RegularPreorderState.CHANGE_BY_USER);
     }
 
     private void deleteRegularPreorderInternal(Session session, RegularPreorder regularPreorder, PreorderState state,
