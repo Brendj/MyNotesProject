@@ -97,10 +97,10 @@ public class MeshClientCardRefService {
         Transaction transaction = null;
         try{
             session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
 
             for(Org o : orgs){
                 try {
+                    transaction = session.beginTransaction();
                     log.info(String.format("Begin sending cards for OO ID %d", o.getIdOfOrg()));
 
                     List<Card> cards = DAOUtils.getNotRegistryInMeshCardsByOrg(session, o);
@@ -117,13 +117,15 @@ public class MeshClientCardRefService {
                         session.update(c);
                     }
                     transaction.commit();
+                    transaction = null;
 
                     log.info(String.format("OO ID %d is processed", o.getIdOfOrg()));
                 } catch (Exception e){
                     log.error(
                             String.format("For OO ID %d catch exception. Further processing of this organization is skipped",
                                     o.getIdOfOrg()), e);
-                    transaction.rollback();
+                } finally {
+                    HibernateUtils.rollback(transaction, log);
                 }
             }
             transaction = null;

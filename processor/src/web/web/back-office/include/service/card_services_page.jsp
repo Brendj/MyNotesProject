@@ -11,8 +11,8 @@
 
 <%--@elvariable id="cardServicesPage" type="ru.axetta.ecafe.processor.web.ui.service.CardServicesPage"--%>
 
-<h:panelGrid id="CardServicesGrid" binding="#{cardServicesPage.pageComponent}" columns="2">
-    <h:panelGrid id="CardServicesPanel">
+<h:panelGrid id="cardServicesGrid" binding="#{cardServicesPage.pageComponent}" columns="2">
+    <h:panelGrid id="cardServicesPanel">
         <rich:panel>
             <f:facet name="header">
                 <h:outputText styleClass="column-header" value="Отправка ЭИ в МЭШ" />
@@ -20,7 +20,7 @@
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText styleClass="output-text" escape="true" value="Организации" />
                 <h:panelGroup>
-                    <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" id="cardServicesPanelModalOrgListSelectorPanel"
                                        reRender="modalOrgListSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                        styleClass="command-link" style="width: 25px;">
@@ -32,19 +32,22 @@
                 <h:outputText styleClass="output-text" escape="true" value="Учитывать дружественные ОО" />
                 <h:selectBooleanCheckbox value="#{cardServicesPage.allFriendlyOrgs}" styleClass="checkboxes" />
                 <a4j:commandButton value="Отправить ЭИ в МЭШ" id="CardServicesSentToMeshButton"
-                                   action="#{cardServicesPage.sendCardsToMESH()}" styleClass="command-button" />
+                                   action="#{cardServicesPage.sendCardsToMESH()}" styleClass="command-button"
+                                   status="cardServicesPanelreportGenerateStatus"
+                />
             </h:panelGrid>
         </rich:panel>
         <a4j:commandButton value="Блокировка ЭИ без транзакций" action="#{cardServicesPage.autoBlockCards()}" id="autoBlockCards"
-                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"
+                           status="cardServicesPanelreportGenerateStatus"
+        />
+        <a4j:status id="cardServicesPanelreportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
     </h:panelGrid>
 
-    <a4j:status id="reportGenerateStatus">
-        <f:facet name="start">
-            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-        </f:facet>
-    </a4j:status>
-
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
+                   warnClass="warn-messages" id="cardServicesPageInfo"/>
 </h:panelGrid>
