@@ -2,26 +2,21 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence;
+/**
+ * Created by a.voinov on 27.10.2020.
+ */
 
+package ru.axetta.ecafe.processor.web.partner.library;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import java.util.Date;
 
-public class Library {
-    private Long id;
+@JsonDeserialize(using = JsonLibraryDeSerializer.class)
+public class LibraryRequest {
     private String guid;
-    private Long libraryCode;
+    private String libraryCode;
     private String libraryName;
     private String libraryAdress;
     private Date accessTime;
-    private Date createDate;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getGuid() {
         return guid;
@@ -31,11 +26,11 @@ public class Library {
         this.guid = guid;
     }
 
-    public Long getLibraryCode() {
+    public String getLibraryCode() {
         return libraryCode;
     }
 
-    public void setLibraryCode(Long libraryCode) {
+    public void setLibraryCode(String libraryCode) {
         this.libraryCode = libraryCode;
     }
 
@@ -53,14 +48,6 @@ public class Library {
 
     public void setLibraryAdress(String libraryAdress) {
         this.libraryAdress = libraryAdress;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
     }
 
     public Date getAccessTime() {

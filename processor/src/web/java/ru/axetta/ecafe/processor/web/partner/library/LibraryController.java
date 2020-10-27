@@ -2,6 +2,10 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
+/**
+ * Created by a.voinov on 27.10.2020.
+ */
+
 package ru.axetta.ecafe.processor.web.partner.library;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -38,7 +42,7 @@ public class LibraryController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "enterlibrary")
-    public Response setEntryLibrary(@Context HttpServletRequest request) {
+    public Response setEntryLibrary(@Context HttpServletRequest request, LibraryRequest libraryRequest) {
         Result result = new Result();
         String securityKey = "";
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -59,37 +63,25 @@ public class LibraryController {
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
-        String guid = "";
-        String libraryCode = "";
-        String libraryName = "";
-        String libraryAdress = "";
-        Date accessTime = new Date(0);
-        for (String key : request.getParameterMap().keySet()) {
-            if (key.toLowerCase().equals("guid")) {
-                guid = request.getParameterMap().get(key)[0];
-            }
-            if (key.toLowerCase().equals("librarycode")) {
-                libraryCode = request.getParameterMap().get(key)[0];
-            }
-            if (key.toLowerCase().equals("libraryname")) {
-                libraryName = request.getParameterMap().get(key)[0];
-            }
-            if (key.toLowerCase().equals("libraryadress")) {
-                libraryAdress = request.getParameterMap().get(key)[0];
-            }
-            if (key.toLowerCase().equals("accesstime")) {
-                String date = request.getParameterMap().get(key)[0];
-                DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                try {
-                    accessTime = format.parse(date);
-                } catch (ParseException e) {
-                    logger.error("Ошибка при чтении даты для Библиотеки", e);
-                    result.setErrorCode(ResponseCodes.RC_WRONG_DATE.getCode().toString());
-                    result.setErrorMessage(ResponseCodes.RC_WRONG_DATE.toString());
-                    return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-                }
-            }
+        String guid = libraryRequest.getGuid();
+        String libraryCode = libraryRequest.getLibraryCode();
+        String libraryName = libraryRequest.getLibraryName();
+        String libraryAdress = libraryRequest.getLibraryAdress();
+        Date accessTime = libraryRequest.getAccessTime();
 
+        if (guid == null || libraryCode == null || libraryName == null || libraryAdress == null)
+        {
+            logger.error("Не все обязательные поля заполнены");
+            result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
+        if (accessTime == null)
+        {
+            logger.error("Ошибка при чтении даты для Библиотеки");
+            result.setErrorCode(ResponseCodes.RC_WRONG_DATE.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_WRONG_DATE.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -115,7 +107,6 @@ public class LibraryController {
                     ExternalEventType.LIBRARY, accessTime, card == null ? null : card.getCardNo(),
                     card == null ? null : card.getCardType(), handler);
             persistenceSession.save(event);
-            //DAOUtils.saveLiblary(persistenceSession, guid, libraryCode, libraryName, libraryAdress, accessTime);
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
