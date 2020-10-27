@@ -41,6 +41,8 @@ public class JsonLibraryDeSerializer extends JsonDeserializer<LibraryRequest> {
             {
                 val = val.substring(0,val.length()-1);
             }
+            if (val.equals("null"))
+                val = null;
             if (elt.getKey().toLowerCase().equals("guid")) {
                 libraryRequest.setGuid(val);
             }
