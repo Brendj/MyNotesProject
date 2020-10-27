@@ -100,7 +100,7 @@ public class LibraryController {
             Client client = DAOUtils.findClientByMeshGuid(persistenceSession, guid);
             if (client == null)
             {
-                logger.error("Клиент не найден");
+                logger.error(String.format("Client with guid=%s not found", guid));
                 result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
