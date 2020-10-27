@@ -45,7 +45,7 @@ public class LibraryController {
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
                 String header = headerNames.nextElement();
-                if (header.toLowerCase().equals("authorization bearer token"))
+                if (header.toLowerCase().equals("authorization bearer token") || header.toLowerCase().equals("key"))
                 {
                     securityKey = request.getHeader(header);
                     break;
