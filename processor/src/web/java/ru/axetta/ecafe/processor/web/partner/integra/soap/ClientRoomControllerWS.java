@@ -9508,6 +9508,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_PREORDERS_NOT_ENABLED_DESC;
             return result;
         }
+        boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), null);
         if (mode.equals("child")) {
             List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient());
             boolean informed = false;
@@ -9522,7 +9523,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
                 return result;
             }
-            boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), null);
             if (!allowed) {
                 result.resultCode = RC_NOT_ALLOWED_PREORDERS;
                 result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
@@ -9543,6 +9543,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         summaryBase.setGrade(child.getClientGroup().getGroupName());
         if (mode.equals("child")) {
             summaryBase.setPreorderAllowed(1); //т.к. если флаг выключен, то выше уже кидаем ошибку
+        } else if (mode.equals("staff")) {
+            summaryBase.setPreorderAllowed(allowed ? 1 : 0);
         }
         summaryBase.setAddress(child.getOrg().getShortAddress());
 
@@ -9780,10 +9782,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         PreorderCalendar calendar = new PreorderCalendar();
         for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
             PreorderCalendarItem item = new PreorderCalendarItem();
-            item.setDate(toXmlDateTime(CalendarUtils.parseDate(entry.getKey())));
+            today = CalendarUtils.startOfDay(CalendarUtils.parseDate(entry.getKey()));
+            endDate = CalendarUtils.endOfDay(today);
+            item.setDate(toXmlDateTime(today));
             item.setEditForbidden((entry.getValue())[0]);
             item.setPreorderExists((entry.getValue())[1]);
             item.setAddress(preorderDAOService.getAddress((entry.getValue())[2]));
+            Long sum = preorderDAOService.getPreordersSum(client, today, endDate);
+            item.setSumm(sum);
             calendar.getItems().add(item);
         }
         result.setCalendar(calendar);
