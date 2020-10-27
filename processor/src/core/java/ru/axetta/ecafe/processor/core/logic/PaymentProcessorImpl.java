@@ -160,7 +160,7 @@ public class PaymentProcessorImpl implements PaymentProcessor {
         Integer subBalanceNum = null;
         Long contractId = null;
 
-        boolean enableSubBalanceOperation = RuntimeContext.getInstance()
+        Boolean enableSubBalanceOperation = RuntimeContext.getInstance()
                 .getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
         if (enableSubBalanceOperation) {
             if (payment.getContractId() != null) {
@@ -200,6 +200,15 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                     PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
                     String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
                             PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
+                            payment.getContractId(), payment.getClientId()), null);
+        }
+
+        if (subBalanceNum != null && subBalanceNum > 1 && enableSubBalanceOperation) {
+            SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false, "Не найден субсчет", null);
+            return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
+                    PaymentProcessResult.SUB_BALANCE_NOT_FOUND.getCode(),
+                    String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
+                            PaymentProcessResult.SUB_BALANCE_NOT_FOUND.getDescription(), idOfContragent,
                             payment.getContractId(), payment.getClientId()), null);
         }
 
@@ -253,7 +262,7 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                 clientPayment = financialOpsManager
                     .createClientPayment(persistenceSession, client, contragent, payment.getPaymentMethod(),
                             paymentSum, payment.getPayTime(), payment.getIdOfPayment(),
-                            payment.getAddPaymentMethod(), payment.getAddIdOfPayment());
+                            payment.getAddPaymentMethod(), payment.getAddIdOfPayment(), subBalanceNum);
 
                 persistenceSession.flush();
                 persistenceTransaction.commit();

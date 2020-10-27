@@ -4462,7 +4462,7 @@ public class Processor implements SyncProcessor {
                 Set<String> rations = new HashSet<>();
                 //Проверяем, есть ли среди деталей элемент со ссылкой на предзаказ
                 PreorderComplex preorderComplex = findPreorderComplexByPayment(persistenceSession, payment);
-                boolean saveAllPreorderDetails = (preorderComplex != null && preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4));
+                boolean saveAllPreorderDetails = (preorderComplex == null ? false : preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4));
 
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {

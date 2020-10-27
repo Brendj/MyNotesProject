@@ -31,7 +31,7 @@ public class ClientAccountManager {
      * @param transactionTime
      * @return
      */
-        // Скорее всего legacy-code
+
     public static AccountTransaction checkBalanceAndProcessAccountTransaction(Session session, Client client, Card card,
           long transactionSum, String source, int sourceType, Date transactionTime, Long idOfSourceOrg, Long orderId) throws Exception {
         AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
