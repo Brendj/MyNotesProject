@@ -1344,6 +1344,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         //To change body of implemented methods use File | Settings | File Templates.
         if (null != categoryMap) {
             idOfCategoryList = new ArrayList<Long>();
+            clientDiscountItems = new ArrayList<>();
             List<ClientDiscountItem> newClientDiscountItems = new LinkedList<ClientDiscountItem>();
             if (!categoryMap.isEmpty()) {
                 for (Long idOfCategory : categoryMap.keySet()) {
