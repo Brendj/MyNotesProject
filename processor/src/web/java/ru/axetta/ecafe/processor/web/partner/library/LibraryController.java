@@ -71,8 +71,7 @@ public class LibraryController {
 
         if (guid == null || guid.trim().isEmpty()
                 || libraryCode == null || libraryCode.trim().isEmpty()
-                || libraryName == null || libraryName.trim().isEmpty()
-                || libraryAdress == null || libraryAdress.trim().isEmpty())
+                || libraryName == null || libraryName.trim().isEmpty())
         {
             logger.error("Не все обязательные поля заполнены");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
