@@ -1516,8 +1516,8 @@ public class PreorderDAOService {
         delQuery.executeUpdate();
 
         delQuery = session.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0, state = :state "
-                + "where preorderComplex.idOfPreorderComplex in (select idOfPreorderComplex from PreorderComplex "
-                + "where regularPreorder = :regularPreorder) and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
+                //+ "where preorderComplex.idOfPreorderComplex in (select idOfPreorderComplex from PreorderComplex "
+                + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
         delQuery.setParameter("state", state);
@@ -1785,9 +1785,14 @@ public class PreorderDAOService {
                         em.persist(preorderMenuDetail);
                     }
                 } else if (preorderMenuDetail != null) {
-                    preorderMenuDetail.setAmount(regularPreorder.getAmount());
-                    preorderMenuDetail.setRegularPreorder(regularPreorder);
-                    em.merge(preorderMenuDetail);
+                    if (preorderMenuDetail.getAmount() == 0) {
+                        preorderMenuDetail.setAmount(regularPreorder.getAmount());
+                        preorderMenuDetail.setRegularPreorder(regularPreorder);
+                        em.merge(preorderMenuDetail);
+                    } else {
+                        currentDate = CalendarUtils.addDays(currentDate, 1);
+                        continue;
+                    }
                 }
             }
 
