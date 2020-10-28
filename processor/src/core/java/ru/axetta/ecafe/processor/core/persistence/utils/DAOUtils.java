@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -694,11 +694,16 @@ public class DAOUtils {
     public static ClientGroup findClientGroupByGroupNameAndIdOfOrg(Session persistenceSession, Long idOfOrg,
             String groupName) throws Exception {
         Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        List l = clientGroupCriteria.add(Restrictions
+        List<ClientGroup> list = clientGroupCriteria.add(Restrictions
                 .and(Restrictions.eq("groupName", groupName).ignoreCase(), Restrictions.eq("org.idOfOrg", idOfOrg)))
                 .list();
-        if (l.size() > 0) {
-            return (ClientGroup) l.get(0);
+        if (list.size() == 1) {
+            return list.get(0);
+        } else if (list.size() > 1) {
+            for (ClientGroup clientGroup : list) {
+                if (clientGroup.getGroupName().equals(groupName)) return clientGroup; //ищем точное совпадение с учетом регистра, если есть
+            }
+            return list.get(0); //если нет совпадения с учетом регистра, отдаем первую запись
         }
         return null;
     }
