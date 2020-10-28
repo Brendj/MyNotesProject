@@ -4710,7 +4710,8 @@ public class DAOUtils {
             criteria.add(Restrictions.isNull("dtisznCode"));
         }
         if (!StringUtils.isEmpty(guid)) {
-            criteria.add(Restrictions.or(Restrictions.eq("client.clientGUID", guid), Restrictions.eq("client.meshGUID", guid)));
+            criteria.createAlias("client", "cl", JoinType.INNER_JOIN);
+            criteria.add(Restrictions.or(Restrictions.eq("cl.clientGUID", guid), Restrictions.eq("cl.meshGUID", guid)));
         }
         return criteria.list();
     }
