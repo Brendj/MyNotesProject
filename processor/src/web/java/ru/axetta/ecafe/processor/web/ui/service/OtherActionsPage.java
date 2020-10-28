@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManagerService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
-import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -714,7 +713,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void runUpdateApplicationsForFoodTask() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask(true);
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask(true, null);
             printMessage("Обработка ЗЛП завершена");
         } catch (Exception e) {
             getLogger().error("Error in runUpdateApplicationsForFoodTask: ", e);

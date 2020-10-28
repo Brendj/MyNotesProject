@@ -65,7 +65,7 @@ public class ApplicationForFoodProcessingService {
             ApplicationForFoodStatus pausedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null);
 
             List<ApplicationForFood> applicationForFoodList =
-                    DAOUtils.getApplicationForFoodListByStatus(session, pausedStatus, true);
+                    DAOUtils.getApplicationForFoodListByStatus(session, pausedStatus, true, null);
             logger.info(String.format("%d applications was found", applicationForFoodList.size()));
 
             Integer daysCount;

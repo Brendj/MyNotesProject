@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4702,12 +4702,15 @@ public class DAOUtils {
     }
 
     public static List<ApplicationForFood> getApplicationForFoodListByStatus(Session session,
-            ApplicationForFoodStatus status, Boolean isOthers) {
+            ApplicationForFoodStatus status, Boolean isOthers, String guid) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("status", status));
         criteria.add(Restrictions.eq("archived", false));
         if (isOthers) {
             criteria.add(Restrictions.isNull("dtisznCode"));
+        }
+        if (!StringUtils.isEmpty(guid)) {
+            criteria.add(Restrictions.or(Restrictions.eq("client.clientGUID", guid), Restrictions.eq("client.meshGUID", guid)));
         }
         return criteria.list();
     }
@@ -4865,15 +4868,27 @@ public class DAOUtils {
         return (GroupNamesToOrgs) criteria.uniqueResult();
     }
 
-    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date) {
+    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date, String guid) {
         List<Long> clientGroupList = new LinkedList<Long>();
         clientGroupList.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
         boolean useLastReceiveDate = RuntimeContext.getInstance().getConfigProperties().getProperty(DTSZNDiscountsReviseService.FIELD_PROPERTY, "false").equals("true");
         String field = useLastReceiveDate ? "lastReceivedDate" : "lastUpdate";
-        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
-                + "where (" + field + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+        Query query;
+        if (StringUtils.isEmpty(guid)) {
+            query = session.createQuery(
+                    "select distinct client.idOfClient from ClientDtisznDiscountInfo " + "where (" + field
+                            + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) "
+                            + "and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+        } else {
+            query = session.createQuery(
+                    "select distinct client.idOfClient from ClientDtisznDiscountInfo " + "where (" + field
+                            + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) "
+                            + "and (client.clientGUID = :guid or client.meshGUID = :guid) "
+                            + "and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+            query.setParameter("guid", guid);
+        }
         query.setParameter("date", date);
         query.setParameterList("clientGroups", clientGroupList);
         query.setParameter("otherDiscountCode", DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
