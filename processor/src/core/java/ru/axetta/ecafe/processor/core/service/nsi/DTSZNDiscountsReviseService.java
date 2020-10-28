@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
@@ -100,6 +101,31 @@ public class DTSZNDiscountsReviseService {
 
     public void updateApplicationsForFoodTask(boolean forTest, String guid) throws Exception {
         updateApplicationsForFoodTaskService(forTest, null, guid);
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            maxRecords = getMaxRecords();
+        } catch (Exception e) {
+            logger.error("DTSZNDiscountsReviseService initialization error", e);
+        }
+    }
+
+    private Long getMaxRecords() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String recordsString = runtimeContext.getConfigProperties().getProperty(MAX_RECORDS_PER_TRANSACTION);
+        if (null == recordsString) {
+            return DEFAULT_MAX_RECORDS_PER_TRANSACTION;
+        }
+        Long records;
+        try {
+            records = Long.parseLong(recordsString);
+        } catch (NumberFormatException e) {
+            logger.error(String.format("Unable to parse max records value from config: %s", recordsString));
+            return DEFAULT_MAX_RECORDS_PER_TRANSACTION;
+        }
+        return records;
     }
 
     public void updateApplicationsForFoodTaskService(boolean forTest, String serviceNumber, String guid) throws Exception {
