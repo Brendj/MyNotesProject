@@ -206,8 +206,7 @@ public class SMSService {
                 for (int i = 0; i < 3; i++) {
                     try {
                         if (smsService instanceof EMPSmsServiceImpl) {
-                            //logger.info(String.format("Test sending sms: %s", ((EMPAbstractEventType)textObject).toFullString()));
-                            sendResponse = ((EMPSmsServiceImpl) smsService).sendTextMessage(sender, client, textObject);
+                            sendResponse = ((EMPSmsServiceImpl) smsService).sendTextMessage(client, textObject);
                             boolean isSuccess = sendResponse.isSuccess();
                             if (sendResponse != null && !isSuccess) {
                                 String msg = ((EMPEventType) textObject).buildText();
@@ -216,7 +215,6 @@ public class SMSService {
                                         messageTargetId, messageType, msg);
                                 return false;
                             }
-                            //textObject = ((EMPEventType) textObject).buildText();
                             textMessage = ((EMPEventType) textObject).buildText();
                         } else {
                             sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);

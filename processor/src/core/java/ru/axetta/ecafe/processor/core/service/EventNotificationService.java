@@ -1039,7 +1039,6 @@ public class EventNotificationService {
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_LIBRARY, destClient, values);
                 }
-                putGenderParams(empType, values);
             }
 
             String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);

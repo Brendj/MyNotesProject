@@ -28,11 +28,11 @@ public class EMPLeaveEventType extends EMPAbstractEventType {
 
     @Override
     public void parse(Client client) {
-        parseClientSimpleInfo(client);
+        parseClientSimpleInfo(client, type);
     }
 
     @Override
     public void parse(Client child, Client guardian) {
-        parseChildAndGuardianInfo(child, guardian);
+        parseChildAndGuardianInfo(child, guardian, type);
     }
 }

@@ -169,6 +169,9 @@ public class EMPEventTypeFactory {
                         break;
                 }
                 break;
+            case ENTER_LIBRARY:
+                event = new EMPLibraryEventType(values);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown type");
         }

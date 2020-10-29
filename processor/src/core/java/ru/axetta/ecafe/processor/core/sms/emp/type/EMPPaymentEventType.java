@@ -29,14 +29,14 @@ public class EMPPaymentEventType extends EMPAbstractEventType {
 
     @Override
     public void parse(Client client) {
-        parseClientSimpleInfo(client);
+        parseClientSimpleInfo(client, type);
 
         Map<String, String> params = getParameters();
     }
 
     @Override
     public void parse(Client child, Client guardian) {
-        parseChildAndGuardianInfo(child, guardian);
+        parseChildAndGuardianInfo(child, guardian, type);
 
         Map<String, String> params = getParameters();
     }
