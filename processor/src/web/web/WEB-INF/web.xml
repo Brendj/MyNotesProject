@@ -515,6 +515,23 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>LibraryServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.partner.library.LibraryController</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/library</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LibraryServlet</servlet-name>
+        <url-pattern>/library/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>SchoolServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>

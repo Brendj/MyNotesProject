@@ -9404,7 +9404,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
             ExternalEvent event = new ExternalEvent(cl, orgCode, cultureName, cultureAddress, ExternalEventType.CULTURE,
-                    accessTime, ExternalEventStatus.fromInteger(eventsStatus.intValue()), handler);
+                    accessTime, ExternalEventStatus.fromInteger(eventsStatus.intValue()), card == null ? null : card.getCardNo(),
+                    card == null ? null : card.getCardType(), handler);
             session.save(event);
             transaction.commit();
             transaction = null;
