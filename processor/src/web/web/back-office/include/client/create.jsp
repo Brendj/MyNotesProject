@@ -132,8 +132,8 @@
 
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.san}" maxlength="14" styleClass="input-text" />
-    <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.guardsan}" maxlength="64" styleClass="input-text" />
+    <%--<h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />--%>
+    <%--<h:inputText value="#{mainPage.clientCreatePage.guardsan}" maxlength="64" styleClass="input-text" />--%>
     <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.externalId}" maxlength="64" styleClass="input-text"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
