@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.web.partner.smartwatch.security.SmartWatchApiKeyManager;
 
 import org.jboss.resteasy.annotations.interception.Precedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
@@ -29,32 +30,44 @@ import java.util.List;
 @ServerInterceptor
 @Precedence("SECURITY")
 public class SmartWatchRequestInterceptor implements PreProcessInterceptor {
+
     private static final Logger logger = LoggerFactory.getLogger("SmartWatchRequestInterceptor");
 
     @Override
-    public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure,
-            WebApplicationException {
-        StringBuilder sb = new StringBuilder();
-        UriInfo info = request.getUri();
+    public ServerResponse preProcess(HttpRequest request, ResourceMethod method)
+            throws Failure, WebApplicationException {
+        try {
+            SmartWatchApiKeyManager manager = RuntimeContext.getAppContext().getBean(SmartWatchApiKeyManager.class);
+            StringBuilder sb = new StringBuilder();
+            UriInfo info = request.getUri();
 
-        sb.append(String.format("Try process request: %s | Inputted QueryParam:\n", info.getPath()));
-        for(String key : info.getQueryParameters().keySet()){
-            sb.append(key).append(" : ").append(info.getQueryParameters().get(key));
-            sb.append("\n");
+            sb.append(String.format("Try process request: %s | Inputted QueryParam:\n", info.getPath()));
+            for (String key : info.getQueryParameters().keySet()) {
+                sb.append(key).append(" : ").append(info.getQueryParameters().get(key));
+                sb.append("\n");
+            }
+            logger.info(sb.toString());
+
+            HttpHeaders headers = request.getHttpHeaders();
+            List<String> requestHeaderKey = headers.getRequestHeader("key");
+
+            if (CollectionUtils.isEmpty(requestHeaderKey) || requestHeaderKey.get(0) == null) {
+                throw new WebApplicationException(
+                        Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("NOT_VALID_API_KEY").build());
+            }
+
+            String vendor = manager.getVendorByApiKey(requestHeaderKey.get(0));
+            if (vendor == null){
+                throw new WebApplicationException(
+                        Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("NOT_VALID_API_KEY").build());
+            }
+
+            request.getHttpHeaders().getRequestHeaders().add("vendor", vendor);
+
+            return null;
+        } catch (Exception e) {
+            logger.error("", e);
+            throw e;
         }
-        logger.info(sb.toString());
-
-        String apiKey = RuntimeContext.getInstance().getGeoplanerApiKey();
-
-        HttpHeaders headers = request.getHttpHeaders();
-        List<String> requestHeaderKey = headers.getRequestHeader("key");
-
-        if (CollectionUtils.isEmpty(requestHeaderKey) || !requestHeaderKey.get(0).equals(apiKey)){
-            logger.warn("Invalid API_KEY");
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity("NOT_VALID_API_KEY")
-                    .build());
-        }
-        return null;
     }
 }

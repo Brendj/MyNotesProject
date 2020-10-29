@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.partner.smartwatch;
+package ru.axetta.ecafe.processor.web.partner.smartwatch.dto;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 

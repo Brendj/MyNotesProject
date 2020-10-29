@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
+import ru.axetta.ecafe.processor.web.partner.smartwatch.dto.*;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
 import org.apache.commons.lang.StringUtils;
@@ -191,7 +192,8 @@ public class SmartWatchRestController {
             @FormParam(value="contractId") Long contractId, @FormParam(value="model") String model, @FormParam(value="color") String color,
             @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId,
             @FormParam(value="trackerActivateUserId") Long trackerActivateUserId, @FormParam(value="status") String status,
-            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid) throws Exception {
+            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid,
+            @HeaderParam(value="vendor") String vendor) throws Exception {
         logger.info(String.format("Try registry SmartWatch for Phone: %s", mobilePhone));
         Result result = new Result();
         Session session = null;
@@ -871,7 +873,7 @@ public class SmartWatchRestController {
     }
 
     private List<JsonEnterEventItem> buildEnterEventItem(Session session, Client child, Long startDate, Long endDate,
-            Integer limit) throws Exception{
+            Integer limit) throws Exception {
         List<JsonEnterEventItem> items = new LinkedList<JsonEnterEventItem>();
         List<EnterEventsItem> events = null;
         String timeConditional = endDate == null ? " ee.evtDateTime <= :startDate " : " ee.evtDateTime BETWEEN :endDate AND :startDate ";
