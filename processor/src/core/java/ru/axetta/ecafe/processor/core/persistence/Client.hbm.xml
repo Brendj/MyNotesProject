@@ -212,9 +212,9 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation"/>
         </set>
 
-        <set name="guardSan" table="CF_GuardSAN" lazy="true">
+        <set name="guardSan" inverse="true" lazy="true">
             <key column="IdOfClient"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.GuardSan" column="IdOfGuardSan"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.GuardSan"/>
         </set>
     </class>
 </hibernate-mapping>

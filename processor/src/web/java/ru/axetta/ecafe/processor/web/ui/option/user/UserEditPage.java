@@ -287,7 +287,9 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setRegion(null);
             }
             user.setNeedChangePassword(needChangePassword);
-            user.getUserOrgses().clear();
+            for (UserOrgs uo : user.getUserOrgses()) {
+                session.delete(uo);
+            }
             session.update(user);
             session.flush();
             for (OrgItem orgItem : orgItems) {

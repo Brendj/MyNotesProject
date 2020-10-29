@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.service.spb.ClientSpbService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ import java.util.List;
  */
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class SpbClientService {
 
     private static final Logger logger = LoggerFactory.getLogger(SpbClientService.class);

@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
-import ru.axetta.ecafe.processor.core.sms.emp.type.EMPAbstractEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPLeaveWithGuardianEventType;
@@ -20,6 +19,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -35,6 +35,7 @@ import java.util.Properties;
 
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class EventNotificationService {
 
     Logger logger = LoggerFactory.getLogger(EventNotificationService.class);
