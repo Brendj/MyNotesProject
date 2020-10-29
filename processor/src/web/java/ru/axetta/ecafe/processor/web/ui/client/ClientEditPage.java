@@ -1039,11 +1039,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         } else {
             /* очистить список если он не пуст */
-            Set<CategoryDiscount> categories = client.getCategories();
-            for (CategoryDiscount categoryDiscount : categories) {
-                categoryDiscount.getClients().remove(client);
-                persistenceSession.update(categoryDiscount);
-            }
+            client.getCategories().clear();
         }
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
@@ -1348,6 +1344,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         //To change body of implemented methods use File | Settings | File Templates.
         if (null != categoryMap) {
             idOfCategoryList = new ArrayList<Long>();
+            clientDiscountItems = new ArrayList<>();
             List<ClientDiscountItem> newClientDiscountItems = new LinkedList<ClientDiscountItem>();
             if (!categoryMap.isEmpty()) {
                 for (Long idOfCategory : categoryMap.keySet()) {
