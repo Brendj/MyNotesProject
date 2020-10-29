@@ -41,44 +41,45 @@ public class EMPEventTypeFactory {
     public static final int REFUSAL_PREFERENTIAL_FOOD = 901240020;
     public static final int ENTER_CULTURE             = 901240021;
     public static final int LEAVE_CULTURE              = 901240022;
+    public static final int ENTER_LIBRARY              = 901240024;
 
 
     //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
     //Например для события прохода код только один (901240001), а могут произойти 2 события: проход в школу и проход в здание культуры
 
     public static final EMPEventType buildEvent(int type, Client client, int modifired, String[] values) {
-        return buildEvent(type, client, Collections.EMPTY_MAP, modifired, values);
+        return buildEventMain(type, client,  modifired, values);
     }
 
     public static final EMPEventType buildEvent(int type, Client client, String[] values) {
-        return buildEvent(type, client, Collections.EMPTY_MAP, 0, values);
+        return buildEventMain(type, client, 0, values);
     }
 
     public static final EMPEventType buildEvent(int type, Client client) {
-        return buildEvent(type, client, Collections.EMPTY_MAP, 0, null);
+        return buildEventMain(type, client, 0, null);
     }
 
     public static final EMPEventType buildEvent(int type, Client child, Client guardian, int modifired, String[] values) {
-        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, modifired, values);
+        return buildEventMain(type, child, guardian, modifired, values);
     }
 
     public static final EMPEventType buildEvent(int type, Client child, Client guardian, String[] values) {
-        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, 0, values);
+        return buildEventMain(type, child, guardian,  0, values);
     }
 
     public static final EMPEventType buildEvent(int type, Client child, Client guardian) {
-        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, 0,  null);
+        return buildEventMain(type, child, guardian, 0,  null);
     }
 
-    public static final EMPEventType buildEvent(int type, Client client, Map<String, Object> additionalParams, int modifired, String[] values) {
+    public static final EMPEventType buildEventMain(int type, Client client, int modifired, String[] values) {
         EMPEventType event = getEmpEventType(type, modifired, values);
-        event.parse(client, additionalParams);
+        event.parse(client);
         return event;
     }
 
-    public static final EMPEventType buildEvent(int type, Client child, Client guardian, Map<String, Object> additionalParams, int modifired, String[] values) {
+    public static final EMPEventType buildEventMain(int type, Client child, Client guardian, int modifired, String[] values) {
         EMPEventType event = getEmpEventType(type, modifired, values);
-        event.parse(child, guardian, additionalParams);
+        event.parse(child, guardian);
         return event;
     }
 

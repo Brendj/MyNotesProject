@@ -46,12 +46,12 @@ public class EMPSpecialEventType extends EMPAbstractEventType {
     }
 
     @Override
-    public void parse(Client client, Map<String, Object> additionalParams) {
+    public void parse(Client client) {
         parseClientSimpleInfo(client);
     }
 
     @Override
-    public void parse(Client child, Client guardian, Map<String, Object> additionalParams) {
+    public void parse(Client child, Client guardian) {
         parseChildAndGuardianInfo(child, guardian);
     }
 }

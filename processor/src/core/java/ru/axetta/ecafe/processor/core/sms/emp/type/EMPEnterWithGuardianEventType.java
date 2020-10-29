@@ -27,14 +27,14 @@ public class EMPEnterWithGuardianEventType extends EMPAbstractEventType {
     }
 
     @Override
-    public void parse(Client client, Map<String, Object> additionalParams) {
+    public void parse(Client client) {
         parseClientSimpleInfo(client);
 
         Map<String, String> params = getParameters();
     }
 
     @Override
-    public void parse(Client child, Client guardian, Map<String, Object> additionalParams) {
+    public void parse(Client child, Client guardian) {
         parseChildAndGuardianInfo(child, guardian);
 
         Map<String, String> params = getParameters();

@@ -69,6 +69,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_CANCEL_START_SICK = "CstartSick";
     public static String NOTIFICATION_END_SICK = "endSick";
     public static String NOTIFICATION_CANCEL_END_SICK = "CendSick";
+    public static String NOTIFICATION_LIBRARY = "library";
     public static String NOTIFICATION_CLIENT_NEWPASSWORD = "clientNewPassword";
     public static String NOTIFICATION_EXPIRED_REGULAR_PAYMENT = "regularPaymentExpired";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
@@ -503,22 +504,6 @@ public class EventNotificationService {
         if ((StringUtils.isEmpty(destClient.getMobile()) && !isIgnoreEmptyMobile()) || isLeavingGroup(destClient)) {
             return false;
         }
-        String text = getNotificationText(type, TYPE_SMS);
-        if (type != NOTIFICATION_END_BENEFIT && type != NOTIFICATION_PREFERENTIAL_FOOD) {
-            if (text == null) {
-                logger.warn("No notification SMS text is specified for type '" + type + "'. SMS is not sent");
-                return false;
-            }
-            text = formatMessage(text, values);
-
-            if (text.length() > 68) {
-                text = text.substring(0, 67) + "..";
-            }
-        }
-        else
-        {
-            text = "Новый тип уведомлений";
-        }
         boolean result = false;
         try {
             int clientSMSType;
@@ -563,11 +548,13 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_END_SICK;
             } else if (type.equals(NOTIFICATION_CANCEL_END_SICK)) {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_CANCEL_END_SICK;
+            } else if (type.equals(NOTIFICATION_LIBRARY)) {
+                clientSMSType = ClientSms.TYPE_NOTIFICATION_LIBRARY;
             } else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
 
-            Object textObject = getTextObject(text, type, destClient, dataClient, direction, guardian, values);
+            Object textObject = getTextObject(type, destClient, dataClient, direction, guardian, values);
             if(textObject != null) {
                 if (sendAsync) {
                     smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
@@ -885,7 +872,7 @@ public class EventNotificationService {
         return empType;
     }
 
-    private Object getTextObject(String text, String type, Client destClient, Client dataClient, Integer direction, Client guardianClient, String[] values) {
+    private Object getTextObject(String type, Client destClient, Client dataClient, Integer direction, Client guardianClient, String[] values) {
         ISmsService smsService = runtimeContext.getSmsService();
         if(smsService instanceof EMPSmsServiceImpl) {
             EMPEventType empType = null;
@@ -1046,6 +1033,14 @@ public class EventNotificationService {
                 }
                 putGenderParams(empType, values);
             }
+            else if (type.equals(NOTIFICATION_LIBRARY)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_LIBRARY, dataClient, destClient, values);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_LIBRARY, destClient, values);
+                }
+                putGenderParams(empType, values);
+            }
 
             String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);
             if (!isTest.equals(""))
@@ -1065,7 +1060,7 @@ public class EventNotificationService {
 
             return empType;
         } else {
-            return text;
+            return "Not found";
         }
     }
 
@@ -1173,67 +1168,5 @@ public class EventNotificationService {
         RuntimeContext.getInstance().setOptionValue(Option.OPTION_NOTIFICATION_TEXT, stringBuilder.toString());
         RuntimeContext.getInstance().saveOptionValues();
         notificationText = properties;
-    }
-
-
-    /*public void sendPaymentNotificationSMS(long idOfOrg, SyncRequest.PaymentRegistry.Payment payment) {
-        if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON)) {
-            return;
-        }
-
-
-        RuntimeContext runtimeContext = null;
-        Session session = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            session = runtimeContext.createPersistenceSession();
-        } catch (Exception e) {
-            logger.error("Failed to receive session using RuntimeContext");
-            return;
-        }
-
-
-        Criteria clientCriteria = session.createCriteria(Client.class);
-        clientCriteria.add(Restrictions.eq("idOfClient", payment.getIdOfClient()));
-        List clientsList = clientCriteria.list();
-        if (clientsList.size() < 1) {
-            logger.error("Failed to receive clients with id " +
-                    payment.getIdOfClient() + " to send SMS payment notification");
-            return;
-        }
-        Client cl = (Client) clientsList.get(0);
-
-        //  Если у пользователя не стоит флажка отправлять СМС, то пропускаем его
-        if (!cl.isNotifyViaSMS()) {
-            return;
-        }
-
-
-        long complexes = 0L;
-        long others = 0L;
-        Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
-        while (purchases.hasMoreElements()) {
-            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
-            if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_MIN && purchase.getType() <= OrderDetail.TYPE_COMPLEX_MAX) {
-                complexes += purchase.getSocDiscount() + purchase.getRPrice();
-            } else {
-                others += purchase.getSocDiscount() + purchase.getRPrice();
-            }
-        }
-
-
-        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date(System.currentTimeMillis()));
-        String msg = "Столовая " + date + "\n" +
-                "Л/с:" + cl.getContractId() + "\n" +
-                "Буфет:" + beautifyAmount(others) + "\n" +
-                "Комплекс:" + beautifyAmount(complexes);
-        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                .sendMessageAsync(cl, EventNotificationService.MESSAGE_PAYMENT,
-                        new String[]{EventNotificationService.MESSAGE_PAYMENT, msg});
-    }*/
-
-    public String beautifyAmount(long amt) {
-        String balanceStr = NumberFormat.getCurrencyInstance().format((double) amt / 100) + "р.";
-        return balanceStr;
     }
 }

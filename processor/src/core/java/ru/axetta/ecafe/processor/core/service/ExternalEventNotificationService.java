@@ -84,6 +84,9 @@ public class ExternalEventNotificationService {
             }
 
         }
+        if (event.getEvtType().equals(ExternalEventType.LIBRARY)) {
+                type = EventNotificationService.NOTIFICATION_LIBRARY;
+        }
         if (type == null) {
             return;
         }
@@ -94,7 +97,8 @@ public class ExternalEventNotificationService {
             transaction = persistenceSession.beginTransaction();
             String[] values = generateNotificationParams(client, event);
             values = EventNotificationService.attachGenderToValues(client.getGender(), values);
-            if (type.equals(EventNotificationService.NOTIFICATION_ENTER_CULTURE) || type.equals(EventNotificationService.NOTIFICATION_EXIT_CULTURE))
+            if (type.equals(EventNotificationService.NOTIFICATION_ENTER_CULTURE)
+                    || type.equals(EventNotificationService.NOTIFICATION_EXIT_CULTURE))
                 values = EventNotificationService.attachTargetIdToValues(event.getIdOfExternalEvent(), values);
             final EventNotificationService notificationService = RuntimeContext.getAppContext()
                     .getBean(EventNotificationService.class);
@@ -121,6 +125,13 @@ public class ExternalEventNotificationService {
                             client.getIdOfClient(),
                             ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()) && event
                             .getEvtType().equals(ExternalEventType.CULTURE)) {
+                        notificationService
+                                .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                    }
+                    if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
+                            client.getIdOfClient(),
+                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()) && event
+                            .getEvtType().equals(ExternalEventType.LIBRARY)) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
@@ -171,7 +182,6 @@ public class ExternalEventNotificationService {
                         }
                     }
                 }
-
             } else {
                 //для всех других типов отправляем без условий
                 notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
@@ -264,7 +274,31 @@ public class ExternalEventNotificationService {
                         ACCOUNT, client.getContractId().toString()
                 };
             }
-
+        }
+        if (event.getEvtType().equals(ExternalEventType.LIBRARY)) {
+            SimpleDateFormat dateFormat = null;
+            dateFormat = new SimpleDateFormat("dd.MM.YYYY");
+            String empDate = dateFormat.format(event.getEvtDateTime());
+            dateFormat = new SimpleDateFormat("HH:mm");
+            String empTimeH = dateFormat.format(event.getEvtDateTime());
+            if (event.getForTest() != null && event.getForTest()) {
+                return new String[]{
+                        NAME, client.getPerson().getFirstName(),
+                        SURNAME, client.getPerson().getSurname(),
+                        ACCOUNT, client.getContractId().toString(),
+                        PLACE_NAME, event.getOrgName(),
+                        EMP_DATE, empDate,
+                        EMP_TIME, empTimeH,
+                        "TEST", "true"};
+            } else {
+                return new String[]{
+                        NAME, client.getPerson().getFirstName(),
+                        SURNAME, client.getPerson().getSurname(),
+                        ACCOUNT, client.getContractId().toString(),
+                        PLACE_NAME, event.getOrgName(),
+                        EMP_DATE, empDate,
+                        EMP_TIME, empTime};
+            }
         }
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
