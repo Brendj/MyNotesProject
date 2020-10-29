@@ -14,7 +14,8 @@ public enum ExternalEventType {
 
     /*0*/ MUSEUM("Проход в музей"),
     /*1*/ CULTURE("Посещении зданий Мункультуры РФ"),
-    /*2*/ SPECIAL("Служебное оповещение");
+    /*2*/ SPECIAL("Служебное оповещение"),
+    /*3*/ LIBRARY("Проход в библиотеку");
 
     private final String description;
     static Map<Integer,ExternalEventType> map = new HashMap<Integer,ExternalEventType>();

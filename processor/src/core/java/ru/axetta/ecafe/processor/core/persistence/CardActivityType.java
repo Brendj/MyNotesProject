@@ -11,7 +11,8 @@ public enum CardActivityType {
         INITIAL("Инициализация", 0),
         ENTER_EVENT("Проход в ОО", 1),
         ORDER("Покупка", 2),
-        ENTER_MUSEUM("Проход в музей, учреждение культуры", 3);
+        ENTER_MUSEUM("Проход в музей, учреждение культуры", 3),
+        ENTER_LIBRARY("Проход в библиотеку", 4);
 
         private final String value;
         public final int order;
