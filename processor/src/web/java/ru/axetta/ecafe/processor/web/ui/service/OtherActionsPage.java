@@ -708,7 +708,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void runUpdateApplicationsForFoodTask() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask(true);
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask(true, null);
             printMessage("Обработка ЗЛП завершена");
         } catch (Exception e) {
             getLogger().error("Error in runUpdateApplicationsForFoodTask: ", e);

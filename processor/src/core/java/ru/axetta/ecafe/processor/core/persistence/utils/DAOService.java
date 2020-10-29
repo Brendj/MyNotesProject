@@ -1043,6 +1043,10 @@ public class DAOService {
         return DAOUtils.findClientByGuid(entityManager, guid);
     }
 
+    public Client getClientByMeshGuid(String guid) {
+        return DAOUtils.findClientByMeshGuid(entityManager.unwrap(Session.class), guid);
+    }
+
     public Client getClientByMobilePhone(String mobile) {
         return DAOUtils.getClientByMobilePhone(entityManager, mobile);
     }

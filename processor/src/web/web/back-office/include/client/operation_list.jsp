@@ -592,7 +592,7 @@
                 <h:outputText escape="true" value="Адрес" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
-                <h:outputText escape="true" value="Наименование входа" styleClass="column-header" />
+                <h:outputText escape="true" value="Наименование события" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                 <h:outputText escape="true" value="Дата и время" styleClass="column-header" />

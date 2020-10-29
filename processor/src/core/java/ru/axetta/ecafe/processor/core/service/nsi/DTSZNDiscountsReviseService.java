@@ -18,32 +18,17 @@ import ru.axetta.ecafe.processor.core.service.BenefitService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.*;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.xml.bind.DatatypeConverter;
-import java.net.ConnectException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.*;
-import java.util.Calendar;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
 
@@ -57,19 +42,6 @@ public class DTSZNDiscountsReviseService {
     public static final String DEFAULT_MODE = "true";
 
     public static final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.revise.dtszn.cronExpression";
-
-    public static final String SERVICE_URL = "ecafe.processor.revise.dtszn.url";
-    public static final String DEFAULT_TEST_SERVICE_URL = "https://10.89.95.142:38080/api/public/v2";
-    public static final String DEFAULT_PROD_SERVICE_URL = "https://10.89.95.132:38080/api/public/v2";
-
-    public static final String USER = "ecafe.processor.revise.dtszn.user";
-    public static final String PASSWORD = "ecafe.processor.revise.dtszzn.password";
-
-    public static final String DEFAULT_USER = "USER_IS_PP";
-    public static final String DEFAULT_PASSWORD = "IS_PP#weynb_234%";
-
-    public static final String PAGE_SIZE = "ecafe.processor.revise.dtszn.page.size";
-    public static final Long DEFAULT_PAGE_SIZE = 300L;
 
     public static final String MAX_RECORDS_PER_TRANSACTION = "ecafe.processor.revise.dtszn.records";
     public static final Long DEFAULT_MAX_RECORDS_PER_TRANSACTION = 20L;
@@ -102,13 +74,8 @@ public class DTSZNDiscountsReviseService {
     private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
 
-    private URL serviceURL;
-    private String username;
-    private String password;
     private Boolean isTest;
     private Long maxRecords;
-    private Boolean disableOUFilter;
-    private Boolean disableUpdatedAtFilter;
 
     public boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -121,20 +88,6 @@ public class DTSZNDiscountsReviseService {
         return true;
     }
 
-    @PostConstruct
-    public void init() {
-        try {
-            serviceURL = getServiceUrl();
-            username = getUserName();
-            password = getPassword();
-            maxRecords = getMaxRecords();
-            disableOUFilter = getDisableOuFilter();
-            disableUpdatedAtFilter = getDisableUpdatedAtFilter();
-        } catch (Exception e) {
-            logger.error("DTSZNDiscountsReviseService initialization error", e);
-        }
-    }
-
     public void run() throws Exception {
         if (!isOn()) {
             return;
@@ -143,234 +96,20 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTask() throws Exception {
-        Integer sourceType = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
-
-        switch (sourceType) {
-            case 1:
-                runTaskRest();
-                break;   //DATA_SOURCE_TYPE_NSI
-            case 2:
-                runTaskDB();
-                break;     //DATA_SOURCE_TYPE_DB
-            default:
-                runTaskRest();
-                break;
-        }
+        runTaskDB();
     }
 
-    public void runTaskRest() throws Exception {
-        runTaskRest(null);
+    public void updateApplicationsForFoodTask(boolean forTest, String guid) throws Exception {
+        updateApplicationsForFoodTaskService(forTest, null, guid);
     }
 
-    public void runTaskRest(String guid) throws Exception {
-        if (null == serviceURL) {
-            throw new Exception("Unable to run DTSZNDiscountsReviseService - no service url was found");
-        }
-
-        Long pageSize = getPageSize();
-        List<String> entityIdList = loadEntityIdList(pageSize);
-
-        if (null != entityIdList && entityIdList.isEmpty()) {
-            throw new Exception("No benefits was found - revise will be terminating");
-        }
-
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Long currentPage = 1L;
-        Long pagesCount = 0L;
-        Long clientDTISZNDiscountVersion;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(CalendarUtils.truncateToDayOfMonth(new Date()));
-        String filterDate = DatatypeConverter.printDateTime(calendar);
-        Date fireTime = new Date();
-
-        Session session = null;
-        Transaction transaction = null;
-
-        do {
-            try {
-                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate,
-                        guid);
-
-                session = runtimeContext.createPersistenceSession();
-                session.setFlushMode(FlushMode.MANUAL);
-
-                transaction = session.beginTransaction();
-                clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-
-                Integer counter = 1;
-                for (NSIPersonBenefitResponseItem item : response.getPayLoad()) {
-                    try {
-                        Client client = DAOUtils.findClientByGuid(session, item.getPerson().getId());
-                        if (null == client) {
-                            //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
-                            if (0 == counter++ % maxRecords) {
-                                session.flush();
-                                session.clear();
-                            }
-                            continue;
-                        }
-
-                        if (!client.getOrg().getChangesDSZN()) {
-                            logger.info(String.format(
-                                    "Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped",
-                                    item.getPerson().getId()));
-                            if (0 == counter++ % maxRecords) {
-                                session.flush();
-                                session.clear();
-                            }
-                            continue;
-                        }
-
-                        ClientDtisznDiscountInfo discountInfo = DAOUtils
-                                .getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
-
-                        if (null == discountInfo) {
-                            discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
-                                    item.getBenefit().getBenefitForm(),
-                                    item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED
-                                            : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getDsznDateBeginAsDate(),
-                                    item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
-                                    clientDTISZNDiscountVersion);
-                            discountInfo.setArchived(
-                                    item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()
-                                            || !item.getBenefitConfirmed());
-                            session.save(discountInfo);
-                        } else {
-                            if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
-                                // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
-                                // Перезаписываем те поля, которые отличаются в Реестре от ИС ПП (берем из Реестров).
-                                boolean wasModified = false;
-                                if (!discountInfo.getDateStart().equals(item.getDsznDateBeginAsDate())) {
-                                    discountInfo.setDateStart(item.getDsznDateBeginAsDate());
-                                    wasModified = true;
-                                }
-                                if (!discountInfo.getDateEnd().equals(item.getDsznDateEndAsDate())) {
-                                    discountInfo.setDateEnd(item.getDsznDateEndAsDate());
-                                    wasModified = true;
-                                }
-                                if (item.getBenefitConfirmed() && (
-                                        discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)
-                                                || discountInfo.getArchived())) {
-                                    discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
-                                    discountInfo.setArchived(false);
-                                    wasModified = true;
-                                }
-                                if (!item.getBenefitConfirmed() && (
-                                        discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)
-                                                || !discountInfo.getArchived())) {
-                                    discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
-                                    discountInfo.setArchived(true);
-                                    wasModified = true;
-                                }
-                                if (item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()) {
-                                    discountInfo.setArchived(true);
-                                    wasModified = true;
-                                } else if (item.getBenefitConfirmed() && discountInfo.getArchived()) {
-                                    discountInfo.setArchived(false);
-                                    wasModified = true;
-                                }
-                                discountInfo.setLastReceivedDate(new Date());
-                                if (wasModified) {
-                                    discountInfo.setVersion(clientDTISZNDiscountVersion);
-                                    discountInfo.setLastUpdate(new Date());
-                                }
-                                discountInfo.setSource(DATA_SOURCE_TYPE_MARKER_NSI);
-                                session.merge(discountInfo);
-                            } else {
-                                // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
-                                // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
-                                discountInfo.setArchived(true);
-                                discountInfo.setLastUpdate(new Date());
-                                session.merge(discountInfo);
-
-                                discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
-                                        item.getBenefit().getBenefitForm(),
-                                        item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED
-                                                : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                        item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(),
-                                        item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
-                                        clientDTISZNDiscountVersion);
-                                discountInfo.setArchived(
-                                        item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()
-                                                || !item.getBenefitConfirmed());
-                                session.save(discountInfo);
-                            }
-                        }
-                        if (0 == counter++ % maxRecords) {
-                            session.flush();
-                            session.clear();
-                        }
-                    } catch (Exception e) {
-                        logger.error(
-                                String.format("Unable to update ClientDtisznDiscountInfo for person with guid = {%s}",
-                                        item.getPerson().getEntityId()), e);
-                    }
-                }
-                transaction.commit();
-                transaction = null;
-
-                pagesCount = response.getPagesCount();
-            } catch (HttpException e) {
-                logger.error("HTTP exception: ", e);
-            } catch (Exception e) {
-                logger.error("Unable to get person benefits from NSI", e);
-            } finally {
-                HibernateUtils.rollback(transaction, logger);
-                HibernateUtils.close(session, logger);
-            }
-
-            logger.info(String.format("Revise 2.0: %d/%d pages was processed", currentPage, pagesCount));
-        } while (currentPage++ < pagesCount);
-
-        if (pagesCount != 0L) {
-            // не ставим архивный при обработке льгот одного клиента
-            if (StringUtils.isEmpty(guid)) {
-                updateArchivedFlagForDiscounts();
-            }
-            updateArchivedFlagForDiscountsDB();
-            runTaskPart2(fireTime);
-            updateApplicationsForFoodTask(false);
-        }
-    }
-
-    private URL getServiceUrl() throws Exception {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        isTest = Boolean.parseBoolean(runtimeContext.getConfigProperties().getProperty(MODE, DEFAULT_MODE));
-
-        String urlString;
-        if (isTest) {
-            urlString = runtimeContext.getConfigProperties().getProperty(SERVICE_URL, DEFAULT_TEST_SERVICE_URL);
-        } else {
-            urlString = runtimeContext.getConfigProperties().getProperty(SERVICE_URL, DEFAULT_PROD_SERVICE_URL);
-        }
-
-        return new URL(urlString);
-    }
-
-    private Long getPageSize() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String pageSizeString = runtimeContext.getConfigProperties().getProperty(PAGE_SIZE);
-        if (null == pageSizeString) {
-            return DEFAULT_PAGE_SIZE;
-        }
-        Long pageSize;
+    @PostConstruct
+    public void init() {
         try {
-            pageSize = Long.parseLong(pageSizeString);
-        } catch (NumberFormatException e) {
-            logger.error(String.format("Unable to parse page size value from config: %s", pageSizeString));
-            return DEFAULT_PAGE_SIZE;
+            maxRecords = getMaxRecords();
+        } catch (Exception e) {
+            logger.error("DTSZNDiscountsReviseService initialization error", e);
         }
-        return pageSize;
-    }
-
-    private String getUserName() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        return runtimeContext.getConfigProperties().getProperty(USER, DEFAULT_USER);
-    }
-
-    private String getPassword() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        return runtimeContext.getConfigProperties().getProperty(PASSWORD, DEFAULT_PASSWORD);
     }
 
     private Long getMaxRecords() {
@@ -389,189 +128,7 @@ public class DTSZNDiscountsReviseService {
         return records;
     }
 
-    private Boolean getDisableOuFilter() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String disableOUFilterString = runtimeContext.getConfigProperties().getProperty(DISABLE_OU_FILTER_PROPERTY);
-        if (null == disableOUFilterString) {
-            return DEFAULT_DISABLE_OU_FILTER;
-        }
-        return Boolean.parseBoolean(disableOUFilterString);
-    }
-
-    private Boolean getDisableUpdatedAtFilter() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String disableUpdatedAtFilterString = runtimeContext.getConfigProperties()
-                .getProperty(DISABLE_UPDATED_AT_FILTER_PROPERTY);
-        if (null == disableUpdatedAtFilterString) {
-            return DEFAULT_DISABLE_UPDATED_AT_FILTER;
-        }
-        return Boolean.parseBoolean(disableUpdatedAtFilterString);
-    }
-
-    private NSIRequest buildDictBenefitRequest(Long page, Long pageSize) {
-        List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
-        paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false));
-        paramList.add(new NSIRequestParam("created-by", OPERATOR_EQUAL, "ou", false));
-        return new NSIRequest(paramList, page, "DictBenefit", pageSize);
-    }
-
-    private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList, String date,
-            String guid) {
-        List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
-        if (!disableOUFilter) {
-            paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group",
-                    OPERATOR_EQUAL, "ОУ", false));
-        }
-        paramList.add(new NSIRequestParam("benefit-form/entity-id", OPERATOR_IN, StringUtils.join(entityIdList, ","),
-                false));
-        paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false));
-        paramList.add(new NSIRequestParam("dszn-date-begin", OPERATOR_IS_NULL, true));
-        paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_IS_NULL, true));
-        paramList.add(new NSIRequestParam("benefit-confirmed", OPERATOR_IS_NULL, true));
-        if (!disableUpdatedAtFilter) {
-            paramList.add(new NSIRequestParam("updated-at", OPERATOR_IS_NULL, true));
-        }
-        paramList.add(new NSIRequestParam("person/deleted-at", OPERATOR_IS_NULL, false));
-        paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_LT, date, true));
-        paramList.add(new NSIRequestParam("created-by", OPERATOR_EQUAL, "ou", false));
-        paramList.add(new NSIRequestParam("deleted", OPERATOR_EQUAL, Boolean.TRUE.toString(), true));
-        paramList.add(new NSIRequestParam("date-end", OPERATOR_LT, date, true));
-
-        if (!StringUtils.isEmpty(guid)) {
-            paramList.add(new NSIRequestParam("person/entity-id", OPERATOR_EQUAL, guid, false));
-        }
-
-        return new NSIRequest(paramList, page, "PersonBenefit", pageSize);
-    }
-
-    private NSIBenefitDictionaryResponse loadBenefitsDictionary(Long page, Long pageSize) throws ConnectException {
-        HttpClient httpClient = new HttpClient();
-
-        httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
-                new Protocol("https", new EasySSLProtocolSocketFactory(), serviceURL.getPort()));
-        PostMethod method = new PostMethod(serviceURL.getPath());
-        try {
-
-            method.addRequestHeader("Content-Type", "application/json; charset=utf-8");
-            authenticateHeaders(method);
-            prepareMethodData(method, buildDictBenefitRequest(page, pageSize));
-
-            Date date = new Date();
-            Integer status = httpClient.executeMethod(method);
-            long timeTaken = new Date().getTime() - date.getTime();
-            logger.info(
-                    String.format("loadBenefitsDictionary(page=%d, pageSize=%d loaded with status %d by %d msec", page,
-                            pageSize, status, timeTaken));
-
-            String responseBody = method.getResponseBodyAsString();
-            reviseLogger.logResponse(method, responseBody, status, timeTaken);
-
-            if (HttpStatus.OK.value() != status) {
-                throw new Exception("Unable to get data from NSI");
-            }
-            return readDataFromResponse(responseBody, NSIBenefitDictionaryResponse.class);
-        } catch (ConnectException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error in loadBenefitsDictionary", e);
-        } finally {
-            method.releaseConnection();
-        }
-        return null;
-    }
-
-    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList,
-            String filterDate, String guid) throws ConnectException {
-        HttpClient httpClient = new HttpClient();
-
-        httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
-                new Protocol("https", new EasySSLProtocolSocketFactory(), serviceURL.getPort()));
-        PostMethod method = new PostMethod(serviceURL.getPath());
-        try {
-
-            method.addRequestHeader("Content-Type", "application/json; charset=utf-8");
-            authenticateHeaders(method);
-            prepareMethodData(method, buildPersonBenefitRequest(page, pageSize, entityIdList, filterDate, guid));
-
-            Date date = new Date();
-            Integer status = httpClient.executeMethod(method);
-            long timeTaken = new Date().getTime() - date.getTime();
-            logger.info(String.format("loadPersonBenefits(page=%d, pageSize=%d loaded with status %d by %d msec", page,
-                    pageSize, status, timeTaken));
-
-            String responseBody = method.getResponseBodyAsString();
-            reviseLogger.logResponse(method, responseBody, status, timeTaken);
-
-            if (HttpStatus.OK.value() != status) {
-                throw new Exception("Unable to get data from NSI");
-            }
-            return readDataFromResponse(responseBody, NSIPersonBenefitResponse.class);
-
-        } catch (ConnectException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error in loadPersonBenefits", e);
-        }
-        return null;
-    }
-
-    private void authenticateHeaders(EntityEnclosingMethod method) {
-        String auth = username + ":" + password;
-        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
-        String authHeader = "Basic " + new String(encodedAuth);
-        method.addRequestHeader("Authorization", authHeader);
-    }
-
-    private void prepareMethodData(EntityEnclosingMethod method, NSIRequest request) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String serialized = objectMapper.writeValueAsString(request);
-
-        StringRequestEntity requestEntity = new StringRequestEntity(serialized, "application/json", "UTF-8");
-        method.setRequestEntity(requestEntity);
-        reviseLogger.logRequest(method);
-    }
-
-    private <T> T readDataFromResponse(String responseBody, Class<T> clazz) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(responseBody, clazz);
-    }
-
-    private List<String> loadEntityIdList(Long pageSize) throws ConnectException {
-        Long currentPage = 1L;
-        Long pagesCount;
-
-        List<String> entityIds = new ArrayList<String>();
-        do {
-            try {
-                NSIBenefitDictionaryResponse response = loadBenefitsDictionary(currentPage, pageSize);
-                String[] dsznCodeArray = StringUtils.split(DSZN_CODE_FILTER, ",");
-                List<Long> dsznCodeList = new ArrayList<Long>();
-                for (String code : dsznCodeArray) {
-                    dsznCodeList.add(Long.parseLong(code));
-                }
-
-                for (NSIBenefitDictionaryResponseItem item : response.getPayLoad()) {
-                    if (dsznCodeList.contains(item.getDsznCode())) {
-                        entityIds.add(item.getEntityId());
-                    }
-                }
-
-                pagesCount = response.getPagesCount();
-            } catch (ConnectException e) {
-                throw e;
-            } catch (Exception e) {
-                logger.error("Unable to get benefits from NSI");
-                break;
-            }
-        } while (++currentPage < pagesCount);
-        return entityIds;
-    }
-
-    public void updateApplicationsForFoodTask(boolean forTest) throws Exception {
-        updateApplicationsForFoodTaskService(forTest, null);
-    }
-
-    public void updateApplicationsForFoodTaskService(boolean forTest, String serviceNumber) throws Exception {
+    public void updateApplicationsForFoodTaskService(boolean forTest, String serviceNumber, String guid) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -586,7 +143,7 @@ public class DTSZNDiscountsReviseService {
                         serviceNumber);
             } else {
                 applicationForFoodList = DAOUtils.getApplicationForFoodListByStatus(session,
-                        new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null), false);
+                        new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null), false, guid);
             }
 
             ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
@@ -907,7 +464,7 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTaskPart2() throws Exception {
-        runTaskPart2(null);
+        runTaskPart2(null, null);
     }
 
     private void runOneClient(Session session, Transaction transaction, Long idOfClient, Long otherDiscountCode)
@@ -924,7 +481,7 @@ public class DTSZNDiscountsReviseService {
         transaction.commit();
     }
 
-    public void runTaskPart2(Date startDate) throws Exception {
+    public void runTaskPart2(Date startDate, String guid) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -937,7 +494,7 @@ public class DTSZNDiscountsReviseService {
             if (null == startDate) {
                 clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfo(session);
             } else {
-                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate);
+                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate, guid);
             }
 
             Integer clientCounter = 1;
@@ -1202,16 +759,16 @@ public class DTSZNDiscountsReviseService {
             HibernateUtils.close(session, logger);
         }
 
-        updateArchivedFlagForDiscountsDB();
-        runTaskPart2(fireTime);
-        updateApplicationsForFoodTask(false);
+        updateArchivedFlagForDiscountsDB(guid);
+        runTaskPart2(fireTime, guid);
+        updateApplicationsForFoodTask(false, guid);
         if (StringUtils.isEmpty(guid) && discountItemList != null && discountItemList.getDate() != null) {
             DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(discountItemList.getDate()),
                     Option.OPTION_REVISE_LAST_DATE);
         }
     }
 
-    public void updateArchivedFlagForDiscountsDB() throws Exception {
+    public void updateArchivedFlagForDiscountsDB(String guid) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -1219,8 +776,16 @@ public class DTSZNDiscountsReviseService {
 
             Date fireTime = new Date();
             Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-            Query query = session.createQuery("select i from ClientDtisznDiscountInfo i where i.dateEnd <= :now "
-                    + "and i.status = :confirmed and i.archived = false");
+            Query query;
+            if (StringUtils.isEmpty(guid)) {
+                query = session.createQuery("select i from ClientDtisznDiscountInfo i where i.dateEnd <= :now "
+                        + "and i.status = :confirmed and i.archived = false");
+            } else {
+                query = session.createQuery("select i from ClientDtisznDiscountInfo i where i.dateEnd <= :now "
+                        + "and (i.client.clientGUID = :guid or i.client.meshGUID = :guid) "
+                        + "and i.status = :confirmed and i.archived = false");
+                query.setParameter("guid", guid);
+            }
 
             query.setParameter("now", CalendarUtils.addDays(fireTime, -1));
             query.setParameter("confirmed", ClientDTISZNDiscountStatus.CONFIRMED);
@@ -1300,19 +865,7 @@ public class DTSZNDiscountsReviseService {
             throw new IllegalArgumentException("GUID wrong format");
         }
 
-        Integer sourceType = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
-
-        switch (sourceType) {
-            case 1:
-                runTaskRest(guid);
-                break;   //DATA_SOURCE_TYPE_NSI
-            case 2:
-                runTaskDB(guid);
-                break;     //DATA_SOURCE_TYPE_DB
-            default:
-                runTaskRest(guid);
-                break;
-        }
+        runTaskDB(guid);
     }
 
     public void scheduleSync() throws Exception {
