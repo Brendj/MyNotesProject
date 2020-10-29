@@ -66,6 +66,8 @@ public class ETPMVService {
     private final int AIS_CONTINGENT_REQUEST_TIMEOUT = 10*60*1000;
     private final int AIS_CONTINGENT_MAX_PACKET = 10;
 
+    private boolean useMeshGuid = false;
+
     @Async
     public void processIncoming(String message) {
         try {
@@ -130,7 +132,13 @@ public class ETPMVService {
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
                 return;
         }
-        Client client = DAOService.getInstance().getClientByGuid(guid);
+        Client client;
+        if (useMeshGuid) {
+            client = DAOService.getInstance().getClientByMeshGuid(guid);
+        } else {
+            client = DAOService.getInstance().getClientByGuid(guid);
+        }
+
         if (client == null) {
             logger.error("Error in processCoordinateMessage: client not found");
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "client not found");
@@ -448,7 +456,10 @@ public class ETPMVService {
     private JAXBContext getJAXBContext(int type) throws Exception {
         switch (type) {
             case COORDINATE_MESSAGE:
-                if (jaxbConsumerContext == null) jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
+                if (jaxbConsumerContext == null) {
+                    jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
+                    useMeshGuid = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.useMeshGuid", "false").equals("true");
+                }
                 return jaxbConsumerContext;
         }
         return null;
