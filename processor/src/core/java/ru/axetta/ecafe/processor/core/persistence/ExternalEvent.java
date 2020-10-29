@@ -56,6 +56,20 @@ public class ExternalEvent {
         buildEnterName(evtStatus);
     }
 
+    public ExternalEvent(Client cl, String librarycode, String libraryName, String libraryAddress, ExternalEventType evtType,
+            Date evtDateTime, Long cardNo, Integer cardType, ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
+        this.orgCode = librarycode;
+        this.orgName = libraryName;
+        this.evtType = evtType;
+        this.client = cl;
+        this.evtDateTime = evtDateTime;
+        this.cardNo = cardNo;
+        this.cardType = cardType;
+        this.version = handlerVersion.getVersion();
+        this.address = libraryAddress;
+        this.enterName = "Проход в библиотеку";
+    }
+
     public ExternalEvent(Client client, String orgCode, String orgName, ExternalEventType evtType,
             Date evtDateTime, ExternalEventStatus evtStatus,
             ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
