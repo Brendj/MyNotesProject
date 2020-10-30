@@ -283,18 +283,12 @@ public class ExternalEventNotificationService {
             String empTimeH = dateFormat.format(event.getEvtDateTime());
             if (event.getForTest() != null && event.getForTest()) {
                 return new String[]{
-                        NAME, client.getPerson().getFirstName(),
-                        SURNAME, client.getPerson().getSurname(),
-                        ACCOUNT, client.getContractId().toString(),
                         PLACE_NAME, event.getOrgName(),
                         EMP_DATE, empDate,
                         EMP_TIME, empTimeH,
                         "TEST", "true"};
             } else {
                 return new String[]{
-                        NAME, client.getPerson().getFirstName(),
-                        SURNAME, client.getPerson().getSurname(),
-                        ACCOUNT, client.getContractId().toString(),
                         PLACE_NAME, event.getOrgName(),
                         EMP_DATE, empDate,
                         EMP_TIME, empTime};
