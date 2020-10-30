@@ -243,7 +243,7 @@ public class SmartWatchRestController {
             SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, trackerId, trackerUid);
             if(watch == null) {
                 DAOUtils.createSmartWatch(session, idOfCard, child.getIdOfClient(), model, color,
-                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);
+                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid, vendor);
             } else {
                 this.updateSmartWatch(watch, session, idOfCard, child.getIdOfClient(), color, model,
                         trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);

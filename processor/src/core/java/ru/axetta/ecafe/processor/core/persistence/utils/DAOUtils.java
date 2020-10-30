@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4283,7 +4283,7 @@ public class DAOUtils {
 
     public static Long createSmartWatch(Session session, Long idOfCard, Long idOfClient, String model, String color,
             Long trackerUid, Long trackerId, Long trackerActivateUserId, String status, Date trackerActivateTime,
-            String simIccid) {
+            String simIccid, String vendor) {
         try {
             SmartWatch watch = new SmartWatch();
             watch.setIdOfCard(idOfCard);
@@ -4296,6 +4296,7 @@ public class DAOUtils {
             watch.setStatus(status);
             watch.setTrackerActivateTime(trackerActivateTime);
             watch.setSimIccid(simIccid);
+            watch.setVendor(vendor);
             session.save(watch);
             return watch.getIdOfSmartWatch();
         } catch (Exception e) {

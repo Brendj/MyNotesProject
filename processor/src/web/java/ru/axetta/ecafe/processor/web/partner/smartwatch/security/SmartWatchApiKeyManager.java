@@ -52,7 +52,7 @@ public class SmartWatchApiKeyManager {
     private boolean isUUID(String uuidStr){
         try {
             UUID uuid = UUID.fromString(uuidStr);
-            return uuid.version() == 4;
+            return true;
         } catch (Exception ignored){
             return false;
         }

@@ -18,6 +18,7 @@ public class SmartWatch {
     private String simIccid;
     private String model;
     private String color;
+    private String vendor;
 
     public Long getIdOfSmartWatch() {
         return idOfSmartWatch;
@@ -105,5 +106,13 @@ public class SmartWatch {
 
     public void setSimIccid(String simIccid) {
         this.simIccid = simIccid;
+    }
+
+    public String getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
     }
 }
