@@ -9,10 +9,10 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.Org" table="CF_Orgs" optimistic-lock="version">
         <cache usage="transactional"/>
         <id name="idOfOrg" column="IdOfOrg" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfOrg</param>
-                <param name="max_lo">0</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">none</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">CF_Orgs_Id_Gen_seq</param>
             </generator>
         </id>
         <version name="version" column="Version" type="long"/>

@@ -25,9 +25,7 @@
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="sendAll" column="SendAll">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">
-                    ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs
-                </param>
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
                 <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
                 <param name="type">4</param>
             </type>

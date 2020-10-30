@@ -9,10 +9,10 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.TaloonApproval" table="CF_Taloon_Approval">
 
         <id name="idOfTaloonApproval" column="idOfTaloonApproval" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfTaloonApproval</param>
-                <param name="max_lo">64</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">64</param>
+                <param name="sequence_name">CF_Taloon_Approval_Id_Gen_seq</param>
             </generator>
         </id>
         <property name="idOfOrg" column="IdOfOrg" type="long" not-null="true"/>
