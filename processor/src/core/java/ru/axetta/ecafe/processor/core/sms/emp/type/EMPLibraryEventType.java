@@ -9,18 +9,16 @@ import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 
 public class EMPLibraryEventType extends EMPAbstractEventType {
 
-    public static String PLACE_NAME = "orgName";
-    public static String DATE = "date";
-    public static String TIME = "time";
-
     public EMPLibraryEventType(String [] values) {
         type = EMPEventTypeFactory.ENTER_LIBRARY;
-        String libraryName = findValueInParams(new String[]{ExternalEventNotificationService.PLACE_NAME}, values);
-        this.getParameters().put(PLACE_NAME, libraryName);
-        String dateEvent = findValueInParams(new String[]{ExternalEventNotificationService.EMP_DATE}, values);
-        this.getParameters().put(DATE, dateEvent);
-        String timeEvent = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME}, values);
-        this.getParameters().put(TIME, timeEvent);
+        String libraryName = findValueInParams(new String[]{ExternalEventNotificationService.ORG_NAME}, values);
+        this.getParameters().put(ExternalEventNotificationService.ORG_NAME, libraryName);
+        String libraryAddress = findValueInParams(new String[]{ExternalEventNotificationService.ADDRESS}, values);
+        this.getParameters().put(ExternalEventNotificationService.ADDRESS, libraryAddress);
+        String dateEvent = findValueInParams(new String[]{ExternalEventNotificationService.DATE}, values);
+        this.getParameters().put(ExternalEventNotificationService.DATE, dateEvent);
+        String timeEvent = findValueInParams(new String[]{ExternalEventNotificationService.TIME}, values);
+        this.getParameters().put(ExternalEventNotificationService.TIME, timeEvent);
     }
 
     @Override

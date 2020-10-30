@@ -48,6 +48,9 @@ public class ExternalEventNotificationService {
     public static String ADDRESS = "address";
     public static String TEST = "TEST";
     public static String SHORTNAMEINFOSERVICE = "shortnameinfoservice";
+    public static String ORG_NAME = "orgName";
+    public static String DATE = "date";
+    public static String TIME = "time";
     private String cultureShortName;
     private Date START_DATE;
     private Date END_DATE;
@@ -279,19 +282,21 @@ public class ExternalEventNotificationService {
             SimpleDateFormat dateFormat = null;
             dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(event.getEvtDateTime());
-            dateFormat = new SimpleDateFormat("HH:mm");
+            dateFormat = new SimpleDateFormat("HH:mm:ss");
             String empTimeH = dateFormat.format(event.getEvtDateTime());
             if (event.getForTest() != null && event.getForTest()) {
                 return new String[]{
-                        PLACE_NAME, event.getOrgName(),
-                        EMP_DATE, empDate,
-                        EMP_TIME, empTimeH,
+                        ORG_NAME, event.getOrgName(),
+                        ADDRESS, event.getAddress(),
+                        DATE, empDate,
+                        TIME, empTimeH,
                         "TEST", "true"};
             } else {
                 return new String[]{
-                        PLACE_NAME, event.getOrgName(),
-                        EMP_DATE, empDate,
-                        EMP_TIME, empTime};
+                        ORG_NAME, event.getOrgName(),
+                        ADDRESS, event.getAddress(),
+                        DATE, empDate,
+                        TIME, empTimeH};
             }
         }
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {

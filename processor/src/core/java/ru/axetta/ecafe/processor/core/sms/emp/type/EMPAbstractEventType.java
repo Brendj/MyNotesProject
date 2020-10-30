@@ -136,8 +136,6 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         Date currentDate = new Date(System.currentTimeMillis());
 
 
-        params.put("date", DATE_FORMAT.format(currentDate));
-        params.put("time", TIME_FORMAT.format(currentDate));
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
         params.put("account", "" + client.getContractId());
@@ -146,6 +144,8 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             params.put("gender", getGender(client));
 
         if (type != EMPEventTypeFactory.ENTER_LIBRARY) {
+            params.put("date", DATE_FORMAT.format(currentDate));
+            params.put("time", TIME_FORMAT.format(currentDate));
             if (client.getOrg() != null) {
                 appendOrgParameters(client.getOrg().getIdOfOrg(), params);
             }

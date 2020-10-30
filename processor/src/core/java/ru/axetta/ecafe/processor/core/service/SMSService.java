@@ -188,7 +188,7 @@ public class SMSService {
 
             SendResponse sendResponse = null;
 
-            logger.info("sending SMS: " + getLoggingInfo(values, textObject, messageType));
+            logger.info("sending SMS: " + getLoggingInfo(textObject, messageType));
             String textMessage = null;
             if (smsService instanceof SMPPClient) {
                 try {
@@ -258,8 +258,9 @@ public class SMSService {
             return result;
         }
 
-        private String getLoggingInfo(String[] values, Object textObject, int messageType) {
+        private String getLoggingInfo(Object textObject, int messageType) {
             String result = "";
+            ((EMPEventType) textObject).getParameters();
             try {
                 result += "phone=" + ((EMPEventType) textObject).getMsisdn();
                 result += ";typeId=" + ((EMPEventType) textObject).getType();
@@ -277,8 +278,10 @@ public class SMSService {
                         }
                     }
                 } else {
-                    for (int i = 0; i < values.length - 1; i += 2) {
-                        result += ";" + values[i] + "=" + values[i + 1];
+                    Map<String, String> param = ((EMPEventType) textObject).getParameters();
+                    for (String k : param.keySet()) {
+                        String v = param.get(k);
+                        result += ";" + k + "=" + v;
                     }
                 }
             } catch (Exception ignore) {
