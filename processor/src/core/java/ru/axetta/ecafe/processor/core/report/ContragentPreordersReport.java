@@ -162,7 +162,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17 )"
                     + " select * from contragent_preorders_table "
                     + simpleCondition
-                    + " order by 1, 6 desc, 2, 3, 4 ";
+                    + " order by 6 desc, 7, 1, 2, 3, 4 ";
 
 
 

@@ -21,7 +21,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
-import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
@@ -1369,6 +1368,10 @@ public class FrontController extends HttpServlet {
         }
     }
 
+    private String getApiKey() {
+        return RuntimeContext.getInstance().getFrontControllerApiKey();
+    }
+
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
         if (RuntimeContext.getInstance().isTestMode()) {
             return;
@@ -1378,6 +1381,19 @@ public class FrontController extends HttpServlet {
         try {
             MessageContext msgContext = wsContext.getMessageContext();
             HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+
+            String apiKey = getApiKey();
+            if (!StringUtils.isEmpty(apiKey)) {
+                String requestApiKey = request.getHeader("API-KEY");
+                if (!StringUtils.isEmpty(requestApiKey)) {
+                    if (!requestApiKey.equals(apiKey)) {
+                        throw new FrontControllerException("Invalid API KEY");
+                    } else {
+                        return;
+                    }
+                }
+            }
+
             certs = getCertificateFromContextOrHeaders(request);
 
             if (certs == null || certs.length == 0) {

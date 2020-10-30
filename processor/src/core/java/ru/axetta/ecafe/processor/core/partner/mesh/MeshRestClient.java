@@ -1,26 +1,36 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 
-@Component
 public class MeshRestClient {
-    public static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.rest.address";
-    public static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.rest.api.key";
     private static final Logger logger = LoggerFactory.getLogger(MeshRestClient.class);
+    private final String serviceAddress;
+    private final String apiKey;
+
+    public MeshRestClient(String serviceAddress, String apiKey){
+        this.serviceAddress = serviceAddress;
+        this.apiKey = apiKey;
+    }
+
+    public String getServiceAddress() {
+        return serviceAddress;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
 
     public byte[] executeRequest(String relativeUrl, String parameters) throws Exception {
         URL url = new URL(getServiceAddress() + relativeUrl + parameters);
@@ -51,6 +61,39 @@ public class MeshRestClient {
         }
     }
 
+    public byte[] executeCreateCategory(String meshGuid, String parameters) throws Exception {
+        URL url = new URL(getServiceAddress() + "/persons/" + meshGuid + "/category");
+        logger.info("Execute POST request to MESH REST: " + url);
+        PostMethod httpMethod = new PostMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        StringRequestEntity requestEntity = new StringRequestEntity(
+                parameters,
+                "application/json",
+                "UTF-8");
+        httpMethod.setRequestEntity(requestEntity);
+
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            if (statusCode == HttpStatus.SC_OK) {
+                InputStream inputStream = httpMethod.getResponseBodyAsStream();
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[1024*1024];
+                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+
+                buffer.flush();
+                return buffer.toByteArray();
+            } else {
+                throw new Exception("Mesh request has status " + statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
+    }
+
     private HttpClient getHttpClient(URL url) {
         HttpClient httpClient = new HttpClient();
         httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort(),
@@ -58,16 +101,52 @@ public class MeshRestClient {
         return httpClient;
     }
 
-    private String getServiceAddress() throws Exception{
-        String address = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_ADDRESS_PROPERTY, "");
-        if (address.equals("")) throw new Exception("MESH REST address not specified");
-        return address;
+    public byte[] executeUpdateCategory(String meshGUID, Integer idOfRefInExternalSystem, String json) throws Exception {
+        URL url = new URL(getServiceAddress() + "/persons/" + meshGUID + "/category/" + idOfRefInExternalSystem);
+        logger.info("Execute PUT request to MESH REST: " + url);
+        PutMethod httpMethod = new PutMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        StringRequestEntity requestEntity = new StringRequestEntity(
+                json,
+                "application/json",
+                "UTF-8");
+        httpMethod.setRequestEntity(requestEntity);
+
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            if (statusCode == HttpStatus.SC_OK) {
+                InputStream inputStream = httpMethod.getResponseBodyAsStream();
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[1024*1024];
+                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+
+                buffer.flush();
+                return buffer.toByteArray();
+            } else {
+                throw new Exception("Mesh request has status " + statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
     }
 
-    private String getApiKey() throws Exception{
-        String key = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_API_KEY_PROPERTY, "");
-        if (key.equals("")) throw new Exception("MESH API key not specified");
-        return key;
+    public void executeDeleteCategory(String meshGUID, Integer idOfRefInExternalSystem) throws Exception {
+        URL url = new URL(getServiceAddress() + "/persons/" + meshGUID + "/category/" + idOfRefInExternalSystem);
+        logger.info("Execute DELETE request to MESH REST: " + url);
+        DeleteMethod httpMethod = new DeleteMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            if (statusCode != HttpStatus.SC_OK) {
+                throw new Exception("Mesh request has status " + statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
     }
-
 }
