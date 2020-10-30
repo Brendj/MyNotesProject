@@ -69,6 +69,7 @@ public class Card {
     private Boolean isLongUid;
     private Integer transitionState;
     private Set<CardSync> cardsync;
+    private MeshClientCardRef meshCardClientRef;
 
     protected Card() {
         // For Hibernate only
@@ -351,5 +352,17 @@ public class Card {
 
     public void setCardsync(Set<CardSync> cardsync) {
         this.cardsync = cardsync;
+    }
+
+    public MeshClientCardRef getMeshCardClientRef() {
+        return meshCardClientRef;
+    }
+
+    public void setMeshCardClientRef(MeshClientCardRef meshCardClientRef) {
+        this.meshCardClientRef = meshCardClientRef;
+    }
+
+    public boolean refNotExistsOrNotSending() {
+        return  getMeshCardClientRef() == null || !getMeshCardClientRef().getSend();
     }
 }

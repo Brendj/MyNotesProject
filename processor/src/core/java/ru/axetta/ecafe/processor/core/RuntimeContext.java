@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
+import ru.axetta.ecafe.processor.core.partner.mesh.card.taskexecutor.MeshCardNotifyTaskExecutor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -181,6 +182,10 @@ public class RuntimeContext implements ApplicationContextAware {
         return okuApiKey;
     }
 
+    public String getFrontControllerApiKey() {
+        return frontControllerApiKey;
+    }
+
     private static ApplicationContext applicationContext;
 
     public static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
@@ -213,6 +218,7 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String SCUD_LOGIN = SCUD + ".login";
     public static final String SCUD_PASSWORD = SCUD + ".password";
     private static final String OKU_API_KEY = PROCESSOR_PARAM_BASE + ".oku.api.key";
+    private static final String FRONT_CONTROLLER_API_KEY = PROCESSOR_PARAM_BASE + ".frontController.api.key";
     private static final String EXTEND_CARD_SERVICE_API_KEY = PROCESSOR_PARAM_BASE + ".extendCardService.api.key";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
@@ -273,6 +279,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private String okuApiKey;
     private String extendCardServiceApiKey;
+    private String frontControllerApiKey;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
     ////////////////////////////////////////////
@@ -676,6 +683,8 @@ public class RuntimeContext implements ApplicationContextAware {
             this.okuApiKey = properties.getProperty(OKU_API_KEY);
             this.extendCardServiceApiKey = properties.getProperty(EXTEND_CARD_SERVICE_API_KEY);
 
+            this.frontControllerApiKey = properties.getProperty(FRONT_CONTROLLER_API_KEY);
+
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;
             this.eventProcessor = ruleProcessor;
@@ -776,6 +785,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(BenefitService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(MaintenanceService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(CardBlockUnblockService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(MeshCardNotifyTaskExecutor.class).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();

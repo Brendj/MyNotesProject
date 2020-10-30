@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -694,11 +694,16 @@ public class DAOUtils {
     public static ClientGroup findClientGroupByGroupNameAndIdOfOrg(Session persistenceSession, Long idOfOrg,
             String groupName) throws Exception {
         Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        List l = clientGroupCriteria.add(Restrictions
+        List<ClientGroup> list = clientGroupCriteria.add(Restrictions
                 .and(Restrictions.eq("groupName", groupName).ignoreCase(), Restrictions.eq("org.idOfOrg", idOfOrg)))
                 .list();
-        if (l.size() > 0) {
-            return (ClientGroup) l.get(0);
+        if (list.size() == 1) {
+            return list.get(0);
+        } else if (list.size() > 1) {
+            for (ClientGroup clientGroup : list) {
+                if (clientGroup.getGroupName().equals(groupName)) return clientGroup; //ищем точное совпадение с учетом регистра, если есть
+            }
+            return list.get(0); //если нет совпадения с учетом регистра, отдаем первую запись
         }
         return null;
     }
@@ -4702,12 +4707,16 @@ public class DAOUtils {
     }
 
     public static List<ApplicationForFood> getApplicationForFoodListByStatus(Session session,
-            ApplicationForFoodStatus status, Boolean isOthers) {
+            ApplicationForFoodStatus status, Boolean isOthers, String guid) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("status", status));
         criteria.add(Restrictions.eq("archived", false));
         if (isOthers) {
             criteria.add(Restrictions.isNull("dtisznCode"));
+        }
+        if (!StringUtils.isEmpty(guid)) {
+            criteria.createAlias("client", "cl", JoinType.INNER_JOIN);
+            criteria.add(Restrictions.or(Restrictions.eq("cl.clientGUID", guid), Restrictions.eq("cl.meshGUID", guid)));
         }
         return criteria.list();
     }
@@ -4865,15 +4874,27 @@ public class DAOUtils {
         return (GroupNamesToOrgs) criteria.uniqueResult();
     }
 
-    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date) {
+    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date, String guid) {
         List<Long> clientGroupList = new LinkedList<Long>();
         clientGroupList.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
         boolean useLastReceiveDate = RuntimeContext.getInstance().getConfigProperties().getProperty(DTSZNDiscountsReviseService.FIELD_PROPERTY, "false").equals("true");
         String field = useLastReceiveDate ? "lastReceivedDate" : "lastUpdate";
-        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
-                + "where (" + field + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+        Query query;
+        if (StringUtils.isEmpty(guid)) {
+            query = session.createQuery(
+                    "select distinct client.idOfClient from ClientDtisznDiscountInfo " + "where (" + field
+                            + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) "
+                            + "and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+        } else {
+            query = session.createQuery(
+                    "select distinct client.idOfClient from ClientDtisznDiscountInfo " + "where (" + field
+                            + " >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) "
+                            + "and (client.clientGUID = :guid or client.meshGUID = :guid) "
+                            + "and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+            query.setParameter("guid", guid);
+        }
         query.setParameter("date", date);
         query.setParameterList("clientGroups", clientGroupList);
         query.setParameter("otherDiscountCode", DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
@@ -5326,5 +5347,26 @@ public class DAOUtils {
         Criteria orgCriteria = session.createCriteria(Org.class);
         orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         return (Org) orgCriteria.uniqueResult();
+    }
+
+    public static List<Card> getAllCardForMESHByTime(Session session, Date lastProcessing) {
+        Query query = session.createQuery("from Card as crd "
+                + "where (crd.updateTime > :lastProc or crd.createTime > :lastProc) "
+        );
+        query.setParameter("lastProc", lastProcessing);
+
+        return query.list();
+    }
+
+    public static List<Card> getNotRegistryInMeshCardsByOrg(Session session, Org org){
+        Query query = session.createQuery("select crd from Card as crd "
+                + " left join crd.meshCardClientRef as ref "
+                + " where (crd.client.meshGUID not like '' and crd.client.meshGUID is not null) "
+                + " and ref is null "
+                + " and crd.org = :org "
+        );
+        query.setParameter("org", org);
+
+        return query.list();
     }
 }

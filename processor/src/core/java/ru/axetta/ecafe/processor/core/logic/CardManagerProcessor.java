@@ -36,13 +36,15 @@ import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
  * Time: 10:37
  */
 public class CardManagerProcessor implements CardManager {
-    private static final Logger logger = LoggerFactory.getLogger(Processor.class);
+    private static final Logger logger = LoggerFactory.getLogger(CardManagerProcessor.class);
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final Integer SMARTWATCH_CARD_SIGN_CERT_NUM = 16;
+
     public static Long getPriceOfMifare() {
         return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifare"));
     }
+
     public static Long getPriceOfMifareBracelet() {
         return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifareBracelet"));
     }

@@ -45,6 +45,7 @@ public class AtolService {
     private static final String ATOL_PASSWORD_PROPERTY = "ecafe.processing.atol.password";
     private static final String ATOL_CALLBACK_URL = "ecafe.processor.atol.callback.url";
     private static final String ATOL_GROUP_CODE = "ecafe.processor.atol.group.code";
+    private static final Integer ATOL_TOKEN_EXPIRED = 11;
     //private static final String DEFAULT_ADDRESS = "https://testonline.atol.ru/possystem/v4/";
     //private static final String DEFAULT_USER = "v4-online-atol-ru";
     //private static final String DEFAULT_PASSWORD = "iGFFuihss";
@@ -68,12 +69,14 @@ public class AtolService {
         GetMethod httpMethod = new GetMethod(url.getPath());
         httpMethod.setQueryString(parameters);
         try {
+            logger.info("Get new token for Atol");
             HttpClient httpClient = getHttpClient(url);
             int statusCode = httpClient.executeMethod(httpMethod);
             if (statusCode == HttpStatus.SC_OK) {
                 InputStream inputStream = httpMethod.getResponseBodyAsStream();
                 ObjectMapper objectMapper = new ObjectMapper();
                 AtolTokenResponse atolResponse = objectMapper.readValue(inputStream, AtolTokenResponse.class);
+                logger.info(String.format("Got token from Atol. Status code = %s, Response body - %s", statusCode, objectMapper.writeValueAsString(atolResponse)));
                 if (atolResponse.getError() != null) {
                     throw new Exception("Error in get Atol token: " + atolResponse.getError().toString());
                 }
@@ -119,6 +122,7 @@ public class AtolService {
                     AtolDAOService.getInstance().saveWithSuccess(clientPaymentAddon, atolResponse.getUuid(), responseBody);
                 } else {
                     AtolDAOService.getInstance().saveWithError(clientPaymentAddon, statusCode);
+                    if (atolResponse.getError() != null && atolResponse.getError().getCode().equals(ATOL_TOKEN_EXPIRED)) token = null;
                 }
             } finally {
                 httpMethod.releaseConnection();

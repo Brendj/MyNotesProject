@@ -250,8 +250,6 @@
             <h:outputText value="Ид. организаций:"/>
             <h:inputText value="#{otherActionsPage.updateSpbClientDoubles}" size="50"/>
         </rich:panel>
-        <a4j:commandButton value="Блокировка ЭИ без транзакций" action="#{otherActionsPage.autoBlockCards()}" id="autoBlockCards"
-                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
 
     <rich:panel rendered="#{otherActionsPage.isSpb()}">
