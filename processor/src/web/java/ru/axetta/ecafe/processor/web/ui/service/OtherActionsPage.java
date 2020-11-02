@@ -123,22 +123,10 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Пересчет льготных правил выполнен");
     }
 
-    public void runClientGuardSANRebuild() throws Exception {
-        RuntimeContext.getAppContext().getBean(ClientGuardSanRebuildService.class).rebuild(); //DEF
-        printMessage("Переформирование Guard SAN для клиентов выполнено успешно");
-        /*RuntimeContext.getAppContext().getBean(ClientRoomControllerWS.class).attachGuardSan("14414414452", "14414414453"); //DEF
-        printMessage("Переформирование Guard SAN для клиентов выполнено успешно");*/
-    }
-
     public void runImportRNIPPayment() throws Exception {
         RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).runRequests(); //DEF
         printMessage("Импорт платежей RNIP был выполнен успешно");
     }
-
-    /*public void runClientGuardSANRemove () throws Exception {
-        RuntimeContext.getAppContext().getBean(ClientGuardSanRebuildService.class).delete(); //DEF
-        printMessage("Переформирование Guard SAN для клиентов выполнено успешно");
-    }*/
 
     public void runRepositoryReportsCleanup() throws Exception {
         RuntimeContext.getAppContext().getBean(CleanupReportsService.class).run(); //DEF

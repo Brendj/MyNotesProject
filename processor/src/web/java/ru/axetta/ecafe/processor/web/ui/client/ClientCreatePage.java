@@ -208,7 +208,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Long limit;
     private Long balanceToNotify;
     private String san;
-    private String guardsan;
     private Long externalId;
     private String clientGUID;
     private Integer discountMode;
@@ -277,14 +276,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void setSan(String san) {
         this.san = san;
-    }
-
-    public String getGuardsan() {
-        return guardsan;
-    }
-
-    public void setGuardsan(String guardsan) {
-        this.guardsan = guardsan;
     }
 
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
@@ -699,7 +690,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.idOfCategoryList = new ArrayList<Long>();
         this.categoryDiscountSet=new HashSet<CategoryDiscount>();
         this.san = null;
-        this.guardsan = null;
         this.externalId = null;
         this.clientGUID = null;
         this.gender = null;

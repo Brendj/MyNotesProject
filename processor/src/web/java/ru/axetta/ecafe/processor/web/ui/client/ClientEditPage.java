@@ -15,7 +15,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
-import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -314,7 +313,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Integer discountMode;
     private List<SelectItem> selectItemList = new ArrayList<SelectItem>();
     private String san;
-    private String guardsan;
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
     private final ClientContractStateMenu clientContractStateMenu = new ClientContractStateMenu();
     private Integer freePayMaxCount;
@@ -379,14 +377,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setSan(String san) {
         this.san = san;
-    }
-
-    public String getGuardsan() {
-        return guardsan;
-    }
-
-    public void setGuardsan(String guardsan) {
-        this.guardsan = guardsan;
     }
 
     public int getContractIdMaxLength() {
@@ -992,7 +982,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
         client.setBalanceToNotify(this.balanceToNotify);
-        ClientGuardSanRebuildService.getInstance().removeGuardSan(idOfClient);
 
         if (this.externalId == null || this.externalId == 0) {
             client.setExternalId(null);
@@ -1254,14 +1243,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.balanceToNotify = client.getBalanceToNotify();
         this.freePayMaxCount = client.getFreePayMaxCount();
         this.san = client.getSan();
-        Set<GuardSan> guardSans = client.getGuardSan();
-        this.guardsan = "";
-        for (GuardSan guard : guardSans) {
-            if (this.guardsan.length() > 0) {
-                this.guardsan = this.guardsan + ",";
-            }
-            this.guardsan = this.guardsan + guard.getGuardSan();
-        }
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
         this.meshGUID = client.getMeshGUID();
