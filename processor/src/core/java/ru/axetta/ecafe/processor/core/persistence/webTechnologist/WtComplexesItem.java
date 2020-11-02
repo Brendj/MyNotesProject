@@ -25,9 +25,6 @@ public class WtComplexesItem {
     @Column(name = "cycle_day")
     private Integer cycleDay;
 
-    @Column(name = "count_dishes")
-    private Integer countDishes;
-
     @ManyToMany
     @JoinTable(name = "cf_wt_complex_items_dish",
             joinColumns = @JoinColumn(name = "idOfComplexItem"),
@@ -48,14 +45,6 @@ public class WtComplexesItem {
 
     public void setCycleDay(Integer cycleDay) {
         this.cycleDay = cycleDay;
-    }
-
-    public Integer getCountDishes() {
-        return countDishes;
-    }
-
-    public void setCountDishes(Integer countDishes) {
-        this.countDishes = countDishes;
     }
 
     public WtComplex getWtComplex() {
@@ -83,12 +72,11 @@ public class WtComplexesItem {
             return false;
         }
         WtComplexesItem that = (WtComplexesItem) o;
-        return Objects.equals(idOfComplexItem, that.idOfComplexItem) && Objects.equals(cycleDay, that.cycleDay)
-                && Objects.equals(countDishes, that.countDishes);
+        return Objects.equals(idOfComplexItem, that.idOfComplexItem) && Objects.equals(cycleDay, that.cycleDay);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfComplexItem, cycleDay, countDishes);
+        return Objects.hash(idOfComplexItem, cycleDay);
     }
 }

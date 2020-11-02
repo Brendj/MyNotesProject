@@ -21,10 +21,6 @@
             <column name="cycle_day" sql-type="integer"/>
         </property>
 
-        <property name="countDishes">
-            <column name="count_dishes" sql-type="integer"/>
-        </property>
-
         <set name="dishes" lazy="true" table="cf_wt_complex_items_dish">
             <key column="idOfComplexItem"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="idOfDish"/>
