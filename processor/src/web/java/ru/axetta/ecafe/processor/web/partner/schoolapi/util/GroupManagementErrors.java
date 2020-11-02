@@ -17,7 +17,8 @@ public enum GroupManagementErrors {
     DISCOUNT_NOT_MODIFY(110, "По данной льготе запрещены изменения"),
     VALIDATION_ERROR(111, "Ошибка валидации запроса"),
     CLIENTS_NOT_FOUND(112, "Клиенты не найдены"),
-    PLANORDERS_NOT_FOUND(113, "Планы питаний не найдены");
+    PLANORDERS_NOT_FOUND(113, "Планы питаний не найдены"),
+    DATE_VALIDATION_ERROR(114, "Неверный формат даты");
 
     private int errorCode;
     private String errorMessage;

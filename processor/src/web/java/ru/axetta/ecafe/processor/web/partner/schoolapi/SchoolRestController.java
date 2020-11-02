@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -688,13 +689,14 @@ public class SchoolRestController {
         ISchoolApiService groupManagementService;
         try{
             SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_STRING_FORMAT);
+            format.setTimeZone(Calendar.getInstance().getTimeZone());
             Date planDate;
             try {
                 planDate = format.parse(planDateString);
             }
             catch (Exception e){
-                throw new RequestProcessingException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(),
-                        GroupManagementErrors.VALIDATION_ERROR.getErrorMessage()+": дата заполнена неверно");
+                throw new RequestProcessingException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
+                        GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorMessage());
             }
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -782,6 +784,9 @@ public class SchoolRestController {
         Transaction persistenceTransaction = null;
         ISchoolApiService groupManagementService;
         try{
+            if(setToPayRequestDTO.getPlanDate() == null)
+                throw new RequestProcessingException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
+                        GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorMessage());
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new SchoolApiService(persistenceSession);
@@ -842,6 +847,9 @@ public class SchoolRestController {
         Transaction persistenceTransaction = null;
         ISchoolApiService groupManagementService;
         try{
+            if(setOrderRequestDTO.getPlanDate() == null)
+                throw new RequestProcessingException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
+                        GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorMessage());
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new SchoolApiService(persistenceSession);
