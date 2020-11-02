@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.util.GroupManagementError
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
 
 import org.apache.commons.lang.NullArgumentException;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -24,6 +25,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SchoolApiService implements ISchoolApiService {
+    private static int rootMenuMaxLength = 512;
+    private static int menuDetailNameMaxLength = 512;
+    private static int menuGroupMaxLength = 60;
+    private static int itemCodeMaxLength = 32;
+    private static int menuOutputMaxLength = 32;
+
     Logger logger = LoggerFactory.getLogger(SchoolApiService.class);
 
     private Session persistanceSession;
@@ -858,7 +866,7 @@ public class SchoolApiService implements ISchoolApiService {
                             0L,  0, 0, new Date(), new Date(), 0, 0,
                             orderComment, planOrder.getClient(),null,null,null,
                             planOrder.getOrg().getDefaultSupplier(), OrderTypeEnumType.REDUCED_PRICE_PLAN, null);
-                    List<ComplexInfoDetail> complexInfoDetails = getComplexInfoDetails(planOrderComplex);
+                    /*List<ComplexInfoDetail> complexInfoDetails = getComplexInfoDetails(planOrderComplex);
                     String complexItemCode = null;
                     OrderDetailFRationType orderDetailFRationType = null;
                     if(planOrderComplex.getGood()!= null){
@@ -866,12 +874,29 @@ public class SchoolApiService implements ISchoolApiService {
                         if(planOrderComplex.getGood().getGoodType() != null){
                             orderDetailFRationType = OrderDetailFRationType.fromInteger(planOrderComplex.getGood().getGoodType().getCode());
                         }
+                    }*/
+                    CompositeIdOfOrderDetail compositeIdOfOrderDetailForComplex = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                    orderDetails.add(buildOrderDetailsFromComplex(compositeIdOfOrderDetailForComplex,
+                            planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), planOrderComplex, idOfRule));
+                    List<MenuDetail> complexMenuDetails = getMenuDetailsForComplexAndDate(planOrderComplex);
+                    for(MenuDetail menuDetail: complexMenuDetails){
+                        CompositeIdOfOrderDetail compositeIdOfOrderDetailForMenuDetails = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                        orderDetails.add(buildOrderDetailsFromMenuDetails(compositeIdOfOrderDetailForMenuDetails,planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), menuDetail));
                     }
+
+                    /*String menuDetailName = "";
+                    String rootMenu = "";
+                    String menuGroup = "";
+                    String itemCode = "";
+                    String manufacturer = "";
                     if(complexInfoDetails.isEmpty()){
                         CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                        menuDetailName = planOrderComplex.getComplexName().length() > menuDetailNameMaxLength ?
+                                planOrderComplex.getComplexName().substring(0,menuDetailNameMaxLength): planOrderComplex.getComplexName();
+
                         OrderDetail complexOrderDetail = new OrderDetail(compositeIdOfOrderDetail, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
                                 1, planOrderComplex.getCurrentPrice(), planOrderComplex.getCurrentPrice(), 0,
-                                planOrderComplex.getComplexName(), "","", 0, "",
+                                menuDetailName, rootMenu,menuGroup, 0, "",
                                 50, null, null,false, complexItemCode, idOfRule, orderDetailFRationType);
                         complexOrderDetail.setGood(planOrderComplex.getGood());
                         orderDetails.add(complexOrderDetail);
@@ -919,7 +944,7 @@ public class SchoolApiService implements ISchoolApiService {
                                 orderDetails.add(goodOrderDetail);
                             }
                         }
-                    }
+                    }*/
 
                     if(planOrderOrder!= null){
                         persistanceSession.save(planOrderOrder);
@@ -954,6 +979,71 @@ public class SchoolApiService implements ISchoolApiService {
         return planOrders;
     }
 
+
+    private OrderDetail buildOrderDetailsFromMenuDetails(CompositeIdOfOrderDetail compositeIdOfOrderDetail,
+            Long idOfOrder, MenuDetail menuDetail) throws Exception {
+        String menuDetailName = StringUtils.substring(menuDetail.getShortName(), 0, menuDetailNameMaxLength);
+        String rootMenu = StringUtils.substring(StringUtils.substringBefore(menuDetail.getMenuPath(), "|"), 0, rootMenuMaxLength);
+        String menuGroup = StringUtils.substring(menuDetail.getGroupName(), 0, menuGroupMaxLength);
+        String itemCode = StringUtils.substring(menuDetail.getItemCode(), 0, itemCodeMaxLength);
+        Long idOfMenuFromSync = menuDetail.getIdOfMenuFromSync();
+        String menuOutput = StringUtils.substring(menuDetail.getMenuDetailOutput(), 0, menuOutputMaxLength);
+        int menuOrigin = menuDetail.getMenuOrigin();
+        int discount = 0;
+        int socDiscount = 0;
+        int rPrice = 0;
+        int qty = 1;
+        int menuType = 150;
+        OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
+        Good menuDetailsGood = getGoodById(menuDetail.getIdOfGood());
+        if(menuDetailsGood != null){
+            itemCode = StringUtils.substring(menuDetailsGood.getGoodsCode(), 0, itemCodeMaxLength);
+            if(menuDetailsGood.getGoodType() != null){
+                FRationType = OrderDetailFRationType.fromInteger(menuDetailsGood.getGoodType().getCode());
+            }
+        }
+        return new OrderDetail(compositeIdOfOrderDetail, idOfOrder, qty, discount, socDiscount, rPrice, menuDetailName,
+                rootMenu, menuGroup, menuOrigin, menuOutput, menuType, idOfMenuFromSync,
+                null, false, itemCode, null, FRationType);
+    }
+
+    private OrderDetail buildOrderDetailsFromComplex(CompositeIdOfOrderDetail compositeIdOfOrderDetail,
+            Long idOfOrder, ComplexInfo complexInfo, Long idOfRule) {
+        String menuDetailName = StringUtils.substring(complexInfo.getComplexName(), 0, menuDetailNameMaxLength);
+        String rootMenu = "";
+        String menuGroup = "";
+        String itemCode = "";
+        Long idOfMenuFromSync = null;
+        String menuOutput = "";
+        int menuOrigin = 0;
+        if(complexInfo.getMenuDetail() != null){
+            MenuDetail menuDetail = complexInfo.getMenuDetail();
+            rootMenu = StringUtils.substring(StringUtils.substringBefore(menuDetail.getMenuPath(), "|"), 0, rootMenuMaxLength);
+            menuGroup = StringUtils.substring(menuDetail.getGroupName(), 0, menuGroupMaxLength);
+            itemCode = StringUtils.substring(menuDetail.getItemCode(), 0, itemCodeMaxLength);
+            idOfMenuFromSync = menuDetail.getIdOfMenuFromSync();
+            menuOutput = StringUtils.substring(menuDetail.getMenuDetailOutput(), 0, menuOutputMaxLength);
+            menuOrigin = menuDetail.getMenuOrigin();
+        }
+        long discount = complexInfo.getCurrentPrice();
+        long socDiscount = complexInfo.getCurrentPrice();
+        int rPrice = 0;
+        int qty = 1;
+        int menuType = 50;
+        OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
+        Good menuDetailsGood = complexInfo.getGood();
+        if(menuDetailsGood != null){
+            itemCode = StringUtils.substring(menuDetailsGood.getGoodsCode(), 0, itemCodeMaxLength);
+            if(menuDetailsGood.getGoodType() != null){
+                FRationType = OrderDetailFRationType.fromInteger(menuDetailsGood.getGoodType().getCode());
+            }
+        }
+        return new OrderDetail(compositeIdOfOrderDetail, idOfOrder, qty, discount, socDiscount, rPrice, menuDetailName,
+                rootMenu, menuGroup, menuOrigin, menuOutput, menuType, idOfMenuFromSync,
+                null, false, itemCode, idOfRule, FRationType);
+    }
+
+
     private Date getDateWithAddDay(Date date, int days){
         Calendar dateCal = Calendar.getInstance();
         dateCal.setTimeInMillis(date.getTime());
@@ -971,6 +1061,19 @@ public class SchoolApiService implements ISchoolApiService {
         complexInfoDetailsCriteria.add(Restrictions.eq("complexInfo.idOfComplexInfo", complexInfo.getIdOfComplexInfo()));
         return complexInfoDetailsCriteria.list();
     }
+
+    private List<MenuDetail> getMenuDetailsForComplexAndDate(ComplexInfo complexInfo) throws Exception {
+        Query menuDetailsQuery = persistanceSession.createSQLQuery(
+                "select md.* from cf_complexinfo ci"
+                        + " inner join cf_complexinfodetail cd on ci.idofcomplexinfo = cd.idofcomplexinfo"
+                        + " inner join cf_menudetails md on cd.idofmenudetail = md.idofmenudetail"
+                        + " where ci.idoforg = :idOfOrg and ci.idofcomplexinfo = :idOfComplexInfo");
+        menuDetailsQuery.setResultTransformer(Transformers.aliasToBean(MenuDetail.class));
+        menuDetailsQuery.setLong("idOfOrg", complexInfo.getOrg().getIdOfOrg());
+        menuDetailsQuery.setLong("idOfComplexInfo", complexInfo.getIdOfComplexInfo());
+        return menuDetailsQuery.list();
+    }
+
 
     private Good getGoodById(Long goodId) throws Exception{
         return (Good) persistanceSession.get(Good.class, goodId);
