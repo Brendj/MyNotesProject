@@ -5,8 +5,9 @@
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.web.partner.smartwatch.security.SmartWatchApiKeyManager;
+import ru.axetta.ecafe.processor.web.partner.smartwatch.security.SmartWatchVendorManager;
 
 import org.jboss.resteasy.annotations.interception.Precedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
@@ -31,13 +32,13 @@ import java.util.List;
 @Precedence("SECURITY")
 public class SmartWatchRequestInterceptor implements PreProcessInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger("SmartWatchRequestInterceptor");
+    private static final Logger logger = LoggerFactory.getLogger(SmartWatchRequestInterceptor.class);
 
     @Override
     public ServerResponse preProcess(HttpRequest request, ResourceMethod method)
             throws Failure, WebApplicationException {
         try {
-            SmartWatchApiKeyManager manager = RuntimeContext.getAppContext().getBean(SmartWatchApiKeyManager.class);
+            SmartWatchVendorManager manager = RuntimeContext.getAppContext().getBean(SmartWatchVendorManager.class);
             StringBuilder sb = new StringBuilder();
             UriInfo info = request.getUri();
 
@@ -56,13 +57,13 @@ public class SmartWatchRequestInterceptor implements PreProcessInterceptor {
                         Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("NOT_VALID_API_KEY").build());
             }
 
-            String vendor = manager.getVendorByApiKey(requestHeaderKey.get(0));
-            if (vendor == null){
+            SmartWatchVendor vendor = manager.getVendorIdByApiKey(requestHeaderKey.get(0));
+            if (vendor == null || !vendor.getEnableService()){
                 throw new WebApplicationException(
                         Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("NOT_VALID_API_KEY").build());
             }
 
-            request.getHttpHeaders().getRequestHeaders().add("vendor", vendor);
+            request.getHttpHeaders().getRequestHeaders().add("vendorId", vendor.getIdOfVendor().toString());
 
             return null;
         } catch (Exception e) {

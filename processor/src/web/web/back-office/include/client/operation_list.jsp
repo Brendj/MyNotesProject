@@ -671,7 +671,7 @@
     </f:facet>
 </rich:dataTable>
 
-    <h:outputText value="История уведомлений Geoplaner (для владельцев Smart-часов):"/>
+    <h:outputText value="История уведомлений для поставщиков Smart-часов (для владельцев Smart-часов):"/>
     <rich:dataTable id="clientGeoplanerJournal" var="geoplanerJournal" value="#{mainPage.clientOperationListPage.geoplanerNotificationJournalList}"
                     rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8"
                     columns="10">
@@ -683,6 +683,9 @@
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Название ОО" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Поставщик карт" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="ID события прохода" styleClass="column-header"/>
@@ -712,6 +715,9 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{geoplanerJournal.org.shortName}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.vendor.name}" styleClass="output-text"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{geoplanerJournal.idOfEnterEvents}" styleClass="output-text"/>

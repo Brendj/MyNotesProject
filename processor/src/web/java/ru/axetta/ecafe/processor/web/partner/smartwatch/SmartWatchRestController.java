@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.partner.smartwatch.dto.*;
+import ru.axetta.ecafe.processor.web.partner.smartwatch.security.SmartWatchVendorManager;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
 import org.apache.commons.lang.StringUtils;
@@ -193,7 +194,7 @@ public class SmartWatchRestController {
             @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId,
             @FormParam(value="trackerActivateUserId") Long trackerActivateUserId, @FormParam(value="status") String status,
             @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid,
-            @HeaderParam(value="vendor") String vendor) throws Exception {
+            @HeaderParam(value="vendorId") Long vendorId) throws Exception {
         logger.info(String.format("Try registry SmartWatch for Phone: %s", mobilePhone));
         Result result = new Result();
         Session session = null;
@@ -210,6 +211,9 @@ public class SmartWatchRestController {
                 throw new IllegalArgumentException("The client witch contractID: " + child.getContractId()
                         + " has an active SmartWatch");
             }
+
+            SmartWatchVendorManager manager = RuntimeContext.getAppContext().getBean(SmartWatchVendorManager.class);
+            SmartWatchVendor vendor = manager.getVendorById(vendorId);
 
             Date issueTime = new Date();
             Date validTime = CalendarUtils.addYear(issueTime, 5); // Карта действительна с момента выдачи/передачи новому лицу + 5 лет
@@ -238,6 +242,7 @@ public class SmartWatchRestController {
             }
 
             child.setHasActiveSmartWatch(true);
+            child.setVendor(vendor);
 
             Date trackerActivateTimeDate = trackerActivateTime == null ? new Date() : new Date(trackerActivateTime);
             SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, trackerId, trackerUid);
@@ -246,7 +251,7 @@ public class SmartWatchRestController {
                         trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid, vendor);
             } else {
                 this.updateSmartWatch(watch, session, idOfCard, child.getIdOfClient(), color, model,
-                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);
+                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid, vendor);
             }
 
             blockActiveCards(child, idOfCard);
@@ -302,6 +307,7 @@ public class SmartWatchRestController {
 
             blockActiveCard(child, card);
             child.setHasActiveSmartWatch(false);
+            child.setVendor(null);
             session.update(child);
 
             transaction.commit();
@@ -1060,8 +1066,8 @@ public class SmartWatchRestController {
     }
 
     private void updateSmartWatch(SmartWatch watch, Session session, Long idOfCard, Long idOfClient, String color,
-            String model, Long trackerUid, Long trackerId, Long trackerActivateUserId,
-            String status, Date trackerActivateTimeDate, String simIccid) {
+            String model, Long trackerUid, Long trackerId, Long trackerActivateUserId, String status, Date trackerActivateTimeDate, String simIccid,
+            SmartWatchVendor vendor) {
         try {
             watch.setIdOfCard(idOfCard);
             watch.setIdOfClient(idOfClient);
@@ -1073,6 +1079,7 @@ public class SmartWatchRestController {
             watch.setStatus(status);
             watch.setTrackerActivateTime(trackerActivateTimeDate);
             watch.setSimIccid(simIccid);
+            watch.setVendor(vendor);
             session.update(watch);
         } catch (Exception e) {
             logger.error("Can't update SmartWatch with ID " + watch.getIdOfSmartWatch() + " : ", e);

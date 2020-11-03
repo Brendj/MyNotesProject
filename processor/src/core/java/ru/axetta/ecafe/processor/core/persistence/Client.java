@@ -146,6 +146,7 @@ public class Client {
     private String passportNumber;
     private String passportSeries;
     private Boolean hasActiveSmartWatch;
+    private SmartWatchVendor vendor;
     private String iacRegId;
     private Boolean multiCardMode;
 
@@ -1196,7 +1197,7 @@ public class Client {
     }
 
     public boolean clientHasActiveSmartWatch() {
-        return hasActiveSmartWatch == null ? false : hasActiveSmartWatch;
+        return hasActiveSmartWatch != null && hasActiveSmartWatch;
     }
 
     public void setHasActiveSmartWatch(Boolean hasActiveSmartWatch) {
@@ -1241,5 +1242,13 @@ public class Client {
 
     public void setUserOP(Boolean userOP) {
         this.userOP = userOP;
+    }
+
+    public SmartWatchVendor getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(SmartWatchVendor vendor) {
+        this.vendor = vendor;
     }
 }

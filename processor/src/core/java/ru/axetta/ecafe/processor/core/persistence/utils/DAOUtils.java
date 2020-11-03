@@ -4283,7 +4283,7 @@ public class DAOUtils {
 
     public static Long createSmartWatch(Session session, Long idOfCard, Long idOfClient, String model, String color,
             Long trackerUid, Long trackerId, Long trackerActivateUserId, String status, Date trackerActivateTime,
-            String simIccid, String vendor) {
+            String simIccid, SmartWatchVendor vendor) {
         try {
             SmartWatch watch = new SmartWatch();
             watch.setIdOfCard(idOfCard);
@@ -5369,5 +5369,12 @@ public class DAOUtils {
         query.setParameter("org", org);
 
         return query.list();
+    }
+
+    public static SmartWatchVendor getVendorByApiKey(String apiKey, Session session) {
+        Criteria criteria = session.createCriteria(SmartWatchVendor.class);
+        criteria.add(Restrictions.like("apiKey", apiKey));
+
+        return (SmartWatchVendor) criteria.uniqueResult();
     }
 }

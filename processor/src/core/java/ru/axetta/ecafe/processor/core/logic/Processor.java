@@ -23,7 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
+import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotificationManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
@@ -4544,12 +4544,13 @@ public class Processor implements SyncProcessor {
                 /* в случае анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировочных заказов */
                 if (client != null) {
-                    if (GeoplanerManager.isOn() && client.clientHasActiveSmartWatch()) {
+                    if (client.clientHasActiveSmartWatch()) {
                         try {
-                            GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                            manager.sendPurchasesInfoToGeoplaner(payment, client);
+                            SmartWatchVendorNotificationManager manager = RuntimeContext.getAppContext().getBean(
+                                    SmartWatchVendorNotificationManager.class);
+                            manager.sendPurchasesInfoToVendor(payment, client);
                         } catch (Exception exc) {
-                            logger.error("Can't send to Geoplaner JSON with Purchases", exc);
+                            logger.error("Can't send to Vendor JSON with Purchases", exc);
                         }
                     }
 
@@ -6342,12 +6343,13 @@ public class Processor implements SyncProcessor {
                     if (RuntimeContext.RegistryType.isSpb() && ScudManager.serviceIsWork) {
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
                     }
-                    if (GeoplanerManager.isOn() && enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)) {
+                    if (enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)) {
                         try {
-                            GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                            manager.sendEnterEventsToGeoplaner(enterEvent);
+                            SmartWatchVendorNotificationManager manager = RuntimeContext.getAppContext().getBean(
+                                    SmartWatchVendorNotificationManager.class);
+                            manager.sendEnterEventsToVendor(enterEvent);
                         } catch (Exception exc) {
-                            logger.error("Can't send JSON to Geoplaner with EnterEvents:", exc);
+                            logger.error("Can't send JSON to Vendor with EnterEvents:", exc);
                         }
                     }
 

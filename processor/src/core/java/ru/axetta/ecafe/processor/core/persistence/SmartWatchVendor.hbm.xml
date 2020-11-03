@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor" table="cf_smartwatch_vendor">
+        <cache usage="transactional"/>
+        <id name="idOfVendor" column="idofvendor" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" length="128" not-null="true"/>
+        <property name="apiKey" column="apikey" type="string" length="36" not-null="true"/>
+        <property name="enableService" column="enableService" type="boolean"/>
+        <property name="cardSignCertNum" column="cardsigncertnum" type="integer"/>
+        <property name="enablePushes" column="enablePushes" type="boolean"/>
+        <property name="enterEventsEndPoint" column="entereventsEndPoint" type="string" length="512"/>
+        <property name="purchasesEndPoint" column="purchasesendpoint" type="string" length="512"/>
+        <property name="paymentEndPoint" column="paymentendpoint" type="string" length="512"/>
+    </class>
+</hibernate-mapping>
+
+u
