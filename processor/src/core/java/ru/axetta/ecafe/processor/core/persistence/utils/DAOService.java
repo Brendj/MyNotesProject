@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2925,6 +2925,14 @@ public class DAOService {
         return q.getResultList();
     }
 
+    public List<WtComplex> getWtComplexesListByDiscountRule(WtDiscountRule wtRule) {
+        TypedQuery<WtComplex> q = entityManager
+                .createQuery("select wc from WtComplex wc left join fetch wc.discountRules discountRules "
+                                + "where :wtRule in elements(wc.discountRules)",
+                        WtComplex.class).setParameter("wtRule", wtRule);
+        return q.getResultList();
+    }
+
     public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem,
             Contragent contragent, WtDiscountRule rule) {
         StringBuilder sb = new StringBuilder();
@@ -2957,7 +2965,10 @@ public class DAOService {
         try {
             results = query.getResultList();
             if (rule != null) {
-                results.addAll(rule.getComplexes());
+                List<WtComplex> complexList = getWtComplexesListByDiscountRule(rule);
+                if (complexList != null) {
+                    results.addAll(complexList);
+                }
             }
             return results;
         } catch (Exception e) {

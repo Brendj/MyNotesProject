@@ -437,7 +437,6 @@ public class ResMenuSupplier implements AbstractToElement {
             XMLUtils.setAttributeIfNotNull(elem, "Id", item.getIdOfComplexItem());
             XMLUtils.setAttributeIfNotNull(elem, "ComplexId", complex.getIdOfComplex());
             XMLUtils.setAttributeIfNotNull(elem, "CycleDay", item.getCycleDay());
-            XMLUtils.setAttributeIfNotNull(elem, "CountDishes", item.getCountDishes());
             items.appendChild(elem);
         }
 
