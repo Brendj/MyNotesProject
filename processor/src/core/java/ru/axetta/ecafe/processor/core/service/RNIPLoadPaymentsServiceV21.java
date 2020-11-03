@@ -68,14 +68,14 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     };
 
     @Override
-    public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate, int paging) throws Exception {
         if(startDate == null) {
             startDate = getStartDateByLastUpdateDate(updateDate);
         }
         if (endDate == null) {
             endDate = getEndDateByStartDate(startDate);
         }
-        SendRequestResponse requestResponse = (SendRequestResponse)executeRequest21(requestType, contragent, updateDate, startDate, endDate);
+        SendRequestResponse requestResponse = (SendRequestResponse)executeRequest21(requestType, contragent, updateDate, startDate, endDate, paging);
         if (isRequestQueued(requestResponse)) {
             RnipEventType eventType = getEventType(requestType);
             RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType, startDate, endDate);
@@ -115,14 +115,14 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return false;
     }
 
-    public Object executeRequest21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public Object executeRequest21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate, int paging) throws Exception {
         switch(requestType) {
             case REQUEST_MODIFY_CATALOG:
             case REQUEST_CREATE_CATALOG:
                 return executeModifyCatalogV21(requestType, contragent, updateDate, startDate, endDate);
             case REQUEST_LOAD_PAYMENTS:
             case REQUEST_LOAD_PAYMENTS_MODIFIED:
-                return executeLoadPaymentsV21(requestType, contragent, updateDate, startDate, endDate, 1);
+                return executeLoadPaymentsV21(requestType, contragent, updateDate, startDate, endDate, paging);
                 /*requests = new HashMap<Contragent, Integer>();
                 int attempt = 1;
                 String uuid = UUID.randomUUID().toString();
@@ -179,7 +179,8 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return sendRequestRequest;
     }
 
-    public SendRequestResponse executeLoadPaymentsV21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate, int attempt) throws Exception {
+    public SendRequestResponse executeLoadPaymentsV21(int requestType, Contragent contragent, Date updateDate, Date startDate,
+            Date endDate, int paging) throws Exception {
         InitRNIP21Service(contragent);
 
         SendRequestRequest sendRequestRequest = getMessageHeaderV21(contragent);
@@ -193,10 +194,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         exportPaymentsRequest.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
 
         generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory commonObjectFactory = new generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory();
-        PagingType paging = commonObjectFactory.createPagingType();
-        paging.setPageLength(BigInteger.valueOf(PAGING_VALUE));
-        paging.setPageNumber(BigInteger.valueOf(attempt));
-        exportPaymentsRequest.setPaging(paging);
+        PagingType pagingObject = commonObjectFactory.createPagingType();
+        pagingObject.setPageLength(BigInteger.valueOf(PAGING_VALUE));
+        pagingObject.setPageNumber(BigInteger.valueOf(paging));
+        exportPaymentsRequest.setPaging(pagingObject);
 
         generated.ru.mos.rnip.xsd.searchconditions._2_1.ObjectFactory searchConditionsObjectFactory = new generated.ru.mos.rnip.xsd.searchconditions._2_1.ObjectFactory();
         PaymentsExportConditions paymentsExportConditions = searchConditionsObjectFactory.createPaymentsExportConditions();
@@ -604,12 +605,14 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
         GetResponseResponse response = null;
         String[] responseMessageToSave = {"", ""};
+        boolean hasMore = false;
         try {
             response = port21.getResponse(getResponseRequest);
             GetResponseResponse.ResponseMessage responseMessage = response.getResponseMessage();
             if (responseMessage == null) {
                 //Если получаем пустой ответ, то повторяем запрос с другим MessageID
-                receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(), rnipMessage.getStartDate(), rnipMessage.getEndDate());
+                receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(),
+                        rnipMessage.getStartDate(), rnipMessage.getEndDate(), rnipMessage.getPaging());
                 loggerGetResponse.info(String.format("Получен пустой ответ на запрос с ид=%s, контрагент %s. Отправлен повторный запрос", rnipMessage.getMessageId(),
                         rnipMessage.getContragent().getContragentName()));
                 RnipDAOService.getInstance().saveAsProcessed(rnipMessage, EMPTY_PACKET, null, rnipMessage.getEventType());
@@ -618,6 +621,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             Response internalResponse = responseMessage.getResponse();
             responseMessageToSave = checkResponseByEventType(internalResponse, rnipMessage);
             if (noErrors(responseMessageToSave[0]) && isPaymentRequest(rnipMessage)) {
+                hasMore = getHasMore(internalResponse);
                 loggerGetResponse.info(String.format("Разбор новых платежей для контрагента %s..", rnipMessage.getContragent().getContragentName()));
 
                 RNIPPaymentsResponse res = parsePayments(internalResponse);
@@ -633,6 +637,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             throw e;
         }
         RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());
+        if (hasMore) {
+            receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(),
+                    rnipMessage.getStartDate(), rnipMessage.getEndDate(), rnipMessage.getPaging() + 1);
+        }
     }
 
     private boolean isPaymentRequest(RnipMessage rnipMessage) {
@@ -672,7 +680,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return res;
     }
 
-    public Boolean receiveContragentPayments(int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception{
+    public Boolean receiveContragentPayments(int requestType, Contragent contragent, Date startDate, Date endDate, int paging) throws Exception{
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
@@ -684,7 +692,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         //  Отправка запроса на получение платежей
         SendRequestResponse response = null;
         try {
-            response = (SendRequestResponse)executeRequest(requestType, contragent, lastUpdateDate, startDate, endDate);
+            response = (SendRequestResponse)executeRequest(requestType, contragent, lastUpdateDate, startDate, endDate, paging);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -726,6 +734,14 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             }
         }
         return vals;
+    }
+
+    private boolean getHasMore(Response internalResponse) {
+        try {
+            return internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse().isHasMore();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private String[] checkResponseByEventType(Response internalResponse, RnipMessage rnipMessage) {
