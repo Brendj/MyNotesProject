@@ -286,6 +286,9 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 else if(userOrg.idOfOrg != null)
                     user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
             }
+            else {
+                user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+            }
 
             if (role != null && User.DefaultRole.DEFAULT.equals(role)) {
                 if (StringUtils.isEmpty(roleName)) {
