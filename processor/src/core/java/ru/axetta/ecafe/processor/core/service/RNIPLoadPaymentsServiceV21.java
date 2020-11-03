@@ -78,7 +78,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         SendRequestResponse requestResponse = (SendRequestResponse)executeRequest21(requestType, contragent, updateDate, startDate, endDate, paging);
         if (isRequestQueued(requestResponse)) {
             RnipEventType eventType = getEventType(requestType);
-            RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType, startDate, endDate);
+            RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType, startDate, endDate, paging);
             return requestResponse;
         } else {
             hasError.set("Получен ошибочный InteractionStatusType");
@@ -611,8 +611,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             GetResponseResponse.ResponseMessage responseMessage = response.getResponseMessage();
             if (responseMessage == null) {
                 //Если получаем пустой ответ, то повторяем запрос с другим MessageID
+                int paging = rnipMessage.getPaging() == null ? 1 : rnipMessage.getPaging();
                 receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(),
-                        rnipMessage.getStartDate(), rnipMessage.getEndDate(), rnipMessage.getPaging());
+                        rnipMessage.getStartDate(), rnipMessage.getEndDate(), paging);
                 loggerGetResponse.info(String.format("Получен пустой ответ на запрос с ид=%s, контрагент %s. Отправлен повторный запрос", rnipMessage.getMessageId(),
                         rnipMessage.getContragent().getContragentName()));
                 RnipDAOService.getInstance().saveAsProcessed(rnipMessage, EMPTY_PACKET, null, rnipMessage.getEventType());
@@ -638,8 +639,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());
         if (hasMore) {
+            int paging = rnipMessage.getPaging() == null ? 1 : rnipMessage.getPaging();
             receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(),
-                    rnipMessage.getStartDate(), rnipMessage.getEndDate(), rnipMessage.getPaging() + 1);
+                    rnipMessage.getStartDate(), rnipMessage.getEndDate(), paging + 1);
         }
     }
 
