@@ -25,7 +25,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -878,7 +877,7 @@ public class SchoolApiService implements ISchoolApiService {
                     CompositeIdOfOrderDetail compositeIdOfOrderDetailForComplex = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
                     orderDetails.add(buildOrderDetailsFromComplex(compositeIdOfOrderDetailForComplex,
                             planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), planOrderComplex, idOfRule));
-                    List<MenuDetail> complexMenuDetails = getMenuDetailsForComplexAndDate(planOrderComplex);
+                    List<MenuDetail> complexMenuDetails = getMenuDetailsForComplexNameAndDate(planOrder.getPlanDate(), planOrderComplex);
                     for(MenuDetail menuDetail: complexMenuDetails){
                         CompositeIdOfOrderDetail compositeIdOfOrderDetailForMenuDetails = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
                         orderDetails.add(buildOrderDetailsFromMenuDetails(compositeIdOfOrderDetailForMenuDetails,planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), menuDetail));
@@ -1062,15 +1061,18 @@ public class SchoolApiService implements ISchoolApiService {
         return complexInfoDetailsCriteria.list();
     }
 
-    private List<MenuDetail> getMenuDetailsForComplexAndDate(ComplexInfo complexInfo) throws Exception {
-        Query menuDetailsQuery = persistanceSession.createSQLQuery(
-                "select md.* from cf_complexinfo ci"
-                        + " inner join cf_complexinfodetail cd on ci.idofcomplexinfo = cd.idofcomplexinfo"
-                        + " inner join cf_menudetails md on cd.idofmenudetail = md.idofmenudetail"
-                        + " where ci.idoforg = :idOfOrg and ci.idofcomplexinfo = :idOfComplexInfo");
-        menuDetailsQuery.setResultTransformer(Transformers.aliasToBean(MenuDetail.class));
+    private List<MenuDetail> getMenuDetailsForComplexNameAndDate(Date planDate, ComplexInfo complexInfo) throws Exception {
+        Date startDate = getDateWithAddDay(planDate, 0);
+        Date endDate = getDateWithAddDay(startDate, 1);
+        Query menuDetailsQuery = persistanceSession.createQuery(
+                "select md from ComplexInfoDetail cd"
+                        + " join cd.menuDetail md"
+                        + " where cd.complexInfo.org.idOfOrg = :idOfOrg and upper(cd.complexInfo.complexName) = upper(:complexName)"
+                        + " and cd.complexInfo.menuDate>=:startDate and cd.complexInfo.menuDate<:endDate");
         menuDetailsQuery.setLong("idOfOrg", complexInfo.getOrg().getIdOfOrg());
-        menuDetailsQuery.setLong("idOfComplexInfo", complexInfo.getIdOfComplexInfo());
+        menuDetailsQuery.setString("complexName", complexInfo.getComplexName());
+        menuDetailsQuery.setParameter("startDate", startDate);
+        menuDetailsQuery.setParameter("endDate", endDate);
         return menuDetailsQuery.list();
     }
 

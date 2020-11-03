@@ -803,6 +803,9 @@ public class SchoolRestController {
             for(GroupNameDTO groupNameDTO: managerGroups){
                 managerGroupsNames.add(groupNameDTO.getGroupName());
             }
+            if(managerGroupsNames.isEmpty())
+                throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
             clients = groupManagementService.getClientsByGroupsAndContractIds(managerGroupsNames,
                     setToPayRequestDTO.getContractIds(), jwtUserDetails.getIdOfOrg());
             if(clients.isEmpty()){
