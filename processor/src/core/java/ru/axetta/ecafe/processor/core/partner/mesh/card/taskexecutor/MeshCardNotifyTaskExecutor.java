@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.mesh.card.taskexecutor;
 
+import org.springframework.context.annotation.DependsOn;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic.MeshClientCardRefService;
 import ru.axetta.ecafe.processor.core.persistence.Card;
@@ -21,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.ejb.DependsOn;
 import java.util.Date;
 import java.util.List;
 

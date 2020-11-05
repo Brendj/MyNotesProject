@@ -412,6 +412,12 @@ public class RuntimeContext implements ApplicationContextAware {
         return session;
     }
 
+    public void initSessionFactory() {
+        sessionFactory = ((EntityManagerFactory)applicationContext.getBean("masterEntityManagerFactory")).unwrap(SessionFactory.class);
+        reportsSessionFactory = ((EntityManagerFactory)applicationContext.getBean("slaveEntityManagerFactory")).unwrap(SessionFactory.class);
+        externalServicesSessionFactory = ((EntityManagerFactory)applicationContext.getBean("externalEntityManagerFactory")).unwrap(SessionFactory.class);
+    }
+
     //hibernate cache for processorPU
     public static Statistics statisticPersistenceSession() {
         return sessionFactory.getStatistics();
@@ -590,6 +596,9 @@ public class RuntimeContext implements ApplicationContextAware {
 
     @PostConstruct
     public void init() throws Exception {
+        logger.info("Start runtime context");
+        //applicationContext.getBean(this.getClass()).initSessionFactory();
+        initSessionFactory();
         // to run in transaction
         applicationContext.getBean(this.getClass()).initDB();
 
@@ -825,7 +834,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     private void initWSCrypto() {
-        java.util.Properties signatureProps = (java.util.Properties) CxfContextCapture.getApplicationContextInstance()
+        java.util.Properties signatureProps = (java.util.Properties) RuntimeContext.getAppContext()
                 .getBean("wsCryptoProperties");
         String params[] = {
                 "keystore.type", "keystore.password", "file", "truststore.type", "truststore.password",
@@ -1722,7 +1731,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private static X509Certificate getRootCert() throws Exception {
         if (rtCert == null) {
-            byte bytes[] = Base64.decode(base64crt);
+            byte bytes[] = ru.axetta.ecafe.processor.core.utils.Base64.decode(base64crt);
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             rtCert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(bytes));
         }

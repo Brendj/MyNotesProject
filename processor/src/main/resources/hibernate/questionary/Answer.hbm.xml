@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.questionary.Answer" table="cf_qa_answers">
+        <id name="idOfAnswer" column="IdOfAnswer" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="answer" column="Answer" type="string" length="90"/>
+        <property name="description" column="Description" type="string" length="255"/>
+        <property name="weight" column="Weight" type="integer"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <many-to-one name="questionary" class="ru.axetta.ecafe.processor.core.persistence.questionary.Questionary"
+                     lazy="proxy" fetch="select">
+            <column name="IdOfQuestionary" not-null="true" />
+        </many-to-one>
+
+        <set name="clientAnswerByQuestion" inverse="true" cascade="all">
+            <key column="IdOfAnswer"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary"/>
+        </set>
+    </class>
+</hibernate-mapping>

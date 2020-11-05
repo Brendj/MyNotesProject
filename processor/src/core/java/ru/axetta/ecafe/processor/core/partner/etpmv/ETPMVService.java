@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.partner.etpmv;
 
-import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import generated.contingent.ispp.*;
 import generated.etp.*;
 import generated.etp.ObjectFactory;
@@ -65,6 +64,8 @@ public class ETPMVService {
     private final int AIS_CONTINGENT_CONNECT_TIMEOUT = 10000;
     private final int AIS_CONTINGENT_REQUEST_TIMEOUT = 10*60*1000;
     private final int AIS_CONTINGENT_MAX_PACKET = 10;
+    private final String REQUEST_TIMEOUT = "com.sun.xml.internal.ws.request.timeout";
+    private final String CONNECT_TIMEOUT = "com.sun.xml.internal.ws.connect.timeout";
 
     private boolean useMeshGuid = false;
 
@@ -421,8 +422,8 @@ public class ETPMVService {
             URL endpoint = new URL(getAISContingentUrl());
             bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint.toString());
             Map<String, Object> requestContext = bindingProvider.getRequestContext();
-            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, AIS_CONTINGENT_REQUEST_TIMEOUT);
-            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, AIS_CONTINGENT_CONNECT_TIMEOUT);
+            requestContext.put(REQUEST_TIMEOUT, AIS_CONTINGENT_REQUEST_TIMEOUT);
+            requestContext.put(CONNECT_TIMEOUT, AIS_CONTINGENT_CONNECT_TIMEOUT);
 
             final AISContingentMessageLogger loggingHandler = new RuntimeContext().getAppContext().getBean(AISContingentMessageLogger.class);
             final List<Handler> handlerChain = new ArrayList<Handler>();

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.DiaryValue" table="CF_DiaryValues">
+        <composite-id name="compositeIdOfDiaryValue"
+                      class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfDiaryValue">
+            <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
+            <key-property name="idOfClient" type="long" column="IdOfClient"/>
+            <key-property name="idOfClass" type="long" column="IdOfClass"/>
+            <key-property name="recDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="RecDate"/>
+            <key-property name="VType" type="int" column="VType"/>
+        </composite-id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     insert="false" update="false"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
+                     not-null="true"
+                     insert="false" update="false"/>
+        <many-to-one name="diaryClass" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfClass"/>
+        </many-to-one>
+        <property name="value" column="Value" type="string" not-null="true" length="10" update="false"/>
+        <property name="recDate" column="RecDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false" insert="false"/>
+        <property name="VType" column="VType" type="int" not-null="true" update="false" insert="false"/>
+    </class>
+</hibernate-mapping>
+
+

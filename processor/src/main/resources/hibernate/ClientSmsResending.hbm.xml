@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientSmsResending" table="cf_clientsms_resending">
+        <id name="idOfSms" column="IdOfSms" type="string" length="70"/>
+        <version name="version" column="Version" type="long"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
+                     not-null="true" update="false"/>
+        <property name="phone" column="Phone" type="string" length="32" not-null="true" update="false"/>
+        <property name="serviceName" column="ServiceName" type="string" length="10" not-null="true" update="false"/>
+        <property name="contentsId" column="ContentsId" type="long" not-null="false"/>
+        <property name="contentsType" column="ContentsType" type="integer" not-null="true"/>
+        <property name="textContents" column="TextContents" type="string" length="65535" not-null="true" update="false"/>
+        <property name="paramsContents" column="ParamsContents" type="string" length="65535" not-null="true" update="false"/>
+        <property name="createDate" column="CreateDate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="lastResendingDate" column="LastResendingDate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="eventTime" column="EvtDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="idOfOrg" column="IdOfOrg" type="long"/>
+    </class>
+</hibernate-mapping>

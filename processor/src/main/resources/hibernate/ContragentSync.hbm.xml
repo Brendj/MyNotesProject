@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2015. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ContragentSync" table="cf_contragents_sync" optimistic-lock="version">
+
+        <id name="idOfContragent" column="IdOfContragent" type="long">
+            <generator class="foreign">
+                <param name="property">contragent</param>
+            </generator>
+        </id>
+        <version name="version" column="Version" type="long"/>
+        <one-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" constrained="true"/>
+
+        <property name="lastRNIPUpdate" column="LastRNIPUpdate" type="string" length="30" />
+        <property name="lastModifiesUpdate" column="LastModifiesUpdate" type="string" length="30" />
+
+    </class>
+</hibernate-mapping>
+
+

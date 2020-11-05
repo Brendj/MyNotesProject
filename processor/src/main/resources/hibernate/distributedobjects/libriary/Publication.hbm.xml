@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication"
+           table="cf_publications">
+        <id name="globalId" column="IdOfPublication" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersionOnCreate" column="GlobalVersionOnCreate" type="long"/>
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="sendAll" column="SendAll">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <!-- End Global params -->
+
+        <property name="data" column="DataOfPublication" type="byte[]" not-null="false"/>
+        <property name="isbn" column="ISBN" type="string" length="15" not-null="false"/>
+        <property name="validISBN" column="validISBN" type="boolean" not-null="true"/>
+        <property name="author" column="Author" type="string" length="255" not-null="false"/>
+        <property name="title" column="Title" type="string" length="512" not-null="false"/>
+        <property name="title2" column="Title2" type="string" length="255" not-null="false"/>
+        <property name="publicationdate" column="PublicationDate" type="string" length="15" not-null="false"/>
+        <property name="publisher" column="Publisher" type="string" length="255" not-null="false"/>
+        <property name="hash" column="Hash" type="integer" not-null="false"/>
+        <property name="idOfLang" column="IdOfLang" type="long" not-null="false"/>
+
+        <many-to-one name="bbkDetail" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" not-null="true" column="idofbbkdetails"/>
+
+        <set name="journalInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfPublication"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Journal" />
+        </set>
+
+        <set name="instanceInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfPublication"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Instance" />
+        </set>
+
+    </class>
+</hibernate-mapping>

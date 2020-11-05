@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -162,6 +163,14 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
 
                     public void write(byte b[], int off, int len) throws IOException {
                         streamBuffer.write(b, off, len);
+                    }
+
+                    public boolean isReady() {
+                        return true;
+                    }
+
+                    public void setWriteListener(WriteListener var1) {
+
                     }
                 };
             }

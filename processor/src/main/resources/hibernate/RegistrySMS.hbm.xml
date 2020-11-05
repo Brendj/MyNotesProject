@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.RegistrySMS" table="CF_RegistrySMS" optimistic-lock="version">
+        <id name="idOfRegistrySMS" column="IdOfRegistrySMS" type="long"/>
+        <version name="version" column="Version" type="long"/>
+        <property name="smsId" column="SmsId" type="string" length="16" not-null="true" insert="false"/>
+    </class>
+</hibernate-mapping>
+
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.HistoryCard" table="CF_History_Card">
+        <id name="idOfHistoryCard" column="idofhistorycard" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <many-to-one name="card" class="ru.axetta.ecafe.processor.core.persistence.Card" column="idofcard"
+                     not-null="false"/>
+
+        <property name="upDatetime" column="updatetime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <many-to-one name="formerOwner" class="ru.axetta.ecafe.processor.core.persistence.Client" column="formerowner"
+                     not-null="false" fetch="select" lazy="proxy"/>
+        <many-to-one name="newOwner" class="ru.axetta.ecafe.processor.core.persistence.Client" column="newowner"
+                     not-null="false"/>
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofuser"
+                    not-null="false"/>
+        <many-to-one name="transaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction" column="idoftransaction"/>
+
+        <property name="informationAboutCard" column="informationaboutcard" type="string" length="1024"/>
+    </class>
+</hibernate-mapping>

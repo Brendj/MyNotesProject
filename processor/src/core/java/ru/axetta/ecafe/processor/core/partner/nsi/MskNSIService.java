@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.partner.nsi;
 
-import com.sun.xml.internal.ws.client.BindingProviderProperties;
-import com.sun.xml.internal.ws.developer.JAXWSProperties;
 import generated.nsiws2.com.rstyle.nsi.beans.Context;
 import generated.nsiws2.com.rstyle.nsi.beans.Item;
 import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
@@ -177,27 +175,6 @@ public class MskNSIService {
         return !isTestingService ? "Реестр обучаемых линейный" : "Реестр обучаемых спецификация";
     }
 
-
-    public static void setTimeouts(BindingProvider bindingProvider, Long connectTimeout, Long requestTimeout) {
-        // from Java SE 6
-        final String keyInternalConnectTimeout = com.sun.xml.internal.ws.developer.JAXWSProperties.CONNECT_TIMEOUT;
-        final String keyInternalRequestTimeout = com.sun.xml.internal.ws.developer.JAXWSProperties.REQUEST_TIMEOUT;
-        // from Java EE 6
-        final String keyConnectTimeout = JAXWSProperties.CONNECT_TIMEOUT;
-        final String keyRequestTimeout = JAXWSProperties.REQUEST_TIMEOUT;
-
-        final Map<String, Object> requestContext = bindingProvider.getRequestContext();
-        if (connectTimeout != null) {
-            requestContext.put(keyInternalConnectTimeout, connectTimeout);
-            requestContext.put(keyConnectTimeout, (int) connectTimeout.longValue());
-            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, (int) connectTimeout.longValue());
-        }
-        if (requestTimeout != null) {
-            requestContext.put(keyInternalRequestTimeout, requestTimeout);
-            requestContext.put(keyRequestTimeout, (int) requestTimeout.longValue());
-            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, (int) requestTimeout.longValue());
-        }
-    }
 
     public void buildSearchPredicate(NSIRequestType request, SearchPredicateInfo searchPredicateInfo) {
         request.getMessageData().getAppData().setCatalogName(searchPredicateInfo.getCatalogName());

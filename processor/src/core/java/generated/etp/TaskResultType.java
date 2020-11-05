@@ -27,24 +27,12 @@ import javax.xml.bind.annotation.XmlType;
 public enum TaskResultType {
 
 
-    /**
-     * ������������� �������
-     * 
-     */
     @XmlEnumValue("PositiveAnswer")
     POSITIVE_ANSWER("PositiveAnswer"),
 
-    /**
-     * ������������� �������
-     * 
-     */
     @XmlEnumValue("NegativeAnswer")
     NEGATIVE_ANSWER("NegativeAnswer"),
 
-    /**
-     * ������
-     * 
-     */
     @XmlEnumValue("Error")
     ERROR("Error");
     private final String value;

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ReportInfo" table="CF_ReportInfo">
+        <id name="idOfReportInfo" column="idOfReportInfo" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="ruleName" column="RuleName" type="string" length="64" not-null="true"/>
+        <property name="documentFormat" column="DocumentFormat" type="integer" not-null="true"/>
+        <property name="reportName" column="ReportName" type="string" length="128" not-null="true"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="generationTime" column="GenerationTime" type="long"/>
+        <property name="startDate" column="StartDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="endDate" column="EndDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="reportFile" column="ReportFile" type="string" length="256" not-null="true"/>
+        <property name="orgNum" column="OrgNum" type="string" length="12" not-null="false"/>
+        <property name="idOfOrg" column="IdOfOrg" type="long" not-null="false"/>
+        <property name="tag" column="Tag" type="string" length="12" not-null="false"/>
+        <property name="idOfContragentReceiver" column="IdOfContragentReceiver" type="long" not-null="false"/>
+        <property name="contragentReceiver" column="ContragentReceiver" type="string" length="128" not-null="false"/>
+        <property name="idOfContragentPayer" column="IdOfContragentPayer" type="long" not-null="false"/>
+        <property name="contragentPayer" column="ContragentPayer" type="string" length="128" not-null="false"/>
+        <property name="createState" column="CreateState" type="integer" not-null="false"/>
+        <property name="errorString" column="ErrorString" type="string" not-null="false"/>
+    </class>
+</hibernate-mapping>
+
+

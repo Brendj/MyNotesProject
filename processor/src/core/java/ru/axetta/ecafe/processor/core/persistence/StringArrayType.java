@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 
 import java.io.Serializable;
@@ -23,14 +24,14 @@ public class StringArrayType implements UserType {
     protected static final int  SQLTYPE = java.sql.Types.ARRAY;
 
     @Override
-    public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor sessionImplementor, final Object owner) throws HibernateException, SQLException {
+    public Object nullSafeGet(final ResultSet rs, final String[] names, final SharedSessionContractImplementor sessionImplementor, final Object owner) throws HibernateException, SQLException {
         Array array = rs.getArray(names[0]);
         String[] javaArray = (String[]) array.getArray();
         return javaArray;
     }
 
     @Override
-    public void nullSafeSet(final PreparedStatement statement, final Object object, final int i, final SessionImplementor sessionImplementor) throws HibernateException, SQLException {
+    public void nullSafeSet(final PreparedStatement statement, final Object object, final int i, final SharedSessionContractImplementor sessionImplementor) throws HibernateException, SQLException {
         Connection connection = statement.getConnection();
 
         String[] castObject = (String[]) object;

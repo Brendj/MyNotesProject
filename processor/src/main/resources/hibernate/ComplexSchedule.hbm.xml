@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ComplexSchedule" table="CF_Complex_schedules">
+        <id name="guid" column="guid" type="string" length="40"/>
+        <property name="idOfOrg" column="idOfOrg" type="long" not-null="true" update="true"/>
+        <property name="idOfOrgCreated" column="idOfOrgCreated" type="long" not-null="true" update="true"/>
+        <property name="idOfComplex" column="idOfComplex" type="long" not-null="true" update="true"/>
+        <property name="intervalFrom" column="intervalFrom" type="int" update="true"/>
+        <property name="intervalTo" column="intervalTo" type="int" update="true"/>
+        <property name="version" column="version" type="long" not-null="true" update="true"/>
+        <property name="groupsIds" column="GroupsIds" type="string" length="128"/>
+        <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
+    </class>
+</hibernate-mapping>

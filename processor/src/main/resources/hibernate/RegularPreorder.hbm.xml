@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.RegularPreorder" table="cf_regular_preorders">
+        <id name="idOfRegularPreorder" column="IdOfRegularPreorder" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">32</param>
+                <param name="sequence_name">cf_regular_preorders_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="IdOfClient" not-null="true" fetch="select"/>
+        <property name="idOfComplex" column="idofcomplex" type="integer"/>
+        <property name="itemCode" column="itemCode" type="string" length="32"/>
+        <property name="amount" column="amount" type="integer" not-null="true"/>
+        <property name="startDate" column="startDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="endDate" column="endDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="itemName" column="itemName" type="string" length="256"/>
+        <property name="price" column="price" type="long" not-null="true"/>
+        <property name="monday" column="monday" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="tuesday" column="tuesday" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="wednesday" column="wednesday" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="thursday" column="thursday" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="friday" column="friday" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="saturday" column="saturday" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="mobile" column="mobile" type="string" length="32"/>
+        <property name="state" column="state">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.RegularPreorderState</param>
+            </type>
+        </property>
+        <property name="mobileGroupOnCreate" column="mobileGroupOnCreate">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType</param>
+            </type>
+        </property>
+	<property name="sendeddailynotification" column="sendeddailynotification" type="boolean"/>
+        <property name="idOfDish" column="idofdish" type="long"/>
+
+    </class>
+</hibernate-mapping>

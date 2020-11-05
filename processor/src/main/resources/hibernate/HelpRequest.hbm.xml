@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.HelpRequest" table="CF_HelpRequests" optimistic-lock="version">
+        <id name="idOfHelpRequest" column="IdOfHelpRequests" type="long">
+            <generator class="sequence">
+                <param name="sequence">cf_helprequests_idofhelprequests_seq</param>
+            </generator>
+        </id>
+        <version name="hibernateVersion" column="HibernateVersion" type="long"/>
+        <property name="requestDate" column="RequestDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="requestUpdateDate" column="RequestUpdateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true"/>
+        <property name="theme" column="Theme" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.HelpRequestThemeEnumType</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="message" column="Message" type="string" length="2000"/>
+        <property name="declarer" column="Declarer" type="string" length="100"/>
+        <property name="phone" column="Phone" type="string" length="11" not-null="true"/>
+        <property name="status" column="Status" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.HelpRequestStatusEnumType</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="requestNumber" column="RequestNumber" type="string" length="15" not-null="true" unique="true"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" fetch="select" lazy="proxy">
+            <column name="idOfOrg"/>
+        </many-to-one>
+        <property name="guid" column="Guid" type="string" length="36" not-null="true" unique="true"/>
+        <property name="comment" column="Comment" type="string" length="2000"/>
+        <property name="version" column="Version" type="long"/>
+    </class>
+</hibernate-mapping>

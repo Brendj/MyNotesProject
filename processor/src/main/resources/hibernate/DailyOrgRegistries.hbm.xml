@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.DailyOrgRegistries"
+           table="cf_daily_org_registries">
+        <id name="idOfDailyOrgRegistries" column="idofdailyorgregistries" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="orgNum" column="orgnum" type="string" length="30"/>
+        <many-to-one name="idOfOrg" column="idoforg" class="ru.axetta.ecafe.processor.core.persistence.Org"
+                     not-null="false"/>
+        <property name="officialName" column="officialname" type="string" length="256"/>
+        <property name="address" column="address" type="string" length="256"/>
+        <property name="totalBalance" column="totalbalance" type="long"/>
+        <property name="rechargeAmount" column="rechargeamount" type="long"/>
+        <property name="salesAmount" column="salesamount" type="long"/>
+        <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <many-to-one name="dailyFormationRegistries" column="idofregistries" not-null="true"
+                     class="ru.axetta.ecafe.processor.core.persistence.DailyFormationRegistries"/>
+    </class>
+</hibernate-mapping>

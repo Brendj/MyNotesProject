@@ -524,10 +524,14 @@
       <entry name="*.CharsetProvider" />
     </wildcardResourcePatterns>
     <annotationProcessing>
-      <profile name="Maven default annotation processors profile" enabled="true">
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
   </component>
@@ -540,7 +544,7 @@
       <option name="myLocal" value="true" />
     </copyright>
   </component>
-  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+  <component name="DataSourceManagerImpl" format="xml" hash="0">
     <data-source source="LOCAL" name="Moscow Stand VM" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
@@ -884,10 +888,6 @@
   </component>
   <component name="IdProvider" IDEtalkID="18F2146BFFA68BDCCC8665BD3D587E9B" />
   <component name="InspectionProjectProfileManager">
-    <profile version="1.0">
-      <option name="myName" value="Project Default" />
-    </profile>
-    <version value="1.0" />
     <list size="7">
       <item index="0" class="java.lang.String" itemvalue="INFORMATION" />
       <item index="1" class="java.lang.String" itemvalue="SERVER PROBLEM" />
@@ -1303,7 +1303,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" default="false" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
@@ -1334,7 +1334,7 @@
         <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="JProfiler">
-        <option name="JVM" value="$PROJECT_DIR$/../../../../../../../Java/jdk1.6.0_45" />
+        <option name="JVM" value="C:/../../Java/jdk1.6.0_45" />
         <option name="WINDOW" value="false" />
         <option name="JVMPI" value="false" />
         <option name="INTERPRETED" value="false" />
@@ -1584,49 +1584,26 @@
   </component>
   <component name="dataSourceStorageLocal">
     <data-source name="Moscow Stand VM" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
       <user-name>postgres</user-name>
-      <schema-mapping />
     </data-source>
     <data-source name="Kazan Stand VM" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
       <user-name>postgres</user-name>
-      <schema-mapping />
     </data-source>
     <data-source name="Local MoscowDB" uuid="cedfba61-0f44-4ced-9708-18045311d229">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
       <user-name>postgres</user-name>
-      <schema-mapping />
     </data-source>
     <data-source name="Local Stand Data Source" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
       <user-name>postgres</user-name>
-      <schema-mapping />
     </data-source>
     <data-source name="SPB Data Base Source" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
       <user-name>postgres</user-name>
-      <schema-mapping />
     </data-source>
     <data-source name="Moscow Last" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
       <user-name>postgres</user-name>
-      <schema-mapping />
     </data-source>
     <data-source name="postgres@localhost" uuid="1451f6ca-0353-4926-b556-16dbf9094cef">
-      <database-info product="PostgreSQL" version="9.3.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" dbms="POSTGRES" exact-version="9.3.4" exact-driver-version="9.1">
-        <identifier-quote-string>&quot;</identifier-quote-string>
-      </database-info>
-      <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
       <secret-storage>master_key</secret-storage>
       <user-name>postgres</user-name>
-      <schema-mapping>
-        <introspection-scope>
-          <node kind="database" negative="1">
-            <node kind="schema" negative="1" />
-          </node>
-        </introspection-scope>
-      </schema-mapping>
     </data-source>
   </component>
   <component name="ideadoc.IdeaDocConfigurationGUI">

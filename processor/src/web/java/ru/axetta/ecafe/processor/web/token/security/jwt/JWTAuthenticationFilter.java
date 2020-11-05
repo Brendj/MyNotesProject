@@ -67,6 +67,10 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
         return authentication;
     }
 
+    //TODO разобраться с getFilterProcessesUrl
+    private String getFilterProcessesUrl() {
+        return getServletContext().getContextPath();
+    }
 
     @Override
     protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response){

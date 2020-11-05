@@ -26,6 +26,7 @@ import org.w3c.dom.Node;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,6 +53,11 @@ import java.util.zip.GZIPOutputStream;
  * Date: 21.07.2009
  * Time: 16:02:24
  */
+@WebServlet(
+        name = "SyncServlet",
+        description = "Sync with school ARMs",
+        urlPatterns = {"/sync"}
+)
 public class SyncServlet extends HttpServlet {
 
     private static final String CONTENT_TYPE = "text/xml", CONTENT_TYPE_GZIPPED= "application/octet-stream";
@@ -60,12 +66,12 @@ public class SyncServlet extends HttpServlet {
     private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
     private static final HashSet<Long> fullSyncsInProgress = new HashSet<Long>();
     private static final HashSet<Long> accIncSyncsInProgress = new HashSet<Long>();
-    private static final List<String[]> restrictedFullSyncPeriods =
-            getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
+    private static List<String[]> restrictedFullSyncPeriods;
     private static final AtomicLong threadCounter = new AtomicLong();
-    public static final int MAX_SYNCS = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
-    public static final int permitsTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
-    private static final Semaphore permitsForSync = new Semaphore(MAX_SYNCS, true);
+    public static int MAX_SYNCS;
+    public static int permitsTimeout;
+    private static Boolean initComplete = false;
+    private static Semaphore permitsForSync;
     private final static ThreadLocal<Boolean> currentSyncWasGranted = new ThreadLocal<Boolean>(){
         @Override protected Boolean initialValue() { return false; }
     };
@@ -75,7 +81,20 @@ public class SyncServlet extends HttpServlet {
         public Document document;
     }
 
+    private void initOnFirstRequest() {
+        synchronized (initComplete) {
+            if (initComplete) return;
+            restrictedFullSyncPeriods =
+                    getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
+            MAX_SYNCS = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
+            permitsTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
+            permitsForSync = new Semaphore(MAX_SYNCS, true);
+            initComplete = true;
+        }
+    }
+
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        initOnFirstRequest();
         RuntimeContext runtimeContext = null;
         Long syncTime = new Date().getTime();
         SyncCollector.registerSyncStart(syncTime);

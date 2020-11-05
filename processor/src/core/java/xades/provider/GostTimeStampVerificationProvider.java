@@ -119,7 +119,8 @@ public class GostTimeStampVerificationProvider implements TimeStampVerificationP
 
         X509Certificate tsaCert;
 
-        try {
+        //TODO разобраться с getCertificates
+        /*try {
 
             final LinkedList<X509Certificate> tsTokenInfo = new LinkedList<X509Certificate>();
             final Store certStore = tsToken.getCertificates();
@@ -152,7 +153,7 @@ public class GostTimeStampVerificationProvider implements TimeStampVerificationP
             throw new TimeStampTokenVerificationException(e.getMessage(), e);
         } catch (XAdES4jException e) {
             throw new TimeStampTokenTSACertException("cannot validate TSA certificate", e);
-        }
+        }*/
 
         /*
             Не работает, т.к. расширение time-stamping в TSP
