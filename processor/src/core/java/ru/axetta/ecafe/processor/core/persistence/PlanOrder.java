@@ -12,7 +12,7 @@ public class PlanOrder {
     private String groupName;
     private Client client;
     private Date planDate;
-    private ComplexInfo complexInfo;
+    private int idOfComplex;
     private String complexName;
     private User userRequestToPay;
     private Boolean toPay;
@@ -23,18 +23,17 @@ public class PlanOrder {
     private Date createDate;
     private Date lastUpdate;
 
-    public PlanOrder(){
+    public PlanOrder(){ }
 
-    }
-
-    public PlanOrder(Long idOfPlanOrder, Org org, String groupName, Client client, Date planDate, ComplexInfo complexInfo, String complexName,
-            User userRequestToPay, Boolean toPay, Long idOfOrder, User userConfirmToPay, DiscountRule discountRule){
+    public PlanOrder(Long idOfPlanOrder, Org org, String groupName, Client client, Date planDate, int idOfComplex,
+            String complexName, User userRequestToPay, Boolean toPay,
+            Long idOfOrder, User userConfirmToPay, DiscountRule discountRule){
         this.idOfPlanOrder = idOfPlanOrder;
         this.org = org;
         this.groupName = groupName;
         this.client = client;
         this.planDate = planDate;
-        this.complexInfo = complexInfo;
+        this.idOfComplex = idOfComplex;
         this.complexName = complexName;
         this.userRequestToPay = userRequestToPay;
         this.toPay = toPay;
@@ -87,12 +86,12 @@ public class PlanOrder {
         this.planDate = planDate;
     }
 
-    public ComplexInfo getComplexInfo() {
-        return complexInfo;
+    public int getIdOfComplex() {
+        return idOfComplex;
     }
 
-    public void setComplexInfo(ComplexInfo complexInfo) {
-        this.complexInfo = complexInfo;
+    public void setIdOfComplex(int idOfComplex) {
+        this.idOfComplex = idOfComplex;
     }
 
     public String getComplexName() {

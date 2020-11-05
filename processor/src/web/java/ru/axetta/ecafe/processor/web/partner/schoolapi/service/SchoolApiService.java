@@ -678,26 +678,29 @@ public class SchoolApiService implements ISchoolApiService {
         Query planOrderQuery = persistanceSession.createQuery("from PlanOrder po "
                 + "where po.org.idOfOrg=:orgId "
                 + "and po.client.idOfClient=:clientId "
-                + "and po.complexInfo.idOfComplexInfo=:idOfComplex "
+                + "and po.idOfComplex=:idOfComplex "
+                + " and po.complexName=:complexName "
                 + "and po.planDate>=:startDate and po.planDate<:endDate ");
         planOrderQuery.setParameter("orgId", orgId);
         planOrderQuery.setParameter("startDate", startDate);
         planOrderQuery.setParameter("endDate", endDate);
-
-        for(PlanOrderClientDTO planOrderClientDTO: clients){
+        for(Iterator clientIterator = clients.iterator(); clientIterator.hasNext();){
+            PlanOrderClientDTO planOrderClientDTO = (PlanOrderClientDTO) clientIterator.next();
             if(planOrderClientDTO.getClient() == null){
                 clients.remove(planOrderClientDTO);
                 continue;
             }
             planOrderQuery.setParameter("clientId",planOrderClientDTO.getClient().getIdOfClient());
             for(ClientComplexDTO complexDTO: planOrderClientDTO.getComplexes()){
-                planOrderQuery.setParameter("idOfComplex", complexDTO.getComplexInfo().getIdOfComplexInfo());
+                planOrderQuery.setParameter("idOfComplex", complexDTO.getComplexInfo().getIdOfComplex());
+                planOrderQuery.setParameter("complexName", complexDTO.getComplexInfo().getComplexName());
                 planOrderQuery.setMaxResults(1);
                 PlanOrder planOrder = (PlanOrder) planOrderQuery.uniqueResult();
                 if(planOrder != null){
                     if(planOrder.getOrder() == null){
+                        planOrder.setIdOfComplex(complexDTO.getComplexInfo().getIdOfComplex());
                         planOrder.setGroupName(groupName);
-                        planOrder.setComplexName(complexDTO.getComplexName());
+                        planOrder.setComplexName(complexDTO.getComplexInfo().getComplexName());
                         planOrder.setDiscountRule(complexDTO.getDiscountRule());
                         planOrder.setLastUpdate(new Date());
                         persistanceSession.update(planOrder);
@@ -705,8 +708,8 @@ public class SchoolApiService implements ISchoolApiService {
                 }
                 else{
                     ComplexInfo complexInfo = (ComplexInfo) persistanceSession.get(ComplexInfo.class, complexDTO.getComplexInfo().getIdOfComplexInfo());
-                    planOrder = new PlanOrder(uniqueIdGenerator.createId(), org, groupName, planOrderClientDTO.getClient(), new Date(planDate.getTime()), complexInfo,
-                            complexInfo.getComplexName(),
+                    planOrder = new PlanOrder(uniqueIdGenerator.createId(), org, groupName, planOrderClientDTO.getClient(),
+                            new Date(planDate.getTime()), complexInfo.getIdOfComplex(), complexInfo.getComplexName(),
                             null, false, null, null, complexDTO.getDiscountRule());
                     persistanceSession.save(planOrder);
                 }
@@ -858,7 +861,8 @@ public class SchoolApiService implements ISchoolApiService {
                     }
                     IIdGenerator<Long> orderIdGenerator = OrganizationUniqueGeneratorId.getInstance(orgId);
                     CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(planOrder.getOrg().getIdOfOrg(), orderIdGenerator.createId());
-                    ComplexInfo planOrderComplex = planOrder.getComplexInfo();
+                    ComplexInfo planOrderComplex = getComplexInfoByOrgIdAndIdOfComplexAndComplexName(planOrder.getOrg().getIdOfOrg(),
+                            planOrder.getIdOfComplex(), planOrder.getComplexName(), planOrder.getPlanDate());
                     if(planOrderComplex == null)
                         continue;
                     planOrderOrder = new Order(compositeIdOfOrder, idOfUser, planOrderComplex.getCurrentPrice(),
@@ -978,6 +982,23 @@ public class SchoolApiService implements ISchoolApiService {
         return planOrders;
     }
 
+    public ComplexInfo getComplexInfoByOrgIdAndIdOfComplexAndComplexName(long orgId, int idOfComplex, String complexName, Date planDate) throws Exception {
+        Date startDate = getDateWithAddDay(planDate, 0);
+        Date endDate = getDateWithAddDay(startDate, 1);
+        Query complexInfoQuery = persistanceSession.createQuery("select distinct ci from ComplexInfo ci"
+                + " where ci.org.idOfOrg=:orgId and ci.idOfComplex=:idOfComplex"
+                + " and upper(ci.complexName)=upper(:complexName)"
+                + " and ci.menuDate>=:startDate and ci.menuDate<:endDate"
+                + " and ci.modeFree=1");
+        complexInfoQuery.setParameter("orgId", orgId);
+        complexInfoQuery.setParameter("idOfComplex", idOfComplex);
+        complexInfoQuery.setParameter("complexName", complexName);
+        complexInfoQuery.setParameter("startDate", startDate);
+        complexInfoQuery.setParameter("endDate", endDate);
+        complexInfoQuery.setMaxResults(1);
+        return (ComplexInfo) complexInfoQuery.uniqueResult();
+    }
+
 
     private OrderDetail buildOrderDetailsFromMenuDetails(CompositeIdOfOrderDetail compositeIdOfOrderDetail,
             Long idOfOrder, MenuDetail menuDetail) throws Exception {
@@ -994,7 +1015,9 @@ public class SchoolApiService implements ISchoolApiService {
         int qty = 1;
         int menuType = 150;
         OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
-        Good menuDetailsGood = getGoodById(menuDetail.getIdOfGood());
+        Good menuDetailsGood = null;
+        if(menuDetail.getIdOfGood() != null)
+            menuDetailsGood = getGoodById(menuDetail.getIdOfGood());
         if(menuDetailsGood != null){
             itemCode = StringUtils.substring(menuDetailsGood.getGoodsCode(), 0, itemCodeMaxLength);
             if(menuDetailsGood.getGoodType() != null){
@@ -1030,11 +1053,11 @@ public class SchoolApiService implements ISchoolApiService {
         int qty = 1;
         int menuType = 50;
         OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
-        Good menuDetailsGood = complexInfo.getGood();
-        if(menuDetailsGood != null){
-            itemCode = StringUtils.substring(menuDetailsGood.getGoodsCode(), 0, itemCodeMaxLength);
-            if(menuDetailsGood.getGoodType() != null){
-                FRationType = OrderDetailFRationType.fromInteger(menuDetailsGood.getGoodType().getCode());
+        Good complexInfoGood = complexInfo.getGood();
+        if(complexInfoGood != null){
+            itemCode = StringUtils.substring(complexInfoGood.getGoodsCode(), 0, itemCodeMaxLength);
+            if(complexInfoGood.getGoodType() != null){
+                FRationType = OrderDetailFRationType.fromInteger(complexInfoGood.getGoodType().getCode());
             }
         }
         return new OrderDetail(compositeIdOfOrderDetail, idOfOrder, qty, discount, socDiscount, rPrice, menuDetailName,
@@ -1067,7 +1090,7 @@ public class SchoolApiService implements ISchoolApiService {
         Query menuDetailsQuery = persistanceSession.createQuery(
                 "select md from ComplexInfoDetail cd"
                         + " join cd.menuDetail md"
-                        + " where cd.complexInfo.org.idOfOrg = :idOfOrg and upper(cd.complexInfo.complexName) = upper(:complexName)"
+                        + " where cd.complexInfo.org.idOfOrg =:idOfOrg and upper(cd.complexInfo.complexName) = upper(:complexName)"
                         + " and cd.complexInfo.menuDate>=:startDate and cd.complexInfo.menuDate<:endDate");
         menuDetailsQuery.setLong("idOfOrg", complexInfo.getOrg().getIdOfOrg());
         menuDetailsQuery.setString("complexName", complexInfo.getComplexName());
