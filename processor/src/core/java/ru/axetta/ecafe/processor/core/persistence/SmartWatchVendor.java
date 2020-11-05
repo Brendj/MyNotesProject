@@ -10,9 +10,9 @@ public class SmartWatchVendor {
     private Long idOfVendor;
     private String name;
     private String apiKey;
-    private Boolean enableService;
+    private Boolean enableService = false;
     private Integer cardSignCertNum;
-    private Boolean enablePushes;
+    private Boolean enablePushes = false;
     private String enterEventsEndPoint;
     private String purchasesEndPoint;
     private String paymentEndPoint;
@@ -95,14 +95,19 @@ public class SmartWatchVendor {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SmartWatchVendor that = (SmartWatchVendor) o;
-        return Objects.equals(idOfVendor, that.idOfVendor);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SmartWatchVendor vendor = (SmartWatchVendor) o;
+        return Objects.equals(idOfVendor, vendor.idOfVendor) && Objects.equals(name, vendor.name) && Objects
+                .equals(apiKey, vendor.apiKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfVendor);
+        return Objects.hash(idOfVendor, name, apiKey);
     }
 }

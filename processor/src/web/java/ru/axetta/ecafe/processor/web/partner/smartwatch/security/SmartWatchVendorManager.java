@@ -9,12 +9,20 @@ import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.ejb.DependsOn;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -66,6 +74,80 @@ public class SmartWatchVendorManager {
             log.error("", e);
             return null;
         } finally {
+            HibernateUtils.close(session, log);
+        }
+    }
+
+    public List<SmartWatchVendor> getAllVendors() {
+        Session session = null;
+        List<SmartWatchVendor> result = Collections.emptyList();
+        try{
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+
+            Criteria criteria = session.createCriteria(SmartWatchVendor.class);
+            criteria.addOrder(Order.asc("name"));
+
+            result = criteria.list();
+
+            session.close();
+        } catch (Exception e) {
+            log.error("Can't get all Vendors:", e);
+        } finally {
+            HibernateUtils.close(session, log);
+        }
+        return  result;
+    }
+
+    public List<SmartWatchVendor> findVendorByName(String name) {
+        if(StringUtils.isEmpty(name)){
+            return getAllVendors();
+        }
+
+        Session session = null;
+        List<SmartWatchVendor> result = Collections.emptyList();
+        try{
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+
+            Criteria criteria = session.createCriteria(SmartWatchVendor.class);
+            criteria.add(Restrictions.ilike("name", name, MatchMode.ANYWHERE));
+            criteria.addOrder(Order.asc("name"));
+
+            result = criteria.list();
+
+            session.close();
+        } catch (Exception e) {
+            log.error("Can't get Vendors by name:", e);
+            throw e;
+        } finally {
+            HibernateUtils.close(session, log);
+        }
+        return  result;
+    }
+
+    public void deleteVendor(SmartWatchVendor vendor) throws Exception {
+        if(vendor == null){
+            return;
+        }
+
+        Session session = null;
+        Transaction transaction = null;
+
+        try{
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            session.merge(vendor);
+            session.delete(vendor);
+
+            transaction.commit();
+            transaction = null;
+
+            session.close();
+        } catch (Exception e) {
+            log.error("Can't get Vendors by name:", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
         }
     }
