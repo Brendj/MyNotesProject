@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.web.partner.smartwatch;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.web.partner.smartwatch.security.SmartWatchVendorManager;
 
 import org.jboss.resteasy.annotations.interception.Precedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;

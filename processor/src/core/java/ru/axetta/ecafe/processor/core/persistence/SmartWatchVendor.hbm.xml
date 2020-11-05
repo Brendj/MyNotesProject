@@ -17,5 +17,3 @@
         <property name="paymentEndPoint" column="paymentendpoint" type="string" length="512"/>
     </class>
 </hibernate-mapping>
-
-u

@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.partner.smartwatch.dto.*;
-import ru.axetta.ecafe.processor.web.partner.smartwatch.security.SmartWatchVendorManager;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
 import org.apache.commons.lang.StringUtils;

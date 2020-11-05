@@ -2,7 +2,7 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.partner.smartwatch.security;
+package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
@@ -50,7 +50,7 @@ public class SmartWatchVendorManager {
         }
     }
 
-    private boolean isUUID(String uuidStr){
+    public boolean isUUID(String uuidStr){
         try {
             UUID uuid = UUID.fromString(uuidStr);
             return true;

@@ -8,7 +8,7 @@ package ru.axetta.ecafe.processor.web.ui.card.smartwatchvendors;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.smartwatch.security.SmartWatchVendorManager;
+import ru.axetta.ecafe.processor.web.partner.smartwatch.SmartWatchVendorManager;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.StringUtils;
@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @Scope("session")
@@ -32,6 +34,7 @@ public class SmartWatchVendorsListPage extends BasicWorkspacePage {
     private List<SmartWatchVendor> smartWatchVendorList;
     private SmartWatchVendorManager manager;
     private SmartWatchVendor selectedItem = null;
+    private final Pattern urlPattern = Pattern.compile("^(https|http):\\/\\/[a-zA-Z0-9@:%._\\+~#=\\/&?]+");
 
     @Autowired
     public void setService(SmartWatchVendorManager manager) {
@@ -65,7 +68,10 @@ public class SmartWatchVendorsListPage extends BasicWorkspacePage {
             return;
         }
         try {
-            manager.deleteVendor(selectedItem);
+            if(selectedItem.getIdOfVendor() != null) {
+                manager.deleteVendor(selectedItem);
+            }
+            smartWatchVendorList.remove(selectedItem);
         } catch (Exception e){
             printError("Не удалось удалить поставщика: " + e.getMessage());
             log.error("Can't delete vendor", e);
@@ -108,6 +114,9 @@ public class SmartWatchVendorsListPage extends BasicWorkspacePage {
             transaction = session.beginTransaction();
 
             for (SmartWatchVendor vendor : smartWatchVendorList){
+                if(isInvalidData(vendor)){
+                    continue;
+                }
                 session.saveOrUpdate(vendor);
             }
 
@@ -121,6 +130,39 @@ public class SmartWatchVendorsListPage extends BasicWorkspacePage {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
         }
+    }
+
+    private boolean isInvalidData(SmartWatchVendor vendor) {
+        if(StringUtils.isNotEmpty(vendor.getApiKey()) && !manager.isUUID(vendor.getApiKey())){
+            printError("У поставщика " + vendor.getName() + " указан API-Key в неверном формате. Обработка пропущена");
+            return true;
+        }
+        Matcher matcher = null;
+        if(StringUtils.isNotEmpty(vendor.getEnterEventsEndPoint())){
+            matcher = urlPattern.matcher(vendor.getEnterEventsEndPoint());
+            if(!matcher.matches()){
+                printError("У поставщика " + vendor.getName() + " указан неверный адрес для отправки событий проходов. Обработка пропущена");
+                return true;
+            }
+        }
+
+        if(StringUtils.isNotEmpty(vendor.getPurchasesEndPoint())){
+            matcher = urlPattern.matcher(vendor.getPurchasesEndPoint());
+            if(!matcher.matches()){
+                printError("У поставщика " + vendor.getName() + " указан неверный адрес для отправки событий покупок. Обработка пропущена");
+                return true;
+            }
+        }
+
+        if(StringUtils.isNotEmpty(vendor.getPaymentEndPoint())){
+            matcher = urlPattern.matcher(vendor.getPaymentEndPoint());
+            if(!matcher.matches()){
+                printError("У поставщика " + vendor.getName() + " указан неверный адрес для отправки событий поплнения счёта. Обработка пропущена");
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void createNewVendor() {
