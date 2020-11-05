@@ -848,7 +848,7 @@ public class SchoolApiService implements ISchoolApiService {
             throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
         for(PlanOrder planOrder: planOrders){
-            if(planOrder.getOrg() == null)
+            if(planOrder.getOrg() == null || planOrder.getClient() == null)
                 continue;
             Order planOrderOrder = null;
             List<OrderDetail> orderDetails = new ArrayList<>();
@@ -866,18 +866,10 @@ public class SchoolApiService implements ISchoolApiService {
                     if(planOrderComplex == null)
                         continue;
                     planOrderOrder = new Order(compositeIdOfOrder, idOfUser, planOrderComplex.getCurrentPrice(),
-                            0L,  0, 0, new Date(), new Date(), 0, 0,
+                            0L,  0, 0, planOrder.getPlanDate(), new Date(), 0, 0,
                             orderComment, planOrder.getClient(),null,null,null,
                             planOrder.getOrg().getDefaultSupplier(), OrderTypeEnumType.REDUCED_PRICE_PLAN, null);
-                    /*List<ComplexInfoDetail> complexInfoDetails = getComplexInfoDetails(planOrderComplex);
-                    String complexItemCode = null;
-                    OrderDetailFRationType orderDetailFRationType = null;
-                    if(planOrderComplex.getGood()!= null){
-                        complexItemCode = planOrderComplex.getGood().getGoodsCode();
-                        if(planOrderComplex.getGood().getGoodType() != null){
-                            orderDetailFRationType = OrderDetailFRationType.fromInteger(planOrderComplex.getGood().getGoodType().getCode());
-                        }
-                    }*/
+                    planOrderOrder.setIdOfClientGroup(planOrder.getClient().getIdOfClientGroup());
                     CompositeIdOfOrderDetail compositeIdOfOrderDetailForComplex = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
                     orderDetails.add(buildOrderDetailsFromComplex(compositeIdOfOrderDetailForComplex,
                             planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), planOrderComplex, idOfRule));
@@ -886,69 +878,6 @@ public class SchoolApiService implements ISchoolApiService {
                         CompositeIdOfOrderDetail compositeIdOfOrderDetailForMenuDetails = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
                         orderDetails.add(buildOrderDetailsFromMenuDetails(compositeIdOfOrderDetailForMenuDetails,planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), menuDetail));
                     }
-
-                    /*String menuDetailName = "";
-                    String rootMenu = "";
-                    String menuGroup = "";
-                    String itemCode = "";
-                    String manufacturer = "";
-                    if(complexInfoDetails.isEmpty()){
-                        CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
-                        menuDetailName = planOrderComplex.getComplexName().length() > menuDetailNameMaxLength ?
-                                planOrderComplex.getComplexName().substring(0,menuDetailNameMaxLength): planOrderComplex.getComplexName();
-
-                        OrderDetail complexOrderDetail = new OrderDetail(compositeIdOfOrderDetail, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
-                                1, planOrderComplex.getCurrentPrice(), planOrderComplex.getCurrentPrice(), 0,
-                                menuDetailName, rootMenu,menuGroup, 0, "",
-                                50, null, null,false, complexItemCode, idOfRule, orderDetailFRationType);
-                        complexOrderDetail.setGood(planOrderComplex.getGood());
-                        orderDetails.add(complexOrderDetail);
-                        if(planOrderComplex.getGood()!= null){
-                            CompositeIdOfOrderDetail compositeIdOfOrderDetailForGood = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
-                            Good good = planOrderComplex.getGood();
-                            OrderDetail goodOrderDetail = new OrderDetail(compositeIdOfOrderDetailForGood, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
-                                    1, 0,0,0,"","","",0,
-                                    "",150,null,null, false,
-                                    good.getGoodsCode(), null, orderDetailFRationType);
-                            goodOrderDetail.setGood(good);
-                            orderDetails.add(goodOrderDetail);
-                        }
-                    }
-                    else {
-                        MenuDetail complexMenuDetail = complexInfoDetails.get(0).getMenuDetail();
-                        CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
-                        OrderDetail complexOrderDetail = new OrderDetail(compositeIdOfOrderDetail, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
-                                planOrderComplex.getCurrentPrice(), planOrderComplex.getCurrentPrice(), 0, 0,
-                                planOrderComplex.getComplexName(), (complexMenuDetail.getMenuPath().length() > 32 ?
-                                complexMenuDetail.getMenuPath().substring(0,32) : complexMenuDetail.getMenuPath()), complexMenuDetail.getGroupName(),
-                                complexMenuDetail.getMenuOrigin(), complexMenuDetail.getMenuDetailOutput(), 50,
-                                complexMenuDetail.getIdOfMenuFromSync(), null, false,
-                                complexItemCode, idOfRule,orderDetailFRationType);
-                        complexOrderDetail.setGood(planOrderComplex.getGood());
-                        orderDetails.add(complexOrderDetail);
-                        for(ComplexInfoDetail complexInfoDetail: complexInfoDetails){
-                            MenuDetail complexInfoMenuDetail = complexInfoDetail.getMenuDetail();
-                            Good menuGood = getGoodById(complexInfoMenuDetail.getIdOfGood());
-                            if(menuGood != null){
-                                OrderDetailFRationType menuGoodFRationType = null;
-                                if(menuGood.getGoodType() != null){
-                                    menuGoodFRationType = OrderDetailFRationType.fromInteger(menuGood.getGoodType().getCode());
-                                }
-                                CompositeIdOfOrderDetail compositeIdOfOrderDetailForGood = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
-                                OrderDetail goodOrderDetail = new OrderDetail(compositeIdOfOrderDetailForGood, planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(),
-                                        0, 0, 0, 0,
-                                        menuGood.getFullName(), complexInfoMenuDetail.getMenuPath().length() > 32 ?
-                                        complexInfoMenuDetail.getMenuPath().substring(0, 32): complexInfoMenuDetail.getMenuPath(),
-                                        complexInfoMenuDetail.getGroupName(),
-                                        complexInfoMenuDetail.getMenuOrigin(), complexInfoMenuDetail.getMenuDetailOutput(), 50,
-                                        complexInfoMenuDetail.getIdOfMenuFromSync(), null, false,
-                                        menuGood.getGoodsCode(), null, menuGoodFRationType);
-                                goodOrderDetail.setGood(menuGood);
-                                orderDetails.add(goodOrderDetail);
-                            }
-                        }
-                    }*/
-
                     if(planOrderOrder!= null){
                         persistanceSession.save(planOrderOrder);
                         for(OrderDetail orderDetail: orderDetails){
