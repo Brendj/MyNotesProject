@@ -112,9 +112,9 @@
         </f:facet>
     </rich:dataTable>
     <h:panelGrid columns="2" styleClass="borderless-grid" id="smartWatchCreateVendorPanelGrid">
-        <h:outputText escape="true" value="Имя нового элемента" styleClass="output-text"/>
+        <h:outputText escape="true" value="Имя нового поставщика" styleClass="output-text"/>
         <h:inputText value="#{smartWatchVendorsListPage.nameForNewVendor}" styleClass="input-text"/>
-        <a4j:commandButton reRender="SmartWatchVendorsDataTable, SmartWatchVendorDetailPanelGroup"
+        <a4j:commandButton reRender="SmartWatchVendorsDataTable, SmartWatchVendorDetailPanelGroup, smartWatchCreateVendorPanelGrid"
                            action="#{smartWatchVendorsListPage.createNewVendor()}"
                            status="SmartWatchVendorsItemProcessStatus" value="Создать"/>
     </h:panelGrid>

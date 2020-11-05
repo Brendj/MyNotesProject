@@ -224,7 +224,7 @@ public class SmartWatchRestController {
             if(card == null) {
                 idOfCard = cardManager
                         .createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE, validTime,
-                                Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
+                                Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null, vendor.getCardSignCertNum());
             } else {
                 if((card.getClient() == null || card.getState().equals(CardState.BLOCKED.getValue()))
                         && card.getCardType().equals(CARD_TYPE_SMARTWATCH)) {

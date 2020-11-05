@@ -172,6 +172,7 @@ public class SmartWatchVendorsListPage extends BasicWorkspacePage {
         try {
             SmartWatchVendor vendor = new SmartWatchVendor();
             vendor.setName(nameForNewVendor);
+            smartWatchVendorList.add(vendor);
 
         } catch (Exception e) {
             log.error("Can't create new vendor: ", e);
