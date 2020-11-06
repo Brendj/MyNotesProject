@@ -3426,7 +3426,14 @@ public class DAOUtils {
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
         Criteria criteria = session.createCriteria(SpecialDate.class);
         criteria.add(Restrictions.in("org", orgs));
-        criteria.add(Restrictions.gt("version", version));
+        if (version == -1)
+        {
+           Date startDate =  CalendarUtils.getFirstDayMonth(new Date());
+           criteria.add(Restrictions.ge("date", startDate));
+        }
+        else {
+            criteria.add(Restrictions.gt("version", version));
+        }
         return criteria.list();
     }
 
