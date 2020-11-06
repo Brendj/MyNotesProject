@@ -557,7 +557,8 @@
         <url-pattern>/fps/api/*</url-pattern>
         <url-pattern>/assessment/*</url-pattern>
         <url-pattern>/smartwatch/*</url-pattern>
-       <!-- <url-pattern>/school/api/v1/*</url-pattern>-->
+        <url-pattern>/school/api/v1/*</url-pattern>
+        <url-pattern>/library/*</url-pattern>
     </filter-mapping>
 
     <filter>
