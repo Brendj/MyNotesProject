@@ -233,7 +233,9 @@ public class EMPSmsServiceImpl extends ISmsService {
                     DAOService.getInstance().setSendedNotificationforDTISZNDiscount(idofclientdtiszndiscountinfo, true);
             }
         }
-        if (event.getParameters().get("TEST") == null) {
+        if (event.getParameters().get("TEST") == null && RuntimeContext.getInstance().getConfigProperties().
+                getProperty("ecafe.processor.sms.service.empsend", "true")
+                .equals("true")) {
             //  Отправка запроса
             SubscriptionPortType subscription = createEventController(false);
             if (subscription == null) {
