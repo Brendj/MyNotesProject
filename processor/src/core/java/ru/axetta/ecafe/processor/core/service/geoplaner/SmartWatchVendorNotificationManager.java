@@ -46,7 +46,7 @@ public class SmartWatchVendorNotificationManager {
             Card card = getCardFromEnterEvent(session, enterEvent);
             Client client = getClient(enterEvent, card);
 
-            session.merge(client);
+            client = (Client) session.merge(client);
             vendor = client.getVendor();
 
             if(!vendor.getEnablePushes()){
@@ -99,7 +99,7 @@ public class SmartWatchVendorNotificationManager {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             hibernateTransaction = session.beginTransaction();
 
-            session.merge(client);
+            client = (Client) session.merge(client);
             vendor = client.getVendor();
 
             if(!vendor.getEnablePushes()){
@@ -148,7 +148,7 @@ public class SmartWatchVendorNotificationManager {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             hibernateTransaction = session.beginTransaction();
 
-            session.merge(client);
+            client = (Client) session.merge(client);
             vendor = client.getVendor();
 
             if(!vendor.getEnablePushes()){
