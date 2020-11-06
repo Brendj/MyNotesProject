@@ -98,7 +98,7 @@ public class GoodRequestsNewReportService {
 
     private boolean addRowToTotalSum(List<Item> itemList, Item wtItem) {
         for (Item item : itemList) {
-            if (item.feedingPlanType.equals(wtItem.feedingPlanType) &&
+            if (item.doneDate.equals(wtItem.doneDate) && item.feedingPlanType.equals(wtItem.feedingPlanType) &&
                     item.goodName.equals(wtItem.goodName) && item.price.equals(wtItem.price)) {
                 item.totalCount += wtItem.totalCount;
                 item.newTotalCount += wtItem.newTotalCount;
@@ -326,15 +326,15 @@ public class GoodRequestsNewReportService {
             }
         }
 
-        if (itemList.isEmpty() && !hideTotalRow) {
-            for (BasicReportJob.OrgShortItem item : orgMap.values()) {
-                itemList.add(new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
-                        hideLastValue, null, 0L, "", 0L, ""));
-            }
-            itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                    hideDailySampleValue, hideLastValue, null, 0L, null, "",
-                    "", 0L, ""));
-        }
+        //if (itemList.isEmpty() && !hideTotalRow) {
+        //    for (BasicReportJob.OrgShortItem item : orgMap.values()) {
+        //        itemList.add(new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
+        //                hideLastValue, null, 0L, "", 0L, ""));
+        //    }
+        //    itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
+        //            hideDailySampleValue, hideLastValue, null, 0L, null, "",
+        //            "", 0L, ""));
+        //}
 
         if(orgFilter == 0){
             buildReportItemsWithoutData(itemList, orgMap, startTime, hideDailySampleValue, hideLastValue);
@@ -526,15 +526,15 @@ public class GoodRequestsNewReportService {
             }
         }
 
-        if (itemList.isEmpty() && !hideTotalRow) {
-            for (BasicReportJob.OrgShortItem item : orgMap.values()) {
-                itemList.add(new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
-                        hideLastValue, null, 0L, "", 0L, ""));
-            }
-            itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                    hideDailySampleValue, hideLastValue, null, 0L, null, "",
-                    "", 0L, ""));
-        }
+        //if (itemList.isEmpty() && !hideTotalRow) {
+        //    for (BasicReportJob.OrgShortItem item : orgMap.values()) {
+        //        itemList.add(new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
+        //                hideLastValue, null, 0L, "", 0L, ""));
+        //    }
+        //    itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
+        //            hideDailySampleValue, hideLastValue, null, 0L, null, "",
+        //            "", 0L, ""));
+        //}
 
         if(orgFilter == 0){
             buildReportItemsWithoutData(itemList, orgMap, startTime, hideDailySampleValue, hideLastValue);
