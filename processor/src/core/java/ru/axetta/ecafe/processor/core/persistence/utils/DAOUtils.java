@@ -4777,6 +4777,7 @@ public class DAOUtils {
         if (withEtp) {
             criteria.add(Restrictions.isNotNull("ETPCode"));
         }
+        criteria.add(Restrictions.eq("deleted", false));
         criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscountDSZN"));
         return criteria.list();
     }
