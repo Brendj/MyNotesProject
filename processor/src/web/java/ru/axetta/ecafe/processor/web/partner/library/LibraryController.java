@@ -111,6 +111,7 @@ public class LibraryController {
                     card == null ? null : card.getCardType(), handler);
             persistenceSession.save(event);
             persistenceTransaction.commit();
+            //logger.info("Проход клиента л/с:" + client.getContractId() + " в библиотеку " + libraryName + " успешно зарегистрирован");
             ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
                     .getBean(ExternalEventNotificationService.class);
             notificationService.sendNotification(client, event);
