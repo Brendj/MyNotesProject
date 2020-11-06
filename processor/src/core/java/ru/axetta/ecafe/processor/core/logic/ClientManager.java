@@ -1703,13 +1703,21 @@ public class ClientManager {
         return clients;
     }
 
-    public static void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, String comment, String newGroupName){
+    public static void addClientMigrationEntry(Session session,Org oldOrg,ClientGroup beforeMigrationGroup,
+            Org newOrg, Client client, String comment, String newGroupName){
         ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
         ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
         migration.setComment(comment);
-        if(client.getClientGroup() != null) {
-            ClientGroup clientGroup = (ClientGroup)session.load(ClientGroup.class, new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), client.getIdOfClientGroup()));
-            migration.setOldGroupName(clientGroup.getGroupName());
+        if (beforeMigrationGroup != null)
+        {
+            migration.setOldGroupName(beforeMigrationGroup.getGroupName());
+        }
+        else {
+            if (client.getClientGroup() != null) {
+                ClientGroup clientGroup = (ClientGroup) session.load(ClientGroup.class,
+                        new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), client.getIdOfClientGroup()));
+                migration.setOldGroupName(clientGroup.getGroupName());
+            }
         }
         migration.setNewGroupName(newGroupName);
         session.save(migration);
