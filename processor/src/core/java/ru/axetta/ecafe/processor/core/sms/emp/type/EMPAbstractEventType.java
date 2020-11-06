@@ -52,7 +52,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     public void setTime(long time) {
         this.time = time;
-        if(params != null) {
+        if(params != null && type != EMPEventTypeFactory.ENTER_LIBRARY) {
             params.put("time", new SimpleDateFormat("HH:mm").format(new Date(time)));
         }
     }

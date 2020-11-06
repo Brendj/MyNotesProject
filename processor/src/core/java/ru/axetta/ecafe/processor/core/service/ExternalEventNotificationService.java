@@ -282,7 +282,7 @@ public class ExternalEventNotificationService {
             SimpleDateFormat dateFormat = null;
             dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(event.getEvtDateTime());
-            dateFormat = new SimpleDateFormat("HH:mm:ss");
+            dateFormat = new SimpleDateFormat("HH:mm");
             String empTimeH = dateFormat.format(event.getEvtDateTime());
             if (event.getForTest() != null && event.getForTest()) {
                 return new String[]{
