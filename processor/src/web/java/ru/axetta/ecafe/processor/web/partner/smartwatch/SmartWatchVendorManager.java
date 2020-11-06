@@ -136,7 +136,7 @@ public class SmartWatchVendorManager {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            session.merge(vendor);
+            vendor = (SmartWatchVendor) session.merge(vendor);
             session.delete(vendor);
 
             transaction.commit();
@@ -144,7 +144,7 @@ public class SmartWatchVendorManager {
 
             session.close();
         } catch (Exception e) {
-            log.error("Can't get Vendors by name:", e);
+            log.error("Can't delete Vendor:", e);
             throw e;
         } finally {
             HibernateUtils.rollback(transaction, log);
