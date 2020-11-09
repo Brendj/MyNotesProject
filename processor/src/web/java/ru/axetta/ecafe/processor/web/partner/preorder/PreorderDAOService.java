@@ -3025,7 +3025,7 @@ public class PreorderDAOService {
                         + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = d.idofrule "
                         + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
                         + "left join cf_wt_discountrules_categorydiscount dc on dc.idofrule = d.idofrule "
-                        + "where cor.idoforg = :idoforg and dc.idofcategorydiscount = :discount");
+                        + "where (cor.idoforg = :idoforg or cor.idoforg is null) and dc.idofcategorydiscount = :discount");
                 query.setParameter("discount", categoryDiscount.getIdOfCategoryDiscount());
                 query.setParameter("idoforg", org.getIdOfOrg());
                 List<BigInteger> res = query.getResultList();
