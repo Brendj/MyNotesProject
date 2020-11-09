@@ -61,6 +61,10 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.iac.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventItem;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventList;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventListResult;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.DataAllEvents;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
@@ -3863,21 +3867,44 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public EnterEventListResult getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
+    public AllEventListResult getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
         authenticateRequest(contractId);
+        DataAllEvents dataAllEvents = new DataAllEvents();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createExternalServicesPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
 
-        Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                    Session session, Transaction transaction) throws Exception {
-                processEnterEventList(client, data, objectFactory, session, endDate, startDate, false);
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            List<Client> clients = clientCriteria.list();
+
+            if (clients.isEmpty()) {
+                dataAllEvents.setResultCode(RC_CLIENT_NOT_FOUND);
+                dataAllEvents.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+            } else if (clients.size() > 1) {
+                dataAllEvents.setResultCode(RC_SEVERAL_CLIENTS_WERE_FOUND);
+                dataAllEvents.setDescription(RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
+            } else {
+                Client client = clients.get(0);
+                dataAllEvents.setEnterEventList(processAllEventList(client, persistenceSession, endDate, startDate));
             }
-        });
 
-        EnterEventListResult enterEventListResult = new EnterEventListResult();
-        enterEventListResult.enterEventList = data.getEnterEventList();
-        enterEventListResult.resultCode = data.getResultCode();
-        enterEventListResult.description = data.getDescription();
-        return enterEventListResult;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            dataAllEvents.setResultCode(RC_INTERNAL_ERROR);
+            dataAllEvents.setDescription(e.toString());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        AllEventListResult allEventListResult = new AllEventListResult();
+        allEventListResult.enterEventList = dataAllEvents.getEnterEventList();
+        allEventListResult.resultCode = dataAllEvents.getResultCode();
+        allEventListResult.description = dataAllEvents.getDescription();
+        return allEventListResult;
     }
 
     @Override
@@ -4006,6 +4033,121 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventWithRepList.getE().add(enterEventWithRepItem);
         }
         data.setEnterEventWithRepList(enterEventWithRepList);
+    }
+
+    private AllEventList processAllEventList(Client client, Session session,
+            Date endDate, Date startDate) throws Exception {
+        Date nextToEndDate = DateUtils.addDays(endDate, 1);
+        /*Запрос на получение данных из таблицы EnterEvents*/
+        Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
+        enterEventCriteria.add(Restrictions.eq("client", client));
+        enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<EnterEvent> enterEvents = enterEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы EnterEvents -- */
+
+        /*Запрос на получение данных из таблицы EnterEventsManual*/
+        Criteria manualEventCriteria = session.createCriteria(EnterEventManual.class);
+        manualEventCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        manualEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        manualEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        manualEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<EnterEventManual> manualEvents = manualEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы EnterEventsManual -- */
+
+        /*Запрос на получение данных из таблицы ExternalEventsManual*/
+        List<ExternalEventType> externalType = new ArrayList();
+        externalType.add(ExternalEventType.CULTURE);
+        externalType.add(ExternalEventType.MUSEUM);
+        externalType.add(ExternalEventType.LIBRARY);
+        Criteria externalEventCriteria = session.createCriteria(ExternalEvent.class);
+        externalEventCriteria.add(Restrictions.eq("client", client));
+        externalEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        externalEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        externalEventCriteria.add(Restrictions.in("evtType", externalType));
+        externalEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<ExternalEvent> externalEvents = externalEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы ExternalEventsManual -- */
+
+        Locale locale = new Locale("ru", "RU");
+        Calendar calendar = Calendar.getInstance(locale);
+
+        AllEventList enterEventList = new AllEventList();
+        int nRecs = 0;
+
+        for (EnterEvent enterEvent : enterEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(enterEvent.getEvtDateTime()));
+            calendar.setTime(enterEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setDirection(enterEvent.getPassDirection());
+            enterEventItem.setAddress(enterEvent.getOrg().getAddress());
+            enterEventItem.setShortNameInfoService(enterEvent.getOrg().getShortNameInfoService());
+            enterEventItem.setChildPassCheckerMethod(enterEvent.getChildPassChecker());
+            final Long checkerId = enterEvent.getChildPassCheckerId();
+            if (checkerId != null) {
+                Client checker = DAOUtils.findClient(session, checkerId);
+                enterEventItem.setChildPassChecker(checker.getPerson().getFullName());
+            }
+            enterEventList.getE().add(enterEventItem);
+        }
+
+        for (EnterEventManual manualEvent : manualEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(manualEvent.getEvtDateTime()));
+            calendar.setTime(manualEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setDirection(EnterEvent.CHECKED_BY_TEACHER_EXT);
+            Org org = (Org) session.load(Org.class, manualEvent.getIdOfOrg());
+            enterEventItem.setAddress(org.getAddress());
+            enterEventItem.setShortNameInfoService(org.getShortNameInfoService());
+            enterEventList.getE().add(enterEventItem);
+        }
+        for (ExternalEvent externalEvent : externalEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(externalEvent.getEvtDateTime()));
+            calendar.setTime(externalEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+
+            if (externalEvent.getEvtType().equals(ExternalEventType.MUSEUM)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                enterEventItem.setDirection(1000);
+                enterEventItem.setDirectionText("выдан билет в музее");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.MUSEUM)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                enterEventItem.setDirection(1001);
+                enterEventItem.setDirectionText("возврат билета в музей");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.CULTURE)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                enterEventItem.setDirection(2000);
+                enterEventItem.setDirectionText("вход в здание учреждения культуры");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.CULTURE)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                enterEventItem.setDirection(2001);
+                enterEventItem.setDirectionText("выход из здания учреждения культуры");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.LIBRARY)) {
+                enterEventItem.setDirection(3000);
+                enterEventItem.setDirectionText("вход в библтотеку");
+            }
+            enterEventItem.setAddress(externalEvent.getAddress());
+            enterEventItem.setShortNameInfoService(externalEvent.getOrgShortName());
+            enterEventList.getE().add(enterEventItem);
+        }
+        return enterEventList;
     }
 
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
