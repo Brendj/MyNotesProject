@@ -8,11 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -430,6 +425,11 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 pathPart4 = parts[3];
             } else {
                 pathPart4 = parts[0];
+            }
+
+            // новое меню
+            if (parts.length == 1) {
+                pathPart1 = "";
             }
 
             qty = ((Integer) objects[1]).longValue();
