@@ -4,12 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfSpecialDate;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -45,6 +43,17 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
             ResSpecialDatesItem resItem;
             Long nextVersion = DAOUtils.nextVersionBySpecialDate(session);
             for (SpecialDatesItem item : specialDates.getItems()) {
+                //
+                OrgSync orgSync = (OrgSync)session.load(OrgSync.class, item.getIdOfOrg());
+                if (orgSync != null && orgSync.getClientVersion() != null) {
+                    if (!orgSync.getClientVersion().trim().isEmpty()
+                            && (item.getGroupName() == null || item.getGroupName().trim().isEmpty())) {
+                        if (SyncRequest.versionIsAfter(orgSync.getClientVersion(), "2.7.93.1")) {
+                            continue;
+                        }
+                    }
+                }
+                //
                 String groupName = item.getGroupName();
                 Long idOfClientGroup = null;
                 if (item.getResCode().equals(SpecialDatesItem.ERROR_CODE_ALL_OK)) {
