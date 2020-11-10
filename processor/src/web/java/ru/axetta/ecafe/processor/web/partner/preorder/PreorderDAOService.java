@@ -449,7 +449,8 @@ public class PreorderDAOService {
     }
 
     private Integer getAmountForPreorderComplex(Map<Integer, Integer> amountByComplexes, Integer idOfComplex) {
-        return amountByComplexes.get(idOfComplex);
+        Integer result = amountByComplexes.get(idOfComplex);
+        return result == null ? 0 : result;
     }
 
     private Map<Integer, Integer> getAmountForPreorderComplexes(Client client, Date startDate, Date endDate) {
@@ -465,6 +466,7 @@ public class PreorderDAOService {
             Object[] row = (Object[]) obj;
             Integer complexId = HibernateUtils.getDbInt(row[0]);
             Long amountSum = HibernateUtils.getDbLong(row[1]);
+            if (amountSum == null) amountSum = 0L;
             if (complexId != null) result.put(complexId, amountSum.intValue());
         }
         return result;
