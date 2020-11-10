@@ -2987,10 +2987,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (client.getAgeTypeGroup() != null && !client.getAgeTypeGroup().isEmpty()) {
                     String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
                     if (ageGroupDesc.startsWith("дошкол")) {
-                        logger.error(RC_CLIENT_DOU);
-                        result.resultCode = RC_INTERNAL_ERROR;
-                        result.description = RC_CLIENT_DOU;
-                        return result;
+                        complexSign.put("Free", true);
                     } else {
                         checkParallel(client, categoriesDiscount, ageGroupIds, complexSign);
                     }
