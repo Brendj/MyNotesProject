@@ -2362,4 +2362,12 @@ public class ClientManager {
         }
     }
 
+    public static void resetFlagsOfAllClients(Org org, Session session) throws Exception {
+        List<Client> clientList = DAOUtils.findClientsByOrg(session, org.getIdOfOrg());
+        Query q = session.createQuery("update PreorderFlag set informedSpecialMenu = false, allowedPreorder = false, "
+                + "lastUpdate = :date where client in :clientList");
+        q.setParameter("date", new Date());
+        q.setParameterList("clientList", clientList);
+        q.executeUpdate();
+    }
 }
