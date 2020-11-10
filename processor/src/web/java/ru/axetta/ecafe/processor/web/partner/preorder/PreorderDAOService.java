@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientWithAddInfo;
@@ -380,6 +381,7 @@ public class PreorderDAOService {
             if (wtComplexes.size() > 0) {
                 Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
                 List<PreorderComplexItemExt> list = new ArrayList<>();
+                Map<Integer, Integer> amountByComplexes = getAmountForPreorderComplexes(client, startDate, endDate);
 
                 for (WtComplex wtComplex : wtComplexes) {
 
@@ -390,7 +392,7 @@ public class PreorderDAOService {
                     Integer complexType = wtComplex.getComposite() ? 4 : 2;
                     Long complexPrice = (wtComplex.getPrice() == null) ? 0L :
                             wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
-                    Integer amount = getAmountForPreorderComplex(client, idOfComplex, startDate, endDate);
+                    Integer amount = getAmountForPreorderComplex(amountByComplexes, idOfComplex);
                     boolean isRegular = getRegularSignForPreorderComplex(client, idOfComplex, startDate, endDate);
 
                     PreorderComplexItemExt complexItemExt;
@@ -446,16 +448,26 @@ public class PreorderDAOService {
         return groupResult;
     }
 
-    private Integer getAmountForPreorderComplex(Client client, Integer idOfComplex, Date startDate, Date endDate) {
-        Query query = emReport.createQuery("SELECT sum(pc.amount) FROM PreorderComplex pc "
+    private Integer getAmountForPreorderComplex(Map<Integer, Integer> amountByComplexes, Integer idOfComplex) {
+        return amountByComplexes.get(idOfComplex);
+    }
+
+    private Map<Integer, Integer> getAmountForPreorderComplexes(Client client, Date startDate, Date endDate) {
+        Map<Integer, Integer> result = new HashMap<>();
+        Query query = emReport.createQuery("SELECT pc.armComplexId, sum(pc.amount) FROM PreorderComplex pc "
                 + "WHERE pc.client = :client AND pc.preorderDate between :startDate and :endDate "
-                + "AND pc.deletedState = false AND pc.armComplexId = :idOfComplex");
+                + "AND pc.deletedState = false group by pc.armComplexId");
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
-        query.setParameter("idOfComplex", idOfComplex);
-        Long res = (Long) query.getSingleResult();
-        return (res == null) ? 0 : res.intValue();
+        List list = query.getResultList();
+        for (Object obj : list) {
+            Object[] row = (Object[]) obj;
+            Integer complexId = HibernateUtils.getDbInt(row[0]);
+            Long amountSum = HibernateUtils.getDbLong(row[1]);
+            if (complexId != null) result.put(complexId, amountSum.intValue());
+        }
+        return result;
     }
 
     private boolean getRegularSignForPreorderComplex(Client client, Integer idOfComplex, Date startDate, Date endDate) {
