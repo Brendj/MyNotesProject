@@ -10201,7 +10201,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 res = processPreorderComplexesWithWtMenuList(contractId, date);
             }
-            if (res.resultCode.equals(RC_OK)) {
+            if (res.resultCode == null || res.resultCode.equals(RC_OK)) {
                 List<PreorderComplexGroup> list = res.getComplexesWithGroups();
                 if (list != null && list.size() > 0) {
                     ComplexGroup complexGroup = new ComplexGroup();
