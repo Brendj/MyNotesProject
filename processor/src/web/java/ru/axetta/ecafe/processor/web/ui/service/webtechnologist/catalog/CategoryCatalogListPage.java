@@ -61,6 +61,7 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     public void createNewCatalog() {
         if (StringUtils.isBlank(descriptionForNewCategory)) {
             printError("Введите описание категории");
+            return;
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
@@ -78,6 +79,7 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     public void createNewItem() {
         if (StringUtils.isBlank(descriptionForNewItem)) {
             printError("Введите описание элемента");
+            return;
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
@@ -140,6 +142,7 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
             transaction.commit();
             transaction = null;
             catalogListItem = service.getAllActiveCategory();
+            categoryItemsSelectedCategory = Collections.emptyList();
         } catch (Exception e) {
             printError("Не удалось обновить элементы: " + e.getMessage());
             logger.error("Can't update elements", e);
