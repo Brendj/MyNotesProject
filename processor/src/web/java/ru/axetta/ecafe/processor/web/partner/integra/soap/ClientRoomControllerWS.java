@@ -10201,20 +10201,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 res = processPreorderComplexesWithWtMenuList(contractId, date);
             }
-            List<PreorderComplexGroup> list = res.getComplexesWithGroups();
-            if (list != null && list.size() > 0) {
-                ComplexGroup complexGroup = new ComplexGroup();
-                complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
-                result.setComplexGroup(complexGroup);
+            if (res.resultCode.equals(RC_OK)) {
+                List<PreorderComplexGroup> list = res.getComplexesWithGroups();
+                if (list != null && list.size() > 0) {
+                    ComplexGroup complexGroup = new ComplexGroup();
+                    complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
+                    result.setComplexGroup(complexGroup);
+                }
+                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId);
+                if (regularPreordersList.getRegularPreorders() != null
+                        && regularPreordersList.getRegularPreorders().size() > 0) {
+                    result.setRegularPreorders(regularPreordersList);
+                }
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+            } else {
+                result.resultCode = res.resultCode;
+                result.description = res.description;
             }
-            RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getRegularPreordersList(contractId);
-            if (regularPreordersList.getRegularPreorders() != null
-                    && regularPreordersList.getRegularPreorders().size() > 0) {
-                result.setRegularPreorders(regularPreordersList);
-            }
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
         } catch (Exception e) {
             logger.error("Error in getPreorderComplexes", e);
             result.resultCode = RC_INTERNAL_ERROR;
