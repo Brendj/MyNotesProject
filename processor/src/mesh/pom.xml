@@ -19,6 +19,7 @@
         <module>rest-client</module>
         <module>nsi-sync</module>
         <module>card-sync</module>
+        <module>dtszn-kafka</module>
     </modules>
 
     <properties>
