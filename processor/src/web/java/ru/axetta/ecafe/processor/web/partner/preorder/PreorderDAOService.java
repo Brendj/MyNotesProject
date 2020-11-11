@@ -675,8 +675,8 @@ public class PreorderDAOService {
         Map<Long, Integer> result = new HashMap<>();
         for (Object obj : list) {
             Object[] row = (Object[]) obj;
-            Long idOfDish = HibernateUtils.getDbLong(row[0]);
-            Long sum = HibernateUtils.getDbLong(row[1]);
+            Long idOfDish = (Long)row[0];
+            Long sum = (Long)row[1];
             if (idOfDish != null) result.put(idOfDish, sum == null ? 0 : sum.intValue());
         }
         return result;
@@ -696,8 +696,8 @@ public class PreorderDAOService {
         Map<Long, Long> result = new HashMap<>();
         for (Object obj : list) {
             Object[] row = (Object[]) obj;
-            Long idOfDish = HibernateUtils.getDbLong(row[0]);
-            Long idOfRegularPreorder = HibernateUtils.getDbLong(row[1]);
+            Long idOfDish = (Long)row[0];
+            Long idOfRegularPreorder = (Long)row[1];
             if (idOfDish != null) {
                 result.put(idOfDish, idOfRegularPreorder == null ? 0L : idOfRegularPreorder);
             }
