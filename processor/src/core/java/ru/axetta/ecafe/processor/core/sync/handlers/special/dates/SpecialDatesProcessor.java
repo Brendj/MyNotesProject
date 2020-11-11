@@ -49,7 +49,8 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                     if (!orgSync.getClientVersion().trim().isEmpty()
                             && (item.getGroupName() == null || item.getGroupName().trim().isEmpty())) {
                         if (SyncRequest.versionIsAfter(orgSync.getClientVersion(), "2.7.93.1")) {
-                            continue;
+                            item.setResCode(SpecialDatesItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
+                            item.setErrorMessage("software version higher than 2.7.93.1");
                         }
                     }
                 }
