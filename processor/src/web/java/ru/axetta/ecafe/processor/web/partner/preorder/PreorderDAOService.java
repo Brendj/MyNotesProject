@@ -465,7 +465,7 @@ public class PreorderDAOService {
         for (Object obj : list) {
             Object[] row = (Object[]) obj;
             Integer complexId = HibernateUtils.getDbInt(row[0]);
-            Long amountSum = HibernateUtils.getDbLong(row[1]);
+            Long amountSum = (row[1] == null ? 0L : (Long)row[1]);
             if (amountSum == null) amountSum = 0L;
             if (complexId != null) result.put(complexId, amountSum.intValue());
         }
