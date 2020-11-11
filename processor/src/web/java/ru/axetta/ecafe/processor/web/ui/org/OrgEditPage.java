@@ -394,6 +394,9 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
         org.setHelpdeskEnabled(helpdeskEnabled);
         org.setPreordersEnabled(preordersEnabled);
+        if(!preordersEnabled) {
+            ClientManager.resetFlagsOfAllClients(org, session);
+        }
 
         org.setMultiCardModeEnabled(multiCardModeEnabled);
         for(Org fo: org.getFriendlyOrg()){
