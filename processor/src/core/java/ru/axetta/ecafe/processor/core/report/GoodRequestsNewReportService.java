@@ -795,7 +795,10 @@ public class GoodRequestsNewReportService {
             criteria.add(Restrictions.eq("gr.comment", PREORDER_COMMENT));
         }
         if (hidePreorders) {
-            criteria.add(Restrictions.ne("gr.comment", PREORDER_COMMENT));
+            Disjunction commentDisjunction = Restrictions.disjunction();
+            commentDisjunction.add(Restrictions.ne("gr.comment", PREORDER_COMMENT));
+            commentDisjunction.add(Restrictions.isNull("gr.comment"));
+            criteria.add(commentDisjunction);
         }
 
         if (notification) {
