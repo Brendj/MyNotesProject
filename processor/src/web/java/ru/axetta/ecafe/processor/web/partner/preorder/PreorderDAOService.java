@@ -342,7 +342,7 @@ public class PreorderDAOService {
                     CategoryDiscount discount = getElemDiscount();
                     Set<WtDiscountRule> discRules = getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
                     discRules = getWtDiscountRulesWithMaxPriority(discRules);
-                    resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds);
+                    resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds, org);
                     if (resComplexes.size() > 0) {
                         wtDiscComplexes.addAll(resComplexes);
                     }
@@ -356,7 +356,7 @@ public class PreorderDAOService {
                     Set<WtDiscountRule> discRules = getWtDiscountRuleByTwoDiscounts(wtDiscountRuleSet, middleDiscount,
                             highDiscount);
                     discRules = getWtDiscountRulesWithMaxPriority(discRules);
-                    resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds);
+                    resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds, org);
                     if (resComplexes.size() > 0) {
                         wtDiscComplexes.addAll(resComplexes);
                     }
@@ -367,7 +367,7 @@ public class PreorderDAOService {
             if (!complexSign.get("Free") && complexSign.get("Elem")) {
                 Set<WtDiscountRule> discRules = getWtElemDiscountRules(org);
                 discRules = getWtDiscountRulesWithMaxPriority(discRules);
-                resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds);
+                resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds, org);
                 if (resComplexes.size() > 0) {
                     wtDiscComplexes.addAll(resComplexes);
                 }
@@ -3301,13 +3301,14 @@ public class PreorderDAOService {
     }
 
     public Set<WtComplex> getFreeWtComplexesByRulesAndAgeGroups(Date startDate, Date endDate,
-            Set<WtDiscountRule> wtDiscountRuleSet, Set<Long> ageGroupIds) {
+            Set<WtDiscountRule> wtDiscountRuleSet, Set<Long> ageGroupIds, Org org) {
         Set<WtComplex> wtComplexes = new HashSet<>();
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("select complex from WtComplex complex "
                         + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "and complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
+                        + "and complex.contragent = :contragent "
                         + "and :rule in elements(complex.discountRules) "
                         + "and (complex.wtComplexGroupItem.idOfComplexGroupItem = :freeComplex "
                         + "or complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
@@ -3317,6 +3318,7 @@ public class PreorderDAOService {
                 query.setParameter("ageGroupId", ageGroupId);
                 query.setParameter("freeComplex", FREE_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
+                query.setParameter("contragent", org.getDefaultSupplier());
                 List<WtComplex> res = query.getResultList();
                 if (res != null && res.size() > 0) {
                     wtComplexes.addAll(res);

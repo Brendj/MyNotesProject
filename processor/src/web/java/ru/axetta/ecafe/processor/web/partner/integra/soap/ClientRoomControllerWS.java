@@ -3054,7 +3054,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3073,7 +3073,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3087,7 +3087,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getWtDiscountRulesWithMaxPriority(discRules);
                         resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                         if (resComplexes.size() > 0) {
                             wtDiscComplexes.addAll(resComplexes);
                         }
