@@ -688,7 +688,6 @@ public class GoodRequestsNewReportService {
             if (needFullGoodNames) {
                 name = good.getFullName();
             }
-
             if (!needFullGoodNames || StringUtils.isEmpty(name)) {
                 name = good.getNameOfGood();
             }
@@ -708,7 +707,21 @@ public class GoodRequestsNewReportService {
                 name = wtDish.getDishName();
                 price = wtDish.getPrice() == null ? 0L : wtDish.getPrice().multiply(new BigDecimal(100)).longValue();
             }
-            feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
+            if (complexOrgDictionary.containsKey(position.getOrgOwner())) {
+                complexInfoItem = complexOrgDictionary.get(position.getOrgOwner());
+                if (complexInfoItem.preorderInfo.containsKey(position.getGlobalId())) {
+                    GoodInfo info = complexInfoItem.preorderInfo.get(position.getGlobalId());
+                    feedingPlanType = info.feedingPlanType;
+                } else if (complexId != null && complexInfoItem.goodInfos.containsKey(complexId.longValue())) {
+                    GoodInfo info = complexInfoItem.goodInfos.get(complexId.longValue());
+                    feedingPlanType = info.feedingPlanType;
+                    price = info.price;
+                } else {
+                    feedingPlanType = FeedingPlanType.PAY_PLAN;
+                }
+            } else {
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
+            }
         }
 
         if (isROSection) {
