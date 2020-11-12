@@ -74,8 +74,7 @@ public class GoodRequestsNewReportService {
         List<Item> wtMenuItems = buildWtReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue,
                 generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns,
                 hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly, needFullGoodNames);
-        //List<Item> summaryItems = buildSummaryReportItems(oldMenuItems, wtMenuItems);
-        List<Item> summaryItems = new ArrayList<>();
+        List<Item> summaryItems = buildSummaryReportItems(oldMenuItems, wtMenuItems);
         TotalItem totalItem = new TotalItem(oldMenuItems, wtMenuItems, summaryItems);
         ArrayList<TotalItem> reportTotalItems = new ArrayList<>();
         reportTotalItems.add(totalItem);
