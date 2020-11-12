@@ -505,6 +505,16 @@ public class DAOUtils {
         return (SpecialDate) criteria.uniqueResult();
     }
 
+    public static List<SpecialDate> findSpecialDateWithOutGroup(Session persistenceSession,
+            CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
+        criteria.add(Restrictions.ge("date", compositeIdOfSpecialDate.getDate()));
+        criteria.add(Restrictions.isNull("idOfClientGroup"));
+        criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
+        return criteria.list();
+    }
+
     public static SpecialDate findSpecialDateWithGroup(Session persistenceSession,
             CompositeIdOfSpecialDate compositeIdOfSpecialDate, Long idOfClientGroup) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
