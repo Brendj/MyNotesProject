@@ -48,6 +48,9 @@
             <h:outputText escape="true" value="Поиск по GUID" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.filterClientGUID}" size="40"
                          styleClass="input-text" />
+            <h:outputText escape="true" value="Поиск по MESH GUID" styleClass="output-text" />
+            <h:inputText value="#{mainPage.clientListPage.clientFilter.filterClientMESHGUID}" size="40"
+                         styleClass="input-text" />
             <h:outputText escape="true" value="Группа" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.clientListPage.clientFilter.clientGroupId}" styleClass="input-text"
                              style="width: 145px;">
