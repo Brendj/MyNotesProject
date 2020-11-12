@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -111,8 +111,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -196,6 +196,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
     private static final String RC_CLIENT_NO_LONGER_ACTIVE = "Клиент не активен в ИС ПП";
+    private static final String RC_CLIENT_DOU = "Клиент является обучающимся дошкольной группы.";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC = "По условиям найден более одного клиента";
     private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC = "Ошибка авторизации клиента";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
@@ -3051,7 +3052,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3070,7 +3071,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3084,7 +3085,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getWtDiscountRulesWithMaxPriority(discRules);
                         resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                         if (resComplexes.size() > 0) {
                             wtDiscComplexes.addAll(resComplexes);
                         }
@@ -3191,8 +3192,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 // 2 Возрастная группа
                 if (client.getAgeTypeGroup() != null && !client.getAgeTypeGroup().isEmpty()) {
                     String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
-                    if (ageGroupDesc.startsWith("дошкол")) {
-                        complexSign.put("Free", true);
+                    if (ageGroupDesc.contains("дошкол")) {
+                        logger.error(RC_CLIENT_DOU);
+                        groupResult.resultCode = RC_INTERNAL_ERROR;
+                        groupResult.description = RC_CLIENT_DOU;
+                        return groupResult;
                     } else {
                         checkParallel(client, categoriesDiscount, ageGroupIds, complexSign);
                     }
@@ -9893,20 +9897,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 res = processPreorderComplexesWithWtMenuList(contractId, date);
             }
-            List<PreorderComplexGroup> list = res.getComplexesWithGroups();
-            if (list != null && list.size() > 0) {
-                ComplexGroup complexGroup = new ComplexGroup();
-                complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
-                result.setComplexGroup(complexGroup);
+            if (res.resultCode == null || res.resultCode.equals(RC_OK)) {
+                List<PreorderComplexGroup> list = res.getComplexesWithGroups();
+                if (list != null && list.size() > 0) {
+                    ComplexGroup complexGroup = new ComplexGroup();
+                    complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
+                    result.setComplexGroup(complexGroup);
+                }
+                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId);
+                if (regularPreordersList.getRegularPreorders() != null
+                        && regularPreordersList.getRegularPreorders().size() > 0) {
+                    result.setRegularPreorders(regularPreordersList);
+                }
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+            } else {
+                result.resultCode = res.resultCode;
+                result.description = res.description;
             }
-            RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getRegularPreordersList(contractId);
-            if (regularPreordersList.getRegularPreorders() != null
-                    && regularPreordersList.getRegularPreorders().size() > 0) {
-                result.setRegularPreorders(regularPreordersList);
-            }
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
         } catch (Exception e) {
             logger.error("Error in getPreorderComplexes", e);
             result.resultCode = RC_INTERNAL_ERROR;

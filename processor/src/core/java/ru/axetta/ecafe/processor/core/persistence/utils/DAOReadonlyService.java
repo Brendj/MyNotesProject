@@ -926,7 +926,9 @@ public class DAOReadonlyService {
         Set<WtComplex> complexes = new HashSet<>();
         try {
             Query queryOrgs = entityManager.createQuery(
-                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items left join fetch items.dishes dishes where complex.version > :version "
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items "
+                            + "left join fetch complex.orgs orgs "
+                            + "left join fetch items.dishes dishes where complex.version > :version "
                             + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs)");
             queryOrgs.setParameter("version", version);
             queryOrgs.setParameter("contragent", contragent);
@@ -938,7 +940,9 @@ public class DAOReadonlyService {
             }
 
             Query queryOrgGroups = entityManager.createQuery(
-                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items left join fetch items.dishes dishes where complex.version > :version "
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items "
+                            + "left join fetch complex.orgs orgs "
+                            + "left join fetch items.dishes dishes where complex.version > :version "
                             + "AND complex.contragent = :contragent AND :org IN elements(complex.wtOrgGroup.orgs)");
             queryOrgGroups.setParameter("version", version);
             queryOrgGroups.setParameter("contragent", contragent);
