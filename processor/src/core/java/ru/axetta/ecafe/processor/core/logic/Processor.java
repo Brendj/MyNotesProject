@@ -335,6 +335,34 @@ public class Processor implements SyncProcessor {
         }
         return System.currentTimeMillis();
     }
+    private void deleteOldVersionSpecialDate(SyncRequest request)
+    {
+        if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.93.1")
+                && !SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.95.1")){
+            CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(request.getIdOfOrg(), new Date(1598918400000L));
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = persistenceSessionFactory.openSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                List<SpecialDate> specialDates =
+                        DAOUtils.findSpecialDateWithOutGroup(persistenceSession, compositeId);
+                for (SpecialDate specialDate: specialDates)
+                {
+                    specialDate.setDeleted(true);
+                    persistenceSession.save(specialDate);
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+    }
 
     /* Do process full synchronization */
     private SyncResponse buildFullSyncResponse(SyncRequest request, Date syncStartTime, int syncResult)
@@ -916,6 +944,10 @@ public class Processor implements SyncProcessor {
             if (request.getSpecialDates() != null) {
                 specialDatesData = processSpecialDatesData(request.getSpecialDates());
                 resSpecialDates = processSpecialDates(request.getSpecialDates());
+                //
+                //Удаление всех SpecalDate, у которых группа null
+                deleteOldVersionSpecialDate(request);
+                //
             }
         } catch (Exception e) {
             String message = String.format("processSpecialDates: %s", e.getMessage());
@@ -1408,6 +1440,10 @@ public class Processor implements SyncProcessor {
 
                 ResSpecialDates resSpecialDates = processSpecialDates(specialDatesRequest);
                 addToResponseSections(resSpecialDates, responseSections);
+                //
+                //Удаление всех SpecalDate, у которых группа null
+                deleteOldVersionSpecialDate(request);
+                //
             }
         } catch (Exception e) {
             String message = String.format("processSpecialDates: %s", e.getMessage());

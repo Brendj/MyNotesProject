@@ -28,6 +28,8 @@ import java.util.Map;
 public abstract class EMPAbstractEventType implements EMPEventType {
     protected static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    public static final String CLIENT_GENDER_VALUE_MALE = "male";
+    public static final String CLIENT_GENDER_VALUE_FEMALE = "female";
     protected static final int STREAM = 124;
     protected static final int INFORMATION_STREAM = 125;   //Информационный стрим
     protected int previousId;
@@ -50,7 +52,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     public void setTime(long time) {
         this.time = time;
-        if(params != null) {
+        if(params != null && type != EMPEventTypeFactory.ENTER_LIBRARY) {
             params.put("time", new SimpleDateFormat("HH:mm").format(new Date(time)));
         }
     }
@@ -112,7 +114,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         return result;
     }
 
-    protected void parseClientSimpleInfo(Client client) {
+    protected void parseClientSimpleInfo(Client client, int type) {
         ssoid = client.getSsoid();
         if(!StringUtils.isBlank(client.getMobile()) && NumberUtils.isNumber(client.getMobile())) {
             msisdn = NumberUtils.toLong(client.getMobile().replaceAll("-", ""));
@@ -133,27 +135,25 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
         Date currentDate = new Date(System.currentTimeMillis());
 
-        params.put("date", DATE_FORMAT.format(currentDate));
-        params.put("time", TIME_FORMAT.format(currentDate));
-        params.put("account", "" + client.getContractId());
+
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
+        params.put("account", "" + client.getContractId());
 
-        if (client.getOrg() != null) {
-            appendOrgParameters(client.getOrg().getIdOfOrg(), params);
-        }
+        if (type == EMPEventTypeFactory.ENTER_LIBRARY)
+            params.put("gender", getGender(client));
 
-        /*BigDecimal balance = null;
-        if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
-            balance = new BigDecimal(0D).setScale(2);
-        } else {
-            balance = new BigDecimal(Math.ceil((double) client.getBalance() / 100)).setScale(2, RoundingMode.CEILING);
+        if (type != EMPEventTypeFactory.ENTER_LIBRARY) {
+            params.put("date", DATE_FORMAT.format(currentDate));
+            params.put("time", TIME_FORMAT.format(currentDate));
+            if (client.getOrg() != null) {
+                appendOrgParameters(client.getOrg().getIdOfOrg(), params);
+            }
+            appendBalance(client.getBalance(), params);
         }
-        params.put("balance", balance.toString());*/
-        appendBalance(client.getBalance(), params);
     }
 
-    protected void parseChildAndGuardianInfo(Client child, Client guardian) {
+    protected void parseChildAndGuardianInfo(Client child, Client guardian, int type) {
         ssoid = guardian.getSsoid();
         if(!StringUtils.isBlank(guardian.getMobile()) && NumberUtils.isNumber(guardian.getMobile())) {
             msisdn = NumberUtils.toLong(guardian.getMobile().replaceAll("-", ""));
@@ -174,22 +174,19 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
         Date currentDate = new Date(System.currentTimeMillis());
 
-        params.put("date", DATE_FORMAT.format(currentDate));
-        params.put("time", TIME_FORMAT.format(currentDate));
         params.put("account", "" + child.getContractId());
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
 
-        appendOrgParameters(child.getOrg().getIdOfOrg(), params);
+        if (type == EMPEventTypeFactory.ENTER_LIBRARY)
+            params.put("gender", getGender(child));
 
-        /*BigDecimal balance = null;
-        if(child.getBalance() == null || child.getBalance().longValue() == 0L) {
-            balance = new BigDecimal(0D).setScale(2);
-        } else {
-            balance = new BigDecimal(Math.ceil((double) child.getBalance() / 100)).setScale(2, RoundingMode.CEILING);
+        if (type != EMPEventTypeFactory.ENTER_LIBRARY) {
+            params.put("date", DATE_FORMAT.format(currentDate));
+            params.put("time", TIME_FORMAT.format(currentDate));
+            appendOrgParameters(child.getOrg().getIdOfOrg(), params);
+            appendBalance(child.getBalance(), params);
         }
-        params.put("balance", balance.toString());*/
-        appendBalance(child.getBalance(), params);
     }
 
     protected void appendOrgParameters(Long idOfOrg, Map<String, String> params) {
@@ -256,5 +253,16 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             }
         }
         return "";
+    }
+
+    private String getGender(Client client)
+    {
+        String genderString = "";
+        switch (client.getGender()) {
+            case 0: genderString = CLIENT_GENDER_VALUE_FEMALE; break;
+            case 1: genderString = CLIENT_GENDER_VALUE_MALE; break;
+            default: genderString = "";
+        }
+        return genderString;
     }
 }

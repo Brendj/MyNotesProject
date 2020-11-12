@@ -73,7 +73,6 @@ public class Client {
     private Long expenditureLimit;
     private String categoriesDiscounts;
     private String san;
-    private String guardSan;
     private Long externalId;
     private String clientGUID;
     private Set<Card> cards = new HashSet<Card>();
@@ -127,45 +126,10 @@ public class Client {
         this.freePayCount = 0;
         this.discountMode = INITIAL_DISCOUNT_MODE;
         this.clientRegistryVersion = clientRegistryVersion;
-        //this.image = Hibernate.createBlob(ArrayUtils.EMPTY_BYTE_ARRAY);
         this.balance = 0L;
         this.limit = limit;
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
-    }
-
-    //public Client(Org org, ru.axetta.ecafe.processor.core.persistence.Person person, ru.axetta.ecafe.processor.core.persistence.Person contractPerson, int flags, boolean notifyViaEmail,
-    //        boolean notifyViaSMS, long contractId, Date contractTime, int contractState, String plainPassword,
-    //        int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit, String categoriesDiscounts)
-    //        throws Exception {
-    //    this.org = org;
-    //    this.person = person;
-    //    this.contractPerson = contractPerson;
-    //    this.flags = flags;
-    //    this.notifyViaEmail = notifyViaEmail;
-    //    this.notifyViaSMS = notifyViaSMS;
-    //    this.updateTime = new Date();
-    //    this.contractId = contractId;
-    //    this.contractTime = contractTime;
-    //    this.contractState = contractState;
-    //    this.cypheredPassword = encryptPassword(plainPassword);
-    //    this.payForSMS = payForSMS;
-    //    this.freePayCount = 0;
-    //    this.discountMode = INITIAL_DISCOUNT_MODE;
-    //    this.clientRegistryVersion = clientRegistryVersion;
-    //    //this.image = Hibernate.createBlob(ArrayUtils.EMPTY_BYTE_ARRAY);
-    //    this.balance = 0L;
-    //    this.limit = limit;
-    //    this.expenditureLimit = expenditureLimit;
-    //    this.categoriesDiscounts = categoriesDiscounts;
-    //}
-
-    public String getGuardSan() {
-        return guardSan;
-    }
-
-    public void setGuardSan(String guardSan) {
-        this.guardSan = guardSan;
     }
 
     public String getSan() {

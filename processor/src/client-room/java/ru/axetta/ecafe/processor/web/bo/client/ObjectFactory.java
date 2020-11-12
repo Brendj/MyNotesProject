@@ -26,19 +26,16 @@ public class ObjectFactory {
 
     private final static QName _AuthorizeClientResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "authorizeClientResponse");
     private final static QName _CheckPasswordRestoreRequest_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "checkPasswordRestoreRequest");
-    private final static QName _DetachGuardSan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "detachGuardSan");
     private final static QName _GetSummaryByTypedIdResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryByTypedIdResponse");
     private final static QName _GetEnterEventListBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getEnterEventListBySan");
     private final static QName _GetMenuListByOrgResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuListByOrgResponse");
     private final static QName _GetBanks_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getBanks");
     private final static QName _ChangeMobilePhone_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeMobilePhone");
-    private final static QName _GetSummaryByGuardSan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryByGuardSan");
     private final static QName _GetMenuListBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuListBySan");
     private final static QName _GetCirculationList_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getCirculationList");
     private final static QName _GetSummaryBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryBySan");
     private final static QName _GetCardList_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getCardList");
     private final static QName _GetRBKMoneyConfigResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getRBKMoneyConfigResponse");
-    private final static QName _GetClientsByGuardSanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getClientsByGuardSanResponse");
     private final static QName _GetEnterEventListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getEnterEventListResponse");
     private final static QName _GetIdOfClientResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfClientResponse");
     private final static QName _GetSummaryByTypedId_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryByTypedId");
@@ -57,9 +54,7 @@ public class ObjectFactory {
     private final static QName _GetIdOfClient_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfClient");
     private final static QName _GetRBKMoneyConfig_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getRBKMoneyConfig");
     private final static QName _GetMenuListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuListBySanResponse");
-    private final static QName _AttachGuardSanBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "attachGuardSanBySanResponse");
     private final static QName _SendPasswordRecoverURLFromEmailResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendPasswordRecoverURLFromEmailResponse");
-    private final static QName _GetSummaryByGuardSanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryByGuardSanResponse");
     private final static QName _GetMenuList_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuList");
     private final static QName _GetChronopayConfigResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getChronopayConfigResponse");
     private final static QName _GetContractIdByCardNoResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getContractIdByCardNoResponse");
@@ -67,16 +62,13 @@ public class ObjectFactory {
     private final static QName _GetClientSmsListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getClientSmsListResponse");
     private final static QName _GetIdOfContragent_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfContragent");
     private final static QName _GetStudentListByIdOfClientGroup_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getStudentListByIdOfClientGroup");
-    private final static QName _AttachGuardSan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "attachGuardSan");
     private final static QName _SendLinkingTokenByMobileResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendLinkingTokenByMobileResponse");
     private final static QName _GetPaymentListBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPaymentListBySan");
     private final static QName _ChangeEmail_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeEmail");
     private final static QName _GetSummaryBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryBySanResponse");
     private final static QName _GetPaymentListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPaymentListResponse");
-    private final static QName _AttachGuardSanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "attachGuardSanResponse");
     private final static QName _CheckPasswordRestoreRequestResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "checkPasswordRestoreRequestResponse");
     private final static QName _AuthorizeClient_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "authorizeClient");
-    private final static QName _DetachGuardSanBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "detachGuardSanBySanResponse");
     private final static QName _GetIdOfContragentResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getIdOfContragentResponse");
     private final static QName _GetHiddenPagesResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getHiddenPagesResponse");
     private final static QName _ChangePaymentOrderStatusResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePaymentOrderStatusResponse");
@@ -87,16 +79,13 @@ public class ObjectFactory {
     private final static QName _GetPaymentList_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPaymentList");
     private final static QName _ChangeMobilePhoneResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeMobilePhoneResponse");
     private final static QName _GetSummaryResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getSummaryResponse");
-    private final static QName _AttachGuardSanBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "attachGuardSanBySan");
     private final static QName _ChangePersonalInfo_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePersonalInfo");
-    private final static QName _DetachGuardSanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "detachGuardSanResponse");
     private final static QName _GetPaymentListBySanResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPaymentListBySanResponse");
     private final static QName _SendLinkingTokenByContractId_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "sendLinkingTokenByContractId");
     private final static QName _ChangeExpenditureLimit_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeExpenditureLimit");
     private final static QName _GetComplexListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getComplexListResponse");
     private final static QName _ActivateLinkingTokenResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "activateLinkingTokenResponse");
     private final static QName _ChangeEmailResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changeEmailResponse");
-    private final static QName _GetClientsByGuardSan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getClientsByGuardSan");
     private final static QName _ChangePassword_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePassword");
     private final static QName _EnableNotificationBySMSResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "enableNotificationBySMSResponse");
     private final static QName _ChangePasswordResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "changePasswordResponse");
@@ -111,7 +100,6 @@ public class ObjectFactory {
     private final static QName _GetPurchaseList_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPurchaseList");
     private final static QName _GetMenuListByOrg_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getMenuListByOrg");
     private final static QName _CreatePaymentOrder_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "createPaymentOrder");
-    private final static QName _DetachGuardSanBySan_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "detachGuardSanBySan");
     private final static QName _EnableNotificationByEmail_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "enableNotificationByEmail");
     private final static QName _GetContractIdByCardNo_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getContractIdByCardNo");
     private final static QName _GetPurchaseListResponse_QNAME = new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "getPurchaseListResponse");
@@ -249,14 +237,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DetachGuardSanResult }
-     * 
-     */
-    public DetachGuardSanResult createDetachGuardSanResult() {
-        return new DetachGuardSanResult();
-    }
-
-    /**
      * Create an instance of {@link SendLinkingTokenByContractId }
      * 
      */
@@ -374,14 +354,6 @@ public class ObjectFactory {
      */
     public GetPaymentListResponse createGetPaymentListResponse() {
         return new GetPaymentListResponse();
-    }
-
-    /**
-     * Create an instance of {@link EnableNotificationByEmail }
-     * 
-     */
-    public EnableNotificationByEmail createEnableNotificationByEmail() {
-        return new EnableNotificationByEmail();
     }
 
     /**
@@ -585,14 +557,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetClientsByGuardSanResponse }
-     * 
-     */
-    public GetClientsByGuardSanResponse createGetClientsByGuardSanResponse() {
-        return new GetClientsByGuardSanResponse();
-    }
-
-    /**
      * Create an instance of {@link CirculationItemList }
      * 
      */
@@ -689,14 +653,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link AttachGuardSanResult }
-     * 
-     */
-    public AttachGuardSanResult createAttachGuardSanResult() {
-        return new AttachGuardSanResult();
-    }
-
-    /**
      * Create an instance of {@link Result }
      * 
      */
@@ -753,14 +709,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DetachGuardSanResponse }
-     * 
-     */
-    public DetachGuardSanResponse createDetachGuardSanResponse() {
-        return new DetachGuardSanResponse();
-    }
-
-    /**
      * Create an instance of {@link ChangeEmailResponse }
      * 
      */
@@ -774,14 +722,6 @@ public class ObjectFactory {
      */
     public ComplexDate createComplexDate() {
         return new ComplexDate();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanResponse }
-     * 
-     */
-    public AttachGuardSanResponse createAttachGuardSanResponse() {
-        return new AttachGuardSanResponse();
     }
 
     /**
@@ -801,14 +741,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link AttachGuardSan }
-     * 
-     */
-    public AttachGuardSan createAttachGuardSan() {
-        return new AttachGuardSan();
-    }
-
-    /**
      * Create an instance of {@link BankItem }
      * 
      */
@@ -825,14 +757,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DetachGuardSanBySanResponse }
-     * 
-     */
-    public DetachGuardSanBySanResponse createDetachGuardSanBySanResponse() {
-        return new DetachGuardSanBySanResponse();
-    }
-
-    /**
      * Create an instance of {@link ClientGroupListResult }
      * 
      */
@@ -846,14 +770,6 @@ public class ObjectFactory {
      */
     public PurchaseListResult createPurchaseListResult() {
         return new PurchaseListResult();
-    }
-
-    /**
-     * Create an instance of {@link GetSummaryByGuardSanResponse }
-     * 
-     */
-    public GetSummaryByGuardSanResponse createGetSummaryByGuardSanResponse() {
-        return new GetSummaryByGuardSanResponse();
     }
 
     /**
@@ -929,22 +845,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetSummaryByGuardSan }
-     * 
-     */
-    public GetSummaryByGuardSan createGetSummaryByGuardSan() {
-        return new GetSummaryByGuardSan();
-    }
-
-    /**
-     * Create an instance of {@link EnableNotificationBySMS }
-     * 
-     */
-    public EnableNotificationBySMS createEnableNotificationBySMS() {
-        return new EnableNotificationBySMS();
-    }
-
-    /**
      * Create an instance of {@link CheckPasswordResult }
      * 
      */
@@ -1001,14 +901,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link AttachGuardSanBySan }
-     * 
-     */
-    public AttachGuardSanBySan createAttachGuardSanBySan() {
-        return new AttachGuardSanBySan();
-    }
-
-    /**
      * Create an instance of {@link PaymentList }
      * 
      */
@@ -1022,14 +914,6 @@ public class ObjectFactory {
      */
     public PurchaseElementExt createPurchaseElementExt() {
         return new PurchaseElementExt();
-    }
-
-    /**
-     * Create an instance of {@link GetClientsByGuardSan }
-     * 
-     */
-    public GetClientsByGuardSan createGetClientsByGuardSan() {
-        return new GetClientsByGuardSan();
     }
 
     /**
@@ -1137,14 +1021,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DetachGuardSanBySan }
-     * 
-     */
-    public DetachGuardSanBySan createDetachGuardSanBySan() {
-        return new DetachGuardSanBySan();
-    }
-
-    /**
      * Create an instance of {@link GetRBKMoneyConfigResponse }
      * 
      */
@@ -1185,14 +1061,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EnableNotificationByEmailResponse }
-     * 
-     */
-    public EnableNotificationByEmailResponse createEnableNotificationByEmailResponse() {
-        return new EnableNotificationByEmailResponse();
-    }
-
-    /**
      * Create an instance of {@link GetChronopayConfigResponse }
      * 
      */
@@ -1230,22 +1098,6 @@ public class ObjectFactory {
      */
     public GetEnterEventListResponse createGetEnterEventListResponse() {
         return new GetEnterEventListResponse();
-    }
-
-    /**
-     * Create an instance of {@link AttachGuardSanBySanResponse }
-     * 
-     */
-    public AttachGuardSanBySanResponse createAttachGuardSanBySanResponse() {
-        return new AttachGuardSanBySanResponse();
-    }
-
-    /**
-     * Create an instance of {@link DetachGuardSan }
-     * 
-     */
-    public DetachGuardSan createDetachGuardSan() {
-        return new DetachGuardSan();
     }
 
     /**
@@ -1427,15 +1279,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DetachGuardSan }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "detachGuardSan")
-    public JAXBElement<DetachGuardSan> createDetachGuardSan(DetachGuardSan value) {
-        return new JAXBElement<DetachGuardSan>(_DetachGuardSan_QNAME, DetachGuardSan.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetSummaryByTypedIdResponse }{@code >}}
      * 
      */
@@ -1481,15 +1324,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetSummaryByGuardSan }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getSummaryByGuardSan")
-    public JAXBElement<GetSummaryByGuardSan> createGetSummaryByGuardSan(GetSummaryByGuardSan value) {
-        return new JAXBElement<GetSummaryByGuardSan>(_GetSummaryByGuardSan_QNAME, GetSummaryByGuardSan.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetMenuListBySan }{@code >}}
      * 
      */
@@ -1532,15 +1366,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getRBKMoneyConfigResponse")
     public JAXBElement<GetRBKMoneyConfigResponse> createGetRBKMoneyConfigResponse(GetRBKMoneyConfigResponse value) {
         return new JAXBElement<GetRBKMoneyConfigResponse>(_GetRBKMoneyConfigResponse_QNAME, GetRBKMoneyConfigResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetClientsByGuardSanResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getClientsByGuardSanResponse")
-    public JAXBElement<GetClientsByGuardSanResponse> createGetClientsByGuardSanResponse(GetClientsByGuardSanResponse value) {
-        return new JAXBElement<GetClientsByGuardSanResponse>(_GetClientsByGuardSanResponse_QNAME, GetClientsByGuardSanResponse.class, null, value);
     }
 
     /**
@@ -1706,30 +1531,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AttachGuardSanBySanResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "attachGuardSanBySanResponse")
-    public JAXBElement<AttachGuardSanBySanResponse> createAttachGuardSanBySanResponse(AttachGuardSanBySanResponse value) {
-        return new JAXBElement<AttachGuardSanBySanResponse>(_AttachGuardSanBySanResponse_QNAME, AttachGuardSanBySanResponse.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link SendPasswordRecoverURLFromEmailResponse }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "sendPasswordRecoverURLFromEmailResponse")
     public JAXBElement<SendPasswordRecoverURLFromEmailResponse> createSendPasswordRecoverURLFromEmailResponse(SendPasswordRecoverURLFromEmailResponse value) {
         return new JAXBElement<SendPasswordRecoverURLFromEmailResponse>(_SendPasswordRecoverURLFromEmailResponse_QNAME, SendPasswordRecoverURLFromEmailResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetSummaryByGuardSanResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getSummaryByGuardSanResponse")
-    public JAXBElement<GetSummaryByGuardSanResponse> createGetSummaryByGuardSanResponse(GetSummaryByGuardSanResponse value) {
-        return new JAXBElement<GetSummaryByGuardSanResponse>(_GetSummaryByGuardSanResponse_QNAME, GetSummaryByGuardSanResponse.class, null, value);
     }
 
     /**
@@ -1796,15 +1603,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AttachGuardSan }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "attachGuardSan")
-    public JAXBElement<AttachGuardSan> createAttachGuardSan(AttachGuardSan value) {
-        return new JAXBElement<AttachGuardSan>(_AttachGuardSan_QNAME, AttachGuardSan.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link SendLinkingTokenByMobileResponse }{@code >}}
      * 
      */
@@ -1850,15 +1648,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AttachGuardSanResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "attachGuardSanResponse")
-    public JAXBElement<AttachGuardSanResponse> createAttachGuardSanResponse(AttachGuardSanResponse value) {
-        return new JAXBElement<AttachGuardSanResponse>(_AttachGuardSanResponse_QNAME, AttachGuardSanResponse.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link CheckPasswordRestoreRequestResponse }{@code >}}
      * 
      */
@@ -1874,15 +1663,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "authorizeClient")
     public JAXBElement<AuthorizeClient> createAuthorizeClient(AuthorizeClient value) {
         return new JAXBElement<AuthorizeClient>(_AuthorizeClient_QNAME, AuthorizeClient.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DetachGuardSanBySanResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "detachGuardSanBySanResponse")
-    public JAXBElement<DetachGuardSanBySanResponse> createDetachGuardSanBySanResponse(DetachGuardSanBySanResponse value) {
-        return new JAXBElement<DetachGuardSanBySanResponse>(_DetachGuardSanBySanResponse_QNAME, DetachGuardSanBySanResponse.class, null, value);
     }
 
     /**
@@ -1976,30 +1756,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AttachGuardSanBySan }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "attachGuardSanBySan")
-    public JAXBElement<AttachGuardSanBySan> createAttachGuardSanBySan(AttachGuardSanBySan value) {
-        return new JAXBElement<AttachGuardSanBySan>(_AttachGuardSanBySan_QNAME, AttachGuardSanBySan.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ChangePersonalInfo }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "changePersonalInfo")
     public JAXBElement<ChangePersonalInfo> createChangePersonalInfo(ChangePersonalInfo value) {
         return new JAXBElement<ChangePersonalInfo>(_ChangePersonalInfo_QNAME, ChangePersonalInfo.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DetachGuardSanResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "detachGuardSanResponse")
-    public JAXBElement<DetachGuardSanResponse> createDetachGuardSanResponse(DetachGuardSanResponse value) {
-        return new JAXBElement<DetachGuardSanResponse>(_DetachGuardSanResponse_QNAME, DetachGuardSanResponse.class, null, value);
     }
 
     /**
@@ -2054,15 +1816,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "changeEmailResponse")
     public JAXBElement<ChangeEmailResponse> createChangeEmailResponse(ChangeEmailResponse value) {
         return new JAXBElement<ChangeEmailResponse>(_ChangeEmailResponse_QNAME, ChangeEmailResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetClientsByGuardSan }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "getClientsByGuardSan")
-    public JAXBElement<GetClientsByGuardSan> createGetClientsByGuardSan(GetClientsByGuardSan value) {
-        return new JAXBElement<GetClientsByGuardSan>(_GetClientsByGuardSan_QNAME, GetClientsByGuardSan.class, null, value);
     }
 
     /**
@@ -2192,24 +1945,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DetachGuardSanBySan }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "detachGuardSanBySan")
-    public JAXBElement<DetachGuardSanBySan> createDetachGuardSanBySan(DetachGuardSanBySan value) {
-        return new JAXBElement<DetachGuardSanBySan>(_DetachGuardSanBySan_QNAME, DetachGuardSanBySan.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link EnableNotificationByEmail }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "enableNotificationByEmail")
-    public JAXBElement<EnableNotificationByEmail> createEnableNotificationByEmail(EnableNotificationByEmail value) {
-        return new JAXBElement<EnableNotificationByEmail>(_EnableNotificationByEmail_QNAME, EnableNotificationByEmail.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetContractIdByCardNo }{@code >}}
      * 
      */
@@ -2237,30 +1972,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link EnableNotificationBySMS }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "enableNotificationBySMS")
-    public JAXBElement<EnableNotificationBySMS> createEnableNotificationBySMS(EnableNotificationBySMS value) {
-        return new JAXBElement<EnableNotificationBySMS>(_EnableNotificationBySMS_QNAME, EnableNotificationBySMS.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ChangeExpenditureLimitResponse }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "changeExpenditureLimitResponse")
     public JAXBElement<ChangeExpenditureLimitResponse> createChangeExpenditureLimitResponse(ChangeExpenditureLimitResponse value) {
         return new JAXBElement<ChangeExpenditureLimitResponse>(_ChangeExpenditureLimitResponse_QNAME, ChangeExpenditureLimitResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link EnableNotificationByEmailResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", name = "enableNotificationByEmailResponse")
-    public JAXBElement<EnableNotificationByEmailResponse> createEnableNotificationByEmailResponse(EnableNotificationByEmailResponse value) {
-        return new JAXBElement<EnableNotificationByEmailResponse>(_EnableNotificationByEmailResponse_QNAME, EnableNotificationByEmailResponse.class, null, value);
     }
 
     /**

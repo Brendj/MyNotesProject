@@ -92,7 +92,6 @@
         <property name="disablePlanEndDate" column="DisablePlanEndDate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="san" column="San" type="string" length="14" not-null="false"/>
-        <!--<property name="guardSan" column="GuardSan" type="string" length="64" not-null="false"/>-->
         <property name="externalId" column="ExternalId" type="long" not-null="false"/>
         <property name="clientGUID" column="ClientGUID" type="string" length="40" not-null="false"/>
         <property name="meshGUID" column="meshguid" type="string" length="36"/>
@@ -210,11 +209,6 @@
                 <column name="IdOfClient"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation"/>
-        </set>
-
-        <set name="guardSan" table="CF_GuardSAN" lazy="true">
-            <key column="IdOfClient"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.GuardSan" column="IdOfGuardSan"/>
         </set>
     </class>
 </hibernate-mapping>
