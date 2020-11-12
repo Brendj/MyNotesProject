@@ -1341,6 +1341,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             Boolean migration = false;
 
             String group = groupName == null ? change.getGroupName() : groupName;
+            ClientGroup beforeMigrationGroup = null;
 
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
@@ -1409,6 +1410,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     Org newOrg = (Org) session.load(Org.class, change.getIdOfMigrateOrgTo());
 
                     Org beforeMigrateOrg = dbClient.getOrg();
+                    beforeMigrationGroup = dbClient.getClientGroup();
 
                     checkGroupNamesToOrgs(session, change.getGroupName(), newOrg.getIdOfOrg());
 
@@ -1438,11 +1440,15 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         ClientManager.blockExtraCardOfClient(dbClient, session);
                     }
 
-                    addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), dbClient, change);
+                    addClientMigrationEntry(session, beforeMigrateOrg, beforeMigrationGroup, dbClient.getOrg(), dbClient, change);
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
+                    if (beforeMigrationGroup == null)
+                    {
+                        beforeMigrationGroup = dbClient.getClientGroup();
+                    }
 
                     checkGroupNamesToOrgs(session, group, change.getIdOfOrg());
 
@@ -1467,7 +1473,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     if (!migration) {
                         if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {
-                            addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), dbClient,
+                            addClientMigrationEntry(session, beforeModifyOrg, beforeMigrationGroup, dbClient.getOrg(), dbClient,
                                     change); //орг. меняется - история миграции между ОО
                         } else {
                             if((change.getGroupName() == null && change.getGroupNameFrom() == null) ||
@@ -1562,8 +1568,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     //@Transactional
-    private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
-        ClientManager.addClientMigrationEntry(session, oldOrg, newOrg, client,
+    private void addClientMigrationEntry(Session session,Org oldOrg, ClientGroup beforeMigrationGroup, Org newOrg, Client client, RegistryChange change){
+        ClientManager.addClientMigrationEntry(session, oldOrg, beforeMigrationGroup, newOrg, client,
                 ClientMigration.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())), change.getGroupName());
     }
 
