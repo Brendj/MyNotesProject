@@ -74,67 +74,67 @@
 	<summary>
 		<band height="70">
 			<crosstab>
-				<reportElement style="table" mode="Transparent" x="0" y="0" width="140" height="50" forecolor="#FFFFFF" uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055"/>
+				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" style="table" mode="Transparent" x="0" y="0" width="140" height="50" forecolor="#FFFFFF"/>
 				<crosstabHeaderCell>
 					<cellContents backcolor="#99FF99" mode="Opaque" style="table">
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="415" y="0" width="207" height="34" backcolor="#F0F8FF" uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="415" y="0" width="207" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Адрес ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="78" y="0" width="130" height="34" backcolor="#F0F8FF" uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc"/>
+							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="78" y="0" width="130" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Идентификатор ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="0" y="0" width="78" height="34" backcolor="#F0F8FF" uuid="7761f0ef-0e43-407c-9d37-6bdea874dc36"/>
+							<reportElement uuid="7761f0ef-0e43-407c-9d37-6bdea874dc36" style="table" mode="Opaque" x="0" y="0" width="78" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[№ ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="622" y="0" width="214" height="34" backcolor="#F0F8FF" uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="622" y="0" width="214" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Товар]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="208" y="0" width="207" height="34" backcolor="#F0F8FF" uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc"/>
+							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="208" y="0" width="207" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Наименование ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="836" y="0" width="100" height="34" backcolor="#F0F8FF" uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="836" y="0" width="100" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Код товара]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="1136" y="0" width="100" height="34" backcolor="#F0F8FF" uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="1136" y="0" width="100" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Сумма (руб.)]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="1036" y="0" width="100" height="34" backcolor="#F0F8FF" uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="1036" y="0" width="100" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Цена (руб.)]]></text>
 						</staticText>
 						<staticText>
-							<reportElement style="table" mode="Opaque" x="936" y="0" width="100" height="34" backcolor="#F0F8FF" uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="936" y="0" width="100" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
@@ -148,10 +148,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#FFFFFF" mode="Transparent" style="style1">
-							<textField pattern="" isBlankWhenNull="true">
-								<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="78" height="123" uuid="296ecedd-7681-4642-8f78-eb8d15759642">
-									<printWhenExpression><![CDATA[!$V{orgNum}.equals("=")]]></printWhenExpression>
-								</reportElement>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="296ecedd-7681-4642-8f78-eb8d15759642" style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="78" height="123"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
 							</textField>
@@ -160,7 +158,7 @@
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#000000" mode="Transparent">
 							<staticText>
-								<reportElement style="table" x="0" y="0" width="1236" height="41" uuid="9cb16bc5-8dcf-4346-9771-0a08fb6d6c21"/>
+								<reportElement uuid="9cb16bc5-8dcf-4346-9771-0a08fb6d6c21" style="table" x="0" y="0" width="1236" height="41"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -176,7 +174,7 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="130" height="123" uuid="d506aba1-d7ff-481a-86df-387ee041b6dd"/>
+								<reportElement uuid="d506aba1-d7ff-481a-86df-387ee041b6dd" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="130" height="123"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
 							</textField>
@@ -193,7 +191,7 @@
 					<crosstabRowHeader>
 						<cellContents backcolor="#CCFFFF" mode="Transparent" style="table">
 							<textField isStretchWithOverflow="true">
-								<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="207" height="120" uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a"/>
+								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="207" height="120"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{officialName}]]></textFieldExpression>
 							</textField>
@@ -202,7 +200,8 @@
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#000000" mode="Opaque" style="style2">
 							<staticText>
-								<reportElement style="style2" x="0" y="0" width="421" height="3" forecolor="#000000" uuid="db9ef8af-79e9-4357-bfcd-c8b0cb9d217c"/>
+								<reportElement uuid="db9ef8af-79e9-4357-bfcd-c8b0cb9d217c" style="style2" x="0" y="0" width="421" height="3" forecolor="#000000"/>
+								<textElement/>
 								<text><![CDATA[Static text]]></text>
 							</staticText>
 						</cellContents>
@@ -215,7 +214,7 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isStretchWithOverflow="true">
-								<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="207" height="120" uuid="73d72894-3631-44bd-9924-7f451b74cae5"/>
+								<reportElement uuid="73d72894-3631-44bd-9924-7f451b74cae5" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="207" height="120"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
 							</textField>
@@ -246,7 +245,7 @@
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#CCCCCC" mode="Opaque">
 							<textField>
-								<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="214" y="0" width="400" height="40" uuid="0d39e18e-ad49-45d4-9804-76b11c1f18a7">
+								<reportElement uuid="0d39e18e-ad49-45d4-9804-76b11c1f18a7" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="214" y="0" width="400" height="40">
 									<printWhenExpression><![CDATA[$V{totalPlanStr} != null]]></printWhenExpression>
 								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -256,7 +255,7 @@
     + ($V{totalPlanTempSum}==0L ? "" : " / " + java.math.BigDecimal.valueOf($V{totalPlanTempSum}).movePointLeft(2)))]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
-								<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="214" height="40" uuid="4c1312fd-afe2-437e-b2b8-236e0affbd96">
+								<reportElement uuid="4c1312fd-afe2-437e-b2b8-236e0affbd96" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="214" height="40">
 									<printWhenExpression><![CDATA[!$V{totalPlanStr}.isEmpty()]]></printWhenExpression>
 								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -272,7 +271,7 @@
 					<crosstabRowHeader>
 						<cellContents mode="Transparent" style="table">
 							<textField isStretchWithOverflow="true">
-								<reportElement style="table" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="214" height="40" uuid="2b0b8916-f6ef-462f-b217-2452810563fe"/>
+								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" style="table" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="214" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{goodName}]]></textFieldExpression>
 							</textField>
@@ -281,7 +280,7 @@
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#99CCFF" mode="Opaque">
 							<textField isBlankWhenNull="false">
-								<reportElement style="table" x="0" y="0" width="214" height="40" uuid="cd96f855-dc06-47d2-ad1b-d050c7257886">
+								<reportElement uuid="cd96f855-dc06-47d2-ad1b-d050c7257886" style="table" x="0" y="0" width="214" height="40">
 									<printWhenExpression><![CDATA[!$V{officialName}.equals("ВСЕГО")]]></printWhenExpression>
 								</reportElement>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -291,16 +290,20 @@
 								<textFieldExpression><![CDATA[$V{feedingPlanTypeStr}]]></textFieldExpression>
 							</textField>
 							<textField isBlankWhenNull="true">
-								<reportElement style="table" x="414" y="0" width="100" height="40" uuid="10f00356-a7d9-4411-addc-01b42e669cd4"/>
+								<reportElement uuid="10f00356-a7d9-4411-addc-01b42e669cd4" style="table" x="414" y="0" width="100" height="40"/>
+								<textElement/>
 							</textField>
 							<textField isBlankWhenNull="true">
-								<reportElement style="table" x="514" y="0" width="100" height="40" uuid="10f00356-a7d9-4411-addc-01b42e669cd4"/>
+								<reportElement uuid="10f00356-a7d9-4411-addc-01b42e669cd4" style="table" x="514" y="0" width="100" height="40"/>
+								<textElement/>
 							</textField>
 							<textField isBlankWhenNull="true">
-								<reportElement style="table" x="314" y="0" width="100" height="40" uuid="10f00356-a7d9-4411-addc-01b42e669cd4"/>
+								<reportElement uuid="10f00356-a7d9-4411-addc-01b42e669cd4" style="table" x="314" y="0" width="100" height="40"/>
+								<textElement/>
 							</textField>
 							<textField isBlankWhenNull="true">
-								<reportElement style="table" x="214" y="0" width="100" height="40" uuid="10f00356-a7d9-4411-addc-01b42e669cd4"/>
+								<reportElement uuid="10f00356-a7d9-4411-addc-01b42e669cd4" style="table" x="214" y="0" width="100" height="40"/>
+								<textElement/>
 							</textField>
 						</cellContents>
 					</crosstabTotalRowHeader>
@@ -312,24 +315,24 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isStretchWithOverflow="true">
-								<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="40" uuid="22532499-6119-4a8b-955e-3327c45fba01"/>
+								<reportElement uuid="22532499-6119-4a8b-955e-3327c45fba01" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{goodsCode}]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
-								<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="100" y="0" width="100" height="40" uuid="697b775f-9b9e-428a-844a-e780d60c68fc"/>
+								<reportElement uuid="697b775f-9b9e-428a-844a-e780d60c68fc" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="100" y="0" width="100" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{totalPlanCount} + ($V{hideDailySampleSum}==0L ? "" :
     ($V{dailySampleMeasure} == 0L ? "" : " / " + $V{dailySampleMeasure})
     + ($V{tempClientsMeasure} == 0L ? "" : " / " + $V{tempClientsMeasure}))]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
-								<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="100" height="40" uuid="e063563f-6ddf-417c-bac5-b4ec840162d3"/>
+								<reportElement uuid="e063563f-6ddf-417c-bac5-b4ec840162d3" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="100" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{goodPrice}).movePointLeft(2)]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
-								<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="100" height="40" uuid="499a56c7-5738-430b-b060-fb552df71846"/>
+								<reportElement uuid="499a56c7-5738-430b-b060-fb552df71846" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="100" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{goodPrice} * $V{totalPlanCount}).movePointLeft(2)
 + ($V{hideDailySampleSum}==0L ? "" :
@@ -360,7 +363,7 @@
 					<crosstabColumnHeader>
 						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
 							<textField pattern="" isBlankWhenNull="false">
-								<reportElement mode="Opaque" x="1" y="0" width="90" height="34" backcolor="#F0F8FF" uuid="2b8c79cb-cab8-4ac5-acd0-f1e499ddd5b6"/>
+								<reportElement uuid="2b8c79cb-cab8-4ac5-acd0-f1e499ddd5b6" mode="Opaque" x="1" y="0" width="90" height="34" backcolor="#F0F8FF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
 									<font isBold="true"/>
 								</textElement>
@@ -420,7 +423,7 @@
 				<crosstabCell width="91" height="40">
 					<cellContents style="table">
 						<textField>
-							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="40" forecolor="#FFFFFF" backcolor="#FF6666" uuid="231375ae-43c8-4e27-bc2f-2f82281f4282">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="40" forecolor="#FFFFFF" backcolor="#FF6666">
 								<printWhenExpression><![CDATA[!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -448,7 +451,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 ))]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="40" backcolor="#92D050" uuid="67da7250-646f-4951-8566-1635493f6071">
+							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="40" backcolor="#92D050">
 								<printWhenExpression><![CDATA[$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -459,7 +462,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 $V{tempClientsMeasure}))]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true">
-							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="40" uuid="231375ae-43c8-4e27-bc2f-2f82281f4282">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="40">
 								<printWhenExpression><![CDATA[$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -476,7 +479,8 @@ $V{tempClientsMeasure}))]]></textFieldExpression>
 				<crosstabCell width="91" height="40" rowTotalGroup="goodName">
 					<cellContents backcolor="#99CCFF" mode="Opaque" style="style2">
 						<staticText>
-							<reportElement style="table" mode="Transparent" x="0" y="0" width="91" height="40" forecolor="#005FB3" backcolor="#005FB3" uuid="59c14182-de93-4b3f-b3c9-6cca48484167"/>
+							<reportElement uuid="59c14182-de93-4b3f-b3c9-6cca48484167" style="table" mode="Transparent" x="0" y="0" width="91" height="40" forecolor="#005FB3" backcolor="#005FB3"/>
+							<textElement/>
 							<text><![CDATA[]]></text>
 						</staticText>
 					</cellContents>
@@ -490,7 +494,8 @@ $V{tempClientsMeasure}))]]></textFieldExpression>
 				<crosstabCell width="91" height="3" rowTotalGroup="officialName">
 					<cellContents backcolor="#000000" mode="Opaque" style="style2">
 						<staticText>
-							<reportElement style="style2" x="0" y="0" width="57" height="3" forecolor="#000000" backcolor="#000000" uuid="30270492-c0d6-4af8-bb02-c45b81d040c7"/>
+							<reportElement uuid="30270492-c0d6-4af8-bb02-c45b81d040c7" style="style2" x="0" y="0" width="57" height="3" forecolor="#000000" backcolor="#000000"/>
+							<textElement/>
 							<text><![CDATA[S]]></text>
 						</staticText>
 					</cellContents>
@@ -501,7 +506,7 @@ $V{tempClientsMeasure}))]]></textFieldExpression>
 				<crosstabCell width="91" height="41" rowTotalGroup="orgNum">
 					<cellContents backcolor="#000000" mode="Transparent">
 						<textField>
-							<reportElement style="table" x="0" y="0" width="91" height="40" uuid="75b7be62-4feb-4f53-b204-0e6987a61483"/>
+							<reportElement uuid="75b7be62-4feb-4f53-b204-0e6987a61483" style="table" x="0" y="0" width="91" height="40"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
