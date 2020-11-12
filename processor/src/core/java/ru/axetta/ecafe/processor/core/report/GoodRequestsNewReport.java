@@ -36,13 +36,14 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
    */
     public static final String REPORT_NAME = "Сводный отчет по заявкам";
     public static final String[] TEMPLATE_FILE_NAMES = {"GoodRequestsNewReport.jasper", "GoodRequestsNewReport_export.jasper",
-    "GoodRequestsNewReport_notify.jasper", "GoodRequestsNewReport_summary.jasper", "GoodRequestsReport.jasper"};
+    "GoodRequestsNewReport_notify.jasper", "GoodRequestsNewReport_summary.jasper", "GoodRequestsReport.jasper",
+    "GoodRequestsNewReport_resume.jasper", "GoodRequestsNewReport_allmenus.jasper", "GoodRequestsNewReport_wtmenu.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReport.class);
-    final private static String OVERALL = "";
+    final private static String OVERALL = "=";
     final private static long OVERALL_TOTAL = Long.MAX_VALUE - 8;
     final private static String OVERALL_TOTAL_TITLE = "ВСЕГО";
     final private static String OVERALL_TITLE = "ИТОГО";
@@ -193,7 +194,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             GoodRequestsNewReportService service;
             service = new GoodRequestsNewReportService(session,OVERALL, OVERALL_TITLE, hideTotalRow);
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, nameFilter, orgFilter,
+            return new JRBeanCollectionDataSource(service.buildTotalReportItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
                     hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly,
                     needFullGoodNames, isROSection));
