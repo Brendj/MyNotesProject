@@ -3116,7 +3116,7 @@ public class PreorderDAOService {
                 + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = d.idofrule "
                 + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
                 + "left join cf_wt_discountrules_categorydiscount dc on dc.idofrule = d.idofrule "
-                + "where cor.idoforg = :idoforg and dc.idofcategorydiscount = :discount "
+                + "where (cor.idoforg = :idoforg or cor.idoforg is null) and dc.idofcategorydiscount = :discount "
                 + "and d.idofrule in (select dc2.idofrule from cf_wt_discountrules_categorydiscount dc2 "
                 + "group by dc2.idofrule having count (dc2.idofrule) = 1)");
         query.setParameter("discount", ELEM_DISCOUNT_ID);

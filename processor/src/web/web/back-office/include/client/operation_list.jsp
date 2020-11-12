@@ -1226,7 +1226,10 @@
                 <h:outputText escape="true" value="Дата статуса" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="2">
-                <h:outputText escape="true" value="Архивное" />
+                <h:outputText escape="true" value="Архив" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="2">
+                <h:outputText escape="true" value="Дата архивирования" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Льгота" />
@@ -1269,6 +1272,9 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <h:outputText escape="true" value="#{app.archieved}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <h:outputText escape="true" value="#{app.archiveDate}" styleClass="output-text" converter="dateConverter" />
     </rich:column>
     <rich:column headerClass="column-header">
         <h:outputText escape="true" value="#{app.benefit}" styleClass="output-text" />

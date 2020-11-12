@@ -29,6 +29,7 @@ public class ApplicationForFood {
     private Date docOrderDate;
     private Long version;
     private Boolean sendToAISContingent;
+    private Date archiveDate;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
 
     public ApplicationForFood(Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName,
@@ -142,6 +143,7 @@ public class ApplicationForFood {
 
     public void setArchived(Boolean archived) {
         this.archived = archived;
+        this.setArchiveDate(archived ? new Date() : null);
     }
 
     public Long getVersion() {
@@ -214,5 +216,13 @@ public class ApplicationForFood {
 
     public void setDiscountDateEnd(Date discountDateEnd) {
         this.discountDateEnd = discountDateEnd;
+    }
+
+    public Date getArchiveDate() {
+        return archiveDate;
+    }
+
+    public void setArchiveDate(Date archiveDate) {
+        this.archiveDate = archiveDate;
     }
 }
