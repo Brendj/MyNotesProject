@@ -168,6 +168,7 @@ public class SmartWatchVendorsListPage extends BasicWorkspacePage {
     public void createNewVendor() {
         if (StringUtils.isBlank(nameForNewVendor)) {
             printError("Введите название поставщика");
+            return;
         }
         try {
             SmartWatchVendor vendor = new SmartWatchVendor();
