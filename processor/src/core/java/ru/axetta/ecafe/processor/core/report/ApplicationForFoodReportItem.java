@@ -19,6 +19,7 @@ public class ApplicationForFoodReportItem {
     protected Date createdDate;
     protected ApplicationForFoodStatus applicationForFoodStatus;
     private Date lastUpdate;
+    private Date archiveDate;
     private Long contractId;
     private String fio;
     private String applicantFio;
@@ -43,6 +44,7 @@ public class ApplicationForFoodReportItem {
         this.createdDate = applicationForFood.getCreatedDate();
         this.applicationForFoodStatus = applicationForFood.getStatus();
         this.lastUpdate = applicationForFood.getLastUpdate();
+        this.archiveDate = applicationForFood.getArchiveDate();
         this.contractId = applicationForFood.getClient().getContractId();
         this.fio = applicationForFood.getClient().getPerson().getFullName();
         this.applicantFio = applicationForFood.getApplicantSurname() + " " + applicationForFood.getApplicantName() + " " + applicationForFood.getApplicantSecondName();
@@ -236,5 +238,13 @@ public class ApplicationForFoodReportItem {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public Date getArchiveDate() {
+        return archiveDate;
+    }
+
+    public void setArchiveDate(Date archiveDate) {
+        this.archiveDate = archiveDate;
     }
 }

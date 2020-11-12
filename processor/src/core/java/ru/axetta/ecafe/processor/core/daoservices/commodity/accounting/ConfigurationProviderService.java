@@ -85,7 +85,7 @@ public class ConfigurationProviderService {
                         for(Org sourceOrg : sourceOrgs) {
                             if(sourceOrg.getConfigurationProvider() != null) {
                                 isProvider = isProvider ||
-                                !sourceOrg.getConfigurationProvider().getIdOfConfigurationProvider().equals(cp.getIdOfConfigurationProvider());
+                                sourceOrg.getConfigurationProvider().getIdOfConfigurationProvider().equals(cp.getIdOfConfigurationProvider());
                             } else if(orgs.contains(sourceOrg)) {
                                 isProvider = true;
                             }

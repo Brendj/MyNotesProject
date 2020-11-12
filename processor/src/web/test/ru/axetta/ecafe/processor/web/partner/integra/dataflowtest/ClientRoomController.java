@@ -92,23 +92,6 @@ public interface ClientRoomController {
 
     /**
      * 
-     * @param guardSan
-     * @param contractId
-     * @return
-     *     returns ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.DetachGuardSanResult
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "detachGuardSan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.DetachGuardSan")
-    @ResponseWrapper(localName = "detachGuardSanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.DetachGuardSanResponse")
-    public DetachGuardSanResult detachGuardSan(
-        @WebParam(name = "contractId", targetNamespace = "")
-        Long contractId,
-        @WebParam(name = "guardSan", targetNamespace = "")
-        String guardSan);
-
-    /**
-     * 
      * @param contractId
      * @return
      *     returns ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.CardListResult
@@ -174,23 +157,6 @@ public interface ClientRoomController {
 
     /**
      * 
-     * @param guardSan
-     * @param contractId
-     * @return
-     *     returns ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.AttachGuardSanResult
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "attachGuardSan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.AttachGuardSan")
-    @ResponseWrapper(localName = "attachGuardSanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.AttachGuardSanResponse")
-    public AttachGuardSanResult attachGuardSan(
-        @WebParam(name = "contractId", targetNamespace = "")
-        Long contractId,
-        @WebParam(name = "guardSan", targetNamespace = "")
-        String guardSan);
-
-    /**
-     * 
      * @param startDate
      * @param san
      * @param endDate
@@ -222,20 +188,6 @@ public interface ClientRoomController {
     public ClassStudentListResult getStudentListByIdOfClientGroup(
         @WebParam(name = "idOfClientGroup", targetNamespace = "")
         Long idOfClientGroup);
-
-    /**
-     * 
-     * @param san
-     * @return
-     *     returns ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.ClientsData
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "getClientsByGuardSan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.GetClientsByGuardSan")
-    @ResponseWrapper(localName = "getClientsByGuardSanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.GetClientsByGuardSanResponse")
-    public ClientsData getClientsByGuardSan(
-        @WebParam(name = "san", targetNamespace = "")
-        String san);
 
     /**
      * 
@@ -335,20 +287,6 @@ public interface ClientRoomController {
         String id,
         @WebParam(name = "idType", targetNamespace = "")
         int idType);
-
-    /**
-     * 
-     * @param guardSan
-     * @return
-     *     returns java.util.List<ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.ClientSummaryExt>
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "getSummaryByGuardSan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.GetSummaryByGuardSan")
-    @ResponseWrapper(localName = "getSummaryByGuardSanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.GetSummaryByGuardSanResponse")
-    public List<ClientSummaryExt> getSummaryByGuardSan(
-        @WebParam(name = "guardSan", targetNamespace = "")
-        String guardSan);
 
     /**
      *
@@ -494,40 +432,6 @@ public interface ClientRoomController {
         XMLGregorianCalendar startDate,
         @WebParam(name = "endDate", targetNamespace = "")
         XMLGregorianCalendar endDate);
-
-    /**
-     * 
-     * @param san
-     * @param guardSan
-     * @return
-     *     returns ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.DetachGuardSanResult
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "detachGuardSanBySan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.DetachGuardSanBySan")
-    @ResponseWrapper(localName = "detachGuardSanBySanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.DetachGuardSanBySanResponse")
-    public DetachGuardSanResult detachGuardSanBySan(
-        @WebParam(name = "san", targetNamespace = "")
-        String san,
-        @WebParam(name = "guardSan", targetNamespace = "")
-        String guardSan);
-
-    /**
-     * 
-     * @param san
-     * @param guardSan
-     * @return
-     *     returns ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.AttachGuardSanResult
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "attachGuardSanBySan", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.AttachGuardSanBySan")
-    @ResponseWrapper(localName = "attachGuardSanBySanResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.AttachGuardSanBySanResponse")
-    public AttachGuardSanResult attachGuardSanBySan(
-        @WebParam(name = "san", targetNamespace = "")
-        String san,
-        @WebParam(name = "guardSan", targetNamespace = "")
-        String guardSan);
 
     /**
      * 

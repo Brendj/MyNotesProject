@@ -103,7 +103,6 @@ public class Client {
     private Date disablePlanCreationDate;
     private Date disablePlanEndDate;
     private String san;
-    private Set<GuardSan> guardSan;
     private Long externalId;
     private String clientGUID;
     private String meshGUID;
@@ -371,14 +370,6 @@ public class Client {
 
     public static boolean isValidContractState(int contractState) {
         return contractState >= 0 && contractState < CONTRACT_STATE_NAMES.length;
-    }
-
-    public Set<GuardSan> getGuardSan() {
-        return guardSan;
-    }
-
-    public void setGuardSan(Set<GuardSan> guardSan) {
-        this.guardSan = guardSan;
     }
 
     public String getSan() {
