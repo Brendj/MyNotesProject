@@ -43,9 +43,9 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "GoodRequestsNewReport_summary.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="200">
+		<band height="150">
 			<subreport>
-				<reportElement x="0" y="100" width="200" height="100" uuid="28e2b24c-4bfd-49cf-a481-3696e8c58c24"/>
+				<reportElement x="0" y="50" width="200" height="100" uuid="28e2b24c-4bfd-49cf-a481-3696e8c58c24"/>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -65,33 +65,7 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "GoodRequestsNewReport_wtmenu.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement x="0" y="0" width="200" height="100" uuid="89b36519-ddc3-40ee-8c86-d14561189733"/>
-				<text><![CDATA[]]></text>
-			</staticText>
-		</band>
-		<band height="200">
-			<subreport>
-				<reportElement x="0" y="100" width="200" height="100" uuid="f832564f-5181-4358-99fb-37685cd4f433"/>
-				<subreportParameter name="SUBREPORT_DIR">
-					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="startDate">
-					<subreportParameterExpression><![CDATA[$P{startDate}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="endDate">
-					<subreportParameterExpression><![CDATA[$P{endDate}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="overall_all">
-					<subreportParameterExpression><![CDATA[$P{overall_all}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="overall">
-					<subreportParameterExpression><![CDATA[$P{overall}]]></subreportParameterExpression>
-				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{summaryItems})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "GoodRequestsNewReport_resume.jasper"]]></subreportExpression>
-			</subreport>
-			<staticText>
-				<reportElement x="0" y="0" width="200" height="100" uuid="4f6586f8-a8be-4864-9a70-5b0942e3e1c1"/>
+				<reportElement x="0" y="0" width="200" height="50" uuid="89b36519-ddc3-40ee-8c86-d14561189733"/>
 				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
