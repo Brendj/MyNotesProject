@@ -1372,6 +1372,30 @@ public class FrontController extends HttpServlet {
         return RuntimeContext.getInstance().getFrontControllerApiKey();
     }
 
+    private void checkRequestValidityExtended(Long orgId) throws FrontControllerException {
+        try {
+            checkRequestValidity(orgId);
+        } catch (FrontControllerException e) {
+            if (!e.msg.contains("Ключ сертификата невалиден")) throw e;
+            try {
+                Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(orgId);
+                PublicKey publicKey;
+                MessageContext msgContext = wsContext.getMessageContext();
+                HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+                X509Certificate[] certs = getCertificateFromContextOrHeaders(request);
+                for (Org org : orgs) {
+                    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+                    if (publicKey.equals(certs[0].getPublicKey())) {
+                        return;
+                    }
+                }
+            } catch (Exception e2) {
+                throw new FrontControllerException("Внутренняя ошибка", e2);
+            }
+            throw new FrontControllerException(String.format("Ключ сертификата невалиден: %d", orgId));
+        }
+    }
+
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
         if (RuntimeContext.getInstance().isTestMode()) {
             return;
@@ -1998,7 +2022,7 @@ public class FrontController extends HttpServlet {
     public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
             @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList)
             throws FrontControllerException {
-        checkRequestValidity(orgId);
+        checkRequestValidityExtended(orgId);
         PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
         Session session = null;
         Transaction persistenceTransaction = null;
