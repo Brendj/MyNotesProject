@@ -33,7 +33,7 @@ public class RnipMessage {
     }
 
     public RnipMessage(Contragent contragent, RnipEventType eventType, String request,
-            String messageId, Date startDate, Date endDate) {
+            String messageId, Date startDate, Date endDate, int paging) {
         processed = false;
         eventTime = new Date();
         lastUpdate = new Date();
@@ -45,6 +45,7 @@ public class RnipMessage {
         this.messageId = messageId;
         this.ackSent = false;
         this.succeeded = false;
+        this.paging = paging;
     }
 
     @Override
