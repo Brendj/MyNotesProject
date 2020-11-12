@@ -3054,7 +3054,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3073,7 +3073,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3087,7 +3087,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getWtDiscountRulesWithMaxPriority(discRules);
                         resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                         if (resComplexes.size() > 0) {
                             wtDiscComplexes.addAll(resComplexes);
                         }
@@ -3194,8 +3194,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 // 2 Возрастная группа
                 if (client.getAgeTypeGroup() != null && !client.getAgeTypeGroup().isEmpty()) {
                     String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
-                    if (ageGroupDesc.startsWith("дошкол")) {
-                        complexSign.put("Free", true);
+                    if (ageGroupDesc.contains("дошкол")) {
+                        logger.error(RC_CLIENT_DOU);
+                        groupResult.resultCode = RC_INTERNAL_ERROR;
+                        groupResult.description = RC_CLIENT_DOU;
+                        return groupResult;
                     } else {
                         checkParallel(client, categoriesDiscount, ageGroupIds, complexSign);
                     }
@@ -10198,20 +10201,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 res = processPreorderComplexesWithWtMenuList(contractId, date);
             }
-            List<PreorderComplexGroup> list = res.getComplexesWithGroups();
-            if (list != null && list.size() > 0) {
-                ComplexGroup complexGroup = new ComplexGroup();
-                complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
-                result.setComplexGroup(complexGroup);
+            if (res.resultCode == null || res.resultCode.equals(RC_OK)) {
+                List<PreorderComplexGroup> list = res.getComplexesWithGroups();
+                if (list != null && list.size() > 0) {
+                    ComplexGroup complexGroup = new ComplexGroup();
+                    complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
+                    result.setComplexGroup(complexGroup);
+                }
+                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId);
+                if (regularPreordersList.getRegularPreorders() != null
+                        && regularPreordersList.getRegularPreorders().size() > 0) {
+                    result.setRegularPreorders(regularPreordersList);
+                }
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+            } else {
+                result.resultCode = res.resultCode;
+                result.description = res.description;
             }
-            RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getRegularPreordersList(contractId);
-            if (regularPreordersList.getRegularPreorders() != null
-                    && regularPreordersList.getRegularPreorders().size() > 0) {
-                result.setRegularPreorders(regularPreordersList);
-            }
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
         } catch (Exception e) {
             logger.error("Error in getPreorderComplexes", e);
             result.resultCode = RC_INTERNAL_ERROR;
