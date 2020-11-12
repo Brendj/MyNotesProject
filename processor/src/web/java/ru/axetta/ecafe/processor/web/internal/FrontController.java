@@ -1378,7 +1378,7 @@ public class FrontController extends HttpServlet {
         } catch (FrontControllerException e) {
             if (!e.msg.contains("Ключ сертификата невалиден")) throw e;
             try {
-                Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(orgId);
+                Set<Org> orgs = DAOReadonlyService.getInstance().findFriendlyOrgs(orgId);
                 PublicKey publicKey;
                 MessageContext msgContext = wsContext.getMessageContext();
                 HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
