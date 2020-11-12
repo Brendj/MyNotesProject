@@ -58,7 +58,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     @Resource
     RNIPGetPaymentsServiceV21 getPaymentsService;
 
-    public static final int PAGING_VALUE = 2147483647;
+    public static final int PAGING_VALUE = 100;
     public static final String SUCCESS_CODE = "0 -";
     public static final String NODATA_CODE = "NO_DATA -";
     public static final String EMPTY_PACKET = "Empty packet, rerequest sent";
