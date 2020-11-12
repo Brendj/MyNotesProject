@@ -41,7 +41,9 @@ public class ClientSms {
             "Окончание срока действия льготы", //19 - TYPE_CLIENT_END_BENEFIT_NOTIFICATION
             "Отказ в предоставлении услуги получения льготного питания", //20 - TYPE_CLIENT_PREFERENTIAL_FOOD_NOTIFICATION
             "Посещение здания культуры", //21 - TYPE_ENTER_CULTURE_NOTIFICATION
-            "Выход из здания культуры" //22 - TYPE_EXIT_CULTURE_NOTIFICATION
+            "Выход из здания культуры", //22 - TYPE_EXIT_CULTURE_NOTIFICATION
+            "Оповещение об отмене предзаказа по техническим причинам", //23 -
+            "Оповещение о нахождении обучающегося в здании Московской библиотеки" //24 - TYPE_LIBRARY
     };
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
@@ -65,12 +67,13 @@ public class ClientSms {
     public static final int TYPE_CLIENT_PREFERENTIAL_FOOD_NOTIFICATION = 20;
     public static final int TYPE_ENTER_CULTURE_NOTIFICATION = 21;
     public static final int TYPE_EXIT_CULTURE_NOTIFICATION = 22;
+    public static final int TYPE_NOTIFICATION_LIBRARY = 24;
 
+    public static final int TYPE_NOTIFICATION_START_SICK = 25;
+    public static final int TYPE_NOTIFICATION_CANCEL_START_SICK = 26;
+    public static final int TYPE_NOTIFICATION_END_SICK = 27;
+    public static final int TYPE_NOTIFICATION_CANCEL_END_SICK = 28;
 
-    public static final int TYPE_NOTIFICATION_START_SICK = 23;
-    public static final int TYPE_NOTIFICATION_CANCEL_START_SICK = 24;
-    public static final int TYPE_NOTIFICATION_END_SICK = 25;
-    public static final int TYPE_NOTIFICATION_CANCEL_END_SICK = 26;
 
 
 
