@@ -1,12 +1,9 @@
 package ru.iteco.dtszn.config;
 
-import com.fasterxml.jackson.databind.JsonDeserializer;
-
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +19,6 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 class KafkaProducerConfig {
-    private final JsonDeserializer jsonDeserializer;
-
     @Value(value = "${kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
@@ -35,11 +30,6 @@ class KafkaProducerConfig {
 
     @Value(value = "${kafka.password}")
     private String password;
-
-    @Autowired
-    public KafkaProducerConfig(JsonDeserializer jsonDeserializer) {
-        this.jsonDeserializer = jsonDeserializer;
-    }
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {
