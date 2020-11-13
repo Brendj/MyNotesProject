@@ -52,6 +52,8 @@ public class CardActionClient{
     @Column(name = "oldcardstate", nullable = false)
     private Integer oldcardstate;
 
+    @Column(name = "idoldcards")
+    private String idOldCards;
 
     public CardActionClient() {
         // for Hibernate
@@ -111,5 +113,13 @@ public class CardActionClient{
 
     public void setOldcardstate(Integer oldcardstate) {
         this.oldcardstate = oldcardstate;
+    }
+
+    public String getIdOldCards() {
+        return idOldCards;
+    }
+
+    public void setIdOldCards(String idOldCards) {
+        this.idOldCards = idOldCards;
     }
 }
