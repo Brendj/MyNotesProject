@@ -254,7 +254,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                             persistenceSession = runtimeContext.createPersistenceSession();
                             persistenceTransaction = persistenceSession.beginTransaction();
                             reportJob = builder
-                                    .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar, isROSection);
+                                    .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar,
+                                            isROSection, true);
                             //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                             persistenceTransaction.commit();
                             persistenceTransaction = null;

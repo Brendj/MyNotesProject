@@ -663,6 +663,7 @@ public class GoodRequestsNewReportService {
         Long price = null;
         ComplexInfoItem complexInfoItem;
         String goodsCode = "";
+        String dishCode = "";
         WtComplex wtComplex = null;
         WtDish wtDish = null;
 
@@ -706,12 +707,14 @@ public class GoodRequestsNewReportService {
                 wtDish = DAOService.getInstance().getWtDishById(dishId);
                 name = wtDish.getDishName();
                 price = wtDish.getPrice() == null ? 0L : wtDish.getPrice().multiply(new BigDecimal(100)).longValue();
+                dishCode = wtDish.getCode();
             }
             if (complexOrgDictionary.containsKey(position.getOrgOwner())) {
                 complexInfoItem = complexOrgDictionary.get(position.getOrgOwner());
                 if (complexInfoItem.preorderInfo.containsKey(position.getGlobalId())) {
                     GoodInfo info = complexInfoItem.preorderInfo.get(position.getGlobalId());
                     feedingPlanType = info.feedingPlanType;
+                    goodsCode = dishCode;
                 } else if (complexId != null && complexInfoItem.goodInfos.containsKey(complexId.longValue())) {
                     GoodInfo info = complexInfoItem.goodInfos.get(complexId.longValue());
                     feedingPlanType = info.feedingPlanType;

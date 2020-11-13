@@ -87,7 +87,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             parameterMap.put("endDate", endTime);
 
             calendar.setTime(startTime);
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, true);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, true, false);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -95,7 +95,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
         }
 
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
-                boolean isROSection) throws Exception {
+                boolean isROSection, boolean isNotificationReport) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
@@ -103,7 +103,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             parameterMap.put("endDate", endTime);
 
             calendar.setTime(startTime);
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, isROSection);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, isROSection, isNotificationReport);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -111,7 +111,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Map<String,
-                Object> parameterMap, boolean isROSection) throws Exception{
+                Object> parameterMap, boolean isROSection, boolean isNotificationReport) throws Exception{
             boolean hideMissedColumns = Boolean.parseBoolean(reportProperties.getProperty(P_HIDE_MISSED_COLUMNS, "false"));
             boolean hideGeneratePeriod = Boolean.parseBoolean(reportProperties.getProperty(P_HIDE_GENERATE_PERIOD, "false"));
             String nameFilter = StringUtils.trim(reportProperties.getProperty(P_NAME_FILTER, ""));
@@ -194,10 +194,19 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             GoodRequestsNewReportService service;
             service = new GoodRequestsNewReportService(session,OVERALL, OVERALL_TITLE, hideTotalRow);
 
-            return new JRBeanCollectionDataSource(service.buildTotalReportItems(startTime, endTime, nameFilter, orgFilter,
-                    hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
-                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly,
-                    needFullGoodNames, isROSection));
+            if (isNotificationReport) {
+                return new JRBeanCollectionDataSource(
+                        service.buildReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue,
+                                generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
+                                hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders,
+                                preordersOnly, needFullGoodNames, isROSection));
+            } else {
+                return new JRBeanCollectionDataSource(
+                        service.buildTotalReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue,
+                                generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
+                                hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders,
+                                preordersOnly, needFullGoodNames, isROSection));
+            }
         }
     }
 
