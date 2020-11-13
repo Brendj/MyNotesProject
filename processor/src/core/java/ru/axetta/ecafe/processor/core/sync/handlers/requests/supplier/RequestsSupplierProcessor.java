@@ -204,7 +204,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                 .getInstance();
         for (Long orgOwner : mapPositions.keySet()) {
             List<String> guids = mapPositions.get(orgOwner);
-            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids, false);
+            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids, true);
         }
     }
 

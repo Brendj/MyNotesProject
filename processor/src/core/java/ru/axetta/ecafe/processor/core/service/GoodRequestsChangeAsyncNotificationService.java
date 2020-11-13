@@ -81,7 +81,7 @@ public class GoodRequestsChangeAsyncNotificationService {
 
     @Async
     public void notifyOrg(final Long idOfOrg, final Date beginGenerateTime, final Date endGenerateTime,
-            final Date lastCreateOrUpdateDate, List<String> guids, boolean isROSection) {
+            final Date lastCreateOrUpdateDate, List<String> guids, boolean isWtMenu) {
         if (!enableNotify) {
             return;
         }
@@ -255,7 +255,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                             persistenceTransaction = persistenceSession.beginTransaction();
                             reportJob = builder
                                     .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar,
-                                            isROSection, true);
+                                            isWtMenu, true);
                             //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                             persistenceTransaction.commit();
                             persistenceTransaction = null;
