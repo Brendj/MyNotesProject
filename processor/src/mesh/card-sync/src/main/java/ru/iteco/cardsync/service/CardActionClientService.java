@@ -53,7 +53,8 @@ public class CardActionClientService {
             for (Card card : cardsActive) {
                 actionCards = actionCards + card.getIdOfCard() + ",";
             }
-            actionCards = actionCards.substring(0, actionCards.length()-1);
+            if (actionCards.length() > 1)
+                actionCards = actionCards.substring(0, actionCards.length()-1);
             cardActionClientnew.setIdOldCards(actionCards);
         }
         cardActionClientRepository.save(cardActionClientnew);
