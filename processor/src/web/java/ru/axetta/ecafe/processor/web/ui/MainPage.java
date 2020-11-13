@@ -9245,6 +9245,12 @@ public class MainPage implements Serializable {
         return currentUser;
     }
 
+    public String getSourceWebAddress() throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        return request.getRemoteAddr();
+    }
+
     public static MainPage getSessionInstance() {
         FacesContext context = FacesContext.getCurrentInstance();
         return (MainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);

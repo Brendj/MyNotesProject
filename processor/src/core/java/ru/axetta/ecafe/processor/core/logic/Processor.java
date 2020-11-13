@@ -501,8 +501,13 @@ public class Processor implements SyncProcessor {
                 final List<ClientGuardianItem> clientGuardianResponseElement = clientGuardianRequest
                         .getClientGuardianResponseElement();
                 if (clientGuardianResponseElement != null) {
+                    ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                    clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+                    clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+                    clientGuardianHistory.setOrg(request.getOrg());
+                    clientGuardianHistory.setReason("Полная синхронизация");
                     resultClientGuardian = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),
-                            syncHistory);
+                            syncHistory, clientGuardianHistory);
                 }
                 final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
                 if (responseClientGuardian != null) {
@@ -2126,8 +2131,13 @@ public class Processor implements SyncProcessor {
                 final List<ClientGuardianItem> clientGuardianResponseElement = clientGuardianRequest
                         .getClientGuardianResponseElement();
                 if (clientGuardianResponseElement != null) {
+                    ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                    clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+                    clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+                    clientGuardianHistory.setOrg(request.getOrg());
+                    clientGuardianHistory.setReason("Синхронизация по секциям");
                     ResultClientGuardian resultClientGuardian = processClientGuardian(clientGuardianResponseElement,
-                            request.getIdOfOrg(), syncHistory);
+                            request.getIdOfOrg(), syncHistory, clientGuardianHistory);
                     addToResponseSections(resultClientGuardian, responseSections);
                 }
                 final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
@@ -4198,7 +4208,7 @@ public class Processor implements SyncProcessor {
     }
 
     private ResultClientGuardian processClientGuardian(List<ClientGuardianItem> items, Long idOfOrg,
-            SyncHistory syncHistory) {
+            SyncHistory syncHistory, ClientGuardianHistory clientGuardianHistory) {
         ResultClientGuardian resultClientGuardian = new ResultClientGuardian();
         Long resultClientGuardianVersion = 0L;
         if (items.size() > 0) {
@@ -4245,6 +4255,13 @@ public class Processor implements SyncProcessor {
                         }
                         clientGuardian.setLastUpdate(new Date());
                         persistenceSession.save(clientGuardian);
+                        //
+                        clientGuardianHistory.setClientGuardian(clientGuardian);
+                        clientGuardianHistory.setChangeDate(new Date());
+                        clientGuardianHistory.setAction("Создание новой связки");
+                        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+                        persistenceSession.persist(clientGuardianHistory);
+                        //
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
                         if (dbClientGuardian.getDeletedState() && !item.isDeleted()) {

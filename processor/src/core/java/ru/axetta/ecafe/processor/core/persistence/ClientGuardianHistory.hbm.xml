@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory" table="cf_client_guardian_history">
+        <id name="guardHistory" column="ifofclientguardianhistory" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="clientGuardian" class="ru.axetta.ecafe.processor.core.persistence.ClientGuardian"
+                     column="idofclientguardian" update="false" />
+        <property name="changeDate" column="changedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="action" column="action" type="string"/>
+        <property name="webAdress" column="webAdress" type="string"/>
+        <property name="createdFrom" column="createdFrom">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType</param>
+            </type>
+        </property>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org"
+                     column="idOrgChanger" update="false" />
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User"
+                     column="idofuser" update="false" />
+        <property name="idOfPacket" column="idOfPacket" type="long"/>
+        <property name="changeParam" column="changeParam" type="string"/>
+        <property name="oldValue" column="oldValue" type="string"/>
+        <property name="newValue" column="newValue" type="string"/>
+        <property name="reason" column="reason" type="string"/>
+    </class>
+</hibernate-mapping>

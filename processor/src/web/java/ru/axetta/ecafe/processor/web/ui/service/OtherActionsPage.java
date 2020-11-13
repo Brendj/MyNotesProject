@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -299,7 +300,11 @@ public class OtherActionsPage extends OnlineReportPage {
             int count = 0;
             try {
                 orgs = getOrgsForGenGuardians();
-                count = ClientService.getInstance().generateGuardians(orgs);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+                clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                clientGuardianHistory.setReason("Нажата кнопка \"Генерировать представителей\" в Сервис/Другое");
+                count = ClientService.getInstance().generateGuardians(orgs, clientGuardianHistory);
             } catch (Exception e) {
                 printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
                 return;

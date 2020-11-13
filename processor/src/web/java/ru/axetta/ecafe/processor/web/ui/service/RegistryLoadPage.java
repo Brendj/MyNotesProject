@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -624,6 +625,17 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(guardianItem.getRelationType());
         persistenceSession.persist(clientGuardian);
+        //
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason("Нажата кнопка \"Обработать параметры клиентов\" в Сервис/Обработать параметры клиентов из файлов");
+        clientGuardianHistory.setClientGuardian(clientGuardian);
+        clientGuardianHistory.setChangeDate(new Date());
+        clientGuardianHistory.setAction("Создание новой связки");
+        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+        persistenceSession.persist(clientGuardianHistory);
+        //
         return guardian.getIdOfClient();
     }
 

@@ -977,7 +977,7 @@ public class ClientManager {
     }
 
     public static void applyClientGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
-            Long idOfOrg, Long idOfClientChild, Iterator<Long> iterator) throws Exception {
+            Long idOfOrg, Long idOfClientChild, Iterator<Long> iterator, ClientGuardianHistory clientGuardianHistory) throws Exception {
         try {
             Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
 
@@ -1030,25 +1030,32 @@ public class ClientManager {
                                 clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(registryChangeGuardians.getIntegerRepresentative()));
                                 clientGuardian.setLastUpdate(new Date());
                                 persistenceSession.persist(clientGuardian);
+                                //
+                                clientGuardianHistory.setClientGuardian(clientGuardian);
+                                clientGuardianHistory.setChangeDate(new Date());
+                                clientGuardianHistory.setAction("Создание новой связки");
+                                clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+                                persistenceSession.persist(clientGuardianHistory);
+                                //
                                 persistenceSession.flush();
 
                                 setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
 
                             } else {
                                 applyGuardians(registryChangeGuardians, persistenceSession,
-                                        organization, idOfClientChild, iterator);
+                                        organization, idOfClientChild, iterator, clientGuardianHistory);
                             }
                         } else {
                             applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                                    idOfClientChild, iterator);
+                                    idOfClientChild, iterator, clientGuardianHistory);
                         }
                     } else {
                         applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                                idOfClientChild, iterator);
+                                idOfClientChild, iterator, clientGuardianHistory);
                     }
                 } else {
                     applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                            idOfClientChild, iterator);
+                            idOfClientChild, iterator, clientGuardianHistory);
                 }
             }
         } catch (Exception e) {
@@ -1121,7 +1128,8 @@ public class ClientManager {
     }
 
     public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative) {
+            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative,
+            ClientGuardianHistory clientGuardianHistory) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1151,11 +1159,18 @@ public class ClientManager {
         }
         clientGuardian.setLastUpdate(new Date());
         session.persist(clientGuardian);
+        //
+        clientGuardianHistory.setClientGuardian(clientGuardian);
+        clientGuardianHistory.setChangeDate(new Date());
+        clientGuardianHistory.setAction("Создание новой связки");
+        clientGuardianHistory.setCreatedFrom(createdFrom);
+        session.persist(clientGuardianHistory);
+        //
         return clientGuardian;
     }
 
     public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
-            Org organization, Long idOfClientChild, Iterator<Long> iterator) throws Exception{
+            Org organization, Long idOfClientChild, Iterator<Long> iterator, ClientGuardianHistory clientGuardianHistory) throws Exception{
         String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
@@ -1165,7 +1180,8 @@ public class ClientManager {
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getIntegerRepresentative());
+                true, idOfClientChild, ClientCreatedFromType.REGISTRY,
+                registryChangeGuardians.getIntegerRepresentative(), clientGuardianHistory);
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
@@ -1861,19 +1877,21 @@ public class ClientManager {
     }
 
     /* Добавить список опекунов клиента */
-    public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
+    public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians,
+            ClientGuardianHistory clientGuardianHistory) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
+                    clientGuardianHistory);
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
             ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
-            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType) {
+            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType, ClientGuardianHistory clientGuardianHistory) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1889,6 +1907,13 @@ public class ClientManager {
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
+            //
+            clientGuardianHistory.setClientGuardian(clientGuardian);
+            clientGuardianHistory.setChangeDate(new Date());
+            clientGuardianHistory.setAction("Создание новой связки");
+            clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+            session.persist(clientGuardianHistory);
+            //
             Client guardian = (Client)session.get(Client.class, idOfGuardian);
             try {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -2013,12 +2038,14 @@ public class ClientManager {
         }
     }
 
-    public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards) {
+    public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards,
+            ClientGuardianHistory clientGuardianHistory) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
+                    clientGuardianHistory);
         }
     }
 

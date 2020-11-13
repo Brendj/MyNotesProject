@@ -8645,9 +8645,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (relation != null) {
                     description = ClientGuardianRelationType.fromInteger(relation.intValue()).getDescription();
                 }
+                //
+                MessageContext mc = context.getMessageContext();
+                HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setOrg(org);
+                clientGuardianHistory.setReason("Веб метод addGuardian");
+                clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+                //
                 clientGuardian = ClientManager
                         .createClientGuardianInfoTransactionFree(session, guardian, description, false,
-                                client.getIdOfClient(), ClientCreatedFromType.MPGU, roleRepresentative);
+                                client.getIdOfClient(), ClientCreatedFromType.MPGU, roleRepresentative, clientGuardianHistory);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);

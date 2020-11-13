@@ -159,7 +159,7 @@ public class ClientDao extends WritableJpaDao {
         return (String) criteria.uniqueResult();
     }
 
-    public int runGenerateGuardians(List idOfOrgs) throws Exception {
+    public int runGenerateGuardians(List idOfOrgs, ClientGuardianHistory clientGuardianHistory) throws Exception {
         logger.info("Start generate guardians");
         List<ClientContactInfo> clientsGenerate = new ArrayList<ClientContactInfo>();
         int result = 0;
@@ -248,7 +248,7 @@ public class ClientDao extends WritableJpaDao {
         } finally {
             HibernateUtils.close(session, logger);
         }
-        createParentAndGuardianship(clientsGenerate);
+        createParentAndGuardianship(clientsGenerate, clientGuardianHistory);
         logger.info("End generate guardians");
         return result;
     }
@@ -271,7 +271,8 @@ public class ClientDao extends WritableJpaDao {
         return map;
     }
 
-    private void createParentAndGuardianship(List<ClientContactInfo> clientInfos) throws Exception {
+    private void createParentAndGuardianship(List<ClientContactInfo> clientInfos,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -325,7 +326,8 @@ public class ClientDao extends WritableJpaDao {
                         //Создаем опекунскую связь
                         Long version = generateNewClientGuardianVersion(session);
                         ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(),
-                                version, false, null, null, ClientCreatedFromType.DEFAULT, null);
+                                version, false, null, null, ClientCreatedFromType.DEFAULT, null,
+                                clientGuardianHistory);
                         session.flush();
 
                         //Устанавливаем правила оповещения для опекуна

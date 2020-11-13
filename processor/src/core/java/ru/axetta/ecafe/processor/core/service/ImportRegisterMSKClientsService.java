@@ -1543,7 +1543,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         }
     }
 
-    private static void saveClientGuardians(RegistryChange registryChange, Iterator<Long> iterator) throws Exception {
+    private static void saveClientGuardians(RegistryChange registryChange, Iterator<Long> iterator,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
 
             Set<RegistryChangeGuardians> registryChangeGuardiansSet = registryChange.getRegistryChangeGuardiansSet();
 
@@ -1557,7 +1558,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     transaction = session.beginTransaction();
                     Long clientId = registryChange.getIdOfClient();
                     Long idOfOrg = registryChange.getIdOfOrg();
-                    ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId, iterator);
+                    ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId, iterator,
+                            clientGuardianHistory);
                     transaction.commit();
                     transaction = null;
                 } finally {

@@ -30,6 +30,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -2362,10 +2363,18 @@ public class FrontController extends HttpServlet {
             Long idOfClient = ClientManager.registerClient(orgId, fc, false, true);
 
             Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
+            //
+            MessageContext mc = wsContext.getMessageContext();
+            HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setOrg(org);
+            clientGuardianHistory.setReason("Веб метод registerGuardian");
+            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
 
+            //
             ClientGuardian clientGuardian = ClientManager
                     .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
-                            clientId, ClientCreatedFromType.ARM, null);
+                            clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
             clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
             persistenceSession.merge(clientGuardian);
@@ -2485,9 +2494,17 @@ public class FrontController extends HttpServlet {
 
             ClientGuardian existingRef = DAOUtils.findClientGuardian(persistenceSession, clientId, guardianId);
             if (existingRef == null) {
+                //
+                MessageContext mc = wsContext.getMessageContext();
+                HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setOrg(org);
+                clientGuardianHistory.setReason("Веб метод registerGuardianMigrantRequest");
+                clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+                //
                 ClientGuardian clientGuardian = ClientManager
                         .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
-                                clientId, ClientCreatedFromType.ARM, null);
+                                clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
                 clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
                 persistenceSession.merge(clientGuardian);

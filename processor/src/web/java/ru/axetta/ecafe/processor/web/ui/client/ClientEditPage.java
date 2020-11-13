@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -1063,14 +1064,25 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
-            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана связка на карточке клиента id = %s",
+                    idOfClient));
+            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems,
+                    clientGuardianHistory);
         }
         if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
         }
 
         if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана связка на карточке клиента id = %s",
+                    idOfClient));
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
         }
         if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
             removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
