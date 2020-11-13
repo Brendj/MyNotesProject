@@ -31,6 +31,9 @@ COMMENT ON COLUMN public.cf_cr_cardactionrequests.previdcardrequest IS 'Иден
 drop table cf_GuardSan;
 ALTER TABLE cf_clients DROP COLUMN guardsan;
 
+--777
+ALTER TABLE cf_cr_cardactionclient ADD idoldcards varchar NULL;
+
 --551
 ALTER TABLE cf_complex_schedules ALTER COLUMN groupsids TYPE varchar USING cast(groupsids as varchar);
 
