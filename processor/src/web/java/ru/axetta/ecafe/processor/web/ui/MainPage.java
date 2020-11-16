@@ -373,6 +373,9 @@ public class MainPage implements Serializable {
     // Rule manipulation
     private final BasicWorkspacePage ruleGroupPage = new BasicWorkspacePage();
 
+    // Code MSP
+    private final BasicWorkspacePage codeMSPGroupPage = new BasicWorkspacePage();
+
     // Event notification manipulation
     private final BasicWorkspacePage eventNotificationGroupPage = new BasicWorkspacePage();
     private final EventNotificationListPage eventNotificationListPage = new EventNotificationListPage();
@@ -9184,6 +9187,10 @@ public class MainPage implements Serializable {
      */
     public BasicWorkspacePage getRuleGroupPage() {
         return ruleGroupPage;
+    }
+
+    public BasicWorkspacePage getCodeMSPGroupPage(){
+        return codeMSPGroupPage;
     }
 
     public Object showRuleGroupPage() {

@@ -5361,4 +5361,9 @@ public class DAOUtils {
 
         return (SmartWatchVendor) criteria.uniqueResult();
     }
+
+    public static List<CodeMSP> getAllCodeMSP(Session session) {
+        Criteria criteria = session.createCriteria(CodeMSP.class);
+        return criteria.list();
+    }
 }
