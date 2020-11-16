@@ -241,6 +241,14 @@ public class ClientGuardian {
     }
 
     public void setCardRequest(CardRequest cardRequest) {
+        if (clientGuardianHistory != null) {
+            if (this.cardRequest == null || cardRequest == null || !cardRequest.equals(this.cardRequest)) {
+                createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.CARD_REQUEST.nativedescription,
+                        ClientGuardionHistoryAction.CARD_REQUEST.description, this.cardRequest == null ? null :
+                                this.cardRequest.getIdOfCardRequest().toString(),
+                        cardRequest == null ? null : cardRequest.getIdOfCardRequest().toString());
+            }
+        }
         this.cardRequest = cardRequest;
     }
 
@@ -249,6 +257,14 @@ public class ClientGuardian {
     }
 
     public void setRepresentType(ClientGuardianRepresentType representType) {
+        if (clientGuardianHistory != null) {
+            if (this.representType == null || representType == null || !representType.equals(this.representType)) {
+                createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.REPRESENT_TYPE.nativedescription,
+                        ClientGuardionHistoryAction.REPRESENT_TYPE.description, this.representType == null ? null :
+                                this.representType.getDescription(),
+                        representType == null ? null : representType.getDescription());
+            }
+        }
         this.representType = representType;
     }
 
@@ -283,7 +299,8 @@ public class ClientGuardian {
         DELETED(2, "deletedState", "Изменение флага \"Статус удаления записи\""),
         REPRESENT_TYPE(3, "representType", "Изменение флага \"Законный представитель\""),
         RELATION(4, "relation", "Изменение типа родственной связи"),
-        DELETED_DATE(5, "deleteDate", "Изменение Даты удаления");
+        DELETED_DATE(5, "deleteDate", "Изменение Даты удаления"),
+        CARD_REQUEST(6, "idofcardrequest", "Изменение Заявления на выдачу карты");
 
         private final int code;
         private final String description;
