@@ -645,8 +645,8 @@ public class PreorderDAOService {
         return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(wtDish);
     }
 
-    public String getWtMenuGroupByWtDish(WtDish wtDish) {
-        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getWtMenuGroupByWtDish(wtDish);
+    public String getWtMenuGroupByWtDish(Long idOfOrg, WtDish wtDish) {
+        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getWtMenuGroupByWtDish(idOfOrg, wtDish);
     }
 
     public String getMenuGroupByWtDishAndCategories(WtDish wtDish) {

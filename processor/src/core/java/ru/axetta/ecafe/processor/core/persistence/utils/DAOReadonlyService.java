@@ -1084,14 +1084,18 @@ public class DAOReadonlyService {
         }
     }
 
-    public String getWtMenuGroupByWtDish(WtDish wtDish) {
+    public String getWtMenuGroupByWtDish(Long idOfOrg, WtDish wtDish) {
         Query query = entityManager.createNativeQuery("SELECT mg.name FROM cf_wt_menu_groups mg "
                 + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE d.idofdish = :idOfDish and mgr.deletestate = 0 ");
+                + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
+                + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
+                + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
+                + "and d.idofdish = :idOfDish and mgr.deletestate = 0 ");
         query.setParameter("idOfDish", wtDish.getIdOfDish());
+        query.setParameter("idOfOrg", idOfOrg);
         Object result = query.getSingleResult();
         return result != null ? result.toString() : "";
     }

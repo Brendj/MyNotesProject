@@ -2815,7 +2815,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
                 for (WtDish wtDish : wtDishSet) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
+                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDish, false);
                     menuDateItemExt.getE().add(menuItemExt);
                 }
             }
@@ -3108,7 +3108,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 // комплекс не выводим
                                 continue;
                             }
-                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
+                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, org.getIdOfOrg(), wtDishes);
                             // Проверка типа питания
                             int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()
                                     .intValue();
@@ -3605,7 +3605,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishes != null && wtDishes.size() > 0) {
                 menuDateItemExt.setDate(toXmlDateTime(startDate));
                 for (WtDish wtDish : wtDishes) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
+                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(), wtDish, false);
                     // Добавляем блокировки
                     if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
                         menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
@@ -6889,24 +6889,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, List<WtDish> wtDishes) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfOrg, List<WtDish> wtDishes) {
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, true);
+                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDish, true);
                 menuItemExtList.add(menuItemExt);
             }
         }
         return menuItemExtList;
     }
 
-    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish, boolean isGroupByCategory) {
+    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDish wtDish, boolean isGroupByCategory) {
         MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
         String menuGroup = "";
         if (isGroupByCategory) {
             menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
         } else {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(wtDish);
+            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(idOfOrg, wtDish);
         }
         menuItemExt.setGroup(menuGroup);
         menuItemExt.setName(wtDish.getDishName());
