@@ -285,8 +285,9 @@ public class ClientGuardian {
             clientGuardianHistoryChanged.setNewValue(newValue);
             session.persist(clientGuardianHistoryChanged);
             transaction.commit();
+            transaction = null;
         } catch (Exception e) {
-            logger.error("Can't get all Vendors:", e);
+            logger.error("Can't get save ClientGuardianHistory:", e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -300,7 +301,7 @@ public class ClientGuardian {
         REPRESENT_TYPE(3, "representType", "Изменение флага \"Законный представитель\""),
         RELATION(4, "relation", "Изменение типа родственной связи"),
         DELETED_DATE(5, "deleteDate", "Изменение Даты удаления"),
-        CARD_REQUEST(6, "idofcardrequest", "Изменение Заявления на выдачу карты");
+        CARD_REQUEST(6, "idofcardrequest", "Изменение идентификатора Заявления на выдачу карты");
 
         private final int code;
         private final String description;

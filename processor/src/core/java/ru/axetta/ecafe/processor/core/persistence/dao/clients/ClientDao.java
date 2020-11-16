@@ -278,9 +278,6 @@ public class ClientDao extends WritableJpaDao {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             session.setFlushMode(FlushMode.MANUAL);
-
-
-
             Map<Long, List<ClientContactInfo>> clientContactInfoMap = getClientContactInfoMap(clientInfos);
             for (Map.Entry<Long, List<ClientContactInfo>> entry : clientContactInfoMap.entrySet()) {
                 Long idOfOrg = entry.getKey();

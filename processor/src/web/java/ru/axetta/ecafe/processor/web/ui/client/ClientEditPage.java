@@ -1067,7 +1067,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Создана связка на карточке клиента id = %s как опекун",
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
                     idOfClient));
             addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems,
                     clientGuardianHistory);
@@ -1085,7 +1085,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Создана связка на карточке клиента id = %s как опекаемый",
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
                     idOfClient));
             addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
         }
