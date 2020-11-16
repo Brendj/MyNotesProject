@@ -39,7 +39,6 @@ import java.util.*;
 public class ClientManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
-
     public enum FieldId {
         CONTRACT_ID, PASSWORD,
         CONTRACT_DATE,
@@ -1031,11 +1030,13 @@ public class ClientManager {
                                 clientGuardian.setLastUpdate(new Date());
                                 persistenceSession.persist(clientGuardian);
                                 //
-                                clientGuardianHistory.setClientGuardian(clientGuardian);
-                                clientGuardianHistory.setChangeDate(new Date());
-                                clientGuardianHistory.setAction("Создание новой связки");
-                                clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
-                                persistenceSession.persist(clientGuardianHistory);
+                                ClientGuardianHistory clientGuardianHistoryChanged =
+                                        clientGuardianHistory.getCopyClientGuardionHistory(clientGuardianHistory);
+                                clientGuardianHistoryChanged.setClientGuardian(clientGuardian);
+                                clientGuardianHistoryChanged.setChangeDate(new Date());
+                                clientGuardianHistoryChanged.setAction("Создание новой связки");
+                                clientGuardianHistoryChanged.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+                                persistenceSession.persist(clientGuardianHistoryChanged);
                                 //
                                 persistenceSession.flush();
 
@@ -1160,11 +1161,13 @@ public class ClientManager {
         clientGuardian.setLastUpdate(new Date());
         session.persist(clientGuardian);
         //
-        clientGuardianHistory.setClientGuardian(clientGuardian);
-        clientGuardianHistory.setChangeDate(new Date());
-        clientGuardianHistory.setAction("Создание новой связки");
-        clientGuardianHistory.setCreatedFrom(createdFrom);
-        session.persist(clientGuardianHistory);
+        ClientGuardianHistory clientGuardianHistoryChanged =
+                clientGuardianHistory.getCopyClientGuardionHistory(clientGuardianHistory);
+        clientGuardianHistoryChanged.setClientGuardian(clientGuardian);
+        clientGuardianHistoryChanged.setChangeDate(new Date());
+        clientGuardianHistoryChanged.setAction("Создание новой связки");
+        clientGuardianHistoryChanged.setCreatedFrom(createdFrom);
+        session.persist(clientGuardianHistoryChanged);
         //
         return clientGuardian;
     }
@@ -1849,28 +1852,32 @@ public class ClientManager {
     }
 
     /* Удалить список опекунов клиента */
-    public static void removeGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
+    public static void removeGuardiansByClient(Session session, Long idOfClient,
+            List<ClientGuardianItem> clientGuardians, ClientGuardianHistory clientGuardianHistory) {
         Long version = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item: clientGuardians){
-            removeGuardianByClient(session, idOfClient, item.getIdOfClient(), version);
+            removeGuardianByClient(session, idOfClient, item.getIdOfClient(), version, clientGuardianHistory);
         }
     }
 
     /* Удалить список опекаемых клиента */
-    public static void removeWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards) {
+    public static void removeWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards,
+            ClientGuardianHistory clientGuardianHistory) {
         Long version = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item: clientWards){
-            removeGuardianByClient(session, item.getIdOfClient(), idOfClient, version);
+            removeGuardianByClient(session, item.getIdOfClient(), idOfClient, version, clientGuardianHistory);
         }
     }
 
     /* Удалить опекуна клиента */
-    public static void removeGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version) {
+    public static void removeGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version,
+            ClientGuardianHistory clientGuardianHistory) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         ClientGuardian clientGuardian = (ClientGuardian) criteria.uniqueResult();
         if(clientGuardian!=null) {
+            clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
             clientGuardian.delete(version);
             session.update(clientGuardian);
         }
@@ -1924,6 +1931,7 @@ public class ClientManager {
                 logger.error("Exception when try add Guardian By Client", e);
             }
         } else {
+            clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
             clientGuardian.setVersion(version);
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
@@ -1936,17 +1944,19 @@ public class ClientManager {
     }
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
-    public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
+    public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion,
+            ClientGuardianHistory clientGuardianHistory) {
         if (guardian != null) {
             Criteria cr = session.createCriteria(ClientGuardian.class);
             cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
             cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
             ClientGuardian cg = (ClientGuardian) cr.uniqueResult();
+            cg.initializateClientGuardianHistory(clientGuardianHistory);
+            clientGuardianHistory.setChangeDate(new Date());
             cg.setVersion(newVersion);
             cg.setLastUpdate(new Date());
             session.update(cg);
         }
-
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", client));
         if (guardian != null) criteria.add(Restrictions.eq("guardianInformedSpecialMenu", guardian));
@@ -1975,12 +1985,14 @@ public class ClientManager {
 
     /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
     public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile,
-            Boolean value, Long newVersion) throws Exception {
+            Boolean value, Long newVersion, ClientGuardianHistory clientGuardianHistory) throws Exception {
         if (guardian != null) {
             Criteria cr = session.createCriteria(ClientGuardian.class);
             cr.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
             cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
             ClientGuardian cg = (ClientGuardian) cr.uniqueResult();
+            cg.initializateClientGuardianHistory(clientGuardianHistory);
+            clientGuardianHistory.setChangeDate(new Date());
             cg.setVersion(newVersion);
             cg.setLastUpdate(new Date());
             session.update(cg);
@@ -2283,13 +2295,13 @@ public class ClientManager {
     }
 
     public static void createClientGroupMigrationHistoryLite(Session session, Client client, Org org, Long idOfClientGroup,
-            String clientGroupName, String comment) {
+            String clientGroupName, String comment, ClientGuardianHistory clientGuardianHistory) {
         createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
-                clientGroupName, comment, false);
+                clientGroupName, comment, false, clientGuardianHistory);
     }
 
     public static void createClientGroupMigrationHistoryFull(Session session, Client client, Org org, Long idOfClientGroup,
-            String clientGroupName, String comment, boolean full) {
+            String clientGroupName, String comment, boolean full, ClientGuardianHistory clientGuardianHistory) {
         ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
         if (client.getClientGroup() != null) {
             clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -2301,15 +2313,15 @@ public class ClientManager {
 
         session.save(clientGroupMigrationHistory);
         if (full) {
-            disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+            disableGuardianshipIfClientLeaving(session, client, idOfClientGroup, clientGuardianHistory);
             archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
         }
     }
 
     public static void createClientGroupMigrationHistory(Session session, Client client, Org org, Long idOfClientGroup,
-            String clientGroupName, String comment) {
+            String clientGroupName, String comment, ClientGuardianHistory clientGuardianHistory) {
         createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
-                clientGroupName, comment, true);
+                clientGroupName, comment, true, clientGuardianHistory);
     }
 
     public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
@@ -2334,7 +2346,8 @@ public class ClientManager {
         }
     }
 
-    private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+    private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup,
+            ClientGuardianHistory clientGuardianHistory) {
         if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
         try {
             List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), true);
@@ -2351,12 +2364,13 @@ public class ClientManager {
                 if (deactivateGuardianship) {
                     Long version = generateNewClientGuardianVersion(session);
                     ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+                    clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
                     clientGuardian.disable(version);
                     if (guardian.isParent() && !otherChildrenExist) {
                         ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(),
                                 ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(),
                                 ClientGroupMigrationHistory.MODIFY_AUTO_MODE
-                                        .concat(String.format(" (ид. опекаемого=%s)", client.getIdOfClient())));
+                                        .concat(String.format(" (ид. опекаемого=%s)", client.getIdOfClient())), clientGuardianHistory);
                         guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
                         long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                         guardian.setClientRegistryVersion(clientRegistryVersion);

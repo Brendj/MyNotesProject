@@ -169,11 +169,11 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
 
     @Override
     public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation,
-            String groupName) throws Exception {
+            String groupName, ClientGuardianHistory clientGuardianHistory) throws Exception {
         List<RegistryChangeCallback> result = new LinkedList<>();
         for (Long idOfRegistryChange : changesList) {
             try {
-                applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                applyRegistryChange(idOfRegistryChange, fullNameValidation, clientGuardianHistory);
                 result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
             } catch (Exception e1) {
                 logger.error("Error when apply RegistryChange: ", e1);
@@ -184,7 +184,8 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
         return result;
     }
 
-    public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
+    public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
 
@@ -324,7 +325,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                             if((change.getGroupName() == null && change.getGroupNameFrom() == null) ||
                                     (change.getGroupName() != null && change.getGroupNameFrom() != null &&
                                             !change.getGroupName().equals(change.getGroupNameFrom()))) {
-                                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change);
+                                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change, clientGuardianHistory);
                                 //если орг. не меняется, добавляем историю миграции внутри ОО
                             }
                         }
@@ -816,9 +817,11 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
     }
 
     //@Transactional
-    private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
+    private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change,
+            ClientGuardianHistory clientGuardianHistory){
         ClientManager.createClientGroupMigrationHistory(session, client, org, client.getIdOfClientGroup(),
-                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
+                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)",
+                        change.getIdOfOrg())), clientGuardianHistory);
     }
 
     @Transactional

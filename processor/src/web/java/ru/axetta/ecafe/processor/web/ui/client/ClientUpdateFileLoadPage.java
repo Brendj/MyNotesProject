@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -315,7 +316,11 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
                 dataSize = data.length;
                 inputStream = new ByteArrayInputStream(data);
             }
-            updateGroupChanges(inputStream, dataSize);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason("Выполнено обновление через вкладку Клиеты/Обновить из файла (Изменение группы)");
+            updateGroupChanges(inputStream, clientGuardianHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
             setErrorTextGroups("");
@@ -356,7 +361,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         throw new Exception("Не удается определить кодировку файла");
     }
 
-    private void updateGroupChanges(InputStream inputStream, long dataSize) throws Exception {
+    private void updateGroupChanges(InputStream inputStream, ClientGuardianHistory clientGuardianHistory) throws Exception {
         lineGroupsResults.clear();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "Windows-1251"));
         String currLine = getInWindows1251OrUTF8(reader.readLine());
@@ -372,7 +377,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
             Org orga = DAOService.getInstance().findOrgById(org.getIdOfOrg());
             while (null != currLine) {
-                LineResult result = updateClientGroup(session, currLine, lineNo, orga);
+                LineResult result = updateClientGroup(session, currLine, lineNo, orga, clientGuardianHistory);
                 if (result.getResultCode() == 0) {
                     ++successLineNumber;
                 }
@@ -383,7 +388,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
             this.successLineNumber = successLineNumber;
 
-            List<LineResult> lineResults2 = moveToLeaving(session, orga, lineResults);
+            List<LineResult> lineResults2 = moveToLeaving(session, orga, lineResults, clientGuardianHistory);
             lineResults.addAll(lineResults2);
             lineGroupsResults = lineResults;
 
@@ -399,7 +404,8 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
     }
 
-    private List<LineResult> moveToLeaving(Session session, Org org, List<LineResult> lineResults) throws Exception {
+    private List<LineResult> moveToLeaving(Session session, Org org, List<LineResult> lineResults,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
         List<Long> ids = new ArrayList<>();
         for (LineResult lineResult : lineResults) {
             if (lineResult.getInvolvedClients() == null) continue;
@@ -419,7 +425,8 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
             ClientManager.createClientGroupMigrationHistoryLite(session, client, client.getOrg(),
                     clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
+                            FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
             client.setClientGroup(clientGroup);
             client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
 
@@ -437,7 +444,8 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         return false;
     }
 
-    private LineResult updateClientGroup(Session session, String line, int lineNo, Org orga) throws Exception {
+    private LineResult updateClientGroup(Session session, String line, int lineNo, Org orga,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
         String[] tokens = line.split(";");
         if (tokens.length != 4 && tokens.length != 5) throw new Exception("Неправильная структура файла. Ошибка в строке " + lineNo);
         try {
@@ -466,7 +474,9 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
             ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
                     clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
+                            FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(),
+                    clientGuardianHistory);
             client.setClientGroup(clientGroup);
             client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             Long nextClientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
@@ -482,7 +492,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         //nothing to do here
     }
 
-    public void updateClients(InputStream inputStream, long dataSize) throws Exception {
+    public void updateClients(InputStream inputStream, long dataSize, ClientGuardianHistory clientGuardianHistory) throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         try{
@@ -508,7 +518,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
                     currLine = reader.readLine();
                     continue; //пропускаем заголовок
                 } else {
-                    LineResult result = updateClient(currLine, lineNo);
+                    LineResult result = updateClient(currLine, lineNo, clientGuardianHistory);
                     if (result.getResultCode() == 0) {
                         ++successLineNumber;
                     }
@@ -535,7 +545,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         fc.checkRequiredFields();
     }
 
-    private LineResult updateClient(String line, int lineNo) throws Exception {
+    private LineResult updateClient(String line, int lineNo, ClientGuardianHistory clientGuardianHistory) throws Exception {
         String[] tokens = line.split(";");
         if (tokens.length != 7) throw new Exception("Неправильная структура файла. Ошибка в строке " + lineNo);
         Session session = null;
@@ -565,7 +575,9 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
 
             ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
                     clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
+                            FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(),
+                    clientGuardianHistory);
             client.setClientGroup(clientGroup);
             client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             Long nextClientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);

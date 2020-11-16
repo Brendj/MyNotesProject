@@ -38,7 +38,11 @@ public class ESZMigrantsUpdateService {
         if (!isOn()) {
             return;
         }
-        updateMigrants();
+
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Срабатыване по расписанию");
+        clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
+        updateMigrants(clientGuardianHistory);
     }
 
     public static boolean isOn() {
@@ -53,7 +57,7 @@ public class ESZMigrantsUpdateService {
         return true;
     }
 
-    public void updateMigrants() throws Exception {
+    public void updateMigrants(ClientGuardianHistory clientGuardianHistory) throws Exception {
         Long idOfESZOrg = PropertyUtils.getIdOfESZOrg();
 
         Date currentDate = new Date();
@@ -104,7 +108,7 @@ public class ESZMigrantsUpdateService {
                     fieldConfig.setValue(ClientManager.FieldId.GROUP,
                             ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
-                    addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                    addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING.getValue(), clientGuardianHistory);
                 }
             }
 
@@ -159,7 +163,8 @@ public class ESZMigrantsUpdateService {
         }
     }
 
-    public static void addGroupHistory(Session session, Client client, Long idOfClientGroup)
+    public static void addGroupHistory(Session session, Client client, Long idOfClientGroup,
+            ClientGuardianHistory clientGuardianHistory)
             throws Exception {
         ClientGroup clientGroup = DAOUtils.findClientGroup(session,
                 new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), idOfClientGroup));
@@ -170,7 +175,7 @@ public class ESZMigrantsUpdateService {
         }
         ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
                 clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                ClientGroupMigrationHistory.MODIFY_IN_ISPP);
+                ClientGroupMigrationHistory.MODIFY_IN_ISPP, clientGuardianHistory);
     }
 
     public void scheduleSync() throws Exception {

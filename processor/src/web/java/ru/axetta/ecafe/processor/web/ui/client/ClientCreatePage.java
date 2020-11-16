@@ -566,7 +566,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     }
 
 
-    public Client createClient(Session persistenceSession) throws Exception {
+    public Client createClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory) throws Exception {
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
         if(this.org.getIdOfOrg() == null) {
             throw new IllegalArgumentException();
@@ -589,7 +589,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS, this.notifyViaPUSH,
                 this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
                 clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
-
         client.setAddress(this.address);
         client.setPhone(this.phone);
         client.setMobile(this.mobile);
@@ -650,7 +649,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if(client.getClientGroup() != null) {
             ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, client.getIdOfClientGroup(),
                     ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
-                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
+                            FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
 
         clean();

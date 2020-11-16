@@ -323,9 +323,15 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass auth", e);
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
         }
-
+        //
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод proceedRegitryChangeItem (front)");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        //
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientGuardianHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
@@ -341,8 +347,15 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass ip check", fce);
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
         }
+        //
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод proceedRegitryChangeItemInternal (front)");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        //
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientGuardianHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeEmployeeItem")
@@ -358,8 +371,15 @@ public class FrontController extends HttpServlet {
         } catch (FrontControllerException fce) {
             logger.error("Failed to pass ip check", fce);
         }
+        //
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод proceedRegitryChangeEmployeeItem (front)");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        //
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
+                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName, clientGuardianHistory);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
@@ -2368,7 +2388,7 @@ public class FrontController extends HttpServlet {
             HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setOrg(org);
-            clientGuardianHistory.setReason("Веб метод registerGuardian");
+            clientGuardianHistory.setReason("Веб метод registerGuardian (front)");
             clientGuardianHistory.setWebAdress(req.getRemoteAddr());
 
             //
@@ -2499,7 +2519,7 @@ public class FrontController extends HttpServlet {
                 HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
                 ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setOrg(org);
-                clientGuardianHistory.setReason("Веб метод registerGuardianMigrantRequest");
+                clientGuardianHistory.setReason("Веб метод registerGuardianMigrantRequest (front)");
                 clientGuardianHistory.setWebAdress(req.getRemoteAddr());
                 //
                 ClientGuardian clientGuardian = ClientManager

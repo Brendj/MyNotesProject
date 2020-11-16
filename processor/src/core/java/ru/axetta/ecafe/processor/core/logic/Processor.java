@@ -482,8 +482,13 @@ public class Processor implements SyncProcessor {
         // Process ClientParamRegistry
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+            clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+            clientGuardianHistory.setOrg(request.getOrg());
+            clientGuardianHistory.setReason("Полная синхронизация");
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion);
+                    errorClientIds, clientsWithWrongVersion, clientGuardianHistory);
         } catch (Exception e) {
             String message = String
                     .format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -2088,8 +2093,13 @@ public class Processor implements SyncProcessor {
         try {
             SyncRequest.ClientParamRegistry clientParamRegistry = request.getClientParamRegistry();
             if (clientParamRegistry != null) {
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+                clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+                clientGuardianHistory.setOrg(request.getOrg());
+                clientGuardianHistory.setReason("Синхронизация по секциям");
                 processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds,
-                        clientsWithWrongVersion);
+                        clientsWithWrongVersion, clientGuardianHistory);
             }
         } catch (Exception e) {
             String message = String
@@ -3101,8 +3111,13 @@ public class Processor implements SyncProcessor {
         }
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+            clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+            clientGuardianHistory.setOrg(request.getOrg());
+            clientGuardianHistory.setReason("Синхронизации параметров клиента");
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion);
+                    errorClientIds, clientsWithWrongVersion, clientGuardianHistory);
         } catch (Exception e) {
             logger.error(String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -4264,6 +4279,7 @@ public class Processor implements SyncProcessor {
                         //
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
+                        dbClientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
                         if (dbClientGuardian.getDeletedState() && !item.isDeleted()) {
                             dbClientGuardian.restore(resultClientGuardianVersion, enableNotificationSpecial);
                         } else if (item.isDeleted()) {
@@ -4795,7 +4811,7 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
             SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds,
-            List<Long> clientsWithWrongVersion) throws Exception {
+            List<Long> clientsWithWrongVersion, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -4848,7 +4864,7 @@ public class Processor implements SyncProcessor {
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
                     processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg,
-                            allocatedClients, orgSet, clientsWithWrongVersion);
+                            allocatedClients, orgSet, clientsWithWrongVersion, clientGuardianHistory);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -4879,7 +4895,8 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg,
-            List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion) throws Exception {
+            List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -5029,10 +5046,11 @@ public class Processor implements SyncProcessor {
                     }
 
                     if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
+                        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
                         ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
                                 clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
                                 ClientGroupMigrationHistory.MODIFY_IN_ARM
-                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGuardianHistory);
                     }
                     client.setClientGroup(clientGroup);
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());

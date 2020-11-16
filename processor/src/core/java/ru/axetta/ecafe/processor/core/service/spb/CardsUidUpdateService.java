@@ -70,7 +70,7 @@ public class CardsUidUpdateService {
         }
     }
 
-    public void processClientDoubles(Long idOfOrg) throws Exception {
+    public void processClientDoubles(Long idOfOrg, ClientGuardianHistory clientGuardianHistory) throws Exception {
         logger.info("Start processClientDoubles");
         Session session = null;
         Transaction transaction = null;
@@ -106,7 +106,7 @@ public class CardsUidUpdateService {
                 }
                 ClientManager.createClientGroupMigrationHistory(session, fromClient, fromClient.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
                         ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), BALANCE_TRANSFER + " Пользователь: "
-                                + user.getUserName());
+                                + user.getUserName(), clientGuardianHistory);
                 fromClient.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
                 fromClient.setClientRegistryVersion(clientRegistryVersion);

@@ -1,10 +1,14 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,6 +18,8 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientGuardian {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClientGuardian.class);
 
     private Long idOfClientGuardian;
     private Long version;
@@ -29,8 +35,16 @@ public class ClientGuardian {
     private Date lastUpdate;
     private CardRequest cardRequest;
     private ClientGuardianRepresentType representType;
+    private ClientGuardianHistory clientGuardianHistory = null;
 
-    protected ClientGuardian() {}
+    public void initializateClientGuardianHistory(ClientGuardianHistory clientGuardianHistory)
+    {
+        this.clientGuardianHistory = clientGuardianHistory;
+        clientGuardianHistory.setClientGuardian(this);
+    }
+
+    protected ClientGuardian() {
+    }
 
     public ClientGuardian(Long idOfChildren, Long idOfGuardian) {
         this.idOfChildren = idOfChildren;
@@ -57,6 +71,13 @@ public class ClientGuardian {
     }
 
     public void setVersion(Long version) {
+         if (clientGuardianHistory != null) {
+             if (this.version == null || version == null || !version.equals(this.version)) {
+                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.VERSION.getNativedescription(),
+                         ClientGuardionHistoryAction.VERSION.getDescription(), this.version == null ? null : this.version.toString(),
+                         version == null ? null : version.toString());
+             }
+         }
         this.version = version;
     }
 
@@ -85,6 +106,7 @@ public class ClientGuardian {
     }
 
     public void disable(Long version) {
+        this.setDeletedState(true);
         this.setDisabled(true);
         this.setVersion(version);
         this.setLastUpdate(new Date());
@@ -104,10 +126,9 @@ public class ClientGuardian {
         this.setDeleteDate(null);
         this.setVersion(version);
         this.setLastUpdate(new Date());
-        if(enableSpecialNotification){
-            getNotificationSettings()
-                    .add(new ClientGuardianNotificationSetting(this,
-                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()));
+        if (enableSpecialNotification) {
+            getNotificationSettings().add(new ClientGuardianNotificationSetting(this,
+                    ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()));
         }
     }
 
@@ -120,6 +141,13 @@ public class ClientGuardian {
     }
 
     public void setDisabled(Boolean disabled) {
+        if (clientGuardianHistory != null) {
+            if (this.isDisabled() == null || !this.isDisabled()) {
+                createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.DISABLED.getNativedescription(),
+                        ClientGuardionHistoryAction.DISABLED.getDescription(),
+                        this.isDisabled() == null ? null : this.isDisabled().toString(), "true");
+            }
+        }
         if (disabled == null) {
             this.disabled = false;
         } else {
@@ -132,6 +160,13 @@ public class ClientGuardian {
     }
 
     public void setDeletedState(Boolean deletedState) {
+        if (clientGuardianHistory != null) {
+            if (this.getDeletedState() == null || this.getDeletedState()) {
+                createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.DELETED.getNativedescription(),
+                        ClientGuardionHistoryAction.DELETED.getDescription(),
+                        this.getDeletedState() == null ? null : this.getDeletedState().toString(), "false");
+            }
+        }
         this.deletedState = deletedState;
     }
 
@@ -140,6 +175,13 @@ public class ClientGuardian {
     }
 
     public void setDeleteDate(Date deleteDate) {
+        if (clientGuardianHistory != null) {
+            if (this.getDeleteDate() != null) {
+                createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.DELETED_DATE.getNativedescription(),
+                        ClientGuardionHistoryAction.DELETED_DATE.getDescription(),
+                        this.getDeleteDate() == null ? null : this.getDeleteDate().toString(), null);
+            }
+        }
         this.deleteDate = deleteDate;
     }
 
@@ -148,6 +190,13 @@ public class ClientGuardian {
     }
 
     public void setRelation(ClientGuardianRelationType relation) {
+        if (clientGuardianHistory != null) {
+            if (this.relation == null || relation == null || !relation.equals(this.relation)) {
+                createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.RELATION.nativedescription,
+                        ClientGuardionHistoryAction.RELATION.description, this.relation == null ? null : String.valueOf(this.relation.getCode()),
+                        relation == null ? null : String.valueOf(relation.getCode()));
+            }
+        }
         this.relation = relation;
     }
 
@@ -177,6 +226,13 @@ public class ClientGuardian {
     }
 
     public void setCreatedFrom(ClientCreatedFromType createdFrom) {
+        if (clientGuardianHistory != null) {
+            if (this.createdFrom == null || createdFrom == null || !createdFrom.equals(this.createdFrom)) {
+                createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.RELATION.nativedescription,
+                        ClientGuardionHistoryAction.RELATION.description, this.createdFrom == null ? null : String.valueOf(this.createdFrom.getValue()),
+                        createdFrom == null ? null : String.valueOf(createdFrom.getValue()));
+            }
+        }
         this.createdFrom = createdFrom;
     }
 
@@ -196,4 +252,78 @@ public class ClientGuardian {
         this.representType = representType;
     }
 
+    public void createNewClientGuardianHistory(ClientGuardianHistory clientGuardianHistory, String action,
+            String changeParam, String oldValue, String newValue) {
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            ClientGuardianHistory clientGuardianHistoryChanged = clientGuardianHistory
+                    .getCopyClientGuardionHistory(clientGuardianHistory);
+            clientGuardianHistoryChanged.setChangeDate(new Date());
+            clientGuardianHistoryChanged.setAction(action);
+            clientGuardianHistoryChanged.setChangeParam(changeParam);
+            clientGuardianHistoryChanged.setOldValue(oldValue);
+            clientGuardianHistoryChanged.setNewValue(newValue);
+            session.persist(clientGuardianHistoryChanged);
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Can't get all Vendors:", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public enum ClientGuardionHistoryAction {
+        VERSION(0,"version", "Изменение версии"),
+        DISABLED(1, "disabled", "Изменение флага \"показывать/не показывать\" опекуна внешним системам"),
+        DELETED(2, "deletedState", "Изменение флага \"Статус удаления записи\""),
+        REPRESENT_TYPE(3, "representType", "Изменение флага \"Законный представитель\""),
+        RELATION(4, "relation", "Изменение типа родственной связи"),
+        DELETED_DATE(5, "deleteDate", "Изменение Даты удаления");
+
+        private final int code;
+        private final String description;
+        private final String nativedescription;
+
+        static Map<Integer,ClientGuardionHistoryAction> map = new HashMap<Integer,ClientGuardionHistoryAction>();
+        static {
+            for (ClientGuardionHistoryAction questionaryStatus : ClientGuardionHistoryAction.values()) {
+                map.put(questionaryStatus.code, questionaryStatus);
+            }
+        }
+
+        private ClientGuardionHistoryAction(int code, String description, String nativedescription){
+            this.code = code;
+            this.description = description;
+            this.nativedescription = nativedescription;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
+
+        public static ClientGuardionHistoryAction fromInteger(Integer value){
+            if (value == null)
+                return map.get(-1);
+            return map.get(value);
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+
+        public String getNativedescription() {
+            return nativedescription;
+        }
+    }
 }

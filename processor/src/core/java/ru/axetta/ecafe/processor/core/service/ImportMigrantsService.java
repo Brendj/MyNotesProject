@@ -35,7 +35,10 @@ public class ImportMigrantsService {
         if (!isOn()) {
             return;
         }
-        loadMigrants();
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Срабатыване по расписанию");
+        clientGuardianHistory.setAction("Обработка мигрантов");
+        loadMigrants(clientGuardianHistory);
     }
 
     public static boolean isOn() {
@@ -50,7 +53,7 @@ public class ImportMigrantsService {
         return true;
     }
 
-    public void loadMigrants() throws Exception {
+    public void loadMigrants(ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -135,7 +138,7 @@ public class ImportMigrantsService {
                                             ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
                             if (null != clientGroup) {
                                 ESZMigrantsUpdateService.addGroupHistory(session, client,
-                                        clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                                        clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGuardianHistory);
                             } else {
                                 logger.error(String.format(
                                         "Unable to save client group migration history for client with id = %d",

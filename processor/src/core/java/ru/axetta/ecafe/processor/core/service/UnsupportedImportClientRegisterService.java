@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ public class UnsupportedImportClientRegisterService implements ImportClientRegis
 
     @Override
     public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation,
-            String groupName) throws Exception {
+            String groupName, ClientGuardianHistory clientGuardianHistory) throws Exception {
         throw new UnsupportedOperationException("Операция подтверждения разногласий не поддерживается");
     }
 }

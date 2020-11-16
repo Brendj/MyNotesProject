@@ -504,7 +504,12 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void loadESZMigrants() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants();
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов\" в Сервис/Другое");
+            clientGuardianHistory.setAction("Обработка мигрантов");
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants(clientGuardianHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run load ESZ migrants: ", e);
@@ -759,7 +764,12 @@ public class OtherActionsPage extends OnlineReportPage {
     public void runProcessClientDoubles() throws Exception {
         try {
             Long idOfOrg = Long.parseLong(updateSpbClientDoubles);
-            RuntimeContext.getAppContext().getBean(CardsUidUpdateService.class).processClientDoubles(idOfOrg);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("Нажата кнопка \"Обработка дублей клиентов\" в Сервис/Другое");
+            clientGuardianHistory.setAction("Обработка дублей клиентов");
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            RuntimeContext.getAppContext().getBean(CardsUidUpdateService.class).processClientDoubles(idOfOrg, clientGuardianHistory);
             printMessage("Обработка дублей клиентов завершена");
         } catch (Exception e) {
             getLogger().error("Error update card uids: ", e);
@@ -777,8 +787,13 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void updateESZMigrants() throws Exception {
         try {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов (перевод в выбывшие)\" в Сервис/Другое");
+            clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class)
-                    .updateMigrants();
+                    .updateMigrants(clientGuardianHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run update ESZ migrants: ", e);

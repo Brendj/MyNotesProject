@@ -32,6 +32,24 @@ public class ClientGuardianHistory {
     private String newValue;
     private String reason;
 
+    public ClientGuardianHistory getCopyClientGuardionHistory(ClientGuardianHistory clientGuardianHistory)
+    {
+        ClientGuardianHistory clientGuardianHistoryCopy = new ClientGuardianHistory();
+        clientGuardianHistoryCopy.setClientGuardian(clientGuardianHistory.getClientGuardian());
+        clientGuardianHistoryCopy.setChangeDate(clientGuardianHistory.getChangeDate());
+        clientGuardianHistoryCopy.setAction(clientGuardianHistory.getAction());
+        clientGuardianHistoryCopy.setWebAdress(clientGuardianHistory.getWebAdress());
+        clientGuardianHistoryCopy.setCreatedFrom(clientGuardianHistory.getCreatedFrom());
+        clientGuardianHistoryCopy.setOrg(clientGuardianHistory.getOrg());
+        clientGuardianHistoryCopy.setUser(clientGuardianHistory.getUser());
+        clientGuardianHistoryCopy.setIdOfPacket(clientGuardianHistory.getIdOfPacket());
+        clientGuardianHistoryCopy.setChangeParam(clientGuardianHistory.getChangeParam());
+        clientGuardianHistoryCopy.setOldValue(clientGuardianHistory.getOldValue());
+        clientGuardianHistoryCopy.setNewValue(clientGuardianHistory.getNewValue());
+        clientGuardianHistoryCopy.setReason(clientGuardianHistory.getReason());
+        return clientGuardianHistoryCopy;
+    }
+
     public Long getGuardHistory() {
         return guardHistory;
     }
