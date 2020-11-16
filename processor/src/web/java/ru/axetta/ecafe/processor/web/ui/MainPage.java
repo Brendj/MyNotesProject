@@ -3451,7 +3451,8 @@ public class MainPage implements Serializable {
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason("Выполнено обновление через вкладку Клиеты/Обновить из файла (обновление из файла)");
+            clientGuardianHistory.setAction("обновление из файла");
+            clientGuardianHistory.setReason("Выполнено обновление через вкладку Клиенты/Обновить из файла");
             clientUpdateFileLoadPage.updateClients(inputStream, dataSize, clientGuardianHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));

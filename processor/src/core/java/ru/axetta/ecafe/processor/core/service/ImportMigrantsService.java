@@ -36,7 +36,7 @@ public class ImportMigrantsService {
             return;
         }
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-        clientGuardianHistory.setReason("Срабатыване по расписанию");
+        clientGuardianHistory.setReason("Срабатывание по расписанию");
         clientGuardianHistory.setAction("Обработка мигрантов");
         loadMigrants(clientGuardianHistory);
     }

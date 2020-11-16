@@ -40,7 +40,7 @@ public class ESZMigrantsUpdateService {
         }
 
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-        clientGuardianHistory.setReason("Срабатыване по расписанию");
+        clientGuardianHistory.setReason("Срабатывание по расписанию");
         clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
         updateMigrants(clientGuardianHistory);
     }
