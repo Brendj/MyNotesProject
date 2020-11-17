@@ -5239,6 +5239,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Веб метод setGuardianshipDisabled");
         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(guardMobile);
         return processSetGuardianship(contractId, guardMobile, value, roleRepresentativePrincipal, clientGuardianHistory);
     }
 
@@ -8554,6 +8555,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Веб метод addGuardian");
         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(mobile);
 
         String mobilePhoneCreator = Client.checkAndConvertMobile(creatorMobile);
         String mobilePhone = Client.checkAndConvertMobile(mobile);
@@ -8842,6 +8844,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Веб метод removeGuardian");
         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(guardianContractId.toString());
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -9646,6 +9649,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                         clientGuardianHistory.setReason("Веб метод setPreorderAllowed");
                         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+                        clientGuardianHistory.setGuardian(guardianMobile);
                         ClientManager.setPreorderAllowed(session, client, guardian, mobile, value,
                                 version, clientGuardianHistory);
                     }
@@ -9688,6 +9692,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Веб метод setInformedSpecialMenu");
         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(guardianMobile);
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();

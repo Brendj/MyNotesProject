@@ -24,6 +24,7 @@ public class ClientGuardianHistory {
     private String action;
     private String webAdress;
     private ClientCreatedFromType  createdFrom;
+    private String guardian;
     private Org org;
     private User user;
     private Long idOfPacket;
@@ -31,6 +32,8 @@ public class ClientGuardianHistory {
     private String oldValue;
     private String newValue;
     private String reason;
+
+
 
     public ClientGuardianHistory getCopyClientGuardionHistory(ClientGuardianHistory clientGuardianHistory)
     {
@@ -152,5 +155,13 @@ public class ClientGuardianHistory {
 
     public void setCreatedFrom(ClientCreatedFromType createdFrom) {
         this.createdFrom = createdFrom;
+    }
+
+    public String getGuardian() {
+        return guardian;
+    }
+
+    public void setGuardian(String guardian) {
+        this.guardian = guardian;
     }
 }

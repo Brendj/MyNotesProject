@@ -13,7 +13,7 @@
         </id>
         <many-to-one name="clientGuardian" class="ru.axetta.ecafe.processor.core.persistence.ClientGuardian"
                      column="idofclientguardian" update="false" />
-        <property name="changeDate" column="changedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="changeDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="action" column="action" type="string"/>
         <property name="webAdress" column="webAdress" type="string"/>
         <property name="createdFrom" column="createdFrom">
@@ -21,8 +21,9 @@
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType</param>
             </type>
         </property>
+        <property name="guardian" column="guardian" type="string"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org"
-                     column="idOrgChanger" update="false" />
+                     column="idOfOrg" update="false" />
         <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User"
                      column="idofuser" update="false" />
         <property name="idOfPacket" column="idOfPacket" type="long"/>
