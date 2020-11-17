@@ -2815,8 +2815,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
                 for (WtDish wtDish : wtDishSet) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
-                    menuDateItemExt.getE().add(menuItemExt);
+                    List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDish, false);
+                    menuDateItemExt.getE().addAll(menuItemExt);
                 }
             }
             menuListExt.getM().add(menuDateItemExt);
@@ -3108,7 +3108,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 // комплекс не выводим
                                 continue;
                             }
-                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
+                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, org.getIdOfOrg(), wtDishes);
                             // Проверка типа питания
                             int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()
                                     .intValue();
@@ -3605,23 +3605,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishes != null && wtDishes.size() > 0) {
                 menuDateItemExt.setDate(toXmlDateTime(startDate));
                 for (WtDish wtDish : wtDishes) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
+                    List<MenuItemExt> menuItemExtList = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(), wtDish, false);
                     // Добавляем блокировки
-                    if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
-                        menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
-                    } else {
-                        if (ProhibitByName.containsKey(wtDish.getDishName())) {
-                            menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                    for (MenuItemExt menuItemExt : menuItemExtList) {
+                        if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
+                            menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
                         } else {
-                            //пробегаться в цикле.
-                            for (String filter : ProhibitByFilter.keySet()) {
-                                if (wtDish.getDishName().contains(filter)) {
-                                    menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                            if (ProhibitByName.containsKey(wtDish.getDishName())) {
+                                menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                            } else {
+                                //пробегаться в цикле.
+                                for (String filter : ProhibitByFilter.keySet()) {
+                                    if (wtDish.getDishName().contains(filter)) {
+                                        menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                                    }
                                 }
                             }
                         }
+                        menuDateItemExt.getE().add(menuItemExt);
                     }
-                    menuDateItemExt.getE().add(menuItemExt);
                 }
             }
             menuListExt.getM().add(menuDateItemExt);
@@ -6889,48 +6891,51 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, List<WtDish> wtDishes) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfOrg, List<WtDish> wtDishes) {
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, true);
-                menuItemExtList.add(menuItemExt);
+                List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDish, true);
+                menuItemExtList.addAll(menuItemExt);
             }
         }
         return menuItemExtList;
     }
 
-    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish, boolean isGroupByCategory) {
-        MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-        String menuGroup = "";
+    private List<MenuItemExt> getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDish wtDish, boolean isGroupByCategory) {
+        List<MenuItemExt> result = new ArrayList<>();
+        Set<String> menuGroupSet = null;
         if (isGroupByCategory) {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
+            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
         } else {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(wtDish);
+            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(idOfOrg, wtDish);
         }
-        menuItemExt.setGroup(menuGroup);
-        menuItemExt.setName(wtDish.getDishName());
-        menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
-        menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
-        menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
-        menuItemExt.setAvailableNow(1);
-        menuItemExt.setCarbohydrates(
-                wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
-        menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
-        menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
-        menuItemExt.setVitB1(0.0);
-        menuItemExt.setVitB2(0.0);
-        menuItemExt.setVitPp(0.0);
-        menuItemExt.setVitC(0.0);
-        menuItemExt.setVitA(0.0);
-        menuItemExt.setVitE(0.0);
-        menuItemExt.setMinCa(0.0);
-        menuItemExt.setMinP(0.0);
-        menuItemExt.setMinMg(0.0);
-        menuItemExt.setMinFe(0.0);
-        menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-        menuItemExt.setFullName(wtDish.getComponentsOfDish());
-        return menuItemExt;
+        for (String menuGroup : menuGroupSet) {
+            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+            menuItemExt.setGroup(menuGroup);
+            menuItemExt.setName(wtDish.getDishName());
+            menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
+            menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+            menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+            menuItemExt.setAvailableNow(1);
+            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
+            menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+            menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+            menuItemExt.setVitB1(0.0);
+            menuItemExt.setVitB2(0.0);
+            menuItemExt.setVitPp(0.0);
+            menuItemExt.setVitC(0.0);
+            menuItemExt.setVitA(0.0);
+            menuItemExt.setVitE(0.0);
+            menuItemExt.setMinCa(0.0);
+            menuItemExt.setMinP(0.0);
+            menuItemExt.setMinMg(0.0);
+            menuItemExt.setMinFe(0.0);
+            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+            menuItemExt.setFullName(wtDish.getComponentsOfDish());
+            result.add(menuItemExt);
+        }
+        return result;
     }
 
 
