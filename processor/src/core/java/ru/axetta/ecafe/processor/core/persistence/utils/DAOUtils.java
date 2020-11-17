@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -38,6 +38,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ApplicationForFoorStatusExistsException;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -4510,7 +4511,7 @@ public class DAOUtils {
                     .format("Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
                             applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
                             applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber());
-            throw new Exception(errorString);
+            throw new ApplicationForFoorStatusExistsException(errorString);
         }
         addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, version);
     }
