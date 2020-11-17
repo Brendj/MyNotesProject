@@ -453,6 +453,11 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 pathPart4 = parts[0];
             }
 
+            // новое меню
+            if (parts.length == 1) {
+                pathPart1 = "";
+            }
+
             qty = ((Integer) objects[1]).longValue();
 
             date = timeFormat.format(objects[2]);
