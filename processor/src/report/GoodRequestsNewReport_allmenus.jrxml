@@ -20,17 +20,6 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="60">
-			<textField>
-				<reportElement x="0" y="0" width="340" height="60" uuid="9415e512-2379-4259-bd83-da96ad2b63ff"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Сводный отчет по заявкам от " + new SimpleDateFormat("dd.MM.yyyy").format($P{startDate}) + " до "  + new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></textFieldExpression>
-			</textField>
-		</band>
-	</title>
 	<detail>
 		<band height="100">
 			<subreport>
@@ -75,9 +64,10 @@
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{wtMenuItems})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "GoodRequestsNewReport_wtmenu.jasper"]]></subreportExpression>
 			</subreport>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="100" height="50" uuid="4c7ab090-38fb-4fd0-a549-fa807fd0abe2"/>
-			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="200" height="50" uuid="89b36519-ddc3-40ee-8c86-d14561189733"/>
+				<text><![CDATA[]]></text>
+			</staticText>
 		</band>
 	</detail>
 </jasperReport>
