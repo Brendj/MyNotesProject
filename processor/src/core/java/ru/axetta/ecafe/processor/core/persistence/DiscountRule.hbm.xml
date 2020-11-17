@@ -80,6 +80,8 @@
         <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
         <property name="subCategory" column="Subcategory" type="string" length="100" />
 
+        <many-to-one name="codeMSP" column="idofcode" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.CodeMSP"/>
+
         <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
         <set name="categoriesDiscountsInternal" table="CF_DiscountRules_CategoryDiscounts">
             <key column="IdOfRule"/>

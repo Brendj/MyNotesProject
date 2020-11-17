@@ -273,6 +273,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         private List<CategoryDiscount> categoryDiscountList;
         private List<CategoryOrg> categoryOrgList;
         private String subCategory;
+        private Integer codeMSP;
         //
 
 
@@ -338,6 +339,14 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
 
         public void setPriority(int priority) {
             this.priority = priority;
+        }
+
+        public Integer getCodeMSP() {
+            return codeMSP;
+        }
+
+        public void setCodeMSP(Integer codeMSP) {
+            this.codeMSP = codeMSP;
         }
 
         private int priority;

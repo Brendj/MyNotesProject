@@ -5,18 +5,17 @@
 package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
-import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -48,10 +47,43 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private Set<CategoryDiscount> categoryDiscountSet;
     private Integer[] selectedComplexIds;
     private int subCategory;
+    private CodeMSP codeMSP;
+    private List<SelectItem> allMSP = loadAllMSP();
+
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
     @Autowired
     private DAOService daoService;
+
+    private List<SelectItem> loadAllMSP() {
+        List<CodeMSP> items = Collections.emptyList();
+        List<SelectItem> result = new LinkedList<>();
+
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            items = DAOUtils.getAllCodeMSP(session);
+            session.close();
+
+            result.add(new SelectItem(null, ""));
+            for(CodeMSP code : items){
+                SelectItem selectItem = new SelectItem(code, code.getCode().toString());
+                result.add(selectItem);
+            }
+
+            return result;
+        } finally {
+            HibernateUtils.close(session, getLogger());
+        }
+    }
+
+    public List<SelectItem> getAllMSP() {
+        return allMSP;
+    }
+
+    public void setAllMSP(List<SelectItem> allMSP) {
+        this.allMSP = allMSP;
+    }
 
     public Integer[] getSelectedComplexIds() {
         return selectedComplexIds;
@@ -75,6 +107,14 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             list.add(selectItem);
         }
         return list;
+    }
+
+    public CodeMSP getCodeMSP() {
+        return codeMSP;
+    }
+
+    public void setCodeMSP(CodeMSP codeMSP) {
+        this.codeMSP = codeMSP;
     }
 
     public String getIdOfCategoryOrgListString() {
@@ -312,6 +352,8 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                 entity.getCategoryOrgs().add((CategoryOrg) object);
             }
         }
+        entity.setCodeMSP(codeMSP);
+
         em.persist(entity);
         fill(entity);
         printMessage("Данные обновлены.");
@@ -469,6 +511,8 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     }
     public void reload() throws Exception {
         DiscountRule discountRule = em.merge(entity);
+
+        this.codeMSP = discountRule.getCodeMSP();
 
         StringBuilder categoryFilter = new StringBuilder();
         if(!discountRule.getCategoriesDiscounts().isEmpty()){
