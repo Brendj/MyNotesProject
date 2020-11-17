@@ -2949,7 +2949,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Transaction transaction = null;
         MenuListWithComplexesResult result = new MenuListWithComplexesResult();
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             Client client = findClientByContractId(session, contractId, result);
@@ -3149,7 +3149,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
 
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             Client client = findClientByContractId(session, contractId, groupResult);
