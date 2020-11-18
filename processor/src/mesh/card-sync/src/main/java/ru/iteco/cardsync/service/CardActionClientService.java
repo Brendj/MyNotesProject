@@ -11,6 +11,8 @@ import ru.iteco.cardsync.models.CardActionRequest;
 import ru.iteco.cardsync.models.Client;
 import ru.iteco.cardsync.repo.CardActionClientRepository;
 
+import java.util.List;
+
 @Service
 public class CardActionClientService {
     private final CardActionClientRepository cardActionClientRepository;
@@ -38,14 +40,23 @@ public class CardActionClientService {
         cardActionClientRepository.save(cardActionClient);
     }
 
-    public void writeRecord(CardActionRequest cardActionRequest, CardActionClient cardActionClient, String comment) {
+    public void writeRecord(CardActionRequest cardActionRequest, CardActionClient cardActionClient,
+                            List<Card> cardsActive, String comment) {
         CardActionClient cardActionClientnew = new CardActionClient();
         cardActionClientnew.setComment(comment);
         cardActionClientnew.setCardActionRequest(cardActionRequest);
         cardActionClientnew.setCard(cardActionClient.getCard());
         cardActionClientnew.setClient(cardActionClient.getClient());
         cardActionClientnew.setClientChild(cardActionClient.getClientChild());
+        if (cardsActive != null) {
+            String actionCards = "";
+            for (Card card : cardsActive) {
+                actionCards = actionCards + card.getIdOfCard() + ",";
+            }
+            if (actionCards.length() > 1)
+                actionCards = actionCards.substring(0, actionCards.length()-1);
+            cardActionClientnew.setIdOldCards(actionCards);
+        }
         cardActionClientRepository.save(cardActionClientnew);
     }
-
 }

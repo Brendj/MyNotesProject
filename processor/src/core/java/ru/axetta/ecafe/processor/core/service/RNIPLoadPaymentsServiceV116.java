@@ -84,11 +84,11 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
     };
 
     @Override
-    public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
-        return executeRequest116(requestType, contragent, updateDate, startDate, endDate);
+    public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate, int paging) throws Exception {
+        return executeRequest116(requestType, contragent, updateDate, startDate, endDate, paging);
     }
 
-    public Object executeRequest116(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public Object executeRequest116(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate, int paging) throws Exception {
         switch(requestType) {
             case REQUEST_MODIFY_CATALOG:
             case REQUEST_CREATE_CATALOG:

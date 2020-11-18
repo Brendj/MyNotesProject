@@ -4,16 +4,29 @@
 
 package ru.iteco.cardsync.models;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "cf_history_card")
 public class HistoryCard {
+    @GenericGenerator(
+            name = "cf_history_card_idofhistorycard",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "sequence_name", value = "cf_history_card_idofhistorycard_seq"),
+                    @org.hibernate.annotations.Parameter(name = "INCREMENT", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "MINVALUE", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "MAXVALUE", value = "2147483647"),
+                    @org.hibernate.annotations.Parameter(name = "CACHE", value = "1")
+            }
+    )
 
     @Id
     @Column(name = "idofhistorycard")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "cf_history_card_idofhistorycard")
     private Long id;
 
     @Column(name = "updatetime", nullable = false)

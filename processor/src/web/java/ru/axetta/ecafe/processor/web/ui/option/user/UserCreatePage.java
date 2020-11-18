@@ -278,16 +278,16 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setPerson(person);
                 session.save(person);
             }
-            if(userIdOfClient != null){
+            if(userIdOfClient != null && !userIdOfClient.equals(0L)){
                 Client userClient = (Client) session.load(Client.class, userIdOfClient);
                 user.setClient(userClient);
                 if(userClient != null && userClient.getOrg() != null)
                     user.setOrg(userClient.getOrg());
-                else if(userOrg.idOfOrg != null)
-                    user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+                else if(userOrg != null && userOrg.getIdOfOrg() != null)
+                    user.setOrg((Org) session.load(Org.class, userOrg.getIdOfOrg()));
             }
-            else {
-                user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+            else if(userOrg != null && userOrg.getIdOfOrg() != null) {
+                user.setOrg((Org) session.load(Org.class, userOrg.getIdOfOrg()));
             }
 
             if (role != null && User.DefaultRole.DEFAULT.equals(role)) {

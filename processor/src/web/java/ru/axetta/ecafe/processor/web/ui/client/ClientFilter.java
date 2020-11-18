@@ -53,6 +53,14 @@ public class ClientFilter {
         this.offset = offset;
     }
 
+    public String getFilterClientMESHGUID() {
+        return filterClientMESHGUID;
+    }
+
+    public void setFilterClientMESHGUID(String filterClientMESHGUID) {
+        this.filterClientMESHGUID = filterClientMESHGUID;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -149,6 +157,7 @@ public class ClientFilter {
     private Integer clientBalanceCondition =  ClientBalanceFilter.NO_CONDITION;
     private String filterClientId;
     private String filterClientGUID;
+    private String filterClientMESHGUID;
     private Map<String, Long> clientGroupItems = ClientGroupMenu.getItems();
     private Map<String, Long> clientGroupsCustomItems = ClientGroupMenu.getCustomItems();
     private Long clientGroupId = ClientGroupMenu.CLIENT_ALL;
@@ -291,7 +300,8 @@ public class ClientFilter {
     public boolean isEmpty() {
         if (ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
                 && StringUtils.isEmpty(filterClientId) && person.isEmpty() && contractPerson.isEmpty()
-                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(email) && StringUtils.isEmpty(filterClientGUID)) {
+                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(email) && StringUtils.isEmpty(filterClientGUID)
+                && StringUtils.isEmpty(filterClientMESHGUID)) {
             if (!org.isEmpty() && org.getIdOfOrg().equals(getPermanentOrgId()) || org.isEmpty()) {
                 return true;
             }
@@ -417,6 +427,9 @@ public class ClientFilter {
         }
         if (StringUtils.isNotEmpty(filterClientGUID)) {
             criteria.add(Restrictions.eq("clientGUID", filterClientGUID.trim()));
+        }
+        if (StringUtils.isNotEmpty(filterClientMESHGUID)) {
+            criteria.add(Restrictions.eq("meshGUID", filterClientMESHGUID.trim()));
         }
         criteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
         String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";

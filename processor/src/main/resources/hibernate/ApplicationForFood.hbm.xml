@@ -26,6 +26,7 @@
         <property name="archived" column="Archived" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="sendToAISContingent" column="SendToAISContingent" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="serviceNumber" column="ServiceNumber" type="string" length="128" unique="true" not-null="true"/>
+        <property name="archiveDate" column="ArchiveDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="creatorType" column="CreatorType" not-null="true">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodCreatorType</param>

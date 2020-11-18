@@ -4,14 +4,28 @@
 
 package ru.iteco.cardsync.models;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "cf_cr_cardactionclient")
 public class CardActionClient{
 
+    @GenericGenerator(
+            name = "cf_cr_cardactionclient_idcardactionclient",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "sequence_name", value = "cf_cr_cardactionclient_idcardactionclient_seq"),
+                    @org.hibernate.annotations.Parameter(name = "INCREMENT", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "MINVALUE", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "MAXVALUE", value = "2147483647"),
+                    @org.hibernate.annotations.Parameter(name = "CACHE", value = "1")
+            }
+    )
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_cr_cardactionclient_idcardactionclient")
     @Column(name = "idcardactionclient")
     private Long idcardactionclient;
 
@@ -38,6 +52,8 @@ public class CardActionClient{
     @Column(name = "oldcardstate", nullable = false)
     private Integer oldcardstate;
 
+    @Column(name = "idoldcards")
+    private String idOldCards;
 
     public CardActionClient() {
         // for Hibernate
@@ -97,5 +113,13 @@ public class CardActionClient{
 
     public void setOldcardstate(Integer oldcardstate) {
         this.oldcardstate = oldcardstate;
+    }
+
+    public String getIdOldCards() {
+        return idOldCards;
+    }
+
+    public void setIdOldCards(String idOldCards) {
+        this.idOldCards = idOldCards;
     }
 }

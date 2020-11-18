@@ -4,6 +4,7 @@
 
 package ru.iteco.cardsync.models;
 
+import org.hibernate.annotations.GenericGenerator;
 import ru.iteco.cardsync.audit.AuditEntity;
 import ru.iteco.cardsync.audit.AuditEntityListener;
 import ru.iteco.cardsync.audit.Auditable;
@@ -19,8 +20,20 @@ import java.util.List;
 @Table(name = "cf_cr_cardactionrequests")
 public class CardActionRequest implements Auditable {
 
+    @GenericGenerator(
+            name = "cf_cr_cardactionrequests_idcardactionrequest",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "sequence_name", value = "cf_cr_cardactionrequests_idcardactionrequest_seq"),
+                    @org.hibernate.annotations.Parameter(name = "INCREMENT", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "MINVALUE", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "MAXVALUE", value = "2147483647"),
+                    @org.hibernate.annotations.Parameter(name = "CACHE", value = "1")
+            }
+    )
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_cr_cardactionrequests_idcardactionrequest")
     @Column(name = "idcardactionrequest")
     private Long id;
 

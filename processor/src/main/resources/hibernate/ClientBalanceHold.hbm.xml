@@ -16,7 +16,7 @@
         <many-to-one name="newContragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfNewContragent"
                      update="false"/>
         <many-to-one name="accountTransaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction" column="IdOfTransaction"
-                     not-null="true" update="false"/>
+                     update="false"/>
         <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

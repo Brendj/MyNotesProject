@@ -34,8 +34,6 @@ import javax.xml.bind.annotation.XmlType;
 })
 @XmlSeeAlso({
     ActivateLinkingTokenResult.class,
-    DetachGuardSanResult.class,
-    AttachGuardSanResult.class,
     GenerateLinkingTokenResult.class
 })
 public class Result {

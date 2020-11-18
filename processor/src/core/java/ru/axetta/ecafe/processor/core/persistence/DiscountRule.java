@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -686,6 +689,20 @@ public class DiscountRule {
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public List<Integer> getComplexIdsFromComplexMap(){
+        List<String> allMatches = new ArrayList<String>();
+        List<Integer> complexIds = new ArrayList<>();
+        Matcher matcherPattern = Pattern.compile("\\d+(=1)")
+                .matcher(this.complexesMap);
+        while (matcherPattern.find()) {
+            allMatches.add(matcherPattern.group().replace("=1",""));
+        }
+        for(String match: allMatches){
+            complexIds.add(Integer.parseInt(match));
+        }
+        return complexIds;
     }
 
     @Override
