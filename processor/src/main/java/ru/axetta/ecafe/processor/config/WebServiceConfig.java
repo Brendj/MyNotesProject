@@ -1,17 +1,14 @@
 package ru.axetta.ecafe.processor.config;
 
 import javax.xml.ws.Endpoint;
-import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.servlet.CXFServlet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.web.internal.FrontController;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
 
 /**
@@ -20,7 +17,43 @@ import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS
 @Configuration
 public class WebServiceConfig {
 
-    @Autowired
+    @Bean
+    public ServletRegistrationBean disServlet() {
+        CXFServlet cxfServlet = new CXFServlet();
+        return new ServletRegistrationBean(cxfServlet, "/soap/*");
+    }
+
+    @Bean(name="cxf")
+    public SpringBus springBus() {
+        return new SpringBus();
+    }
+
+    @Bean
+    public ClientRoomControllerWS clientRoomControllerWS() {
+        return new ClientRoomControllerWS();
+    }
+
+    @Bean
+    public Endpoint clientRoomControllerEndpoint() {
+        EndpointImpl endpoint = new EndpointImpl(springBus(), clientRoomControllerWS());
+        endpoint.publish("/client");
+        return endpoint;
+    }
+
+    @Bean
+    public FrontController frontController() {
+        return new FrontController();
+    }
+
+    @Bean
+    public Endpoint frontControllerEndpoint() {
+        EndpointImpl endpoint = new EndpointImpl(springBus(), frontController());
+        endpoint.publish("/front");
+        return endpoint;
+    }
+
+
+    /*@Autowired
     private ApplicationContext applicationContext;
 
     @Bean
@@ -54,5 +87,5 @@ public class WebServiceConfig {
         //endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
 
         return endpoint;
-    }
+    }*/
 }

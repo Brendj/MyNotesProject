@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import org.springframework.stereotype.*;
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -124,7 +126,8 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOf
  * To change this template use File | Settings | File Templates.
  */
 
-@WebService()
+@Component
+@WebService(endpointInterface="ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController")
 public class ClientRoomControllerWS extends HttpServlet implements ClientRoomController {
 
     @Resource
