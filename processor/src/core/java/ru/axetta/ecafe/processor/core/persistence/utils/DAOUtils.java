@@ -38,6 +38,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ApplicationForFoorStatusExistsException;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -503,6 +504,16 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.isNull("idOfClientGroup"));
         return (SpecialDate) criteria.uniqueResult();
+    }
+
+    public static List<SpecialDate> findSpecialDateWithOutGroup(Session persistenceSession,
+            CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
+        criteria.add(Restrictions.ge("date", compositeIdOfSpecialDate.getDate()));
+        criteria.add(Restrictions.isNull("idOfClientGroup"));
+        criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
+        return criteria.list();
     }
 
     public static SpecialDate findSpecialDateWithGroup(Session persistenceSession,
@@ -2671,32 +2682,6 @@ public class DAOUtils {
         return (Visitor) clientQuery.uniqueResult();
     }
 
-    public static void removeGuardSan(Session session, Client client) {
-        //  Очищаем cf_client_guardsan
-        org.hibernate.Query remove = session.createSQLQuery("delete from CF_GuardSan where idofclient=:idofclient");
-        remove.setLong("idofclient", client.getIdOfClient());
-        remove.executeUpdate();
-    }
-
-    public static void clearGuardSanTable(Session session) {
-        org.hibernate.Query clear = session.createSQLQuery("delete from CF_GuardSan");
-        clear.executeUpdate();
-    }
-
-    public static Map<Long, String> getClientGuardSan_Old(Session session) {
-        Map<Long, String> data = new HashMap<Long, String>();
-        org.hibernate.Query select = session
-                .createSQLQuery("select idofclient, guardsan from CF_Clients where guardsan<>'' order by idofclient");
-        List resultList = select.list();
-        for (Object entry : resultList) {
-            Object e[] = (Object[]) entry;
-            long idOfClient = ((BigInteger) e[0]).longValue();
-            String guardSan = e[1].toString();
-            data.put(idOfClient, guardSan);
-        }
-        return data;
-    }
-
 
     // TODO: воспользоваться диклоративными пособами генерации запроса и на выходи получать только TempCardOperationItem
     public static CardTempOperation getLastTempCardOperationByOrgAndCartNo(Session session, Long idOfOrg, Long cardNo) {
@@ -2786,13 +2771,6 @@ public class DAOUtils {
         } else {
             return (String) list.get(0);
         }
-    }
-
-    public static List<Long> extractIDFromGuardSanByGuardSan(Session persistenceSession, String guardSan) {
-        Query q = persistenceSession
-                .createQuery("select gs.client.idOfClient from GuardSan gs where gs.guardSan=:guardSan");
-        q.setParameter("guardSan", guardSan);
-        return q.list();
     }
 
     public static boolean guardianExistsByMobile(Session session, String mobile, Client client) throws Exception {
@@ -3426,7 +3404,14 @@ public class DAOUtils {
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
         Criteria criteria = session.createCriteria(SpecialDate.class);
         criteria.add(Restrictions.in("org", orgs));
-        criteria.add(Restrictions.gt("version", version));
+        if (version == -1)
+        {
+           Date startDate =  CalendarUtils.getFirstDayMonth(new Date());
+           criteria.add(Restrictions.ge("date", startDate));
+        }
+        else {
+            criteria.add(Restrictions.gt("version", version));
+        }
         return criteria.list();
     }
 
@@ -4283,7 +4268,7 @@ public class DAOUtils {
 
     public static Long createSmartWatch(Session session, Long idOfCard, Long idOfClient, String model, String color,
             Long trackerUid, Long trackerId, Long trackerActivateUserId, String status, Date trackerActivateTime,
-            String simIccid) {
+            String simIccid, SmartWatchVendor vendor) {
         try {
             SmartWatch watch = new SmartWatch();
             watch.setIdOfCard(idOfCard);
@@ -4296,6 +4281,7 @@ public class DAOUtils {
             watch.setStatus(status);
             watch.setTrackerActivateTime(trackerActivateTime);
             watch.setSimIccid(simIccid);
+            watch.setVendor(vendor);
             session.save(watch);
             return watch.getIdOfSmartWatch();
         } catch (Exception e) {
@@ -4525,7 +4511,7 @@ public class DAOUtils {
                     .format("Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
                             applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
                             applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber());
-            throw new Exception(errorString);
+            throw new ApplicationForFoorStatusExistsException(errorString);
         }
         addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, version);
     }
@@ -4777,6 +4763,7 @@ public class DAOUtils {
         if (withEtp) {
             criteria.add(Restrictions.isNotNull("ETPCode"));
         }
+        criteria.add(Restrictions.eq("deleted", false));
         criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscountDSZN"));
         return criteria.list();
     }
@@ -5368,5 +5355,12 @@ public class DAOUtils {
         query.setParameter("org", org);
 
         return query.list();
+    }
+
+    public static SmartWatchVendor getVendorByApiKey(String apiKey, Session session) {
+        Criteria criteria = session.createCriteria(SmartWatchVendor.class);
+        criteria.add(Restrictions.like("apiKey", apiKey));
+
+        return (SmartWatchVendor) criteria.uniqueResult();
     }
 }

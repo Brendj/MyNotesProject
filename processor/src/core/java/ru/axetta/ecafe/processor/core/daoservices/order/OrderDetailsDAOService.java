@@ -8,11 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -196,6 +191,32 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate",end.getTime());
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        Object res = query.uniqueResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigInteger) res).longValue();
+        }
+    }
+
+    // для меню веб-технолога
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampDailySampleWtMenuValue(Long idOfOrg, Date start, Date end, Long idOfComplex) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " cforder.idoforg=:idoforg and complex.idofcomplex = :idOfComplex and " +
+                " cforder.ordertype in (5) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("startDate",start.getTime());
+        query.setParameter("endDate",end.getTime());
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
         Object res = query.uniqueResult();
         if (res==null) {
             return 0L;
@@ -430,6 +451,11 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 pathPart4 = parts[3];
             } else {
                 pathPart4 = parts[0];
+            }
+
+            // новое меню
+            if (parts.length == 1) {
+                pathPart1 = "";
             }
 
             qty = ((Integer) objects[1]).longValue();

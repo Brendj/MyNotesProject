@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.WtComplexItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
@@ -102,6 +103,10 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
             allGoods.addAll(service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
 
+            // комплексы
+            List<WtComplexItem> allComplexes = service.findAllWtComplexes(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
+            allComplexes.addAll(service.findAllWtComplexes(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+
             Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
             List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
             calendar.setTime(startTime);
@@ -109,7 +114,7 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 Date time = calendar.getTime();
                 String date = timeFormat.format(time);
-                if(allGoods.isEmpty()){
+                if(allGoods.isEmpty() && allComplexes.isEmpty()){
                     RegisterStampReportItem item = new RegisterStampReportItem(emptyGoodItem,0L,date, time);
                     RegisterStampReportItem total = new RegisterStampReportItem(emptyGoodItem,0L,"Итого", CalendarUtils.addDays(endTime, 1));
                     RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
@@ -128,10 +133,30 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                         result.add(item);
                         result.add(total);
                     }
+
+                    // цикл по комплексам
+                    String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
+                    for (WtComplexItem complexItem : allComplexes) {
+                        String dietType = complexItem.getDietType().getDescription();
+                        String ageGroup = complexItem.getAgeGroup().getDescription();
+                        Long idOfComplex = complexItem.getIdOfComplex();
+                        Integer orderType = complexItem.getOrderType();
+
+                        Long val = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), time, idOfComplex, withOutActDiscrepancies);
+                        RegisterStampReportItem item = new RegisterStampReportItem(ageGroup, dietType, val, date, number, time, orderType);
+                        RegisterStampReportItem total = new RegisterStampReportItem(ageGroup,
+                                dietType, val, "Итого", null, CalendarUtils.addDays(endTime, 1), orderType);
+                        RegisterStampReportItem allTotal = new RegisterStampReportItem(ageGroup,
+                                dietType, val,"Всего кол-во:", null, CalendarUtils.addDays(endTime, 3), orderType);
+                        result.add(allTotal);
+                        result.add(item);
+                        result.add(total);
+                    }
                 }
                 calendar.add(Calendar.DATE,1);
             }
-            if(allGoods.isEmpty()){
+
+            if(allGoods.isEmpty() && allComplexes.isEmpty()){
                 RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(emptyGoodItem,0L,"Суточная проба", CalendarUtils.addDays(endTime, 2));
                 RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
                 result.add(allTotal);
@@ -142,6 +167,21 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                             goodItem.getFullName());
                     RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem,val,"Суточная проба", CalendarUtils.addDays(endTime, 2));
                     RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
+                    result.add(allTotal);
+                    result.add(dailySampleItem);
+                }
+                // цикл по комплексам
+                for (WtComplexItem complexItem : allComplexes) {
+                    String dietType = complexItem.getDietType().getDescription();
+                    String ageGroup = complexItem.getAgeGroup().getDescription();
+                    Long idOfComplex = complexItem.getIdOfComplex();
+                    Integer orderType = complexItem.getOrderType();
+
+                    Long val = service.buildRegisterStampDailySampleWtMenuValue(org.getIdOfOrg(), startTime, endTime, idOfComplex);
+                    RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(ageGroup, dietType, val,
+                            "Суточная проба", null, CalendarUtils.addDays(endTime, 2), orderType);
+                    RegisterStampReportItem allTotal = new RegisterStampReportItem(ageGroup, dietType, val,
+                            "Всего кол-во:", null, CalendarUtils.addDays(endTime, 3), orderType);
                     result.add(allTotal);
                     result.add(dailySampleItem);
                 }

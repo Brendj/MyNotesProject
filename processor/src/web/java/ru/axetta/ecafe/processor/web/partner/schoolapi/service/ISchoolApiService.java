@@ -4,14 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.service;
 
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.PlanOrder;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseClients;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseDiscountClients;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseDiscountGroups;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseDiscounts;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ISchoolApiService {
@@ -32,4 +36,20 @@ public interface ISchoolApiService {
     List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups, boolean strictEditMode) throws Exception;
     List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients, String username) throws Exception;
     void createClient(ClientGroup clientGroup, Client client, String username) throws Exception;
+    List<ClientGroup> getClientGroupsByGroupNamesAndOrgId(List<String> groupsNames, Long orgId) throws Exception,
+            RequestProcessingException;
+    List<ClientGroup> getClientGroupsForClientManager(List<ClientGroup> clientGroups, Long idOfClient) throws Exception;
+    List<PlanOrderClientDTO> getClientsForGroupAndOrgByCategoryDiscount(ClientGroup clientGroup, Long orgId,
+            CategoryDiscountEnumType categoryDiscountEnumType) throws Exception;
+    List<PlanOrderClientDTO> setEnterEventsForClients(List<PlanOrderClientDTO> clients, Date planDate) throws Exception;
+    List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId) throws Exception;
+    List<PlanOrderClientDTO> createOrUpdatePlanOrderForClientsComplexes(List<PlanOrderClientDTO> clients,
+            Date planDate, Long orgId, String groupName) throws Exception;
+    List<Client> getClientsByContractIdsForOrg(List<Long> contractIds, Long idOfOrg) throws Exception;
+    List<Client> getClientsByGroupsAndContractIds(List<String> groupsNames, List<Long> contractIds, Long idOfOrg) throws Exception;
+    List<PlanOrder> getPlanOrdersWithoutOrder(Date planDate, List<Long> contractIds, String complexName) throws Exception;
+    List<PlanOrder> setToPayForPlanOrders(List<PlanOrder> planOrders, Long idOfUser, Boolean toPay) throws Exception;
+    List<PlanOrder> getPlanOrdersByToPay(Date planDate, List<Long> contractIds, String complexName, Boolean toPay) throws Exception;
+    List<PlanOrder> createOrderForPlanOrders(List<PlanOrder> planOrders, Boolean orderState, Long idOfUser) throws Exception;
+
 }

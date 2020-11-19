@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
+import ru.axetta.ecafe.processor.web.partner.smartwatch.dto.*;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
 import org.apache.commons.lang.StringUtils;
@@ -191,7 +192,8 @@ public class SmartWatchRestController {
             @FormParam(value="contractId") Long contractId, @FormParam(value="model") String model, @FormParam(value="color") String color,
             @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId,
             @FormParam(value="trackerActivateUserId") Long trackerActivateUserId, @FormParam(value="status") String status,
-            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid) throws Exception {
+            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid,
+            @HeaderParam(value="vendorId") Long vendorId) throws Exception {
         logger.info(String.format("Try registry SmartWatch for Phone: %s", mobilePhone));
         Result result = new Result();
         Session session = null;
@@ -209,6 +211,9 @@ public class SmartWatchRestController {
                         + " has an active SmartWatch");
             }
 
+            SmartWatchVendorManager manager = RuntimeContext.getAppContext().getBean(SmartWatchVendorManager.class);
+            SmartWatchVendor vendor = manager.getVendorById(vendorId);
+
             Date issueTime = new Date();
             Date validTime = CalendarUtils.addYear(issueTime, 5); // Карта действительна с момента выдачи/передачи новому лицу + 5 лет
 
@@ -219,7 +224,7 @@ public class SmartWatchRestController {
             if(card == null) {
                 idOfCard = cardManager
                         .createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE, validTime,
-                                Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
+                                Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null, vendor.getCardSignCertNum());
             } else {
                 if((card.getClient() == null || card.getState().equals(CardState.BLOCKED.getValue()))
                         && card.getCardType().equals(CARD_TYPE_SMARTWATCH)) {
@@ -236,15 +241,16 @@ public class SmartWatchRestController {
             }
 
             child.setHasActiveSmartWatch(true);
+            child.setVendor(vendor);
 
             Date trackerActivateTimeDate = trackerActivateTime == null ? new Date() : new Date(trackerActivateTime);
             SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, trackerId, trackerUid);
             if(watch == null) {
                 DAOUtils.createSmartWatch(session, idOfCard, child.getIdOfClient(), model, color,
-                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);
+                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid, vendor);
             } else {
                 this.updateSmartWatch(watch, session, idOfCard, child.getIdOfClient(), color, model,
-                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);
+                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid, vendor);
             }
 
             blockActiveCards(child, idOfCard);
@@ -300,6 +306,7 @@ public class SmartWatchRestController {
 
             blockActiveCard(child, card);
             child.setHasActiveSmartWatch(false);
+            child.setVendor(null);
             session.update(child);
 
             transaction.commit();
@@ -871,7 +878,7 @@ public class SmartWatchRestController {
     }
 
     private List<JsonEnterEventItem> buildEnterEventItem(Session session, Client child, Long startDate, Long endDate,
-            Integer limit) throws Exception{
+            Integer limit) throws Exception {
         List<JsonEnterEventItem> items = new LinkedList<JsonEnterEventItem>();
         List<EnterEventsItem> events = null;
         String timeConditional = endDate == null ? " ee.evtDateTime <= :startDate " : " ee.evtDateTime BETWEEN :endDate AND :startDate ";
@@ -1058,8 +1065,8 @@ public class SmartWatchRestController {
     }
 
     private void updateSmartWatch(SmartWatch watch, Session session, Long idOfCard, Long idOfClient, String color,
-            String model, Long trackerUid, Long trackerId, Long trackerActivateUserId,
-            String status, Date trackerActivateTimeDate, String simIccid) {
+            String model, Long trackerUid, Long trackerId, Long trackerActivateUserId, String status, Date trackerActivateTimeDate, String simIccid,
+            SmartWatchVendor vendor) {
         try {
             watch.setIdOfCard(idOfCard);
             watch.setIdOfClient(idOfClient);
@@ -1071,6 +1078,7 @@ public class SmartWatchRestController {
             watch.setStatus(status);
             watch.setTrackerActivateTime(trackerActivateTimeDate);
             watch.setSimIccid(simIccid);
+            watch.setVendor(vendor);
             session.update(watch);
         } catch (Exception e) {
             logger.error("Can't update SmartWatch with ID " + watch.getIdOfSmartWatch() + " : ", e);

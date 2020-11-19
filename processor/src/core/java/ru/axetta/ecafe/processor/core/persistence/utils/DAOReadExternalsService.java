@@ -327,8 +327,8 @@ public class DAOReadExternalsService {
     }
 
     public List<WtDish> getWtDishesByComplexItemAndDates(WtComplexesItem complexItem, Date startDate, Date endDate) {
-        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish "
-                + "WHERE :complexItem IN ELEMENTS(dish.complexItems) "
+        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish join dish.complexItems complex "
+                + "WHERE complex = :complexItem "
                 + "AND dish.deleteState = 0 "
                 + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "

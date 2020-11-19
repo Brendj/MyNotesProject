@@ -174,11 +174,16 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
             printError("Неверное название категории");
             return null;
         }
-        if (!DAOService.getInstance().getCategoryDiscountListByCategoryName(categoryName).isEmpty() )
+
+        List<CategoryDiscount> categoryDiscounts = DAOService.getInstance().getCategoryDiscountListByCategoryName(categoryName);
+        for (CategoryDiscount categoryDiscount: categoryDiscounts)
         {
-            printError("Категория с данным названием уже зарегистрирована");
-            return null;
+            if (categoryDiscount.getIdOfCategoryDiscount() != idOfCategoryDiscount) {
+                printError("Категория с данным названием уже зарегистрирована");
+                return null;
+            }
         }
+
         if (discountRate != null && discountRate != 100) {
             description = DISCOUNT_START + discountRate + DISCOUNT_END;
         }

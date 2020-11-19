@@ -284,12 +284,12 @@ public class RNIPLoadPaymentsService {
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
                 resultReceivePayments = rnipLoadPaymentsService
-                        .receiveContragentPayments(REQUEST_LOAD_PAYMENTS, contragent, startDate, endDate);
+                        .receiveContragentPayments(REQUEST_LOAD_PAYMENTS, contragent, startDate, endDate, 1);
                 isSuccessEnd = isSuccessEnd && resultReceivePayments;
                 if ((paymentRunTotalIterator % valueToRunModifiedPayments == 0 || !isAutoRun) && rnipLoadPaymentsService instanceof RNIPLoadPaymentsServiceV116) {
                     rnipLoadPaymentsService
                             .receiveContragentPayments(REQUEST_LOAD_PAYMENTS_MODIFIED, contragent, startDate,
-                                    endDate);
+                                    endDate, 1);
                 }
             } catch (Exception e) {
                 isSuccessEnd = false;
@@ -308,7 +308,7 @@ public class RNIPLoadPaymentsService {
     }
 
     //returns true если не было ошибок, иначе false
-    public Boolean receiveContragentPayments(int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception{
+    public Boolean receiveContragentPayments(int requestType, Contragent contragent, Date startDate, Date endDate, int paging) throws Exception{
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
@@ -320,7 +320,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         Object response = null;
         try {
-            response = executeRequest(requestType, contragent, lastUpdateDate, startDate, endDate);
+            response = executeRequest(requestType, contragent, lastUpdateDate, startDate, endDate, 1);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -419,10 +419,10 @@ public class RNIPLoadPaymentsService {
 
 
     public Object executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate) throws Exception {
-        return executeRequest(requestType, contragent, updateDate, null, null);
+        return executeRequest(requestType, contragent, updateDate, null, null, 1);
     }
 
-    public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate, int paging) throws Exception {
         String fileName = getTemplateFileName(requestType);
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(

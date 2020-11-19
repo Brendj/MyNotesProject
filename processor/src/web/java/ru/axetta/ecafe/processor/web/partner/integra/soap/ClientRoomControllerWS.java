@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -111,8 +111,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -197,9 +197,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
     private static final String RC_NOT_ALL_ARG = "Не заполнены обязательные поля";
     private static final String RC_CLIENT_NO_LONGER_ACTIVE = "Клиент не активен в ИС ПП";
+    private static final String RC_CLIENT_DOU = "Клиент является обучающимся дошкольной группы.";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC = "По условиям найден более одного клиента";
-    private static final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC = "У клиента нет СНИЛС опекуна";
-    private static final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC = "У клиента уже есть данный СНИЛС опекуна";
     private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC = "Ошибка авторизации клиента";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
     private static final String RC_NO_CONTACT_DATA_DESC = "У лицевого счета нет контактных данных";
@@ -2817,8 +2816,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
                 for (WtDish wtDish : wtDishSet) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
-                    menuDateItemExt.getE().add(menuItemExt);
+                    List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDish, false);
+                    menuDateItemExt.getE().addAll(menuItemExt);
                 }
             }
             menuListExt.getM().add(menuDateItemExt);
@@ -2951,7 +2950,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Transaction transaction = null;
         MenuListWithComplexesResult result = new MenuListWithComplexesResult();
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             Client client = findClientByContractId(session, contractId, result);
@@ -3054,7 +3053,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3073,7 +3072,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(discRules);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3087,7 +3086,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getWtDiscountRulesWithMaxPriority(discRules);
                         resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds, org);
                         if (resComplexes.size() > 0) {
                             wtDiscComplexes.addAll(resComplexes);
                         }
@@ -3110,7 +3109,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 // комплекс не выводим
                                 continue;
                             }
-                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
+                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, org.getIdOfOrg(), wtDishes);
                             // Проверка типа питания
                             int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()
                                     .intValue();
@@ -3151,7 +3150,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
 
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             Client client = findClientByContractId(session, contractId, groupResult);
@@ -3194,8 +3193,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 // 2 Возрастная группа
                 if (client.getAgeTypeGroup() != null && !client.getAgeTypeGroup().isEmpty()) {
                     String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
-                    if (ageGroupDesc.startsWith("дошкол")) {
-                        complexSign.put("Free", true);
+                    if (ageGroupDesc.contains("дошкол")) {
+                        logger.error(RC_CLIENT_DOU);
+                        groupResult.resultCode = RC_INTERNAL_ERROR;
+                        groupResult.description = RC_CLIENT_DOU;
+                        return groupResult;
                     } else {
                         checkParallel(client, categoriesDiscount, ageGroupIds, complexSign);
                     }
@@ -3604,23 +3606,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (wtDishes != null && wtDishes.size() > 0) {
                 menuDateItemExt.setDate(toXmlDateTime(startDate));
                 for (WtDish wtDish : wtDishes) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
+                    List<MenuItemExt> menuItemExtList = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(), wtDish, false);
                     // Добавляем блокировки
-                    if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
-                        menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
-                    } else {
-                        if (ProhibitByName.containsKey(wtDish.getDishName())) {
-                            menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                    for (MenuItemExt menuItemExt : menuItemExtList) {
+                        if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
+                            menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
                         } else {
-                            //пробегаться в цикле.
-                            for (String filter : ProhibitByFilter.keySet()) {
-                                if (wtDish.getDishName().contains(filter)) {
-                                    menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                            if (ProhibitByName.containsKey(wtDish.getDishName())) {
+                                menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                            } else {
+                                //пробегаться в цикле.
+                                for (String filter : ProhibitByFilter.keySet()) {
+                                    if (wtDish.getDishName().contains(filter)) {
+                                        menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                                    }
                                 }
                             }
                         }
+                        menuDateItemExt.getE().add(menuItemExt);
                     }
-                    menuDateItemExt.getE().add(menuItemExt);
                 }
             }
             menuListExt.getM().add(menuDateItemExt);
@@ -4172,43 +4176,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return -1;
     }
 
-    @Override
-    public ClientsData getClientsByGuardSan(String guardSan) {
-        authenticateRequest(null);
-        ClientsData data = new ClientsData();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            List<Long> idOfClients = DAOUtils.extractIDFromGuardSanByGuardSan(persistenceSession, guardSan);
-
-            data.clientList = new ClientList();
-            for (Long idOfClient : idOfClients) {
-                Client cl = DAOUtils.findClient(persistenceSession, idOfClient);
-                ClientItem clientItem = new ClientItem();
-                clientItem.setContractId(cl.getContractId());
-                clientItem.setSan(cl.getSan());
-                data.clientList.getClients().add(clientItem);
-            }
-            data.resultCode = RC_OK;
-            data.description = "OK";
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to process client room controller request", e);
-            data.resultCode = RC_INTERNAL_ERROR;
-            data.description = e.toString();
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return data;
-    }
-
     public ClientsWithResultCode getClientsByGuardMobile(String mobile, Session session) {
 
         ClientsWithResultCode data = new ClientsWithResultCode();
@@ -4311,246 +4278,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    @Override
-    public AttachGuardSanResult attachGuardSan(String san, String guardSan) {
-        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
-        authenticateRequest(null);
-
-        AttachGuardSanResult data = new AttachGuardSanResult();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            List clientList = DAOUtils.findClientsBySan(persistenceSession, san);
-            workClientSan(persistenceSession, guardSan, data, clientList);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            data.resultCode = RC_INTERNAL_ERROR;
-            data.description = e.getMessage();
-        } finally {
-            if (persistenceTransaction != null) {
-                persistenceTransaction.rollback();
-            }
-            if (persistenceSession != null) {
-                persistenceSession.close();
-            }
-        }
-        return data;
-    }
-
-    @Override
-    public AttachGuardSanResult attachGuardSan(Long contractId, String guardSan) {
-        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
-        authenticateRequest(null);
-
-        AttachGuardSanResult data = new AttachGuardSanResult();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            List clientList = DAOUtils.findClientsByContract(persistenceSession, contractId);
-            workClientSan(persistenceSession, guardSan, data, clientList);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            data.resultCode = RC_INTERNAL_ERROR;
-            data.description = e.getMessage();
-        } finally {
-            if (persistenceTransaction != null) {
-                persistenceTransaction.rollback();
-            }
-            if (persistenceSession != null) {
-                persistenceSession.close();
-            }
-        }
-        return data;
-    }
-
-    @Override
-    public DetachGuardSanResult detachGuardSan(String san, String guardSan) {
-        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
-        authenticateRequest(null);
-
-        DetachGuardSanResult data = new DetachGuardSanResult();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            List clientList = DAOUtils.findClientsBySan(persistenceSession, san);
-            workClientSan(persistenceSession, guardSan, data, clientList);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            data.resultCode = RC_INTERNAL_ERROR;
-            data.description = e.getMessage();
-        } finally {
-            if (persistenceTransaction != null) {
-                persistenceTransaction.rollback();
-            }
-            if (persistenceSession != null) {
-                persistenceSession.close();
-            }
-        }
-
-        return data;
-    }
-
-    @Override
-    public DetachGuardSanResult detachGuardSan(Long contractId, String guardSan) {
-        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
-        authenticateRequest(null);
-
-        DetachGuardSanResult data = new DetachGuardSanResult();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            List clientList = DAOUtils.findClientsByContract(persistenceSession, contractId);
-            workClientSan(persistenceSession, guardSan, data, clientList);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            data.resultCode = RC_INTERNAL_ERROR;
-            data.description = e.getMessage();
-        } finally {
-            if (persistenceTransaction != null) {
-                persistenceTransaction.rollback();
-            }
-            if (persistenceSession != null) {
-                persistenceSession.close();
-            }
-        }
-
-        return data;
-    }
-
-    private void workClientSan(Session persistenceSession, String guardSan, Result data, List clientList) {
-        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
-        if (guardSan.length() < 1) {
-            data.resultCode = RC_INVALID_DATA;
-            data.description = "Неверно указан СНИЛС: " + guardSan;
-            return;
-        }
-
-
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        try {
-            parseWorkClientSan(persistenceSession, guardSan, data, clientList);
-        } catch (Exception e) {
-            data.resultCode = RC_INVALID_DATA;
-            data.description = RC_INTERNAL_ERROR_DESC;
-            return;
-        }
-    }
-
-    public void parseWorkClientSan(Session persistenceSession, String guardSan, Result data, List clientList) {
-        if (clientList.size() == 0) {
-            data.resultCode = RC_CLIENT_NOT_FOUND;
-            data.description = RC_CLIENT_NOT_FOUND_DESC;
-        } /*else if (clientList.size() > 1) {
-            data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
-            data.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
-        }*/ else {
-            Long idOfClient = ((BigInteger) clientList.get(0)).longValue();
-            Client cl = null;
-            Set<GuardSan> guardSans = Collections.EMPTY_SET;
-            //String clientGuardSan = (String) clientObject[1];
-            try {
-                cl = DAOUtils.findClient(persistenceSession, idOfClient);
-                guardSans = cl.getGuardSan();
-            } catch (Exception e) {
-                data.resultCode = RC_INTERNAL_ERROR;
-                data.description = RC_INTERNAL_ERROR_DESC;
-                logger.error("Failed to insert SNILS using WS", e);
-                return;
-            }
-
-
-            //  Проверка наличия опекуна среди текущих
-            boolean exists = false;
-            for (GuardSan gSan : guardSans) {
-                if (gSan.getGuardSan().equals(guardSan)) {
-                    exists = true;
-                    break;
-                }
-            }
-
-            if (data instanceof AttachGuardSanResult) {
-                //  Если надо прикрепить опекуна
-                try {
-                    if (exists) {
-                        //  Если уже опекун уже существует, то ничего не делаем
-                        data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
-                        data.description = RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC;
-                    } else {
-                        //  Иначе, добавляем его и обновляем все сущности в БД
-                        GuardSan newGuardSan = new GuardSan(cl, guardSan);
-                        newGuardSan.setGuardSan(guardSan);
-                        persistenceSession.save(newGuardSan);
-                        /*guardSans.add(newGuardSan);
-                        cl.setGuardSan(guardSans);
-                        session.update(cl);*/
-                        data.resultCode = RC_OK;
-                        data.description = "Ok";
-                    }
-                } catch (Exception e) {
-                    data.resultCode = RC_INTERNAL_ERROR;
-                    data.description = RC_INTERNAL_ERROR_DESC;
-                    logger.error("Failed to insert guard SNILS using WS", e);
-                    return;
-                }
-            } else if (data instanceof DetachGuardSanResult) {
-                //  Если надо его открепить
-                try {
-                    if (!exists) {
-                        //  Если опекун уже не существует, ничего не делаем
-                        data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                        data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
-                    } else {
-                        for (GuardSan gSan : guardSans) {
-                            if (gSan.getGuardSan().equals(guardSan)) {
-                                guardSans.remove(gSan);
-                                break;
-                            }
-                        }
-                        cl.setGuardSan(guardSans);
-                        persistenceSession.update(cl);
-                        data.resultCode = RC_OK;
-                        data.description = "Ok";
-                    }
-                } catch (Exception e) {
-                    data.resultCode = RC_INTERNAL_ERROR;
-                    data.description = RC_INTERNAL_ERROR_DESC;
-                    logger.error("Failed to remove guard SNILS using WS", e);
-                    return;
-                }
-            } else {
-                data.resultCode = RC_INTERNAL_ERROR;
-                data.description = RC_INTERNAL_ERROR_DESC;
-                logger.error("Try to execute unknown operation " + data.getClass());
-            }
-        }
-    }
-
-    private boolean isGuardSanExists(String guardSan, String clientGuardSans) {
-        String[] guardSans = clientGuardSans.split(";");
-        for (String gs : guardSans) {
-            if (gs.equals(guardSan)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     XMLGregorianCalendar toXmlDateTime(Date date) throws DatatypeConfigurationException {
         if (date == null) {
             return null;
@@ -4610,31 +4337,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return contractId;
-    }
-
-    @Override
-    public ClientSummaryExt[] getSummaryByGuardSan(String guardSan) {
-        HTTPData data = new HTTPData();
-        HTTPDataHandler handler = new HTTPDataHandler(data);
-        authenticateRequest(null, handler);
-        Date date = new Date(System.currentTimeMillis());
-        //authenticateRequest(null);
-
-        ClientsData cd = getClientsByGuardSan(guardSan);
-        LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
-        if (cd != null && cd.clientList != null) {
-            for (ClientItem ci : cd.clientList.getClients()) {
-                ClientSummaryResult cs = getSummary(ci.getContractId());
-                if (cs.clientSummary != null) {
-                    clientSummaries.add(cs.clientSummary);
-                    Long idOfClient = DAOService.getInstance().getClientByContractId(cs.clientSummary.getContractId())
-                            .getIdOfClient();
-                    handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date,
-                            handler.getData().getSsoId(), idOfClient, handler.getData().getOperationType());
-                }
-            }
-        }
-        return clientSummaries.toArray(new ClientSummaryExt[clientSummaries.size()]);
     }
 
     @Override
@@ -7190,48 +6892,51 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, List<WtDish> wtDishes) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfOrg, List<WtDish> wtDishes) {
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, true);
-                menuItemExtList.add(menuItemExt);
+                List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDish, true);
+                menuItemExtList.addAll(menuItemExt);
             }
         }
         return menuItemExtList;
     }
 
-    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish, boolean isGroupByCategory) {
-        MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-        String menuGroup = "";
+    private List<MenuItemExt> getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDish wtDish, boolean isGroupByCategory) {
+        List<MenuItemExt> result = new ArrayList<>();
+        Set<String> menuGroupSet = null;
         if (isGroupByCategory) {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
+            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
         } else {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(wtDish);
+            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(idOfOrg, wtDish);
         }
-        menuItemExt.setGroup(menuGroup);
-        menuItemExt.setName(wtDish.getDishName());
-        menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
-        menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
-        menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
-        menuItemExt.setAvailableNow(1);
-        menuItemExt.setCarbohydrates(
-                wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
-        menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
-        menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
-        menuItemExt.setVitB1(0.0);
-        menuItemExt.setVitB2(0.0);
-        menuItemExt.setVitPp(0.0);
-        menuItemExt.setVitC(0.0);
-        menuItemExt.setVitA(0.0);
-        menuItemExt.setVitE(0.0);
-        menuItemExt.setMinCa(0.0);
-        menuItemExt.setMinP(0.0);
-        menuItemExt.setMinMg(0.0);
-        menuItemExt.setMinFe(0.0);
-        menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-        menuItemExt.setFullName(wtDish.getComponentsOfDish());
-        return menuItemExt;
+        for (String menuGroup : menuGroupSet) {
+            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+            menuItemExt.setGroup(menuGroup);
+            menuItemExt.setName(wtDish.getDishName());
+            menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
+            menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+            menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+            menuItemExt.setAvailableNow(1);
+            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
+            menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+            menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+            menuItemExt.setVitB1(0.0);
+            menuItemExt.setVitB2(0.0);
+            menuItemExt.setVitPp(0.0);
+            menuItemExt.setVitC(0.0);
+            menuItemExt.setVitA(0.0);
+            menuItemExt.setVitE(0.0);
+            menuItemExt.setMinCa(0.0);
+            menuItemExt.setMinP(0.0);
+            menuItemExt.setMinMg(0.0);
+            menuItemExt.setMinFe(0.0);
+            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+            menuItemExt.setFullName(wtDish.getComponentsOfDish());
+            result.add(menuItemExt);
+        }
+        return result;
     }
 
 
@@ -10198,20 +9903,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 res = processPreorderComplexesWithWtMenuList(contractId, date);
             }
-            List<PreorderComplexGroup> list = res.getComplexesWithGroups();
-            if (list != null && list.size() > 0) {
-                ComplexGroup complexGroup = new ComplexGroup();
-                complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
-                result.setComplexGroup(complexGroup);
+            if (res.resultCode == null || res.resultCode.equals(RC_OK)) {
+                List<PreorderComplexGroup> list = res.getComplexesWithGroups();
+                if (list != null && list.size() > 0) {
+                    ComplexGroup complexGroup = new ComplexGroup();
+                    complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
+                    result.setComplexGroup(complexGroup);
+                }
+                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId);
+                if (regularPreordersList.getRegularPreorders() != null
+                        && regularPreordersList.getRegularPreorders().size() > 0) {
+                    result.setRegularPreorders(regularPreordersList);
+                }
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+            } else {
+                result.resultCode = res.resultCode;
+                result.description = res.description;
             }
-            RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getRegularPreordersList(contractId);
-            if (regularPreordersList.getRegularPreorders() != null
-                    && regularPreordersList.getRegularPreorders().size() > 0) {
-                result.setRegularPreorders(regularPreordersList);
-            }
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
         } catch (Exception e) {
             logger.error("Error in getPreorderComplexes", e);
             result.resultCode = RC_INTERNAL_ERROR;

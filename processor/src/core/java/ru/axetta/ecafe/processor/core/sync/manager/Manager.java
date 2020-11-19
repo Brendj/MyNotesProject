@@ -705,7 +705,7 @@ public class Manager implements AbstractToElement {
                 .getInstance();
         for (Long orgOwner : mapPositions.keySet()) {
             List<String> guids = mapPositions.get(orgOwner);
-            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids, true);
+            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids, false);
         }
     }
 

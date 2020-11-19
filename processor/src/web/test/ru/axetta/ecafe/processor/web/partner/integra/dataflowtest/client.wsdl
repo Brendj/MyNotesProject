@@ -27,10 +27,6 @@
       <xs:attribute name="AmountForCondition" type="xs:int"/>
     </xs:complexType>
   </xs:element>
-<xs:element name="attachGuardSan" type="tns:attachGuardSan"/>
-<xs:element name="attachGuardSanBySan" type="tns:attachGuardSanBySan"/>
-<xs:element name="attachGuardSanBySanResponse" type="tns:attachGuardSanBySanResponse"/>
-<xs:element name="attachGuardSanResponse" type="tns:attachGuardSanResponse"/>
 <xs:element name="authorizeClient" type="tns:authorizeClient"/>
 <xs:element name="authorizeClientResponse" type="tns:authorizeClientResponse"/>
 <xs:element name="changeEmail" type="tns:changeEmail"/>
@@ -39,10 +35,6 @@
 <xs:element name="changeExpenditureLimitResponse" type="tns:changeExpenditureLimitResponse"/>
 <xs:element name="changeMobilePhone" type="tns:changeMobilePhone"/>
 <xs:element name="changeMobilePhoneResponse" type="tns:changeMobilePhoneResponse"/>
-<xs:element name="detachGuardSan" type="tns:detachGuardSan"/>
-<xs:element name="detachGuardSanBySan" type="tns:detachGuardSanBySan"/>
-<xs:element name="detachGuardSanBySanResponse" type="tns:detachGuardSanBySanResponse"/>
-<xs:element name="detachGuardSanResponse" type="tns:detachGuardSanResponse"/>
 <xs:element name="enableNotificationByEmail" type="tns:enableNotificationByEmail"/>
 <xs:element name="enableNotificationByEmailResponse" type="tns:enableNotificationByEmailResponse"/>
 <xs:element name="enableNotificationBySMS" type="tns:enableNotificationBySMS"/>
@@ -59,8 +51,6 @@
 <xs:element name="putClassRegisterEventListByGUIDResponse" type="tns:putClassRegisterEventListByGUIDResponse"/>
 <xs:element name="getEnterEventStatusListByGUID" type="tns:getEnterEventStatusListByGUID"/>
 <xs:element name="getEnterEventStatusListByGUIDResponse" type="tns:getEnterEventStatusListByGUIDResponse"/>
-<xs:element name="getClientsByGuardSan" type="tns:getClientsByGuardSan"/>
-<xs:element name="getClientsByGuardSanResponse" type="tns:getClientsByGuardSanResponse"/>
 <xs:element name="getContractIdByCardNo" type="tns:getContractIdByCardNo"/>
 <xs:element name="getContractIdByCardNoResponse" type="tns:getContractIdByCardNoResponse"/>
 <xs:element name="getEnterEventList" type="tns:getEnterEventList"/>
@@ -86,8 +76,6 @@
 <xs:element name="getStudentListByIdOfClientGroup" type="tns:getStudentListByIdOfClientGroup"/>
 <xs:element name="getStudentListByIdOfClientGroupResponse" type="tns:getStudentListByIdOfClientGroupResponse"/>
 <xs:element name="getSummary" type="tns:getSummary"/>
-<xs:element name="getSummaryByGuardSan" type="tns:getSummaryByGuardSan"/>
-<xs:element name="getSummaryByGuardSanResponse" type="tns:getSummaryByGuardSanResponse"/>
 <xs:element name="getSummaryBySan" type="tns:getSummaryBySan"/>
 <xs:element name="getSummaryBySanResponse" type="tns:getSummaryBySanResponse"/>
 <xs:element name="getSummaryByTypedId" type="tns:getSummaryByTypedId"/>
@@ -221,24 +209,6 @@
       <xs:element minOccurs="0" name="return" type="tns:cardListResult"/>
     </xs:sequence>
   </xs:complexType>
-<xs:complexType name="detachGuardSan">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
-      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="detachGuardSanResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="tns:detachGuardSanResult"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="detachGuardSanResult">
-    <xs:complexContent>
-      <xs:extension base="tns:result">
-        <xs:sequence/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
 <xs:complexType name="enableNotificationBySMS">
     <xs:sequence>
       <xs:element minOccurs="0" name="contractId" type="xs:long"/>
@@ -272,24 +242,6 @@
       <xs:element minOccurs="0" name="return" type="tns:result"/>
     </xs:sequence>
   </xs:complexType>
-<xs:complexType name="attachGuardSan">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
-      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="attachGuardSanResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="tns:attachGuardSanResult"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="attachGuardSanResult">
-    <xs:complexContent>
-      <xs:extension base="tns:result">
-        <xs:sequence/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
 <xs:complexType name="getStudentListByIdOfClientGroup">
     <xs:sequence>
       <xs:element minOccurs="0" name="idOfClientGroup" type="xs:long"/>
@@ -320,16 +272,6 @@
 <xs:complexType name="getPaymentListBySanResponse">
     <xs:sequence>
       <xs:element minOccurs="0" name="return" type="tns:paymentListResult"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="getClientsByGuardSan">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="san" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="getClientsByGuardSanResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="tns:clientsData"/>
     </xs:sequence>
   </xs:complexType>
 <xs:complexType name="clientsData">
@@ -480,16 +422,6 @@
 <xs:complexType name="getSummaryByTypedIdResponse">
     <xs:sequence>
       <xs:element minOccurs="0" name="return" type="tns:clientSummaryResult"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="getSummaryByGuardSan">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="getSummaryByGuardSanResponse">
-    <xs:sequence>
-      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:ClientSummaryExt"/>
     </xs:sequence>
   </xs:complexType>
 <xs:complexType name="getPurchaseListBySan">
@@ -728,28 +660,6 @@
       <xs:element minOccurs="0" name="return" type="tns:menuListResult"/>
     </xs:sequence>
   </xs:complexType>
-<xs:complexType name="detachGuardSanBySan">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="san" type="xs:string"/>
-      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="detachGuardSanBySanResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="tns:detachGuardSanResult"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="attachGuardSanBySan">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="san" type="xs:string"/>
-      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-<xs:complexType name="attachGuardSanBySanResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="tns:attachGuardSanResult"/>
-    </xs:sequence>
-  </xs:complexType>
 <xs:complexType name="getEnterEventListBySan">
     <xs:sequence>
       <xs:element minOccurs="0" name="san" type="xs:string"/>
@@ -815,10 +725,6 @@
     <wsdl:part element="tns:authorizeClientResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="detachGuardSan">
-    <wsdl:part element="tns:detachGuardSan" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getSummaryByTypedIdResponse">
     <wsdl:part element="tns:getSummaryByTypedIdResponse" name="parameters">
     </wsdl:part>
@@ -833,10 +739,6 @@
   </wsdl:message>
   <wsdl:message name="changeMobilePhone">
     <wsdl:part element="tns:changeMobilePhone" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getSummaryByGuardSan">
-    <wsdl:part element="tns:getSummaryByGuardSan" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getMenuListBySan">
@@ -865,10 +767,6 @@
   </wsdl:message>
   <wsdl:message name="getSummaryBySan">
     <wsdl:part element="tns:getSummaryBySan" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getClientsByGuardSanResponse">
-    <wsdl:part element="tns:getClientsByGuardSanResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getEnterEventListResponse">
@@ -903,14 +801,6 @@
     <wsdl:part element="tns:getMenuListBySanResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="attachGuardSanBySanResponse">
-    <wsdl:part element="tns:attachGuardSanBySanResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getSummaryByGuardSanResponse">
-    <wsdl:part element="tns:getSummaryByGuardSanResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getMenuList">
     <wsdl:part element="tns:getMenuList" name="parameters">
     </wsdl:part>
@@ -925,10 +815,6 @@
   </wsdl:message>
   <wsdl:message name="getStudentListByIdOfClientGroup">
     <wsdl:part element="tns:getStudentListByIdOfClientGroup" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="attachGuardSan">
-    <wsdl:part element="tns:attachGuardSan" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getPaymentListBySan">
@@ -947,16 +833,8 @@
     <wsdl:part element="tns:getSummaryBySanResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="attachGuardSanResponse">
-    <wsdl:part element="tns:attachGuardSanResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="authorizeClient">
     <wsdl:part element="tns:authorizeClient" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="detachGuardSanBySanResponse">
-    <wsdl:part element="tns:detachGuardSanBySanResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getCardListBySanResponse">
@@ -975,24 +853,12 @@
     <wsdl:part element="tns:getSummaryResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="attachGuardSanBySan">
-    <wsdl:part element="tns:attachGuardSanBySan" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="detachGuardSanResponse">
-    <wsdl:part element="tns:detachGuardSanResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getPaymentListBySanResponse">
     <wsdl:part element="tns:getPaymentListBySanResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="changeExpenditureLimit">
     <wsdl:part element="tns:changeExpenditureLimit" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getClientsByGuardSan">
-    <wsdl:part element="tns:getClientsByGuardSan" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="changeEmailResponse">
@@ -1037,10 +903,6 @@
   </wsdl:message>
   <wsdl:message name="getMenuListByOrg">
     <wsdl:part element="tns:getMenuListByOrg" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="detachGuardSanBySan">
-    <wsdl:part element="tns:detachGuardSanBySan" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="enableNotificationByEmail">
@@ -1106,12 +968,6 @@
       <wsdl:output message="tns:getCardListResponse" name="getCardListResponse">
     </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="detachGuardSan">
-      <wsdl:input message="tns:detachGuardSan" name="detachGuardSan">
-    </wsdl:input>
-      <wsdl:output message="tns:detachGuardSanResponse" name="detachGuardSanResponse">
-    </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="enableNotificationBySMS">
       <wsdl:input message="tns:enableNotificationBySMS" name="enableNotificationBySMS">
     </wsdl:input>
@@ -1130,12 +986,6 @@
       <wsdl:output message="tns:enableNotificationByEmailResponse" name="enableNotificationByEmailResponse">
     </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="attachGuardSan">
-      <wsdl:input message="tns:attachGuardSan" name="attachGuardSan">
-    </wsdl:input>
-      <wsdl:output message="tns:attachGuardSanResponse" name="attachGuardSanResponse">
-    </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="getStudentListByIdOfClientGroup">
       <wsdl:input message="tns:getStudentListByIdOfClientGroup" name="getStudentListByIdOfClientGroup">
     </wsdl:input>
@@ -1146,12 +996,6 @@
       <wsdl:input message="tns:getPaymentListBySan" name="getPaymentListBySan">
     </wsdl:input>
       <wsdl:output message="tns:getPaymentListBySanResponse" name="getPaymentListBySanResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="getClientsByGuardSan">
-      <wsdl:input message="tns:getClientsByGuardSan" name="getClientsByGuardSan">
-    </wsdl:input>
-      <wsdl:output message="tns:getClientsByGuardSanResponse" name="getClientsByGuardSanResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getGroupListByOrg">
@@ -1188,12 +1032,6 @@
       <wsdl:input message="tns:getSummaryByTypedId" name="getSummaryByTypedId">
     </wsdl:input>
       <wsdl:output message="tns:getSummaryByTypedIdResponse" name="getSummaryByTypedIdResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="getSummaryByGuardSan">
-      <wsdl:input message="tns:getSummaryByGuardSan" name="getSummaryByGuardSan">
-    </wsdl:input>
-      <wsdl:output message="tns:getSummaryByGuardSanResponse" name="getSummaryByGuardSanResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getPurchaseListBySan">
@@ -1257,18 +1095,6 @@
       <wsdl:output message="tns:getMenuListByOrgResponse" name="getMenuListByOrgResponse">
     </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="detachGuardSanBySan">
-      <wsdl:input message="tns:detachGuardSanBySan" name="detachGuardSanBySan">
-    </wsdl:input>
-      <wsdl:output message="tns:detachGuardSanBySanResponse" name="detachGuardSanBySanResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="attachGuardSanBySan">
-      <wsdl:input message="tns:attachGuardSanBySan" name="attachGuardSanBySan">
-    </wsdl:input>
-      <wsdl:output message="tns:attachGuardSanBySanResponse" name="attachGuardSanBySanResponse">
-    </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="getEnterEventListBySan">
       <wsdl:input message="tns:getEnterEventListBySan" name="getEnterEventListBySan">
     </wsdl:input>
@@ -1314,15 +1140,6 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="detachGuardSan">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="detachGuardSan">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="detachGuardSanResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="getCardList">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="getCardList">
@@ -1359,15 +1176,6 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="attachGuardSan">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="attachGuardSan">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="attachGuardSanResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="getPaymentListBySan">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="getPaymentListBySan">
@@ -1383,15 +1191,6 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="getStudentListByIdOfClientGroupResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="getClientsByGuardSan">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="getClientsByGuardSan">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="getClientsByGuardSanResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
@@ -1446,15 +1245,6 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="getSummaryByTypedIdResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="getSummaryByGuardSan">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="getSummaryByGuardSan">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="getSummaryByGuardSanResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
@@ -1518,24 +1308,6 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="getMenuListByOrgResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="detachGuardSanBySan">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="detachGuardSanBySan">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="detachGuardSanBySanResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="attachGuardSanBySan">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="attachGuardSanBySan">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="attachGuardSanBySanResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
