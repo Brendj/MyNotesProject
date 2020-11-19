@@ -333,6 +333,7 @@ public class DeliveredServicesReportBuilder extends BasicReportForAllOrgJob.Buil
 
             DeliveredServicesItem item1 = new DeliveredServicesItem(level1, level2, level3, nameOfGood,
                     null, null, null, officialname, orgNum, address, idoforg, createdDate);
+            if (level3 == null) continue;
             if(level3.equals("1,5-3") || level3.equals("1.5-3")) {
                 result.getList153().add(item);
                 summary37 += summary;
