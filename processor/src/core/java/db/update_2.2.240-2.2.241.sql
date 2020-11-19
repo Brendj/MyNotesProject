@@ -52,4 +52,8 @@ SELECT fix_settingtype();
 --271
 ALTER TABLE public.cf_clientbalance_hold ALTER COLUMN idoftransaction DROP NOT NULL;
 
+CREATE INDEX cf_visitreqresolutionhist_idoforgregistry_syncstate_idx
+ON cf_visitreqresolutionhist USING btree
+(idoforgregistry, syncstate);
+
 --! ФИНАЛИЗИРОВАН 17.11.2020, НЕ МЕНЯТЬ
