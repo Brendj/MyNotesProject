@@ -17,7 +17,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 @Service
 public class KafkaService {
     private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final KafkaTemplate<String, String> kafkaStarshipTemplate;
 
     @Value(value = "${kafka.topic.assign}")
@@ -26,9 +26,7 @@ public class KafkaService {
     @Value(value = "${kafka.topic.supply}")
     private String topicSupplyName;
 
-    public KafkaService(ObjectMapper objectMapper,
-                        KafkaTemplate<String, String> kafkaStarshipTemplate) {
-        this.objectMapper = objectMapper;
+    public KafkaService(KafkaTemplate<String, String> kafkaStarshipTemplate) {
         this.kafkaStarshipTemplate = kafkaStarshipTemplate;
     }
 

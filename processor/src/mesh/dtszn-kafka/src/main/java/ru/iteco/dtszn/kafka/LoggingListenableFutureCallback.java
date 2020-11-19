@@ -7,6 +7,7 @@ package ru.iteco.dtszn.kafka;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.lang.NonNull;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 public class LoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, String>> {
@@ -18,9 +19,8 @@ public class LoggingListenableFutureCallback implements ListenableFutureCallback
     }
 
     @Override
-    public void onSuccess(SendResult<String, String> result) {
-        log.info("Sent message=[" + message + "] with offset=[" + result.getRecordMetadata()
-                .offset() + "]");
+    public void onSuccess(@NonNull SendResult<String, String> result) {
+        log.info("Sent message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "]");
     }
 
     @Override
