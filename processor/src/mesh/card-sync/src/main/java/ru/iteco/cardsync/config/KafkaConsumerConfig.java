@@ -36,6 +36,12 @@ class KafkaConsumerConfig {
     @Value(value = "${kafka.password}")
     private String password;
 
+    @Value(value = "${kafka.max.poll.interval.ms}")
+    private String maxPollInterval;
+
+    @Value(value = "${kafka.max.poll.records}")
+    private String maxPollRecords;
+
     @Value(value = "${kafka.consumer.auto-offset-reset}")
     private String consumerAutoOffset;
 
@@ -53,6 +59,8 @@ class KafkaConsumerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerAutoOffset);
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollInterval);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
         props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
         props.put(SaslConfigs.SASL_JAAS_CONFIG,
