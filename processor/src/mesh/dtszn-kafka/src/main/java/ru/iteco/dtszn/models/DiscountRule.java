@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Table
-public class DiscountRules {
+public class DiscountRule {
     @Id
     @Column(name = "idofrule")
     private Long idOfRule;

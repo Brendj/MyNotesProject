@@ -2,7 +2,7 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.dtszn.models.compositkey;
+package ru.iteco.dtszn.models.compositeId;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -10,19 +10,19 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class OrderCompositeKey implements Serializable {
-    @Column(name = "idoforder")
-    private Long idOfOrder;
+public class OrderDetailCompositeId implements Serializable {
+    @Column(name = "idoforderdetail")
+    private Long idOfOrderDetail;
 
     @Column(name = "idoforg")
     private Long idOfOrg;
 
-    public Long getIdOfOrder() {
-        return idOfOrder;
+    public Long getIdOfOrderDetail() {
+        return idOfOrderDetail;
     }
 
-    public void setIdOfOrder(Long idOfOrder) {
-        this.idOfOrder = idOfOrder;
+    public void setIdOfOrderDetail(Long idOfOrderDetail) {
+        this.idOfOrderDetail = idOfOrderDetail;
     }
 
     public Long getIdOfOrg() {
@@ -41,12 +41,12 @@ public class OrderCompositeKey implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        OrderCompositeKey that = (OrderCompositeKey) o;
-        return Objects.equals(idOfOrder, that.idOfOrder) && Objects.equals(idOfOrg, that.idOfOrg);
+        OrderDetailCompositeId that = (OrderDetailCompositeId) o;
+        return Objects.equals(idOfOrderDetail, that.idOfOrderDetail) && Objects.equals(idOfOrg, that.idOfOrg);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfOrder, idOfOrg);
+        return Objects.hash(idOfOrderDetail, idOfOrg);
     }
 }

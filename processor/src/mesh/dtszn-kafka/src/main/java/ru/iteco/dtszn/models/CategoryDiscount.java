@@ -24,7 +24,7 @@ public class CategoryDiscount {
             joinColumns = @JoinColumn(name = "idofcategorydiscount"),
             inverseJoinColumns = @JoinColumn(name = "idofrule")
     )
-    private Set<DiscountRules> rules;
+    private Set<DiscountRule> rules;
 
     @OneToMany
     @JoinColumn(name = "idofcategorydiscount")
@@ -46,11 +46,11 @@ public class CategoryDiscount {
         this.categoryName = categoryName;
     }
 
-    public Set<DiscountRules> getRules() {
+    public Set<DiscountRule> getRules() {
         return rules;
     }
 
-    public void setRules(Set<DiscountRules> rules) {
+    public void setRules(Set<DiscountRule> rules) {
         this.rules = rules;
     }
 

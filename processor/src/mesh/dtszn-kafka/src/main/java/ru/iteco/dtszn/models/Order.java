@@ -4,16 +4,20 @@
 
 package ru.iteco.dtszn.models;
 
-import ru.iteco.dtszn.models.compositkey.OrderCompositeKey;
+import ru.iteco.dtszn.models.compositeId.OrderCompositeId;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_orders")
 public class Order {
+    private static final int DISCOUNT_TYPE = 4;
+    private static final int DISCOUNT_TYPE_RESERVE = 6;
+
     @EmbeddedId
-    private OrderCompositeKey compositeKey;
+    private OrderCompositeId compositeId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idofclient")
@@ -23,12 +27,35 @@ public class Order {
     @JoinColumn(name = "idoforg")
     private Org org;
 
-    public OrderCompositeKey getCompositeKey() {
-        return compositeKey;
+    @OneToMany(mappedBy = "order")
+    private Set<OrderDetail> orderDetailSet;
+
+    @Column(name = "orderdate")
+    private Long orderDate;
+
+    @Column(name = "createddate")
+    private Long createdDate;
+
+    @Column(name = "ordertype")
+    private Integer orderType;
+
+    @Column(name = "rsum")
+    private Long rsum;
+
+    public Set<OrderDetail> getOrderDetailSet() {
+        return orderDetailSet;
     }
 
-    public void setCompositeKey(OrderCompositeKey compositeKey) {
-        this.compositeKey = compositeKey;
+    public void setOrderDetailSet(Set<OrderDetail> orderDetailSet) {
+        this.orderDetailSet = orderDetailSet;
+    }
+
+    public OrderCompositeId getCompositeId() {
+        return compositeId;
+    }
+
+    public void setCompositeId(OrderCompositeId compositeKey) {
+        this.compositeId = compositeKey;
     }
 
     public Client getClient() {
@@ -56,11 +83,11 @@ public class Order {
             return false;
         }
         Order order = (Order) o;
-        return Objects.equals(compositeKey, order.compositeKey);
+        return Objects.equals(compositeId, order.compositeId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(compositeKey);
+        return Objects.hash(compositeId);
     }
 }
