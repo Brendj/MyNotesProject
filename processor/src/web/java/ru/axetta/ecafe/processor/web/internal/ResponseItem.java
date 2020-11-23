@@ -40,7 +40,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_WRONG_KEY_MESSAGE_EMIAS = "Доступ запрещен";
     public static final String ERROR_ORG_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_EVENT_NOT_FOUND_MESSAGE = "Некорректный тип события";
-    public static final String ERROR_CANCEL_EVENT_NOT_FOUND_MESSAGE = "Некорректный тип отменяемого события";
+    public static final String ERROR_CANCEL_EVENT_NOT_FOUND_MESSAGE = "Некорректный идентификатор отменяемого события";
     public static final String ERROR_ARGUMENT_NOT_FOUND_MESSAGE = "Не заполнены обязательные поля";
     public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS = "Клиент не найден";
     public static final String ERROR_ID_EVENT_EMIAS = "Некорректные данные";
