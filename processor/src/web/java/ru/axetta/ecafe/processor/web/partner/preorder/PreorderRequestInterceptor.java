@@ -4,11 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.jboss.resteasy.annotations.interception.Precedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -27,13 +27,13 @@ import java.util.List;
 @Precedence("SECURITY")
 public class PreorderRequestInterceptor implements PreProcessInterceptor {
     @Override
-    public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
+    public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method) throws Failure, WebApplicationException {
 
         if (!RuntimeContext.getAppContext().getBean(SudirClientService.class).SECURITY_ON) {
             return null;
         }
 
-        if (request.getPreprocessedPath().contains("login") || (request.getPreprocessedPath().contains("clientsummary") && request.getPreprocessedPath().length() > 30)) {
+        if (request.getUri().getPath().contains("login") || (request.getUri().getPath().contains("clientsummary") && request.getUri().getPath().length() > 30)) {
             return null;
         }
         HttpHeaders headers = request.getHttpHeaders();

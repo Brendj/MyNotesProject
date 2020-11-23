@@ -25,7 +25,6 @@ import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jboss.resteasy.spi.validation.ValidateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -632,7 +631,6 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ValidateRequest
     @Path(value = "createclient")
     public Response createClient(CreateClientRequestDTO createClientRequestDTO) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -776,7 +774,6 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ValidateRequest
     @Path(value = "settopay")
     public Response setToPay(SetToPayRequestDTO setToPayRequestDTO) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();

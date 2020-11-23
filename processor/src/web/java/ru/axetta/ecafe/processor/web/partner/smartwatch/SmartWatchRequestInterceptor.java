@@ -4,13 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.jboss.resteasy.annotations.interception.Precedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -34,7 +34,7 @@ public class SmartWatchRequestInterceptor implements PreProcessInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(SmartWatchRequestInterceptor.class);
 
     @Override
-    public ServerResponse preProcess(HttpRequest request, ResourceMethod method)
+    public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method)
             throws Failure, WebApplicationException {
         try {
             SmartWatchVendorManager manager = RuntimeContext.getAppContext().getBean(SmartWatchVendorManager.class);
