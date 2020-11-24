@@ -182,6 +182,7 @@ public class MeshPersonsSyncService {
             meshSyncPerson.setGuidnsi(guidnsi);
             meshSyncPerson.setLastupdateRest(new Date());
             meshSyncPerson.setDeletestate(deleted);
+            meshSyncPerson.setInvaliddata(false);
             session.saveOrUpdate(meshSyncPerson);
 
         } catch (Exception e) {
