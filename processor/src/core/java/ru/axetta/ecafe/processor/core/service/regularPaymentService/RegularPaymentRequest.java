@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
+import org.springframework.context.annotation.DependsOn;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientPaymentsDao;
@@ -35,6 +36,7 @@ import java.util.Map;
  */
 
 @Service(IRequestOperation.REGULAR_PAYMENT)
+@DependsOn("runtimeContext")
 public class RegularPaymentRequest implements IRequestOperation {
 
     private static Logger logger = LoggerFactory.getLogger(RegularPaymentRequest.class);
