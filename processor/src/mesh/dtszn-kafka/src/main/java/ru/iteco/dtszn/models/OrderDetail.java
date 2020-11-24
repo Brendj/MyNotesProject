@@ -11,6 +11,18 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "cf_orderdetails")
+@NamedEntityGraph(
+        name = "orderDetail.rule",
+        attributeNodes = {
+                @NamedAttributeNode(value = "ruleCategoryDiscount", subgraph = "rule.categoryDiscount")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "rule.categoryDiscount",
+                        attributeNodes = @NamedAttributeNode("categoryDiscount")
+                )
+        }
+)
 public class OrderDetail {
     public static final int TYPE_COMPLEX_MIN = 50;
     public static final int TYPE_COMPLEX_MAX = 99;

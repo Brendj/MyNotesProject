@@ -6,24 +6,44 @@ package ru.iteco.dtszn.models;
 
 import ru.iteco.dtszn.models.compositeId.OrderCompositeId;
 
+import org.hibernate.annotations.JoinFormula;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "cf_orders")
+@NamedEntityGraphs({
+        @NamedEntityGraph(
+                name = "order_with_detail_only",
+                attributeNodes = {
+                        @NamedAttributeNode("orderDetailSet")
+                }
+        ),
+        @NamedEntityGraph(
+                name = "full_info",
+                attributeNodes = {
+
+                },
+                subgraphs = {
+
+                }
+        )
+})
 public class Order {
-    private static final int DISCOUNT_TYPE = 4;
-    private static final int DISCOUNT_TYPE_RESERVE = 6;
+    public static final int DISCOUNT_TYPE = 4;
+    public static final int DISCOUNT_TYPE_RESERVE = 6;
 
     @EmbeddedId
     private OrderCompositeId compositeId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idofclient")
+    @JoinFormula("(meshguid is not null or meshguid not like '')")
     private Client client;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idoforg")
     private Org org;
 

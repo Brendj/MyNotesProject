@@ -26,7 +26,7 @@ public class Client {
     @JoinColumn(name = "idoforg")
     private Org org;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "cf_clients_categorydiscounts",
             joinColumns = @JoinColumn(name = "idofclient"),
@@ -64,6 +64,14 @@ public class Client {
 
     public void setOrg(Org org) {
         this.org = org;
+    }
+
+    public Set<CategoryDiscountDTSZN> getDiscounts() {
+        return discounts;
+    }
+
+    public void setDiscounts(Set<CategoryDiscountDTSZN> discounts) {
+        this.discounts = discounts;
     }
 
     @Override

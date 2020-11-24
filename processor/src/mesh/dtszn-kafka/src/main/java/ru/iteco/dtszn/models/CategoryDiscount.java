@@ -10,6 +10,15 @@ import java.util.Set;
 
 @Entity
 @Table(name = "cf_categorydiscounts")
+@NamedEntityGraphs({
+        @NamedEntityGraph(name = "only_discount"),
+        @NamedEntityGraph(
+                name = "discount.categoryDiscountDTSZN",
+                attributeNodes = {
+                        @NamedAttributeNode(value = "categoryDiscountDTSZN")
+                }
+        )
+})
 public class CategoryDiscount {
     @Id
     @Column(name = "idofcategorydiscount")
@@ -18,7 +27,7 @@ public class CategoryDiscount {
     @Column(name = "categoryname")
     private String categoryName;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "cf_discountrules_categorydiscounts",
             joinColumns = @JoinColumn(name = "idofcategorydiscount"),
@@ -26,9 +35,25 @@ public class CategoryDiscount {
     )
     private Set<DiscountRule> rules;
 
+    @ManyToMany
+    @JoinTable(
+            name = "cf_wt_discountrules_categorydiscount",
+            joinColumns = @JoinColumn(name = "idofcategorydiscount"),
+            inverseJoinColumns = @JoinColumn(name = "idofrule")
+    )
+    private Set<WtDiscountRule> wtRules;
+
     @OneToMany
     @JoinColumn(name = "idofcategorydiscount")
     private Set<CategoryDiscountDTSZN> categoryDiscountDTSZN;
+
+    public Set<WtDiscountRule> getWtRules() {
+        return wtRules;
+    }
+
+    public void setWtRules(Set<WtDiscountRule> wtRules) {
+        this.wtRules = wtRules;
+    }
 
     public Long getIdOfCategoryDiscount() {
         return idOfCategoryDiscount;

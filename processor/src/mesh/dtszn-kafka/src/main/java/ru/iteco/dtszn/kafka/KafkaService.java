@@ -5,6 +5,8 @@
 package ru.iteco.dtszn.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.iteco.dtszn.kafka.dto.SupplyEvent;
+import ru.iteco.dtszn.models.Order;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +32,27 @@ public class KafkaService {
         this.kafkaStarshipTemplate = kafkaStarshipTemplate;
     }
 
-    public void sendAssign(String message){
-        ListenableFuture<SendResult<String, String>> future = kafkaStarshipTemplate.send(this.topicAssignName, message);
-        future.addCallback(new LoggingListenableFutureCallback(message));
+    public void sendSupplyMSP(Order order){
+        try{
+            SupplyEvent event = SupplyEvent.build(order);
+            String msg = objectMapper.writeValueAsString(event);
+            sendSupply(msg);
+        } catch (Exception e){
+            log.error(String.format("Can't send Order ID:%s ID OO:%s",
+                    order.getCompositeId().getIdOfOrder(), order.getCompositeId().getIdOfOrg()
+            ), e);
+        }
     }
 
-    public void sendSupply(String message){
+    private ListenableFuture sendAssign(String message){
+        ListenableFuture<SendResult<String, String>> future = kafkaStarshipTemplate.send(this.topicAssignName, message);
+        future.addCallback(new LoggingListenableFutureCallback(message));
+        return future;
+    }
+
+    private ListenableFuture sendSupply(String message){
         ListenableFuture<SendResult<String, String>> future = kafkaStarshipTemplate.send(this.topicSupplyName, message);
         future.addCallback(new LoggingListenableFutureCallback(message));
+        return future;
     }
 }

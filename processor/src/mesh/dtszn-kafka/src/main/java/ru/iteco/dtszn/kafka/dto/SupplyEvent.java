@@ -4,6 +4,8 @@
 
 package ru.iteco.dtszn.kafka.dto;
 
+import ru.iteco.dtszn.models.Order;
+
 public class SupplyEvent {
     private String person_id;
     private String benefit_code;
@@ -13,6 +15,10 @@ public class SupplyEvent {
     private String date;
     private Long amount;
     private Long organization_id;
+
+    public static SupplyEvent build(Order order) {
+        //TODO
+    }
 
     public String getPerson_id() {
         return person_id;
