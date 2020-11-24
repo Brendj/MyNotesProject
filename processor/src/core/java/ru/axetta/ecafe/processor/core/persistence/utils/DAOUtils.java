@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2255,8 +2255,13 @@ public class DAOUtils {
                 session.update(preorderComplex);
             }
 
-            if (preorderComplex.isType4Complex() && guidOfGood != null && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX) {
-                PreorderMenuDetail pmd = getPreorderMenuDetailByGoodsGuid(session, preorderComplex, guidOfGood);
+            if (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX) {
+                PreorderMenuDetail pmd = null;
+                if (guidOfGood != null) {
+                     pmd = getPreorderMenuDetailByGoodsGuid(session, preorderComplex, guidOfGood);
+                } else if (orderDetail.getIdOfDish() != null) {
+                    pmd = getPreorderMenuDetailByIdOfDish(preorderComplex, orderDetail.getIdOfDish());
+                }
                 if (pmd != null) {
                     long sum2 = qty * pmd.getMenuDetailPrice();
                     pmd.setUsedSum(pmd.getUsedSum() + sum2);
@@ -2326,6 +2331,21 @@ public class DAOUtils {
         // если нет неудаленных - возвращаем удаленное блюдо
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getIdOfGood().equals(good.getGlobalId()) && pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        return null;
+    }
+
+    private static PreorderMenuDetail getPreorderMenuDetailByIdOfDish(PreorderComplex preorderComplex, Long idOfDish) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfDish().equals(idOfDish) && !pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        // если нет неудаленных - возвращаем удаленное блюдо
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfDish().equals(idOfDish) && pmd.getDeletedState()) {
                 return pmd;
             }
         }
