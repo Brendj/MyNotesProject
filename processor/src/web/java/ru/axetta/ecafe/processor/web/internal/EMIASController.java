@@ -98,6 +98,7 @@ public class EMIASController extends HttpServlet {
                     continue;
                 }
                 Integer eventsStatus = -1;
+                boolean goodIdEmias = true;
                 switch (liberateClientsList.getTypeEventEMIAS().intValue()) {
                     case 1://создание освобождения (в том числе продление освобождения)
                         if (liberateClientsList.getStartDateLiberate() == null
@@ -111,40 +112,58 @@ public class EMIASController extends HttpServlet {
                         eventsStatus = 2;
                         break;
                     case 2:
-                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
-                        eventsStatus = 3;
+                        if (liberateClientsList.getIdEventCancelEMIAS() == null)
+                        {
+                            orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_EVENT_NOT_FOUND,
+                                    ResponseItem.ERROR_CANCEL_EVENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                            goodIdEmias = false;
+                        } else
+                        {
+                            DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                            eventsStatus = 3;
+                        }
                         break;
                     case 3:
                         DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
                         eventsStatus = 4;
                         break;
                     case 4:
-                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
-                        eventsStatus = 5;
+                        if (liberateClientsList.getIdEventCancelEMIAS() == null)
+                        {
+                            orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_EVENT_NOT_FOUND,
+                                    ResponseItem.ERROR_CANCEL_EVENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                            goodIdEmias = false;
+                        }
+                        else {
+                            DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                            eventsStatus = 5;
+                        }
                         break;
                     default: {
                         orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_EVENT_NOT_FOUND,
                                 ResponseItem.ERROR_EVENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                        goodIdEmias = false;
                         continue;
                     }
                 }
-                if (eventsStatus != -1) {
-                    logger.info("Старт сервиса по отправке уведомлений в ЕМП для ЕМИАС");
-                    ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
-                    ExternalEvent event = new ExternalEvent(cl, cl.getOrg().getShortNameInfoService(), 
-					cl.getOrg().getOfficialName(), ExternalEventType.SPECIAL, liberateClientsList.getDateLiberate(),
-                    ExternalEventStatus.fromInteger(eventsStatus), handler);
-                    persistenceSession.save(event);
-                    event.setForTest(false);
-                    ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
-                            .getBean(ExternalEventNotificationService.class);
-                    notificationService.setSTART_DATE(liberateClientsList.getStartDateLiberate());
-                    notificationService.setEND_DATE(liberateClientsList.getEndDateLiberate());
-                    notificationService.sendNotification(cl, event);
-                }
+                if (goodIdEmias) {
+                    if (eventsStatus != -1) {
+                        logger.info("Старт сервиса по отправке уведомлений в ЕМП для ЕМИАС");
+                        ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
+                        ExternalEvent event = new ExternalEvent(cl, cl.getOrg().getShortNameInfoService(), cl.getOrg().getOfficialName(), ExternalEventType.SPECIAL,
+                                liberateClientsList.getDateLiberate(), ExternalEventStatus.fromInteger(eventsStatus),
+                                handler);
+                        persistenceSession.save(event);
+                        event.setForTest(false);
+                        ExternalEventNotificationService notificationService = RuntimeContext.getAppContext().getBean(ExternalEventNotificationService.class);
+                        notificationService.setSTART_DATE(liberateClientsList.getStartDateLiberate());
+                        notificationService.setEND_DATE(liberateClientsList.getEndDateLiberate());
+                        notificationService.sendNotification(cl, event);
+                    }
 
-                orgSummaryResults.add(new OrgSummaryResult(ResponseItem.OK, ResponseItem.OK_MESSAGE_2,
-                        liberateClientsList.getIdEventEMIAS()));
+                    orgSummaryResults.add(new OrgSummaryResult(ResponseItem.OK, ResponseItem.OK_MESSAGE_2,
+                            liberateClientsList.getIdEventEMIAS()));
+                }
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
