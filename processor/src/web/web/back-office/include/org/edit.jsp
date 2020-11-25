@@ -288,7 +288,9 @@
     <h:outputText escape="true" value="Использование обучающимися нескольких идентификаторов в ОО" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.multiCardModeEnabled}" styleClass="input-text" />
     <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text">
+        <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" action="#{mainPage.orgEditPage.changeSubscriptionFeeding}" />
+    </h:selectBooleanCheckbox>
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />

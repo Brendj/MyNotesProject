@@ -291,6 +291,17 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        if (org.getFriendlyOrg() != null && org.getFriendlyOrg().size() > 0) {
+            for (Org fOrg : org.getFriendlyOrg()) {
+                if (!fOrg.getIdOfOrg().equals(org.getIdOfOrg())) {
+                    DAOUtils.setUseWebArm(session, fOrg.getIdOfOrg(), useWebArm);
+                    if (useWebArm) {
+                        DAOUtils.unsetSubscriptionFeeding(session, fOrg.getIdOfOrg());
+                    }
+                }
+            }
+        }
+
         Long nextVersion = null; //DAOUtils.nextVersionByOrgStucture(session);
 
         Set<Org> friendlyOrg = org.getFriendlyOrg();
@@ -676,6 +687,12 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
             menuExchangeSourceOrgName = org.getShortName();
+        }
+    }
+
+    public void changeSubscriptionFeeding() {
+        if (useWebArm) {
+            usePaydableSubscriptionFeeding = false;
         }
     }
 
