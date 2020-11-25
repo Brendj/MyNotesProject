@@ -22,10 +22,8 @@ import org.springframework.stereotype.Controller;
 
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,7 +36,8 @@ import java.util.*;
 @Path(value = "")
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Controller
-public class FpsapiController {
+@ApplicationPath("/fps/api")
+public class FpsapiController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(FpsapiController.class);
     private static final Integer RANGES_DAYS = 14;

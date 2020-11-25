@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,7 +37,8 @@ import java.util.*;
 
 @Path(value = "")
 @Controller
-public class EzdController {
+@ApplicationPath("/ezd")
+public class EzdController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(EzdController.class);
     private static final int SETTING_TYPE = 11001;

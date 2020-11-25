@@ -33,6 +33,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -46,7 +47,8 @@ import java.util.List;
 
 @Path(value = "/")
 @Controller
-public class SchoolRestController {
+@ApplicationPath("/school/api/v1")
+public class SchoolRestController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
 
