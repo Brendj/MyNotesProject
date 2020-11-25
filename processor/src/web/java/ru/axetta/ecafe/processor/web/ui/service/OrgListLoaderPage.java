@@ -263,7 +263,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             org.setState(1); // Обслуживается
             org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
             org.setDistrict(district);
-            if (ogrn.length() > 12 && ogrn.length() < 33) { // ОГРН состоит из 13 цифр; размерность поля в БД = 32
+            if (ogrn != null && ogrn.length() > 12 && ogrn.length() < 33) { // ОГРН состоит из 13 цифр; размерность поля в БД = 32
                 org.setOGRN(ogrn);
             }
             org.setGuid(guid);
