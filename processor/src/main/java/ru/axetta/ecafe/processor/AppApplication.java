@@ -8,12 +8,14 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.annotation.ImportResource;
 
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @EnableConfigurationProperties
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
 @ServletComponentScan
+@ImportResource("classpath:META-INF/services-app.xml")
 public class AppApplication {
 
     public static void main(String[] args) {
