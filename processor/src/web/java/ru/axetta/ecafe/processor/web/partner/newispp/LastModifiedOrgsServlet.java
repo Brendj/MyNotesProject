@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +42,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@WebServlet(
+        name = "LastModifiedOrgsServlet",
+        description = "LastModifiedOrgsServlet",
+        urlPatterns = {"/modified-orgs"}
+)
 public class LastModifiedOrgsServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(LastModifiedOrgsServlet.class);
 

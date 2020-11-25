@@ -5,6 +5,8 @@ import ru.axetta.ecafe.processor.core.service.SummaryDownloadMakerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Created with IntelliJ IDEA.
  * User: i.semenov
@@ -12,6 +14,11 @@ import org.slf4j.LoggerFactory;
  * Time: 10:58
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "SummaryDownloadServlet",
+        description = "SummaryDownloadServlet",
+        urlPatterns = {"/summary/download"}
+)
 public class SummaryDownloadServlet extends SummaryBaseServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(SummaryDownloadServlet.class);

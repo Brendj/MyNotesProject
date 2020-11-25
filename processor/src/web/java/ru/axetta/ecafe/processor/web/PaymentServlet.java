@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +49,11 @@ import java.security.PublicKey;
  * Time: 16:02:24
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "PaymentServlet",
+        description = "PaymentServlet",
+        urlPatterns = {"/pay"}
+)
 public class PaymentServlet extends HttpServlet {
 
     private static final String CONTENT_TYPE = "text/xml";

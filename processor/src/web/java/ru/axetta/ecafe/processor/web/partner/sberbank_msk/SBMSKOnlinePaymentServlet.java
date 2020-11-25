@@ -13,24 +13,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Properties;
 
+@WebServlet(
+        name = "SBMSKOnlinePaymentServlet",
+        description = "SBMSKOnlinePaymentServlet",
+        urlPatterns = {"/payment-sbmsk"}
+)
 public class SBMSKOnlinePaymentServlet extends HttpServlet {
 
     private Logger logger = LoggerFactory.getLogger(SBMSKOnlinePaymentServlet.class);
-    private String remoteAddressMasks = getSberbankRemoteAddressMasks();
+    private String remoteAddressMasks;
+    private Long idOfSberbankAsContragent;
     public static final String ONLINE_PS_ERROR = "paymentError";
+    private Boolean initComplete = false;
 
     private String getSberbankRemoteAddressMasks() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         return properties.getProperty("ecafe.processor.sbpayment.remoteAddress", ".*");
     }
 
-    private Long idOfSberbankAsContragent = getIdOfSberbankAsContragent();
+    private void initFields() {
+        synchronized (initComplete) {
+            if (initComplete) return;
+            remoteAddressMasks = getSberbankRemoteAddressMasks();
+            idOfSberbankAsContragent = getIdOfSberbankAsContragent();
+        }
+    }
 
     private Long getIdOfSberbankAsContragent() {
         Long idOfContragentLongVal;
@@ -62,6 +76,7 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
             throws ServletException, IOException {
+        initFields();
         RuntimeContext runtimeContext = null;
         try {
             runtimeContext = RuntimeContext.getInstance();

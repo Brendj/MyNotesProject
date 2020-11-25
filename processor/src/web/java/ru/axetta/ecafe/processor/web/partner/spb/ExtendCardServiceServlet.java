@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,9 +28,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by nuc on 03.12.2019.
- */
+@WebServlet(
+        name = "ExtendCardServiceServlet",
+        description = "ExtendCardServiceServlet",
+        urlPatterns = {"/cardservice"}
+)
 public class ExtendCardServiceServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ExtendCardServiceServlet.class);
     private static final String PARAM_UID = "uid";

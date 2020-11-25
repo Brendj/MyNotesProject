@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,11 @@ import java.util.List;
  * Time: 18:02
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "SMSStatusServlet",
+        description = "SMSStatusServlet",
+        urlPatterns = {"/sms-status"}
+)
 public class SMSStatusServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(SMSStatusServlet.class);
