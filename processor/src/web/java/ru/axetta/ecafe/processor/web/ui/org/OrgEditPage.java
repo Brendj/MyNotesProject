@@ -291,17 +291,6 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
-        if (org.getFriendlyOrg() != null && org.getFriendlyOrg().size() > 0) {
-            for (Org fOrg : org.getFriendlyOrg()) {
-                if (!fOrg.getIdOfOrg().equals(org.getIdOfOrg())) {
-                    DAOUtils.setUseWebArm(session, fOrg.getIdOfOrg(), useWebArm);
-                    if (useWebArm) {
-                        DAOUtils.unsetSubscriptionFeeding(session, fOrg.getIdOfOrg());
-                    }
-                }
-            }
-        }
-
         Long nextVersion = null; //DAOUtils.nextVersionByOrgStucture(session);
 
         Set<Org> friendlyOrg = org.getFriendlyOrg();
@@ -331,6 +320,15 @@ public class OrgEditPage extends BasicWorkspacePage
                 //session.evict(o); // убираем из кеша
                 //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
                 //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
+            }
+        }
+
+        for (Org fOrg : friendlyOrg) {
+            if (!fOrg.getIdOfOrg().equals(org.getIdOfOrg())) {
+                fOrg.setUseWebArm(useWebArm);
+                if (useWebArm) {
+                    fOrg.setUsePaydableSubscriptionFeeding(false);
+                }
             }
         }
 

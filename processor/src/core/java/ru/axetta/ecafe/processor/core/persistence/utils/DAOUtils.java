@@ -484,19 +484,6 @@ public class DAOUtils {
         return q.executeUpdate();
     }
 
-    public static void setUseWebArm(Session session, long idOfOrg, boolean isWebArm) {
-        Query q = session.createSQLQuery("update cf_orgs set usewebarm = :isWebArm where idOfOrg = :idOfOrg");
-        q.setParameter("idOfOrg", idOfOrg);
-        q.setParameter("isWebArm", isWebArm);
-        q.executeUpdate();
-    }
-
-    public static void unsetSubscriptionFeeding(Session session, long idOfOrg) {
-        Query q = session.createSQLQuery("update cf_orgs set usepaydablesubscriptionfeeding = 0 where idOfOrg = :idOfOrg")
-                .setParameter("idOfOrg", idOfOrg);
-        q.executeUpdate();
-    }
-
     public static Order findOrder(Session persistenceSession, Long idOfOrg, Long idOfOrder) throws Exception {
         return findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, idOfOrder));
     }
