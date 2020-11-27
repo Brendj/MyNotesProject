@@ -5,21 +5,21 @@
 package ru.iteco.dtszn.models;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
-@Table
+@Table(name = "cf_discountrules")
 @NamedEntityGraphs({
         @NamedEntityGraph(name = "rule_only"),
         @NamedEntityGraph(
-                name = "rule.categoryDiscount",
+                name = "rule.categoryDiscounts",
                 attributeNodes = {
-                       @NamedAttributeNode(value = "categoryDiscount", subgraph = "discount.categoryDiscountDTSZN")
+                       @NamedAttributeNode(value = "categoryDiscounts", subgraph = "categoryDiscounts.categoryDiscountDTSZN")
                 },
                 subgraphs = {
                         @NamedSubgraph(
-                                name = "discount.categoryDiscountDTSZN",
+                                name = "categoryDiscounts.categoryDiscountDTSZN",
                                 attributeNodes = @NamedAttributeNode("categoryDiscountDTSZN")
                         )
                 }
@@ -43,14 +43,14 @@ public class DiscountRule {
             joinColumns = @JoinColumn(name = "idofrule"),
             inverseJoinColumns = @JoinColumn(name = "idofcategorydiscount")
     )
-    private Set<CategoryDiscount> categoryDiscount;
+    private List<CategoryDiscount> categoryDiscounts;
 
-    public Set<CategoryDiscount> getCategoryDiscount() {
-        return categoryDiscount;
+    public List<CategoryDiscount> getCategoryDiscounts() {
+        return categoryDiscounts;
     }
 
-    public void setCategoryDiscount(Set<CategoryDiscount> categoryDiscount) {
-        this.categoryDiscount = categoryDiscount;
+    public void setCategoryDiscounts(List<CategoryDiscount> categoryDiscounts) {
+        this.categoryDiscounts = categoryDiscounts;
     }
 
     public Long getIdOfRule() {

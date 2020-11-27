@@ -5,11 +5,31 @@
 package ru.iteco.dtszn.models;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_clients")
+@NamedEntityGraphs({
+        @NamedEntityGraph(
+                name = "only_client"
+        ),
+        @NamedEntityGraph(
+                name = "client.discount",
+                attributeNodes = {
+                        @NamedAttributeNode(
+                                value = "discounts",
+                                subgraph = "discount.categoryDiscountDTSZN"
+                        )
+                },
+                subgraphs = {
+                      @NamedSubgraph(
+                              name = "discount.categoryDiscountDTSZN",
+                              attributeNodes = @NamedAttributeNode("categoryDiscountDTSZN")
+                      )
+                }
+        )
+})
 public class Client {
 
     @Id
@@ -28,11 +48,11 @@ public class Client {
 
     @ManyToMany
     @JoinTable(
-            name = "cf_clients_categorydiscounts",
+            name = "cf_clientdiscounts",
             joinColumns = @JoinColumn(name = "idofclient"),
             inverseJoinColumns = @JoinColumn(name = "idofcategorydiscount")
     )
-    private Set<CategoryDiscountDTSZN> discounts;
+    private List<CategoryDiscount> discounts;
 
     public String getAgeGroup() {
         return ageGroup;
@@ -66,11 +86,11 @@ public class Client {
         this.org = org;
     }
 
-    public Set<CategoryDiscountDTSZN> getDiscounts() {
+    public List<CategoryDiscount> getDiscounts() {
         return discounts;
     }
 
-    public void setDiscounts(Set<CategoryDiscountDTSZN> discounts) {
+    public void setDiscounts(List<CategoryDiscount> discounts) {
         this.discounts = discounts;
     }
 

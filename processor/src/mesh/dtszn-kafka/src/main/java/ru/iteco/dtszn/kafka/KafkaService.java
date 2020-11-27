@@ -6,7 +6,7 @@ package ru.iteco.dtszn.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.iteco.dtszn.kafka.dto.SupplyEvent;
-import ru.iteco.dtszn.models.Order;
+import ru.iteco.dtszn.models.dto.SupplyMSPOrders;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +32,14 @@ public class KafkaService {
         this.kafkaStarshipTemplate = kafkaStarshipTemplate;
     }
 
-    public void sendSupplyMSP(Order order){
+    public void sendSupplyMSP(SupplyMSPOrders order){
         try{
             SupplyEvent event = SupplyEvent.build(order);
             String msg = objectMapper.writeValueAsString(event);
             sendSupply(msg);
         } catch (Exception e){
             log.error(String.format("Can't send Order ID:%s ID OO:%s",
-                    order.getCompositeId().getIdOfOrder(), order.getCompositeId().getIdOfOrg()
-            ), e);
+                    order.getOrderDate(), order.getIdOfOrg()), e);
         }
     }
 

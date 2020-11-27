@@ -14,12 +14,12 @@ import java.util.Objects;
 @NamedEntityGraph(
         name = "orderDetail.rule",
         attributeNodes = {
-                @NamedAttributeNode(value = "ruleCategoryDiscount", subgraph = "rule.categoryDiscount")
+                @NamedAttributeNode(value = "rule", subgraph = "rule.categoryDiscounts")
         },
         subgraphs = {
                 @NamedSubgraph(
-                        name = "rule.categoryDiscount",
-                        attributeNodes = @NamedAttributeNode("categoryDiscount")
+                        name = "rule.categoryDiscounts",
+                        attributeNodes = @NamedAttributeNode("categoryDiscounts")
                 )
         }
 )
@@ -32,20 +32,32 @@ public class OrderDetail {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name="idoforder"),
-            @JoinColumn(name="idoforderdetail")
+            @JoinColumn(name="idoforder", insertable = false, updatable = false),
+            @JoinColumn(name="idoforderdetail", insertable = false, updatable = false)
     })
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "idofrule")
+    @JoinColumn(name = "idofrule", insertable = false, updatable = false)
     private DiscountRule rule;
+
+    @ManyToOne
+    @JoinColumn(name = "idofrule", insertable = false, updatable = false)
+    private WtDiscountRule wtRule;
 
     @Column(name = "menudetailname")
     private String menuDetailName;
 
     @Column(name = "menutype")
     private Integer menuType;
+
+    public WtDiscountRule getWtRule() {
+        return wtRule;
+    }
+
+    public void setWtRule(WtDiscountRule wtRule) {
+        this.wtRule = wtRule;
+    }
 
     public DiscountRule getRule() {
         return rule;

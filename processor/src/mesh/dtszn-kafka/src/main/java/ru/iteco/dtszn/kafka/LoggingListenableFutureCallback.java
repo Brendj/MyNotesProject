@@ -20,7 +20,7 @@ public class LoggingListenableFutureCallback implements ListenableFutureCallback
 
     @Override
     public void onSuccess(@NonNull SendResult<String, String> result) {
-        log.info("Sent message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "]");
+        log.info("Send message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "]");
     }
 
     @Override

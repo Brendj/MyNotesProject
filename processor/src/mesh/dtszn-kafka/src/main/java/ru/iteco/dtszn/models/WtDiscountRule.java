@@ -4,11 +4,9 @@
 
 package ru.iteco.dtszn.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_discountrules")
@@ -19,6 +17,14 @@ public class WtDiscountRule {
 
     @Column(name = "description")
     private String description;
+
+    @ManyToMany
+    @JoinTable(
+            name = "cf_discountrules_categorydiscounts",
+            joinColumns = @JoinColumn(name = "idofrule"),
+            inverseJoinColumns = @JoinColumn(name = "idofcategorydiscount")
+    )
+    Set<CategoryDiscount> categoryDiscountSet;
 
     public Long getIdOfRule() {
         return idOfRule;
@@ -34,6 +40,14 @@ public class WtDiscountRule {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<CategoryDiscount> getCategoryDiscountSet() {
+        return categoryDiscountSet;
+    }
+
+    public void setCategoryDiscountSet(Set<CategoryDiscount> categoryDiscountSet) {
+        this.categoryDiscountSet = categoryDiscountSet;
     }
 
     @Override

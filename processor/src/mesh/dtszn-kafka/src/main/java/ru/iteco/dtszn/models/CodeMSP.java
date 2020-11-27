@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table
+@Table(name = "cf_code_msp")
 public class CodeMSP {
     @Id
     @Column(name = "idofcode")

@@ -4,10 +4,7 @@
 
 package ru.iteco.dtszn.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -15,7 +12,7 @@ import java.util.Objects;
 public class CategoryDiscountDTSZN {
     @Id
     @Column(name = "idofcategorydiscountdszn")
-    private Long idOfCategoryDiscountDTSZN;
+    private Integer idOfCategoryDiscountDTSZN;
 
     @Column(name = "code")
     private Integer code;
@@ -26,11 +23,23 @@ public class CategoryDiscountDTSZN {
     @Column(name = "etpcode")
     private Long ETPCode;
 
-    public Long getIdOfCategoryDiscountDTSZN() {
+    @OneToOne
+    @JoinColumn(name = "idofcategorydiscount")
+    private CategoryDiscount categoryDiscount;
+
+    public CategoryDiscount getCategoryDiscount() {
+        return categoryDiscount;
+    }
+
+    public void setCategoryDiscount(CategoryDiscount categoryDiscount) {
+        this.categoryDiscount = categoryDiscount;
+    }
+
+    public Integer getIdOfCategoryDiscountDTSZN() {
         return idOfCategoryDiscountDTSZN;
     }
 
-    public void setIdOfCategoryDiscountDTSZN(Long idOfCategoryDiscountDTSZN) {
+    public void setIdOfCategoryDiscountDTSZN(Integer idOfCategoryDiscountDTSZN) {
         this.idOfCategoryDiscountDTSZN = idOfCategoryDiscountDTSZN;
     }
 

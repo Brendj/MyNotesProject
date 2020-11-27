@@ -5,8 +5,8 @@
 package ru.iteco.dtszn.models;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_categorydiscounts")
@@ -33,7 +33,7 @@ public class CategoryDiscount {
             joinColumns = @JoinColumn(name = "idofcategorydiscount"),
             inverseJoinColumns = @JoinColumn(name = "idofrule")
     )
-    private Set<DiscountRule> rules;
+    private List<DiscountRule> rules;
 
     @ManyToMany
     @JoinTable(
@@ -41,17 +41,16 @@ public class CategoryDiscount {
             joinColumns = @JoinColumn(name = "idofcategorydiscount"),
             inverseJoinColumns = @JoinColumn(name = "idofrule")
     )
-    private Set<WtDiscountRule> wtRules;
+    private List<WtDiscountRule> wtRules;
 
-    @OneToMany
-    @JoinColumn(name = "idofcategorydiscount")
-    private Set<CategoryDiscountDTSZN> categoryDiscountDTSZN;
+    @OneToOne(mappedBy = "categoryDiscount")
+    private CategoryDiscountDTSZN categoryDiscountDTSZN;
 
-    public Set<WtDiscountRule> getWtRules() {
+    public List<WtDiscountRule> getWtRules() {
         return wtRules;
     }
 
-    public void setWtRules(Set<WtDiscountRule> wtRules) {
+    public void setWtRules(List<WtDiscountRule> wtRules) {
         this.wtRules = wtRules;
     }
 
@@ -71,19 +70,19 @@ public class CategoryDiscount {
         this.categoryName = categoryName;
     }
 
-    public Set<DiscountRule> getRules() {
+    public List<DiscountRule> getRules() {
         return rules;
     }
 
-    public void setRules(Set<DiscountRule> rules) {
+    public void setRules(List<DiscountRule> rules) {
         this.rules = rules;
     }
 
-    public Set<CategoryDiscountDTSZN> getCategoryDiscountDTSZN() {
+    public CategoryDiscountDTSZN getCategoryDiscountDTSZN() {
         return categoryDiscountDTSZN;
     }
 
-    public void setCategoryDiscountDTSZN(Set<CategoryDiscountDTSZN> categoryDiscountDTSZN) {
+    public void setCategoryDiscountDTSZN(CategoryDiscountDTSZN categoryDiscountDTSZN) {
         this.categoryDiscountDTSZN = categoryDiscountDTSZN;
     }
 

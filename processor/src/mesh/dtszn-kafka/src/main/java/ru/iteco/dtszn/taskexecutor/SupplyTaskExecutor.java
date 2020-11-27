@@ -5,7 +5,7 @@
 package ru.iteco.dtszn.taskexecutor;
 
 import ru.iteco.dtszn.kafka.KafkaService;
-import ru.iteco.dtszn.models.Order;
+import ru.iteco.dtszn.models.dto.SupplyMSPOrders;
 import ru.iteco.dtszn.service.SupplyMSPService;
 
 import org.slf4j.Logger;
@@ -59,11 +59,11 @@ public class SupplyTaskExecutor {
                 Integer allRows = supplyMSPService.countOrders(begin, end);
 
                 for(int i = 0; i <= allRows; i += SAMPLE_SIZE){
-                    Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("createDate"));
+                    Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("createdDate"));
 
-                    List<Order> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
+                    List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
 
-                    for(Order o : orderList){
+                    for(SupplyMSPOrders o : orderList){
                         kafkaService.sendSupplyMSP(o);
                     }
                     orderList = null;

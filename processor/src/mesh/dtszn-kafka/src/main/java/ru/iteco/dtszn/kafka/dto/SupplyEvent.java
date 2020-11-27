@@ -4,8 +4,10 @@
 
 package ru.iteco.dtszn.kafka.dto;
 
-import ru.iteco.dtszn.models.Order;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import ru.iteco.dtszn.models.dto.SupplyMSPOrders;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SupplyEvent {
     private String person_id;
     private String benefit_code;
@@ -16,8 +18,22 @@ public class SupplyEvent {
     private Long amount;
     private Long organization_id;
 
-    public static SupplyEvent build(Order order) {
-        //TODO
+    public static SupplyEvent build(SupplyMSPOrders order) {
+        SupplyEvent event = new SupplyEvent();
+
+        event.person_id = order.getMeshGUID();
+        event.benefit_code = order.getCode() == null ? null : order.getCode().toString();
+        if(order.getDtsznCodes() != null){
+            event.benefit_category_code = order.getDtsznCodes();
+        } else {
+            event.benefit_category_name = order.getCategoryName();
+        }
+        event.data = order.getDetails();
+        event.date = order.getOrderDate().toString();
+        event.amount = order.getrSum();
+        event.organization_id = order.getOrganizationId();
+
+        return event;
     }
 
     public String getPerson_id() {
