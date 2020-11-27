@@ -1006,6 +1006,7 @@ public class DAOReadonlyService {
             Long id = HibernateUtils.getDbLong(obj);
             ids.add(id);
         }
+        if (ids.size() == 0) return null;
         org.hibernate.Query query = session
                 .createQuery("SELECT dish FROM WtDish dish where dish.idOfDish in :list");
         query.setParameterList("list", ids);
