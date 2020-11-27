@@ -38,6 +38,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ApplicationForFoorStatusExistsException;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -2254,8 +2255,13 @@ public class DAOUtils {
                 session.update(preorderComplex);
             }
 
-            if (preorderComplex.isType4Complex() && guidOfGood != null && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX) {
-                PreorderMenuDetail pmd = getPreorderMenuDetailByGoodsGuid(session, preorderComplex, guidOfGood);
+            if (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX) {
+                PreorderMenuDetail pmd = null;
+                if (guidOfGood != null) {
+                     pmd = getPreorderMenuDetailByGoodsGuid(session, preorderComplex, guidOfGood);
+                } else if (orderDetail.getIdOfDish() != null) {
+                    pmd = getPreorderMenuDetailByIdOfDish(preorderComplex, orderDetail.getIdOfDish());
+                }
                 if (pmd != null) {
                     long sum2 = qty * pmd.getMenuDetailPrice();
                     pmd.setUsedSum(pmd.getUsedSum() + sum2);
@@ -2325,6 +2331,21 @@ public class DAOUtils {
         // если нет неудаленных - возвращаем удаленное блюдо
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getIdOfGood().equals(good.getGlobalId()) && pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        return null;
+    }
+
+    private static PreorderMenuDetail getPreorderMenuDetailByIdOfDish(PreorderComplex preorderComplex, Long idOfDish) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfDish().equals(idOfDish) && !pmd.getDeletedState()) {
+                return pmd;
+            }
+        }
+        // если нет неудаленных - возвращаем удаленное блюдо
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getIdOfDish().equals(idOfDish) && pmd.getDeletedState()) {
                 return pmd;
             }
         }
@@ -4510,7 +4531,7 @@ public class DAOUtils {
                     .format("Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
                             applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
                             applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber());
-            throw new Exception(errorString);
+            throw new ApplicationForFoorStatusExistsException(errorString);
         }
         addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, version);
     }
@@ -4762,6 +4783,7 @@ public class DAOUtils {
         if (withEtp) {
             criteria.add(Restrictions.isNotNull("ETPCode"));
         }
+        criteria.add(Restrictions.eq("deleted", false));
         criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscountDSZN"));
         return criteria.list();
     }

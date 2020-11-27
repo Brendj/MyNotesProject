@@ -575,13 +575,15 @@ public class FinancialOpsManager {
             ClientBalanceHoldLastChangeStatus lastChangeStatus) throws Exception {
         if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
         Session session = (Session)em.getDelegate();
-        AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                null, -holdSum, "", AccountTransaction.CLIENT_BALANCE_HOLD, oldOrg.getIdOfOrg(), new Date(), null);
         ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
                 .createClientBalanceHold(session, guid, client, holdSum, oldOrg, newOrg, oldContragent, newContragent, createStatus,
                         requestStatus, declarer, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version,
                         idOfOrgLastChange, lastChangeStatus);
-        clientBalanceHold.setAccountTransaction(accountTransaction);
+        if (ClientBalanceHoldRequestStatus.ANNULLED != requestStatus) {
+            AccountTransaction accountTransaction = ClientAccountManager
+                    .processAccountTransaction(session, client, null, -holdSum, "", AccountTransaction.CLIENT_BALANCE_HOLD, oldOrg.getIdOfOrg(), new Date(), null);
+            clientBalanceHold.setAccountTransaction(accountTransaction);
+        }
         session.save(clientBalanceHold);
     }
 

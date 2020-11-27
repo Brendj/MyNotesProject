@@ -110,6 +110,11 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                         new ApplicationForFoodStatus(status.getApplicationForFoodState(),
                                                 status.getDeclineReason())));
                             }
+                        } catch (ApplicationForFoorStatusExistsException e) {
+                            logger.error("Error in processing entity: " + e.getMessage());
+                            resItem = new ResRequestFeedingItem(applicationForFood, item.getResCode());
+                            items.add(resItem);
+                            continue;
                         } catch (Exception e) {
                             resItem = new ResRequestFeedingItem();
                             resItem.setCode(RequestFeedingItem.ERROR_CODE_INTERNAL_ERROR);
