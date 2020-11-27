@@ -995,10 +995,20 @@ public class DAOReadonlyService {
 
     public List<WtDish> getMenuDishes(WtMenu menu) {
         Session session = entityManager.unwrap(Session.class);
+        org.hibernate.Query q = session.createSQLQuery("select d.idofdish "
+                + "from cf_wt_dishes d left join cf_wt_menu_group_dish_relationships mgd on d.idofdish=mgd.idOfDish "
+                + "left outer join cf_wt_menu_group_relationships mgr on mgd.idOfMenuMenuGroupRelation=mgr.id "
+                + "left outer join cf_wt_menu m on mgr.idOfMenu=m.idofmenu where m.idofmenu=:idOfMenu and d.deletestate = 0 and mgr.deletestate = 0");
+        q.setParameter("idOfMenu", menu.getIdOfMenu());
+        List list = q.list();
+        List<Long> ids = new ArrayList<>();
+        for (Object obj : list) {
+            Long id = HibernateUtils.getDbLong(obj);
+            ids.add(id);
+        }
         org.hibernate.Query query = session
-                .createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.menuGroupMenus mgm "
-                        + "LEFT JOIN mgm.menu menu where menu = :menu");
-        query.setParameter("menu", menu);
+                .createQuery("SELECT dish FROM WtDish dish where dish.idOfDish in :list");
+        query.setParameterList("list", ids);
         return query.list();
     }
 
