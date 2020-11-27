@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
@@ -1007,13 +1008,17 @@ public class DAOReadonlyService {
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE m.idofmenu = :idOfMenu AND d.idofdish = :idOfDish");
+                + "WHERE m.idofmenu = :idOfMenu AND d.idofdish = :idOfDish "
+                + "and mg.deletestate = 0 and m.deletestate = 0 and mgr.deletestate = 0");
 
         query.setParameter("idOfMenu", menuId);
         query.setParameter("idOfDish", dishId);
-
-        Object result = query.getSingleResult();
-        return result != null ? ((BigInteger) result).longValue() : 0L;
+        try {
+            Object result = query.getSingleResult();
+            return ((BigInteger) result).longValue();
+        } catch (NoResultException e) {
+            return 0L;
+        }
     }
 
     public Boolean isMenuItemAvailable (Long menuId) {
@@ -1021,7 +1026,8 @@ public class DAOReadonlyService {
                 + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE m.idofmenu = :idOfMenu AND mgd.idofdish is not null group by mgd.idofdish");
+                + "WHERE m.idofmenu = :idOfMenu AND mgd.idofdish is not null "
+                + "and mg.deletestate = 0 and m.deletestate = 0 and mgr.deletestate = 0 group by mgd.idofdish");
         query.setParameter("idOfMenu", menuId);
         List<BigInteger> temp = query.getResultList();
         for(BigInteger o : temp) {
