@@ -112,6 +112,11 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Генерация данных ключевых показателей выполнена");
     }
 
+    public void testing() throws Exception {
+       PreorderCancelNotificationService.sendNotification.test();
+        printMessage("Генерация данных ключевых показателей выполнена");
+    }
+
     public void runImportRegisterClients() throws Exception {
         RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                 .run(); //DEF

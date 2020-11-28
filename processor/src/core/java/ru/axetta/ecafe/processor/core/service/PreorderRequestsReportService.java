@@ -431,6 +431,10 @@ public class PreorderRequestsReportService extends RecoverableService {
         if (instance.equals(firstNode)) {
             RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().dailyCheckPreorders();
         }
+        //
+
+
+        //
         logger.info("Finish runTask for gererate preorder requests");
     }
 

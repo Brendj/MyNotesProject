@@ -19,6 +19,9 @@
 <%--Тест лога --%>
 <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid borderless-grid-align-top" columns="2">
     <h:panelGrid styleClass="borderless-grid">
+
+        <a4j:commandButton value="Тест" action="#{otherActionsPage.testing}"
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 

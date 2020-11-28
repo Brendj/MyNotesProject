@@ -70,6 +70,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_END_SICK = "endSick";
     public static String NOTIFICATION_CANCEL_END_SICK = "CendSick";
     public static String NOTIFICATION_LIBRARY = "library";
+    public static String NOTIFICATION_CANCEL_PREORDER = "preorderCancelNotification";
     public static String NOTIFICATION_CLIENT_NEWPASSWORD = "clientNewPassword";
     public static String NOTIFICATION_EXPIRED_REGULAR_PAYMENT = "regularPaymentExpired";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
