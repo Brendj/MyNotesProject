@@ -5449,4 +5449,9 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(CancelPreorderNotification.class);
         return criteria.list();
     }
+
+    public static void clearCancelNotificationTable(Session session) {
+        Query q = session.createSQLQuery("truncate cf_cancel_preorder_notifications");
+        q.executeUpdate();
+    }
 }

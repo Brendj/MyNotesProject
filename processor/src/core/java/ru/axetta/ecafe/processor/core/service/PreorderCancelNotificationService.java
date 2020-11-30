@@ -112,8 +112,6 @@ public class PreorderCancelNotificationService {
 
 
     public void start(Session session) throws Exception {
-        //Получаем данные из БД, которые не отправлены при предидущим вызовом сервиса
-        Map<Client, Object> oldMessage = convertResultFromDB(session);
         //Получаем новые данные для отправления
         Map<Client, Object> newMessage = getNewNotification(session);
 
@@ -133,9 +131,13 @@ public class PreorderCancelNotificationService {
         if (currentTime > (dateH.getTime() + 10800000) &&
                 currentTime < (dateM.getTime() + 10800000))
         {
+            //Получаем данные из БД, которые не отправлены при предидущим вызовом сервиса
+            Map<Client, Object> oldMessage = convertResultFromDB(session);
             //Отправляем сообщение
             reallySendNotification (session, oldMessage);
             reallySendNotification (session, newMessage);
+            //Очищаем таблицу сообщений
+            DAOUtils.clearCancelNotificationTable(session);
         }
         else
         {
