@@ -195,6 +195,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
+    private static final String RC_NOT_ALL_ARG = "Не заполнены обязательные поля";
     private static final String RC_CLIENT_NO_LONGER_ACTIVE = "Клиент не активен в ИС ПП";
     private static final String RC_CLIENT_DOU = "Клиент является обучающимся дошкольной группы.";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC = "По условиям найден более одного клиента";
@@ -1671,8 +1672,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     client.getIdOfClient(), handler.getData().getOperationType());
                         }
                     } catch (NullPointerException e) {
-                        data.setResultCode(RC_CLIENT_NOT_FOUND);
-                        data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+                        data.setResultCode(RC_INVALID_DATA);
+                        data.setDescription(RC_NOT_ALL_ARG);
                     }
                 }
                 persistenceTransaction.commit();
@@ -8551,7 +8552,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         String mobilePhone = Client.checkAndConvertMobile(mobile);
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
                 || childContractId == null || StringUtils.isEmpty(mobilePhoneCreator)) {
-            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+            return new Result(RC_INVALID_DATA, RC_NOT_ALL_ARG);
         }
         if (StringUtils.isEmpty(mobilePhone)) {
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
@@ -8730,7 +8731,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || contracts == null
                 || gender == null || CollectionUtils.isEmpty(contracts.getContractIds())) {
-            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+            return new Result(RC_INVALID_DATA, RC_NOT_ALL_ARG);
         }
 
         Result result = new Result();
@@ -10476,7 +10477,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         String mobilePhone = Client.checkAndConvertMobile(guardianMobile);
         if (StringUtils.isEmpty(clientGuid) || (null == categoryDiscount && !otherDiscount) || StringUtils
                 .isEmpty(mobilePhone) || StringUtils.isEmpty(guardianName) || StringUtils.isEmpty(guardianSurname)) {
-            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+            return new Result(RC_INVALID_DATA, RC_NOT_ALL_ARG);
         }
         if (StringUtils.isEmpty(mobilePhone)) {
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
