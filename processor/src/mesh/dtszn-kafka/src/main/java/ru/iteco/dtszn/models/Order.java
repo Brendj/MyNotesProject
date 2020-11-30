@@ -98,6 +98,7 @@ import java.util.Set;
         "         left join cf_code_msp ccm on dr.idofcode = ccm.idofcode\n" +
         "         join cf_orgs org on o.idoforg = org.idoforg\n" +
         "where o.state = 0\n" +
+        "  and c.idofclientgroup < 1100000000 \n" +
         "  and o.createddate between :begin and :end \n" +
         "  and o.ordertype in :types \n" +
         "  and od.menutype between 50 and 99\n" +

@@ -10,6 +10,7 @@ import ru.iteco.dtszn.service.SupplyMSPService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,6 +34,9 @@ public class SupplyTaskExecutor {
     private final ThreadPoolTaskScheduler threadPoolSupplyTaskScheduler;
     private final KafkaService kafkaService;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     public SupplyTaskExecutor(
             CronTrigger supplyCronTrigger,
             ThreadPoolTaskScheduler threadPoolSupplyTaskScheduler,
@@ -53,9 +57,16 @@ public class SupplyTaskExecutor {
 
         @Override
         public void run() {
+            Date begin;
+            Date end;
             try {
-                Date begin = getStartOfPreviousMonth();
-                Date end = getEndOfPreviousMonth();
+                if(activeProfile.contains("dev")){
+                    begin = getStartOfDay();
+                    end = getEndOfDay();
+                } else {
+                    begin = getStartOfPreviousMonth();
+                    end = getEndOfPreviousMonth();
+                }
                 Integer allRows = supplyMSPService.countOrders(begin, end);
 
                 for(int i = 0; i <= allRows; i += SAMPLE_SIZE){
@@ -94,6 +105,26 @@ public class SupplyTaskExecutor {
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.set(Calendar.DAY_OF_MONTH, 1);
             calendar.add(Calendar.MILLISECOND, -1);
+            return calendar.getTime();
+        }
+
+        private Date getStartOfDay() {
+            Calendar calendar = GregorianCalendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.set(Calendar.MILLISECOND, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            return calendar.getTime();
+        }
+
+        private Date getEndOfDay() {
+            Calendar calendar = GregorianCalendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.set(Calendar.MILLISECOND, 999);
+            calendar.set(Calendar.SECOND, 59);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
             return calendar.getTime();
         }
     }
