@@ -7,10 +7,12 @@ package ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
@@ -58,6 +60,8 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private String filterOrg = "Не выбрано";
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private Set<CategoryOrg> categoryOrgs;
+    private CodeMSP codeMSP;
+    private List<SelectItem> allMSP = loadAllMSP();
 
     public String getPageFilename() {
         return "option/wtdiscountrule/edit";
@@ -75,6 +79,44 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
     private List<ContragentItem> contragentItems = new ArrayList<>();
+
+    private List<SelectItem> loadAllMSP() {
+        List<CodeMSP> items = Collections.emptyList();
+        List<SelectItem> result = new LinkedList<>();
+
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            items = DAOUtils.getAllCodeMSP(session);
+            session.close();
+
+            result.add(new SelectItem(null, ""));
+            for(CodeMSP code : items){
+                SelectItem selectItem = new SelectItem(code, code.getCode().toString());
+                result.add(selectItem);
+            }
+
+            return result;
+        } finally {
+            HibernateUtils.close(session, getLogger());
+        }
+    }
+
+    public List<SelectItem> getAllMSP() {
+        return allMSP;
+    }
+
+    public void setAllMSP(List<SelectItem> allMSP) {
+        this.allMSP = allMSP;
+    }
+
+    public CodeMSP getCodeMSP() {
+        return codeMSP;
+    }
+
+    public void setCodeMSP(CodeMSP codeMSP) {
+        this.codeMSP = codeMSP;
+    }
 
     public List<SelectItem> getComplexTypes() {
         List<SelectItem> res = new ArrayList<>();
@@ -416,6 +458,8 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                 }
             }
             wtEntity.setComplexes(newComplexes);
+
+            wtEntity.setCodeMSP(codeMSP);
 
             em.persist(wtEntity);
             fill(wtEntity);

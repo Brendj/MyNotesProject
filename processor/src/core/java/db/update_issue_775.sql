@@ -11,3 +11,6 @@ CREATE TABLE cf_code_msp
 
 alter table CF_DiscountRules
     add column idofcode bigint references cf_code_msp on delete set null on update no action;
+
+alter table CF_wt_DiscountRules
+    add column idofcode bigint references cf_code_msp on delete set null on update no action;

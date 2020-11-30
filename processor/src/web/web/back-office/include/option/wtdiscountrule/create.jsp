@@ -65,6 +65,12 @@
             <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
         </h:selectOneListbox>
 
+        <h:outputText value="Код МСП" styleClass="output-text"/>
+        <h:selectOneListbox id="codeMSP" value="#{wtRuleCreatePage.codeMSP}"  size="1"
+                            styleClass="output-text">
+            <f:selectItems value="#{wtRuleCreatePage.allMSP}" />
+        </h:selectOneListbox>
+
         <h:panelGrid styleClass="borderless-grid">
             <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                            warnClass="warn-messages"/>

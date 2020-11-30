@@ -4,11 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -80,6 +84,9 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
     private List<ContragentItem> contragentItems = new ArrayList<>();
+
+    private CodeMSP codeMSP;
+    private List<SelectItem> allMSP = loadAllMSP();
 
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
@@ -174,6 +181,45 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         }
         setContragentFilterInfo(contragentItems);
     }
+
+    private List<SelectItem> loadAllMSP() {
+        List<CodeMSP> items = Collections.emptyList();
+        List<SelectItem> result = new LinkedList<>();
+
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            items = DAOUtils.getAllCodeMSP(session);
+            session.close();
+
+            result.add(new SelectItem(null, ""));
+            for(CodeMSP code : items){
+                SelectItem selectItem = new SelectItem(code, code.getCode().toString());
+                result.add(selectItem);
+            }
+
+            return result;
+        } finally {
+            HibernateUtils.close(session, getLogger());
+        }
+    }
+
+    public List<SelectItem> getAllMSP() {
+        return allMSP;
+    }
+
+    public void setAllMSP(List<SelectItem> allMSP) {
+        this.allMSP = allMSP;
+    }
+
+    public CodeMSP getCodeMSP() {
+        return codeMSP;
+    }
+
+    public void setCodeMSP(CodeMSP codeMSP) {
+        this.codeMSP = codeMSP;
+    }
+
 
     private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
         StringBuilder str = new StringBuilder();
@@ -330,6 +376,8 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         wtDiscountRule.setDeletedState(false);
 
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
+
+        wtDiscountRule.setCodeMSP(codeMSP);
 
         if (!this.idOfCategoryList.isEmpty()) {
             List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);

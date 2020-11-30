@@ -310,6 +310,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setOperationOr(operationOr);
         discountRule.setDeletedState(false);
         discountRule.setCategoryDiscounts(categoryDiscounts);
+        discountRule.setCodeMSP(codeMSP);
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (!this.idOfCategoryList.isEmpty()) {
             List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);

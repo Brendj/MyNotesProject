@@ -68,6 +68,11 @@
             <f:selectItem itemLabel="И" itemValue="false"/>
             <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
         </h:selectOneListbox>
+        <h:outputText value="Код МСП" styleClass="output-text"/>
+        <h:selectOneListbox id="codeMSP" value="#{wtRuleEditPage.codeMSP}" size="1"
+                            styleClass="output-text">
+            <f:selectItems value="#{wtRuleEditPage.allMSP}" />
+        </h:selectOneListbox>
 
         <h:panelGrid columns="4" styleClass="borderless-grid">
             <a4j:commandButton value="Сохранить" action="#{wtRuleEditPage.updateRule}" reRender="workspaceTogglePanel"
