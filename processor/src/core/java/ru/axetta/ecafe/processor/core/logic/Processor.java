@@ -23,7 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
+import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotificationManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
@@ -334,6 +334,34 @@ public class Processor implements SyncProcessor {
             sb.append(function + "=" + (System.currentTimeMillis() - delta) + "\n");
         }
         return System.currentTimeMillis();
+    }
+    private void deleteOldVersionSpecialDate(SyncRequest request)
+    {
+        if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.93.1")
+                && !SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.95.1")){
+            CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(request.getIdOfOrg(), new Date(1598918400000L));
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = persistenceSessionFactory.openSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                List<SpecialDate> specialDates =
+                        DAOUtils.findSpecialDateWithOutGroup(persistenceSession, compositeId);
+                for (SpecialDate specialDate: specialDates)
+                {
+                    specialDate.setDeleted(true);
+                    persistenceSession.save(specialDate);
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
     }
 
     /* Do process full synchronization */
@@ -916,6 +944,10 @@ public class Processor implements SyncProcessor {
             if (request.getSpecialDates() != null) {
                 specialDatesData = processSpecialDatesData(request.getSpecialDates());
                 resSpecialDates = processSpecialDates(request.getSpecialDates());
+                //
+                //Удаление всех SpecalDate, у которых группа null
+                deleteOldVersionSpecialDate(request);
+                //
             }
         } catch (Exception e) {
             String message = String.format("processSpecialDates: %s", e.getMessage());
@@ -1408,6 +1440,10 @@ public class Processor implements SyncProcessor {
 
                 ResSpecialDates resSpecialDates = processSpecialDates(specialDatesRequest);
                 addToResponseSections(resSpecialDates, responseSections);
+                //
+                //Удаление всех SpecalDate, у которых группа null
+                deleteOldVersionSpecialDate(request);
+                //
             }
         } catch (Exception e) {
             String message = String.format("processSpecialDates: %s", e.getMessage());
@@ -4544,12 +4580,13 @@ public class Processor implements SyncProcessor {
                 /* в случае анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировочных заказов */
                 if (client != null) {
-                    if (GeoplanerManager.isOn() && client.clientHasActiveSmartWatch()) {
+                    if (client.clientHasActiveSmartWatch()) {
                         try {
-                            GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                            manager.sendPurchasesInfoToGeoplaner(payment, client);
+                            SmartWatchVendorNotificationManager manager = RuntimeContext.getAppContext().getBean(
+                                    SmartWatchVendorNotificationManager.class);
+                            manager.sendPurchasesInfoToVendor(payment, client);
                         } catch (Exception exc) {
-                            logger.error("Can't send to Geoplaner JSON with Purchases", exc);
+                            logger.error("Can't send to Vendor JSON with Purchases", exc);
                         }
                     }
 
@@ -6342,12 +6379,13 @@ public class Processor implements SyncProcessor {
                     if (RuntimeContext.RegistryType.isSpb() && ScudManager.serviceIsWork) {
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
                     }
-                    if (GeoplanerManager.isOn() && enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)) {
+                    if (enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)) {
                         try {
-                            GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                            manager.sendEnterEventsToGeoplaner(enterEvent);
+                            SmartWatchVendorNotificationManager manager = RuntimeContext.getAppContext().getBean(
+                                    SmartWatchVendorNotificationManager.class);
+                            manager.sendEnterEventsToVendor(enterEvent);
                         } catch (Exception exc) {
-                            logger.error("Can't send JSON to Geoplaner with EnterEvents:", exc);
+                            logger.error("Can't send JSON to Vendor with EnterEvents:", exc);
                         }
                     }
 

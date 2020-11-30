@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.CardBlockService;
+import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -110,6 +111,10 @@ public class LibraryController {
                     card == null ? null : card.getCardType(), handler);
             persistenceSession.save(event);
             persistenceTransaction.commit();
+            //logger.info("Проход клиента л/с:" + client.getContractId() + " в библиотеку " + libraryName + " успешно зарегистрирован");
+            ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
+                    .getBean(ExternalEventNotificationService.class);
+            notificationService.sendNotification(client, event);
             persistenceTransaction = null;
 
         } catch (Exception e) {
@@ -129,7 +134,7 @@ public class LibraryController {
     private boolean validateAccess(String key) {
         //Узнаем, нужно ли использовать проверку по ip
         String keyinternal = RuntimeContext.getInstance().getConfigProperties().getProperty(KEY_FOR_LIBRARY, "");
-        if (key != "" && key.equals(keyinternal))
+        if (!key.isEmpty() && key.equals(keyinternal))
             return true;
         return false;
     }

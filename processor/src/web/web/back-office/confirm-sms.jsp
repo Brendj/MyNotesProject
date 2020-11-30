@@ -9,6 +9,14 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<script type="text/javascript">
+function sendFocus() {
+    document.getElementById('confirmSmsForm:enterSmsCodeButton').focus();
+}
+function sendEvent() {
+    document.getElementById('confirmSmsForm:enterSmsCodeButton').click();
+}
+</script>
 <html>
 <head>
     <title>Новая школа: Авторизация</title>
@@ -33,7 +41,8 @@
                             <div align="center">
                                 <h:panelGrid columns="2">
                                     <h:outputText value="Введите код активации, полученный в СМС-сообщении" styleClass="output-text" />
-                                    <h:inputText id="smscode-security" size="16" maxlength="64" styleClass="input-text" value="#{mainPage.smsCode}"/>
+                                    <h:inputText id="smscode-security" size="16" maxlength="64" styleClass="input-text" value="#{mainPage.smsCode}" onblur="sendFocus()"
+                                    onkeydown="if (event.keyCode === 13) { sendEvent(); return false;}"/>
                                 </h:panelGrid>
                                 <h:panelGrid columns="2">
                                     <a4j:commandButton type="submit" value="Отправить sms повторно" action="#{mainPage.sendSMSagain()}" disabled="#{mainPage.canSendAgain}"/>

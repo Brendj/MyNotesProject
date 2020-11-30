@@ -81,7 +81,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         return impl;
     }
 
-    public SendResponse sendTextMessage(String sender, Client client, Object textObject) throws Exception {
+    public SendResponse sendTextMessage(Client client, Object textObject) throws Exception {
         if (!(textObject instanceof EMPEventType)) {
             throw new Exception("Text argument must be an EMPEventType instead of " + textObject.getClass().toString());
         }
@@ -188,20 +188,11 @@ public class EMPSmsServiceImpl extends ISmsService {
 
     public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
-        /*if(1 == 1) {
-            updateStats(INCOME_STATS_ID, 10000);       //  TEST ONLY!!!!!!
-            return null;                //  TEST ONLY!!!!!!
-        }*/
         if (!ignoreMobileTest(event) && (event.getMsisdn() == null || StringUtils.isBlank("" + event.getMsisdn()))) {
             throw new EMPException(
                     String.format("Failed to send EMP event for client [%s] - msisdn (mobile) is required",
                             client.getIdOfClient()));
         }
-        /*if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L/) {
-            //return null;
-            throw new EMPException(String.format("Failed to send EMP event for client [%s] - ssoid is required", client.getIdOfClient()));
-        }*/
-
 
         updateStats(INCOME_STATS_ID, 1);
 
@@ -242,7 +233,9 @@ public class EMPSmsServiceImpl extends ISmsService {
                     DAOService.getInstance().setSendedNotificationforDTISZNDiscount(idofclientdtiszndiscountinfo, true);
             }
         }
-        if (event.getParameters().get("TEST") == null) {
+        if (event.getParameters().get("TEST") == null && RuntimeContext.getInstance().getConfigProperties().
+                getProperty("ecafe.processor.sms.service.empsend", "true")
+                .equals("true")) {
             //  Отправка запроса
             SubscriptionPortType subscription = createEventController(false);
             if (subscription == null) {

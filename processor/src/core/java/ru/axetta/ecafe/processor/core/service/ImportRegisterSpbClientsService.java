@@ -206,7 +206,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
             Date issueTime = new Date();
             Date validTime = CalendarUtils.endOfDay(CalendarUtils.addYear(issueTime, 5));
             Long cardNo;
-
+            ClientGroup beforeMigrationGroup = null;
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
                     //  добавление нового клиента
@@ -268,6 +268,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     Org newOrg = (Org) session.load(Org.class, change.getIdOfMigrateOrgTo());
 
                     Org beforeMigrateOrg = dbClient.getOrg();
+                    beforeMigrationGroup = dbClient.getClientGroup();
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(),
@@ -286,11 +287,15 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                         dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                         dbClient.setOrg(newOrg);
                     }
-                    addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), dbClient, change);
+                    addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), beforeMigrationGroup, dbClient, change);
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
+                    if (beforeMigrationGroup == null)
+                    {
+                        beforeMigrationGroup = dbClient.getClientGroup();
+                    }
 
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
@@ -313,7 +318,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
 
                     if (!migration) {
                         if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {
-                            addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), dbClient,
+                            addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), beforeMigrationGroup, dbClient,
                                     change); //орг. меняется - история миграции между ОО
                         } else {
                             if((change.getGroupName() == null && change.getGroupNameFrom() == null) ||
@@ -798,12 +803,13 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
     }
 
     //@Transactional
-    private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
+    private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg,  ClientGroup beforeMigrationGroup,
+            Client client, RegistryChange change){
         ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
         ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
         migration.setComment(ClientMigration.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
-        if(client.getClientGroup() != null) {
-            migration.setOldGroupName(client.getClientGroup().getGroupName());
+        if(beforeMigrationGroup != null) {
+            migration.setOldGroupName(beforeMigrationGroup.getGroupName());
         }
         migration.setNewGroupName(change.getGroupName());
         session.save(migration);

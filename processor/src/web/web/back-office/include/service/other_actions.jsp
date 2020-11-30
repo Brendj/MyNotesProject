@@ -31,9 +31,6 @@
     <a4j:commandButton value="Запустить пересчет льготных правил" action="#{otherActionsPage.runBenefitsRecalculation}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
-    <a4j:commandButton value="Перестроить таблицу опекунов" action="#{otherActionsPage.runClientGuardSANRebuild}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-
     <a4j:commandButton value="Импорт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 

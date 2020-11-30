@@ -14,7 +14,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
-import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
+import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotificationManager;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 
@@ -268,12 +268,13 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 RuntimeContext.getAppContext().getBean(PaymentNotificator.class).sendNotification(clientPayment, client, subBalanceNum);
-                if(GeoplanerManager.isOn() && client.clientHasActiveSmartWatch()){
+                if(client.clientHasActiveSmartWatch()){
                     try {
-                        GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                        manager.sendPaymentInfoToGeoplaner(clientPayment, client);
+                        SmartWatchVendorNotificationManager manager = RuntimeContext.getAppContext().getBean(
+                                SmartWatchVendorNotificationManager.class);
+                        manager.sendPaymentInfoToVendor(clientPayment, client);
                     } catch (Exception exc){
-                        logger.error("Can't send to Geoplaner JSON with Payments: ", exc);
+                        logger.error("Can't send to Vendor JSON with Payments: ", exc);
                     }
                 }
             } finally {
