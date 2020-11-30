@@ -33,6 +33,7 @@ public class RegularPreorder {
 	private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
 	private Boolean sendeddailynotification;
     private Long idOfDish;
+    private Boolean cancelnotification;
 
     public RegularPreorder() {
 
@@ -256,5 +257,13 @@ public class RegularPreorder {
 
     public void setIdOfDish(Long idOfDish) {
         this.idOfDish = idOfDish;
+    }
+
+    public Boolean getCancelnotification() {
+        return cancelnotification;
+    }
+
+    public void setCancelnotification(Boolean cancelnotification) {
+        this.cancelnotification = cancelnotification;
     }
 }

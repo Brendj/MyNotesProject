@@ -394,7 +394,8 @@ public class EventNotificationService {
         }
         ClientNotificationSetting.Predefined predefined;
         //Сообщения об окончинии срока льгот имеет тип Служебные
-        if (type.equals(EventNotificationService.NOTIFICATION_END_BENEFIT))
+        if (type.equals(EventNotificationService.NOTIFICATION_END_BENEFIT) ||
+                type.equals(EventNotificationService.NOTIFICATION_CANCEL_PREORDER))
             predefined = ClientNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL;
         else
             predefined = ClientNotificationSetting.Predefined.parseByBinding(type);
@@ -549,6 +550,8 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_END_SICK;
             } else if (type.equals(NOTIFICATION_CANCEL_END_SICK)) {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_CANCEL_END_SICK;
+            } else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
+                clientSMSType = ClientSms.TYPE_PREORDER_CANCEL_NOTIFICATION;
             } else if (type.equals(NOTIFICATION_LIBRARY)) {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_LIBRARY;
             } else {
@@ -1041,7 +1044,13 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_LIBRARY, destClient, values);
                 }
             }
-
+            else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CANCEL_PREORDER, dataClient, destClient, values);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CANCEL_PREORDER, destClient, values);
+                }
+            }
             String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);
             if (!isTest.equals(""))
                 empType.getParameters().put(ExternalEventNotificationService.TEST, isTest);

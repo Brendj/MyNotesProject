@@ -5386,35 +5386,35 @@ public class DAOUtils {
     public static List<PreorderComplex> getContentDeletedPreorderDishOtherOO(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
-                + " and pc.modeOfAdd = 4 and pc.state in (3, 4, 5, 6)");
+                + " and pc.modeOfAdd = 4 and pc.state in (3, 4, 5, 6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }
     public static List<PreorderComplex> getContentDeletedPreorderDishOtherPP(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
-                + " and pc.modeOfAdd = 4 and pc.state in (1,2)");
+                + " and pc.modeOfAdd = 4 and pc.state in (1,2) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }
     public static List<PreorderComplex> getContentDeletedPreorderOtherOO(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
-                + " and pc.modeOfAdd = 2 and pc.state in (3,4,5,6)");
+                + " and pc.modeOfAdd = 2 and pc.state in (3,4,5,6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }
     public static List<PreorderComplex> getContentDeletedPreorderOtherPP(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
-                + " and pc.modeOfAdd = 2 and pc.state in (1,2)");
+                + " and pc.modeOfAdd = 2 and pc.state in (1,2) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }
     public static List<RegularPreorder> getContentDeletedPreorderOtherRegularOO(Session session, Date date) {
-        Query query = session.createQuery("select  rp from RegularPreorder rp "
+        Query query = session.createQuery("select rp from RegularPreorder rp "
                 + " where rp.itemCode is null and idofdish is null "
-                + " and rp.state = 1 and rp.deletedState = 1 "
+                + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
                 + " and rp.endDate < :date");
         query.setParameter("date", date);
         return (List<RegularPreorder>) query.list();
@@ -5423,7 +5423,7 @@ public class DAOUtils {
         Query query = session.createQuery("select  rp from RegularPreorder rp "
                 + " where ((rp.itemCode is not null and idofdish is null) or "
                 + " (rp.itemCode is null and idofdish is not null)) "
-                + " and rp.state = 1 and rp.deletedState = 1 "
+                + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
                 + " and rp.endDate < :date");
         query.setParameter("date", date);
         return (List<RegularPreorder>) query.list();

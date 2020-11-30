@@ -52,7 +52,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     public void setTime(long time) {
         this.time = time;
-        if(params != null && type != EMPEventTypeFactory.ENTER_LIBRARY) {
+        if(params != null) {
             params.put("time", new SimpleDateFormat("HH:mm").format(new Date(time)));
         }
     }
@@ -140,16 +140,19 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("name", person.getFirstName());
         params.put("account", "" + client.getContractId());
 
-        if (type == EMPEventTypeFactory.ENTER_LIBRARY)
+        if (type == EMPEventTypeFactory.ENTER_LIBRARY || type == EMPEventTypeFactory.CANCEL_PREORDER)
             params.put("gender", getGender(client));
 
-        if (type != EMPEventTypeFactory.ENTER_LIBRARY) {
+        if (type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
             params.put("date", DATE_FORMAT.format(currentDate));
             params.put("time", TIME_FORMAT.format(currentDate));
             if (client.getOrg() != null) {
                 appendOrgParameters(client.getOrg().getIdOfOrg(), params);
             }
             appendBalance(client.getBalance(), params);
+        }
+        if(type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
+            setTime(System.currentTimeMillis());
         }
     }
 
@@ -178,14 +181,17 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
 
-        if (type == EMPEventTypeFactory.ENTER_LIBRARY)
+        if (type == EMPEventTypeFactory.ENTER_LIBRARY || type == EMPEventTypeFactory.CANCEL_PREORDER)
             params.put("gender", getGender(child));
 
-        if (type != EMPEventTypeFactory.ENTER_LIBRARY) {
+        if (type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
             params.put("date", DATE_FORMAT.format(currentDate));
             params.put("time", TIME_FORMAT.format(currentDate));
             appendOrgParameters(child.getOrg().getIdOfOrg(), params);
             appendBalance(child.getBalance(), params);
+        }
+        if(type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
+            setTime(System.currentTimeMillis());
         }
     }
 
@@ -253,6 +259,14 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             }
         }
         return "";
+    }
+
+    protected void saveStringtoMap (String values[]) {
+        for(int i=0; i<values.length-1; i+=2) {
+            String name = values [i];
+            String val = values[i+1];
+            getParameters().put(name, val);
+        }
     }
 
     private String getGender(Client client)

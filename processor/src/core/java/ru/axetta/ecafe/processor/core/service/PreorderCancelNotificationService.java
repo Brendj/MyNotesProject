@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BlockUnblockItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -58,7 +60,7 @@ public class PreorderCancelNotificationService {
             }
         }
 
-        public static void test() throws JobExecutionException {
+        public static void manualStart() throws JobExecutionException {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -69,7 +71,6 @@ public class PreorderCancelNotificationService {
                         .start(persistenceSession);
                 persistenceTransaction.commit();
             } catch (Exception e) {
-                System.out.println("test fail");
             }
         }
     }
@@ -92,7 +93,7 @@ public class PreorderCancelNotificationService {
         //if (!isOn())
         //    return;
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
-                getProperty("ecafe.processor.card.blocked.cron", "0 10 3 ? * 2/2");
+                getProperty("ecafe.processor.preorder.cancel.notification.time", "0 0 8 ? * * *");
         try {
             JobDetail jobDetailSync = new JobDetail(CANCEL_PREORDER_NOTIFICATION, Scheduler.DEFAULT_GROUP, sendNotification.class);
             SchedulerFactory sfb = new StdSchedulerFactory();
@@ -111,23 +112,46 @@ public class PreorderCancelNotificationService {
 
 
     public void start(Session session) throws Exception {
+        //Получаем данные из БД, которые не отправлены при предидущим вызовом сервиса
         Map<Client, Object> oldMessage = convertResultFromDB(session);
-        //Map<Client, Object> newMessage = getNewNotification(session);
-        //convertResultToDB(session, newMessage);
+        //Получаем новые данные для отправления
+        Map<Client, Object> newMessage = getNewNotification(session);
+
+        //
+        String goodtime = RuntimeContext.getInstance().getConfigProperties().
+                getProperty("ecafe.processor.preorder.cancel.notification.goodtime", "08:00-22:00");
+        String goodH = goodtime.substring(0,4);
+        String goodM = goodtime.substring(5,10);
+        DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
+        Date dateH = format.parse(goodH);
+        Date dateM = format.parse(goodM);
+        //
 
 
+        Long currentTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
+       // if (currentTime >= 28800000 && currentTime < 79200000) //Отправка только в рабочее время (с 8:00 до 22:00)
+        if (currentTime > (dateH.getTime() + 10800000) &&
+                currentTime < (dateM.getTime() + 10800000))
+        {
+            //Отправляем сообщение
+            reallySendNotification (session, oldMessage);
+            reallySendNotification (session, newMessage);
+        }
+        else
+        {
+            //Сохраняем новые данные в БД
+            convertResultToDB(session, newMessage);
+        }
+    }
 
-        Iterator<Map.Entry<Client, Object>> clients = oldMessage.entrySet().iterator();
+    private void reallySendNotification(Session session, Map<Client, Object> messages) throws Exception {
+        Iterator<Map.Entry<Client, Object>> clients = messages.entrySet().iterator();
         int counttype = 1;
         String value = "<br>";
         while (clients.hasNext()) {
             Map.Entry<Client, Object> client = clients.next();
             String[] values = new String[]{
-                    "name", client.getKey().getPerson().getFirstName(),
-                    "surname",client.getKey().getPerson().getSurname(),
-                    "account", String.valueOf(client.getKey().getContractId()),
                     "balance", String.valueOf(client.getKey().getBalance())};
-            values = EventNotificationService.attachGenderToValues(client.getKey().getGender(), values);
             List<Client> guardians = ClientManager
                     .findGuardiansByClient(session, client.getKey().getIdOfClient(), null);
             Iterator<Map.Entry<String, Object>> types =
@@ -170,24 +194,48 @@ public class PreorderCancelNotificationService {
         Map<Client, Object> result =
                 new HashMap<Client, Object>();
         List<PreorderComplex> preorderComplexs = DAOUtils.getContentDeletedPreorderDishOtherOO(session, new Date());
+        setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherOO", 1, result);
         preorderComplexs = DAOUtils.getContentDeletedPreorderDishOtherPP(session, new Date());
+        setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherPP", 2, result);
         preorderComplexs = DAOUtils.getContentDeletedPreorderOtherOO(session, new Date());
+        setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderOtherOO", 3, result);
         preorderComplexs = DAOUtils.getContentDeletedPreorderOtherPP(session, new Date());
+        setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderOtherPP", 4, result);
         List<RegularPreorder> regularPreorders = DAOUtils.getContentDeletedPreorderOtherRegularOO(session, new Date());
+        setFlagSendedRegular(session, regularPreorders);
         regularPreorders = getUniquleResultRegular(regularPreorders);
         createDataRegularPreorder(session, regularPreorders, "contentDeletedPreorderOtherRegularOO", 1, result);
         regularPreorders = DAOUtils.getContentDeletedPreorderDishOtherRegularOO(session, new Date());
+        setFlagSendedRegular(session, regularPreorders);
         regularPreorders = getUniquleResultRegular(regularPreorders);
         createDataRegularPreorder(session, regularPreorders, "contentDeletedPreorderDishOtherRegularOO", 2, result);
         return result;
+    }
+
+    private void setFlagSended (Session session, List<PreorderComplex> preorderComplexs)
+    {
+        for (PreorderComplex preorderComplex: preorderComplexs)
+        {
+            preorderComplex.setCancelnotification(true);
+            session.save(preorderComplex);
+        }
+    }
+
+    private void setFlagSendedRegular (Session session, List<RegularPreorder> regularPreorders)
+    {
+        for (RegularPreorder regularPreorder: regularPreorders)
+        {
+            regularPreorder.setCancelnotification(true);
+            session.save(regularPreorder);
+        }
     }
 
     private Map<Client, Object> convertResultFromDB (Session session) throws Exception {

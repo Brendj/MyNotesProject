@@ -40,8 +40,9 @@ public class EMPEventTypeFactory {
     public static final int END_BENEFIT               = 901240019;
     public static final int REFUSAL_PREFERENTIAL_FOOD = 901240020;
     public static final int ENTER_CULTURE             = 901240021;
-    public static final int LEAVE_CULTURE              = 901240022;
-    public static final int ENTER_LIBRARY              = 901240024;
+    public static final int LEAVE_CULTURE             = 901240022;
+    public static final int CANCEL_PREORDER           = 901240023;
+    public static final int ENTER_LIBRARY             = 901240024;
 
 
     //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
@@ -172,10 +173,12 @@ public class EMPEventTypeFactory {
             case ENTER_LIBRARY:
                 event = new EMPLibraryEventType(values);
                 break;
+            case CANCEL_PREORDER:
+                event = new EMPCancelPreorderEventType(values);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown type");
         }
-        event.setTime(System.currentTimeMillis());
         return event;
     }
 }
