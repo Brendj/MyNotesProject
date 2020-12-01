@@ -19,6 +19,7 @@ public class GeoplanerNotificationJournal {
     private Date createDate;
     private String errorText;
     private String nodeName;
+    private SmartWatchVendor vendor;
 
     public GeoplanerNotificationJournal() {
         // for hibernate
@@ -120,10 +121,18 @@ public class GeoplanerNotificationJournal {
         this.nodeName = nodeName;
     }
 
+    public SmartWatchVendor getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(SmartWatchVendor vendor) {
+        this.vendor = vendor;
+    }
+
     public static class Builder {
         public static GeoplanerNotificationJournal build(String errorText, Integer responseCode, Boolean isSend,
                 Client client, Org org, Integer eventType, Long idOfEnterEvents, Long idOfOrder,
-                Long idOfClientPayment, String nodeName){
+                Long idOfClientPayment, String nodeName, SmartWatchVendor vendor){
             GeoplanerNotificationJournal journal = new GeoplanerNotificationJournal();
             journal.setClient(client);
             journal.setOrg(org);
@@ -136,6 +145,7 @@ public class GeoplanerNotificationJournal {
             journal.setResponse(responseCode);
             journal.setEventType(eventType);
             journal.setNodeName(nodeName);
+            journal.setVendor(vendor);
 
             return journal;
         }

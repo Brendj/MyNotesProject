@@ -248,7 +248,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     public Object buildReportHTML() {
         if (validateFormData())  return null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile("_summary.jasper");
+        String templateFilename = checkIsExistFile("_allmenus.jasper");
+        //String templateFilename = checkIsExistFile("_summary.jasper");
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }

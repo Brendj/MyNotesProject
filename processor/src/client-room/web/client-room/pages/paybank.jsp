@@ -23,8 +23,6 @@
     final String RC_OK_DESC="OK";
     final String RC_CLIENT_NOT_FOUND_DESC="Клиент не найден";
     final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC="По условиям найден более одного клиента";
-    final String RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC="У клиента нет СНИЛС опекуна";
-    final String RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC= "У клиента уже есть данный СНИЛС опекуна";
     final String RC_CLIENT_AUTHORIZATION_FAILED_DESC="Ошибка авторизации клиента";
     final String RC_INTERNAL_ERROR_DESC="Внутренняя ошибка";
     final String RC_NO_CONTACT_DATA_DESC="У лицевого счета нет контактных данных";

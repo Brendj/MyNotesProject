@@ -749,6 +749,11 @@ public class DAOReadonlyService {
             while (emiasIterator.hasNext()) {
                 EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
                 Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
+                if (cl == null) {
+                    //Удаляем "удаленных" клиентов
+                    emiasIterator.remove();
+                    continue;
+                }
                 if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
                     //Удаляем "чужих" клиентов
                     emiasIterator.remove();
@@ -926,7 +931,9 @@ public class DAOReadonlyService {
         Set<WtComplex> complexes = new HashSet<>();
         try {
             Query queryOrgs = entityManager.createQuery(
-                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items left join fetch items.dishes dishes where complex.version > :version "
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items "
+                            + "left join fetch complex.orgs orgs "
+                            + "left join fetch items.dishes dishes where complex.version > :version "
                             + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs)");
             queryOrgs.setParameter("version", version);
             queryOrgs.setParameter("contragent", contragent);
@@ -938,7 +945,9 @@ public class DAOReadonlyService {
             }
 
             Query queryOrgGroups = entityManager.createQuery(
-                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items left join fetch items.dishes dishes where complex.version > :version "
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items "
+                            + "left join fetch complex.orgs orgs "
+                            + "left join fetch items.dishes dishes where complex.version > :version "
                             + "AND complex.contragent = :contragent AND :org IN elements(complex.wtOrgGroup.orgs)");
             queryOrgGroups.setParameter("version", version);
             queryOrgGroups.setParameter("contragent", contragent);
@@ -1080,16 +1089,25 @@ public class DAOReadonlyService {
         }
     }
 
-    public String getWtMenuGroupByWtDish(WtDish wtDish) {
+    public Set<String> getWtMenuGroupByWtDish(Long idOfOrg, WtDish wtDish) {
         Query query = entityManager.createNativeQuery("SELECT mg.name FROM cf_wt_menu_groups mg "
                 + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE d.idofdish = :idOfDish and mgr.deletestate = 0 ");
+                + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
+                + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
+                + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
+                + "and d.idofdish = :idOfDish and mgr.deletestate = 0 ");
         query.setParameter("idOfDish", wtDish.getIdOfDish());
-        Object result = query.getSingleResult();
-        return result != null ? result.toString() : "";
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = query.getResultList();
+        Set<String> result = new HashSet<>();
+        if (list.size() == 0) result.add("");
+        for (Object obj : list) {
+            result.add((String)obj);
+        }
+        return result;
     }
 
     public List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {

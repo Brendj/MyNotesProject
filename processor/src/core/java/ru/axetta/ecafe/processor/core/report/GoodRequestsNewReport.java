@@ -36,13 +36,14 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
    */
     public static final String REPORT_NAME = "Сводный отчет по заявкам";
     public static final String[] TEMPLATE_FILE_NAMES = {"GoodRequestsNewReport.jasper", "GoodRequestsNewReport_export.jasper",
-    "GoodRequestsNewReport_notify.jasper", "GoodRequestsNewReport_summary.jasper", "GoodRequestsReport.jasper"};
+    "GoodRequestsNewReport_notify.jasper", "GoodRequestsNewReport_summary.jasper", "GoodRequestsReport.jasper",
+    "GoodRequestsNewReport_resume.jasper", "GoodRequestsNewReport_allmenus.jasper", "GoodRequestsNewReport_wtmenu.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReport.class);
-    final private static String OVERALL = "";
+    final private static String OVERALL = "=";
     final private static long OVERALL_TOTAL = Long.MAX_VALUE - 8;
     final private static String OVERALL_TOTAL_TITLE = "ВСЕГО";
     final private static String OVERALL_TITLE = "ИТОГО";
@@ -66,15 +67,18 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
+        private final String subReportDir;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
+            subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         }
 
         public Builder() {
             String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
                     .getReportsTemplateFilePath();
             templateFilename = reportsTemplateFilePath + GoodRequestsNewReport.class.getSimpleName() + ".jasper";
+            subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         }
 
         @Override
@@ -84,9 +88,10 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             calendar.setTime(startTime);
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, true);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, true, false);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -94,15 +99,16 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
         }
 
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
-                boolean isROSection) throws Exception {
+                boolean isWtMenu, boolean isNotificationReport) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, isROSection);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, isWtMenu, isNotificationReport);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -110,7 +116,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Map<String,
-                Object> parameterMap, boolean isROSection) throws Exception{
+                Object> parameterMap, boolean isWtMenu, boolean isNotificationReport) throws Exception{
             boolean hideMissedColumns = Boolean.parseBoolean(reportProperties.getProperty(P_HIDE_MISSED_COLUMNS, "false"));
             boolean hideGeneratePeriod = Boolean.parseBoolean(reportProperties.getProperty(P_HIDE_GENERATE_PERIOD, "false"));
             String nameFilter = StringUtils.trim(reportProperties.getProperty(P_NAME_FILTER, ""));
@@ -193,10 +199,27 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             GoodRequestsNewReportService service;
             service = new GoodRequestsNewReportService(session,OVERALL, OVERALL_TITLE, hideTotalRow);
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, nameFilter, orgFilter,
-                    hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
-                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly,
-                    needFullGoodNames, isROSection));
+            if (isNotificationReport) {
+                if (!isWtMenu) {
+                    return new JRBeanCollectionDataSource(
+                            service.buildReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue,
+                                    generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
+                                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders,
+                                    preordersOnly, needFullGoodNames));
+                } else {
+                    return new JRBeanCollectionDataSource(
+                            service.buildWtReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue,
+                                    generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
+                                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders,
+                                    preordersOnly, needFullGoodNames));
+                }
+            } else {
+                return new JRBeanCollectionDataSource(
+                        service.buildTotalReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue,
+                                generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
+                                hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders,
+                                preordersOnly, needFullGoodNames));
+            }
         }
     }
 
