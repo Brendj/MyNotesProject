@@ -526,7 +526,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             this.filter = "Не выбрано";
         }
 
-
         StringBuilder categoryOrgFilter = new StringBuilder();
         if(!discountRule.getCategoryOrgs().isEmpty()){
             for (CategoryOrg categoryOrg: discountRule.getCategoryOrgs()){

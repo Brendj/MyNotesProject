@@ -292,7 +292,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private void fill(WtDiscountRule wtDiscountRule) {
         this.description = wtDiscountRule.getDescription();
 
-        this.codeMSP = wtDiscountRule.getCodeMSP().getCode();
+        this.codeMSP = wtDiscountRule.getCodeMSP() == null ? null : wtDiscountRule.getCodeMSP().getCode();
 
         if (description.indexOf(CategoryDiscountEditPage.DISCOUNT_START) == 0) {
             String discount = description.substring(description.indexOf(CategoryDiscountEditPage.DISCOUNT_START)
