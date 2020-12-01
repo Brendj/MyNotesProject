@@ -85,7 +85,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private String contragentIds;
     private List<ContragentItem> contragentItems = new ArrayList<>();
 
-    private CodeMSP codeMSP;
+    private Integer codeMSP;
     private List<SelectItem> allMSP = loadAllMSP();
 
     public List<SelectItem> getSubCategories() throws Exception {
@@ -194,7 +194,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
             result.add(new SelectItem(null, ""));
             for(CodeMSP code : items){
-                SelectItem selectItem = new SelectItem(code, code.getCode().toString());
+                SelectItem selectItem = new SelectItem(code.getCode(), code.getCode().toString());
                 result.add(selectItem);
             }
 
@@ -212,11 +212,11 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         this.allMSP = allMSP;
     }
 
-    public CodeMSP getCodeMSP() {
+    public Integer getCodeMSP() {
         return codeMSP;
     }
 
-    public void setCodeMSP(CodeMSP codeMSP) {
+    public void setCodeMSP(Integer codeMSP) {
         this.codeMSP = codeMSP;
     }
 
@@ -377,7 +377,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
 
-        wtDiscountRule.setCodeMSP(codeMSP);
+        wtDiscountRule.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
 
         if (!this.idOfCategoryList.isEmpty()) {
             List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);

@@ -368,6 +368,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.priority = discountRule.getPriority();
             this.operationor = discountRule.getOperationOr();
             this.categoryDiscountList = new LinkedList<CategoryDiscount>();
+            this.codeMSP = discountRule.getCodeMSP() == null ? null : discountRule.getCodeMSP().getCode();
             if(!discountRule.getCategoriesDiscounts().isEmpty()){
                 StringBuilder stringBuilder = new StringBuilder();
                 for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){

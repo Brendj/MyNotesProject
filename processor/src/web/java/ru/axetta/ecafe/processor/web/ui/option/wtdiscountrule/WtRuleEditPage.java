@@ -60,7 +60,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private String filterOrg = "Не выбрано";
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private Set<CategoryOrg> categoryOrgs;
-    private CodeMSP codeMSP;
+    private Integer codeMSP;
     private List<SelectItem> allMSP = loadAllMSP();
 
     public String getPageFilename() {
@@ -92,7 +92,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
             result.add(new SelectItem(null, ""));
             for(CodeMSP code : items){
-                SelectItem selectItem = new SelectItem(code, code.getCode().toString());
+                SelectItem selectItem = new SelectItem(code.getCode(), code.getCode().toString());
                 result.add(selectItem);
             }
 
@@ -110,11 +110,11 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         this.allMSP = allMSP;
     }
 
-    public CodeMSP getCodeMSP() {
+    public Integer getCodeMSP() {
         return codeMSP;
     }
 
-    public void setCodeMSP(CodeMSP codeMSP) {
+    public void setCodeMSP(Integer codeMSP) {
         this.codeMSP = codeMSP;
     }
 
@@ -292,6 +292,8 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private void fill(WtDiscountRule wtDiscountRule) {
         this.description = wtDiscountRule.getDescription();
 
+        this.codeMSP = wtDiscountRule.getCodeMSP().getCode();
+
         if (description.indexOf(CategoryDiscountEditPage.DISCOUNT_START) == 0) {
             String discount = description.substring(description.indexOf(CategoryDiscountEditPage.DISCOUNT_START)
                             + CategoryDiscountEditPage.DISCOUNT_START.length(),
@@ -459,7 +461,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
             }
             wtEntity.setComplexes(newComplexes);
 
-            wtEntity.setCodeMSP(codeMSP);
+            wtEntity.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
 
             em.persist(wtEntity);
             fill(wtEntity);

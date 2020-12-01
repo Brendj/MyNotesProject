@@ -47,7 +47,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private Set<CategoryDiscount> categoryDiscountSet;
     private Integer[] selectedComplexIds;
     private int subCategory;
-    private CodeMSP codeMSP;
+    private Integer codeMSP;
     private List<SelectItem> allMSP = loadAllMSP();
 
     @PersistenceContext(unitName = "processorPU")
@@ -67,7 +67,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
             result.add(new SelectItem(null, ""));
             for(CodeMSP code : items){
-                SelectItem selectItem = new SelectItem(code, code.getCode().toString());
+                SelectItem selectItem = new SelectItem(code.getCode(), code.getCode().toString());
                 result.add(selectItem);
             }
 
@@ -109,11 +109,11 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         return list;
     }
 
-    public CodeMSP getCodeMSP() {
+    public Integer getCodeMSP() {
         return codeMSP;
     }
 
-    public void setCodeMSP(CodeMSP codeMSP) {
+    public void setCodeMSP(Integer codeMSP) {
         this.codeMSP = codeMSP;
     }
 
@@ -352,7 +352,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                 entity.getCategoryOrgs().add((CategoryOrg) object);
             }
         }
-        entity.setCodeMSP(codeMSP);
+        entity.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
 
         em.persist(entity);
         fill(entity);
@@ -512,7 +512,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     public void reload() throws Exception {
         DiscountRule discountRule = em.merge(entity);
 
-        this.codeMSP = discountRule.getCodeMSP();
+        this.codeMSP = discountRule.getCodeMSP() == null ? null : discountRule.getCodeMSP().getCode();
 
         StringBuilder categoryFilter = new StringBuilder();
         if(!discountRule.getCategoriesDiscounts().isEmpty()){

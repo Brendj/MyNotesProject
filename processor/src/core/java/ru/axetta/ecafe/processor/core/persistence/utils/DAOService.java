@@ -3126,4 +3126,16 @@ public class DAOService {
     public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
         return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
     }
+
+    public CodeMSP findCodeNSPByCode(Integer code) {
+        if(code == null){
+            return null;
+        }
+        Session session = (Session) entityManager.getDelegate();
+
+        Criteria criteria = session.createCriteria(CodeMSP.class);
+        criteria.add(Restrictions.eq("code", code));
+
+        return (CodeMSP) criteria.uniqueResult();
+    }
 }

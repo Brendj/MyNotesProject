@@ -67,7 +67,7 @@ public class RuleCreatePage extends BasicWorkspacePage
     private Integer discountRate = 100;
     private Integer[] selectedComplexIds;
     private int subCategory = -1;
-    private CodeMSP codeMSP;
+    private Integer codeMSP;
     private List<SelectItem> allMSP = loadAllMSP();
 
     @Autowired
@@ -111,7 +111,7 @@ public class RuleCreatePage extends BasicWorkspacePage
 
             result.add(new SelectItem(null, ""));
             for(CodeMSP code : items){
-                SelectItem selectItem = new SelectItem(code, code.getCode().toString());
+                SelectItem selectItem = new SelectItem(code.getCode(), code.getCode().toString());
                 result.add(selectItem);
             }
 
@@ -129,11 +129,11 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.allMSP = allMSP;
     }
 
-    public CodeMSP getCodeMSP() {
+    public Integer getCodeMSP() {
         return codeMSP;
     }
 
-    public void setCodeMSP(CodeMSP codeMSP) {
+    public void setCodeMSP(Integer codeMSP) {
         this.codeMSP = codeMSP;
     }
 
@@ -310,7 +310,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setOperationOr(operationOr);
         discountRule.setDeletedState(false);
         discountRule.setCategoryDiscounts(categoryDiscounts);
-        discountRule.setCodeMSP(codeMSP);
+        discountRule.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (!this.idOfCategoryList.isEmpty()) {
             List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);

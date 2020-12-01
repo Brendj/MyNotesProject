@@ -66,7 +66,7 @@
         </h:selectOneListbox>
 
         <h:outputText value="Код МСП" styleClass="output-text"/>
-        <h:selectOneListbox id="codeMSP" value="#{wtRuleCreatePage.codeMSP}"  size="1"
+        <h:selectOneListbox id="codeMSPCreateWT" value="#{wtRuleCreatePage.codeMSP}"  size="1"
                             styleClass="output-text">
             <f:selectItems value="#{wtRuleCreatePage.allMSP}" />
         </h:selectOneListbox>

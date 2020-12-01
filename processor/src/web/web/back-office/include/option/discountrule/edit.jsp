@@ -64,8 +64,8 @@
         <f:selectItem itemLabel="ИЛИ" itemValue="true" />
     </h:selectOneListbox>
     <h:outputText value="Код МСП" styleClass="output-text"/>
-    <h:selectOneListbox id="codeMSP" value="#{ruleEditPage.codeMSP}" size="1"
-                        styleClass="output-text">
+    <h:selectOneListbox id="codeMSPEdit" value="#{ruleEditPage.codeMSP}" size="1"
+                        styleClass="output-text" >
         <f:selectItems value="#{ruleEditPage.allMSP}" />
     </h:selectOneListbox>
 
