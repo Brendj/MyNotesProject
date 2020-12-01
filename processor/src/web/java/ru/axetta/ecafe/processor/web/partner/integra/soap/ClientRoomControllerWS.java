@@ -1672,6 +1672,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     client.getIdOfClient(), handler.getData().getOperationType());
                         }
                     } catch (NullPointerException e) {
+                        data.setResultCode(RC_CLIENT_NOT_FOUND);
+                        data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+                    } catch (DatatypeConfigurationException e)
+                    {
                         data.setResultCode(RC_INVALID_DATA);
                         data.setDescription(RC_NOT_ALL_ARG);
                     }
@@ -4738,12 +4742,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String author, String title, String title2, String publicationDate, String publisher, String isbn,
             int limit, int offset) throws DatatypeConfigurationException {
 
-        if (author.isEmpty() && title.isEmpty() && title2.isEmpty() && publicationDate.isEmpty() && publisher.isEmpty()
-                && isbn.isEmpty()) {
-            data.setPublicationItemList(new PublicationItemList());
-            data.setAmountForCondition(0);
-            return;
+        if ((author == null || author.isEmpty()) && (title == null || title.isEmpty()) &&
+                (title2 == null || title2.isEmpty()) && (publicationDate == null || publicationDate.isEmpty())
+                && (publisher == null || publisher.isEmpty()) && (isbn == null || isbn.isEmpty())) {
+            //data.setPublicationItemList(new PublicationItemList());
+            //data.setAmountForCondition(0);
+            throw new DatatypeConfigurationException();
         }
+        if (limit < 0 )
+            limit = 0;
         Long org = client.getOrg().getIdOfOrg();
 
         StringBuilder bquery = new StringBuilder();
