@@ -83,43 +83,47 @@
             <h:panelGrid columns="2" id="filter">
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text" rendered="true"/>
-
                 <h:selectOneMenu id="typeMenu" value="#{wtRuleEditPage.complexType}"
                                  style="width:300px;" styleClass="groupSelect" rendered="true">
                     <f:selectItems value="#{wtRuleEditPage.complexTypes}"/>
                 </h:selectOneMenu>
 
                 <h:outputText escape="true" value="Возрастная категория" styleClass="output-text" rendered="true"/>
-
                 <h:selectOneMenu id="ageMenu" value="#{wtRuleEditPage.ageGroup}"
                                  style="width:300px;" styleClass="groupSelect" rendered="true">
                     <f:selectItems value="#{wtRuleEditPage.ageGroups}"/>
                 </h:selectOneMenu>
 
-                <a4j:outputPanel ajaxRendered="true" rendered="true">
-                    <h:panelGrid styleClass="borderless-grid" columns="2">
-                        <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
-                        <h:panelGroup styleClass="borderless-div">
-
-                            <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
-                                               reRender="modalContragentListSelectorPanel"
-                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
-                                               styleClass="command-link" style="width: 25px;">
-                                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}"/>
-                                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}"/>
-                                <f:setPropertyActionListener value="#{wtRuleEditPage.contragentIds}"
-                                                             target="#{mainPage.contragentListSelectPage.selectedIds}"/>
-                            </a4j:commandButton>
-
-                            <h:outputText value=" {#{wtRuleEditPage.contragentFilter}}" escape="true"
-                                          styleClass="output-text"/>
-                        </h:panelGroup>
-                    </h:panelGrid>
-                </a4j:outputPanel>
-
+                <h:outputText escape="true" value="Рацион" styleClass="output-text" rendered="true"/>
+                <h:selectOneMenu id="dietMenu" value="#{wtRuleEditPage.dietType}"
+                                 style="width:300px;" styleClass="groupSelect" rendered="true">
+                    <f:selectItems value="#{wtRuleEditPage.dietTypes}"/>
+                </h:selectOneMenu>
             </h:panelGrid>
 
+            <a4j:outputPanel ajaxRendered="true" rendered="true">
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
+                    <h:panelGroup styleClass="borderless-div">
+                        <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
+                                           reRender="modalContragentListSelectorPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
+                                           styleClass="command-link" style="width: 25px;">
+                            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}"/>
+                            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}"/>
+                            <f:setPropertyActionListener value="#{wtRuleEditPage.contragentIds}"
+                                                         target="#{mainPage.contragentListSelectPage.selectedIds}"/>
+                        </a4j:commandButton>
+                        <h:outputText value=" {#{wtRuleEditPage.contragentFilter}}" escape="true"
+                                      styleClass="output-text"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </a4j:outputPanel>
+
             <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Показать выбранные комплексы с учетом фильтра" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{wtRuleEditPage.applyFilter}" styleClass="input-text" />
+
                 <a4j:commandButton value="Отобразить" action="#{wtRuleEditPage.fillWtSelectedComplexes()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
@@ -157,6 +161,9 @@
                         </rich:column>
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="Возрастная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Рацион"/>
                         </rich:column>
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="Цена"/>
@@ -208,6 +215,12 @@
                     <rich:column headerClass="column-header">
                         <h:outputText escape="true" value="#{complex.wtComplex.wtAgeGroupItem.description}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
                         <h:outputText escape="true" value="#{complex.wtComplex.wtAgeGroupItem.description}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
+                    </rich:column>
+
+                    <%--        Рацион--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtDietType.description}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtDietType.description}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        Цена, руб--%>

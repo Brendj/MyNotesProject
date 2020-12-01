@@ -22,6 +22,11 @@ public class WtSelectedComplex {
         this.isChecked = false;
     }
 
+    public WtSelectedComplex(WtComplex wtComplex, boolean isChecked) {
+        this.wtComplex = wtComplex;
+        this.isChecked = isChecked;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

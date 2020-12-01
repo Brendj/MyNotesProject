@@ -2848,57 +2848,29 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public List<Contragent> getSupplierList() {
-        TypedQuery<Contragent> q = entityManager
-                .createQuery("from Contragent where classId = 2 order by idOfContragent", Contragent.class);
+    public List<WtDietType> getWtDietTypeList() {
+        TypedQuery<WtDietType> q = entityManager
+                .createQuery("from WtDietType order by idOfDietType", WtDietType.class);
         return q.getResultList();
     }
 
-    public List<WtDiscountRule> getWtDiscountRulesList() {
-        TypedQuery<WtDiscountRule> q = entityManager
-                .createQuery("from WtDiscountRule order by idOfRule", WtDiscountRule.class);
-        return q.getResultList();
-    }
-
-    public List<WtDiscountRule> getWtDiscountRulesList(WtComplexGroupItem selectedComplexType,
-            WtAgeGroupItem selectedAgeGroup) {
-        Query query = entityManager.createQuery("select dr from WtDiscountRule dr inner join dr.complexes c "
-                + "where c.wtComplexGroupItem = :selectedComplexType and c.wtAgeGroupItem = :selectedAgeGroup");
-        query.setParameter("selectedComplexType", selectedComplexType);
-        query.setParameter("selectedAgeGroup", selectedAgeGroup);
+    public Long getWtComplexGroupValueAll() {
         try {
-            return query.getResultList();
+            return (Long) entityManager.createQuery("select cg.idOfComplexGroupItem from WtComplexGroupItem cg"
+                    + " where lower(cg.description) like '%все%'").getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return 0L;
         }
     }
 
-    public List<WtComplexGroupItem> getWtComplexGroupItemById(Long idOfComplexType) {
-        Query query = entityManager.createQuery("select cg from WtComplexGroupItem cg "
-                + "where cg.idOfComplexGroupItem = :idOfComplexType or cg.idOfComplexGroupItem = 3");
-        query.setParameter("idOfComplexType", idOfComplexType);
+    public Long getWtAgeGroupValueAll() {
         try {
-            return query.getResultList();
+            return (Long) entityManager.createQuery("select ag.idOfAgeGroupItem from WtAgeGroupItem ag"
+                    + " where lower(ag.description) like '%все%'").getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
-        }
-    }
-
-    public List<WtAgeGroupItem> getWtAgeGroupItemById(Long idOfAgeGroup) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("select ag from WtAgeGroupItem ag where ag.idOfAgeGroupItem = :idOfAgeGroup");
-        if (idOfAgeGroup == 3) { // 1-4
-            sb.append(" or ag.idOfAgeGroupItem = 6"); // Все
-        }
-        Query query = entityManager.createQuery(sb.toString());
-        query.setParameter("idOfAgeGroup", idOfAgeGroup);
-        try {
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            return 0L;
         }
     }
 
@@ -2925,56 +2897,58 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public List<WtComplex> getWtComplexesListByDiscountRule(WtDiscountRule wtRule) {
-        TypedQuery<WtComplex> q = entityManager
-                .createQuery("select wc from WtComplex wc left join fetch wc.discountRules discountRules "
-                                + "where :wtRule in elements(wc.discountRules)",
-                        WtComplex.class).setParameter("wtRule", wtRule);
-        return q.getResultList();
+    public List<WtComplex> getWtComplexesListByDiscountRuleAndFilter(List<Long> wtComplexGroupIds,
+            List<Long> wtAgeGroupIds, Long wtDietTypeId, List<Long> contragentIds, WtDiscountRule wtRule) {
+        String strQuery = "select wc from WtComplex wc left join fetch wc.discountRules "
+                + "left join fetch wc.wtComplexGroupItem complexItem "
+                + "left join fetch wc.wtAgeGroupItem ageItem left join fetch wc.wtDietType dietType "
+                + "left join fetch wc.contragent contragent "
+                + "where :wtRule in elements(wc.discountRules)"
+                + (wtComplexGroupIds.size() == 0 ? "" : " and complexItem.idOfComplexGroupItem in (:wtComplexGroupIds)")
+                + (wtAgeGroupIds.size() == 0 ? "" : " and ageItem.idOfAgeGroupItem in (:wtAgeGroupIds)")
+                + (wtDietTypeId == 0 ? "" : " and dietType.idOfDietType = :wtDietTypeId")
+                + (contragentIds.size() == 0 ? "" : " and contragent.idOfContragent in (:contragentIds)");
+        Query query = entityManager.createQuery(strQuery);
+        query.setParameter("wtRule", wtRule);
+        if (wtComplexGroupIds.size() > 0) {
+            query.setParameter("wtComplexGroupIds", wtComplexGroupIds);
+        }
+        if (wtAgeGroupIds.size() > 0) {
+            query.setParameter("wtAgeGroupIds", wtAgeGroupIds);
+        }
+        if (wtDietTypeId > 0) {
+            query.setParameter("wtDietTypeId", wtDietTypeId);
+        }
+        if (contragentIds.size() > 0) {
+            query.setParameter("contragentIds", contragentIds);
+        }
+        return query.getResultList();
     }
 
-    public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem,
-            Contragent contragent, WtDiscountRule rule) {
-        StringBuilder sb = new StringBuilder();
-        List<WtComplex> results = new ArrayList<>();
-
-        sb.append("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
-                + "left join fetch wc.wtAgeGroupItem ageItem "
-                + "left join fetch wc.wtDietType dietType "
-                + "where wc.deleteState = 0");
-        if (wtComplexGroupItem != null) {
-            sb.append(" and wc.wtComplexGroupItem = :wtComplexGroupItem");
+    public List<WtComplex> getWtComplexesListByFilter(List<Long> wtComplexGroupIds, List<Long> wtAgeGroupIds, Long wtDietTypeId,
+            List<Long> contragentIds) {
+        String strQuery = "select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
+                + "left join fetch wc.wtAgeGroupItem ageItem left join fetch wc.wtDietType dietType "
+                + "left join fetch wc.contragent contragent "
+                + "where wc.deleteState = 0"
+                + (wtComplexGroupIds.size() == 0 ? "" : " and complexItem.idOfComplexGroupItem in (:wtComplexGroupIds)")
+                + (wtAgeGroupIds.size() == 0 ? "" : " and ageItem.idOfAgeGroupItem in (:wtAgeGroupIds)")
+                + (wtDietTypeId == 0 ? "" : " and dietType.idOfDietType = :wtDietTypeId")
+                + (contragentIds.size() == 0 ? "" : " and contragent.idOfContragent in (:contragentIds)");
+        Query query = entityManager.createQuery(strQuery);
+        if (wtComplexGroupIds.size() > 0) {
+            query.setParameter("wtComplexGroupIds", wtComplexGroupIds);
         }
-        if (wtAgeGroupItem != null) {
-            sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
+        if (wtAgeGroupIds.size() > 0) {
+            query.setParameter("wtAgeGroupIds", wtAgeGroupIds);
         }
-        if (contragent != null) {
-            sb.append(" and wc.contragent = :contragent");
+        if (wtDietTypeId > 0) {
+            query.setParameter("wtDietTypeId", wtDietTypeId);
         }
-
-        Query query = entityManager.createQuery(sb.toString());
-        if (wtComplexGroupItem != null) {
-            query.setParameter("wtComplexGroupItem", wtComplexGroupItem);
+        if (contragentIds.size() > 0) {
+            query.setParameter("contragentIds", contragentIds);
         }
-        if (wtAgeGroupItem != null) {
-            query.setParameter("wtAgeGroupItem", wtAgeGroupItem);
-        }
-        if (contragent != null) {
-            query.setParameter("contragent", contragent);
-        }
-        try {
-            results = query.getResultList();
-            if (rule != null) {
-                List<WtComplex> complexList = getWtComplexesListByDiscountRule(rule);
-                if (complexList != null) {
-                    results.addAll(complexList);
-                }
-            }
-            return results;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return query.getResultList();
     }
 
     public String getSupplierName(WtComplex wtComplex) {
@@ -2988,22 +2962,6 @@ public class DAOService {
     public Long getIdOfSupplier(WtComplex wtComplex) {
         Query query = entityManager.createQuery(
                 "select c.idOfContragent from WtComplex complex left join complex.contragent c "
-                        + "where complex = :complex");
-        query.setParameter("complex", wtComplex);
-        return (Long) query.getSingleResult();
-    }
-
-    public Long getIdOfComplexGroupItem(WtComplex wtComplex) {
-        Query query = entityManager.createQuery(
-                "select cg.idOfComplexGroupItem from WtComplex complex left join complex.wtComplexGroupItem cg "
-                        + "where complex = :complex");
-        query.setParameter("complex", wtComplex);
-        return (Long) query.getSingleResult();
-    }
-
-    public Long getIdOfAgeGroup(WtComplex wtComplex) {
-        Query query = entityManager.createQuery(
-                "select ag.idOfAgeGroupItem from WtComplex complex left join complex.wtAgeGroupItem ag "
                         + "where complex = :complex");
         query.setParameter("complex", wtComplex);
         return (Long) query.getSingleResult();
