@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
@@ -32,8 +33,7 @@ import java.util.*;
 @Component
 @Scope("session")
 public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList,
-        CategoryOrgListSelectPage.CompleteHandlerList,
-        ContragentListSelectPage.CompleteHandler {
+        CategoryOrgListSelectPage.CompleteHandlerList, ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList {
 
     public static final String SUB_CATEGORIES[] = new String[]{
             "", "Обучающиеся из многодетных семей 5-9 кл. (завтрак+обед)",
@@ -77,6 +77,9 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
     private List<ContragentItem> contragentItems = new ArrayList<>();
+
+    private String orgListFilter;
+    private List<Long> idOfOrgList = new ArrayList<>();
 
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
@@ -198,6 +201,22 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         contragentIds = ids.toString();
     }
 
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if (orgMap != null) {
+            if (orgMap.isEmpty()) {
+                orgListFilter = "Не выбрано";
+            } else {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Long idOfOrg : orgMap.keySet()) {
+                    idOfOrgList.add(idOfOrg);
+                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                }
+                orgListFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+            }
+        }
+    }
+
     public void fillWtSelectedComplexes() {
         wtSelectedComplexes.clear();
         if (isComplexFilterEmpty()) {
@@ -209,7 +228,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
             List<Long> wtComplexGroupIds = new ArrayList<>();
             List<Long> wtAgeGroupIds = new ArrayList<>();
             List<Long> contragentIdList = new ArrayList<>();
-            long dietTypeId = 0L;
 
             if (!contragentItems.isEmpty()) {
                 for (ContragentItem contragentItem : contragentItems) {
@@ -231,12 +249,9 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
                     wtAgeGroupIds.add(valueAllId);
                 }
             }
-            if (dietType > 0) {
-                dietTypeId = dietType;
-            }
 
-            List<WtComplex> wtComplexes = daoService.getWtComplexesListByFilter(wtComplexGroupIds, wtAgeGroupIds,
-                    dietTypeId, contragentIdList);
+            List<WtComplex> wtComplexes = daoService.getWtComplexListByFilter(wtComplexGroupIds, wtAgeGroupIds,
+                    dietType, contragentIdList, idOfOrgList, null);
 
             for (WtComplex wtComplex : wtComplexes) {
                 wtSelectedComplexes.add(new WtSelectedComplex(wtComplex, false));
@@ -310,6 +325,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         ageGroup = -1;
         dietType = -1;
         contragentFilter = "Не выбрано";
+        orgListFilter = "Не выбрано";
 
         daoService.persistEntity(wtDiscountRule);
 
@@ -460,6 +476,14 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
     public void setContragentItems(List<ContragentItem> contragentItems) {
         this.contragentItems = contragentItems;
+    }
+
+    public String getOrgListFilter() {
+        return orgListFilter;
+    }
+
+    public void setOrgListFilter(String orgListFilter) {
+        this.orgListFilter = orgListFilter;
     }
 
     /// class ContragentItem ///

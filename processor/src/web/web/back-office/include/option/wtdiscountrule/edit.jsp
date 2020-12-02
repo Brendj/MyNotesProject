@@ -77,10 +77,10 @@
         </h:panelGrid>
 
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
+    <h:panelGrid styleClass="borderless-grid borderless-grid-align-top">
         <rich:panel>
 
-            <h:panelGrid columns="2" id="filter">
+            <h:panelGrid columns="2" id="filter" styleClass="borderless-grid">
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text" rendered="true"/>
                 <h:selectOneMenu id="typeMenu" value="#{wtRuleEditPage.complexType}"
@@ -99,12 +99,10 @@
                                  style="width:300px;" styleClass="groupSelect" rendered="true">
                     <f:selectItems value="#{wtRuleEditPage.dietTypes}"/>
                 </h:selectOneMenu>
-            </h:panelGrid>
 
-            <a4j:outputPanel ajaxRendered="true" rendered="true">
-                <h:panelGrid styleClass="borderless-grid" columns="2">
-                    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
-                    <h:panelGroup styleClass="borderless-div">
+                <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
+                <h:panelGroup>
+                    <a4j:outputPanel ajaxRendered="true" rendered="true">
                         <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
                                            reRender="modalContragentListSelectorPanel"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
@@ -116,14 +114,28 @@
                         </a4j:commandButton>
                         <h:outputText value=" {#{wtRuleEditPage.contragentFilter}}" escape="true"
                                       styleClass="output-text"/>
-                    </h:panelGroup>
-                </h:panelGrid>
-            </a4j:outputPanel>
+                    </a4j:outputPanel>
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Образовательные организации" styleClass="output-text"/>
+                <h:panelGroup>
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                                       reRender="modalOrgListSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="#{wtRuleEditPage.getStringIdOfOrgList}"
+                                                     target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" id="orgFilter" escape="true"
+                                  value=" {#{wtRuleEditPage.orgListFilter}}"/>
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Показать выбранные комплексы с учетом фильтра" styleClass="output-text"/>
+                <h:selectBooleanCheckbox value="#{wtRuleEditPage.applyFilter}" styleClass="input-text"/>
+
+            </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <h:outputText escape="true" value="Показать выбранные комплексы с учетом фильтра" styleClass="output-text" />
-                <h:selectBooleanCheckbox value="#{wtRuleEditPage.applyFilter}" styleClass="input-text" />
-
                 <a4j:commandButton value="Отобразить" action="#{wtRuleEditPage.fillWtSelectedComplexes()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
@@ -187,16 +199,16 @@
 
                     <%--        Название контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.supplierName}" styleClass="output-text"
+                        <h:outputText escape="true" value="#{complex.wtComplex.contragent.contragentName}" styleClass="output-text"
                                       rendered="#{complex.wtComplex.deleteState == 0}"/>
-                        <h:outputText escape="false" value="#{complex.supplierName}" styleClass="output-disabled-text"
+                        <h:outputText escape="false" value="#{complex.wtComplex.contragent.contragentName}" styleClass="output-disabled-text"
                                       rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        ИД контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.idOfSupplier}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
-                        <h:outputText escape="true" value="#{complex.idOfSupplier}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.contragent.idOfContragent}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.contragent.idOfContragent}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        ИД комплекса--%>

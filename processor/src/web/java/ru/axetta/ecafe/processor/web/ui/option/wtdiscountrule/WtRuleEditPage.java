@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,7 @@ import java.util.*;
 @Component
 @Scope("session")
 public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList,
-        CategoryOrgListSelectPage.CompleteHandlerList,
-        ContragentListSelectPage.CompleteHandler {
+        CategoryOrgListSelectPage.CompleteHandlerList, ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList {
 
     private String description;
     private Integer discountRate;
@@ -73,6 +73,9 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
     private List<ContragentItem> contragentItems = new ArrayList<>();
+
+    private String orgListFilter;
+    private List<Long> idOfOrgList = new ArrayList<>();
 
     private boolean applyFilter = false;
     private boolean disabledComplexType = false;
@@ -117,6 +120,22 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     }
 
     @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if (orgMap != null) {
+            if (orgMap.isEmpty()) {
+                orgListFilter = "Не выбрано";
+            } else {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Long idOfOrg : orgMap.keySet()) {
+                    idOfOrgList.add(idOfOrg);
+                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                }
+                orgListFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+            }
+        }
+    }
+
+    @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
             String classTypes) throws Exception {
         contragentItems.clear();
@@ -158,7 +177,6 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
             List<Long> wtComplexGroupIds = new ArrayList<>();
             List<Long> wtAgeGroupIds = new ArrayList<>();
             List<Long> contragentIdList = new ArrayList<>();
-            long dietTypeId = 0L;
 
             if (!contragentItems.isEmpty()) {
                 for (ContragentItem contragentItem : contragentItems) {
@@ -180,18 +198,15 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                     wtAgeGroupIds.add(valueAllId);
                 }
             }
-            if (dietType > 0) {
-                dietTypeId = dietType;
-            }
 
-            List<WtComplex> wtComplexes = daoService.getWtComplexesListByFilter(wtComplexGroupIds, wtAgeGroupIds,
-                    dietTypeId, contragentIdList);
+            List<WtComplex> wtComplexes = daoService.getWtComplexListByFilter(wtComplexGroupIds, wtAgeGroupIds,
+                    dietType, contragentIdList, idOfOrgList, null);
 
             List<WtComplex> ruleComplexList = new ArrayList<>();
             if (wtEntity != null) {
                 if (applyFilter) {
-                    ruleComplexList = daoService.getWtComplexesListByDiscountRuleAndFilter(wtComplexGroupIds, wtAgeGroupIds,
-                            dietTypeId, contragentIdList, wtEntity);
+                    ruleComplexList = daoService.getWtComplexListByFilter(wtComplexGroupIds, wtAgeGroupIds,
+                            dietType, contragentIdList, idOfOrgList, wtEntity);
                 } else {
                     ruleComplexList = DAOUtils.getComplexesByWtDiscountRule(em, wtEntity);
                 }
@@ -275,6 +290,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         ageGroup = -1;
         dietType = -1;
         contragentFilter = "Не выбрано";
+        orgListFilter = "Не выбрано";
         applyFilter = false;
     }
 
@@ -437,6 +453,10 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
     public String getIdOfCategoryListString() {
         return idOfCategoryList.toString().replaceAll("[^(0-9-),]", "");
+    }
+
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
     public Integer getDiscountRate() {
@@ -613,6 +633,14 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
     public void setDisabledComplexType(boolean disabledComplexType) {
         this.disabledComplexType = disabledComplexType;
+    }
+
+    public String getOrgListFilter() {
+        return orgListFilter;
+    }
+
+    public void setOrgListFilter(String orgListFilter) {
+        this.orgListFilter = orgListFilter;
     }
 
     /// class ContragentItem ///
