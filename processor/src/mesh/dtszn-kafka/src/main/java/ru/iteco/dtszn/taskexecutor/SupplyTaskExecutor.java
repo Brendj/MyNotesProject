@@ -61,15 +61,20 @@ public class SupplyTaskExecutor {
             Date end;
             try {
                 if(activeProfile.contains("dev")){
-                    begin = getStartOfDay();
-                    end = getEndOfDay();
+                    begin = getStartOfPeriod();
+                    end = getEndOfPeriod();
                 } else {
                     begin = getStartOfPreviousMonth();
                     end = getEndOfPreviousMonth();
                 }
                 Integer allRows = supplyMSPService.countOrders(begin, end);
 
-                for(int i = 0; i <= allRows; i += SAMPLE_SIZE){
+                if(allRows.equals(0)){
+                    log.warn("No Orders, skipped");
+                    return;
+                }
+
+                for(int i = 0; i < allRows; i += SAMPLE_SIZE){
                     Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("createdDate"));
 
                     List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
@@ -77,6 +82,7 @@ public class SupplyTaskExecutor {
                     for(SupplyMSPOrders o : orderList){
                         kafkaService.sendSupplyMSP(o);
                     }
+                    orderList.clear();
                     orderList = null;
                 }
             } catch (Exception e) {
@@ -108,24 +114,15 @@ public class SupplyTaskExecutor {
             return calendar.getTime();
         }
 
-        private Date getStartOfDay() {
+        private Date getStartOfPeriod() {
             Calendar calendar = GregorianCalendar.getInstance();
             calendar.setTime(new Date());
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.add(Calendar.MINUTE, -5);
             return calendar.getTime();
         }
 
-        private Date getEndOfDay() {
-            Calendar calendar = GregorianCalendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.set(Calendar.MILLISECOND, 999);
-            calendar.set(Calendar.SECOND, 59);
-            calendar.set(Calendar.MINUTE, 59);
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            return calendar.getTime();
+        private Date getEndOfPeriod() {
+            return new Date();
         }
     }
 }
