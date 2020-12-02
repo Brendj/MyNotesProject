@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -74,13 +75,14 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private List<ContragentItem> contragentItems = new ArrayList<>();
 
     private boolean applyFilter = false;
+    private boolean disabledComplexType = false;
 
     public List<SelectItem> getComplexTypes() {
         List<SelectItem> res = new ArrayList<>();
         List<WtComplexGroupItem> complexGroupItems;
         res.add(new SelectItem(0, " "));
         complexGroupItems = daoService.getWtComplexGroupList();
-        Long valueAllId = daoService.getWtComplexGroupValueAll();
+        Long valueAllId = daoService.getWtComplexGroupIdByDescription("все");
         for (WtComplexGroupItem item : complexGroupItems) {
             if (valueAllId > 0 && !item.getIdOfComplexGroupItem().equals(valueAllId)) {
                 res.add(new SelectItem(item.getIdOfComplexGroupItem(), item.getDescription()));
@@ -94,7 +96,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         List<WtAgeGroupItem> ageGroupItems;
         res.add(new SelectItem(0, " "));
         ageGroupItems = daoService.getWtAgeGroupList();
-        Long valueAllId = daoService.getWtAgeGroupValueAll();
+        Long valueAllId = daoService.getWtAgeGroupIdByDescription("все");
         for (WtAgeGroupItem item : ageGroupItems) {
             if (valueAllId > 0 && !item.getIdOfAgeGroupItem().equals(valueAllId)) {
                 res.add(new SelectItem(item.getIdOfAgeGroupItem(), item.getDescription()));
@@ -166,14 +168,14 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
             if (complexType > 0) {
                 wtComplexGroupIds.add(complexType);
-                Long valueAllId = daoService.getWtComplexGroupValueAll();
+                Long valueAllId = daoService.getWtComplexGroupIdByDescription("все");
                 if (valueAllId > 0) {
                     wtComplexGroupIds.add(valueAllId);
                 }
             }
             if (ageGroup > 0) {
                 wtAgeGroupIds.add(ageGroup);
-                Long valueAllId = daoService.getWtAgeGroupValueAll();
+                Long valueAllId = daoService.getWtAgeGroupIdByDescription("все");
                 if (valueAllId > 0) {
                     wtAgeGroupIds.add(valueAllId);
                 }
@@ -249,10 +251,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
         this.idOfCategoryOrgList.clear();
         if (!wtDiscountRule.getCategoryOrgs().isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder();
             for (CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()) {
-                stringBuilder.append(categoryOrg.getCategoryName());
-                stringBuilder.append("; ");
                 this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
             }
         }
@@ -263,7 +262,16 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         List<WtComplex> ruleComplexes = DAOUtils.getComplexesByWtDiscountRule(em, wtEntity);
         wtSelectedComplexes.addAll(getCheckedComplexes(ruleComplexes));
 
-        complexType = -1;
+        if (!daoService.existOtherDiscountTypes(wtEntity, CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT)) {
+            complexType = daoService.getWtComplexGroupIdByDescription("льгот");
+            disabledComplexType = true;
+        } else if (!daoService.existOtherDiscountTypes(wtEntity, CategoryDiscountEnumType.FEE_CATEGORY)) {
+            complexType = daoService.getWtComplexGroupIdByDescription("плат");
+            disabledComplexType = true;
+        } else {
+            complexType = -1;
+            disabledComplexType = false;
+        }
         ageGroup = -1;
         dietType = -1;
         contragentFilter = "Не выбрано";
@@ -597,6 +605,14 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
     public void setApplyFilter(boolean applyFilter) {
         this.applyFilter = applyFilter;
+    }
+
+    public boolean isDisabledComplexType() {
+        return disabledComplexType;
+    }
+
+    public void setDisabledComplexType(boolean disabledComplexType) {
+        this.disabledComplexType = disabledComplexType;
     }
 
     /// class ContragentItem ///

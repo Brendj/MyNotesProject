@@ -2854,37 +2854,33 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public Long getWtComplexGroupValueAll() {
+    public Long getWtComplexGroupIdByDescription(String description) {
         try {
             return (Long) entityManager.createQuery("select cg.idOfComplexGroupItem from WtComplexGroupItem cg"
-                    + " where lower(cg.description) like '%все%'").getSingleResult();
+                    + " where lower(cg.description) like '%" + description + "%'").getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return 0L;
         }
     }
 
-    public Long getWtAgeGroupValueAll() {
+    public Long getWtAgeGroupIdByDescription(String description) {
         try {
             return (Long) entityManager.createQuery("select ag.idOfAgeGroupItem from WtAgeGroupItem ag"
-                    + " where lower(ag.description) like '%все%'").getSingleResult();
+                    + " where lower(ag.description) like '%" + description + "%'").getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return 0L;
         }
     }
 
-    public List<Contragent> getSupplierItemById(Long idOfSupplier) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("select c from Contragent c where c.idOfContragent = :idOfSupplier");
-        Query query = entityManager.createQuery(sb.toString());
-        query.setParameter("idOfSupplier", idOfSupplier);
-        try {
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public boolean existOtherDiscountTypes(WtDiscountRule wtRule, CategoryDiscountEnumType categoryType) {
+        Query query = entityManager.createQuery("select cd from CategoryDiscount cd "
+                + "left join fetch cd.wtDiscountRules where cd.deletedState = false "
+                + "and :wtRule in elements(cd.wtDiscountRules) and cd.categoryType <> :categoryType");
+        query.setParameter("wtRule", wtRule);
+        query.setParameter("categoryType", categoryType);
+        return query.getResultList().size() > 0;
     }
 
     public List<WtComplex> getWtComplexesList() {

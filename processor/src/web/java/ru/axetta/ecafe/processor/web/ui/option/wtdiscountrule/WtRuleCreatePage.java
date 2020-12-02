@@ -132,7 +132,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         List<WtComplexGroupItem> complexGroupItems;
         res.add(new SelectItem(0, " "));
         complexGroupItems = daoService.getWtComplexGroupList();
-        Long valueAllId = daoService.getWtComplexGroupValueAll();
+        Long valueAllId = daoService.getWtComplexGroupIdByDescription("все");
         for (WtComplexGroupItem item : complexGroupItems) {
             if (valueAllId > 0 && !item.getIdOfComplexGroupItem().equals(valueAllId)) {
                 res.add(new SelectItem(item.getIdOfComplexGroupItem(), item.getDescription()));
@@ -146,7 +146,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         List<WtAgeGroupItem> ageGroupItems;
         res.add(new SelectItem(0, " "));
         ageGroupItems = daoService.getWtAgeGroupList();
-        Long valueAllId = daoService.getWtAgeGroupValueAll();
+        Long valueAllId = daoService.getWtAgeGroupIdByDescription("все");
         int i = 0;
         for (WtAgeGroupItem item : ageGroupItems) {
             if (valueAllId > 0 && !item.getIdOfAgeGroupItem().equals(valueAllId)) {
@@ -219,14 +219,14 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
             if (complexType > 0) {
                 wtComplexGroupIds.add(complexType);
-                Long valueAllId = daoService.getWtComplexGroupValueAll();
+                Long valueAllId = daoService.getWtComplexGroupIdByDescription("все");
                 if (valueAllId > 0) {
                     wtComplexGroupIds.add(valueAllId);
                 }
             }
             if (ageGroup > 0) {
                 wtAgeGroupIds.add(ageGroup);
-                Long valueAllId = daoService.getWtAgeGroupValueAll();
+                Long valueAllId = daoService.getWtAgeGroupIdByDescription("все");
                 if (valueAllId > 0) {
                     wtAgeGroupIds.add(valueAllId);
                 }

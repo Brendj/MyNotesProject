@@ -84,7 +84,7 @@
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text" rendered="true"/>
                 <h:selectOneMenu id="typeMenu" value="#{wtRuleEditPage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="true">
+                                 style="width:300px;" styleClass="groupSelect" rendered="true" disabled="#{wtRuleEditPage.disabledComplexType}">
                     <f:selectItems value="#{wtRuleEditPage.complexTypes}"/>
                 </h:selectOneMenu>
 
