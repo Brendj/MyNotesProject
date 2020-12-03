@@ -42,6 +42,13 @@ public class RNIPSecuritySOAPHandlerV22 extends RNIPSecuritySOAPHandlerV21 {
         try {
             Element requestElement = (Element)doc.getElementsByTagName("soap:Body").item(0).getFirstChild();
             replaceNamespaceVersionInverse(requestElement);
+            NodeList nodeList = requestElement.getElementsByTagName("*");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    node = replaceNamespaceVersionInverse(doc, node);
+                }
+            }
         } catch (Exception e) {
             logger.error("Error in replace RNIP namespaces in inbound message: ", e);
         }
@@ -72,5 +79,9 @@ public class RNIPSecuritySOAPHandlerV22 extends RNIPSecuritySOAPHandlerV21 {
                 node.setValue(node.getValue().replace("2.2.0", "2.1.1"));
             }
         }
+    }
+
+    private Node replaceNamespaceVersionInverse(Document doc, Node nodeItem) {
+        return doc.renameNode(nodeItem, nodeItem.getNamespaceURI().replace("2.2.0", "2.1.1"), nodeItem.getNodeName());
     }
 }
