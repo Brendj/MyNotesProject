@@ -6,6 +6,11 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component("RNIPLoadPaymentsServiceV22")
+@Scope("singleton")
 public class RNIPLoadPaymentsServiceV22 extends RNIPLoadPaymentsServiceV21 {
 
     @Override
