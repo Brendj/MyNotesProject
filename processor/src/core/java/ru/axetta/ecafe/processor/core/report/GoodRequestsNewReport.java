@@ -67,15 +67,18 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
+        private final String subReportDir;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
+            subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         }
 
         public Builder() {
             String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
                     .getReportsTemplateFilePath();
             templateFilename = reportsTemplateFilePath + GoodRequestsNewReport.class.getSimpleName() + ".jasper";
+            subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         }
 
         @Override
@@ -85,6 +88,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             calendar.setTime(startTime);
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
             JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, true, false);
@@ -101,6 +105,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             calendar.setTime(startTime);
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
             JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap, isWtMenu, isNotificationReport);
