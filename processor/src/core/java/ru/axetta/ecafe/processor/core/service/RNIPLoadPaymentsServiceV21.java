@@ -247,6 +247,15 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return response;
     }
 
+    protected void setProperCatalogRequestSection(int requestType, ImportCatalogRequest importCatalogRequest,
+            ServiceCatalogType serviceCatalogType) {
+        if (requestType == RNIPLoadPaymentsService.REQUEST_MODIFY_CATALOG) {
+            importCatalogRequest.setChanges(serviceCatalogType);
+        } else if (requestType == RNIPLoadPaymentsService.REQUEST_CREATE_CATALOG) {
+            importCatalogRequest.setServiceCatalog(serviceCatalogType);
+        }
+    }
+
     public SendRequestResponse executeModifyCatalogV21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
         InitRNIP21Service(contragent);
 
@@ -263,11 +272,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
         generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory serviceCatalogObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory();
         ServiceCatalogType serviceCatalogType = serviceCatalogObjectFactory.createServiceCatalogType();
-        if (requestType == RNIPLoadPaymentsService.REQUEST_MODIFY_CATALOG) {
-            importCatalogRequest.setChanges(serviceCatalogType);
-        } else if (requestType == RNIPLoadPaymentsService.REQUEST_CREATE_CATALOG) {
-            importCatalogRequest.setServiceCatalog(serviceCatalogType);
-        }
+        setProperCatalogRequestSection(requestType, importCatalogRequest, serviceCatalogType);
         //importCatalogRequest.setServiceCatalog(serviceCatalogType);
         serviceCatalogType.setId(String.format("I_%s", UUID.randomUUID().toString()));
         serviceCatalogType.setName("Изменение");

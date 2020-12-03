@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import generated.ru.mos.rnip.xsd.catalog._2_1.ServiceCatalogType;
+import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogRequest;
+
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 
 import org.springframework.context.annotation.Scope;
@@ -18,4 +21,9 @@ public class RNIPLoadPaymentsServiceV22 extends RNIPLoadPaymentsServiceV21 {
         return new RNIPSecuritySOAPHandlerV22(alias, pass, getPacketLogger(contragent));
     }
 
+    @Override
+    protected void setProperCatalogRequestSection(int requestType, ImportCatalogRequest importCatalogRequest,
+            ServiceCatalogType serviceCatalogType) {
+        importCatalogRequest.setServiceCatalog(serviceCatalogType);
+    }
 }
