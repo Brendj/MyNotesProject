@@ -623,7 +623,11 @@ public class GoodRequestsChangeAsyncNotificationService {
         Map<Long, OrgItem> items = new HashMap<Long, OrgItem>();
         String str_query = "select o.idOfOrg, o.shortName, o.officialName, o.defaultSupplier.id, o.address, sm.idOfOrg from Org o join o.sourceMenuOrgs sm";
         if (onlyWithPreorders) str_query += " where o.preordersEnabled = true";
-        str_query += params.getOrgJPACondition("o");
+        if (!onlyWithPreorders && !params.getOrgJPACondition("o").isEmpty()) {
+            str_query += " where" + params.getOrgJPACondition("o").substring(4);
+        } else {
+            str_query += params.getOrgJPACondition("o");
+        }
         str_query += " order by o.idOfOrg";
         Query query = entityManager.createQuery(str_query);
         List res = query.getResultList();

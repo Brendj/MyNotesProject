@@ -37,8 +37,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -131,7 +131,7 @@ public class PreorderRequestsReportService extends RecoverableService {
             if (DAOService.getInstance().getProductionCalendarByDate(currentDate) != null) return; //в выходной день заявки не формируем
             logger.info("Start generating preorder requests");
             List<Date> weekends = GoodRequestsChangeAsyncNotificationService.getInstance().getProductionCalendarDates(date);
-            Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItemsLocal = GoodRequestsChangeAsyncNotificationService.getInstance().findOrgItems2(true, params); //орги с включенным флагом предзаказа
+            Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItemsLocal = GoodRequestsChangeAsyncNotificationService.getInstance().findOrgItems2(false, params); //орги с включенным флагом предзаказа
 
             Integer maxDays = getMaxDateToCreateRequests(currentDate, weekends, MAX_FORBIDDEN_DAYS);
             Date dateTo = CalendarUtils.addDays(currentDate, maxDays);
@@ -185,9 +185,6 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 try {
                                     Org org = DAOUtils.getOrgById(session, idOfOrg);
                                     if (null == item.getIdOfGood() && !org.getUseWebArm()) {
-                                        //logger.error(String.format(
-                                        //        "PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
-                                        //        item.getIdOfOrg(), item.getCreatedDate().toString()));
                                         logger.error("Preorder without good item was found " + item.toString());
                                         continue;
                                     }

@@ -192,7 +192,8 @@
     <h:outputText id="payPlanParamLabel" escape="true" value="Включить использование плана питания" styleClass="output-text" />
     <h:selectBooleanCheckbox id="payPlanParamCheckbox" value="#{mainPage.orgEditPage.usePlanOrders}"/>
     <h:outputText id="PaydableSubscriptionFeedingLabel" escape="true" value="Включить функционал платного горячего питания" styleClass="output-text" />
-    <h:selectBooleanCheckbox id="PaydableSubscriptionFeedingCheckbox" value="#{mainPage.orgEditPage.usePaydableSubscriptionFeeding}"/>
+    <h:selectBooleanCheckbox id="PaydableSubscriptionFeedingCheckbox" value="#{mainPage.orgEditPage.usePaydableSubscriptionFeeding}"
+                             disabled="#{mainPage.orgEditPage.useWebArm}"/>
     <h:outputText escape="true" value="Включить вариативное питание" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.variableFeeding}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
@@ -288,7 +289,9 @@
     <h:outputText escape="true" value="Использование обучающимися нескольких идентификаторов в ОО" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.multiCardModeEnabled}" styleClass="input-text" />
     <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text">
+        <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" action="#{mainPage.orgEditPage.changeSubscriptionFeeding}" />
+    </h:selectBooleanCheckbox>
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
