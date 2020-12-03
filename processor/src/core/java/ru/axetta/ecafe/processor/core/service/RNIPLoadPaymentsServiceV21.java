@@ -506,10 +506,14 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
         String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
-        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
+        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = getSecurityHandler(alias, pass, contragent);
         final List<Handler> handlerChain = new ArrayList<Handler>();
         handlerChain.add(pfrSecuritySOAPHandler);
         bindingProvider21.getBinding().setHandlerChain(handlerChain);
+    }
+
+    protected RNIPSecuritySOAPHandlerV21 getSecurityHandler(String alias, String pass, Contragent contragent) {
+        return new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
     }
 
     @Override

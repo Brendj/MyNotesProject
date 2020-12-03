@@ -15,7 +15,8 @@ public enum RNIPVersion {
 
     RNIP_V115("1.15"),
     RNIP_V116("1.16"),
-    RNIP_V21("2.1");
+    RNIP_V21("2.1"),
+    RNIP_V22("2.2");
 
     private final String description;
 

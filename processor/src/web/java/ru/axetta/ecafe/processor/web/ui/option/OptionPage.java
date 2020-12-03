@@ -153,7 +153,8 @@ public class OptionPage extends BasicWorkspacePage {
     private String cardAutoBlockNode;
     private Integer cardAutoBlockDays;
 
-    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
+    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(),
+                                                  RNIPVersion.RNIP_V21.toString(), RNIPVersion.RNIP_V22.toString()};
 
     private List<BankOptionItem> banks;
 

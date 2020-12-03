@@ -455,6 +455,8 @@ public class RNIPLoadPaymentsService {
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV116", RNIPLoadPaymentsServiceV116.class);
             case RNIP_V21:
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class);
+            case RNIP_V22:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV22", RNIPLoadPaymentsServiceV22.class);
         }
         return null;
     }
