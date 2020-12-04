@@ -71,6 +71,8 @@ public class PreorderDAOService {
     public static final Long MIDDLE_DISCOUNT_ID = -91L;
     public static final Long HIGH_DISCOUNT_ID = -92L;
     public static final Long RESERVE_DISCOUNT_ID = 50L;
+    public static final int FIXED_PRICE_COMPLEX = 2;
+    public static final int INTEGRAL_COMPLEX = 4;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -218,12 +220,12 @@ public class PreorderDAOService {
             PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, modeOfAdd, modeFree);
             complexItemExt.setAmount(amount == null ? 0 : amount);
             complexItemExt.setState(state == null ? 0 : state);
-            complexItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
+            complexItemExt.setIsRegular(idOfRegularPreorder != null);
             complexItemExt.setCreatorRole(mobileGroupOnCreate);
             complexItemExt.setPreorderDate(preorderDate == null ? null : new Date(preorderDate));
 
             List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(id, client.getIdOfClient(), date, idOfPreorderComplex,
-                    modeOfAdd == ComplexInfo.SET_DISHES_COMPLEX ? includeZeroAmount : true);
+                    modeOfAdd != ComplexInfo.SET_DISHES_COMPLEX || includeZeroAmount, modeOfAdd);
             if (menuItemExtList.size() > 0) {
                 complexItemExt.setMenuItemExtList(menuItemExtList);
                 list.add(complexItemExt);
@@ -389,7 +391,7 @@ public class PreorderDAOService {
                     String complexName = wtComplex.getName();
                     // Режим добавления блюд: если комплекс составной - режим составного комплекса,
                     // если нет - режим фиксированной цены
-                    Integer complexType = wtComplex.getComposite() ? 4 : 2;
+                    Integer complexType = wtComplex.getComposite() ? INTEGRAL_COMPLEX : FIXED_PRICE_COMPLEX;
                     Long complexPrice = (wtComplex.getPrice() == null) ? 0L :
                             wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
                     Integer amount = getAmountForPreorderComplex(amountByComplexes, idOfComplex);
@@ -575,7 +577,7 @@ public class PreorderDAOService {
     }
 
     private List<PreorderMenuItemExt> getMenuItemsExt (Long idOfComplexInfo, Long idOfClient, Date date, Long idOfPreorderComplex,
-            boolean includeZeroAmount) {
+            boolean includeZeroAmount, Integer modeOfAdd) {
         List<PreorderMenuItemExt> menuItemExtList = new ArrayList<PreorderMenuItemExt>();
         Query query = null;
         if (idOfPreorderComplex == null) {
@@ -629,8 +631,11 @@ public class PreorderDAOService {
                 menuItemExt = new PreorderMenuItemExt(pmd);
             }
             menuItemExt.setAmount(amount);
+            if (modeOfAdd == FIXED_PRICE_COMPLEX) {
+                menuItemExt.setPrice(0L);
+            };
             menuItemExt.setState(state == null ? 0 : state);
-            menuItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
+            menuItemExt.setIsRegular(idOfRegularPreorder != null);
             menuItemExt.setAvailableForRegular(isAvailableForRegular);
             menuItemExt.setCreatorRole(mobileGroupOnCreate);
             if (!set.contains(menuItemExt.getIdOfMenuDetail())) {
@@ -738,7 +743,7 @@ public class PreorderDAOService {
                 menuItemExt.setGroup(getMenuGroupByWtDishAndCategoriesAsString(wtDish));
                 menuItemExt.setName(wtDish.getDishName());
                 menuItemExt.setFullName(wtDish.getComponentsOfDish());
-                menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
+                menuItemExt.setPrice(isComposite ? wtDish.getPrice().multiply(new BigDecimal(100)).longValue() : 0L);
                 menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
                 menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
                 menuItemExt.setAvailableNow(0);
@@ -747,7 +752,7 @@ public class PreorderDAOService {
                 menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
                 menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
                 menuItemExt.setAmount(isComposite ? getAmountForPreorderMenuDetail(wtDish, amounts) : 0);
-                menuItemExt.setIsRegular(isComposite ? getRegularSignForPreorderMenuDetail(wtDish, regularSigns) : false);
+                menuItemExt.setIsRegular(isComposite && getRegularSignForPreorderMenuDetail(wtDish, regularSigns));
                 menuItemExt.setAvailableForRegular(false);
                 menuItemExtList.add(menuItemExt);
             }

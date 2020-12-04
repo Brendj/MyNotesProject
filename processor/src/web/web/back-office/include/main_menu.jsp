@@ -136,7 +136,7 @@
     <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}"
                         label="Правила распространения" action="#{distributionRulesPage.show}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToEditOrgs}" />
-
+    <%--@elvariable id="orgListLoaderPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgListLoaderPage"--%>
     <rich:panelMenuItem id="orgListLoaderMenuItem" binding="#{orgListLoaderPage.mainMenuComponent}"
                         label="Загрузить из файла" action="#{orgListLoaderPage.show}" reRender="workspaceForm" />
 
