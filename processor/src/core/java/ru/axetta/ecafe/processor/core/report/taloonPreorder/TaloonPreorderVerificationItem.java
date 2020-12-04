@@ -15,18 +15,10 @@ import java.util.List;
  */
 public class TaloonPreorderVerificationItem {
 
-    public static final String MAKE_CONFIRM = "Согласие";
-    public static final String MAKE_CANCEL = "Отказ";
-    public static final String MAKE_CLEAR = "Очистить";
-    public static final String DAY_FORMAT = "dd.MM.yyyy";
-
     private Date taloonDate;
     private TaloonPPStatesEnum ppState;
     private List<TaloonPreorderVerificationComplex> complexes = new ArrayList<>();
-
     private int detailsSize;
-    private boolean allowedSetFirstFlag;
-    private boolean allowedClearFirstFlag;
 
     public TaloonPreorderVerificationItem() {
     }
@@ -64,7 +56,6 @@ public class TaloonPreorderVerificationItem {
     public void deselectPpState() {
         changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
-
     // меняем статусы только там, где это разрешено
     public void changePpState(TaloonPPStatesEnum ppState) {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
@@ -92,12 +83,12 @@ public class TaloonPreorderVerificationItem {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
                     if (detail.isAllowedClearFirstFlag()) {
-                        return allowedSetFirstFlag = true;
+                        return true;
                     }
                 }
             }
         }
-        return allowedSetFirstFlag = false;
+        return false;
     }
 
     public boolean isAllowedClearFirstFlag() {
@@ -105,12 +96,12 @@ public class TaloonPreorderVerificationItem {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
                     if (detail.isAllowedClearFirstFlag()) {
-                        return allowedClearFirstFlag = true;
+                        return true;
                     }
                 }
             }
         }
-        return allowedClearFirstFlag = false;
+        return false;
     }
 
     public List<TaloonPreorderVerificationComplex> getComplexes() {
@@ -135,18 +126,6 @@ public class TaloonPreorderVerificationItem {
             complexesSize += this.complexes.get(i).getDetails().size();
         }
         return complexesSize + rowId;
-    }
-
-    public String getPpStateToTurnOnFirst() {
-        return MAKE_CONFIRM;
-    }
-
-    public String getPpStateToTurnOnSecond() {
-        return MAKE_CANCEL;
-    }
-
-    public String getPpStateToClear() {
-        return MAKE_CLEAR;
     }
 
 }
