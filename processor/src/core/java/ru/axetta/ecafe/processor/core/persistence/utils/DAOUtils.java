@@ -5383,4 +5383,10 @@ public class DAOUtils {
 
         return (SmartWatchVendor) criteria.uniqueResult();
     }
+
+    public static List<Client> getClientsBySsoid(EntityManager em, String ssoid) {
+        return em.createQuery("from Client where ssoid = :ssoid")
+                .setParameter("ssoid", ssoid)
+                .getResultList();
+    }
 }

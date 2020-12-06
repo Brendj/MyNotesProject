@@ -80,6 +80,7 @@ import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.message.Message;
 import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
@@ -4344,6 +4345,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         HTTPDataHandler handler = new HTTPDataHandler(data);
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
+
+        changeSsoid(guardMobile);
 
         Session session = null;
         try {
@@ -9267,6 +9270,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
 
+        changeSsoid(guardMobile);
+
         Session session = null;
         Transaction transaction = null;
         try {
@@ -9804,6 +9809,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (mobilePhone == null) {
             return new ClientGroupResult(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
+
+        changeSsoid(mobile);
+
         Session session = null;
         Transaction transaction = null;
         try {
@@ -10780,5 +10788,41 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(persistenceSession, logger);
         }
         return result;
+    }
+
+    private void changeSsoid(String cientMobile)
+    {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            transaction = session.beginTransaction();
+            Map<String, List> headers = (Map<String, List>) context.getMessageContext().get(Message.PROTOCOL_HEADERS);
+            List<String> ssoids = headers.get("User_ssoid");
+            String ssoid = "";
+            ssoid = ssoids.get(0).trim();
+            if (!ssoid.isEmpty()) {
+                List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
+                for (Client client: clients)
+                {
+                    client.setSsoid(ssoid);
+                    session.persist(client);
+                }
+                List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
+                for (Client client: clientsSsoid)
+                {
+                    client.setMobile(cientMobile);
+                    session.persist(client);
+                }
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error(String.format("Error work with ssoid in getSummaryByGuardMobileMin. guardMobile = %s",
+                    cientMobile), e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 }

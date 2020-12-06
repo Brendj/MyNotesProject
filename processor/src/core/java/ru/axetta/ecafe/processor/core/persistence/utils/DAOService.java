@@ -3126,4 +3126,8 @@ public class DAOService {
     public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
         return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
     }
+    public List<Client> getClientsBySoid(String ssoid) {
+        return DAOUtils.getClientsBySsoid(entityManager, ssoid);
+    }
 }
+
