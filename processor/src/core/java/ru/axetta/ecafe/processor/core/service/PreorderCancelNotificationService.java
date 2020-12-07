@@ -411,7 +411,9 @@ public class PreorderCancelNotificationService {
         if (mode == 1 || mode == 2) {
             mess += preorderComplex.getComplexName().trim() + ":";
             for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                mess += "«" + preorderMenuDetail.getMenuDetailName().trim() + "»,";
+                if (preorderMenuDetail.getRegularPreorder() != null) {
+                    mess += "«" + preorderMenuDetail.getMenuDetailName().trim() + "»,";
+                }
             }
             if (mess.length() > 4)
                 mess = mess.substring(0, mess.length() - 1);
