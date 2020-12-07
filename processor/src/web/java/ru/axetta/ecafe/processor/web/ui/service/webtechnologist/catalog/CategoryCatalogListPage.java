@@ -61,7 +61,9 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     public void createNewCatalog() {
         if (StringUtils.isBlank(descriptionForNewCategory)) {
             printError("Введите описание категории");
+            return;
         }
+        descriptionForNewCategory = deleteExcessWhitespace(descriptionForNewCategory);
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WtCategory item = WtCategory.build(descriptionForNewCategory, currentUser);
@@ -78,7 +80,9 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     public void createNewItem() {
         if (StringUtils.isBlank(descriptionForNewItem)) {
             printError("Введите описание элемента");
+            return;
         }
+        descriptionForNewItem = deleteExcessWhitespace(descriptionForNewItem);
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WtCategoryItem item = WtCategoryItem.build(descriptionForNewItem, selectedItem, currentUser);
@@ -89,6 +93,11 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
         } finally {
             descriptionForNewItem = "";
         }
+    }
+
+    private String deleteExcessWhitespace(String str) {
+        str = str.trim();
+        return str.replaceAll("\\s+", " ");
     }
 
     public void applyChanges() {
@@ -140,6 +149,7 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
             transaction.commit();
             transaction = null;
             catalogListItem = service.getAllActiveCategory();
+            categoryItemsSelectedCategory = Collections.emptyList();
         } catch (Exception e) {
             printError("Не удалось обновить элементы: " + e.getMessage());
             logger.error("Can't update elements", e);
