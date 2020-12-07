@@ -3413,7 +3413,9 @@ public class MainPage implements Serializable {
                 dataSize = data.length;
                 inputStream = new ByteArrayInputStream(data);
             }
-            clientFileLoadPage.loadClients(inputStream, dataSize);
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Загрузка клиентов из файла");
+            clientFileLoadPage.loadClients(inputStream, dataSize, clientsMobileHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {

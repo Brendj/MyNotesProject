@@ -144,7 +144,9 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runReceiveEMPUpdates() throws Exception {
-        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(); //DEF
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("кнопка \"Запустить загрузку обновления из ЕМП\" в Сервис/Другое");
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(clientsMobileHistory); //DEF
         printMessage("Загрузка обновление из ЕМП завершена");
     }
 
@@ -299,7 +301,9 @@ public class OtherActionsPage extends OnlineReportPage {
             int count = 0;
             try {
                 orgs = getOrgsForGenGuardians();
-                count = ClientService.getInstance().generateGuardians(orgs);
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("кнопка \"Генерировать представителей\" в Сервис/Другое");
+                count = ClientService.getInstance().generateGuardians(orgs, clientsMobileHistory);
             } catch (Exception e) {
                 printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
                 return;
@@ -499,7 +503,9 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void loadESZMigrants() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants();
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("кнопка \"Обработка мигрантов\" в Сервис/Другое");
+            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants(clientsMobileHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run load ESZ migrants: ", e);
@@ -772,8 +778,10 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void updateESZMigrants() throws Exception {
         try {
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("нажата кнопка \"Обработка мигрантов (перевод в выбывшие)\" в Сервис/Другое");
             RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class)
-                    .updateMigrants();
+                    .updateMigrants(clientsMobileHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run update ESZ migrants: ", e);

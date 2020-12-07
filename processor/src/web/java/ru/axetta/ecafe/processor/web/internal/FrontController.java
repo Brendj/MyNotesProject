@@ -322,9 +322,10 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass auth", e);
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
         }
-
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод proceedRegitryChangeItem (фронт)");
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
@@ -340,8 +341,10 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass ip check", fce);
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
         }
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод proceedRegitryChangeItemInternal (фронт)");
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeEmployeeItem")
@@ -357,8 +360,10 @@ public class FrontController extends HttpServlet {
         } catch (FrontControllerException fce) {
             logger.error("Failed to pass ip check", fce);
         }
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод proceedRegitryChangeEmployeeItem (фронт)");
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
+                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName, clientsMobileHistory);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
@@ -1213,8 +1218,11 @@ public class FrontController extends HttpServlet {
 
                 logger.debug("register client v2");
                 boolean noComment = true;
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
                 long idOfClient = ClientManager
-                        .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment);
+                        .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment,
+                                clientsMobileHistory);
                 results.add(new RegisterClientResult(idOfClient, recId, true, null));
             } catch (Exception e) {
                 results.add(new RegisterClientResult(null, recId, false, e.getMessage()));
@@ -1316,7 +1324,10 @@ public class FrontController extends HttpServlet {
                     fc.setValue(ClientManager.FieldId.SAN, cd.snils);
                 }
                 logger.debug("register client");
-                long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness, false);
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("soap метод registerClients (фронт)");
+                long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness, false,
+                        clientsMobileHistory);
                 results.add(new RegisterClientResult(idOfClient, cd.recId, true, null));
             } catch (Exception e) {
                 results.add(new RegisterClientResult(null, cd.recId, false, e.getMessage()));
@@ -2359,7 +2370,10 @@ public class FrontController extends HttpServlet {
             }
             fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
 
-            Long idOfClient = ClientManager.registerClient(orgId, fc, false, true);
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("soap метод registerGuardian (фронт)");
+            Long idOfClient = ClientManager.registerClient(orgId, fc, false, true,
+                    clientsMobileHistory);
 
             Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
 

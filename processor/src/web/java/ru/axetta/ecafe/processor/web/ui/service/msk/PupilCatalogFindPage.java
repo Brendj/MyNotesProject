@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -319,7 +320,11 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 if (i.getGroup() != null) {
                     fieldConfig.setValue(ClientManager.FieldId.GROUP, i.getGroup());
                 }
-                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true, false);
+
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("Кнопка \"Зарегистрировать\" Сервис/Сверка/Сверка контингента/Поиск учащихся");
+                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true,
+                        false, clientsMobileHistory);
                 ++nItems;
             }
             printMessage("Успешно зарегистрировано клиентов: " + nItems);

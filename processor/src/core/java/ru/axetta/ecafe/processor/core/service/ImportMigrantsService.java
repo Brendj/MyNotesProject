@@ -35,7 +35,9 @@ public class ImportMigrantsService {
         if (!isOn()) {
             return;
         }
-        loadMigrants();
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("Обработка мигрантов из ЕСЗ по расписанию");
+        loadMigrants(clientsMobileHistory);
     }
 
     public static boolean isOn() {
@@ -50,7 +52,7 @@ public class ImportMigrantsService {
         return true;
     }
 
-    public void loadMigrants() throws Exception {
+    public void loadMigrants(ClientsMobileHistory clientsMobileHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -121,14 +123,15 @@ public class ImportMigrantsService {
                                 (request.getSurname() == null) ? "" : request.getSurname(),
                                 (request.getFirstname() == null) ? "" : request.getFirstname(),
                                 (request.getSecondname() == null) ? "" : request.getSecondname(),
-                                (request.getClientGuid() == null) ? "" : request.getClientGuid());
+                                (request.getClientGuid() == null) ? "" : request.getClientGuid(), clientsMobileHistory);
                         client = (Client) session.load(Client.class, idOfClient);
                         if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup()
                                 .getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
                             ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
                             fieldConfig.setValue(ClientManager.FieldId.GROUP,
                                     ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
-                            ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
+                            ClientManager.modifyClientTransactionFree(fieldConfig, null, "",
+                                    client, session, clientsMobileHistory);
                             ClientGroup clientGroup = DAOUtils
                                     .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
                                             client.getOrg().getIdOfOrg(),
@@ -144,7 +147,7 @@ public class ImportMigrantsService {
                         }
                     } else {
                         if (null != request.getIdOfESZ() && !request.getIdOfESZ().equals(client.getExternalId())) {
-                            ClientManager.removeExternalIdFromClients(session, request.getIdOfESZ());
+                            ClientManager.removeExternalIdFromClients(session, request.getIdOfESZ(), clientsMobileHistory);
                             client.setExternalId(request.getIdOfESZ());
                         }
                     }

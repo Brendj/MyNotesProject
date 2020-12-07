@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.RequestDTO;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.GroupManagementErrors;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
@@ -133,7 +134,8 @@ public class CreateClientRequestDTO {
                     "Значение поля Gender должно быть 0 или 1.");
     }
 
-    public static Client convertRequestToClient(CreateClientRequestDTO createClientRequestDTO) throws Exception{
+    public static Client convertRequestToClient(CreateClientRequestDTO createClientRequestDTO,
+            ClientsMobileHistory clientsMobileHistory) throws Exception{
         Person clientPerson = new Person(createClientRequestDTO.getName(), createClientRequestDTO.getSurname(),
                 createClientRequestDTO.getMiddlename());
         Person contractPerson = new Person("","","");
@@ -143,6 +145,7 @@ public class CreateClientRequestDTO {
         client.setIacRegId(createClientRequestDTO.getIacRegId());
         client.setGender(createClientRequestDTO.getGender());
         client.setBirthDate(createClientRequestDTO.getBirthDate());
+        client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile(createClientRequestDTO.getMobile());
         client.setPassportSeries(createClientRequestDTO.getPassportSeries());
         client.setPassportNumber(createClientRequestDTO.getPassportNumber());

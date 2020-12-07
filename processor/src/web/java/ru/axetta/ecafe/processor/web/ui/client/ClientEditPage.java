@@ -959,6 +959,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
             client.setSsoid("");
         }
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("Изменение клиента через редактирование");
+        client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile(mobile);
         client.setFax(this.fax);
         //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП

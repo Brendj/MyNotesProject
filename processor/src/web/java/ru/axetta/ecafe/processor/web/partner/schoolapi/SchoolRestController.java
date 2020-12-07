@@ -657,8 +657,11 @@ public class SchoolRestController {
                 clientGroup = DAOUtils.createClientGroup(persistenceSession, jwtUserDetails.getIdOfOrg(),
                         createClientRequestDTO.getGroupName());
             }
-            groupManagementService.createClient(clientGroup, CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO),
-                    jwtUserDetails.getUsername());
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("rest метод createClient");
+            groupManagementService.createClient(clientGroup,
+                    CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO, clientsMobileHistory),
+                    jwtUserDetails.getUsername(), clientsMobileHistory);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "OK")).build();
