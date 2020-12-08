@@ -1,8 +1,11 @@
 
 package ru.axetta.ecafe.processor.core.partner.mesh.json;
 
+import ru.axetta.ecafe.processor.core.partner.mesh.json.deserialize.ParameterValuesDeserializer;
+
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.HashMap;
@@ -32,6 +35,7 @@ public class Category implements Comparable {
     @JsonProperty("category_id")
     private Integer categoryId;
     @JsonProperty("parameter_values")
+    @JsonDeserialize(using = ParameterValuesDeserializer.class)
     private List<Object> parameterValues = new LinkedList<>();
     @JsonProperty("actual_from")
     private String actualFrom;
@@ -49,6 +53,7 @@ public class Category implements Comparable {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public static final int PROPER_ID = 1;
+    public static final Integer CARD_CATEGORY_ID = 1000;
 
     public boolean empty(String valueActualFrom) {
         return StringUtils.isEmpty(valueActualFrom) || valueActualFrom.equalsIgnoreCase("null");
