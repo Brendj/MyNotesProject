@@ -2874,13 +2874,12 @@ public class DAOService {
         }
     }
 
-    public boolean existOtherDiscountTypes(WtDiscountRule wtRule, CategoryDiscountEnumType categoryType) {
+    public List<CategoryDiscount> getCategoryDiscountListByWtRule(WtDiscountRule wtRule) {
         Query query = entityManager.createQuery("select cd from CategoryDiscount cd "
-                + "left join fetch cd.wtDiscountRules where cd.deletedState = false "
-                + "and :wtRule in elements(cd.wtDiscountRules) and cd.categoryType <> :categoryType");
+                + "inner join fetch cd.wtDiscountRules where cd.deletedState = false "
+                + "and :wtRule in elements(cd.wtDiscountRules)");
         query.setParameter("wtRule", wtRule);
-        query.setParameter("categoryType", categoryType);
-        return query.getResultList().size() > 0;
+        return query.getResultList();
     }
 
     public List<WtComplex> getWtComplexesList() {

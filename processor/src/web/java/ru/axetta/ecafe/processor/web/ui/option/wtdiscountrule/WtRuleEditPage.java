@@ -277,10 +277,10 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         List<WtComplex> ruleComplexes = DAOUtils.getComplexesByWtDiscountRule(em, wtEntity);
         wtSelectedComplexes.addAll(getCheckedComplexes(ruleComplexes));
 
-        if (!daoService.existOtherDiscountTypes(wtEntity, CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT)) {
+        if (isOneTypeForAllCategoryDiscounts(wtEntity, CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT)) {
             complexType = daoService.getWtComplexGroupIdByDescription("льгот");
             disabledComplexType = true;
-        } else if (!daoService.existOtherDiscountTypes(wtEntity, CategoryDiscountEnumType.FEE_CATEGORY)) {
+        } else if (isOneTypeForAllCategoryDiscounts(wtEntity, CategoryDiscountEnumType.FEE_CATEGORY)) {
             complexType = daoService.getWtComplexGroupIdByDescription("плат");
             disabledComplexType = true;
         } else {
@@ -292,6 +292,19 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         contragentFilter = "Не выбрано";
         orgListFilter = "Не выбрано";
         applyFilter = false;
+    }
+
+    private boolean isOneTypeForAllCategoryDiscounts(WtDiscountRule wtRule, CategoryDiscountEnumType categoryType) {
+        List<CategoryDiscount> categoryDiscountList = daoService.getCategoryDiscountListByWtRule(wtRule);
+        if (categoryDiscountList.size() <= 0) {
+            return false;
+        }
+       for (CategoryDiscount discount : categoryDiscountList) {
+           if (!discount.getCategoryType().equals(categoryType)) {
+               return false;
+           }
+       }
+       return true;
     }
 
     private List<WtSelectedComplex> getCheckedComplexes(List<WtComplex> complexes) {
