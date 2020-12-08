@@ -660,8 +660,6 @@ public class SchoolRestController {
             }
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("rest метод createClient");
-            User user = MainPage.getSessionInstance().getCurrentUser();
-            clientsMobileHistory.setUser(user);
             clientsMobileHistory.setShowing("Портал");
             groupManagementService.createClient(clientGroup,
                     CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO, clientsMobileHistory),
