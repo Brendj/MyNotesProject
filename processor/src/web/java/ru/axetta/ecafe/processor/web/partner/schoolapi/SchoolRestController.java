@@ -659,7 +659,7 @@ public class SchoolRestController {
                         createClientRequestDTO.getGroupName());
             }
             ClientsMobileHistory clientsMobileHistory =
-                    new ClientsMobileHistory("rest метод createClient");
+                    new ClientsMobileHistory("Веб-арм ИС \"ПП\"");
             clientsMobileHistory.setShowing("Портал");
             groupManagementService.createClient(clientGroup,
                     CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO, clientsMobileHistory),
