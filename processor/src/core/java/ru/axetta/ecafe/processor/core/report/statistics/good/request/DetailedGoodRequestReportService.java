@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -85,20 +86,31 @@ public class DetailedGoodRequestReportService {
                     requests.addAll(requestsProducts);
                 }
 
-                sql = "select request.number, request.doneDate, position.totalCount/1000, "
-                        + " position.dailySampleCount/1000, position.tempClientsCount/1000, good.nameOfGood, position.createdDate, position.lastUpdate "
-                        + " from GoodRequest request"
-                        + "                join request.goodRequestPositionInternal position"
-                        + "                right join position.good good"
+                sql = "select request.numberofgoodsrequest, request.doneDate, "
+                        + " case when position.unitsscale = 2 then position.totalCount/1000 "
+                        + "      else position.totalCount end as totalCount, "
+                        + " case when position.unitsscale = 2 then position.dailySampleCount/1000 "
+                        + "      else position.dailySampleCount end as dailySampleCount, "
+                        + " case when position.unitsscale = 2 then position.tempClientsCount/1000 "
+                        + "      else position.tempClientsCount end as tempClientsCount, "
+                        + " case when (position.idofgood is not null and position.idofdish is null) then good.nameOfGood "
+                        + "      when (position.idofgood is null and position.idofdish is not null) then dish.dishname "
+                        + "      else complex.name end as name, "
+                        + " position.createdDate, position.lastUpdate "
+                        + " from cf_goods_requests request "
+                        + " join cf_goods_requests_positions position on position.idofgoodsrequest = request.idofgoodsrequest "
+                        + " left join cf_goods good on good.idofgood = position.idofgood "
+                        + " left join cf_wt_dishes dish on dish.idofdish = position.idofdish "
+                        + " left join cf_wt_complexes complex on complex.idofcomplex = position.complexid "
                         + "                where request.orgOwner = :eduid and request.state in :state "
                         + "                and position.deletedState<>true and request.deletedState<>true "
                         + "                and request.doneDate between :startDate and :endDate "
-                        + "                order by request.doneDate desc";
-                query = session.createQuery(sql);
+                        + "                order by request.doneDate desc ";
+                query = session.createSQLQuery(sql);
                 query.setParameter("eduid", edu.getIdOfOrg());
-                query.setParameterList("state", DocumentStateFilter.states(documentStateFilter));
-                query.setParameter("startDate", startDate);
-                query.setParameter("endDate", endDate);
+                query.setParameterList("state", DocumentStateFilter.convertToOrdinals(DocumentStateFilter.states(documentStateFilter)));
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
                 List requestsGoods = query.list();
                 if (!(requestsGoods == null || requestsGoods.isEmpty())) {
                     requests.addAll(requestsGoods);
@@ -106,9 +118,10 @@ public class DetailedGoodRequestReportService {
                 if (!(requests == null || requests.isEmpty())) {
                     for (Object o : requests) {
                         Object[] row = (Object[]) o;
-                        Date lastCreate = (Date) row[6];
-                        Date lastUpdate = (Date) row[7];
-                        RequestItem request = new RequestItem(row[0].toString(), (Date) row[1], lastCreate, lastUpdate);
+                        Date doneDate = (null != row[1]) ? new Date(((BigInteger) row[1]).longValue()) : null;
+                        Date lastCreate = (null != row[6]) ? new Date(((BigInteger) row[6]).longValue()) : null;
+                        Date lastUpdate = (null != row[7]) ? new Date(((BigInteger) row[7]).longValue()) : null;
+                        RequestItem request = new RequestItem(row[0].toString(), doneDate, lastCreate, lastUpdate);
                         Long dcount = null;
                         if (row[3] != null) {
                             dcount = Long.parseLong(row[3].toString());
