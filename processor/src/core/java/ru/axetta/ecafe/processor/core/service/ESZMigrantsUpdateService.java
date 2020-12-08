@@ -40,6 +40,7 @@ public class ESZMigrantsUpdateService {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Обработка мигрантов (перевод в выбывшие) по расписанию");
+        clientsMobileHistory.setShowing("ЕСЗ");
         updateMigrants(clientsMobileHistory);
     }
 

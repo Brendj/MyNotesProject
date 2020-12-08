@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -146,6 +147,9 @@ public class OtherActionsPage extends OnlineReportPage {
     public void runReceiveEMPUpdates() throws Exception {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("кнопка \"Запустить загрузку обновления из ЕМП\" в Сервис/Другое");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(clientsMobileHistory); //DEF
         printMessage("Загрузка обновление из ЕМП завершена");
     }
@@ -303,6 +307,9 @@ public class OtherActionsPage extends OnlineReportPage {
                 orgs = getOrgsForGenGuardians();
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("кнопка \"Генерировать представителей\" в Сервис/Другое");
+                User user = MainPage.getSessionInstance().getCurrentUser();
+                clientsMobileHistory.setUser(user);
+                clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
                 count = ClientService.getInstance().generateGuardians(orgs, clientsMobileHistory);
             } catch (Exception e) {
                 printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
@@ -505,6 +512,9 @@ public class OtherActionsPage extends OnlineReportPage {
         try {
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("кнопка \"Обработка мигрантов\" в Сервис/Другое");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
             RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants(clientsMobileHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
@@ -780,6 +790,9 @@ public class OtherActionsPage extends OnlineReportPage {
         try {
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("нажата кнопка \"Обработка мигрантов (перевод в выбывшие)\" в Сервис/Другое");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
             RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class)
                     .updateMigrants(clientsMobileHistory);
             printMessage("Обработка мигрантов завершена");

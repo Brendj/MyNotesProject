@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
 import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -659,6 +660,9 @@ public class SchoolRestController {
             }
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("rest метод createClient");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Портал");
             groupManagementService.createClient(clientGroup,
                     CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO, clientsMobileHistory),
                     jwtUserDetails.getUsername(), clientsMobileHistory);

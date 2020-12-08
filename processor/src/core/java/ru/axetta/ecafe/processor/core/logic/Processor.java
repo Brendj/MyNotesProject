@@ -484,6 +484,8 @@ public class Processor implements SyncProcessor {
         try {
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("Полная синхронизация");
+            clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
                     errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
         } catch (Exception e) {
@@ -2087,6 +2089,8 @@ public class Processor implements SyncProcessor {
             if (clientParamRegistry != null) {
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("Синхронизация по секциям (ConstructedSections)");
+                clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+                clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
                 processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds,
                         clientsWithWrongVersion, clientsMobileHistory);
             }
@@ -3098,6 +3102,8 @@ public class Processor implements SyncProcessor {
 
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("Синхронизация типа GetClientParams (синхра клиентов)");
+            clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
                     errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
         } catch (Exception e) {

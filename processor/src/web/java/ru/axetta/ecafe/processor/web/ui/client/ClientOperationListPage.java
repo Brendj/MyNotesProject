@@ -59,6 +59,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<GeoplanerNotificationJournal> geoplanerNotificationJournalList = new LinkedList<>();
     private ApplicationForFoodReportItem currentApplicationForFood;
     private List<BankSubscription> bankSubscriptions;
+    private List<ClientsMobileHistory> clientsMobileHistories = new ArrayList<ClientsMobileHistory>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -226,6 +227,13 @@ public class ClientOperationListPage extends BasicWorkspacePage {
                 .addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
 
+        criteria = session.createCriteria(ClientsMobileHistory.class);
+        criteria.add(Restrictions.eq("client", client))
+                .add(Restrictions.ge("createdate", startTime))
+                .add(Restrictions.le("createdate", endTime))
+                .addOrder(Order.asc("createdate"));
+        clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
+
         //// client group migrations
         ClientGroupMigrationHistoryService clientGroupMigrationHistoryService = RuntimeContext.getAppContext()
                 .getBean(ClientGroupMigrationHistoryService.class);
@@ -305,5 +313,13 @@ public class ClientOperationListPage extends BasicWorkspacePage {
 
     public void setBankSubscriptions(List<BankSubscription> bankSubscriptions) {
         this.bankSubscriptions = bankSubscriptions;
+    }
+
+    public List<ClientsMobileHistory> getClientsMobileHistories() {
+        return clientsMobileHistories;
+    }
+
+    public void setClientsMobileHistories(List<ClientsMobileHistory> clientsMobileHistories) {
+        this.clientsMobileHistories = clientsMobileHistories;
     }
 }

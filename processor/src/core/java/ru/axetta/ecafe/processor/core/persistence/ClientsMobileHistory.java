@@ -34,6 +34,9 @@ public class ClientsMobileHistory {
     private String action;
     private Date createdate;
     private String source;
+    private String showing;
+    private User user;
+    private Org org;
 
     private static final Logger logger = LoggerFactory.getLogger(ClientsMobileHistory.class);
 
@@ -58,6 +61,9 @@ public class ClientsMobileHistory {
             clientsMobileHistory1.setClient(this.getClient());
             clientsMobileHistory1.setSource(this.getSource());
             clientsMobileHistory1.setAction(this.getAction());
+            clientsMobileHistory1.setOrg(this.getOrg());
+            clientsMobileHistory1.setShowing(this.getShowing());
+            clientsMobileHistory1.setUser(this.getUser());
             persistenceSession.persist(clientsMobileHistory1);
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -124,5 +130,29 @@ public class ClientsMobileHistory {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getShowing() {
+        return showing;
+    }
+
+    public void setShowing(String showing) {
+        this.showing = showing;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Org getOrg() {
+        return org;
+    }
+
+    public void setOrg(Org org) {
+        this.org = org;
     }
 }

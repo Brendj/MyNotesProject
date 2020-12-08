@@ -211,7 +211,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         displayMode = DISPLAY_NON_COMMENTED_MODE;
     }
 
-    public void doApply() {
+    public void doApply() throws Exception {
         resetMessages();
 
         List<Long> list = new ArrayList<Long>();
@@ -225,6 +225,9 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("интерактивная сверка (Синхронизация организации с Реестрами)");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         List<RegistryChangeCallback> result = proceedRegistryChangeItemInternal(list,
                 RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, clientsMobileHistory);
         doUpdate();

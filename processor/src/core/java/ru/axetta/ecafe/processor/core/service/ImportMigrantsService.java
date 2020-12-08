@@ -37,6 +37,7 @@ public class ImportMigrantsService {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Обработка мигрантов из ЕСЗ по расписанию");
+        clientsMobileHistory.setShowing("ЕСЗ");
         loadMigrants(clientsMobileHistory);
     }
 

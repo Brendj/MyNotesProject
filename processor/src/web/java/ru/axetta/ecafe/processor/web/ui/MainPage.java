@@ -3415,6 +3415,9 @@ public class MainPage implements Serializable {
             }
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("Загрузка клиентов из файла");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
             clientFileLoadPage.loadClients(inputStream, dataSize, clientsMobileHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));

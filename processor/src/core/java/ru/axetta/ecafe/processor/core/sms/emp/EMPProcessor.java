@@ -153,6 +153,7 @@ public class EMPProcessor {
         long l = System.currentTimeMillis();
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Получение данных из ЕМП по расписанию");
+        clientsMobileHistory.setShowing("ЕМП");
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).runBindClients();
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(clientsMobileHistory);
         l = System.currentTimeMillis() - l;

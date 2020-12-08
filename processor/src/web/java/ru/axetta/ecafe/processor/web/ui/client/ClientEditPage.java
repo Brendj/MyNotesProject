@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -961,6 +962,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Изменение клиента через редактирование");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile(mobile);
         client.setFax(this.fax);

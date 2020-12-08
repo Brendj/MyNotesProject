@@ -324,6 +324,7 @@ public class FrontController extends HttpServlet {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItem (фронт)");
+        clientsMobileHistory.setShowing("АРМ");
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
     }
@@ -343,6 +344,7 @@ public class FrontController extends HttpServlet {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItemInternal (фронт)");
+        clientsMobileHistory.setShowing("АРМ");
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
     }
@@ -362,6 +364,7 @@ public class FrontController extends HttpServlet {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeEmployeeItem (фронт)");
+        clientsMobileHistory.setShowing("АРМ");
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName, clientsMobileHistory);
     }
@@ -1220,6 +1223,7 @@ public class FrontController extends HttpServlet {
                 boolean noComment = true;
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
+                clientsMobileHistory.setShowing("АРМ");
                 long idOfClient = ClientManager
                         .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment,
                                 clientsMobileHistory);
@@ -1326,6 +1330,7 @@ public class FrontController extends HttpServlet {
                 logger.debug("register client");
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("soap метод registerClients (фронт)");
+                clientsMobileHistory.setShowing("АРМ");
                 long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness, false,
                         clientsMobileHistory);
                 results.add(new RegisterClientResult(idOfClient, cd.recId, true, null));
@@ -2372,6 +2377,7 @@ public class FrontController extends HttpServlet {
 
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("soap метод registerGuardian (фронт)");
+            clientsMobileHistory.setShowing("АРМ");
             Long idOfClient = ClientManager.registerClient(orgId, fc, false, true,
                     clientsMobileHistory);
 

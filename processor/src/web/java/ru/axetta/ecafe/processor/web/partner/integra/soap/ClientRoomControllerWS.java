@@ -4570,7 +4570,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r.description = RC_INVALID_MOBILE;
             return r;
         }
-        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm)) {
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод changeMobilePhone");
+        clientsMobileHistory.setShowing("Портал");
+        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm, clientsMobileHistory)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
@@ -5249,6 +5252,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод setGuardianshipDisabled");
+        clientsMobileHistory.setShowing("Портал");
         try {
             if (StringUtils.isEmpty(guardMobile)) {
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
@@ -5369,6 +5373,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Transaction persistenceTransaction = null;
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод clearMobileByContractId");
+        clientsMobileHistory.setShowing("Портал");
         try {
             session = runtimeContext.createPersistenceSession();
             persistenceTransaction = session.beginTransaction();
@@ -6214,7 +6219,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r.description = RC_INVALID_MOBILE;
                 return r;
             }
-            if (!daoService.setClientMobilePhone(contractId, mobilePhone, null)) {
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("soap метод changePersonalInfo");
+            clientsMobileHistory.setShowing("Портал");
+            if (!daoService.setClientMobilePhone(contractId, mobilePhone, null, clientsMobileHistory)) {
                 r.resultCode = RC_CLIENT_NOT_FOUND;
                 r.description = RC_CLIENT_NOT_FOUND_DESC;
             }
@@ -8641,6 +8649,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("soap метод addGuardian");
+                clientsMobileHistory.setShowing("Портал");
                 guardian = ClientManager
                         .createGuardianTransactionFree(session, firstName, secondName, surname, mobile, remark, gender,
                                 org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries,
@@ -9636,6 +9645,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         guardianWithMobileFound = true;
                         ClientsMobileHistory clientsMobileHistory =
                                 new ClientsMobileHistory("soap метод setPreorderAllowed");
+                        clientsMobileHistory.setShowing("Портал");
                         ClientManager.setPreorderAllowed(session, client, guardian, mobile, value, version,
                                 clientsMobileHistory);
                     }
@@ -10039,6 +10049,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("web метод addRegistrationCard");
+                clientsMobileHistory.setShowing("Портал");
                 client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
                         organizationSuid, grade, codeBenefit, contractId, clientsMobileHistory);
             } else {

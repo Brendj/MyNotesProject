@@ -18,6 +18,11 @@
         <property name="createdate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
         <property name="source" column="source" type="string"/>
+        <property name="showing" column="showing" type="string"/>
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofusers"
+                     update="false"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
+                     update="false"/>
     </class>
 </hibernate-mapping>
 
