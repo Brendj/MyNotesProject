@@ -261,6 +261,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     String dateDelete = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
                     commentsAddsDelete(dbClient, deleteCommentsAdds);
+                    dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
                     break;
                 case MOVE_OPERATION:
@@ -289,6 +290,8 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     }
                     addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), beforeMigrationGroup, dbClient, change);
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
+                    dbClient.setUpdateTime(new Date());
+                    session.save(dbClient);
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
@@ -330,6 +333,8 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                         }
                     }
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
+                    dbClient.setUpdateTime(new Date());
+                    session.save(dbClient);
                     break;
                 default:
                     logger.error("Unknown update registry change operation " + change.getOperation());
