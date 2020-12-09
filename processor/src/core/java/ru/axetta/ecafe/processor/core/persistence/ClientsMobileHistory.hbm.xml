@@ -21,6 +21,8 @@
         <property name="showing" column="showing" type="string"/>
         <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofusers"
                      update="false"/>
+        <many-to-one name="clientARM" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclientARM"
+                     update="false"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
                      update="false"/>
     </class>

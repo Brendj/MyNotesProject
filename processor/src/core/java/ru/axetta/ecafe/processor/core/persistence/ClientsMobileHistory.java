@@ -36,6 +36,7 @@ public class ClientsMobileHistory {
     private String source;
     private String showing;
     private User user;
+    private Client clientARM;
     private Org org;
 
     private static final Logger logger = LoggerFactory.getLogger(ClientsMobileHistory.class);
@@ -154,5 +155,13 @@ public class ClientsMobileHistory {
 
     public void setOrg(Org org) {
         this.org = org;
+    }
+
+    public Client getClientARM() {
+        return clientARM;
+    }
+
+    public void setClientARM(Client clientARM) {
+        this.clientARM = clientARM;
     }
 }
