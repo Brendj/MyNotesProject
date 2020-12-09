@@ -1054,27 +1054,19 @@ public class EventNotificationService {
             String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);
             if (!isTest.equals(""))
                 empType.getParameters().put(ExternalEventNotificationService.TEST, isTest);
-
+            
             //  Устанавливаем дату
-            if (type.equals(NOTIFICATION_CANCEL_PREORDER)) //т.к. время тут не передается в параметрах
-            {
-                empType.setTime(new Date().getTime());
-            }
-            else {
-                String empDateStr = findValueInParams(new String[]{"empTime"}, values);
-                if (empDateStr != null && !StringUtils.isBlank(empDateStr)) {
-                    try {
-                        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-                        Date eventDate = df.parse(empDateStr);
-                        empType.setTime(eventDate.getTime());
-                    } catch (Exception e) {
-                        logger.error("Failed to parse EMP date", e);
-                    }
-                }
-            }
-
-
-
+            empType.setTime(new Date().getTime());
+            //String empDateStr = findValueInParams(new String[]{"empTime"}, values);
+            //if (empDateStr != null && !StringUtils.isBlank(empDateStr)) {
+            //    try {
+            //        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+            //        Date eventDate = df.parse(empDateStr);
+            //        empType.setTime(eventDate.getTime());
+            //    } catch (Exception e) {
+            //        logger.error("Failed to parse EMP date", e);
+            //    }
+            //}
             return empType;
         } else {
             return "Not found";
