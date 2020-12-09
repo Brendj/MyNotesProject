@@ -48,7 +48,7 @@ public class Client {
 
     @ManyToMany
     @JoinTable(
-            name = "cf_clientdiscounts",
+            name = "cf_clients_categorydiscounts",
             joinColumns = @JoinColumn(name = "idofclient"),
             inverseJoinColumns = @JoinColumn(name = "idofcategorydiscount")
     )

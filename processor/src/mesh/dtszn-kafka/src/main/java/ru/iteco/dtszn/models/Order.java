@@ -86,7 +86,7 @@ import java.util.Set;
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
-        "         join cf_clientdiscounts ccd on c.idofclient = ccd.idofclient\n" +
+        "         join cf_clients_categorydiscounts ccd on c.idofclient = ccd.idofclient\n" +
         "         left join cf_discountrules dr on dr.idofrule = od.idofrule\n" +
         "         left join cf_wt_discountrules wdr on wdr.idofrule = od.idofrule\n" +
         "         left join cf_discountrules_categorydiscounts drcc on drcc.idofrule = dr.idofrule\n" +
