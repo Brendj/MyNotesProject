@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 public class EMPCancelPreorderEventType extends EMPAbstractEventType {
 
     public EMPCancelPreorderEventType(String [] values) {
+        stream = STREAM;
         type = EMPEventTypeFactory.CANCEL_PREORDER;
         this.saveStringtoMap(values);
     }
