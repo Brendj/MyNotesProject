@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sms.emp.type;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -179,6 +180,7 @@ public class EMPEventTypeFactory {
             default:
                 throw new IllegalArgumentException("Unknown type");
         }
+        event.setTime(new Date().getTime());
         return event;
     }
 }

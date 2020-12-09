@@ -52,9 +52,6 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     public void setTime(long time) {
         this.time = time;
-        if(params != null) {
-            params.put("time", new SimpleDateFormat("HH:mm").format(new Date(time)));
-        }
     }
 
     public int getPreviousId() {
@@ -144,15 +141,14 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             params.put("gender", getGender(client));
 
         if (type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
+            //ENTER_LIBRARY - уже лежит Дата и Время
+            //CANCEL_PREORDER - не нужны эти параметры
             params.put("date", DATE_FORMAT.format(currentDate));
             params.put("time", TIME_FORMAT.format(currentDate));
             if (client.getOrg() != null) {
                 appendOrgParameters(client.getOrg().getIdOfOrg(), params);
             }
             appendBalance(client.getBalance(), params);
-        }
-        if(type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
-            setTime(System.currentTimeMillis());
         }
     }
 
@@ -185,13 +181,12 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             params.put("gender", getGender(child));
 
         if (type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
+            //ENTER_LIBRARY - уже лежит Дата и Время
+            //CANCEL_PREORDER - не нужны эти параметры
             params.put("date", DATE_FORMAT.format(currentDate));
             params.put("time", TIME_FORMAT.format(currentDate));
             appendOrgParameters(child.getOrg().getIdOfOrg(), params);
             appendBalance(child.getBalance(), params);
-        }
-        if(type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
-            setTime(System.currentTimeMillis());
         }
     }
 
