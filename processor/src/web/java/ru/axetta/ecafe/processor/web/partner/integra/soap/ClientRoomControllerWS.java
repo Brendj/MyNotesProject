@@ -10812,7 +10812,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 for (Client client: clientsSsoid)
                 {
                     client.setMobile(cientMobile);
-                    session.persist(client);
+                    session.saveOrUpdate(client);
                 }
             }
             transaction.commit();
