@@ -62,7 +62,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             {"shortName", "Наименование"}, {"officialName", "Официальное наименование"}, {"address", "Адрес"},
             {"district", "Район"}, {"OGRN", "ОГРН"}, {"GUID", "GUID"}, {"supplierId", "ID поставщика"},
             {"orgType", "Тип организации(0-4)"}, {"position", "Должность руководителя"}, {"surname", "Фамилия"},
-            {"firstName", "Имя"}, {"secondName", "Отчество"}};
+            {"firstName", "Имя"}, {"secondName", "Отчество"}, {"shortnameinfoservice", "Краткое наименование"}};
 
     public int getSuccessLineNumber() {
         return successLineNumber;
@@ -164,6 +164,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         String strSupplierID = columns.get("supplierId");
         long supplierID = 0L;
         String strOrgType = columns.get("orgType");
+        String strshortnameinfoservice = columns.get("shortnameinfoservice");
         int orgType;
 
         if (NumberUtils.isNumber(strSupplierID)) {
@@ -253,7 +254,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 position = "";
             }
 
-            Org org = new Org(shortName, "", officialName, address, "", officialPerson, position, "", contractTime,
+            Org org = new Org(shortName, strshortnameinfoservice, officialName, address, "", officialPerson, position, "", contractTime,
                     OrganizationType.fromInteger(orgType), 0, 0L, "", 0L, 0L, currentSupplier, "", "", "", "", "", "",
                     0L, 0L, 0L, "", 0L, "/", version, false);
             org.setStatus(OrganizationStatus.PLANNED);
@@ -262,7 +263,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             org.setState(1); // Обслуживается
             org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
             org.setDistrict(district);
-            if (ogrn.length() > 12 && ogrn.length() < 33) { // ОГРН состоит из 13 цифр; размерность поля в БД = 32
+            if (ogrn != null && ogrn.length() > 12 && ogrn.length() < 33) { // ОГРН состоит из 13 цифр; размерность поля в БД = 32
                 org.setOGRN(ogrn);
             }
             org.setGuid(guid);
@@ -312,7 +313,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     public void downloadSample() {
         String result = "\"Наименование\";\"Официальное наименование\";\"Адрес\";\"Район\";\"ОГРН\";\"GUID\";"
                 + "\"ID поставщика\";" + "\"Тип организации(0-4)\";\"Должность руководителя\";\"Фамилия\";\"Имя\";"
-                + "\"Отчество\";";
+                + "\"Отчество\";\"Краткое наименование\";";
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
