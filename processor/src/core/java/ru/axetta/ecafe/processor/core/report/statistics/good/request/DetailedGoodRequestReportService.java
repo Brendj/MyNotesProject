@@ -87,11 +87,11 @@ public class DetailedGoodRequestReportService {
                 }
 
                 sql = "select request.numberofgoodsrequest, request.doneDate, "
-                        + " case when position.unitsscale = 2 then position.totalCount/1000 "
+                        + " case when position.unitsscale in (0,2) then position.totalCount/1000 "
                         + "      else position.totalCount end as totalCount, "
-                        + " case when position.unitsscale = 2 then position.dailySampleCount/1000 "
+                        + " case when position.unitsscale in (0,2) then position.dailySampleCount/1000 "
                         + "      else position.dailySampleCount end as dailySampleCount, "
-                        + " case when position.unitsscale = 2 then position.tempClientsCount/1000 "
+                        + " case when position.unitsscale in (0,2) then position.tempClientsCount/1000 "
                         + "      else position.tempClientsCount end as tempClientsCount, "
                         + " case when (position.idofgood is not null and position.idofdish is null) then good.nameOfGood "
                         + "      when (position.idofgood is null and position.idofdish is not null) then dish.dishname "
