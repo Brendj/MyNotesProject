@@ -298,9 +298,13 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItem")
-    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */ public List<RegistryChangeCallback> proceedRegitryChangeItem(
-            @WebParam(name = "changesList") List<Long> changesList, @WebParam(name = "operation") int operation,
-            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
+    public List<RegistryChangeCallback> proceedRegitryChangeItem(
+            @WebParam(name = "changesList") List<Long> changesList,
+            @WebParam(name = "operation") int operation,
+            @WebParam(name = "fullNameValidation") boolean fullNameValidation,
+            @WebParam(name = "idoforg") Long idoforg,
+            @WebParam(name = "idofclient") Long idofclient) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -330,9 +334,13 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
-    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */ public List<RegistryChangeCallback> proceedRegitryChangeItemInternal(
-            @WebParam(name = "changesList") List<Long> changesList, @WebParam(name = "operation") int operation,
-            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
+    public List<RegistryChangeCallback> proceedRegitryChangeItemInternal(
+            @WebParam(name = "changesList") List<Long> changesList,
+            @WebParam(name = "operation") int operation,
+            @WebParam(name = "fullNameValidation") boolean fullNameValidation,
+            @WebParam(name = "idoforg") Long idoforg,
+            @WebParam(name = "idofclient") Long idofclient) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -353,7 +361,9 @@ public class FrontController extends HttpServlet {
     /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */ public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItem(
             @WebParam(name = "changesList") List<Long> changesList, @WebParam(name = "operation") int operation,
             @WebParam(name = "fullNameValidation") boolean fullNameValidation,
-            @WebParam(name = "groupName") String groupName) {
+            @WebParam(name = "groupName") String groupName,
+            @WebParam(name = "idoforg") Long idoforg,
+            @WebParam(name = "idofclient") Long idofclient) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -1075,9 +1085,11 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerClientsV2")
-    public List<RegisterClientResult> registerClientsV2(@WebParam(name = "orgId") Long orgId,
+    public List<RegisterClientResult> registerClientsV2(
+            @WebParam(name = "orgId") Long orgId,
             @WebParam(name = "clientDescList") List<ClientDescV2> clientDescList,
-            @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
+            @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness,
+            @WebParam(name = "idofclient") Long idofclient)
             throws FrontControllerException {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
@@ -2199,8 +2211,11 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerGuardian")
-    public List<RegisterGuardianResult> registerGuardian(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "guardianDescList") GuardianDesc guardianDescList) throws FrontControllerException {
+    public List<RegisterGuardianResult> registerGuardian(
+            @WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "guardianDescList") GuardianDesc guardianDescList,
+            @WebParam(name = "idofclient") Long idofclient
+            ) throws FrontControllerException {
         checkRequestValidity(orgId);
 
         String firstName = FrontControllerProcessor
