@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -943,7 +944,6 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
                 }
 
-
                 //  дата только для платного комплекса + льготного комплекса
                 if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
                    findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
@@ -1051,9 +1051,23 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CANCEL_PREORDER, destClient, values);
                 }
             }
+
+            String empDateStr = findValueInParams(new String[]{"empTime"}, values);
+            if (empDateStr != null && !StringUtils.isBlank(empDateStr)) {
+                try {
+                    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+                    Date eventDate = df.parse(empDateStr);
+                    empType.getParameters().put("time", new SimpleDateFormat("HH:mm").format(new Date(eventDate.getTime())));
+                } catch (Exception e) {
+                    logger.error("Failed to parse EMP date", e);
+                }
+            }
+
             String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);
             if (!isTest.equals(""))
                 empType.getParameters().put(ExternalEventNotificationService.TEST, isTest);
+
+            empType.setTime(new Date().getTime());
             return empType;
         } else {
             return "Not found";

@@ -180,7 +180,6 @@ public class EMPEventTypeFactory {
             default:
                 throw new IllegalArgumentException("Unknown type");
         }
-        event.setTime(new Date().getTime());
         return event;
     }
 }
