@@ -36,7 +36,7 @@ public class ClientsMobileHistory {
     private String source;
     private String showing;
     private User user;
-    private Client clientARM;
+    private String staffguid;
     private Org org;
 
     private static final Logger logger = LoggerFactory.getLogger(ClientsMobileHistory.class);
@@ -65,6 +65,7 @@ public class ClientsMobileHistory {
             clientsMobileHistory1.setOrg(this.getOrg());
             clientsMobileHistory1.setShowing(this.getShowing());
             clientsMobileHistory1.setUser(this.getUser());
+            clientsMobileHistory1.setStaffguid(this.getStaffguid());
             persistenceSession.persist(clientsMobileHistory1);
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -157,11 +158,11 @@ public class ClientsMobileHistory {
         this.org = org;
     }
 
-    public Client getClientARM() {
-        return clientARM;
+    public String getStaffguid() {
+        return staffguid;
     }
 
-    public void setClientARM(Client clientARM) {
-        this.clientARM = clientARM;
+    public void setStaffguid(String staffguid) {
+        this.staffguid = staffguid;
     }
 }
