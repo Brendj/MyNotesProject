@@ -149,7 +149,7 @@ public class PreorderCancelNotificationService {
     private void reallySendNotification(Session session, Map<Client, Object> messages) throws Exception {
         Iterator<Map.Entry<Client, Object>> clients = messages.entrySet().iterator();
         int counttype = 1;
-        String value = "&lt;br&gt;";
+        String value = "<br>";
         while (clients.hasNext()) {
             Map.Entry<Client, Object> client = clients.next();
             String[] values = new String[]{
@@ -165,7 +165,7 @@ public class PreorderCancelNotificationService {
                         ((Map<Date, String>)type.getValue()).entrySet().iterator();
                 while (datemessages.hasNext()) {
                     Map.Entry<Date, String> datemessage = datemessages.next();
-                    value = "&lt;br&gt;";
+                    value = "<br>";
                     value += new SimpleDateFormat("yyyy-MM-dd").format(datemessage.getKey());
                     value += datemessage.getValue();
                     values = EventNotificationService.attachToValues
@@ -403,7 +403,7 @@ public class PreorderCancelNotificationService {
     private void createmassage (String mess, PreorderComplex preorderComplex, Integer mode, Map<Date, String> dateMessage)
     {
         if (mess.isEmpty())
-            mess += "&lt;br&gt;";
+            mess += "<br>";
         if (mode == 3 || mode == 4)
         {
             mess += "Комплексный рацион «" + preorderComplex.getComplexName().trim() + "»";
@@ -418,7 +418,7 @@ public class PreorderCancelNotificationService {
             if (mess.length() > 4)
                 mess = mess.substring(0, mess.length() - 1);
         }
-        mess += "&lt;br&gt;";
+        mess += "<br>";
         dateMessage.put(preorderComplex.getPreorderDate(), mess);
     }
 
@@ -426,7 +426,7 @@ public class PreorderCancelNotificationService {
             Map<Date, String> dateMessage)
     {
         if (mess.isEmpty())
-            mess += "&lt;br&gt;";
+            mess += "<br>";
         if (mode == 1) {
             mess += "Комплексный рацион «" + regularPreorder.getItemName().trim() + "»";
 
@@ -440,7 +440,7 @@ public class PreorderCancelNotificationService {
         }
         mess += "(стоимость " + regularPreorder.getPrice() / 100 + " руб., ";
         mess += regularPreorder.getAmount() + " шт)";
-        mess += "&lt;br&gt;";
+        mess += "<br>";
         dateMessage.put(regularPreorder.getEndDate(), mess);
     }
 
