@@ -10795,7 +10795,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Map<String, List> headers = (Map<String, List>) context.getMessageContext().get(Message.PROTOCOL_HEADERS);
             List<String> ssoids = headers.get("User_ssoid");
@@ -10803,16 +10803,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ssoid = ssoids.get(0).trim();
             if (!ssoid.isEmpty()) {
                 List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
+                List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
                 for (Client client: clients)
                 {
-                    client.setSsoid(ssoid);
-                    session.persist(client);
+                    if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
+                        client.setSsoid(ssoid);
+                        client.setUpdateTime(new Date());
+                        session.update(client);
+                    }
                 }
-                List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
                 for (Client client: clientsSsoid)
                 {
-                    client.setMobile(cientMobile);
-                    session.saveOrUpdate(client);
+                    if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
+                        client.setMobile(cientMobile);
+                        client.setUpdateTime(new Date());
+                        session.update(client);
+                    }
                 }
             }
             transaction.commit();
