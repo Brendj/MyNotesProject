@@ -53,23 +53,6 @@
             <a4j:support event="onchange" reRender="clientBalanceByDayReportPanelGrid" />
         </h:selectOneMenu>
     </h:panelGroup>
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Клиент" />
-        <h:panelGroup id="clientFilter">
-            <a4j:commandButton value="..."
-                               action="#{mainPage.showClientSelectListPage(mainPage.clientBalanceByDayReportPage.getClientList())}"
-                               reRender="modalClientListSelectorPanel,selectedClientList"
-                               oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalClientListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
-                <f:setPropertyActionListener value="#{mainPage.clientBalanceByDayReportPage.getStringClientList}"
-                                             target="#{mainPage.clientSelectListPage.clientFilter}" />
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                          value=" {#{mainPage.clientBalanceByDayReportPage.filterClient}}" />
-        </h:panelGroup>
-    </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByDayReportPage.exportToHtmlOnePerUser}"
                            reRender="clientBalanceByDayReportTable, clientBalanceByDayReportTableDatascroller"
@@ -102,16 +85,6 @@
                         <h:outputText styleClass="column-header" escape="true" value="Номер л/с" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Фамилия" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Имя" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Отчество" />
-                    </rich:column>
-
-                    <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Текущий овердрафт" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
@@ -138,15 +111,6 @@
                 </a4j:commandLink>
             </rich:column>
             <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{complex.surname}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{complex.firstName}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{complex.secondName}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.limit}" converter="copeckSumConverter" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
@@ -157,7 +121,7 @@
             </rich:column>
             <f:facet name="footer">
                 <rich:columnGroup rendered="#{not empty mainPage.clientBalanceByDayReportPage.clientsBalance}">
-                    <rich:column styleClass="right-aligned-column" colspan="7">
+                    <rich:column styleClass="right-aligned-column" colspan="4">
                         <h:outputText styleClass="column-header" escape="true" value="ИТОГО" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
