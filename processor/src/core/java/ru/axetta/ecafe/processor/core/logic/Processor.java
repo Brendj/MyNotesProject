@@ -5080,7 +5080,7 @@ public class Processor implements SyncProcessor {
             DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
             client.setClientRegistryVersion(version);
-
+            client.setUpdateTime(new Date());
             persistenceSession.update(client);
 
             persistenceSession.flush();
