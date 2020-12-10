@@ -52,6 +52,11 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN" />
         </set>
 
+        <set name="wtDiscountRules" table="cf_wt_discountrules_categorydiscount" inverse="true" lazy="true">
+            <key column="IdOfCategoryDiscount"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" column="idOfRule"/>
+        </set>
+
         <property name="blockedToChange" column="blockedToChange" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
