@@ -5,7 +5,10 @@
 package ru.axetta.ecafe.processor.web.ui.option.msp;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -17,6 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.model.SelectItem;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 @Component
 @Scope("session")
 public class CodeMSPEditPage extends BasicWorkspacePage {
@@ -26,6 +35,35 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
     private Integer code;
     private String description;
     private CodeMSP codeMSP;
+    private Long selectedDiscount;
+    private List<SelectItem> discounts = loadDiscounts();
+
+    private List<SelectItem> loadDiscounts() {
+        List<SelectItem> result = new LinkedList<>();
+        try {
+            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOService
+                    .getInstance().getCategoryDiscountDSZNList();
+            Set<CategoryDiscount> set = new HashSet<>();
+
+            result.add(new SelectItem(null, ""));
+
+            for(CategoryDiscountDSZN category : categoryDiscountDSZNList){
+                if(category.getCategoryDiscount() != null){
+                    set.add(category.getCategoryDiscount());
+                }
+            }
+
+            for(CategoryDiscount c : set){
+                SelectItem item = new SelectItem(
+                        c.getIdOfCategoryDiscount(),
+                        c.getCategoryName());
+                result.add(item);
+            }
+        } catch (Exception e){
+            log.error("Can't load categoryDiscounts", e);
+        }
+        return result;
+    }
 
     public void save(){
         Session persistenceSession = null;
@@ -43,6 +81,11 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
             codeMSP.setCode(code);
             codeMSP.setDescription(description);
 
+            if(selectedDiscount != null){
+                CategoryDiscount discount = (CategoryDiscount) persistenceSession.get(CategoryDiscount.class, selectedDiscount);
+                codeMSP.setCategoryDiscount(discount);
+            }
+
             persistenceSession.update(codeMSP);
 
             persistenceTransaction.commit();
@@ -58,6 +101,15 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
         }
     }
 
+    private Long findByName(String selectedDiscount) {
+        for(SelectItem i : discounts){
+            if(i.getLabel().equals(selectedDiscount)){
+                return (Long) i.getValue();
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onShow() throws Exception {
         reload();
@@ -69,8 +121,9 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
 
             this.codeMSP = (CodeMSP) session.get(CodeMSP.class, idOfCode);
-            this.code = this.codeMSP.getCode();
-            this.description = this.codeMSP.getDescription();
+            this.code = codeMSP.getCode();
+            this.description = codeMSP.getDescription();
+            this.selectedDiscount = codeMSP.getCategoryDiscount().getIdOfCategoryDiscount();
 
             session.close();
         } catch (Exception e) {
@@ -78,6 +131,22 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
         } finally {
             HibernateUtils.close(session, log);
         }
+    }
+
+    public Long getSelectedDiscount() {
+        return selectedDiscount;
+    }
+
+    public void setSelectedDiscount(Long selectedDiscount) {
+        this.selectedDiscount = selectedDiscount;
+    }
+
+    public void setDiscounts(List<SelectItem> discounts) {
+        this.discounts = discounts;
+    }
+
+    public List<SelectItem> getDiscounts() {
+        return discounts;
     }
 
     public Long getIdOfCode() {

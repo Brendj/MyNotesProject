@@ -4,9 +4,10 @@
 
 CREATE TABLE cf_code_msp
 (
-    idofcode    bigserial primary key,
-    code        INTEGER      not null unique,
-    description varchar(512) not null
+    idofcode             bigserial primary key,
+    code                 INTEGER      not null unique,
+    description          varchar(512) not null,
+    idofcategorydiscount bigint       not null references cf_categorydiscounts (idofcategorydiscount) on update no action on delete cascade
 );
 
 alter table CF_DiscountRules

@@ -28,6 +28,14 @@
             </f:facet>
             <h:outputText styleClass="output-text" value="#{item.description}" />
         </rich:column>
+        <rich:column headerClass="center-aligned-column" style="text-align:left">
+            <f:facet name="header">
+                <h:panelGroup>
+                    <h:outputText styleClass="output-text" escape="true" value="Льгота ИС ПП" />
+                </h:panelGroup>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{item.categoryDiscount.categoryName}" />
+        </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
                      style="text-align:center">
             <f:facet name="header">

@@ -10,6 +10,7 @@ public class CodeMSP {
     private Long idOfCode;
     private Integer code;
     private String description;
+    private CategoryDiscount categoryDiscount;
 
     public Long getIdOfCode() {
         return idOfCode;
@@ -33,6 +34,14 @@ public class CodeMSP {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public CategoryDiscount getCategoryDiscount() {
+        return categoryDiscount;
+    }
+
+    public void setCategoryDiscount(CategoryDiscount categoryDiscount) {
+        this.categoryDiscount = categoryDiscount;
     }
 
     @Override

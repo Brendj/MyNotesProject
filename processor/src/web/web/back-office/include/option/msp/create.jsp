@@ -19,6 +19,11 @@
     <h:inputText value="#{codeMSPCreatePage.code}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Описание кода МСП" styleClass="output-text" />
     <h:inputTextarea value="#{codeMSPCreatePage.description}" styleClass="input-text" rows="5" cols="64" />
+    <h:outputText value="Льгота ИС ПП" styleClass="output-text"/>
+    <h:selectOneListbox id="discountSelectCreate" value="#{codeMSPCreatePage.selectedDiscount}" size="1"
+                        styleClass="output-text">
+        <f:selectItems value="#{codeMSPCreatePage.discounts}" />
+    </h:selectOneListbox>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать код" action="#{codeMSPCreatePage.onSave()}"

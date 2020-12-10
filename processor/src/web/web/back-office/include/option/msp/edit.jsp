@@ -20,6 +20,11 @@
     <h:inputText value="#{codeMSPEditPage.code}" styleClass="input-text" maxlength="32" />
     <h:outputText escape="true" value="Описание кода МСП" styleClass="output-text" />
     <h:inputTextarea value="#{codeMSPEditPage.description}" styleClass="input-text" rows="5" cols="64" />
+    <h:outputText value="Льгота ИС ПП" styleClass="output-text"/>
+    <h:selectOneListbox id="discountSelectEdit" value="#{codeMSPEditPage.selectedDiscount}" size="1"
+                        styleClass="output-text">
+        <f:selectItems value="#{codeMSPEditPage.discounts}" />
+    </h:selectOneListbox>
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{codeMSPEditPage.save()}" reRender="mainMenu, workspaceTogglePanel"

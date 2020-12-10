@@ -12,5 +12,7 @@
         </id>
         <property name="code" column="code" type="integer" not-null="true"/>
         <property name="description" column="description" type="string" length="512" not-null="true"/>
+        <many-to-one name="categoryDiscount" class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount"
+                     column="idofcategorydiscount" lazy="false" not-null="true"/>
     </class>
 </hibernate-mapping>

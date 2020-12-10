@@ -5,7 +5,10 @@
 package ru.axetta.ecafe.processor.web.ui.option.msp;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -16,6 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.model.SelectItem;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 @Component
 @Scope("session")
 public class CodeMSPCreatePage extends BasicWorkspacePage {
@@ -23,6 +32,37 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
     
     private Integer code;
     private String description;
+    private Long selectedDiscount;
+
+    private List<SelectItem> discounts = loadDiscounts();
+
+    private List<SelectItem> loadDiscounts() {
+        List<SelectItem> result = new LinkedList<>();
+        try {
+            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOService
+                    .getInstance().getCategoryDiscountDSZNList();
+            Set<CategoryDiscount> set = new HashSet<>();
+
+            result.add(new SelectItem(null, ""));
+
+            for(CategoryDiscountDSZN category : categoryDiscountDSZNList){
+                if(category.getCategoryDiscount() != null){
+                    set.add(category.getCategoryDiscount());
+                }
+            }
+
+            for(CategoryDiscount c : set){
+                SelectItem item = new SelectItem(
+                        c.getIdOfCategoryDiscount(),
+                        c.getCategoryName());
+                result.add(item);
+            }
+        } catch (Exception e){
+            log.error("Can't load categoryDiscounts", e);
+        }
+        return result;
+    }
+
 
     public Integer getCode() {
         return code;
@@ -38,6 +78,22 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getSelectedDiscount() {
+        return selectedDiscount;
+    }
+
+    public void setSelectedDiscount(Long selectedDiscount) {
+        this.selectedDiscount = selectedDiscount;
+    }
+
+    public void setDiscounts(List<SelectItem> discounts) {
+        this.discounts = discounts;
+    }
+
+    public List<SelectItem> getDiscounts() {
+        return discounts;
     }
 
     @Override
@@ -56,6 +112,11 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
             CodeMSP codeMSP = new CodeMSP();
             codeMSP.setDescription(description);
             codeMSP.setCode(code);
+
+            if(selectedDiscount != null){
+                CategoryDiscount discount = (CategoryDiscount) session.get(CategoryDiscount.class, selectedDiscount);
+                codeMSP.setCategoryDiscount(discount);
+            }
 
             session.save(codeMSP);
 
