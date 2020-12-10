@@ -292,6 +292,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text">
         <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" action="#{mainPage.orgEditPage.changeSubscriptionFeeding}" />
     </h:selectBooleanCheckbox>
+    <h:outputText escape="true" value="Функционал проверки даты в заявке на питание" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.goodDateCheck}" styleClass="input-text"/>
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
