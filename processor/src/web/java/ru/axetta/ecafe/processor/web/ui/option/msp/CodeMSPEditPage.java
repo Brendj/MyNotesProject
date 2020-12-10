@@ -101,15 +101,6 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
         }
     }
 
-    private Long findByName(String selectedDiscount) {
-        for(SelectItem i : discounts){
-            if(i.getLabel().equals(selectedDiscount)){
-                return (Long) i.getValue();
-            }
-        }
-        return null;
-    }
-
     @Override
     public void onShow() throws Exception {
         reload();
