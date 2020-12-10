@@ -8,7 +8,8 @@
 
 -- Пакет обновлений 244
 
---811
-ALTER TABLE public.cf_orgs ADD gooddatecheck bool NULL;
+ALTER TABLE cf_orgs ADD gooddatecheck bool NULL;
+
+--! ФИНАЛИЗИРОВАН 10.12.2020, НЕ МЕНЯТЬ
 
 
