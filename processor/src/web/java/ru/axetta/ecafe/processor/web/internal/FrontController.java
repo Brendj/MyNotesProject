@@ -328,11 +328,19 @@ public class FrontController extends HttpServlet {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItem (фронт)");
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org != null)
-        {
-            clientsMobileHistory.setOrg(org);
+        if (orgId != null) {
+            Org org = DAOService.getInstance().getOrg(orgId);
+            if (org != null) {
+                clientsMobileHistory.setOrg(org);
+            }
             clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+        }
+        else
+        {
+            clientsMobileHistory.setShowing("АРМ");
+        }
+        if (guidStaff != null)
+        {
             clientsMobileHistory.setStaffguid(guidStaff);
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
@@ -358,10 +366,20 @@ public class FrontController extends HttpServlet {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItemInternal (фронт)");
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org != null) {
-            clientsMobileHistory.setOrg(org);
+        if (orgId != null) {
+            Org org = DAOService.getInstance().getOrg(orgId);
+            if (org != null) {
+                clientsMobileHistory.setOrg(org);
+            }
             clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+        }
+        else
+        {
+            clientsMobileHistory.setShowing("АРМ");
+        }
+        if (guidStaff != null)
+        {
+            clientsMobileHistory.setStaffguid(guidStaff);
         }
         clientsMobileHistory.setStaffguid(guidStaff);
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
@@ -385,10 +403,20 @@ public class FrontController extends HttpServlet {
         }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeEmployeeItem (фронт)");
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org != null) {
-            clientsMobileHistory.setOrg(org);
+        if (orgId != null) {
+            Org org = DAOService.getInstance().getOrg(orgId);
+            if (org != null) {
+                clientsMobileHistory.setOrg(org);
+            }
             clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+        }
+        else
+        {
+            clientsMobileHistory.setShowing("АРМ");
+        }
+        if (guidStaff != null)
+        {
+            clientsMobileHistory.setStaffguid(guidStaff);
         }
         clientsMobileHistory.setStaffguid(guidStaff);
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
@@ -1251,10 +1279,21 @@ public class FrontController extends HttpServlet {
                 boolean noComment = true;
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
-                Org org = DAOService.getInstance().getOrg(orgId);
-                clientsMobileHistory.setOrg(org);
-                clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
-                clientsMobileHistory.setStaffguid(guidStaff);
+                if (orgId != null) {
+                    Org org = DAOService.getInstance().getOrg(orgId);
+                    if (org != null) {
+                        clientsMobileHistory.setOrg(org);
+                    }
+                    clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+                }
+                else
+                {
+                    clientsMobileHistory.setShowing("АРМ");
+                }
+                if (guidStaff != null)
+                {
+                    clientsMobileHistory.setStaffguid(guidStaff);
+                }
                 long idOfClient = ClientManager
                         .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment,
                                 clientsMobileHistory);
