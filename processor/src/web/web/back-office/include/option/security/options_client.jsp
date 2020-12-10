@@ -32,6 +32,20 @@
         <h:outputText escape="true" value="Период блокировки аккаунта после максимального числа неудачных попыток ввода логина/пароля (в минутах)" styleClass="output-text" />
         <h:inputText value="#{mainPage.optionsSecurityClientPage.clientTmpBlockAccTime}" maxlength="10"
                      styleClass="input-text" style="margin-left: 10px;" />
+
+        <h:outputText escape="true" value="Время автоматического выхода из УЗ пользователя (в минутах, минимум 15 минут)" styleClass="output-text" />
+        <h:inputText value="#{mainPage.optionsSecurityClientPage.userIdleTimeout}" maxlength="10"
+                     styleClass="input-text" style="margin-left: 10px;" />
+
+        <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
+        <rich:dataTable value="#{mainPage.optionsSecurityClientPage.securityClientAuthorizationItems}" var="securityClientAuthorizationItem">
+            <rich:column>
+                <h:selectBooleanCheckbox value="#{securityClientAuthorizationItem.enabled}" styleClass="output-text" />
+            </rich:column>
+            <rich:column>
+                <h:outputText escape="true" value="#{securityClientAuthorizationItem.optionName}" styleClass="output-text" />
+            </rich:column>
+        </rich:dataTable>
     </h:panelGrid>
 
     <h:panelGrid columns="1" styleClass="borderless-grid">

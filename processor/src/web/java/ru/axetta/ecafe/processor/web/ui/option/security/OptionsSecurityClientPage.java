@@ -10,6 +10,9 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: i.semenov
@@ -24,6 +27,8 @@ public class OptionsSecurityClientPage extends BasicWorkspacePage {
     private Integer clientPeriodPasswordChange;
     private Integer clientMaxAuthFaultCount;
     private Integer clientTmpBlockAccTime;
+    private Integer userIdleTimeout;
+    private List<SecurityClientAuthorizationItem> securityClientAuthorizationItems = new ArrayList<>();
 
     public void fill(Session session) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -32,15 +37,34 @@ public class OptionsSecurityClientPage extends BasicWorkspacePage {
         clientPeriodPasswordChange = runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_PERIOD_PASSWORD_CHANGE);
         clientMaxAuthFaultCount = runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_MAX_AUTH_FAULT_COUNT);
         clientTmpBlockAccTime = runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_TMP_BLOCK_ACC_TIME);
+        userIdleTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_USER_IDLE_TIMEOUT);
+        fillSecurityClientAuthorizationItems(runtimeContext);
+    }
+
+    private void fillSecurityClientAuthorizationItems(RuntimeContext runtimeContext) {
+        securityClientAuthorizationItems.clear();
+        securityClientAuthorizationItems.add(new SecurityClientAuthorizationItem(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_ADMIN,
+                runtimeContext.getOptionValueBool(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_ADMIN), "АРМ администратора ОО"));
+        securityClientAuthorizationItems.add(new SecurityClientAuthorizationItem(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_CASHIER,
+                runtimeContext.getOptionValueBool(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_CASHIER), "АРМ кассира (АРМ быстрые продажи)"));
+        securityClientAuthorizationItems.add(new SecurityClientAuthorizationItem(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_SECURITY,
+                runtimeContext.getOptionValueBool(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_SECURITY), "АРМ охранника"));
+        securityClientAuthorizationItems.add(new SecurityClientAuthorizationItem(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_LIBRARY,
+                runtimeContext.getOptionValueBool(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_LIBRARY), "АРМ библиотекаря"));
     }
 
     public void save() {
+        if (userIdleTimeout < 15) {
+            printError("Время автоматического выхода из УЗ пользователя должно быть не менее 15 минут");
+            return;
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         runtimeContext.setOptionValue(Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_LOGIN_REUSE, clientPeriodBlockLoginReUse);
         runtimeContext.setOptionValue(Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_UNUSED_LOGIN_AFTER, clientPeriodBlockUnusedLogin);
         runtimeContext.setOptionValue(Option.OPTION_SECURITY_CLIENT_PERIOD_PASSWORD_CHANGE, clientPeriodPasswordChange);
         runtimeContext.setOptionValue(Option.OPTION_SECURITY_CLIENT_MAX_AUTH_FAULT_COUNT, clientMaxAuthFaultCount);
         runtimeContext.setOptionValue(Option.OPTION_SECURITY_CLIENT_TMP_BLOCK_ACC_TIME, clientTmpBlockAccTime);
+        runtimeContext.setOptionValue(Option.OPTION_SECURITY_CLIENT_USER_IDLE_TIMEOUT, userIdleTimeout);
         RuntimeContext.getInstance().saveOptionValues();
         printMessage("Настройки сохранены. Для применения необходим перезапуск");
     }
@@ -88,5 +112,22 @@ public class OptionsSecurityClientPage extends BasicWorkspacePage {
 
     public void setClientTmpBlockAccTime(Integer clientTmpBlockAccTime) {
         this.clientTmpBlockAccTime = clientTmpBlockAccTime;
+    }
+
+    public Integer getUserIdleTimeout() {
+        return userIdleTimeout;
+    }
+
+    public void setUserIdleTimeout(Integer userIdleTimeout) {
+        this.userIdleTimeout = userIdleTimeout;
+    }
+
+    public List<SecurityClientAuthorizationItem> getSecurityClientAuthorizationItems() {
+        return securityClientAuthorizationItems;
+    }
+
+    public void setSecurityClientAuthorizationItems(
+            List<SecurityClientAuthorizationItem> securityClientAuthorizationItems) {
+        this.securityClientAuthorizationItems = securityClientAuthorizationItems;
     }
 }
