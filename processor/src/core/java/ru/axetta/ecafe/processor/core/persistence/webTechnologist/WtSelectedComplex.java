@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-
 import java.util.Objects;
 
 public class WtSelectedComplex {
@@ -20,6 +18,11 @@ public class WtSelectedComplex {
     public WtSelectedComplex(WtComplex wtComplex) {
         this.wtComplex = wtComplex;
         this.isChecked = false;
+    }
+
+    public WtSelectedComplex(WtComplex wtComplex, boolean isChecked) {
+        this.wtComplex = wtComplex;
+        this.isChecked = isChecked;
     }
 
     @Override
@@ -55,11 +58,4 @@ public class WtSelectedComplex {
         isChecked = checked;
     }
 
-    public String getSupplierName() {
-        return DAOService.getInstance().getSupplierName(wtComplex);
-    }
-
-    public Long getIdOfSupplier() {
-        return DAOService.getInstance().getIdOfSupplier(wtComplex);
-    }
 }

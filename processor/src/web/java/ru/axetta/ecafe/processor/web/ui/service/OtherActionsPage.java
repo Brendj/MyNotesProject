@@ -594,6 +594,18 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    public void checkPreorderClientGroups() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .checkPreorderClientGroups(new PreorderRequestsReportServiceParam(new Date()));
+            printMessage("Проверка групп клиентов завершена");
+        } catch (Exception e) {
+            getLogger().error("Error create checkPreorderClientGroups: ", e);
+            printError("Во время проверки групп клиентов произошла ошибка с текстом " + e
+                    .getMessage());
+        }
+    }
+
     public void relevancePreordersToMenu() throws Exception {
         try {
             RuntimeContext.getAppContext().getBean(PreorderOperationsService.class)
