@@ -115,14 +115,14 @@ public class ClientBalanceByDayReportPage extends OnlineReportPageOnePerUser imp
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            ClientBalanceByDayReport.Builder reportBuilder = new ClientBalanceByDayReport.Builder("", getClients());
+            ClientBalanceByDayReport.Builder reportBuilder = new ClientBalanceByDayReport.Builder("");
             final Long idOfContragent = contragent == null ? null : contragent.getIdOfContragent();
             Date date = CalendarUtils.addOneDay(startDate);
             localCalendar.setTime(date);
             localCalendar.add(Calendar.SECOND, -1);
             startDate = localCalendar.getTime();
             clientsBalance = reportBuilder.buildReportItems(persistenceSession, idOfContragent, idOfOrgList, startDate,
-                    clientFilter.getClientGroupId(), clientFilter.getClientBalanceCondition(), getClients());
+                    clientFilter.getClientGroupId(), clientFilter.getClientBalanceCondition());
             persistenceTransaction.commit();
             persistenceTransaction = null;
             totalBalance = 0L;
@@ -153,7 +153,7 @@ public class ClientBalanceByDayReportPage extends OnlineReportPageOnePerUser imp
         if (StringUtils.isEmpty(templateFilename)) {
             return;
         }
-        ClientBalanceByDayReport.Builder builder = new ClientBalanceByDayReport.Builder(templateFilename, getClients());
+        ClientBalanceByDayReport.Builder builder = new ClientBalanceByDayReport.Builder(templateFilename);
         if (!CollectionUtils.isEmpty(idOfOrgList)) {
             String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
@@ -235,42 +235,5 @@ public class ClientBalanceByDayReportPage extends OnlineReportPageOnePerUser imp
         } else {
             this.contragent = null;
         }
-    }
-
-    public String getStringClientList() {
-        List<String> val = new ArrayList<String>();
-        for (ClientSelectListPage.Item item : getClientList()) {
-            val.add(item.getCaption());
-        }
-        if (val.isEmpty()) {
-            return "";
-        }
-        else {
-            return val.toString();
-        }
-    }
-
-    @Override
-    public void completeClientSelection(Session session, List<ClientSelectListPage.Item> items) throws Exception {
-        Client cl = null;
-        if (items != null) {
-            getClientList().clear();
-            for (ClientSelectListPage.Item item : items) {
-                getClientList().add(item);
-            }
-        }
-        filterClient = getStringClientList();
-    }
-
-    public List<ClientSelectListPage.Item> getClientList() {
-        return clientList;
-    }
-
-    private List<Long> getClients() {
-        List<Long> clients = new ArrayList<Long>();
-        for(ClientSelectListPage.Item item : clientList) {
-            clients.add(item.getIdOfClient());
-        }
-        return clients;
     }
 }
