@@ -299,7 +299,8 @@
                         </a4j:outputPanel>
 
                         <a4j:outputPanel ajaxRendered="true">
-                            <a4j:commandLink rendered="#{detail.ppStateNotSelected}"
+                            <a4j:commandLink reRender="taloonPreorderVerificationTable"
+                                             rendered="#{detail.ppStateNotSelected}"
                                              action="#{detail.cancelPpState}"
                                              oncomplete="if (#{detail.needFillShippedQty}) { alert('Заполните отгрузку ПП'); }"
                                              onclick="if (#{!detail.allowedSetSecondFlag}) { alert('Операция запрещена'); return false; }"
