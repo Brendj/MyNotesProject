@@ -164,6 +164,7 @@ public class Org implements Serializable {
     private String founder;
     private String subordination;
     private Long orgIdFromNsi;
+    private Boolean gooddatecheck;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1315,4 +1316,14 @@ public class Org implements Serializable {
     public Long getOrgIdFromNsi() { return orgIdFromNsi; }
 
     public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
+
+    public Boolean getGooddatecheck() {
+        if (gooddatecheck == null)
+            return true;
+        return gooddatecheck;
+    }
+
+    public void setGooddatecheck(Boolean gooddatecheck) {
+        this.gooddatecheck = gooddatecheck;
+    }
 }

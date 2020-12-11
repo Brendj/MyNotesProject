@@ -56,6 +56,14 @@ public enum  DocumentStateFilter {
         return state;
     }
 
+    public static Integer[] convertToOrdinals(DocumentState[] states) {
+        Integer[] stateOrdinals = new Integer[states.length];
+        for (int i = 0; i < states.length; i++) {
+            stateOrdinals[i] = states[i].ordinal();
+        }
+        return stateOrdinals;
+    }
+
     @Override
     public String toString() {
         return description;
