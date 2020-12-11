@@ -12,6 +12,7 @@
 <h:panelGrid id="optionsSecurityClientPage" binding="#{mainPage.optionsSecurityClientPage.pageComponent}"
              styleClass="borderless-grid">
 
+    <h:outputText escape="true" value="Общие настройки" styleClass="output-text-strong" />
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Период смены пароля (в днях)" styleClass="output-text" />
         <h:inputText value="#{mainPage.optionsSecurityClientPage.clientPeriodPasswordChange}" maxlength="10"
@@ -32,21 +33,61 @@
         <h:outputText escape="true" value="Период блокировки аккаунта после максимального числа неудачных попыток ввода логина/пароля (в минутах)" styleClass="output-text" />
         <h:inputText value="#{mainPage.optionsSecurityClientPage.clientTmpBlockAccTime}" maxlength="10"
                      styleClass="input-text" style="margin-left: 10px;" />
-
-        <h:outputText escape="true" value="Время автоматического выхода из УЗ пользователя (в минутах, минимум 15 минут)" styleClass="output-text" />
-        <h:inputText value="#{mainPage.optionsSecurityClientPage.userIdleTimeout}" maxlength="10"
-                     styleClass="input-text" style="margin-left: 10px;" />
-
-        <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
-        <rich:dataTable value="#{mainPage.optionsSecurityClientPage.securityClientAuthorizationItems}" var="securityClientAuthorizationItem">
-            <rich:column>
-                <h:selectBooleanCheckbox value="#{securityClientAuthorizationItem.enabled}" styleClass="output-text" />
-            </rich:column>
-            <rich:column>
-                <h:outputText escape="true" value="#{securityClientAuthorizationItem.optionName}" styleClass="output-text" />
-            </rich:column>
-        </rich:dataTable>
     </h:panelGrid>
+
+    <rich:separator height="1" />
+        <h:outputText escape="true" value="Модуль АРМ Администратора" styleClass="output-text-strong" />
+        <h:panelGrid columns="3" styleClass="borderless-grid">
+            <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armAdminAuthWithoutCardForAdmin}" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для администратора и администратора СКУД" styleClass="output-text" />
+            <h:outputText escape="true" value="" styleClass="output-text" />
+
+            <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armAdminAuthWithoutCardForOther}" label="" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для остальных пользователей" styleClass="output-text" />
+            <h:outputText escape="true" value="" styleClass="output-text" />
+
+            &nbsp;
+            <h:outputText escape="true" value="Время автоматического выхода из УЗ пользователя при бездействии (в минутах)" styleClass="output-text" />
+            <h:inputText value="#{mainPage.optionsSecurityClientPage.armAdminUserIdleTimeout}" maxlength="10"
+                         styleClass="input-text" style="margin-left: 10px;" />
+        </h:panelGrid>
+        <rich:separator height="1" />
+        <h:outputText escape="true" value="Модуль АРМ Кассира" styleClass="output-text-strong" />
+        <h:panelGrid columns="3" styleClass="borderless-grid">
+            <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armCashierAuthWithoutCard}" label="" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
+            <h:outputText escape="true" value="" styleClass="output-text" />
+
+            &nbsp;
+            <h:outputText escape="true" value="Время автоматического выхода из УЗ пользователя при бездействии (в минутах)" styleClass="output-text" />
+            <h:inputText value="#{mainPage.optionsSecurityClientPage.armCashierUserIdleTimeout}" maxlength="10"
+                         styleClass="input-text" style="margin-left: 10px;" />
+        </h:panelGrid>
+        <rich:separator height="1" />
+        <h:outputText escape="true" value="Модуль АРМ Охранника" styleClass="output-text-strong" />
+        <h:panelGrid columns="3" styleClass="borderless-grid">
+            <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armSecurityAuthWithoutCard}" label="" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
+            <h:outputText escape="true" value="" styleClass="output-text" />
+
+            &nbsp;
+            <h:outputText escape="true" value="Время автоматического выхода из УЗ пользователя при бездействии (в минутах)" styleClass="output-text" />
+            <h:inputText value="#{mainPage.optionsSecurityClientPage.armSecurityUserIdleTimeout}" maxlength="10"
+                         styleClass="input-text" style="margin-left: 10px;" />
+        </h:panelGrid>
+        <rich:separator height="1" />
+        <h:outputText escape="true" value="Модуль АРМ Библиотекаря" styleClass="output-text-strong" />
+        <h:panelGrid columns="3" styleClass="borderless-grid">
+            <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armLibraryAuthWithoutCard}" label="" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
+            <h:outputText escape="true" value="" styleClass="output-text" />
+
+            &nbsp;
+            <h:outputText escape="true" value="Время автоматического выхода из УЗ пользователя при бездействии (в минутах)" styleClass="output-text" />
+            <h:inputText value="#{mainPage.optionsSecurityClientPage.armLibraryUserIdleTimeout}" maxlength="10"
+                         styleClass="input-text" style="margin-left: 10px;" />
+        </h:panelGrid>
+
 
     <h:panelGrid columns="1" styleClass="borderless-grid">
         <a4j:commandButton value="Применить" action="#{mainPage.optionsSecurityClientPage.save()}"
