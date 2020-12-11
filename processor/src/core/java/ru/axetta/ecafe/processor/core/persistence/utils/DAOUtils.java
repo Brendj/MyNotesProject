@@ -2102,6 +2102,7 @@ public class DAOUtils {
         return em.createQuery("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
                 + "left join fetch wc.wtAgeGroupItem ageItem "
                 + "left join fetch wc.wtDietType dietType "
+                + "left join fetch wc.contragent contragent "
                 + "where wc.idOfComplex in :ids")
                 .setParameter("ids", ids)
                 .getResultList();

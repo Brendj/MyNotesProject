@@ -1335,6 +1335,33 @@ public class PreorderDAOService {
     }
 
     @Transactional
+    public void checkPreorderClientGroups(PreorderRequestsReportServiceParam params) {
+        logger.info("Start checkPreorderClientGroups process");
+        long nextVersion;
+        Query query = em.createQuery("select pc, c.clientGroup from PreorderComplex pc join pc.client c "
+                + "where pc.preorderDate > :date and pc.deletedState = false "
+                + params.getJPACondition()
+                + "order by pc.preorderDate");
+        query.setParameter("date", new Date());
+        List list = query.getResultList();
+        for (Object obj : list) {
+            Object[] row = (Object[]) obj;
+            PreorderComplex preorderComplex = (PreorderComplex) row[0];
+            ClientGroup clientGroup = (ClientGroup) row[1];
+            if (clientGroup != null) {
+                if (clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+                    if (isGoodRequestExists(preorderComplex)) {
+                        continue;
+                    }
+                    nextVersion = nextVersionByPreorderComplex();
+                    testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true, false);
+                }
+            }
+        }
+        logger.info("End checkPreorderClientGroups process");
+    }
+
+    @Transactional
     public List<PreorderComplex> getPreorderComplexListForRelevanceToMenu(PreorderRequestsReportServiceParam params) {
         Query query = em.createQuery("select pc from PreorderComplex pc left join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
                 + "where pc.preorderDate > :date and pc.deletedState = false "

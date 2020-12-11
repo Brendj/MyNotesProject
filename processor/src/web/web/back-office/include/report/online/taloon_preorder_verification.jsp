@@ -1,6 +1,5 @@
 <%--
-  ~ Copyright (c) 2019. Axe
-  tta LLC. All Rights Reserved.
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
   --%>
 
 <%--
@@ -15,15 +14,6 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="ui" uri="http://richfaces.org/a4j" %>
-<script language="javascript">
-    function disableButtons(value) {
-        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateButton").disabled = value;
-        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:xlsButton").disabled = value;
-        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clearButton").disabled = value;
-    }
-</script>
 
 <h:panelGrid id="taloonPreorderVerificationPanelGrid" binding="#{mainPage.taloonPreorderVerificationPage.pageComponent}"
              styleClass="borderless-grid">
@@ -69,13 +59,16 @@
             <a4j:commandButton value="Обновить" action="#{mainPage.taloonPreorderVerificationPage.reload}"
                                reRender="taloonPreorderVerificationPanelGrid" styleClass="command-button"
                                status="reportGenerateStatus" id="reloadButton"/>
-
-            <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
-                               reRender="buttons" styleClass="command-button"
-                               disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
+            <a4j:outputPanel ajaxRendered="true">
+                <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
+                                   reRender="taloonPreorderVerificationPanelGrid" styleClass="command-button"
+                                   disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
                                mainPage.taloonPreorderVerificationPage.needFillQty}"
-                               status="reportGenerateStatus" id="applyAbove"/>
+                                   status="reportGenerateStatus" id="applyAbove"/>
+            </a4j:outputPanel>
         </h:panelGrid>
+    </h:panelGroup>
+
         <h:panelGrid styleClass="borderless-grid">
             <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                            warnClass="warn-messages"/>
@@ -246,15 +239,13 @@
                                          rendered="#{detail.enableEditShippedQty and !detail.needFillShippedQty}"
                                          validatorMessage="Поле Отгрузка не может содержать более 4 символов">
                             <f:validateLength maximum="4"/>
-                            <a4j:support event="onchange" action="#{detail.setChangedData(true)}"
-                                         reRender="buttons"/>
+                            <a4j:support event="onchange" action="#{detail.setChangedData(true)}" />
                         </h:inputTextarea>
                         <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
                                          rendered="#{detail.enableEditShippedQty and detail.needFillShippedQty}"
                                          validatorMessage="Заполните поле Отгрузка">
                             <f:validateLongRange minimum="0" maximum="9999"/>
-                            <a4j:support event="onchange" action="#{detail.setChangedData(true)}"
-                                         reRender="buttons"/>
+                            <a4j:support event="onchange" action="#{detail.setChangedData(true)}" />
                         </h:inputTextarea>
                         <h:outputText escape="false" value="<strong>"
                                       rendered="#{detail.summaryDay}"/>
@@ -297,58 +288,48 @@
                     <%--        Статус ПП--%>
                     <rich:column headerClass="column-header">
                         <%--            Изменить статус записи--%>
-                        <a4j:commandLink reRender="buttons"
-                                         rendered="#{detail.ppStateNotSelected}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.switchPpState}"
-                                         onclick="if (#{!detail.allowedSetFirstFlag}) { alert('Операция запрещена'); return false; }"
-                                         style="color:lightgray;">
-                            <f:setPropertyActionListener value="#{detail}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
-                            <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
-                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
-                            <h:graphicImage value="/images/taloons/applied-gray.png"/>
-                        </a4j:commandLink>
+                        <a4j:outputPanel ajaxRendered="true">
+                            <a4j:commandLink rendered="#{detail.ppStateNotSelected}"
+                                             action="#{detail.confirmPpState}"
+                                             onclick="if (#{!detail.allowedSetFirstFlag}) { alert('Операция запрещена'); return false; }"
+                                             style="color:lightgray;">
+                                <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
+                                <h:graphicImage value="/images/taloons/applied-gray.png"/>
+                            </a4j:commandLink>
+                        </a4j:outputPanel>
 
-                        <a4j:commandLink reRender="buttons"
-                                         rendered="#{detail.ppStateNotSelected}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.switchPpState}"
-                                         oncomplete="if (#{detail.needFillShippedQty}) { alert('Заполните отгрузку ПП'); }"
-                                         onclick="if (#{!detail.allowedSetSecondFlag}) { alert('Операция запрещена'); return false; }"
-                                         style="color:lightgray;">
-                            <f:setPropertyActionListener value="#{detail}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
-                            <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
-                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
-                            <h:graphicImage value="/images/taloons/canceled-gray.png"/>
-                        </a4j:commandLink>
+                        <a4j:outputPanel ajaxRendered="true">
+                            <a4j:commandLink reRender="taloonPreorderVerificationTable"
+                                             rendered="#{detail.ppStateNotSelected}"
+                                             action="#{detail.cancelPpState}"
+                                             oncomplete="if (#{detail.needFillShippedQty}) { alert('Заполните отгрузку ПП'); }"
+                                             onclick="if (#{!detail.allowedSetSecondFlag}) { alert('Операция запрещена'); return false; }"
+                                             style="color:lightgray;">
+                                <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
+                                <h:graphicImage value="/images/taloons/canceled-gray.png"/>
+                            </a4j:commandLink>
+                        </a4j:outputPanel>
 
-                        <a4j:commandLink reRender="buttons" rendered="#{detail.ppStateCanceled}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.resetPpState}"
-                                         onclick="if (#{!detail.allowedClearSecondFlag}) { alert('Операция запрещена'); return false; }">
-                            <f:setPropertyActionListener value="#{detail}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
-                            <f:setPropertyActionListener value="#{detail.getPpStateToClear}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
-                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
-                            <h:graphicImage value="/images/taloons/canceled.png"/>
-                        </a4j:commandLink>
+                        <a4j:outputPanel ajaxRendered="true">
+                            <a4j:commandLink rendered="#{detail.ppStateCanceled}"
+                                             action="#{detail.deselectPpState}"
+                                             onclick="if (#{!detail.allowedClearSecondFlag}) { alert('Операция запрещена'); return false; }">
+                                <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
+                                <h:graphicImage value="/images/taloons/canceled.png"/>
+                            </a4j:commandLink>
+                        </a4j:outputPanel>
 
-                        <a4j:commandLink reRender="buttons"
-                                         rendered="#{detail.ppStateConfirmed}"
-                                         action="#{detail.deselectPpState}"
-                                         onclick="if (#{!detail.allowedClearFirstFlag}) { alert('Операция запрещена'); return false; }">
-                            <f:setPropertyActionListener value="#{detail}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
-                            <f:setPropertyActionListener value="#{detail.getPpStateToClear}"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
-                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
-                            <h:graphicImage value="/images/taloons/applied.png"/>
-                        </a4j:commandLink>
+                        <a4j:outputPanel ajaxRendered="true">
+                            <a4j:commandLink rendered="#{detail.ppStateConfirmed}"
+                                             action="#{detail.deselectPpState}"
+                                             onclick="if (#{!detail.allowedClearFirstFlag}) { alert('Операция запрещена'); return false; }">
+                                <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
+                                <h:graphicImage value="/images/taloons/applied.png"/>
+                            </a4j:commandLink>
+                        </a4j:outputPanel>
 
                         <%--            Подтвердить для всего дня--%>
-                        <a4j:commandLink reRender="buttons"
+                        <a4j:commandLink reRender="taloonPreorderVerificationTable"
                                          rendered="#{detail.summaryDay and !detail.total and !detail.emptyTotal}"
                                          action="#{item.confirmPpState}"
                                          onclick="if (#{!item.allowedSetFirstFlag}) { alert('Операция запрещена'); return false; }">
@@ -356,7 +337,7 @@
                             <h:graphicImage value="/images/taloons/applied-big.png"/>
                         </a4j:commandLink>
                         <%--            Отменить выбор для всего дня--%>
-                        <a4j:commandLink reRender="buttons"
+                        <a4j:commandLink reRender="taloonPreorderVerificationTable"
                                          rendered="#{detail.summaryDay and !detail.total and !detail.emptyTotal}"
                                          action="#{item.deselectPpState}" style="color:lightgray;"
                                          onclick="if (#{!item.allowedClearFirstFlag}) { alert('Операция запрещена'); return false; }">
@@ -365,7 +346,7 @@
                         </a4j:commandLink>
 
                         <%--            Подтвердить для всего периода--%>
-                        <a4j:commandLink reRender="buttons"
+                        <a4j:commandLink reRender="taloonPreorderVerificationTable"
                                          rendered="#{detail.summaryDay and !detail.total and detail.emptyTotal}"
                                          action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay}"
                                          onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetPeriodFirstFlag}) { alert('Операция запрещена'); return false; }">
@@ -373,7 +354,7 @@
                             <h:graphicImage value="/images/taloons/applied-big.png"/>
                         </a4j:commandLink>
                         <%--            Отменить выбор для всего периода--%>
-                        <a4j:commandLink reRender="buttons"
+                        <a4j:commandLink reRender="taloonPreorderVerificationTable"
                                          rendered="#{detail.summaryDay and !detail.total and detail.emptyTotal}"
                                          action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay}"
                                          style="color:lightgray;"
@@ -391,19 +372,9 @@
                                          validatorMessage="Комментарий не может быть больше 128 символов">
                             <f:validateLength maximum="128"/>
                             <a4j:support event="onchange"
-                                         action="#{detail.setChangedData(true)}"
-                                         reRender="buttons"/>
+                                         action="#{detail.setChangedData(true)}" />
                         </h:inputTextarea>
                     </rich:column>
-
-<%--                    <rich:column headerClass="column-header">--%>
-<%--                        <h:inputText value="#{detail.comments}" styleClass="output-text" id="comment" maxlength="128"--%>
-<%--                                     rendered="#{!detail.summaryDay and !detail.total}">--%>
-<%--                            <a4j:support event="onchange"--%>
-<%--                                         action="#{detail.setChangedData(true)}"--%>
-<%--                                         reRender="buttons"/>--%>
-<%--                        </h:inputText>--%>
-<%--                    </rich:column>--%>
 
                     <%--        История изменений--%>
                     <rich:column>
@@ -420,7 +391,7 @@
 
             <f:facet name="footer">
                 <rich:datascroller for="taloonPreorderVerificationTable" renderIfSinglePage="false"
-                                   maxPages="5" fastControls="hide" stepControls="auto"
+                                   maxPages="3" fastControls="hide" stepControls="auto"
                                    boundaryControls="hide">
                     <a4j:support event="onpagechange"/>
                     <f:facet name="previous">
@@ -433,12 +404,15 @@
             </f:facet>
         </rich:dataTable>
 
+    <h:panelGroup id="button">
         <h:panelGrid styleClass="borderless-grid" columns="1">
-            <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
-                               disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
+            <a4j:outputPanel ajaxRendered="true">
+                <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
+                                   disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
                                mainPage.taloonPreorderVerificationPage.needFillQty}"
-                               reRender="taloonPreorderVerificationTable" styleClass="command-button"
-                               status="reportGenerateStatus" id="applyButton"/>
+                                   reRender="taloonPreorderVerificationTable" styleClass="command-button"
+                                   status="reportGenerateStatus" id="applyButton"/>
+            </a4j:outputPanel>
         </h:panelGrid>
     </h:panelGroup>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
