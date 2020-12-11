@@ -68,13 +68,23 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
     public void save(){
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+
+        if(code == null || code.equals(0)){
+            printError("Введите код МСП");
+            return;
+        }
+        if (StringUtils.isEmpty(description)) {
+            printError("Добавьте описание кода МСП");
+            return;
+        }
+        if(selectedDiscount == null || selectedDiscount.equals(0L)){
+            printError("Укажите льготу");
+            return;
+        }
+
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-
-            if (StringUtils.isEmpty(description)) {
-                throw new Exception("Добавьте описание кода МСП");
-            }
 
             CodeMSP codeMSP = (CodeMSP) persistenceSession.merge(this.codeMSP);
 

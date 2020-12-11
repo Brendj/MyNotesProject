@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -102,6 +103,19 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
     }
 
     public void onSave() {
+        if(code == null || code.equals(0)){
+            printError("Введите код МСП");
+            return;
+        }
+        if (StringUtils.isEmpty(description)) {
+            printError("Добавьте описание кода МСП");
+            return;
+        }
+        if(selectedDiscount == null || selectedDiscount.equals(0L)){
+            printError("Укажите льготу");
+            return;
+        }
+
         Session session = null;
         Transaction transaction = null;
 
