@@ -112,9 +112,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
             private String orgShortName;
             private Long contractId;
-            private String firstName;
-            private String surname;
-            private String secondName;
             private String groupName;
             private long totalBalance;
             private Long idOfClient;
@@ -129,9 +126,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 this.orgShortName = client.getOrg().getShortName();
                 this.contractId = client.getContractId();
                 final Person person = client.getPerson();
-                this.firstName = person.getFirstName();
-                this.surname = person.getSurname();
-                this.secondName = person.getSecondName();
                 if (client.getClientGroup() != null) {
                     this.groupName = client.getClientGroup().getGroupName();
                 } else {
@@ -179,36 +173,12 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 return contractId;
             }
 
-            public String getFirstName() {
-                return firstName;
-            }
-
-            public String getSurname() {
-                return surname;
-            }
-
-            public String getSecondName() {
-                return secondName;
-            }
-
             public long getTotalBalance() {
                 return totalBalance;
             }
 
             public void setContractId(Long contractId) {
                 this.contractId = contractId;
-            }
-
-            public void setFirstName(String firstName) {
-                this.firstName = firstName;
-            }
-
-            public void setSurname(String surname) {
-                this.surname = surname;
-            }
-
-            public void setSecondName(String secondName) {
-                this.secondName = secondName;
             }
 
             public void setTotalBalance(long totalBalance) {
@@ -225,12 +195,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
         }
 
         private final String templateFilename;
-        List<Long> clientsIds;
-
-        public Builder(String templateFilename, List<Long> clientsIds) {
-            this.templateFilename = templateFilename;
-            this.clientsIds = clientsIds;
-        }
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -268,25 +232,25 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, endTime, idOfOrgList, clientGroupId, clientBalanceCondition, clientsIds));
+                    createDataSource(session, endTime, idOfOrgList, clientGroupId, clientBalanceCondition));
             Date generateEndTime = new Date();
             return new ClientBalanceByDayReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, idOfContragent1);
         }
 
         private JRDataSource createDataSource(Session session, Date endTime, List<Long> idOfOrgList, Long clientGroupId,
-                Integer clientBalanceCondition, List<Long> clientsIds) throws Exception {
+                Integer clientBalanceCondition) throws Exception {
             Long idOfContragent1 = null;
             if (contragent != null) {
                 idOfContragent1 = contragent.getIdOfContragent();
             }
             List<ClientBalanceInfo> result = buildReportItems(session, idOfContragent1, idOfOrgList, endTime,
-                    clientGroupId, clientBalanceCondition, clientsIds);
+                    clientGroupId, clientBalanceCondition);
             return new JRBeanCollectionDataSource(result);
         }
 
         public List<ClientBalanceInfo> buildReportItems(Session session, Long idOfContragent, List<Long> idOfOrgList,
-                Date endTime, Long clientGroupId, Integer clientBalanceCondition, List<Long> clientsIds) {
+                Date endTime, Long clientGroupId, Integer clientBalanceCondition) {
 
             List<ClientBalanceInfo> result = new ArrayList<ClientBalanceInfo>();
 
@@ -319,12 +283,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
             }
 
             String clientWhere = "";
-            if (!clientsIds.isEmpty()) {
-                for (Long id: clientsIds) {
-                    clientWhere += id.toString() + ",";
-                }
-                clientWhere = "and c.idofclient in (" + clientWhere.substring(0, clientWhere.length()-1) +")";
-            }
 
             List infos = DAOService.getInstance().getClientBalanceInfos(orgs_str, groupWhere, endTime, new Date(System.currentTimeMillis()), clientWhere);
             for (Object obj : infos) {
@@ -334,9 +292,9 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 String orgShortName = (String)row[1];
                 String groupName = (String)row[2];
                 Long contractId = ((BigInteger)row[3]).longValue();
-                String surname = (String)row[4];
-                String firstName = (String)row[5];
-                String secondName = (String)row[6];
+                //String surname = (String)row[4];
+                //String firstName = (String)row[5];
+                //String secondName = (String)row[6];
                 Long limit = ((BigInteger)row[7]).longValue();
                 Long totalBalance = ((BigInteger)row[8]).longValue() - ((BigDecimal)row[9]).longValue();
                 String date = row[10] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger)row[10]).longValue()));
@@ -346,9 +304,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 clientItem.setOrgShortName(orgShortName);
                 clientItem.setGroupName(groupName);
                 clientItem.setContractId(contractId);
-                clientItem.setSurname(surname);
-                clientItem.setFirstName(firstName);
-                clientItem.setSecondName(secondName);
                 clientItem.setLimit(limit);
                 clientItem.setTotalBalance(totalBalance);
                 clientItem.setDate(date);
@@ -373,69 +328,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                         break;
                     case 4:
                         if (clientItem.getTotalBalance() != 0L) {
-                            result.add(clientItem);
-                        }
-                        break;
-                }
-            }
-            return result;
-        }
-
-        public List<ClientBalanceInfo> buildReportItems_old(Session session, Long idOfContragent, List<Long> idOfOrgList,
-                Date endTime, Long clientGroupId, Integer clientBalanceCondition) {
-            List<ClientBalanceInfo> result = new ArrayList<ClientBalanceInfo>();
-            DetachedCriteria idOfClientCriteria = DetachedCriteria.forClass(Client.class);
-            idOfClientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-            String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";
-            if (!clientGroupId.equals(ClientGroupMenu.CLIENT_ALL)) {
-                if (clientGroupId.equals(ClientGroupMenu.CLIENT_STUDENTS)) {
-                    idOfClientCriteria
-                            .add(Restrictions.not(Restrictions.in(cgFieldName, ClientGroupMenu.getNotStudent())));
-                } else {
-                    idOfClientCriteria.add(Restrictions.eq(cgFieldName, clientGroupId));
-                }
-            }
-            idOfClientCriteria.createCriteria("org", "o");
-            if (idOfContragent != null) {
-                idOfClientCriteria.add(Restrictions.eq("o.defaultSupplier.idOfContragent", idOfContragent));
-            }
-            idOfClientCriteria.setProjection(Property.forName("idOfClient"));
-
-            Criteria criteria = session.createCriteria(AccountTransaction.class);
-            criteria.add(Restrictions.lt("transactionTime", endTime));    // <
-            criteria.createCriteria("org", "o");
-            if (!CollectionUtils.isEmpty(idOfOrgList)) {
-                criteria.add(Restrictions.in("o.idOfOrg", idOfOrgList));
-            }
-            criteria.add(Property.forName("client.idOfClient").in(idOfClientCriteria));
-            criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum"))
-                    .add(Projections.groupProperty("client")).add(Projections.max("transactionTime")));
-            criteria.addOrder(Order.asc("client"));
-            //criteria.addOrder(Order.asc("client.person.fullName"));
-            List list = criteria.list();
-            for (Object obj : list) {
-                Object[] row = (Object[]) obj;
-                long balance = Long.valueOf(row[0].toString());
-                Client client = (Client) row[1];
-                String date = CalendarUtils.dateTimeToString((Date) row[2]);
-                ClientBalanceInfo clientItem = new ClientBalanceInfo(client, balance, date);
-
-                switch (clientBalanceCondition) {
-                    case 0:
-                        result.add(clientItem);
-                        break;
-                    case 1:
-                        if (clientItem.getTotalBalance() < 0L) {
-                            result.add(clientItem);
-                        }
-                        break;
-                    case 2:
-                        if (clientItem.getTotalBalance() == 0L) {
-                            result.add(clientItem);
-                        }
-                        break;
-                    case 3:
-                        if (clientItem.getTotalBalance() > 0L) {
                             result.add(clientItem);
                         }
                         break;

@@ -214,6 +214,9 @@ public class DTSZNDiscountsReviseService {
                                         applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason()));
+                        applicationForFood.setDiscountDateStart(info.getDateStart());
+                        applicationForFood.setDiscountDateEnd(info.getDateEnd());
+                        session.update(applicationForFood);
                     } else {
                         //1080.3
                         status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,

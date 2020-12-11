@@ -2372,6 +2372,7 @@ public class ClientManager {
 
     public static void resetFlagsOfAllClients(Org org, Session session) throws Exception {
         List<Client> clientList = DAOUtils.findClientsByOrg(session, org.getIdOfOrg());
+        if (clientList.size() == 0) return;
         Query q = session.createQuery("update PreorderFlag set informedSpecialMenu = false, allowedPreorder = false, "
                 + "lastUpdate = :date where client in :clientList");
         q.setParameter("date", new Date());

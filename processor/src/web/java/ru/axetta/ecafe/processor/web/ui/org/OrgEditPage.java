@@ -139,6 +139,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean preorderlp;
 
     private Boolean useWebArm;
+    private Boolean goodDateCheck;
     private Long orgIdFromNsi = null;
 
     public String getDefaultSupplierMode() {
@@ -433,6 +434,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         org.setPreorderlp(preorderlp);
         org.setUseWebArm(useWebArm);
+        org.setGooddatecheck(goodDateCheck);
         org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
 
         session.update(org);
@@ -590,6 +592,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
         this.useWebArm = org.getUseWebArm();
+        this.goodDateCheck = org.getGooddatecheck();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
     }
 
@@ -1263,6 +1266,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setSubordination(String subordination) {
         this.subordination = subordination;
+    }
+
+    public Boolean getGoodDateCheck() {
+        return goodDateCheck;
+    }
+
+    public void setGoodDateCheck(Boolean goodDateCheck) {
+        this.goodDateCheck = goodDateCheck;
     }
 
     public static class ContragentItem {
