@@ -68,7 +68,7 @@ public class RnipDAOService {
 
     @Transactional
     public void saveRnipMessage(SendRequestResponse requestResponse, Contragent contragent, RnipEventType eventType,
-            Date startDate, Date endDate) throws Exception {
+            Date startDate, Date endDate, int paging) throws Exception {
         /*JAXBContext jaxbContext = getSendRequestContext();
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter writer = new StringWriter();
@@ -76,7 +76,7 @@ public class RnipDAOService {
         String message = writer.toString();*/
         String message = "";
         RnipMessage rnipMessage = new RnipMessage(contragent, eventType, message,
-                requestResponse.getMessageMetadata().getMessageId(), startDate, endDate);
+                requestResponse.getMessageMetadata().getMessageId(), startDate, endDate, paging);
         entityManager.merge(rnipMessage);
     }
 

@@ -258,10 +258,12 @@ public class DeliveredServicesReportBuilder extends BasicReportForAllOrgJob.Buil
         String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10,11,12)) and " +
                 " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
         String sql =
-                "select cf_orgs.shortnameinfoservice, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
-                        + "split_part(cf_goods.fullname, '/', 2) as level2, "
-                        + "split_part(cf_goods.fullname, '/', 3) as level3, "
-                        + "split_part(cf_goods.fullname, '/', 4) as level4, " + "sum(cf_orderdetails.qty) as cnt, "
+                "select cf_orgs.shortnameinfoservice, "
+                        + "case when cf_orderdetails.idofgood is null then '' else split_part(cf_goods.fullname, '/', 1) end as level1, "
+                        + "case when cf_orderdetails.idofgood is null then '' else split_part(cf_goods.fullname, '/', 2) end as level2, "
+                        + "case when cf_orderdetails.idofgood is null then cf_wt_agegroup_items.description else split_part(cf_goods.fullname, '/', 3) end as level3, "
+                        + "case when cf_orderdetails.idofgood is null then cf_wt_diet_type.description else split_part(cf_goods.fullname, '/', 4) end as level4, "
+                        + "sum(cf_orderdetails.qty) as cnt, "
                         + "(cf_orderdetails.rprice + cf_orderdetails.socdiscount) price, "
                         + "sum(cf_orderdetails.qty) * (cf_orderdetails.rprice + cf_orderdetails.socdiscount) as sum, "
                         + "cf_orgs.shortaddress, "
@@ -270,11 +272,15 @@ public class DeliveredServicesReportBuilder extends BasicReportForAllOrgJob.Buil
                         + "from cf_orgs "
                         + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                         + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                        + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                        + "left join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                        + "left join cf_wt_complexes on cf_wt_complexes.idofcomplex = cf_orderdetails.idofcomplex "
+                        + "left join cf_wt_agegroup_items on cf_wt_agegroup_items.idofagegroupitem = cf_wt_complexes.idofagegroupitem "
+                        + "left join cf_wt_diet_type on cf_wt_diet_type.idofdiettype = cf_wt_complexes.idofdiettype "
                         + "where cf_orderdetails.socdiscount>0  and cf_orderdetails.rprice=0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
                         + typeCondition + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                         + " cf_orders.createddate between :start and :end  "
-                        + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, shortaddress, cf_orders.createddate "
+                        + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, "
+                        + "level4, cf_orderdetails.rprice, cf_orderdetails.socdiscount, shortaddress, cf_orders.createddate "
                         + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
         Query query = session.createSQLQuery(sql);//.createQuery(sql);
         query.setParameter("start", start.getTime());
@@ -333,6 +339,7 @@ public class DeliveredServicesReportBuilder extends BasicReportForAllOrgJob.Buil
 
             DeliveredServicesItem item1 = new DeliveredServicesItem(level1, level2, level3, nameOfGood,
                     null, null, null, officialname, orgNum, address, idoforg, createdDate);
+            if (level3 == null) continue;
             if(level3.equals("1,5-3") || level3.equals("1.5-3")) {
                 result.getList153().add(item);
                 summary37 += summary;

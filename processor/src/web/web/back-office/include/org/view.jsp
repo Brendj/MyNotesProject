@@ -231,6 +231,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.multiCardModeEnabled}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useWebArm}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Функционал проверки даты в заявке на питание" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.goodDateCheck}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />

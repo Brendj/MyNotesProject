@@ -21,5 +21,6 @@
         <property name="nodeName" column="nodeName" type="string"/>
         <many-to-one name="org" column="idOfOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true" lazy="false"/>
         <many-to-one name="client" column="idOfClient" class="ru.axetta.ecafe.processor.core.persistence.Client" not-null="true"/>
+        <many-to-one name="vendor" column="idOfVendor" class="ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor" lazy="false"/>
     </class>
 </hibernate-mapping>

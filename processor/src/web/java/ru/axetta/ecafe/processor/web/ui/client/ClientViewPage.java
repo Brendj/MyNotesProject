@@ -262,7 +262,6 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     // Kadyrov (22.12.2011)
     private String san;
-    private String guardsan;
 
     public String getSan() {
         return san;
@@ -270,14 +269,6 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public void setSan(String san) {
         this.san = san;
-    }
-
-    public String getGuardsan() {
-        return guardsan;
-    }
-
-    public void setGuardsan(String guardsan) {
-        this.guardsan = guardsan;
     }
 
     public String getClientGroupName() {
@@ -558,14 +549,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         // опекуны
         // (Kadyrov D) 23.12.2011
         this.san= client.getSan();
-        Set <GuardSan> guardSans = client.getGuardSan();
-        this.guardsan="";
-        for (GuardSan guard : guardSans) {
-            if (this.guardsan.length() > 0) {
-                this.guardsan = this.guardsan + ",";
-            }
-            this.guardsan = this.guardsan + guard.getGuardSan();
-        }
 
 
         ClientGroup group = client.getClientGroup();

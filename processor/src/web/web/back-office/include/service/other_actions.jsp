@@ -31,9 +31,6 @@
     <a4j:commandButton value="Запустить пересчет льготных правил" action="#{otherActionsPage.runBenefitsRecalculation}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
-    <a4j:commandButton value="Перестроить таблицу опекунов" action="#{otherActionsPage.runClientGuardSANRebuild}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-
     <a4j:commandButton value="Импорт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
@@ -199,6 +196,8 @@
                 <a4j:commandButton value="Проверка соответствия меню и предзаказа" action="#{otherActionsPage.relevancePreordersToMenu()}" id="relevancePreordersToMenu"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
                 <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО" action="#{otherActionsPage.relevancePreordersToOrgFlag()}" id="relevancePreordersToOrgFlag"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Проверка группы клиента" action="#{otherActionsPage.checkPreorderClientGroups()}" id="checkPreorderClientGroups"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
                 <a4j:commandButton value="Пересчет количественных показателей по предзаказам" action="#{otherActionsPage.preordersCheck()}" id="preordersCheck"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />

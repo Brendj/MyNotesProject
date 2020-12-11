@@ -69,7 +69,7 @@ public interface CardManager {
             String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception;
 
     Long createSmartWatchAsCard(Session session, Long idOfClient, Long trackerIdAsCardPrintedNo, Integer state, Date validTime, Integer lifeState,
-            String lockReason, Date issueTime, Long trackerUidAsCardNo, User user) throws Exception;
+            String lockReason, Date issueTime, Long trackerUidAsCardNo, User user, Integer cardSignCertNum) throws Exception;
 
     class NewCardItem{
         private Long cardPrintedNo;

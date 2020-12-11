@@ -103,7 +103,6 @@ public class Client {
     private Date disablePlanCreationDate;
     private Date disablePlanEndDate;
     private String san;
-    private Set<GuardSan> guardSan;
     private Long externalId;
     private String clientGUID;
     private String meshGUID;
@@ -146,6 +145,7 @@ public class Client {
     private String passportNumber;
     private String passportSeries;
     private Boolean hasActiveSmartWatch;
+    private SmartWatchVendor vendor;
     private String iacRegId;
     private Boolean multiCardMode;
 
@@ -370,14 +370,6 @@ public class Client {
 
     public static boolean isValidContractState(int contractState) {
         return contractState >= 0 && contractState < CONTRACT_STATE_NAMES.length;
-    }
-
-    public Set<GuardSan> getGuardSan() {
-        return guardSan;
-    }
-
-    public void setGuardSan(Set<GuardSan> guardSan) {
-        this.guardSan = guardSan;
     }
 
     public String getSan() {
@@ -1196,7 +1188,7 @@ public class Client {
     }
 
     public boolean clientHasActiveSmartWatch() {
-        return hasActiveSmartWatch == null ? false : hasActiveSmartWatch;
+        return hasActiveSmartWatch != null && hasActiveSmartWatch;
     }
 
     public void setHasActiveSmartWatch(Boolean hasActiveSmartWatch) {
@@ -1241,5 +1233,13 @@ public class Client {
 
     public void setUserOP(Boolean userOP) {
         this.userOP = userOP;
+    }
+
+    public SmartWatchVendor getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(SmartWatchVendor vendor) {
+        this.vendor = vendor;
     }
 }

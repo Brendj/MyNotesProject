@@ -293,7 +293,7 @@ public class ClientMigrationHistoryService {
                         guardian.setClientRegistryVersion(clientRegistryVersion);
                         session.update(guardian);
 
-                        ClientManager.addClientMigrationEntry(session, clientMigration.getOldOrg(), clientMigration.getOrg(),
+                        ClientManager.addClientMigrationEntry(session, clientMigration.getOldOrg(), null, clientMigration.getOrg(),
                                 guardian, ClientGroupMigrationHistory.MODIFY_AUTO_MODE, guardian.getClientGroup().getGroupName());
                     }
                     if (guardian.isSotrudnikMsk() || hasChildrenInOtherOrg) {

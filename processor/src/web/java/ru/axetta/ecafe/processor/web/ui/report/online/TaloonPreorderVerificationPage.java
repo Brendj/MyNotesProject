@@ -41,16 +41,8 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     private Date startDate;
     private Date endDate;
     private TaloonPreorderVerification builder;
-    private TaloonPreorderVerificationDetail currentTaloonPreorderVerificationDetail;
-    private TaloonPreorderVerificationComplex currentTaloonPreorderVerificationComplex;
-    private TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem;
-    private String currentState;
     private String remarksToShow;
-
     private boolean changedData;
-    private boolean needFillQty;
-    private boolean allowedSetPeriodFirstFlag;
-    private boolean allowedClearPeriodFirstFlag;
 
     private static final Logger logger = LoggerFactory.getLogger(TaloonPreorderVerificationPage.class);
 
@@ -116,43 +108,6 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         }
     }
 
-    public void resetPpState() {
-        for (TaloonPreorderVerificationItem item : items) {
-            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                    if (detail.equals(currentTaloonPreorderVerificationDetail)) {
-                        detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    //public void deselectPpState() {
-    //    changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
-    //}
-
-    public void switchPpState() {
-        for (TaloonPreorderVerificationItem item : items) {
-            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                    if (detail.equals(currentTaloonPreorderVerificationDetail)) {
-                        if (currentState.equals(TaloonPreorderVerificationItem.MAKE_CANCEL)) {
-                            detail.setShippedQty(null);
-                            detail.setShippedSum(0L);
-                            detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
-                        }
-                        if (currentState.equals(TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
-                            detail.performConfirm();
-                        }
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
     public void confirmPpStateAllDay() {
         changePpStateAllDay(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
     }
@@ -170,19 +125,19 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     public boolean isAllowedSetPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
             if (item.isAllowedSetFirstFlag()) {
-                return allowedSetPeriodFirstFlag = true;
+                return true;
             }
         }
-        return allowedSetPeriodFirstFlag = false;
+        return false;
     }
 
     public boolean isAllowedClearPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
             if (item.isAllowedClearFirstFlag()) {
-                return allowedClearPeriodFirstFlag = true;
+                return true;
             }
         }
-        return allowedClearPeriodFirstFlag = false;
+        return false;
     }
 
     public boolean isChangedData() {
@@ -203,18 +158,18 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public boolean isNeedFillQty() {
         if (items == null) {
-            return needFillQty = false;
+            return false;
         }
         for (TaloonPreorderVerificationItem item : items) {
             for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                 for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                     if (detail.isNeedFillShippedQty()) {
-                        return needFillQty = true;
+                        return true;
                     }
                 }
             }
         }
-        return needFillQty = false;
+        return false;
     }
 
     public boolean isPpStateNotSelected() {
@@ -264,51 +219,6 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-
-    public TaloonPreorderVerificationDetail getCurrentTaloonPreorderVerificationItemDetail() {
-        return currentTaloonPreorderVerificationDetail;
-    }
-
-    public void setCurrentTaloonPreorderVerificationItemDetail(
-            TaloonPreorderVerificationDetail currentTaloonPreorderVerificationDetail) {
-        this.currentTaloonPreorderVerificationDetail = currentTaloonPreorderVerificationDetail;
-    }
-
-    public String getCurrentState() {
-        return currentState;
-    }
-
-    public void setCurrentState(String currentState) {
-        this.currentState = currentState;
-    }
-
-    public TaloonPreorderVerificationDetail getCurrentTaloonPreorderVerificationDetail() {
-        return currentTaloonPreorderVerificationDetail;
-    }
-
-    public void setCurrentTaloonPreorderVerificationDetail(
-            TaloonPreorderVerificationDetail currentTaloonPreorderVerificationDetail) {
-        this.currentTaloonPreorderVerificationDetail = currentTaloonPreorderVerificationDetail;
-    }
-
-    public TaloonPreorderVerificationComplex getCurrentTaloonPreorderVerificationComplex() {
-        return currentTaloonPreorderVerificationComplex;
-    }
-
-    public void setCurrentTaloonPreorderVerificationComplex(
-            TaloonPreorderVerificationComplex currentTaloonPreorderVerificationComplex) {
-        this.currentTaloonPreorderVerificationComplex = currentTaloonPreorderVerificationComplex;
-    }
-
-    public TaloonPreorderVerificationItem getCurrentTaloonPreorderVerificationItem() {
-        return currentTaloonPreorderVerificationItem;
-    }
-
-    public void setCurrentTaloonPreorderVerificationItem(
-            TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem) {
-        this.currentTaloonPreorderVerificationItem = currentTaloonPreorderVerificationItem;
     }
 
     public String getRemarksToShow() {

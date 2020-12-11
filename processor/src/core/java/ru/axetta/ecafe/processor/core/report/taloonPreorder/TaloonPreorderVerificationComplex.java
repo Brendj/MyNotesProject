@@ -18,8 +18,6 @@ public class TaloonPreorderVerificationComplex {
     private String complexName;
     private final List<TaloonPreorderVerificationDetail> details = new ArrayList<>();
     private TaloonPreorderVerificationItem item;
-    private boolean taloonDateEmpty;
-    private int detailsSize;
 
     public TaloonPreorderVerificationComplex() {
     }
@@ -53,7 +51,7 @@ public class TaloonPreorderVerificationComplex {
     }
 
     public boolean isTaloonDateEmpty() {
-        return taloonDateEmpty = taloonDate == null;
+        return taloonDate == null;
     }
 
     public TaloonPreorderVerificationItem getItem() {
@@ -65,6 +63,6 @@ public class TaloonPreorderVerificationComplex {
     }
 
     public int getDetailsSize() {
-        return detailsSize = details.size();
+        return details.size();
     }
 }

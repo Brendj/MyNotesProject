@@ -39,7 +39,7 @@ public class CardManagerProcessor implements CardManager {
     private static final Logger logger = LoggerFactory.getLogger(CardManagerProcessor.class);
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
-    private static final Integer SMARTWATCH_CARD_SIGN_CERT_NUM = 16;
+    //private static final Integer SMARTWATCH_CARD_SIGN_CERT_NUM = 16;
 
     public static Long getPriceOfMifare() {
         return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifare"));
@@ -650,8 +650,9 @@ public class CardManagerProcessor implements CardManager {
         return card.getIdOfCard();
     }
 
-    public Long createSmartWatchAsCard(Session session, Long idOfClient, Long trackerIdAsCardPrintedNo, Integer state, Date validTime, Integer lifeState,
-            String lockReason, Date issueTime, Long trackerUidAsCardNo, User user) throws Exception{
+    public Long createSmartWatchAsCard(Session session, Long idOfClient, Long trackerIdAsCardPrintedNo, Integer state,
+            Date validTime, Integer lifeState, String lockReason, Date issueTime, Long trackerUidAsCardNo, User user,
+            Integer cardSignCertNum) throws Exception{
         Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
         logger.debug("check valid date");
         if (validTime.after(CalendarUtils.AFTER_DATE)) {
@@ -678,7 +679,7 @@ public class CardManagerProcessor implements CardManager {
         card.setOrg(client.getOrg());
         card.setCreateTime(new Date());
         card.setTransitionState(CardTransitionState.OWN.getCode());
-        card.setCardSignCertNum(SMARTWATCH_CARD_SIGN_CERT_NUM);
+        card.setCardSignCertNum(cardSignCertNum);
         session.save(card);
 
         HistoryCard historyCard = new HistoryCard();

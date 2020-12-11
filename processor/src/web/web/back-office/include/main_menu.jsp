@@ -136,7 +136,7 @@
     <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}"
                         label="Правила распространения" action="#{distributionRulesPage.show}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToEditOrgs}" />
-
+    <%--@elvariable id="orgListLoaderPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgListLoaderPage"--%>
     <rich:panelMenuItem id="orgListLoaderMenuItem" binding="#{orgListLoaderPage.mainMenuComponent}"
                         label="Загрузить из файла" action="#{orgListLoaderPage.show}" reRender="workspaceForm" />
 
@@ -472,6 +472,14 @@
                         binding="#{mainPage.cardExpireBatchEditPage.mainMenuComponent}"
                         action="#{mainPage.showCardExpireBatchEditPage}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToEditCards}"/>
+
+    <%--@elvariable id="smartWatchVendorsMenuGroup" type="ru.axetta.ecafe.processor.web.ui.card.smartwatchvendors.SmartWatchVendorsMenuGroup"--%>
+    <%--@elvariable id="smartWatchVendorsListPage" type="ru.axetta.ecafe.processor.web.ui.card.smartwatchvendors.SmartWatchVendorsListPage"--%>
+    <rich:panelMenuGroup id="smartWatchVendorsGroupMenu" label="Управление поставщиками Smart-Часов"
+                         binding="#{smartWatchVendorsMenuGroup.mainMenuComponent}" rendered="#{mainPage.eligibleToViewCardSign}">
+        <rich:panelMenuItem id="smartWatchVendorsListPageMenuItem" label="Список" binding="#{smartWatchVendorsListPage.mainMenuComponent}"
+            action="#{smartWatchVendorsListPage.show()}" reRender="workspaceForm"/>
+    </rich:panelMenuGroup>
 
     <%--@elvariable id="cardSignsGroupPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignsGroupPage"--%>
     <rich:panelMenuGroup id="cardSignsGroupMenu" label="Цифровые подписи" binding="#{cardSignsGroupPage.mainMenuComponent}"

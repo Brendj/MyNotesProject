@@ -119,24 +119,24 @@ public class CardProcessorService {
             for (CardActionClient cardActionClient: blockRequests.getCardActionClients()) {
                 Client client = cardActionClient.getClient();
                 if (client == null) {
-                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Не найден клиент для разблокировки карт");
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, null, "Не найден клиент для разблокировки карт");
                     continue;
                 }
                 List<Card> cardsActive = cardService.getActiveCard(client, false);
                 if (!cardsActive.isEmpty())
                 {
-                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Есть активные карты на момент разблокировки");
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, cardsActive,  "Есть активные карты на момент разблокировки");
                     continue;
                 }
                 List<Card> cards = cardService.getBlockedCard(client);
                 if (CollectionUtils.isEmpty(cards)) {
-                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Не найдено карт для разблокировки");
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, null, "Не найдено карт для разблокировки");
                     continue;
                 }
                 if (cardActionClient.getCard() != null) {
                     cardService.unblockCard(cardActionClient.getCard());
                     cardSyncService.savechangeforCard(cardActionClient.getCard(), client.getIdoforg());
-                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, "Карта клиента успешно разблокирована");
+                    cardActionClientService.writeRecord(cardActionRequest, cardActionClient, null, "Карта клиента успешно разблокирована");
                 }
                 else
                 {

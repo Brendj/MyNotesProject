@@ -139,6 +139,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean preorderlp;
 
     private Boolean useWebArm;
+    private Boolean goodDateCheck;
     private Long orgIdFromNsi = null;
 
     public String getDefaultSupplierMode() {
@@ -323,6 +324,15 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        for (Org fOrg : friendlyOrg) {
+            if (!fOrg.getIdOfOrg().equals(org.getIdOfOrg())) {
+                fOrg.setUseWebArm(useWebArm);
+                if (useWebArm) {
+                    fOrg.setUsePaydableSubscriptionFeeding(false);
+                }
+            }
+        }
+
         for (Org o : selectOrg) {
             o.setParticipantOP(participantOP);
             o.setPreorderlp(preorderlp);
@@ -394,6 +404,9 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
         org.setHelpdeskEnabled(helpdeskEnabled);
         org.setPreordersEnabled(preordersEnabled);
+        if(!preordersEnabled) {
+            ClientManager.resetFlagsOfAllClients(org, session);
+        }
 
         org.setMultiCardModeEnabled(multiCardModeEnabled);
         for(Org fo: org.getFriendlyOrg()){
@@ -421,6 +434,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         org.setPreorderlp(preorderlp);
         org.setUseWebArm(useWebArm);
+        org.setGooddatecheck(goodDateCheck);
         org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
 
         session.update(org);
@@ -578,6 +592,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
         this.useWebArm = org.getUseWebArm();
+        this.goodDateCheck = org.getGooddatecheck();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
     }
 
@@ -673,6 +688,12 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
             menuExchangeSourceOrgName = org.getShortName();
+        }
+    }
+
+    public void changeSubscriptionFeeding() {
+        if (useWebArm) {
+            usePaydableSubscriptionFeeding = false;
         }
     }
 
@@ -1245,6 +1266,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setSubordination(String subordination) {
         this.subordination = subordination;
+    }
+
+    public Boolean getGoodDateCheck() {
+        return goodDateCheck;
+    }
+
+    public void setGoodDateCheck(Boolean goodDateCheck) {
+        this.goodDateCheck = goodDateCheck;
     }
 
     public static class ContragentItem {

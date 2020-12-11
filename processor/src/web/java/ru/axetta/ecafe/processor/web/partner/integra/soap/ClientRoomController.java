@@ -199,31 +199,10 @@ public interface ClientRoomController {
     EnterEventListResult getEnterEventListByGuardian(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
-    @WebMethod(operationName = "getClientsByGuardSan")
-    ClientsData getClientsByGuardSan(@WebParam(name = "san") String san);
-
-    @WebMethod(operationName = "attachGuardSanBySan")
-    AttachGuardSanResult attachGuardSan(@WebParam(name = "san") String san,
-          @WebParam(name = "guardSan") String guardSan);
-
-    @WebMethod(operationName = "attachGuardSan")
-    AttachGuardSanResult attachGuardSan(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "guardSan") String guardSan);
-
-    @WebMethod(operationName = "detachGuardSanBySan")
-    DetachGuardSanResult detachGuardSan(@WebParam(name = "san") String san,
-          @WebParam(name = "guardSan") String guardSan);
-
-    @WebMethod(operationName = "detachGuardSan")
-    DetachGuardSanResult detachGuardSan(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "guardSan") String guardSan);
-
     @WebMethod Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId, @WebParam(name = "mode") int mode);
 
-    @WebMethod ClientSummaryExt[] getSummaryByGuardSan(@WebParam(name = "guardSan") String guardSan);
-
     @WebMethod
-    ClientSummaryExtListResult getSummaryByGuardMobile(@WebParam(name = "guardMobile") String guardSan);
+    ClientSummaryExtListResult getSummaryByGuardMobile(@WebParam(name = "guardMobile") String guardMobile);
 
     @WebMethod
     ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") String contractId);

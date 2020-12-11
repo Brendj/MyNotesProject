@@ -464,6 +464,13 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date getFirstDayMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        truncateToMonth(calendar);
+        return calendar.getTime();
+    }
+
     public static Date getFirstDayOfPrevMonth(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

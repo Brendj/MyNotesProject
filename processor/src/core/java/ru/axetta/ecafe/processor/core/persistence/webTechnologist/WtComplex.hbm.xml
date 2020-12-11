@@ -70,11 +70,11 @@
             <column name="idOfDietType"/>
         </many-to-one>
 
-        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
             <column name="idOfContragent"/>
         </many-to-one>
 
-        <many-to-one name="wtOrgGroup" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
+        <many-to-one name="wtOrgGroup" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
             <column name="idOfOrgGroup"/>
         </many-to-one>
 
@@ -94,19 +94,19 @@
             <column name="barcode" sql-type="varchar(16)" length="16"/>
         </property>
 
-        <set name="orgs" lazy="false" table="cf_wt_complexes_org">
+        <set name="orgs" lazy="true" table="cf_wt_complexes_org">
             <key column="IdOfComplex"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
 
-        <set name="wtComplexesItems" inverse="true" cascade="all" lazy="false">
+        <set name="wtComplexesItems" inverse="true" cascade="all" lazy="true">
             <key>
                 <column name="idOfComplexItem"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem"/>
         </set>
 
-        <set name="discountRules" lazy="false" table="cf_wt_discountrules_complexes">
+        <set name="discountRules" lazy="true" table="cf_wt_discountrules_complexes">
             <key column="idOfComplex"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" column="idOfRule"/>
         </set>
