@@ -61,7 +61,7 @@
         <h:outputText escape="true" value="Окончание периода" styleClass="output-text" />
         <rich:calendar value="#{mainPage.clientOperationListPage.endTime}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        <a4j:commandButton value="Показать" action="#{mainPage.showClientOperationListPage}"
+        <a4j:commandButton value="Показать" action="#{mainPage.showClientOperationListPage(true)}"
                            reRender="mainMenu, workspaceTogglePanel" status="clientOperationListGenerateStatus"
                            styleClass="command-button" />
         <a4j:status id="clientOperationListGenerateStatus">

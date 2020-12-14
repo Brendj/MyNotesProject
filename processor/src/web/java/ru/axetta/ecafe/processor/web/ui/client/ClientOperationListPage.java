@@ -146,7 +146,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
 
     @SuppressWarnings("unchecked")
 
-    public void fill(Session session, Long idOfClient) throws Exception {
+    public void fill(Session session, Long idOfClient, boolean full) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         this.idOfClient = client.getIdOfClient();
         this.clientPaymentList.fill(session, client, this.startTime, this.endTime);
@@ -228,12 +228,14 @@ public class ClientOperationListPage extends BasicWorkspacePage {
                 .addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
 
-        //criteria = session.createCriteria(ClientsMobileHistory.class);
-        //criteria.add(Restrictions.eq("client", client))
-        //        .add(Restrictions.ge("createdate", startTime))
-        //        .add(Restrictions.le("createdate", endTime))
-        //        .addOrder(Order.asc("createdate"));
-        //clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
+        if (full) {
+            criteria = session.createCriteria(ClientsMobileHistory.class);
+            criteria.add(Restrictions.eq("client", client))
+                    .add(Restrictions.ge("createdate", startTime))
+                    .add(Restrictions.le("createdate", endTime))
+                    .addOrder(Order.asc("createdate"));
+            clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
+        }
 
         //// client group migrations
         ClientGroupMigrationHistoryService clientGroupMigrationHistoryService = RuntimeContext.getAppContext()
