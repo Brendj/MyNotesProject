@@ -29,6 +29,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.event.ActionEvent;
 import java.util.*;
 
 /**
@@ -227,12 +228,12 @@ public class ClientOperationListPage extends BasicWorkspacePage {
                 .addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
 
-        criteria = session.createCriteria(ClientsMobileHistory.class);
-        criteria.add(Restrictions.eq("client", client))
-                .add(Restrictions.ge("createdate", startTime))
-                .add(Restrictions.le("createdate", endTime))
-                .addOrder(Order.asc("createdate"));
-        clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
+        //criteria = session.createCriteria(ClientsMobileHistory.class);
+        //criteria.add(Restrictions.eq("client", client))
+        //        .add(Restrictions.ge("createdate", startTime))
+        //        .add(Restrictions.le("createdate", endTime))
+        //        .addOrder(Order.asc("createdate"));
+        //clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
 
         //// client group migrations
         ClientGroupMigrationHistoryService clientGroupMigrationHistoryService = RuntimeContext.getAppContext()
@@ -296,6 +297,27 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    public void getHistoryMobileChange(ActionEvent event) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(ClientsMobileHistory.class);
+            Client client = (Client) session.load(Client.class, idOfClient);
+            criteria.add(Restrictions.eq("client", client))
+                    .add(Restrictions.ge("createdate", startTime))
+                    .add(Restrictions.le("createdate", endTime))
+                    .addOrder(Order.asc("createdate"));
+            clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
+        } catch (Exception e) {
+
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 
     public List<GeoplanerNotificationJournal> getGeoplanerNotificationJournalList() {

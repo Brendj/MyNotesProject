@@ -836,6 +836,7 @@ public class ClientManager {
                     //throw new Exception("Неправильный формат факса");
                 }
             }
+            persistenceSession.save(client);
             client.initClientMobileHistory(clientsMobileHistory);
             client.setMobile(mobilePhone);//tokens[14]);
             client.setFax(fax);//tokens[14]);
@@ -944,7 +945,7 @@ public class ClientManager {
             client.setCreatedFrom(ClientCreatedFromType.values()[fieldConfig.getValueInt(FieldId.CREATED_FROM)]);
 
             logger.debug("save client");
-            persistenceSession.save(client);
+            persistenceSession.saveOrUpdate(client);
             Long idOfClient = client.getIdOfClient();
 
             if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, idOfOrg);

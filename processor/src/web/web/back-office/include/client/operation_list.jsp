@@ -1340,7 +1340,12 @@
             </rich:column>
         </rich:dataTable>
 
-        <h:outputText value="Изменение номера телефона" />
+        <h:panelGrid columns="2">
+            <h:outputText value="Изменение номера телефона" />
+            <a4j:commandButton value="Построить" actionListener="#{mainPage.clientOperationListPage.getHistoryMobileChange}"
+                               reRender="historyChangeMobile"
+                               styleClass="command-button" />
+        </h:panelGrid>
         <rich:dataTable id="historyChangeMobile" value="#{mainPage.clientOperationListPage.clientsMobileHistories}"
                         var="item" rows="8"
                         columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
