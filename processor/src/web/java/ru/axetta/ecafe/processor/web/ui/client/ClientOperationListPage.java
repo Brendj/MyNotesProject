@@ -228,6 +228,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
                 .addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
 
+        clientsMobileHistories = new ArrayList<>();
         if (full) {
             criteria = session.createCriteria(ClientsMobileHistory.class);
             criteria.add(Restrictions.eq("client", client))
