@@ -193,6 +193,8 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
     public void reload(){
         Session session = null;
         try {
+            selectedTypes.clear();
+
             session = RuntimeContext.getInstance().createReportPersistenceSession();
 
             this.codeMSP = (CodeMSP) session.get(CodeMSP.class, idOfCode);
