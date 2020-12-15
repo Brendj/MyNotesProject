@@ -36,7 +36,7 @@
     </h:panelGrid>
 
     <rich:separator height="1" />
-        <h:outputText escape="true" value="Модуль \"АРМ Администратора ОУ\"" styleClass="output-text-strong" />
+        <h:outputText escape="true" value="Модуль \"АРМ администратора ОУ\"" styleClass="output-text-strong" />
         <h:panelGrid columns="3" styleClass="borderless-grid">
             <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armAdminAuthWithoutCardForAdmin}" styleClass="output-text" />
             <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для роли \"Администратор\" (созданной по умолчанию) и роли \"Администратор CКУД\"" styleClass="output-text" />
