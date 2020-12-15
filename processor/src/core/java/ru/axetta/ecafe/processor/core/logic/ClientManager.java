@@ -1112,7 +1112,14 @@ public class ClientManager {
                 throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
             }
         }
-        session.persist(clientGuardianToSave);//Сохоаняем клиента ДО сохранения изменений по мобильному номеру
+        clientGuardianToSave.setAddress("");
+        clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
+        clientGuardianToSave.setRemarks(remark);
+        clientGuardianToSave.setCreatedFrom(createdFrom);
+        clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
+        clientGuardianToSave.setPassportNumber(passportNumber);
+        clientGuardianToSave.setPassportSeries(passportSeries);
+        session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
         clientGuardianToSave.setMobile(mobile);
         if (ssoid != null) clientGuardianToSave.setSsoid(ssoid);
@@ -1122,13 +1129,6 @@ public class ClientManager {
             clientGuardianToSave.setGender(gender);
         }
         logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
-        clientGuardianToSave.setAddress("");
-        clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
-        clientGuardianToSave.setRemarks(remark);
-        clientGuardianToSave.setCreatedFrom(createdFrom);
-        clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
-        clientGuardianToSave.setPassportNumber(passportNumber);
-        clientGuardianToSave.setPassportSeries(passportSeries);
         session.update(clientGuardianToSave);
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
