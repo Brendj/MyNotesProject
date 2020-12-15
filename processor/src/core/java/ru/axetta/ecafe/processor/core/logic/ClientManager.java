@@ -1112,6 +1112,7 @@ public class ClientManager {
                 throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
             }
         }
+        session.persist(clientGuardianToSave);//Сохоаняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
         clientGuardianToSave.setMobile(mobile);
         if (ssoid != null) clientGuardianToSave.setSsoid(ssoid);
@@ -1128,7 +1129,7 @@ public class ClientManager {
         clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
         clientGuardianToSave.setPassportNumber(passportNumber);
         clientGuardianToSave.setPassportSeries(passportSeries);
-        session.persist(clientGuardianToSave);
+        session.update(clientGuardianToSave);
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
     }
