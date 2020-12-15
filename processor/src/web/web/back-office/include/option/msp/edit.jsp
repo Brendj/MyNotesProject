@@ -25,6 +25,10 @@
                         styleClass="output-text">
         <f:selectItems value="#{codeMSPEditPage.discounts}" />
     </h:selectOneListbox>
+    <h:outputText value="Возрастные группы" styleClass="output-text"/>
+    <h:selectManyCheckbox value="#{codeMSPEditPage.selectedTypes}" layout="pageDirection">
+        <f:selectItems value="#{codeMSPEditPage.ageTypeGroups}"/>
+    </h:selectManyCheckbox>
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{codeMSPEditPage.save()}" reRender="mainMenu, workspaceTogglePanel"

@@ -4,13 +4,24 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class CodeMSP {
     private Long idOfCode;
     private Integer code;
     private String description;
     private CategoryDiscount categoryDiscount;
+    private Set<CodeMspAgeTypeGroup> codeMspAgeTypeGroupSet = new HashSet<>();
+
+    public Set<CodeMspAgeTypeGroup> getCodeMspAgeTypeGroupSet() {
+        return codeMspAgeTypeGroupSet;
+    }
+
+    public void setCodeMspAgeTypeGroupSet(Set<CodeMspAgeTypeGroup> codeMspAgeTypeGroupSet) {
+        this.codeMspAgeTypeGroupSet = codeMspAgeTypeGroupSet;
+    }
 
     public Long getIdOfCode() {
         return idOfCode;
@@ -59,5 +70,11 @@ public class CodeMSP {
     @Override
     public int hashCode() {
         return Objects.hash(idOfCode, code);
+    }
+
+    public boolean containsAgeTypeGroup(String type) {
+        CodeMspAgeTypeGroup group = new CodeMspAgeTypeGroup();
+        group.setAgeTypeGroup(type);
+        return this.getCodeMspAgeTypeGroupSet().contains(group);
     }
 }

@@ -24,6 +24,10 @@
                         styleClass="output-text">
         <f:selectItems value="#{codeMSPCreatePage.discounts}" />
     </h:selectOneListbox>
+    <h:outputText value="Возрастные группы" styleClass="output-text"/>
+    <h:selectManyCheckbox value="#{codeMSPCreatePage.selectedTypes}" layout="pageDirection">
+        <f:selectItems value="#{codeMSPCreatePage.ageTypeGroups}"/>
+    </h:selectManyCheckbox>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать код" action="#{codeMSPCreatePage.onSave()}"

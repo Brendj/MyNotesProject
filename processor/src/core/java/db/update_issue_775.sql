@@ -15,3 +15,10 @@ alter table CF_DiscountRules
 
 alter table CF_wt_DiscountRules
     add column idofcode bigint references cf_code_msp on delete set null on update no action;
+
+create table cf_code_msp_agetypegroup
+(
+    idofcodemspagetypegroup bigserial primary key,
+    idofcode                bigint references cf_code_msp (idofcode),
+    agetypegroup            varchar(128) not null check (agetypegroup not similar to ' *')
+);

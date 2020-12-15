@@ -8,10 +8,13 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
+import ru.axetta.ecafe.processor.core.persistence.CodeMspAgeTypeGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -36,6 +39,27 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
     private Long selectedDiscount;
 
     private List<SelectItem> discounts = loadDiscounts();
+    private List<SelectItem> ageTypeGroups = loadAgeTypesGroups();
+    private List<String> selectedTypes;
+
+    private List<SelectItem> loadAgeTypesGroups() {
+        Session session = null;
+        List<SelectItem> groups = new LinkedList<>();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+
+            List<String> result = DAOUtils.getAllAgeTypeGroups(session);
+            for(String group : result){
+                groups.add(new SelectItem(group, group));
+            }
+
+        } catch (Exception e){
+            log.error("Can't load AgeGroup types from DB", e);
+        } finally {
+            HibernateUtils.close(session, log);
+        }
+        return groups;
+    }
 
     private List<SelectItem> loadDiscounts() {
         List<SelectItem> result = new LinkedList<>();
@@ -64,6 +88,13 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
         return result;
     }
 
+    public List<String> getSelectedTypes() {
+        return selectedTypes;
+    }
+
+    public void setSelectedTypes(List<String> selectedTypes) {
+        this.selectedTypes = selectedTypes;
+    }
 
     public Integer getCode() {
         return code;
@@ -97,6 +128,14 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
         return discounts;
     }
 
+    public List<SelectItem> getAgeTypeGroups() {
+        return ageTypeGroups;
+    }
+
+    public void setAgeTypeGroups(List<SelectItem> ageTypeGroups) {
+        this.ageTypeGroups = ageTypeGroups;
+    }
+
     @Override
     public String getPageFilename() {
         return "option/msp/create";
@@ -115,6 +154,10 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
             printError("Укажите льготу");
             return;
         }
+        if(CollectionUtils.isEmpty(selectedTypes)){
+            printError("Укажите хотябы одну возрастную категорию");
+            return;
+        }
 
         Session session = null;
         Transaction transaction = null;
@@ -130,6 +173,14 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
             if(selectedDiscount != null){
                 CategoryDiscount discount = (CategoryDiscount) session.get(CategoryDiscount.class, selectedDiscount);
                 codeMSP.setCategoryDiscount(discount);
+            }
+
+            for(String type :  selectedTypes){
+                CodeMspAgeTypeGroup group = new CodeMspAgeTypeGroup();
+                group.setCodeMSP(codeMSP);
+                group.setAgeTypeGroup(type);
+
+                codeMSP.getCodeMspAgeTypeGroupSet().add(group);
             }
 
             session.save(codeMSP);

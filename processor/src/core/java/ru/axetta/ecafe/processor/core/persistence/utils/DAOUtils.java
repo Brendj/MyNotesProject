@@ -5389,4 +5389,16 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(CodeMSP.class);
         return criteria.list();
     }
+
+    public static List<String> getAllAgeTypeGroups(Session session) {
+        Query q = session.createSQLQuery(
+                "select distinct agetypegroup\n "
+                + "from cf_clients\n "
+                + "where meshguid is not null\n "
+                + "  and idofclientgroup < 1100000000\n "
+                + "  and agetypegroup is not null\n "
+                + "  and agetypegroup not like ''\n "
+                + "order by agetypegroup");
+        return q.list();
+    }
 }

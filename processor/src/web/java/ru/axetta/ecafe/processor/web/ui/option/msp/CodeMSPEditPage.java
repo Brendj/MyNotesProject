@@ -8,10 +8,14 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
+import ru.axetta.ecafe.processor.core.persistence.CodeMspAgeTypeGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -37,6 +41,27 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
     private CodeMSP codeMSP;
     private Long selectedDiscount;
     private List<SelectItem> discounts = loadDiscounts();
+    private List<SelectItem> ageTypeGroups = loadAgeTypesGroups();
+    private List<String> selectedTypes = new LinkedList<>();
+
+    private List<SelectItem> loadAgeTypesGroups() {
+        Session session = null;
+        List<SelectItem> groups = new LinkedList<>();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+
+            List<String> result = DAOUtils.getAllAgeTypeGroups(session);
+            for(String group : result){
+                groups.add(new SelectItem(group, group));
+            }
+
+        } catch (Exception e){
+            log.error("Can't load AgeGroup types from DB", e);
+        } finally {
+            HibernateUtils.close(session, log);
+        }
+        return groups;
+    }
 
     private List<SelectItem> loadDiscounts() {
         List<SelectItem> result = new LinkedList<>();
@@ -81,6 +106,10 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
             printError("Укажите льготу");
             return;
         }
+        if(CollectionUtils.isEmpty(selectedTypes)){
+            printError("Укажите хотябы одну возрастную категорию");
+            return;
+        }
 
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
@@ -94,6 +123,35 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
             if(selectedDiscount != null){
                 CategoryDiscount discount = (CategoryDiscount) persistenceSession.get(CategoryDiscount.class, selectedDiscount);
                 codeMSP.setCategoryDiscount(discount);
+            }
+
+            for(String type : selectedTypes){ // add new AgeTypeGroups
+                if(!codeMSP.containsAgeTypeGroup(type)){
+                    CodeMspAgeTypeGroup group = new CodeMspAgeTypeGroup();
+                    group.setAgeTypeGroup(type);
+                    group.setCodeMSP(codeMSP);
+
+                    codeMSP.getCodeMspAgeTypeGroupSet().add(group);
+                }
+            }
+
+            List<CodeMspAgeTypeGroup> deletedTypeGroups = new LinkedList<>(); // Work with excluded age types
+            for(final CodeMspAgeTypeGroup typeGroup : codeMSP.getCodeMspAgeTypeGroupSet()){
+                if(!selectedTypes.contains(typeGroup.getAgeTypeGroup())){
+                    CodeMspAgeTypeGroup targetGroup = (CodeMspAgeTypeGroup) CollectionUtils.find(codeMSP.getCodeMspAgeTypeGroupSet(),
+                            new Predicate() {
+                        @Override
+                        public boolean evaluate(Object o) {
+                            CodeMspAgeTypeGroup g = (CodeMspAgeTypeGroup) o;
+                            return g.equals(typeGroup);
+                        }
+                    });
+                    deletedTypeGroups.add(targetGroup);
+                }
+            }
+
+            for(CodeMspAgeTypeGroup typeGroup : deletedTypeGroups){
+                codeMSP.getCodeMspAgeTypeGroupSet().remove(typeGroup);
             }
 
             persistenceSession.update(codeMSP);
@@ -111,6 +169,22 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
         }
     }
 
+    public List<SelectItem> getAgeTypeGroups() {
+        return ageTypeGroups;
+    }
+
+    public void setAgeTypeGroups(List<SelectItem> ageTypeGroups) {
+        this.ageTypeGroups = ageTypeGroups;
+    }
+
+    public List<String> getSelectedTypes() {
+        return selectedTypes;
+    }
+
+    public void setSelectedTypes(List<String> selectedTypes) {
+        this.selectedTypes = selectedTypes;
+    }
+
     @Override
     public void onShow() throws Exception {
         reload();
@@ -125,6 +199,10 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
             this.code = codeMSP.getCode();
             this.description = codeMSP.getDescription();
             this.selectedDiscount = codeMSP.getCategoryDiscount().getIdOfCategoryDiscount();
+
+            for(CodeMspAgeTypeGroup group : codeMSP.getCodeMspAgeTypeGroupSet()){
+                selectedTypes.add(group.getAgeTypeGroup());
+            }
 
             session.close();
         } catch (Exception e) {
