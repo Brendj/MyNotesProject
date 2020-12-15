@@ -36,14 +36,14 @@
     </h:panelGrid>
 
     <rich:separator height="1" />
-        <h:outputText escape="true" value="Модуль АРМ Администратора" styleClass="output-text-strong" />
+        <h:outputText escape="true" value="Модуль \"АРМ Администратора ОУ\"" styleClass="output-text-strong" />
         <h:panelGrid columns="3" styleClass="borderless-grid">
             <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armAdminAuthWithoutCardForAdmin}" styleClass="output-text" />
-            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для администратора и администратора СКУД" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для роли \"Администратор\" (созданной по умолчанию) и роли \"Администратор CКУД\"" styleClass="output-text" />
             <h:outputText escape="true" value="" styleClass="output-text" />
 
             <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armAdminAuthWithoutCardForOther}" label="" styleClass="output-text" />
-            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для остальных пользователей" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для остальных ролей" styleClass="output-text" />
             <h:outputText escape="true" value="" styleClass="output-text" />
 
             &nbsp;
@@ -52,10 +52,10 @@
                          styleClass="input-text" style="margin-left: 10px;" />
         </h:panelGrid>
         <rich:separator height="1" />
-        <h:outputText escape="true" value="Модуль АРМ Кассира" styleClass="output-text-strong" />
+        <h:outputText escape="true" value="Модуль \"АРМ оператора питания (кассира)\"" styleClass="output-text-strong" />
         <h:panelGrid columns="3" styleClass="borderless-grid">
             <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armCashierAuthWithoutCard}" label="" styleClass="output-text" />
-            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для всех ролей" styleClass="output-text" />
             <h:outputText escape="true" value="" styleClass="output-text" />
 
             &nbsp;
@@ -64,10 +64,10 @@
                          styleClass="input-text" style="margin-left: 10px;" />
         </h:panelGrid>
         <rich:separator height="1" />
-        <h:outputText escape="true" value="Модуль АРМ Охранника" styleClass="output-text-strong" />
+        <h:outputText escape="true" value="Модуль \"АРМ контролёра входа (охранника)\"" styleClass="output-text-strong" />
         <h:panelGrid columns="3" styleClass="borderless-grid">
             <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armSecurityAuthWithoutCard}" label="" styleClass="output-text" />
-            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для всех ролей" styleClass="output-text" />
             <h:outputText escape="true" value="" styleClass="output-text" />
 
             &nbsp;
@@ -76,10 +76,10 @@
                          styleClass="input-text" style="margin-left: 10px;" />
         </h:panelGrid>
         <rich:separator height="1" />
-        <h:outputText escape="true" value="Модуль АРМ Библиотекаря" styleClass="output-text-strong" />
+        <h:outputText escape="true" value="Модуль \"АРМ библиотекаря\"" styleClass="output-text-strong" />
         <h:panelGrid columns="3" styleClass="borderless-grid">
             <h:selectBooleanCheckbox value="#{mainPage.optionsSecurityClientPage.armLibraryAuthWithoutCard}" label="" styleClass="output-text" />
-            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить авторизацию без ЭИ для всех ролей" styleClass="output-text" />
             <h:outputText escape="true" value="" styleClass="output-text" />
 
             &nbsp;
