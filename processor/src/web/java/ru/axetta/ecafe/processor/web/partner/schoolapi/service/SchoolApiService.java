@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.utils.idGenerator.IIdGenerator;
 import ru.axetta.ecafe.processor.core.utils.idGenerator.OrganizationUniqueGeneratorId;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.*;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.GroupManagementErrors;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SchoolApiService implements ISchoolApiService {
+
     private static int rootMenuMaxLength = 512;
     private static int menuDetailNameMaxLength = 512;
     private static int menuGroupMaxLength = 60;
@@ -42,16 +43,17 @@ public class SchoolApiService implements ISchoolApiService {
 
     private Session persistanceSession;
 
-    public SchoolApiService(Session persistanceSession){
+    public SchoolApiService(Session persistanceSession) {
         this.persistanceSession = persistanceSession;
     }
 
 
     @Override
     public boolean isFriendlyOrg(long orgId, long friendlyOrgId) throws Exception {
-        if(orgId != friendlyOrgId){
-            if(!orgIsFriendly(orgId, friendlyOrgId))
+        if (orgId != friendlyOrgId) {
+            if (!orgIsFriendly(orgId, friendlyOrgId)) {
                 return false;
+            }
         }
         return true;
     }
@@ -59,58 +61,68 @@ public class SchoolApiService implements ISchoolApiService {
 
     public void checkPermission(int userIdOfRole, int permittedIdOfRole, long userOrgId, long requestOrgId)
             throws Exception {
-        if(userIdOfRole != permittedIdOfRole)
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+        if (userIdOfRole != permittedIdOfRole) {
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
-        if(userOrgId != requestOrgId){
-            if(!orgIsFriendly(requestOrgId, userOrgId))
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+        }
+        if (userOrgId != requestOrgId) {
+            if (!orgIsFriendly(requestOrgId, userOrgId)) {
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+            }
         }
     }
 
     @Override
     public void addOrgGroup(long orgId, String groupName) throws Exception {
-        if(!isOrgExists(orgId))
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+        if (!isOrgExists(orgId)) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
-        if(isGroupNameAlreadyExists(orgId, groupName))
-            throw new RequestProcessingException(GroupManagementErrors.GROUP_IS_EXISTS.getErrorCode(),
+        }
+        if (isGroupNameAlreadyExists(orgId, groupName)) {
+            throw new WebApplicationException(GroupManagementErrors.GROUP_IS_EXISTS.getErrorCode(),
                     GroupManagementErrors.GROUP_IS_EXISTS.getErrorMessage());
+        }
         ClientGroup clientGroup = DAOUtils.createClientGroup(persistanceSession, orgId, groupName);
     }
 
     @Override
     public List<GroupInfo> getOrgGroups(long orgId) throws Exception {
-        if(!isOrgExists(orgId))
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+        if (!isOrgExists(orgId)) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
         List<GroupInfo> groupInfoList = new LinkedList<GroupInfo>();
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
         Disjunction restrictionOrgIdIn = Restrictions.disjunction();
         List<ClientGroup> orgGroups = new LinkedList<ClientGroup>();
-        for (Org friendlyOrg:friendlyOrgs) {
+        for (Org friendlyOrg : friendlyOrgs) {
             restrictionOrgIdIn.add(Restrictions.eq("idOfMainOrg", friendlyOrg.getIdOfOrg()));
             orgGroups.addAll(DAOUtils.getClientGroupsByIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg()));
         }
-        if(orgGroups.isEmpty())
-            throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+        if (orgGroups.isEmpty()) {
+            throw new WebApplicationException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
-        for (ClientGroup orgGroup: orgGroups){
-            if(orgGroup.getGroupName() == null || orgGroup.getGroupName().isEmpty())
+        }
+        for (ClientGroup orgGroup : orgGroups) {
+            if (orgGroup.getGroupName() == null || orgGroup.getGroupName().isEmpty()) {
                 continue;
-            if(isGroupNotPredefined(orgGroup)){
+            }
+            if (isGroupNotPredefined(orgGroup)) {
 
                 Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
                 groupNamesToOrgCriteria.add(restrictionOrgIdIn);
                 groupNamesToOrgCriteria.add(Restrictions.eq("groupName", orgGroup.getGroupName()));
                 groupNamesToOrgCriteria.setMaxResults(1);
                 GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
-                if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg().longValue() != orgGroup.getCompositeIdOfClientGroup().getIdOfOrg().longValue())
+                if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg().longValue() != orgGroup
+                        .getCompositeIdOfClientGroup().getIdOfOrg().longValue()) {
                     continue;
-                GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup, getClientGroupManagerByGroupName(persistanceSession,
-                        orgGroup.getGroupName(), orgGroup.getOrg().getIdOfOrg()));
+                }
+                GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup,
+                        getClientGroupManagerByGroupName(persistanceSession, orgGroup.getGroupName(),
+                                orgGroup.getOrg().getIdOfOrg()));
                 groupInfo.setOrgId(orgGroup.getCompositeIdOfClientGroup().getIdOfOrg());
                 groupInfoList.add(groupInfo);
             }
@@ -120,9 +132,10 @@ public class SchoolApiService implements ISchoolApiService {
 
     @Override
     public List<GroupEmployee> getEmployees(long orgId) throws Exception {
-        if(!isOrgExists(orgId))
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+        if (!isOrgExists(orgId)) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
         List<Org> organizations = new LinkedList<Org>();
         Org organization = DAOUtils.findOrg(persistanceSession, orgId);
         organizations.add(organization);
@@ -130,16 +143,18 @@ public class SchoolApiService implements ISchoolApiService {
         List<GroupEmployee> groupEmployeeList = new LinkedList<GroupEmployee>();
         GroupEmployee administrationEmployees = getOrgGroupEmployee(persistanceSession,
                 ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue(),
-                ClientGroup.Predefined.CLIENT_ADMINISTRATION.getNameOfGroup(),organizations);
+                ClientGroup.Predefined.CLIENT_ADMINISTRATION.getNameOfGroup(), organizations);
         GroupEmployee teacherEmployees = getOrgGroupEmployee(persistanceSession,
                 ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue(),
-                ClientGroup.Predefined.CLIENT_EMPLOYEES.getNameOfGroup(),organizations);
+                ClientGroup.Predefined.CLIENT_EMPLOYEES.getNameOfGroup(), organizations);
         GroupEmployee techEmployees = getOrgGroupEmployee(persistanceSession,
                 ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue(),
-                ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getNameOfGroup(),organizations);
-        if(administrationEmployees.getEmployees().isEmpty() && teacherEmployees.getEmployees().isEmpty() && techEmployees.getEmployees().isEmpty())
-            throw new RequestProcessingException(GroupManagementErrors.EMPLOYEES_NOT_FOUND.getErrorCode(),
+                ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getNameOfGroup(), organizations);
+        if (administrationEmployees.getEmployees().isEmpty() && teacherEmployees.getEmployees().isEmpty()
+                && techEmployees.getEmployees().isEmpty()) {
+            throw new WebApplicationException(GroupManagementErrors.EMPLOYEES_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.EMPLOYEES_NOT_FOUND.getErrorMessage());
+        }
         groupEmployeeList.add(administrationEmployees);
         groupEmployeeList.add(teacherEmployees);
         groupEmployeeList.add(techEmployees);
@@ -150,12 +165,14 @@ public class SchoolApiService implements ISchoolApiService {
     public void editEmployee(long orgId, String groupName, long contractId, Boolean status) throws Exception {
         checkOrganizationId(orgId);
         ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, orgId, groupName);
-        if(!isGroupNotPredefined(clientGroup))
-            throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND.getErrorCode(),
+        if (!isGroupNotPredefined(clientGroup)) {
+            throw new WebApplicationException(GroupManagementErrors.GROUP_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
-        if(!isEmployeeExists(orgId,contractId))
-            throw new RequestProcessingException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
+        }
+        if (!isEmployeeExists(orgId, contractId)) {
+            throw new WebApplicationException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorMessage());
+        }
         Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
         Criteria employeeGroupCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
         employeeGroupCriteria.add(Restrictions.eq("clientGroupName", clientGroup.getGroupName()));
@@ -164,16 +181,17 @@ public class SchoolApiService implements ISchoolApiService {
         employeeGroupCriteria.setMaxResults(1);
         ClientGroupManager clientGroupManager = (ClientGroupManager) employeeGroupCriteria.uniqueResult();
         boolean deletedStatus = !status;
-        if(clientGroupManager != null && clientGroupManager.isDeleted() == deletedStatus)
+        if (clientGroupManager != null && clientGroupManager.isDeleted() == deletedStatus) {
             return;
-        if(status){
-            if(clientGroupManager != null && clientGroupManager.isDeleted() != deletedStatus){
+        }
+        if (status) {
+            if (clientGroupManager != null && clientGroupManager.isDeleted() != deletedStatus) {
                 clientGroupManager.setDeleted(deletedStatus);
-                clientGroupManager.setVersion((clientGroupManager.getVersion()+1));
+                clientGroupManager.setVersion((clientGroupManager.getVersion() + 1));
                 persistanceSession.update(clientGroupManager);
                 return;
             }
-            if(clientGroupManager == null){
+            if (clientGroupManager == null) {
                 ClientGroupManager newClientGroupManager = new ClientGroupManager();
                 newClientGroupManager.setVersion(DAOUtils.nextVersionByClientgroupManager(persistanceSession));
                 newClientGroupManager.setDeleted(deletedStatus);
@@ -184,11 +202,12 @@ public class SchoolApiService implements ISchoolApiService {
                 return;
             }
         }
-        if(!status){
-            if(clientGroupManager == null)
-                throw new RequestProcessingException(GroupManagementErrors.BUNCH_NOT_FOUND.getErrorCode(),
+        if (!status) {
+            if (clientGroupManager == null) {
+                throw new WebApplicationException(GroupManagementErrors.BUNCH_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.BUNCH_NOT_FOUND.getErrorMessage());
-            if(clientGroupManager != null){
+            }
+            if (clientGroupManager != null) {
                 clientGroupManager.setDeleted(deletedStatus);
                 clientGroupManager.setVersion(DAOUtils.nextVersionByClientgroupManager(persistanceSession));
                 persistanceSession.update(clientGroupManager);
@@ -200,17 +219,22 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public ResponseClients getClientsList(List<String> groupsList, long idOfOrg) throws Exception {
         List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
-        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
+        if (idOfOrgList.size() == 0) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
         ResponseClients responseClients = new ResponseClients();
         boolean groupsNotFound = true;
         for (String nameOfGroup : groupsList) {
             nameOfGroup = nameOfGroup.trim();
-            List groups = DAOUtils.findClientGroupsByGroupNameForAllOrgsIgnoreCase(persistanceSession, idOfOrgList, nameOfGroup);
+            List groups = DAOUtils
+                    .findClientGroupsByGroupNameForAllOrgsIgnoreCase(persistanceSession, idOfOrgList, nameOfGroup);
             if (groups.size() == 0) {
                 addFPGroupNotFound(responseClients, nameOfGroup);
                 continue;
             }
-            GroupNamesToOrgs gnto = DAOUtils.findGroupFromGroupNamesToOrgs(persistanceSession, idOfOrgList, nameOfGroup);
+            GroupNamesToOrgs gnto = DAOUtils
+                    .findGroupFromGroupNamesToOrgs(persistanceSession, idOfOrgList, nameOfGroup);
             ClientGroup cg = findClientGroup(gnto, groups, idOfOrg);
             if (cg == null) {
                 addFPGroupNotFound(responseClients, nameOfGroup);
@@ -222,11 +246,10 @@ public class SchoolApiService implements ISchoolApiService {
             fpGroup.setCode(0);
             fpGroup.setMessage("OK");
             fpGroup.setGroupName(nameOfGroup);
-            Query query = persistanceSession.createQuery("select distinct c from Client c "
-                    + "join fetch c.clientGroup "
-                    + "join fetch c.person "
-                    + "left join fetch c.categoriesInternal "
-                    + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) = :nameOfGroup order by c.contractId");
+            Query query = persistanceSession.createQuery(
+                    "select distinct c from Client c " + "join fetch c.clientGroup " + "join fetch c.person "
+                            + "left join fetch c.categoriesInternal "
+                            + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) = :nameOfGroup order by c.contractId");
             query.setParameterList("idOfOrgList", idOfOrgList);
             query.setParameter("nameOfGroup", nameOfGroup.toUpperCase());
             List<Client> list = query.list();
@@ -238,7 +261,10 @@ public class SchoolApiService implements ISchoolApiService {
             }
             responseClients.getGroups().add(fpGroup);
         }
-        if (groupsNotFound) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
+        if (groupsNotFound) {
+            throw new WebApplicationException(GroupManagementErrors.GROUP_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
+        }
         return responseClients;
     }
 
@@ -253,7 +279,10 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public ResponseDiscounts getDiscountsList(Long idOfOrg) throws Exception {
         List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
-        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
+        if (idOfOrgList.size() == 0) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
         ResponseDiscounts responseDiscounts = new ResponseDiscounts();
         List<CategoryDiscount> categoryDiscounts = DiscountManager.getCategoryDiscounts(persistanceSession);
         for (CategoryDiscount categoryDiscount : categoryDiscounts) {
@@ -262,7 +291,9 @@ public class SchoolApiService implements ISchoolApiService {
                 responseDiscounts.addItem(item);
                 continue;
             }
-            if (categoryDiscount.getDiscountsRules().size() == 0) continue;
+            if (categoryDiscount.getDiscountsRules().size() == 0) {
+                continue;
+            }
             for (DiscountRule discountRule : categoryDiscount.getDiscountsRules()) {
                 if (discountRule.getCategoryOrgs().size() == 0) {
                     ResponseDiscountItem item = new ResponseDiscountItem(categoryDiscount);
@@ -273,12 +304,16 @@ public class SchoolApiService implements ISchoolApiService {
                 for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
                     for (Org o : categoryOrg.getOrgs()) {
                         if (idOfOrgList.contains(o.getIdOfOrg())) {
-                            if (item == null) item = new ResponseDiscountItem(categoryDiscount);
+                            if (item == null) {
+                                item = new ResponseDiscountItem(categoryDiscount);
+                            }
                             item.addCategoryOrg(categoryOrg.getCategoryName(), o.getIdOfOrg());
                         }
                     }
                 }
-                if (item != null) responseDiscounts.addItem(item);
+                if (item != null) {
+                    responseDiscounts.addItem(item);
+                }
             }
         }
 
@@ -286,20 +321,21 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     @Override
-    public ResponseDiscountClients processDiscountClientsList(Long orgId, Long discountId, Boolean status, List<Long> clients) throws Exception {
+    public ResponseDiscountClients processDiscountClientsList(Long orgId, Long discountId, Boolean status,
+            List<Long> clients) throws Exception {
         ResponseDiscountClients result = new ResponseDiscountClients();
         CategoryDiscount categoryDiscount = getCategoryDiscount(discountId);
         ResponseDiscounts availableDiscounts = getDiscountsList(orgId);
         List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, orgId);
         for (Long contractId : clients) {
-            result.addItem(processDiscountClient(allOrgs, contractId, status,
-                    categoryDiscount, availableDiscounts));
+            result.addItem(processDiscountClient(allOrgs, contractId, status, categoryDiscount, availableDiscounts));
         }
         return result;
     }
 
     @Override
-    public ResponseDiscountGroups processDiscountGroupsList(Long orgId, Long discountId, Boolean status, List<String> groups) throws Exception {
+    public ResponseDiscountGroups processDiscountGroupsList(Long orgId, Long discountId, Boolean status,
+            List<String> groups) throws Exception {
         CategoryDiscount categoryDiscount = getCategoryDiscount(discountId);
         ResponseDiscounts availableDiscounts = getDiscountsList(orgId);
         ResponseDiscountGroups result = new ResponseDiscountGroups();
@@ -308,8 +344,8 @@ public class SchoolApiService implements ISchoolApiService {
         for (FPGroup fpGroup : responseClients.getGroups()) {
             ResponseDiscountGroupItem resultClients = new ResponseDiscountGroupItem(fpGroup.getGroupName());
             for (FPClient fpClient : fpGroup.getClients()) {
-                resultClients.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), status,
-                        categoryDiscount, availableDiscounts));
+                resultClients.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), status, categoryDiscount,
+                        availableDiscounts));
             }
             result.addItem(resultClients);
         }
@@ -321,11 +357,12 @@ public class SchoolApiService implements ISchoolApiService {
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         Disjunction restrictionOrgIdIn = Restrictions.disjunction();
         friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
-        ClientGroup group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession,orgId, groupName);
-        if(group == null)
-            throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+        ClientGroup group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, orgId, groupName);
+        if (group == null) {
+            throw new WebApplicationException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
-        for (Org friendlyOrg:friendlyOrgs) {
+        }
+        for (Org friendlyOrg : friendlyOrgs) {
             restrictionOrgIdIn.add(Restrictions.eq("idOfMainOrg", friendlyOrg.getIdOfOrg()));
         }
         Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
@@ -333,15 +370,15 @@ public class SchoolApiService implements ISchoolApiService {
         groupNamesToOrgCriteria.add(Restrictions.eq("groupName", group.getGroupName()));
         groupNamesToOrgCriteria.setMaxResults(1);
         GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
-        if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null){
-            group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession,
-                    groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
-            if(group == null)
-                throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+        if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
+            group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, groupNamesToOrgs.getIdOfOrg(),
+                    groupNamesToOrgs.getGroupName());
+            if (group == null) {
+                throw new WebApplicationException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
+            }
             return group;
-        }
-        else {
+        } else {
             return group;
         }
     }
@@ -350,69 +387,70 @@ public class SchoolApiService implements ISchoolApiService {
     public List<Client> getClientsForContractIds(ClientGroup newClientGroup, List<Long> contractIds,
             boolean strictEditMode) throws Exception {
         Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
-        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
-        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg()));
+        List<Org> friendlyOrgs = DAOUtils
+                .findFriendlyOrgs(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
+        friendlyOrgs
+                .add(DAOUtils.findOrg(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg()));
         List<Long> orgIds = getOrgIds(friendlyOrgs);
-        clientsCriteria.add(Restrictions.and(
-                Restrictions.in("contractId", contractIds),
-                Restrictions.in("org.idOfOrg", orgIds)
-        ));
+        clientsCriteria.add(Restrictions
+                .and(Restrictions.in("contractId", contractIds), Restrictions.in("org.idOfOrg", orgIds)));
         List<Client> clients = clientsCriteria.list();
-        if(!strictEditMode)
+        if (!strictEditMode) {
             return clients;
-        else {
+        } else {
             return getClientsForStrictMode(newClientGroup, clients);
         }
     }
 
     @Override
-    public List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups,
-            boolean strictEditMode) throws Exception {
+    public List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups, boolean strictEditMode)
+            throws Exception {
         List<Client> clients;
-        List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession,
-                newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
-        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession,
-                newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg()));
+        List<Org> friendlyOrgs = DAOUtils
+                .findFriendlyOrgs(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
+        friendlyOrgs
+                .add(DAOUtils.findOrg(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg()));
         List<Long> orgIds = getOrgIds(friendlyOrgs);
         List<String> oldGroupsInUpperCase = new LinkedList<>();
-        for(String groupName: oldGroups){
+        for (String groupName : oldGroups) {
             oldGroupsInUpperCase.add(groupName.toUpperCase());
         }
-        Query query = persistanceSession.createQuery("from Client c "
-                + "join fetch c.clientGroup "
-                + "join fetch c.person "
-                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
+        Query query = persistanceSession.createQuery(
+                "from Client c " + "join fetch c.clientGroup " + "join fetch c.person "
+                        + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
         query.setParameterList("idOfOrgList", orgIds);
         query.setParameterList("nameOfGroupList", oldGroupsInUpperCase);
 
         clients = query.list();
-        if(!strictEditMode)
+        if (!strictEditMode) {
             return clients;
-        else {
-            return getClientsForStrictMode(newClientGroup,clients);
+        } else {
+            return getClientsForStrictMode(newClientGroup, clients);
         }
     }
 
     @Override
-    public List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients, String username)
-            throws Exception {
+    public List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients,
+            String username) throws Exception {
         String comment = "Изменено пользователем " + username;
-        Org newGroupOrg = DAOUtils.findOrg(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
+        Org newGroupOrg = DAOUtils
+                .findOrg(persistanceSession, newClientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
         Long newClientGroupId = newClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
         HashMap<String, List<Client>> orderedClients = getClientsGroupByClientGroup(clients);
         List<EditClientsGroupsGroupDTO> editClientsGroupsGroupDTOList = new LinkedList<>();
-        for(Map.Entry entry: orderedClients.entrySet()){
+        for (Map.Entry entry : orderedClients.entrySet()) {
             EditClientsGroupsGroupDTO editClientsGroupsGroupDTO = new EditClientsGroupsGroupDTO();
             editClientsGroupsGroupDTO.setNewGroupName(newClientGroup.getGroupName());
             editClientsGroupsGroupDTO.setOrgId(newClientGroup.getOrg().getIdOfOrg());
             editClientsGroupsGroupDTO.setOldGroupName((String) entry.getKey());
             List<EditClientsGroupsClientDTO> editClientsGroupsClientDTOList = new LinkedList<>();
             Client firstClient = ((List<Client>) entry.getValue()).get(0);
-            if(((List<Client>) entry.getValue()).isEmpty() && firstClient == null){
-               continue;
+            if (((List<Client>) entry.getValue()).isEmpty() && firstClient == null) {
+                continue;
             }
-            for(Client client: (List<Client>)entry.getValue()){
-                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(newGroupOrg, client);
+            for (Client client : (List<Client>) entry.getValue()) {
+                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(newGroupOrg,
+                        client);
                 clientGroupMigrationHistory.setNewGroupId(newClientGroupId);
                 clientGroupMigrationHistory.setNewGroupName(newClientGroup.getGroupName());
                 clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
@@ -434,43 +472,46 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public void createClient(ClientGroup clientGroup, Client client, String username) throws Exception {
         Client iacClient = DAOUtils.findClientByIacregid(persistanceSession, client.getIacRegId());
-        Org clientGroupOrg = DAOUtils.findOrg(persistanceSession, clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
+        Org clientGroupOrg = DAOUtils
+                .findOrg(persistanceSession, clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
         client.setClientGroup(clientGroup);
         client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         client.setOrg(clientGroupOrg);
-        if(client.getIacRegId() == null || client.getIacRegId().trim().isEmpty() || iacClient == null){
+        if (client.getIacRegId() == null || client.getIacRegId().trim().isEmpty() || iacClient == null) {
             String comment = "Создан пользователем " + username;
             persistanceSession.save(client.getPerson());
             persistanceSession.save(client.getContractPerson());
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
-            long contractId = RuntimeContext.getInstance().getClientContractIdGenerator().generateTransactionFree(client.getOrg().getIdOfOrg());
+            long contractId = RuntimeContext.getInstance().getClientContractIdGenerator()
+                    .generateTransactionFree(client.getOrg().getIdOfOrg());
             client.setContractId(contractId);
             client.setContractTime(new Date());
             persistanceSession.save(client);
-            RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistanceSession, contractId, client.getOrg().getIdOfOrg());
+            RuntimeContext.getInstance().getClientContractIdGenerator()
+                    .updateUsedContractId(persistanceSession, contractId, client.getOrg().getIdOfOrg());
             ClientMigration clientMigration = new ClientMigration(client, client.getOrg());
             clientMigration.setComment(comment);
             persistanceSession.save(clientMigration);
             return;
-        }
-        else {
+        } else {
             String comment = "Изменен пользователем " + username;
-            if(iacClient.getOrg().getIdOfOrg() != client.getOrg().getIdOfOrg()){
+            if (iacClient.getOrg().getIdOfOrg() != client.getOrg().getIdOfOrg()) {
                 ClientMigration clientMigration = new ClientMigration(iacClient, client.getOrg(), iacClient.getOrg());
-                if(iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()){
+                if (iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()) {
                     clientMigration.setOldGroupName(iacClient.getClientGroup().getGroupName());
                     clientMigration.setNewGroupName(client.getClientGroup().getGroupName());
                 }
                 clientMigration.setComment(comment);
                 persistanceSession.save(clientMigration);
-            }
-            else if(iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()){
-                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(iacClient.getOrg(), iacClient);
+            } else if (iacClient.getIdOfClientGroup() != client.getIdOfClientGroup()) {
+                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(
+                        iacClient.getOrg(), iacClient);
                 clientGroupMigrationHistory.setComment(comment);
                 clientGroupMigrationHistory.setOldGroupName(iacClient.getClientGroup().getGroupName());
                 clientGroupMigrationHistory.setOldGroupId(iacClient.getIdOfClientGroup());
                 clientGroupMigrationHistory.setNewGroupName(client.getClientGroup().getGroupName());
-                clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                clientGroupMigrationHistory
+                        .setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
                 persistanceSession.save(clientGroupMigrationHistory);
             }
             iacClient.setOrg(client.getOrg());
@@ -496,12 +537,11 @@ public class SchoolApiService implements ISchoolApiService {
     public List<ClientGroup> getClientGroupsByGroupNamesAndOrgId(List<String> groupsNames, Long orgId)
             throws Exception {
         List<ClientGroup> clientGroups = new ArrayList<>();
-        for(String groupName: groupsNames){
-            try{
+        for (String groupName : groupsNames) {
+            try {
                 clientGroups.add(getClientGroupByOrgIdAndGroupName(orgId, groupName));
-            }
-            catch (Exception e){
-                logger.error("get clientGroup error: "+e.getMessage());
+            } catch (Exception e) {
+                logger.error("get clientGroup error: " + e.getMessage());
                 continue;
             }
         }
@@ -512,18 +552,15 @@ public class SchoolApiService implements ISchoolApiService {
     public List<ClientGroup> getClientGroupsForClientManager(List<ClientGroup> clientGroups, Long idOfClient)
             throws Exception {
         List<ClientGroup> managerClientGroups = new ArrayList<>();
-        for(ClientGroup clientGroup: clientGroups){
+        for (ClientGroup clientGroup : clientGroups) {
             Criteria clientGroupManagerCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
-            Criterion groupNameAndClientCriteria = Restrictions.and(
-                    Restrictions.eq("clientGroupName", clientGroup.getGroupName()),
-                    Restrictions.eq("idOfClient",idOfClient)
-            );
-            clientGroupManagerCriteria.add(Restrictions.and(
-                    groupNameAndClientCriteria,
-                    Restrictions.eq("deleted", false)
-            ));
+            Criterion groupNameAndClientCriteria = Restrictions
+                    .and(Restrictions.eq("clientGroupName", clientGroup.getGroupName()),
+                            Restrictions.eq("idOfClient", idOfClient));
+            clientGroupManagerCriteria
+                    .add(Restrictions.and(groupNameAndClientCriteria, Restrictions.eq("deleted", false)));
             ClientGroupManager clientGroupManager = (ClientGroupManager) clientGroupManagerCriteria.uniqueResult();
-            if(clientGroupManager != null){
+            if (clientGroupManager != null) {
                 managerClientGroups.add(clientGroup);
             }
         }
@@ -536,25 +573,23 @@ public class SchoolApiService implements ISchoolApiService {
         List<PlanOrderClientDTO> clientDTOList = new ArrayList<>();
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
-        Query query = persistanceSession.createQuery("select distinct c from Client c "
-                + "join fetch c.clientGroup "
-                + "join fetch c.person "
-                + "left join fetch c.categoriesInternal as ci "
-                + "left join fetch ci.discountRulesInternal as dr "
-                + "left join fetch dr.categoryOrgsInternal "
-                + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName)=upper(:clientGroupName) ");
+        Query query = persistanceSession.createQuery(
+                "select distinct c from Client c " + "join fetch c.clientGroup " + "join fetch c.person "
+                        + "left join fetch c.categoriesInternal as ci "
+                        + "left join fetch ci.discountRulesInternal as dr " + "left join fetch dr.categoryOrgsInternal "
+                        + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName)=upper(:clientGroupName) ");
         query.setParameterList("idOfOrgList", getOrgIds(friendlyOrgs));
         query.setParameter("clientGroupName", clientGroup.getGroupName().toUpperCase());
         List<Client> clients = query.list();
-        for(Client client: clients){
+        for (Client client : clients) {
             PlanOrderClientDTO planOrderClientDTO = new PlanOrderClientDTO(client);
             List<CategoryDiscount> filteredCategoryDiscounts = new ArrayList<>();
-            for(CategoryDiscount categoryDiscount: client.getCategories()){
-                if(categoryDiscount.getCategoryType().getValue().equals(categoryDiscountEnumType.getValue())){
+            for (CategoryDiscount categoryDiscount : client.getCategories()) {
+                if (categoryDiscount.getCategoryType().getValue().equals(categoryDiscountEnumType.getValue())) {
                     filteredCategoryDiscounts.add(categoryDiscount);
                 }
             }
-            if(!filteredCategoryDiscounts.isEmpty()){
+            if (!filteredCategoryDiscounts.isEmpty()) {
                 planOrderClientDTO.setFilteredClientCategoryDiscounts(filteredCategoryDiscounts);
                 clientDTOList.add(planOrderClientDTO);
             }
@@ -565,19 +600,18 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public List<PlanOrderClientDTO> setEnterEventsForClients(List<PlanOrderClientDTO> clients, Date planDate)
             throws Exception {
-        List<Integer> enterPassDirections = Arrays.asList(EnterEvent.ENTRY, EnterEvent.RE_ENTRY, EnterEvent.DETECTED_INSIDE,
-                EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT);
+        List<Integer> enterPassDirections = Arrays
+                .asList(EnterEvent.ENTRY, EnterEvent.RE_ENTRY, EnterEvent.DETECTED_INSIDE,
+                        EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT);
         List<Integer> exitPassDirections = Arrays.asList(EnterEvent.DIRECTION_EXIT, EnterEvent.RE_EXIT);
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Query queryEvent = persistanceSession.createQuery("from EnterEvent "
-                + "where client=:client "
-                + "and evtDateTime>=:startDate and evtDateTime<:endDate "
-                + "and passDirection in (:passDirectionsList) "
-                + "order by evtDateTime desc");
+        Query queryEvent = persistanceSession.createQuery(
+                "from EnterEvent " + "where client=:client " + "and evtDateTime>=:startDate and evtDateTime<:endDate "
+                        + "and passDirection in (:passDirectionsList) " + "order by evtDateTime desc");
         queryEvent.setParameter("startDate", startDate);
         queryEvent.setParameter("endDate", endDate);
-        for(PlanOrderClientDTO clientDTO: clients){
+        for (PlanOrderClientDTO clientDTO : clients) {
             queryEvent.setParameter("client", clientDTO.getClient());
             queryEvent.setParameterList("passDirectionsList", enterPassDirections);
             queryEvent.setMaxResults(1);
@@ -592,41 +626,41 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     @Override
-    public List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId) throws Exception {
+    public List<PlanOrderClientDTO> setComplexesForClients(List<PlanOrderClientDTO> clients, Date planDate, Long orgId)
+            throws Exception {
         Org org = DAOUtils.findOrg(persistanceSession, orgId);
-        if(org == null)
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+        if (org == null) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Query complexInfoQuery = persistanceSession.createQuery("from ComplexInfo "
-                + "where org.idOfOrg=:orgId "
-                + "and menuDate>=:startDate and menuDate<:endDate "
-                + "and modeFree=1 "
-                + "and idOfComplex in (:complexIds) ");
+        Query complexInfoQuery = persistanceSession.createQuery(
+                "from ComplexInfo " + "where org.idOfOrg=:orgId " + "and menuDate>=:startDate and menuDate<:endDate "
+                        + "and modeFree=1 " + "and idOfComplex in (:complexIds) ");
         complexInfoQuery.setParameter("orgId", orgId);
         complexInfoQuery.setParameter("startDate", startDate);
         complexInfoQuery.setParameter("endDate", endDate);
-        for(PlanOrderClientDTO client: clients){
+        for (PlanOrderClientDTO client : clients) {
             List<ClientComplexDTO> clientComplexList = new ArrayList<>();
             HashMap<CategoryDiscount, List<DiscountRule>> filteredDiscountRulesMap = new HashMap<>();
             List<DiscountRule> clientFilteredDiscountRulesList = new ArrayList<>();
-            for(CategoryDiscount categoryDiscount: client.getFilteredClientCategoryDiscounts()){
-                if(categoryDiscount.getDiscountsRules().isEmpty())
+            for (CategoryDiscount categoryDiscount : client.getFilteredClientCategoryDiscounts()) {
+                if (categoryDiscount.getDiscountsRules().isEmpty()) {
                     continue;
-                for(DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
-                    if(discountRule.getCategoryOrgs() != null && !discountRule.getCategoryOrgs().isEmpty()
-                            && !orgHasCategoryOrg(org.getCategories(), discountRule.getCategoryOrgs())){
+                }
+                for (DiscountRule discountRule : categoryDiscount.getDiscountsRules()) {
+                    if (discountRule.getCategoryOrgs() != null && !discountRule.getCategoryOrgs().isEmpty()
+                            && !orgHasCategoryOrg(org.getCategories(), discountRule.getCategoryOrgs())) {
                         continue;
                     }
-                    if(clientFilteredDiscountRulesList.isEmpty()){
+                    if (clientFilteredDiscountRulesList.isEmpty()) {
                         clientFilteredDiscountRulesList.add(discountRule);
                         filteredDiscountRulesMap.put(categoryDiscount, new ArrayList<DiscountRule>());
                         filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
-                    }
-                    else {
-                        for(DiscountRule filteredDiscountRule: clientFilteredDiscountRulesList){
-                            if(filteredDiscountRule.getPriority() < discountRule.getPriority()){
+                    } else {
+                        for (DiscountRule filteredDiscountRule : clientFilteredDiscountRulesList) {
+                            if (filteredDiscountRule.getPriority() < discountRule.getPriority()) {
                                 clientFilteredDiscountRulesList.clear();
                                 clientFilteredDiscountRulesList.add(discountRule);
                                 filteredDiscountRulesMap.clear();
@@ -634,11 +668,11 @@ public class SchoolApiService implements ISchoolApiService {
                                 filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
                                 break;
                             }
-                            if(filteredDiscountRule.getPriority() == discountRule.getPriority()){
+                            if (filteredDiscountRule.getPriority() == discountRule.getPriority()) {
                                 clientFilteredDiscountRulesList.add(discountRule);
-                                if(filteredDiscountRulesMap.containsKey(categoryDiscount))
+                                if (filteredDiscountRulesMap.containsKey(categoryDiscount)) {
                                     filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
-                                else {
+                                } else {
                                     filteredDiscountRulesMap.put(categoryDiscount, new ArrayList<DiscountRule>());
                                     filteredDiscountRulesMap.get(categoryDiscount).add(discountRule);
                                 }
@@ -648,12 +682,12 @@ public class SchoolApiService implements ISchoolApiService {
                     }
                 }
             }
-            for(Map.Entry categoryDiscountEntry: filteredDiscountRulesMap.entrySet()){
+            for (Map.Entry categoryDiscountEntry : filteredDiscountRulesMap.entrySet()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) categoryDiscountEntry.getKey();
-                for(DiscountRule categoryDiscountRule: ((List<DiscountRule>) categoryDiscountEntry.getValue())){
-                    complexInfoQuery.setParameterList("complexIds",categoryDiscountRule.getComplexIdsFromComplexMap());
+                for (DiscountRule categoryDiscountRule : ((List<DiscountRule>) categoryDiscountEntry.getValue())) {
+                    complexInfoQuery.setParameterList("complexIds", categoryDiscountRule.getComplexIdsFromComplexMap());
                     List<ComplexInfo> complexInfoList = complexInfoQuery.list();
-                    for(ComplexInfo complexInfo: complexInfoList){
+                    for (ComplexInfo complexInfo : complexInfoList) {
                         ClientComplexDTO clientComplexDTO = new ClientComplexDTO(categoryDiscount.getCategoryName(),
                                 complexInfo, null, null, null, categoryDiscountRule);
                         clientComplexList.add(clientComplexDTO);
@@ -669,36 +703,34 @@ public class SchoolApiService implements ISchoolApiService {
     public List<PlanOrderClientDTO> createOrUpdatePlanOrderForClientsComplexes(List<PlanOrderClientDTO> clients,
             Date planDate, Long orgId, String groupName) throws Exception {
         Org org = DAOUtils.findOrg(persistanceSession, orgId);
-        if(org == null){
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+        if (org == null) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
         }
         IIdGenerator<Long> uniqueIdGenerator = OrganizationUniqueGeneratorId.getInstance(orgId);
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Query planOrderQuery = persistanceSession.createQuery("from PlanOrder po "
-                + "where po.org.idOfOrg=:orgId "
-                + "and po.client.idOfClient=:clientId "
-                + "and po.idOfComplex=:idOfComplex "
-                + " and po.complexName=:complexName "
-                + "and po.planDate>=:startDate and po.planDate<:endDate ");
+        Query planOrderQuery = persistanceSession.createQuery(
+                "from PlanOrder po " + "where po.org.idOfOrg=:orgId " + "and po.client.idOfClient=:clientId "
+                        + "and po.idOfComplex=:idOfComplex " + " and po.complexName=:complexName "
+                        + "and po.planDate>=:startDate and po.planDate<:endDate ");
         planOrderQuery.setParameter("orgId", orgId);
         planOrderQuery.setParameter("startDate", startDate);
         planOrderQuery.setParameter("endDate", endDate);
-        for(Iterator clientIterator = clients.iterator(); clientIterator.hasNext();){
+        for (Iterator clientIterator = clients.iterator(); clientIterator.hasNext(); ) {
             PlanOrderClientDTO planOrderClientDTO = (PlanOrderClientDTO) clientIterator.next();
-            if(planOrderClientDTO.getClient() == null){
+            if (planOrderClientDTO.getClient() == null) {
                 clients.remove(planOrderClientDTO);
                 continue;
             }
-            planOrderQuery.setParameter("clientId",planOrderClientDTO.getClient().getIdOfClient());
-            for(ClientComplexDTO complexDTO: planOrderClientDTO.getComplexes()){
+            planOrderQuery.setParameter("clientId", planOrderClientDTO.getClient().getIdOfClient());
+            for (ClientComplexDTO complexDTO : planOrderClientDTO.getComplexes()) {
                 planOrderQuery.setParameter("idOfComplex", complexDTO.getComplexInfo().getIdOfComplex());
                 planOrderQuery.setParameter("complexName", complexDTO.getComplexInfo().getComplexName());
                 planOrderQuery.setMaxResults(1);
                 PlanOrder planOrder = (PlanOrder) planOrderQuery.uniqueResult();
-                if(planOrder != null){
-                    if(planOrder.getOrder() == null){
+                if (planOrder != null) {
+                    if (planOrder.getOrder() == null) {
                         planOrder.setIdOfComplex(complexDTO.getComplexInfo().getIdOfComplex());
                         planOrder.setGroupName(groupName);
                         planOrder.setComplexName(complexDTO.getComplexInfo().getComplexName());
@@ -706,31 +738,29 @@ public class SchoolApiService implements ISchoolApiService {
                         planOrder.setLastUpdate(new Date());
                         persistanceSession.update(planOrder);
                     }
-                }
-                else{
-                    ComplexInfo complexInfo = (ComplexInfo) persistanceSession.get(ComplexInfo.class, complexDTO.getComplexInfo().getIdOfComplexInfo());
-                    planOrder = new PlanOrder(uniqueIdGenerator.createId(), org, groupName, planOrderClientDTO.getClient(),
-                            new Date(planDate.getTime()), complexInfo.getIdOfComplex(), complexInfo.getComplexName(),
-                            null, false, null, null, complexDTO.getDiscountRule());
+                } else {
+                    ComplexInfo complexInfo = (ComplexInfo) persistanceSession
+                            .get(ComplexInfo.class, complexDTO.getComplexInfo().getIdOfComplexInfo());
+                    planOrder = new PlanOrder(uniqueIdGenerator.createId(), org, groupName,
+                            planOrderClientDTO.getClient(), new Date(planDate.getTime()), complexInfo.getIdOfComplex(),
+                            complexInfo.getComplexName(), null, false, null, null, complexDTO.getDiscountRule());
                     persistanceSession.save(planOrder);
                 }
 
-                if(planOrder.getOrder() == null){
+                if (planOrder.getOrder() == null) {
                     complexDTO.setOrder(null);
-                }
-                else{
-                    if(planOrder.getOrder().getState() == 0){
+                } else {
+                    if (planOrder.getOrder().getState() == 0) {
                         complexDTO.setOrder(true);
-                    }
-                    else if(planOrder.getOrder().getState() == 1){
+                    } else if (planOrder.getOrder().getState() == 1) {
                         complexDTO.setOrder(false);
-                    }
-                    else
+                    } else {
                         complexDTO.setOrder(null);
+                    }
                 }
-                if(planOrder.getUserRequestToPay() != null){
+                if (planOrder.getUserRequestToPay() != null) {
                     Person person = planOrder.getUserRequestToPay().getPerson();
-                    if(person != null){
+                    if (person != null) {
                         complexDTO.setmName(person.getFirstName());
                         complexDTO.setmSurname(person.getSurname());
                         complexDTO.setmSecondName(person.getSecondName());
@@ -748,27 +778,24 @@ public class SchoolApiService implements ISchoolApiService {
         orgs.add(DAOUtils.findOrg(persistanceSession, idOfOrg));
         List<Long> orgsIds = getOrgIds(orgs);
         Criteria clientsCriteria = persistanceSession.createCriteria(Client.class);
-        clientsCriteria.add(Restrictions.and(
-                Restrictions.in("contractId", contractIds),
-                Restrictions.in("org.idOfOrg", orgsIds)
-        ));
+        clientsCriteria.add(Restrictions
+                .and(Restrictions.in("contractId", contractIds), Restrictions.in("org.idOfOrg", orgsIds)));
         return clientsCriteria.list();
     }
 
     @Override
-    public List<Client> getClientsByGroupsAndContractIds(List<String > groupsNames, List<Long> contractIds, Long idOfOrg)
+    public List<Client> getClientsByGroupsAndContractIds(List<String> groupsNames, List<Long> contractIds, Long idOfOrg)
             throws Exception {
         List<Org> orgs = DAOUtils.findFriendlyOrgs(persistanceSession, idOfOrg);
         orgs.add(DAOUtils.findOrg(persistanceSession, idOfOrg));
         List<Long> orgsIds = getOrgIds(orgs);
         List<String> groupsNamesInUpperCase = new ArrayList<>();
-        for(String groupName: groupsNames){
+        for (String groupName : groupsNames) {
             groupsNamesInUpperCase.add(groupName.toUpperCase());
         }
-        Query query = persistanceSession.createQuery("from Client c "
-                + "join fetch c.clientGroup "
-                + "join fetch c.person "
-                + "where c.contractId in (:contractsIdsList) and c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
+        Query query = persistanceSession.createQuery(
+                "from Client c " + "join fetch c.clientGroup " + "join fetch c.person "
+                        + "where c.contractId in (:contractsIdsList) and c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) in (:nameOfGroupList)");
         query.setParameterList("contractsIdsList", contractIds);
         query.setParameterList("idOfOrgList", orgsIds);
         query.setParameterList("nameOfGroupList", groupsNamesInUpperCase);
@@ -780,21 +807,14 @@ public class SchoolApiService implements ISchoolApiService {
             throws Exception {
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Criteria planOrdersCriteria = persistanceSession.createCriteria(PlanOrder.class).createAlias("client", "c",
-                JoinType.LEFT_OUTER_JOIN).createAlias("order","o", JoinType.LEFT_OUTER_JOIN);
-        planOrdersCriteria.add(Restrictions.and(
-                Restrictions.and(
-                        Restrictions.and(
-                                Restrictions.isNull("o.compositeIdOfOrder.idOfOrder"),
-                                Restrictions.eq("complexName", complexName)
-                        ),
-                        Restrictions.and(
-                                Restrictions.ge("planDate", startDate),
-                                Restrictions.lt("planDate", endDate)
-                        )
-                ),
-                Restrictions.in("c.contractId", contractIds)
-        ));
+        Criteria planOrdersCriteria = persistanceSession.createCriteria(PlanOrder.class)
+                .createAlias("client", "c", JoinType.LEFT_OUTER_JOIN)
+                .createAlias("order", "o", JoinType.LEFT_OUTER_JOIN);
+        planOrdersCriteria.add(Restrictions.and(Restrictions.and(Restrictions
+                        .and(Restrictions.isNull("o.compositeIdOfOrder.idOfOrder"),
+                                Restrictions.eq("complexName", complexName)),
+                Restrictions.and(Restrictions.ge("planDate", startDate), Restrictions.lt("planDate", endDate))),
+                Restrictions.in("c.contractId", contractIds)));
         List<PlanOrder> planOrders = planOrdersCriteria.list();
         return planOrders;
     }
@@ -804,10 +824,11 @@ public class SchoolApiService implements ISchoolApiService {
             throws Exception {
         User requestUser = DAOUtils.findUser(persistanceSession, idOfUser);
         Date lastUpdateDate = new Date();
-        if(requestUser == null)
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+        if (requestUser == null) {
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
-        for(PlanOrder planOrder: planOrders){
+        }
+        for (PlanOrder planOrder : planOrders) {
             planOrder.setToPay(toPay);
             planOrder.setUserRequestToPay(requestUser);
             planOrder.setLastUpdate(lastUpdateDate);
@@ -821,21 +842,13 @@ public class SchoolApiService implements ISchoolApiService {
             Boolean toPay) throws Exception {
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
-        Criteria planOrdersCriteria = persistanceSession.createCriteria(PlanOrder.class).createAlias("client", "c",
-                JoinType.LEFT_OUTER_JOIN).createAlias("order","o", JoinType.LEFT_OUTER_JOIN);
-        planOrdersCriteria.add(Restrictions.and(
-                Restrictions.and(
-                        Restrictions.and(
-                                Restrictions.eq("toPay", toPay),
-                                Restrictions.eq("complexName", complexName)
-                        ),
-                        Restrictions.and(
-                                Restrictions.ge("planDate", startDate),
-                                Restrictions.lt("planDate", endDate)
-                        )
-                ),
-                Restrictions.in("c.contractId", contractIds)
-        ));
+        Criteria planOrdersCriteria = persistanceSession.createCriteria(PlanOrder.class)
+                .createAlias("client", "c", JoinType.LEFT_OUTER_JOIN)
+                .createAlias("order", "o", JoinType.LEFT_OUTER_JOIN);
+        planOrdersCriteria.add(Restrictions.and(Restrictions
+                        .and(Restrictions.and(Restrictions.eq("toPay", toPay), Restrictions.eq("complexName", complexName)),
+                                Restrictions.and(Restrictions.ge("planDate", startDate), Restrictions.lt("planDate", endDate))),
+                Restrictions.in("c.contractId", contractIds)));
         return planOrdersCriteria.list();
     }
 
@@ -845,43 +858,52 @@ public class SchoolApiService implements ISchoolApiService {
         User requestUser = DAOUtils.findUser(persistanceSession, idOfUser);
         String orderComment = "Льготный план.  Карта не указана Баланс счета после оплаты: 0,00 р.";
         Date lastUpdateDate = new Date();
-        if(requestUser == null)
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+        if (requestUser == null) {
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
-        for(PlanOrder planOrder: planOrders){
-            if(planOrder.getOrg() == null || planOrder.getClient() == null)
+        }
+        for (PlanOrder planOrder : planOrders) {
+            if (planOrder.getOrg() == null || planOrder.getClient() == null) {
                 continue;
+            }
             Order planOrderOrder = null;
             List<OrderDetail> orderDetails = new ArrayList<>();
-            if(orderState){
-                if(planOrder.getOrder() == null || planOrder.getOrder().getState() == Order.STATE_CANCELED){
+            if (orderState) {
+                if (planOrder.getOrder() == null || planOrder.getOrder().getState() == Order.STATE_CANCELED) {
                     Long orgId = planOrder.getOrg().getIdOfOrg();
                     Long idOfRule = null;
-                    if(planOrder.getDiscountRule() != null){
+                    if (planOrder.getDiscountRule() != null) {
                         idOfRule = planOrder.getDiscountRule().getIdOfRule();
                     }
                     IIdGenerator<Long> orderIdGenerator = OrganizationUniqueGeneratorId.getInstance(orgId);
-                    CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(planOrder.getOrg().getIdOfOrg(), orderIdGenerator.createId());
-                    ComplexInfo planOrderComplex = getComplexInfoByOrgIdAndIdOfComplexAndComplexName(planOrder.getOrg().getIdOfOrg(),
-                            planOrder.getIdOfComplex(), planOrder.getComplexName(), planOrder.getPlanDate());
-                    if(planOrderComplex == null)
+                    CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(planOrder.getOrg().getIdOfOrg(),
+                            orderIdGenerator.createId());
+                    ComplexInfo planOrderComplex = getComplexInfoByOrgIdAndIdOfComplexAndComplexName(
+                            planOrder.getOrg().getIdOfOrg(), planOrder.getIdOfComplex(), planOrder.getComplexName(),
+                            planOrder.getPlanDate());
+                    if (planOrderComplex == null) {
                         continue;
-                    planOrderOrder = new Order(compositeIdOfOrder, idOfUser, planOrderComplex.getCurrentPrice(),
-                            0L,  0, 0, planOrder.getPlanDate(), new Date(), 0, 0,
-                            orderComment, planOrder.getClient(),null,null,null,
-                            planOrder.getOrg().getDefaultSupplier(), OrderTypeEnumType.REDUCED_PRICE_PLAN, null);
+                    }
+                    planOrderOrder = new Order(compositeIdOfOrder, idOfUser, planOrderComplex.getCurrentPrice(), 0L, 0,
+                            0, planOrder.getPlanDate(), new Date(), 0, 0, orderComment, planOrder.getClient(), null,
+                            null, null, planOrder.getOrg().getDefaultSupplier(), OrderTypeEnumType.REDUCED_PRICE_PLAN,
+                            null);
                     planOrderOrder.setIdOfClientGroup(planOrder.getClient().getIdOfClientGroup());
-                    CompositeIdOfOrderDetail compositeIdOfOrderDetailForComplex = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
+                    CompositeIdOfOrderDetail compositeIdOfOrderDetailForComplex = new CompositeIdOfOrderDetail(orgId,
+                            orderIdGenerator.createId());
                     orderDetails.add(buildOrderDetailsFromComplex(compositeIdOfOrderDetailForComplex,
                             planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), planOrderComplex, idOfRule));
-                    List<MenuDetail> complexMenuDetails = getMenuDetailsForComplexNameAndDate(planOrder.getPlanDate(), planOrderComplex);
-                    for(MenuDetail menuDetail: complexMenuDetails){
-                        CompositeIdOfOrderDetail compositeIdOfOrderDetailForMenuDetails = new CompositeIdOfOrderDetail(orgId, orderIdGenerator.createId());
-                        orderDetails.add(buildOrderDetailsFromMenuDetails(compositeIdOfOrderDetailForMenuDetails,planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), menuDetail));
+                    List<MenuDetail> complexMenuDetails = getMenuDetailsForComplexNameAndDate(planOrder.getPlanDate(),
+                            planOrderComplex);
+                    for (MenuDetail menuDetail : complexMenuDetails) {
+                        CompositeIdOfOrderDetail compositeIdOfOrderDetailForMenuDetails = new CompositeIdOfOrderDetail(
+                                orgId, orderIdGenerator.createId());
+                        orderDetails.add(buildOrderDetailsFromMenuDetails(compositeIdOfOrderDetailForMenuDetails,
+                                planOrderOrder.getCompositeIdOfOrder().getIdOfOrder(), menuDetail));
                     }
-                    if(planOrderOrder!= null){
+                    if (planOrderOrder != null) {
                         persistanceSession.save(planOrderOrder);
-                        for(OrderDetail orderDetail: orderDetails){
+                        for (OrderDetail orderDetail : orderDetails) {
                             persistanceSession.save(orderDetail);
                         }
                         planOrder.setIdOfOrder(planOrderOrder.getCompositeIdOfOrder().getIdOfOrder());
@@ -890,13 +912,11 @@ public class SchoolApiService implements ISchoolApiService {
                     planOrder.setUserConfirmToPay(requestUser);
                     planOrder.setLastUpdate(lastUpdateDate);
                     persistanceSession.update(planOrder);
-                }
-                else {
+                } else {
                     continue;
                 }
-            }
-            else{
-                if(planOrder.getOrder() != null && planOrder.getOrder().getState() == Order.STATE_COMMITED) {
+            } else {
+                if (planOrder.getOrder() != null && planOrder.getOrder().getState() == Order.STATE_COMMITED) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                     String commentForCancelledOrder = "(отменен: " + simpleDateFormat.format(new Date()) + ")";
                     Order currentPlanOrderOrder = planOrder.getOrder();
@@ -912,14 +932,14 @@ public class SchoolApiService implements ISchoolApiService {
         return planOrders;
     }
 
-    public ComplexInfo getComplexInfoByOrgIdAndIdOfComplexAndComplexName(long orgId, int idOfComplex, String complexName, Date planDate) throws Exception {
+    public ComplexInfo getComplexInfoByOrgIdAndIdOfComplexAndComplexName(long orgId, int idOfComplex,
+            String complexName, Date planDate) throws Exception {
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
         Query complexInfoQuery = persistanceSession.createQuery("select distinct ci from ComplexInfo ci"
                 + " where ci.org.idOfOrg=:orgId and ci.idOfComplex=:idOfComplex"
                 + " and upper(ci.complexName)=upper(:complexName)"
-                + " and ci.menuDate>=:startDate and ci.menuDate<:endDate"
-                + " and ci.modeFree=1");
+                + " and ci.menuDate>=:startDate and ci.menuDate<:endDate" + " and ci.modeFree=1");
         complexInfoQuery.setParameter("orgId", orgId);
         complexInfoQuery.setParameter("idOfComplex", idOfComplex);
         complexInfoQuery.setParameter("complexName", complexName);
@@ -933,7 +953,8 @@ public class SchoolApiService implements ISchoolApiService {
     private OrderDetail buildOrderDetailsFromMenuDetails(CompositeIdOfOrderDetail compositeIdOfOrderDetail,
             Long idOfOrder, MenuDetail menuDetail) throws Exception {
         String menuDetailName = StringUtils.substring(menuDetail.getShortName(), 0, menuDetailNameMaxLength);
-        String rootMenu = StringUtils.substring(StringUtils.substringBefore(menuDetail.getMenuPath(), "|"), 0, rootMenuMaxLength);
+        String rootMenu = StringUtils
+                .substring(StringUtils.substringBefore(menuDetail.getMenuPath(), "|"), 0, rootMenuMaxLength);
         String menuGroup = StringUtils.substring(menuDetail.getGroupName(), 0, menuGroupMaxLength);
         String itemCode = StringUtils.substring(menuDetail.getItemCode(), 0, itemCodeMaxLength);
         Long idOfMenuFromSync = menuDetail.getIdOfMenuFromSync();
@@ -946,21 +967,22 @@ public class SchoolApiService implements ISchoolApiService {
         int menuType = 150;
         OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
         Good menuDetailsGood = null;
-        if(menuDetail.getIdOfGood() != null)
+        if (menuDetail.getIdOfGood() != null) {
             menuDetailsGood = getGoodById(menuDetail.getIdOfGood());
-        if(menuDetailsGood != null){
+        }
+        if (menuDetailsGood != null) {
             itemCode = StringUtils.substring(menuDetailsGood.getGoodsCode(), 0, itemCodeMaxLength);
-            if(menuDetailsGood.getGoodType() != null){
+            if (menuDetailsGood.getGoodType() != null) {
                 FRationType = OrderDetailFRationType.fromInteger(menuDetailsGood.getGoodType().getCode());
             }
         }
         return new OrderDetail(compositeIdOfOrderDetail, idOfOrder, qty, discount, socDiscount, rPrice, menuDetailName,
-                rootMenu, menuGroup, menuOrigin, menuOutput, menuType, idOfMenuFromSync,
-                null, false, itemCode, null, FRationType);
+                rootMenu, menuGroup, menuOrigin, menuOutput, menuType, idOfMenuFromSync, null, false, itemCode, null,
+                FRationType);
     }
 
-    private OrderDetail buildOrderDetailsFromComplex(CompositeIdOfOrderDetail compositeIdOfOrderDetail,
-            Long idOfOrder, ComplexInfo complexInfo, Long idOfRule) {
+    private OrderDetail buildOrderDetailsFromComplex(CompositeIdOfOrderDetail compositeIdOfOrderDetail, Long idOfOrder,
+            ComplexInfo complexInfo, Long idOfRule) {
         String menuDetailName = StringUtils.substring(complexInfo.getComplexName(), 0, menuDetailNameMaxLength);
         String rootMenu = "";
         String menuGroup = "";
@@ -968,9 +990,10 @@ public class SchoolApiService implements ISchoolApiService {
         Long idOfMenuFromSync = null;
         String menuOutput = "";
         int menuOrigin = 0;
-        if(complexInfo.getMenuDetail() != null){
+        if (complexInfo.getMenuDetail() != null) {
             MenuDetail menuDetail = complexInfo.getMenuDetail();
-            rootMenu = StringUtils.substring(StringUtils.substringBefore(menuDetail.getMenuPath(), "|"), 0, rootMenuMaxLength);
+            rootMenu = StringUtils
+                    .substring(StringUtils.substringBefore(menuDetail.getMenuPath(), "|"), 0, rootMenuMaxLength);
             menuGroup = StringUtils.substring(menuDetail.getGroupName(), 0, menuGroupMaxLength);
             itemCode = StringUtils.substring(menuDetail.getItemCode(), 0, itemCodeMaxLength);
             idOfMenuFromSync = menuDetail.getIdOfMenuFromSync();
@@ -984,42 +1007,43 @@ public class SchoolApiService implements ISchoolApiService {
         int menuType = 50;
         OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
         Good complexInfoGood = complexInfo.getGood();
-        if(complexInfoGood != null){
+        if (complexInfoGood != null) {
             itemCode = StringUtils.substring(complexInfoGood.getGoodsCode(), 0, itemCodeMaxLength);
-            if(complexInfoGood.getGoodType() != null){
+            if (complexInfoGood.getGoodType() != null) {
                 FRationType = OrderDetailFRationType.fromInteger(complexInfoGood.getGoodType().getCode());
             }
         }
         return new OrderDetail(compositeIdOfOrderDetail, idOfOrder, qty, discount, socDiscount, rPrice, menuDetailName,
-                rootMenu, menuGroup, menuOrigin, menuOutput, menuType, idOfMenuFromSync,
-                null, false, itemCode, idOfRule, FRationType);
+                rootMenu, menuGroup, menuOrigin, menuOutput, menuType, idOfMenuFromSync, null, false, itemCode,
+                idOfRule, FRationType);
     }
 
 
-    private Date getDateWithAddDay(Date date, int days){
+    private Date getDateWithAddDay(Date date, int days) {
         Calendar dateCal = Calendar.getInstance();
         dateCal.setTimeInMillis(date.getTime());
         dateCal.set(Calendar.HOUR_OF_DAY, 0);
         dateCal.set(Calendar.MINUTE, 0);
         dateCal.set(Calendar.SECOND, 0);
-        dateCal.set(Calendar.MILLISECOND,0);
+        dateCal.set(Calendar.MILLISECOND, 0);
         dateCal.add(Calendar.DATE, days);
         return dateCal.getTime();
 
     }
 
-    private List<ComplexInfoDetail> getComplexInfoDetails(ComplexInfo complexInfo) throws Exception{
+    private List<ComplexInfoDetail> getComplexInfoDetails(ComplexInfo complexInfo) throws Exception {
         Criteria complexInfoDetailsCriteria = persistanceSession.createCriteria(ComplexInfoDetail.class);
-        complexInfoDetailsCriteria.add(Restrictions.eq("complexInfo.idOfComplexInfo", complexInfo.getIdOfComplexInfo()));
+        complexInfoDetailsCriteria
+                .add(Restrictions.eq("complexInfo.idOfComplexInfo", complexInfo.getIdOfComplexInfo()));
         return complexInfoDetailsCriteria.list();
     }
 
-    private List<MenuDetail> getMenuDetailsForComplexNameAndDate(Date planDate, ComplexInfo complexInfo) throws Exception {
+    private List<MenuDetail> getMenuDetailsForComplexNameAndDate(Date planDate, ComplexInfo complexInfo)
+            throws Exception {
         Date startDate = getDateWithAddDay(planDate, 0);
         Date endDate = getDateWithAddDay(startDate, 1);
         Query menuDetailsQuery = persistanceSession.createQuery(
-                "select md from ComplexInfoDetail cd"
-                        + " join cd.menuDetail md"
+                "select md from ComplexInfoDetail cd" + " join cd.menuDetail md"
                         + " where cd.complexInfo.org.idOfOrg =:idOfOrg and upper(cd.complexInfo.complexName) = upper(:complexName)"
                         + " and cd.complexInfo.menuDate>=:startDate and cd.complexInfo.menuDate<:endDate");
         menuDetailsQuery.setLong("idOfOrg", complexInfo.getOrg().getIdOfOrg());
@@ -1030,20 +1054,21 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
 
-    private Good getGoodById(Long goodId) throws Exception{
+    private Good getGoodById(Long goodId) throws Exception {
         return (Good) persistanceSession.get(Good.class, goodId);
     }
 
-    private HashMap<String, List<Client>> getClientsGroupByClientGroup(List<Client> clients){
+    private HashMap<String, List<Client>> getClientsGroupByClientGroup(List<Client> clients) {
         HashMap<String, List<Client>> orderedClients = new LinkedHashMap<>();
-        for(Client client: clients){
-            if(client.getClientGroup() == null || client.getClientGroup().getGroupName() == null
-                    || client.getClientGroup().getGroupName().isEmpty())
+        for (Client client : clients) {
+            if (client.getClientGroup() == null || client.getClientGroup().getGroupName() == null || client
+                    .getClientGroup().getGroupName().isEmpty()) {
                 continue;
+            }
             String key = client.getClientGroup().getGroupName();
-            if(orderedClients.containsKey(key))
+            if (orderedClients.containsKey(key)) {
                 orderedClients.get(key).add(client);
-            else {
+            } else {
                 List<Client> hashMapClients = new LinkedList<>();
                 hashMapClients.add(client);
                 orderedClients.put(key, hashMapClients);
@@ -1056,41 +1081,45 @@ public class SchoolApiService implements ISchoolApiService {
         List<Client> processedClients = new ArrayList<>();
         boolean newClientGroupIsNotPredefined = isGroupNotPredefined(clientGroup);
         Long newClientGroupId = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-        for(Client client: clients){
-            if(client.getClientGroup() == null)
+        for (Client client : clients) {
+            if (client.getClientGroup() == null) {
                 continue;
+            }
             Long clientClientGroupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-            if(newClientGroupIsNotPredefined){
-                if(isGroupNotPredefined(client.getClientGroup()))
+            if (newClientGroupIsNotPredefined) {
+                if (isGroupNotPredefined(client.getClientGroup())) {
                     processedClients.add(client);
-                else if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
-                        || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
-                        || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
-                 processedClients.add(client);
+                } else if (clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue()
+                        .longValue() || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED
+                        .getValue().longValue()
+                        || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
+                        .longValue()) {
+                    processedClients.add(client);
                 }
             }
-            if(!newClientGroupIsNotPredefined){
-                if(!isGroupNotPredefined(client.getClientGroup())){
-                    if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue()
-                            && (newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
-                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue())){
+            if (!newClientGroupIsNotPredefined) {
+                if (!isGroupNotPredefined(client.getClientGroup())) {
+                    if (clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue() && (
+                            newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
+                                    || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED
+                                    .getValue())) {
                         processedClients.add(client);
                         continue;
                     }
-                    if(clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
+                    if (clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue()
                             || clientClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue()) {
                         processedClients.add(client);
                         continue;
                     }
-                    if(newClientGroupId.longValue() != ClientGroup.Predefined.CLIENT_DISPLACED.getValue()){
+                    if (newClientGroupId.longValue() != ClientGroup.Predefined.CLIENT_DISPLACED.getValue()) {
                         processedClients.add(client);
                         continue;
                     }
-                }
-                else {
-                    if(newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
-                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue().longValue()
-                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()){
+                } else {
+                    if (newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DISPLACED.getValue().longValue()
+                            || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_DELETED.getValue()
+                            .longValue() || newClientGroupId.longValue() == ClientGroup.Predefined.CLIENT_LEAVING
+                            .getValue().longValue()) {
                         processedClients.add(client);
                         continue;
                     }
@@ -1104,19 +1133,21 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public Long getIdOfOrgFromUser(String username) throws Exception {
         User user = DAOUtils.findUser(persistanceSession, username);
-        if(user == null || user.isBlocked() || user.getDeletedState())
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+        if (user == null || user.isBlocked() || user.getDeletedState()) {
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
-        if(user.getOrg() == null && user.getClient() == null)
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
-                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
-        if(user.getOrg() == null && user.getClient().getOrg() == null)
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
-                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
-        if(user.getClient() != null){
-            return user.getClient().getOrg().getIdOfOrg();
         }
-        else {
+        if (user.getOrg() == null && user.getClient() == null) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
+        if (user.getOrg() == null && user.getClient().getOrg() == null) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
+        if (user.getClient() != null) {
+            return user.getClient().getOrg().getIdOfOrg();
+        } else {
             return user.getOrg().getIdOfOrg();
         }
     }
@@ -1126,7 +1157,7 @@ public class SchoolApiService implements ISchoolApiService {
         List<FriendlyOrgDTO> friendlyOrgDTOList = new ArrayList<>();
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
-        for(Org org: friendlyOrgs){
+        for (Org org : friendlyOrgs) {
             friendlyOrgDTOList.add(new FriendlyOrgDTO(org));
         }
         return friendlyOrgDTOList;
@@ -1135,29 +1166,31 @@ public class SchoolApiService implements ISchoolApiService {
     @Override
     public List<GroupNameDTO> getManagerGroups(Long contractId) throws Exception {
         Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
-        if(client == null)
-            throw new RequestProcessingException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
+        if (client == null) {
+            throw new WebApplicationException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorMessage());
+        }
         Criteria clientGroupManagersCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
-        clientGroupManagersCriteria.add(Restrictions.and(
-                Restrictions.eq("idOfClient",client.getIdOfClient()),
-                Restrictions.eq("deleted", false)
-        ));
+        clientGroupManagersCriteria.add(Restrictions
+                .and(Restrictions.eq("idOfClient", client.getIdOfClient()), Restrictions.eq("deleted", false)));
         List<ClientGroupManager> clientGroupsManager = clientGroupManagersCriteria.list();
         List<GroupNameDTO> managerGroups = new LinkedList<>();
-        for(ClientGroupManager clientGroupManager: clientGroupsManager){
+        for (ClientGroupManager clientGroupManager : clientGroupsManager) {
             managerGroups.add(new GroupNameDTO(clientGroupManager.getClientGroupName()));
         }
         return managerGroups;
     }
 
     private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
-        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, idOfCategoryDiscount);
+        CategoryDiscount categoryDiscount = (CategoryDiscount) persistanceSession
+                .get(CategoryDiscount.class, idOfCategoryDiscount);
         if (categoryDiscount == null) {
-            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
+            throw new WebApplicationException(GroupManagementErrors.DISCOUNT_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.DISCOUNT_NOT_FOUND.getErrorMessage());
         }
         if (categoryDiscount.getBlockedToChange()) {
-            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_MODIFY);
+            throw new WebApplicationException(GroupManagementErrors.DISCOUNT_NOT_MODIFY.getErrorCode(),
+                    GroupManagementErrors.DISCOUNT_NOT_MODIFY.getErrorMessage());
         }
         return categoryDiscount;
     }
@@ -1183,11 +1216,13 @@ public class SchoolApiService implements ISchoolApiService {
                                 ResponseDiscountClientsItem.MESSAGE_OK);
                     } catch (Exception e) {
                         logger.error("Error in add discount processDiscountClientsList: ", e);
-                        return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
+                        return new ResponseDiscountClientsItem(contractId,
+                                ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
                                 ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR);
                     }
                 } else {
-                    return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_DISCOUNT_NOT_FOUND,
+                    return new ResponseDiscountClientsItem(contractId,
+                            ResponseDiscountClientsItem.CODE_DISCOUNT_NOT_FOUND,
                             ResponseDiscountClientsItem.MESSAGE_DISCOUNT_NOT_FOUND);
                 }
             }
@@ -1209,7 +1244,9 @@ public class SchoolApiService implements ISchoolApiService {
 
     private boolean isProperDiscount(ResponseDiscounts availableDiscounts, Long discountId) {
         for (ResponseDiscountItem item : availableDiscounts.getItems()) {
-            if (item.getIdOfCategoryDiscount().equals(discountId)) return true;
+            if (item.getIdOfCategoryDiscount().equals(discountId)) {
+                return true;
+            }
         }
         return false;
     }
@@ -1217,39 +1254,49 @@ public class SchoolApiService implements ISchoolApiService {
     private ClientGroup findClientGroup(GroupNamesToOrgs gnto, List<ClientGroup> groups, Long idOfOrg) {
         if (gnto == null || gnto.getIdOfOrg() == null) {
             for (ClientGroup clientGroup : groups) {
-                if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(idOfOrg)) return clientGroup;
+                if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(idOfOrg)) {
+                    return clientGroup;
+                }
             }
             return null;
         }
         for (ClientGroup clientGroup : groups) {
-            if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(gnto.getIdOfOrg())) return clientGroup;
+            if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(gnto.getIdOfOrg())) {
+                return clientGroup;
+            }
         }
         return null;
     }
 
-    private Boolean isGroupNotPredefined(ClientGroup group){
-        if(group == null)
+    private Boolean isGroupNotPredefined(ClientGroup group) {
+        if (group == null) {
             return false;
-        if(group.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() < ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES)
+        }
+        if (group.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue()
+                < ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
             return true;
+        }
         return false;
     }
 
-    private List<ClientGroupManager> getClientGroupManagerByGroupName(Session persistanceSession, String groupName, long orgId) throws Exception{
+    private List<ClientGroupManager> getClientGroupManagerByGroupName(Session persistanceSession, String groupName,
+            long orgId) throws Exception {
         Criteria managersCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
-        if(groupName == null || groupName.isEmpty())
+        if (groupName == null || groupName.isEmpty()) {
             throw new NullArgumentException("Group name cannot be null or empty");
+        }
         managersCriteria.add(Restrictions.eq("orgOwner", orgId));
         managersCriteria.add(Restrictions.eq("clientGroupName", groupName));
         managersCriteria.add(Restrictions.eq("deleted", false));
         return managersCriteria.list();
     }
 
-    private List<GroupManager> getGroupManagersFromClients(List<Client> clients){
-        if(clients == null)
+    private List<GroupManager> getGroupManagersFromClients(List<Client> clients) {
+        if (clients == null) {
             throw new NullArgumentException("List of clients cannot be null.");
+        }
         List<GroupManager> groupManagerList = new LinkedList<GroupManager>();
-        for (Client client: clients){
+        for (Client client : clients) {
             GroupManager groupManager = new GroupManager();
             groupManager.setContractId(client.getContractId());
             groupManager.setName(client.getPerson().getFirstName());
@@ -1260,30 +1307,34 @@ public class SchoolApiService implements ISchoolApiService {
         return groupManagerList;
     }
 
-    private GroupInfo getGroupInfo(Session persistanceSession, ClientGroup clientGroup, List<ClientGroupManager> groupManagers) throws Exception{
-        if(clientGroup == null || groupManagers == null)
+    private GroupInfo getGroupInfo(Session persistanceSession, ClientGroup clientGroup,
+            List<ClientGroupManager> groupManagers) throws Exception {
+        if (clientGroup == null || groupManagers == null) {
             throw new NullArgumentException("ClientGroup and groupManagers cannot be null");
+        }
         GroupInfo groupInfo = new GroupInfo();
         List<Client> groupManagerClientList = new LinkedList<Client>();
         groupInfo.setGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         groupInfo.setGroupName(clientGroup.getGroupName());
-        for (ClientGroupManager clientGroupManager: groupManagers){
-            groupManagerClientList.add(DAOUtils.findClient(persistanceSession,clientGroupManager.getIdOfClient()));
+        for (ClientGroupManager clientGroupManager : groupManagers) {
+            groupManagerClientList.add(DAOUtils.findClient(persistanceSession, clientGroupManager.getIdOfClient()));
         }
         groupInfo.setManagers(getGroupManagersFromClients(groupManagerClientList));
         return groupInfo;
     }
 
-    private GroupEmployee getOrgGroupEmployee(Session persistanceSession, Long groupId, String groupName, List<Org> organizations){
-        if(organizations == null)
+    private GroupEmployee getOrgGroupEmployee(Session persistanceSession, Long groupId, String groupName,
+            List<Org> organizations) {
+        if (organizations == null) {
             throw new NullArgumentException("List of organizations cannot be null.");
+        }
         GroupEmployee groupEmployee = new GroupEmployee();
         groupEmployee.setGroupId(groupId);
         groupEmployee.setGroupName(groupName);
         Criteria employeeCriteria = persistanceSession.createCriteria(Client.class);
         Disjunction restrictionGroupOr = Restrictions.disjunction();
         employeeCriteria.add(Restrictions.eq("idOfClientGroup", groupId));
-        for (Org organization: organizations){
+        for (Org organization : organizations) {
             restrictionGroupOr.add(Restrictions.eq("org.idOfOrg", organization.getIdOfOrg()));
         }
         employeeCriteria.add(restrictionGroupOr);
@@ -1292,22 +1343,25 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     private void checkOrganizationId(long orgId) throws Exception {
-        if(!isOrgExists(orgId))
-            throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+        if (!isOrgExists(orgId)) {
+            throw new WebApplicationException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        }
     }
 
     private Boolean isGroupNameAlreadyExists(long orgId, String groupName) throws Exception {
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         ClientGroup group;
-        group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession,orgId, groupName);
-        if(isGroupNotPredefined(group))
+        group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, orgId, groupName);
+        if (isGroupNotPredefined(group)) {
             return true;
-        for (Org friendlyOrg:friendlyOrgs
-        ) {
-            group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg(), groupName);
-            if(isGroupNotPredefined(group))
+        }
+        for (Org friendlyOrg : friendlyOrgs) {
+            group = DAOUtils
+                    .findClientGroupByGroupNameAndIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg(), groupName);
+            if (isGroupNotPredefined(group)) {
                 return true;
+            }
         }
         return false;
     }
@@ -1315,24 +1369,27 @@ public class SchoolApiService implements ISchoolApiService {
 
     private Boolean isOrgExists(long orgId) throws Exception {
         Org org = DAOUtils.findOrg(persistanceSession, orgId);
-        if(org == null)
+        if (org == null) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
 
-    private Boolean isEmployeeExists(long orgId, long contractId) throws Exception{
+    private Boolean isEmployeeExists(long orgId, long contractId) throws Exception {
         Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
-        if(client == null)
+        if (client == null) {
             return false;
+        }
         List<Org> orgList = new LinkedList<Org>();
         orgList.add(DAOUtils.findOrg(persistanceSession, orgId));
         orgList.addAll(DAOUtils.findFriendlyOrgs(persistanceSession, orgId));
-        if(!clientIsEmployee(client))
+        if (!clientIsEmployee(client)) {
             return false;
+        }
         Boolean clientIsBelongToOrg = false;
-        for (Org org: orgList){
-            if(client.getOrg().getIdOfOrg().longValue() == org.getIdOfOrg().longValue()){
+        for (Org org : orgList) {
+            if (client.getOrg().getIdOfOrg().longValue() == org.getIdOfOrg().longValue()) {
                 clientIsBelongToOrg = true;
                 break;
             }
@@ -1340,51 +1397,55 @@ public class SchoolApiService implements ISchoolApiService {
         return clientIsBelongToOrg;
     }
 
-    private Boolean clientIsEmployee(Client client){
+    private Boolean clientIsEmployee(Client client) {
         Long clientGroupId = client.getIdOfClientGroup();
-        if((clientGroupId.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue()))
-                | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()))
-                | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue()))) {
+        if ((clientGroupId.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue())) | (clientGroupId
+                .equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())) | (clientGroupId
+                .equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue()))) {
             return true;
         }
         return false;
     }
 
-    private boolean orgIsFriendly(long orgId, long friendlyOrgId) throws Exception{
-        List<Org> orgs = DAOUtils.findFriendlyOrgs(persistanceSession,orgId);
-        for (Org org: orgs){
-            if(org.getIdOfOrg() != null){
-                if(org.getIdOfOrg().longValue() == friendlyOrgId)
+    private boolean orgIsFriendly(long orgId, long friendlyOrgId) throws Exception {
+        List<Org> orgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
+        for (Org org : orgs) {
+            if (org.getIdOfOrg() != null) {
+                if (org.getIdOfOrg().longValue() == friendlyOrgId) {
                     return true;
+                }
             }
         }
         return false;
     }
 
-    private boolean orgIsFriendly(long orgId, List<Org> friedlyOrgs){
-        for (Org org: friedlyOrgs){
-            if(org.getIdOfOrg() != null){
-                if(org.getIdOfOrg().longValue() == orgId)
+    private boolean orgIsFriendly(long orgId, List<Org> friedlyOrgs) {
+        for (Org org : friedlyOrgs) {
+            if (org.getIdOfOrg() != null) {
+                if (org.getIdOfOrg().longValue() == orgId) {
                     return true;
+                }
             }
         }
         return false;
     }
 
-    private List<Long> getOrgIds(List<Org> orgs){
+    private List<Long> getOrgIds(List<Org> orgs) {
         List<Long> orgIds = new ArrayList<>();
-        for(Org org: orgs){
-            if(org.getIdOfOrg() != null)
+        for (Org org : orgs) {
+            if (org.getIdOfOrg() != null) {
                 orgIds.add(org.getIdOfOrg());
+            }
         }
         return orgIds;
     }
 
-    private boolean orgHasCategoryOrg(Set<CategoryOrg> firstComparable, Set<CategoryOrg> secondComparable){
-        for(CategoryOrg categoryOrg: firstComparable){
-            for(CategoryOrg comparableCategoryOrg: secondComparable){
-                if(categoryOrg.getIdOfCategoryOrg() == comparableCategoryOrg.getIdOfCategoryOrg())
+    private boolean orgHasCategoryOrg(Set<CategoryOrg> firstComparable, Set<CategoryOrg> secondComparable) {
+        for (CategoryOrg categoryOrg : firstComparable) {
+            for (CategoryOrg comparableCategoryOrg : secondComparable) {
+                if (categoryOrg.getIdOfCategoryOrg() == comparableCategoryOrg.getIdOfCategoryOrg()) {
                     return true;
+                }
             }
         }
         return false;

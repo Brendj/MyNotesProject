@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseClients;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseDiscountClients;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseDiscountGroups;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseDiscounts;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 
 import java.util.Date;
 import java.util.List;
@@ -37,7 +37,7 @@ public interface ISchoolApiService {
     List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients, String username) throws Exception;
     void createClient(ClientGroup clientGroup, Client client, String username) throws Exception;
     List<ClientGroup> getClientGroupsByGroupNamesAndOrgId(List<String> groupsNames, Long orgId) throws Exception,
-            RequestProcessingException;
+            WebApplicationException;
     List<ClientGroup> getClientGroupsForClientManager(List<ClientGroup> clientGroups, Long idOfClient) throws Exception;
     List<PlanOrderClientDTO> getClientsForGroupAndOrgByCategoryDiscount(ClientGroup clientGroup, Long orgId,
             CategoryDiscountEnumType categoryDiscountEnumType) throws Exception;
