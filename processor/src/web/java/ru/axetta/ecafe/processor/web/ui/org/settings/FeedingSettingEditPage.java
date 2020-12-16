@@ -84,6 +84,8 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
             printError("Сумма лимита или сумма скидки обязательно должны быть заполнены.");
             return;
         }
+        if (discount == null) useDiscount = false;
+
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {

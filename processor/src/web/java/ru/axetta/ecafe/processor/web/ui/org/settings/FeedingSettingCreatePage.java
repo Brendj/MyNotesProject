@@ -53,6 +53,7 @@ public class FeedingSettingCreatePage extends BasicWorkspacePage implements OrgL
                 printError("Сумма лимита или сумма скидки обязательно должны быть заполнены.");
                 return;
             }
+            if (discount == null) useDiscount = false;
             FeedingSetting setting = new FeedingSetting(settingName, limit, discount, useDiscount, new HashSet<Org>());
             Set<Org> set = new HashSet<Org>();
             for (Long id : idOfOrgList) {
