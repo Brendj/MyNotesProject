@@ -9,7 +9,8 @@ public enum JwtAuthenticationErrors {
     TOKEN_INVALID(301,"Token invalid"),
     TOKEN_EXPIRED(303,"Token expired"),
     USER_DISABLED(304,"User is disabled"),
-    USERNAME_IS_NULL(305, "Username cannot be null");
+    USERNAME_IS_NULL(305, "Username cannot be null"),
+    USER_ROLE_NOT_ALLOWED(306, "User role does not match the allowed roles");
 
     private int errorCode;
     private String errorMessage;

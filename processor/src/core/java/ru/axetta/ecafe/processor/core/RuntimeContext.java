@@ -16,9 +16,7 @@ import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.partner.acquiropay.AcquiropaySystemConfig;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
-import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
-import ru.axetta.ecafe.processor.core.partner.mesh.card.taskexecutor.MeshCardNotifyTaskExecutor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -33,8 +31,10 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
-import ru.axetta.ecafe.processor.core.service.*;
-import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
+import ru.axetta.ecafe.processor.core.service.CheckSumsMessageDigitsService;
+import ru.axetta.ecafe.processor.core.service.EMPAuthorizeUserBySmsService;
+import ru.axetta.ecafe.processor.core.service.EMPSendSmsToUserService;
+import ru.axetta.ecafe.processor.core.service.IAuthorizeUserBySms;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
@@ -104,7 +104,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public boolean isTestMode() {
-        return Boolean.parseBoolean((String)configProperties.get("ecafe.processor.testMode"));
+        return Boolean.parseBoolean((String) configProperties.get("ecafe.processor.testMode"));
     }
 
 
@@ -391,20 +391,20 @@ public class RuntimeContext implements ApplicationContextAware {
     public Session createPersistenceSession() throws Exception {
         if (isOrgRoomRunning()) {
             initiateOrgRoomEntityManager();
-        return sessionFactory.openSession();
-    }
+            return sessionFactory.openSession();
+        }
         return sessionFactory.openSession();
     }
 
-    public void initiateOrgRoomEntityManager () {
+    public void initiateOrgRoomEntityManager() {
         if (entityManager == null) {
             EntityManagerFactory emf = Persistence.createEntityManagerFactory("processorPU");
             entityManager = emf.createEntityManager();
-            setSessionFactory (((Session) entityManager.getDelegate()).getSessionFactory());
+            setSessionFactory(((Session) entityManager.getDelegate()).getSessionFactory());
         }
         if (sessionFactory == null) {
-            setSessionFactory (((Session) entityManager.getDelegate()).getSessionFactory());
-    }
+            setSessionFactory(((Session) entityManager.getDelegate()).getSessionFactory());
+        }
     }
 
     public Session createReportPersistenceSession() {
@@ -635,7 +635,7 @@ public class RuntimeContext implements ApplicationContextAware {
             instanceName = properties.getProperty(INSTANCE_NAME);
 
             String nodeRoleFile = properties.getProperty(NODE_INFO_FILE);
-            if (System.getProperty(NODE_INFO_FILE)!=null) {
+            if (System.getProperty(NODE_INFO_FILE) != null) {
                 nodeRoleFile = System.getProperty(NODE_INFO_FILE);
             }
             if (nodeRoleFile != null) {
@@ -672,9 +672,9 @@ public class RuntimeContext implements ApplicationContextAware {
             }
 
             String registryType = properties.getProperty(RuntimeContext.REGISTRY, "msk");
-            if(registryType.equals(RegistryType.MSK.getName())) {
+            if (registryType.equals(RegistryType.MSK.getName())) {
                 this.registryType = RegistryType.MSK;
-            } else if(registryType.equals(RegistryType.SPB.getName())) {
+            } else if (registryType.equals(RegistryType.SPB.getName())) {
                 this.registryType = RegistryType.SPB;
             }
 
@@ -742,7 +742,8 @@ public class RuntimeContext implements ApplicationContextAware {
             this.syncProcessor = processor;
             this.cardManager = createCardManagerProcessor(properties, sessionFactory, eventNotificator);
             paymentProcessor = createPaymentProcessor(properties, sessionFactory, eventNotificator);
-            clientPaymentOrderProcessor = createClientPaymentOrderProcessor(properties, sessionFactory, eventNotificator);
+            clientPaymentOrderProcessor = createClientPaymentOrderProcessor(properties, sessionFactory,
+                    eventNotificator);
             orderCancelProcessor = createOrderCancelProcessor(properties, sessionFactory, eventNotificator);
 
             this.onlinePaymentProcessor = new OnlinePaymentProcessor(processor);
@@ -775,15 +776,15 @@ public class RuntimeContext implements ApplicationContextAware {
 
             String bkEnabled = (String) getConfigProperties().get("ecafe.autopayment.bk.enabled");
 
-            if(bkEnabled!=null && Boolean.valueOf(bkEnabled) ){
+            if (bkEnabled != null && Boolean.valueOf(bkEnabled)) {
                 regularPaymentSubscriptionService = (RegularPaymentSubscriptionService) RuntimeContext.getAppContext()
                         .getBean("bk_regularPaymentSubscriptionService");
-            }else{
+            } else {
                 regularPaymentSubscriptionService = (RegularPaymentSubscriptionService) RuntimeContext.getAppContext()
                         .getBean("regularPaymentSubscriptionService");
             }
 
-            RuntimeContext.getAppContext().getBean(SummaryCalculationService.class).scheduleSync();
+            /*RuntimeContext.getAppContext().getBean(SummaryCalculationService.class).scheduleSync();
 
             RuntimeContext.getAppContext().getBean(ImportMigrantsFileService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).scheduleSync();
@@ -800,7 +801,7 @@ public class RuntimeContext implements ApplicationContextAware {
             if (!isTestRunning()) {
                 initWSCrypto();
             }
-
+*/
             usePriceSms = getPropertiesValue("ecafe.processor.sms.usePrice", "true").equals("true");
             useQueueForAllSyncs = getPropertiesValue("ecafe.processor.sync.useQueueForAllSyncs", "false").equals("true");
 
@@ -878,7 +879,7 @@ public class RuntimeContext implements ApplicationContextAware {
         // Configure runtime context
         try {
             // check DB version
-            if(isMainNode()){
+            if (isMainNode()) {
                 currentSchemaVersionInfo = updater.checkDbVersion();
                 //
                 loadOptionValues();
@@ -892,18 +893,19 @@ public class RuntimeContext implements ApplicationContextAware {
                 for (Contragent contragent : contragentList) {
                     if (contragent.getClassId().equals(Contragent.OPERATOR)) {
                         operatorExists = true;
-                        logger.info("Contragent with class \"Operator\" exists, name \"" + contragent.getContragentName()
-                                + "\"");
+                        logger.info(
+                                "Contragent with class \"Operator\" exists, name \"" + contragent.getContragentName()
+                                        + "\"");
                     }
                     if (contragent.getClassId().equals(Contragent.BUDGET)) {
                         budgetExists = true;
-                        logger.info(
-                                "Contragent with class \"Budget\" exists, name \"" + contragent.getContragentName() + "\"");
+                        logger.info("Contragent with class \"Budget\" exists, name \"" + contragent.getContragentName()
+                                + "\"");
                     }
                     if (contragent.getClassId().equals(Contragent.CLIENT)) {
                         clientExists = true;
-                        logger.info(
-                                "Contragent with class \"Client\" exists, name \"" + contragent.getContragentName() + "\"");
+                        logger.info("Contragent with class \"Client\" exists, name \"" + contragent.getContragentName()
+                                + "\"");
                     }
                 }
 
@@ -1049,7 +1051,7 @@ public class RuntimeContext implements ApplicationContextAware {
             String description) {
         Date currentTime = new Date();
         CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules,
-                description, currentTime, currentTime, false,false);
+                description, currentTime, currentTime, false, false);
         categoryDiscount.setCategoryType(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         entityManager.persist(categoryDiscount);
         logger.info("Category with name \"" + categoryName + "\" created");
@@ -1116,7 +1118,7 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating application-wide job scheduler.");
         }
-        if (isOrgRoomRunning()){
+        if (isOrgRoomRunning()) {
             Object threadPoolClass = properties.get("org.quartz.threadPool.class");
             if (threadPoolClass == null || ((String) threadPoolClass).length() < 1) {
                 properties.put("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
@@ -1327,9 +1329,7 @@ public class RuntimeContext implements ApplicationContextAware {
         IAuthorizeUserBySms service = null;
         if (properties.getProperty("ecafe.processor.userCode.service", "").equals("EMP")) {
             service = applicationContext.getBean(EMPAuthorizeUserBySmsService.class);
-        }
-        else
-        {
+        } else {
             service = applicationContext.getBean(EMPSendSmsToUserService.class);
         }
         return service;
@@ -1460,7 +1460,7 @@ public class RuntimeContext implements ApplicationContextAware {
             smsService = new AltarixSmsServiceImpl(config, userServiceId);
         } else if (serviceType.equalsIgnoreCase("smpp")) {
             smsService = new SMPPClient(config, properties, SMS_SERVICE_PARAM_BASE);
-        } else if(serviceType.equalsIgnoreCase("emp")) {
+        } else if (serviceType.equalsIgnoreCase("emp")) {
             smsService = EMPSmsServiceImpl.getInstance(config);
         } else {
             throw new Exception("Invalid SMS service type: " + serviceType);
@@ -1598,8 +1598,8 @@ public class RuntimeContext implements ApplicationContextAware {
     public boolean actionIsOnByNode(String parameterName) {
         String instance = getNodeName();
         String reqInstance = getConfigProperties().getProperty(parameterName);
-        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
-                reqInstance.trim())) {
+        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
+                .equals(reqInstance.trim())) {
             return false;
         }
         return true;
@@ -1614,15 +1614,17 @@ public class RuntimeContext implements ApplicationContextAware {
         }
         String[] strs = nodes.split(",");
         List<String> nodesList = new ArrayList<String>(Arrays.asList(strs));
-        if (nodesList.contains(RuntimeContext.getInstance().getNodeName()))
+        if (nodesList.contains(RuntimeContext.getInstance().getNodeName())) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     public boolean isNSI3() {
         return getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3);
     }
+
     public boolean getOptionValueBool(int optionId) {
         return getOptionValueString(optionId).equals("1");
     }
@@ -1689,7 +1691,9 @@ public class RuntimeContext implements ApplicationContextAware {
     @Transactional
     public void saveOptionValues() {
         for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
-            if (e.getKey().equals(Option.OPTION_SVERKA_ENABLED)) continue;
+            if (e.getKey().equals(Option.OPTION_SVERKA_ENABLED)) {
+                continue;
+            }
             Option o = new Option((long) e.getKey(), e.getValue());
             o = entityManager.merge(o);
             entityManager.persist(o);
@@ -1725,8 +1729,10 @@ public class RuntimeContext implements ApplicationContextAware {
                     return (name.endsWith(".lic"));
                 }
             });
-            for (File f : files) {
-                processDataFile(f);
+            if (files != null) {
+                for (File f : files) {
+                    processDataFile(f);
+                }
             }
         }
     }
@@ -1858,8 +1864,7 @@ public class RuntimeContext implements ApplicationContextAware {
         } catch (Exception e) {
             if (!System.getProperty("lacinsierror".replaceAll("i", "e").replaceAll("a", "i"), "").equals("")) {
                 logger.error("Error loading file: " + file.getAbsolutePath(), e);
-            }
-            else {
+            } else {
                 logger.error("Error validating license file: " + file.getAbsolutePath(), e);
             }
         }
@@ -1895,7 +1900,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public SettingsConfig getSettingsConfig() {
-        if (settingsConfig == null){
+        if (settingsConfig == null) {
             settingsConfig = new SettingsConfig();
         }
         return settingsConfig;
@@ -1906,8 +1911,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public static enum RegistryType {
-        MSK("msk"),
-        SPB("spb");
+        MSK("msk"), SPB("spb");
 
         private String name;
 
