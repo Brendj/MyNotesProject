@@ -4,9 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class CodeMSP {
     private Long idOfCode;
@@ -14,6 +12,7 @@ public class CodeMSP {
     private String description;
     private CategoryDiscount categoryDiscount;
     private Set<CodeMspAgeTypeGroup> codeMspAgeTypeGroupSet = new HashSet<>();
+    private List<CodeMspAgeTypeGroup> codeMspAgeTypeGroupList = new LinkedList<>();
 
     public Set<CodeMspAgeTypeGroup> getCodeMspAgeTypeGroupSet() {
         return codeMspAgeTypeGroupSet;
@@ -76,5 +75,16 @@ public class CodeMSP {
         CodeMspAgeTypeGroup group = new CodeMspAgeTypeGroup();
         group.setAgeTypeGroup(type);
         return this.getCodeMspAgeTypeGroupSet().contains(group);
+    }
+
+    public List<CodeMspAgeTypeGroup> getCodeMspAgeTypeGroupList() {
+        if(codeMspAgeTypeGroupList == null || codeMspAgeTypeGroupList.isEmpty()){
+            codeMspAgeTypeGroupList = new LinkedList<>(codeMspAgeTypeGroupSet);
+        }
+        return codeMspAgeTypeGroupList;
+    }
+
+    public void setCodeMspAgeTypeGroupList(List<CodeMspAgeTypeGroup> codeMspAgeTypeGroupList) {
+        this.codeMspAgeTypeGroupList = codeMspAgeTypeGroupList;
     }
 }

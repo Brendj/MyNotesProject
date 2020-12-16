@@ -36,6 +36,18 @@
             </f:facet>
             <h:outputText styleClass="output-text" value="#{item.categoryDiscount.categoryName}" />
         </rich:column>
+        <rich:column headerClass="center-aligned-column" style="text-align:left">
+            <f:facet name="header">
+                <h:panelGroup>
+                    <h:outputText styleClass="output-text" escape="true" value="Возрастная группа" />
+                </h:panelGroup>
+            </f:facet>
+            <rich:dataTable value="#{item.codeMspAgeTypeGroupList}" var="ageGroupVar" styleClass="borderless-grid-all-client">
+                <rich:column styleClass="borderless-grid-all-client">
+                    <h:outputText value="#{ageGroupVar.ageTypeGroup}"/>
+                </rich:column>
+            </rich:dataTable>
+        </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
                      style="text-align:center">
             <f:facet name="header">
