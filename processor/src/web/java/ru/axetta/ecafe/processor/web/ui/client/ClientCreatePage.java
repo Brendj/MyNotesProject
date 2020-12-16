@@ -592,6 +592,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
         client.setAddress(this.address);
         client.setPhone(this.phone);
+        persistenceSession.save(client);
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Регистрация клиента через Клиенты/Регистрация");
         User user = MainPage.getSessionInstance().getCurrentUser();
@@ -647,7 +648,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         client.setSpecialMenu(this.specialMenu);
 
-        persistenceSession.save(client);
+        persistenceSession.update(client);
         if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
 
         ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
