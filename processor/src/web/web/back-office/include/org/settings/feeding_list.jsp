@@ -16,11 +16,7 @@
             <f:facet name="header">
                 <h:outputText value="Идентификатор"/>
             </f:facet>
-            <a4j:commandLink value="#{setting.idOfSetting}" action="#{mainPage.feedingSettingsListPage.view}"
-                             reRender="mainMenu, workspaceForm">
-                <f:setPropertyActionListener value="#{setting.idOfSetting}" target="#{mainPage.feedingSettingsListPage.selectedSetting}" />
-                <f:setPropertyActionListener value="#{setting.idOfSetting}" target="#{mainPage.selectedIdOfFeedingSetting}" />
-            </a4j:commandLink>
+            <h:outputText value="#{setting.idOfSetting}" converter="copeckSumConverter"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -37,6 +33,18 @@
                 <h:outputText value="Сумма лимита" />
             </f:facet>
             <h:outputText value="#{setting.limit}" converter="copeckSumConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Сумма скидки" />
+            </f:facet>
+            <h:outputText value="#{setting.discount}" converter="copeckSumConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Учитывать скидку при оплате" />
+            </f:facet>
+            <h:outputText value="#{setting.useDiscountString}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
