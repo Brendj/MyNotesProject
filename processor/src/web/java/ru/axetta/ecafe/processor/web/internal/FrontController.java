@@ -1376,7 +1376,9 @@ public class FrontController extends HttpServlet {
         try {
             checkRequestValidity(orgId);
         } catch (FrontControllerException e) {
-            if (!e.msg.contains("Ключ сертификата невалиден")) throw e;
+            if (!e.msg.contains("Ключ сертификата невалиден") && !e.msg.contains("У организации не установлен открытый ключ")) {
+                throw e;
+            }
             try {
                 Set<Org> orgs = DAOReadonlyService.getInstance().findFriendlyOrgs(orgId);
                 PublicKey publicKey;
@@ -1384,15 +1386,22 @@ public class FrontController extends HttpServlet {
                 HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
                 X509Certificate[] certs = getCertificateFromContextOrHeaders(request);
                 for (Org org : orgs) {
-                    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
-                    if (publicKey.equals(certs[0].getPublicKey())) {
-                        return;
+                    if (org.getPublicKey() == null || org.getPublicKey().trim().isEmpty()) {
+                        logger.info(String.format("У организации не установлен открытый ключ: %d", orgId));
+                    } else {
+                        publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+                        if (publicKey.equals(certs[0].getPublicKey())) {
+                            return;
+                        }
                     }
                 }
             } catch (Exception e2) {
                 throw new FrontControllerException("Внутренняя ошибка", e2);
             }
-            throw new FrontControllerException(String.format("Ключ сертификата невалиден: %d", orgId));
+            if (e.msg.contains("Ключ сертификата невалиден"))
+                throw new FrontControllerException(String.format("Ключ сертификата невалиден: %d", orgId));
+            if (e.msg.contains("У организации не установлен открытый ключ"))
+                throw new FrontControllerException(String.format("У организации не установлен открытый ключ: %d", orgId));
         }
     }
 
@@ -1429,9 +1438,14 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
             }
 
-            publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
-            if (!publicKey.equals(certs[0].getPublicKey())) {
-                throw new FrontControllerException(String.format("Ключ сертификата невалиден: %d", orgId));
+            if (org.getPublicKey() == null || org.getPublicKey().trim().isEmpty()) {
+                throw new FrontControllerException(
+                        String.format("У организации не установлен открытый ключ: %d", orgId));
+            } else {
+                publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+                if (!publicKey.equals(certs[0].getPublicKey())) {
+                    throw new FrontControllerException(String.format("Ключ сертификата невалиден: %d", orgId));
+                }
             }
         } catch (FrontControllerException e) {
             throw e;
@@ -1528,8 +1542,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum,
-            @WebParam(name = "isLongUid") boolean isLongUid,
-            @WebParam(name = "forceRegister") Integer forceRegister) throws FrontControllerException {
+            @WebParam(name = "isLongUid") boolean isLongUid, @WebParam(name = "forceRegister") Integer forceRegister)
+            throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         logger.info(String.format(
                 "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s",
@@ -1552,13 +1566,15 @@ public class FrontController extends HttpServlet {
             Org org = DAOUtils.findOrg(persistenceSession, idOfOrg);
             Card exCard = null;
             if (VersionUtils.doublesAllowed(persistenceSession, idOfOrg) && org.getNeedVerifyCardSign()) {
-                exCard = DAOUtils.findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum, type);
+                exCard = DAOUtils
+                        .findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum,
+                                type);
             } else {
                 exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             }
             if (null == exCard) {
-                card = cardService.registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
-                        isLongUid);
+                card = cardService
+                        .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
             } else {
                 if (VersionUtils.compareClientVersionForRegisterCard(persistenceSession, idOfOrg) < 0) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
@@ -1572,13 +1588,16 @@ public class FrontController extends HttpServlet {
                 } else if (!secondRegisterAllowed) {
                     testForRegisterConditions(persistenceSession, exCard, idOfOrg, secondRegisterAllowed);
                 }
-                if (secondRegisterAllowed && (forceRegister == null || forceRegister != 1))
-                    throw new CardResponseItem.CardAlreadyExistSecondRegisterAllowed(CardResponseItem.ERROR_DUPLICATE_CARD_SECOND_REGISTER_MESSAGE
-                    + exCard.getOrg().getShortNameInfoService() + ". Статус: " + CardState.fromInteger(exCard.getState()));
+                if (secondRegisterAllowed && (forceRegister == null || forceRegister != 1)) {
+                    throw new CardResponseItem.CardAlreadyExistSecondRegisterAllowed(
+                            CardResponseItem.ERROR_DUPLICATE_CARD_SECOND_REGISTER_MESSAGE + exCard.getOrg()
+                                    .getShortNameInfoService() + ". Статус: " + CardState
+                                    .fromInteger(exCard.getState()));
+                }
 
                 card = cardService
-                        .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
-                                isLongUid, CardTransitionState.BORROWED.getCode());
+                        .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid,
+                                CardTransitionState.BORROWED.getCode());
 
                 if (secondRegisterAllowed && exCard.getState() != CardState.BLOCKED.getValue()) {
                     cardService.blockAndReset(exCard.getCardNo(), exCard.getOrg().getIdOfOrg(),
@@ -1625,20 +1644,20 @@ public class FrontController extends HttpServlet {
         return new CardResponseItem(idOfCard, (null != transitionState) ? transitionState.getCode() : null);
     }
 
-    private void testForRegisterConditions(Session persistenceSession, Card exCard,
-            long idOfOrg, boolean secondRegisterAllowed) throws Exception {
+    private void testForRegisterConditions(Session persistenceSession, Card exCard, long idOfOrg,
+            boolean secondRegisterAllowed) throws Exception {
         if (!secondRegisterAllowed) {
             Integer blockPeriod = RuntimeContext.getInstance()
                     .getPropertiesValue("ecafe.processor.card.registration.block.period", 180);
             Date now = new Date();
             if (blockPeriod >= CalendarUtils.getDifferenceInDays(exCard.getUpdateTime(), now)) {
                 throw new CardResponseItem.CardAlreadyExist(
-                        String.format("%s. Минимальный срок блокировки карты не прошел - %dд", CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE, blockPeriod));
+                        String.format("%s. Минимальный срок блокировки карты не прошел - %dд",
+                                CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE, blockPeriod));
             }
         }
 
-        List<Org> friendlyOrgs = DAOUtils
-                .findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
+        List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
         for (Org o : friendlyOrgs) {
             if (o.getIdOfOrg() == idOfOrg) {
                 throw new CardResponseItem.CardAlreadyExistInYourOrg(
@@ -1786,7 +1805,7 @@ public class FrontController extends HttpServlet {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            CardSign cardSign = (CardSign)session.load(CardSign.class, cardSignCertNum);
+            CardSign cardSign = (CardSign) session.load(CardSign.class, cardSignCertNum);
             if (cardSign == null) {
                 throw new FrontControllerException("Ключ не найден по входным данным");
             }
@@ -2020,8 +2039,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "getBalancesForPayPlan")
     public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList)
-            throws FrontControllerException {
+            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList) throws FrontControllerException {
         checkRequestValidityExtended(orgId);
         PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
         Session session = null;
@@ -2032,7 +2050,10 @@ public class FrontController extends HttpServlet {
             for (PayPlanBalanceItem item : payPlanBalanceList.getItems()) {
                 PayPlanBalanceItem resultItem = new PayPlanBalanceItem(item.getIdOfClient());
                 Client client = DAOReadonlyService.getInstance().findClientById(item.getIdOfClient());
-                if (client == null) throw new Exception("Client not found in getBalancesForPayPlan. IdOfClient = " + item.getIdOfClient());
+                if (client == null) {
+                    throw new Exception(
+                            "Client not found in getBalancesForPayPlan. IdOfClient = " + item.getIdOfClient());
+                }
                 long preorderSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .getNotPaidPreordersSum(client, CalendarUtils.startOfDay(new Date()));
                 long resultSum = client.getBalance() - item.getSumma() - preorderSum;
@@ -2383,8 +2404,12 @@ public class FrontController extends HttpServlet {
     }
 
     private Integer convertLegality(String legality_str) {
-        if (legality_str.equals("true")) return 1;
-        if (legality_str.equals("false")) return 0;
+        if (legality_str.equals("true")) {
+            return 1;
+        }
+        if (legality_str.equals("false")) {
+            return 0;
+        }
         return Integer.parseInt(legality_str);
     }
 
