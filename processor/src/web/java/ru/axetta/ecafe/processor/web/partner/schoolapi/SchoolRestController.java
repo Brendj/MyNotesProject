@@ -662,7 +662,7 @@ public class SchoolRestController {
                     new ClientsMobileHistory("Веб-арм ИС \"ПП\"");
             clientsMobileHistory.setShowing("Портал");
             groupManagementService.createClient(clientGroup,
-                    CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO, clientsMobileHistory),
+                    CreateClientRequestDTO.convertRequestToClient(persistenceSession, createClientRequestDTO, clientsMobileHistory),
                     jwtUserDetails.getUsername(), clientsMobileHistory);
             persistenceTransaction.commit();
             persistenceTransaction = null;

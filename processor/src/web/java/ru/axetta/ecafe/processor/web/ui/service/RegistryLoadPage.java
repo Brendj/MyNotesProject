@@ -620,6 +620,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         if (clientGroup != null) {
             guardian.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         }
+        persistenceSession.persist(guardian);
         guardian.initClientMobileHistory(clientsMobileHistory);
         guardian.setMobile(guardianItem.getPhones().get(0));
         logger.info("class : RegistryLoadPage, method : createGuardian line : 605, idOfClient : " + guardian.getIdOfClient() + " mobile : " + guardian.getMobile());
@@ -630,7 +631,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         guardian.setAddress("");
         guardian.setEmail(guardianItem.getEmail());
         guardian.setDiscountMode(Client.DISCOUNT_MODE_NONE);
-        persistenceSession.persist(guardian);
+        persistenceSession.update(guardian);
 
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, org.getIdOfOrg());
 
