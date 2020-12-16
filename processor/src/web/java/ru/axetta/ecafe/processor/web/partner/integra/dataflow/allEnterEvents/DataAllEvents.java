@@ -10,16 +10,18 @@ import javax.xml.bind.annotation.*;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "enterEventList"
+    "enterEventList",
+    "resultCode",
+    "description"
 })
 @XmlRootElement(name = "DataAllEvents")
 public class DataAllEvents {
 
-    @XmlElement(name = "EnterEventList")
+    @XmlElement(name = "enterEventList")
     protected AllEventList enterEventList;
-    @XmlAttribute(name = "ResultCode")
+    @XmlElement(name = "resultCode")
     protected Long resultCode;
-    @XmlAttribute(name = "Description")
+    @XmlElement(name = "description")
     protected String description;
 
     /**

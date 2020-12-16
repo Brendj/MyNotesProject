@@ -63,7 +63,6 @@ import ru.axetta.ecafe.processor.web.partner.iac.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventItem;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventList;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventListResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.DataAllEvents;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
@@ -3871,7 +3870,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public AllEventListResult getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
+    public DataAllEvents getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
         authenticateRequest(contractId);
         DataAllEvents dataAllEvents = new DataAllEvents();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -3894,6 +3893,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 Client client = clients.get(0);
                 dataAllEvents.setEnterEventList(processAllEventList(client, persistenceSession, endDate, startDate));
+                dataAllEvents.setResultCode(RC_OK);
+                dataAllEvents.setDescription(RC_OK_DESC);
             }
 
         } catch (Exception e) {
@@ -3904,11 +3905,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        AllEventListResult allEventListResult = new AllEventListResult();
-        allEventListResult.enterEventList = dataAllEvents.getEnterEventList();
-        allEventListResult.resultCode = dataAllEvents.getResultCode();
-        allEventListResult.description = dataAllEvents.getDescription();
-        return allEventListResult;
+        return dataAllEvents;
     }
 
     @Override
