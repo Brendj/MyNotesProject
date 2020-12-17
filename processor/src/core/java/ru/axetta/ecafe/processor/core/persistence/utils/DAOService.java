@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2568,6 +2568,14 @@ public class DAOService {
             throw new Exception(String.format("Option id=%s not found", option));
         }
         return (String) list.get(0);
+    }
+
+    public Integer getWtDaysForbid() {
+        try {
+            return new Integer(getOnlineOptionValue(Option.OPTION_WT_DAYS_FORBID));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Transactional
