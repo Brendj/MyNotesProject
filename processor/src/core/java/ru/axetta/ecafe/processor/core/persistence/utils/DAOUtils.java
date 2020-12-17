@@ -5455,4 +5455,11 @@ public class DAOUtils {
         Query q = session.createSQLQuery("truncate cf_cancel_preorder_notifications");
         q.executeUpdate();
     }
+	
+	public static List<Client> getClientsBySsoid(EntityManager em, String ssoid) {
+        return em.createQuery("from Client where ssoid = :ssoid")
+                .setParameter("ssoid", ssoid)
+                .getResultList();
+    }
+
 }
