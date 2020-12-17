@@ -943,6 +943,7 @@ public class ClientManager {
             }
 
             client.setCreatedFrom(ClientCreatedFromType.values()[fieldConfig.getValueInt(FieldId.CREATED_FROM)]);
+            client.setUpdateTime(new Date());
 
             logger.debug("save client");
             persistenceSession.saveOrUpdate(client);
