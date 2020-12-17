@@ -4370,12 +4370,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     dataProcess.getClientSummaryExt()
                             .setRoleRepresentative(entry.getValue().getRepresentType().getCode());
                     //////////////////////
-                    Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
-                    temp = temp - 1;
-                    if (temp == -1) {
-                        temp = 2;
-                    }
-                    dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    try {
+                        Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
+                        temp = temp - 1;
+                        if (temp == -1) {
+                            temp = 2;
+                        }
+                        dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    } catch (Exception e){}
                     /////////////////////
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
@@ -4412,19 +4414,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         });
         //////////////////////
-        for (ClientRepresentative clientRepresentative : data.getClientRepresentativesList().getRep()) {
-            Integer temp = clientRepresentative.getRoleRepresentative();
-            temp = temp - 1;
-            if (temp == -1) {
-                temp = 2;
+        if (data.getClientRepresentativesList() != null ) {
+            for (ClientRepresentative clientRepresentative : data.getClientRepresentativesList().getRep()) {
+                if (clientRepresentative.getRoleRepresentative() != null) {
+                    Integer temp = clientRepresentative.getRoleRepresentative();
+                    temp = temp - 1;
+                    if (temp == -1) {
+                        temp = 2;
+                    }
+                    clientRepresentative.setRoleRepresentative(temp);
+                }
             }
-            clientRepresentative.setRoleRepresentative(temp);
         }
         /////////////////////
         ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
         clientRepresentativesResult.clientRepresentativesList = data.getClientRepresentativesList();
-        clientRepresentativesResult.resultCode = RC_OK;
-        clientRepresentativesResult.description = RC_OK_DESC;
+        clientRepresentativesResult.resultCode = data.getResultCode();
+        clientRepresentativesResult.description = data.getDescription();
 
         return clientRepresentativesResult;
     }
@@ -4465,11 +4471,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientRepresentativesList.getRep().add(clientRepresentative);
                 }
             }
-
             data.setClientRepresentativesList(clientRepresentativesList);
-
+            data.setResultCode(RC_OK);
+            data.setDescription(RC_OK_DESC);
         } catch (Exception e) {
             e.printStackTrace();
+            data.setResultCode(RC_INTERNAL_ERROR);
+            data.setDescription(RC_INTERNAL_ERROR_DESC);
         }
     }
 
