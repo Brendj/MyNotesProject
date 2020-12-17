@@ -10824,7 +10824,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
-            logger.error(String.format("Error work with ssoid in getSummaryByGuardMobileMin. guardMobile = %s",
+            logger.error(String.format("Error work with ssoid. guardMobile = %s",
                     cientMobile), e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
