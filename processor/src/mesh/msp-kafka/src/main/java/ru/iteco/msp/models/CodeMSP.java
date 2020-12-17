@@ -4,10 +4,9 @@
 
 package ru.iteco.msp.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -19,6 +18,29 @@ public class CodeMSP {
 
     @Column(name = "code")
     private Integer code;
+
+    @ManyToOne
+    @JoinColumn(name = "idofcategorydiscount")
+    private CategoryDiscount categoryDiscount;
+
+    @OneToMany(mappedBy = "codeMSP")
+    private List<CodeMspAgeTypeGroup> ageTypeGroupList = new LinkedList<>();
+
+    public List<CodeMspAgeTypeGroup> getAgeTypeGroupList() {
+        return ageTypeGroupList;
+    }
+
+    public void setAgeTypeGroupList(List<CodeMspAgeTypeGroup> ageTypeGroupList) {
+        this.ageTypeGroupList = ageTypeGroupList;
+    }
+
+    public CategoryDiscount getCategoryDiscount() {
+        return categoryDiscount;
+    }
+
+    public void setCategoryDiscount(CategoryDiscount categoryDiscount) {
+        this.categoryDiscount = categoryDiscount;
+    }
 
     public Long getIdOfCode() {
         return idOfCode;
