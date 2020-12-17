@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.persistence.service.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 
 import org.slf4j.Logger;
@@ -49,10 +50,10 @@ public class ClientService {
         return modifiedClientsIds;
     }
 
-    public int generateGuardians(List<Long> orgs) throws Exception {
+    public int generateGuardians(List<Long> orgs, ClientsMobileHistory clientsMobileHistory ) throws Exception {
         int result;
         try {
-            result = clientDao.runGenerateGuardians(orgs);
+            result = clientDao.runGenerateGuardians(orgs, clientsMobileHistory);
         } catch (Exception e) {
             logger.error("Error in generate guardians", e);
             throw e;

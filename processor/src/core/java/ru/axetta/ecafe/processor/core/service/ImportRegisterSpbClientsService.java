@@ -169,11 +169,11 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
 
     @Override
     public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation,
-            String groupName) throws Exception {
+            String groupName, ClientsMobileHistory clientsMobileHistory) throws Exception {
         List<RegistryChangeCallback> result = new LinkedList<>();
         for (Long idOfRegistryChange : changesList) {
             try {
-                applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                applyRegistryChange(idOfRegistryChange, fullNameValidation, clientsMobileHistory);
                 result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
             } catch (Exception e1) {
                 logger.error("Error when apply RegistryChange: ", e1);
@@ -184,7 +184,8 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
         return result;
     }
 
-    public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
+    public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
 
@@ -230,7 +231,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                         createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     }
                     afterSaveClient = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
-                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate), clientsMobileHistory);
                     try {
                         cardNo = Long.parseLong(afterSaveClient.getClientGUID());
                     } catch (Exception e) {
@@ -314,7 +315,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     }
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
                             newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
-                            dbClient, session, true);
+                            dbClient, session, true, clientsMobileHistory);
 
                     if (!migration) {
                         if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {

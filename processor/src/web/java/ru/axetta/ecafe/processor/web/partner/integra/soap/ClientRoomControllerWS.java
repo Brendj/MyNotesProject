@@ -4578,7 +4578,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r.description = RC_INVALID_MOBILE;
             return r;
         }
-        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm)) {
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод changeMobilePhone");
+        clientsMobileHistory.setShowing("Портал");
+        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm, clientsMobileHistory)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
@@ -5254,6 +5257,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session session = null;
         Transaction persistenceTransaction = null;
+
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод setGuardianshipDisabled");
+        clientsMobileHistory.setShowing("Портал");
         try {
             if (StringUtils.isEmpty(guardMobile)) {
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
@@ -5295,6 +5302,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (value) {
                 if (client.getMobile().equals(guardMobile)) {
+                    client.initClientMobileHistory(clientsMobileHistory);
                     client.setMobile("");
                     logger.info(
                             "class : ClientRoomControllerWS, method : processSetGuardianship line : 4790, idOfClient : "
@@ -5304,6 +5312,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 if (!guardianWithMobileFound) {
                     if (client.getMobile() == null || client.getMobile().isEmpty()) {
+                        client.initClientMobileHistory(clientsMobileHistory);
                         client.setMobile(guardMobile);
                         logger.info(
                                 "class : ClientRoomControllerWS, method : processSetGuardianship line : 4797, idOfClient : "
@@ -5370,6 +5379,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session session = null;
         Transaction persistenceTransaction = null;
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод clearMobileByContractId");
+        clientsMobileHistory.setShowing("Портал");
         try {
             session = runtimeContext.createPersistenceSession();
             persistenceTransaction = session.beginTransaction();
@@ -5383,6 +5395,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String currentMobile = client.getMobile();
 
             if (phone.equals(currentMobile)) {
+                client.initClientMobileHistory(clientsMobileHistory);
                 client.setMobile("");
                 logger.debug("class : ClientRoomControllerWS, method : processClearMobile line : 4860, idOfClient : "
                         + client.getIdOfClient() + " mobile : " + client.getMobile());
@@ -5395,6 +5408,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             for (ClientGuardianItem item : guardians) {
                 Client guardian = DAOUtils.findClientByContractId(session, item.getContractId());
                 if (phone.equals(guardian.getMobile())) {
+                    guardian.initClientMobileHistory(clientsMobileHistory);
                     guardian.setMobile("");
                     logger.debug(
                             "class : ClientRoomControllerWS, method : processClearMobile line : 4870, idOfClient : "
@@ -6213,7 +6227,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r.description = RC_INVALID_MOBILE;
                 return r;
             }
-            if (!daoService.setClientMobilePhone(contractId, mobilePhone, null)) {
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("soap метод changePersonalInfo");
+            clientsMobileHistory.setShowing("Портал");
+            if (!daoService.setClientMobilePhone(contractId, mobilePhone, null, clientsMobileHistory)) {
                 r.resultCode = RC_CLIENT_NOT_FOUND;
                 r.description = RC_CLIENT_NOT_FOUND_DESC;
             }
@@ -8638,10 +8655,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else {
                     gender = 1;
                 }
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("soap метод addGuardian");
+                clientsMobileHistory.setShowing("Портал");
                 guardian = ClientManager
                         .createGuardianTransactionFree(session, firstName, secondName, surname, mobile, remark, gender,
                                 org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries,
-                                null, null);
+                                null, null, clientsMobileHistory);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
@@ -9631,7 +9651,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile()
                             .equals(Client.checkAndConvertMobile(guardianMobile))) {
                         guardianWithMobileFound = true;
-                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value, version);
+                        ClientsMobileHistory clientsMobileHistory =
+                                new ClientsMobileHistory("soap метод setPreorderAllowed");
+                        clientsMobileHistory.setShowing("Портал");
+                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value, version,
+                                clientsMobileHistory);
                     }
                 }
 
@@ -10031,8 +10055,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (clientByContractId != null) {
                     throw new Exception("Client already found by contract Id");
                 }
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("web метод addRegistrationCard");
+                clientsMobileHistory.setShowing("Портал");
                 client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
-                        organizationSuid, grade, codeBenefit, contractId);
+                        organizationSuid, grade, codeBenefit, contractId, clientsMobileHistory);
             } else {
                 if (clientByContractId != null && !client.equals(clientByContractId)) {
                     throw new Exception("Client already found by contract Id - 2");
