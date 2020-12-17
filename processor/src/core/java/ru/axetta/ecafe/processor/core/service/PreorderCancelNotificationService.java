@@ -75,23 +75,24 @@ public class PreorderCancelNotificationService {
         }
     }
 
-    //public static boolean isOn() {
-    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    //    String instance = runtimeContext.getNodeName();
-    //    String reqInstance = runtimeContext.getConfigProperties().getProperty(PreorderCancelNotificationService.NODE_PROPERTY, "18");
-    //    String[] nodes = reqInstance.split(",");
-    //    for (String node : nodes) {
-    //        if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
-    //                && instance.trim().equals(node.trim())) {
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().
+                getProperty("ecafe.processor.preorder.cancel.notification.node", "1");
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
+                    && instance.trim().equals(node.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void scheduleSync() throws Exception {
-        //if (!isOn())
-        //    return;
+        if (!isOn())
+            return;
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
                 getProperty("ecafe.processor.preorder.cancel.notification.time", "0 0 8 ? * * *");
         try {
