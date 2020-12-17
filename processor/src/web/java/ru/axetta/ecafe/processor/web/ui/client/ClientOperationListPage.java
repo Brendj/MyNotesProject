@@ -311,8 +311,8 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             Criteria criteria = session.createCriteria(ClientsMobileHistory.class);
             Client client = (Client) session.load(Client.class, idOfClient);
             criteria.add(Restrictions.eq("client", client))
-                    .add(Restrictions.ge("createdate", startTime))
-                    .add(Restrictions.le("createdate", endTime))
+                    //.add(Restrictions.ge("createdate", startTime))
+                    //.add(Restrictions.le("createdate", endTime))
                     .addOrder(Order.asc("createdate"));
             clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
         } catch (Exception e) {
