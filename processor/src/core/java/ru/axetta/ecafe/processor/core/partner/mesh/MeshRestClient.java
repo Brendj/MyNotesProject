@@ -3,6 +3,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -38,6 +39,11 @@ public class MeshRestClient {
         GetMethod httpMethod = new GetMethod(url.getPath());
         httpMethod.setRequestHeader("X-Api-Key", getApiKey());
         httpMethod.setQueryString(parameters);
+
+        return executeRequest(httpMethod, url);
+    }
+
+    private byte[] executeRequest(HttpMethodBase httpMethod, URL url) throws Exception {
         try {
             HttpClient httpClient = getHttpClient(url);
             int statusCode = httpClient.executeMethod(httpMethod);
@@ -72,26 +78,7 @@ public class MeshRestClient {
                 "UTF-8");
         httpMethod.setRequestEntity(requestEntity);
 
-        try {
-            HttpClient httpClient = getHttpClient(url);
-            int statusCode = httpClient.executeMethod(httpMethod);
-            if (statusCode == HttpStatus.SC_OK) {
-                InputStream inputStream = httpMethod.getResponseBodyAsStream();
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int nRead;
-                byte[] data = new byte[1024*1024];
-                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
-                }
-
-                buffer.flush();
-                return buffer.toByteArray();
-            } else {
-                throw new Exception("Mesh request has status " + statusCode);
-            }
-        } finally {
-            httpMethod.releaseConnection();
-        }
+        return executeRequest(httpMethod, url);
     }
 
     private HttpClient getHttpClient(URL url) {
@@ -112,26 +99,7 @@ public class MeshRestClient {
                 "UTF-8");
         httpMethod.setRequestEntity(requestEntity);
 
-        try {
-            HttpClient httpClient = getHttpClient(url);
-            int statusCode = httpClient.executeMethod(httpMethod);
-            if (statusCode == HttpStatus.SC_OK) {
-                InputStream inputStream = httpMethod.getResponseBodyAsStream();
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int nRead;
-                byte[] data = new byte[1024*1024];
-                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
-                }
-
-                buffer.flush();
-                return buffer.toByteArray();
-            } else {
-                throw new Exception("Mesh request has status " + statusCode);
-            }
-        } finally {
-            httpMethod.releaseConnection();
-        }
+        return executeRequest(httpMethod, url);
     }
 
     public void executeDeleteCategory(String meshGUID, Integer idOfRefInExternalSystem) throws Exception {
