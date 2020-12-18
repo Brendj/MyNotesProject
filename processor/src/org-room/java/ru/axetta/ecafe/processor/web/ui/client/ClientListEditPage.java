@@ -7,10 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.dao.DAOServices;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -589,13 +586,13 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     @Transactional
-    public void updateClient() throws Exception {
+    public void updateClient(ClientsMobileHistory clientsMobileHistory) throws Exception {
         Session session = null;
         //Transaction transaction = null;
         try {
             session = (Session) entityManager.getDelegate();
             //transaction = session.beginTransaction();
-            updateClient(session);
+            updateClient(session, clientsMobileHistory);
             //transaction.commit();
             //transaction = null;
         } catch (Exception e) {
@@ -607,8 +604,8 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         }
     }
 
-    public void updateClient(Session session) throws Exception {
-        ClientRegisterPage.registerClient(session, selectedClient, org);
+    public void updateClient(Session session, ClientsMobileHistory clientsMobileHistory) throws Exception {
+        ClientRegisterPage.registerClient(session, selectedClient, org, clientsMobileHistory);
     }
 
 
@@ -693,7 +690,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     @Transactional
-    public void applyChanges() {
+    public void applyChanges(ClientsMobileHistory clientsMobileHistory) {
         boolean change = isClientSelected();
         resetMessages();
         Session session = null;
@@ -701,7 +698,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             session = (Session) entityManager.getDelegate();
 
             //  Вносим изменения в пользователя
-            updateClient(session);
+            updateClient(session, clientsMobileHistory);
             if (!change) {
                 resetSelectedClient();
             }
@@ -836,7 +833,9 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     public void doApplyChanges() {
-        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).applyChanges();
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("изменение клиента через org-room (возможно легаси)");
+        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).applyChanges(clientsMobileHistory);
         List<String> groups = new ArrayList<String>();
         groups.add(selectedClient.getClientGroup());
         groups.add(selectedClient.getDefaultClientGroup());

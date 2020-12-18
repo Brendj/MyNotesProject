@@ -2102,6 +2102,7 @@ public class DAOUtils {
         return em.createQuery("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
                 + "left join fetch wc.wtAgeGroupItem ageItem "
                 + "left join fetch wc.wtDietType dietType "
+                + "left join fetch wc.contragent contragent "
                 + "where wc.idOfComplex in :ids")
                 .setParameter("ids", ids)
                 .getResultList();
@@ -5380,7 +5381,85 @@ public class DAOUtils {
     public static SmartWatchVendor getVendorByApiKey(String apiKey, Session session) {
         Criteria criteria = session.createCriteria(SmartWatchVendor.class);
         criteria.add(Restrictions.like("apiKey", apiKey));
-
         return (SmartWatchVendor) criteria.uniqueResult();
     }
+
+    public static List<PreorderComplex> getContentDeletedPreorderDishOtherOO(Session session, Date date) {
+        Query query = session.createQuery("select  pc from PreorderComplex pc "
+                + " where pc.preorderDate > :date and pc.deletedState = true "
+                + " and pc.modeOfAdd = 4 and pc.state in (3, 4, 5, 6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+        query.setParameter("date", date);
+        return (List<PreorderComplex>) query.list();
+    }
+    public static List<PreorderComplex> getContentDeletedPreorderDishOtherPP(Session session, Date date) {
+        Query query = session.createQuery("select  pc from PreorderComplex pc "
+                + " where pc.preorderDate > :date and pc.deletedState = true "
+                + " and pc.modeOfAdd = 4 and pc.state in (1,2) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+        query.setParameter("date", date);
+        return (List<PreorderComplex>) query.list();
+    }
+    public static List<PreorderComplex> getContentDeletedPreorderOtherOO(Session session, Date date) {
+        Query query = session.createQuery("select  pc from PreorderComplex pc "
+                + " where pc.preorderDate > :date and pc.deletedState = true "
+                + " and pc.modeOfAdd = 2 and pc.state in (3,4,5,6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+        query.setParameter("date", date);
+        return (List<PreorderComplex>) query.list();
+    }
+    public static List<PreorderComplex> getContentDeletedPreorderOtherPP(Session session, Date date) {
+        Query query = session.createQuery("select  pc from PreorderComplex pc "
+                + " where pc.preorderDate > :date and pc.deletedState = true "
+                + " and pc.modeOfAdd = 2 and pc.state in (1,2) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+        query.setParameter("date", date);
+        return (List<PreorderComplex>) query.list();
+    }
+    public static List<RegularPreorder> getContentDeletedPreorderOtherRegularOO(Session session, Date date) {
+        Query query = session.createQuery("select rp from RegularPreorder rp "
+                + " where rp.itemCode is null and idofdish is null "
+                + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
+                + " and rp.endDate < :date");
+        query.setParameter("date", date);
+        return (List<RegularPreorder>) query.list();
+    }
+    public static List<RegularPreorder> getContentDeletedPreorderDishOtherRegularOO(Session session, Date date) {
+        Query query = session.createQuery("select  rp from RegularPreorder rp "
+                + " where ((rp.itemCode is not null and idofdish is null) or "
+                + " (rp.itemCode is null and idofdish is not null)) "
+                + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
+                + " and rp.endDate < :date");
+        query.setParameter("date", date);
+        return (List<RegularPreorder>) query.list();
+    }
+
+    public static ComplexInfo getComplexInfoForRegular(Session session, RegularPreorder regularPreorder) {
+        Query query = session.createQuery("select ci from ComplexInfo ci "
+                + " where ci.idOfComplex = :idOfComplex "
+                + " and ci.org = :org "
+                + " and ci.menuDate = :menuDate");
+        query.setParameter("idOfComplex", regularPreorder.getIdOfComplex());
+        query.setParameter("org", regularPreorder.getClient().getOrg());
+        query.setParameter("menuDate", regularPreorder.getStartDate());
+        List<ComplexInfo> complexInfos = (List<ComplexInfo>) query.list();
+        if (complexInfos != null && !complexInfos.isEmpty())
+            return complexInfos.get(0);
+        else
+            return null;
+    }
+
+    public static List<CancelPreorderNotification> getCancelPreorderNotification(Session session)
+            throws Exception {
+        Criteria criteria = session.createCriteria(CancelPreorderNotification.class);
+        return criteria.list();
+    }
+
+    public static void clearCancelNotificationTable(Session session) {
+        Query q = session.createSQLQuery("truncate cf_cancel_preorder_notifications");
+        q.executeUpdate();
+    }
+	
+	public static List<Client> getClientsBySsoid(EntityManager em, String ssoid) {
+        return em.createQuery("from Client where ssoid = :ssoid")
+                .setParameter("ssoid", ssoid)
+                .getResultList();
+    }
+
 }

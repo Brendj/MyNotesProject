@@ -795,6 +795,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(MaintenanceService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(CardBlockUnblockService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(MeshCardNotifyTaskExecutor.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();

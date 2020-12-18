@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.dao.DAOServices;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -59,8 +60,6 @@ public class ClientRegisterPage extends BasicWorkspacePage {
     private boolean showEmail;
     private boolean showRemarks;
     private boolean registerTwins;
-
-
 
 
     /**
@@ -119,7 +118,9 @@ public class ClientRegisterPage extends BasicWorkspacePage {
                 }
                 client.removeMessages();
                 try {
-                    registerClient(session, client, org, registerTwins);
+                    ClientsMobileHistory clientsMobileHistory =
+                            new ClientsMobileHistory("регистрация клиетов через Клиенты/регистрация (org-room)");
+                    registerClient(session, client, org, registerTwins, clientsMobileHistory);
                     client.setAdded(true);
                     client.setInfo("Клиент успешно зарегистрирован");
                     //session.flush();
@@ -275,11 +276,13 @@ public class ClientRegisterPage extends BasicWorkspacePage {
      * Работа с данными
      * ****************************************************************************************************************
      */
-    public static void registerClient (Session session, ClientListEditPage.SelectedClient client, Org org) throws Exception {
-        registerClient(session, client, org, false);
+    public static void registerClient (Session session, ClientListEditPage.SelectedClient client, Org org,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
+        registerClient(session, client, org, false, clientsMobileHistory);
     }
 
-    public static void registerClient (Session session, ClientListEditPage.SelectedClient client, Org org, boolean checkFullname) throws Exception {
+    public static void registerClient (Session session, ClientListEditPage.SelectedClient client, Org org,
+            boolean checkFullname, ClientsMobileHistory clientsMobileHistory) throws Exception {
         if (org == null) {
             org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
         }
@@ -342,12 +345,12 @@ public class ClientRegisterPage extends BasicWorkspacePage {
             if (cl == null) {
                 Client clientNew = ClientManager
                         .registerClientTransactionFree(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig,
-                                !checkFullname, session, null);
+                                !checkFullname, session, null, clientsMobileHistory);
                 newIdOfClient = clientNew.getIdOfClient();
             } else {
                 newIdOfClient = ClientManager
                         .modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org, "",
-                                cl, session);
+                                cl, session, clientsMobileHistory);
             }
         } catch (Exception e) {
             throw e;

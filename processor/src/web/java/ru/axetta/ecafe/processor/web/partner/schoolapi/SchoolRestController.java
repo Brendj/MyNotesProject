@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
 import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -657,8 +658,12 @@ public class SchoolRestController extends Application {
                 clientGroup = DAOUtils.createClientGroup(persistenceSession, jwtUserDetails.getIdOfOrg(),
                         createClientRequestDTO.getGroupName());
             }
-            groupManagementService.createClient(clientGroup, CreateClientRequestDTO.convertRequestToClient(createClientRequestDTO),
-                    jwtUserDetails.getUsername());
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Веб-арм ИС \"ПП\"");
+            clientsMobileHistory.setShowing("Портал");
+            groupManagementService.createClient(clientGroup,
+                    CreateClientRequestDTO.convertRequestToClient(persistenceSession, createClientRequestDTO, clientsMobileHistory),
+                    jwtUserDetails.getUsername(), clientsMobileHistory);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "OK")).build();

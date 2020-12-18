@@ -298,9 +298,13 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItem")
-    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */ public List<RegistryChangeCallback> proceedRegitryChangeItem(
-            @WebParam(name = "changesList") List<Long> changesList, @WebParam(name = "operation") int operation,
-            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
+    public List<RegistryChangeCallback> proceedRegitryChangeItem(
+            @WebParam(name = "changesList") List<Long> changesList,
+            @WebParam(name = "operation") int operation,
+            @WebParam(name = "fullNameValidation") boolean fullNameValidation,
+            @WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "guidStaff") String guidStaff) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -322,15 +326,35 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass auth", e);
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
         }
-
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод proceedRegitryChangeItem (фронт)");
+        if (orgId != null) {
+            Org org = DAOService.getInstance().getOrg(orgId);
+            if (org != null) {
+                clientsMobileHistory.setOrg(org);
+            }
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+        }
+        else
+        {
+            clientsMobileHistory.setShowing("АРМ");
+        }
+        if (guidStaff != null)
+        {
+            clientsMobileHistory.setStaffguid(guidStaff);
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
-    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */ public List<RegistryChangeCallback> proceedRegitryChangeItemInternal(
-            @WebParam(name = "changesList") List<Long> changesList, @WebParam(name = "operation") int operation,
-            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
+    public List<RegistryChangeCallback> proceedRegitryChangeItemInternal(
+            @WebParam(name = "changesList") List<Long> changesList,
+            @WebParam(name = "operation") int operation,
+            @WebParam(name = "fullNameValidation") boolean fullNameValidation,
+            @WebParam(name = "idoforg") Long orgId,
+            @WebParam(name = "guidStaff") String guidStaff) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -340,15 +364,35 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass ip check", fce);
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
         }
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод proceedRegitryChangeItemInternal (фронт)");
+        if (orgId != null) {
+            Org org = DAOService.getInstance().getOrg(orgId);
+            if (org != null) {
+                clientsMobileHistory.setOrg(org);
+            }
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+        }
+        else
+        {
+            clientsMobileHistory.setShowing("АРМ");
+        }
+        if (guidStaff != null)
+        {
+            clientsMobileHistory.setStaffguid(guidStaff);
+        }
+        clientsMobileHistory.setStaffguid(guidStaff);
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeEmployeeItem")
     /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */ public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItem(
             @WebParam(name = "changesList") List<Long> changesList, @WebParam(name = "operation") int operation,
             @WebParam(name = "fullNameValidation") boolean fullNameValidation,
-            @WebParam(name = "groupName") String groupName) {
+            @WebParam(name = "groupName") String groupName,
+            @WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "guidStaff") String guidStaff) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -357,8 +401,26 @@ public class FrontController extends HttpServlet {
         } catch (FrontControllerException fce) {
             logger.error("Failed to pass ip check", fce);
         }
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод proceedRegitryChangeEmployeeItem (фронт)");
+        if (orgId != null) {
+            Org org = DAOService.getInstance().getOrg(orgId);
+            if (org != null) {
+                clientsMobileHistory.setOrg(org);
+            }
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+        }
+        else
+        {
+            clientsMobileHistory.setShowing("АРМ");
+        }
+        if (guidStaff != null)
+        {
+            clientsMobileHistory.setStaffguid(guidStaff);
+        }
+        clientsMobileHistory.setStaffguid(guidStaff);
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
+                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName, clientsMobileHistory);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
@@ -1067,9 +1129,11 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerClientsV2")
-    public List<RegisterClientResult> registerClientsV2(@WebParam(name = "orgId") Long orgId,
+    public List<RegisterClientResult> registerClientsV2(
+            @WebParam(name = "orgId") Long orgId,
             @WebParam(name = "clientDescList") List<ClientDescV2> clientDescList,
-            @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
+            @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness,
+            @WebParam(name = "guidStaff") String guidStaff)
             throws FrontControllerException {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
@@ -1213,8 +1277,26 @@ public class FrontController extends HttpServlet {
 
                 logger.debug("register client v2");
                 boolean noComment = true;
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
+                if (orgId != null) {
+                    Org org = DAOService.getInstance().getOrg(orgId);
+                    if (org != null) {
+                        clientsMobileHistory.setOrg(org);
+                    }
+                    clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+                }
+                else
+                {
+                    clientsMobileHistory.setShowing("АРМ");
+                }
+                if (guidStaff != null)
+                {
+                    clientsMobileHistory.setStaffguid(guidStaff);
+                }
                 long idOfClient = ClientManager
-                        .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment);
+                        .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment,
+                                clientsMobileHistory);
                 results.add(new RegisterClientResult(idOfClient, recId, true, null));
             } catch (Exception e) {
                 results.add(new RegisterClientResult(null, recId, false, e.getMessage()));
@@ -1316,7 +1398,11 @@ public class FrontController extends HttpServlet {
                     fc.setValue(ClientManager.FieldId.SAN, cd.snils);
                 }
                 logger.debug("register client");
-                long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness, false);
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("soap метод registerClients (фронт)");
+                clientsMobileHistory.setShowing("АРМ");
+                long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness, false,
+                        clientsMobileHistory);
                 results.add(new RegisterClientResult(idOfClient, cd.recId, true, null));
             } catch (Exception e) {
                 results.add(new RegisterClientResult(null, cd.recId, false, e.getMessage()));
@@ -2183,8 +2269,11 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerGuardian")
-    public List<RegisterGuardianResult> registerGuardian(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "guardianDescList") GuardianDesc guardianDescList) throws FrontControllerException {
+    public List<RegisterGuardianResult> registerGuardian(
+            @WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "guardianDescList") GuardianDesc guardianDescList,
+            @WebParam(name = "guidStaff") String guidStaff
+            ) throws FrontControllerException {
         checkRequestValidity(orgId);
 
         String firstName = FrontControllerProcessor
@@ -2359,7 +2448,13 @@ public class FrontController extends HttpServlet {
             }
             fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
 
-            Long idOfClient = ClientManager.registerClient(orgId, fc, false, true);
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("soap метод registerGuardian (фронт)");
+            clientsMobileHistory.setOrg(org);
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+            clientsMobileHistory.setStaffguid(guidStaff);
+            Long idOfClient = ClientManager.registerClient(orgId, fc, false, true,
+                    clientsMobileHistory);
 
             Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
 

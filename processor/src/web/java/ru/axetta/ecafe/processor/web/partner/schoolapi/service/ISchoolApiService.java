@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.service;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.PlanOrder;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseClients;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.ResponseDiscountClients;
@@ -35,7 +32,7 @@ public interface ISchoolApiService {
     List<Client> getClientsForContractIds(ClientGroup newClientGroup, List<Long> contractIds, boolean strictEditMode) throws Exception;
     List<Client> getClientsForGroups(ClientGroup newClientGroup, List<String> oldGroups, boolean strictEditMode) throws Exception;
     List<EditClientsGroupsGroupDTO> moveClientsInGroup(ClientGroup newClientGroup, List<Client> clients, String username) throws Exception;
-    void createClient(ClientGroup clientGroup, Client client, String username) throws Exception;
+    void createClient(ClientGroup clientGroup, Client client, String username, ClientsMobileHistory clientsMobileHistory) throws Exception;
     List<ClientGroup> getClientGroupsByGroupNamesAndOrgId(List<String> groupsNames, Long orgId) throws Exception,
             RequestProcessingException;
     List<ClientGroup> getClientGroupsForClientManager(List<ClientGroup> clientGroups, Long idOfClient) throws Exception;

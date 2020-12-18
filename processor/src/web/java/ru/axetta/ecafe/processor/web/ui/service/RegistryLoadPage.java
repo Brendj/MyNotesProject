@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -134,17 +135,22 @@ public class RegistryLoadPage extends BasicWorkspacePage {
     }
 
     public void process() throws Exception {
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("Загрузка клиента из файла");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         if(parameters == 1){
-            process(1);
+            process(1, clientsMobileHistory);
         } else if(parameters == 2){
-            process(2);
+            process(2, clientsMobileHistory);
         } else {
             printError("Выберите действие");
         }
 
     }
 
-    public void process(int parameter) throws Exception {
+    public void process(int parameter, ClientsMobileHistory clientsMobileHistory) throws Exception {
         String path = this.path;
         File f = new File(path);
         if (!f.isDirectory()) {
@@ -168,7 +174,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         }
 
         if(parameter == 2) {
-            processGuardians(path, lastFile, firstFile, lineResults);
+            processGuardians(path, lastFile, firstFile, lineResults, clientsMobileHistory);
         }
 
         this.lineResults = lineResults;
@@ -279,7 +285,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         }
     }
 
-    private synchronized void processGuardians(String path, Long lastFile, Long firstFile, List<LineResult> lineResults) throws Exception {
+    private synchronized void processGuardians(String path, Long lastFile, Long firstFile,
+            List<LineResult> lineResults, ClientsMobileHistory clientsMobileHistory) throws Exception {
         BufferedReader br = null;
         String line;
         for(int i = firstFile.intValue(); i <= lastFile; i++) {
@@ -298,7 +305,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
                 formClientItems(clientItems);
 
-                List<LineResult> lineResultsByFile = processClientItems(clientItems, i);
+                List<LineResult> lineResultsByFile = processClientItems(clientItems, i, clientsMobileHistory);
                 lineResults.addAll(lineResultsByFile);
 
             } catch (FileNotFoundException ignore) {
@@ -387,7 +394,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
     }
 
-    private List<LineResult> processClientItems(List<ClientItem> clientItems, int orgInt) throws Exception {
+    private List<LineResult> processClientItems(List<ClientItem> clientItems, int orgInt,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
 
         Map<Integer, LineResult> lineResults = new TreeMap<Integer, LineResult>();
         Map<GuardianItem, GuardianData> updateMap = new HashMap<GuardianItem, GuardianData>();
@@ -429,19 +437,20 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             }
         }
 
-        updateAndCreateGuardians(orgInt, lineResults, updateMap, createMap);
+        updateAndCreateGuardians(orgInt, lineResults, updateMap, createMap, clientsMobileHistory);
 
         return new ArrayList<LineResult>(lineResults.values());
     }
 
     private void updateAndCreateGuardians(int orgInt, Map<Integer, LineResult> lineResults,
-            Map<GuardianItem, GuardianData> updateMap, Map<GuardianItem, ClientItem> createMap) throws Exception {
-        updateGuardians(orgInt, lineResults, updateMap);
-        createGuardians(orgInt, lineResults, createMap);
+            Map<GuardianItem, GuardianData> updateMap, Map<GuardianItem, ClientItem> createMap,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
+        updateGuardians(orgInt, lineResults, updateMap, clientsMobileHistory);
+        createGuardians(orgInt, lineResults, createMap, clientsMobileHistory);
     }
 
     private void createGuardians(int orgInt, Map<Integer, LineResult> lineResults,
-            Map<GuardianItem, ClientItem> createMap) throws Exception {
+            Map<GuardianItem, ClientItem> createMap, ClientsMobileHistory clientsMobileHistory) throws Exception {
 
         Map<Long, Map<GuardianItem, ClientItem>> orgMap = new HashMap<Long, Map<GuardianItem, ClientItem>>();
         for(Map.Entry<GuardianItem, ClientItem> entry : createMap.entrySet()) {
@@ -460,17 +469,18 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             for(Map.Entry<GuardianItem, ClientItem> entry1 : entry.getValue().entrySet()) {
                 batchMap.put(entry1.getKey(), entry1.getValue());
                 if(batchMap.size() % MAX_BATCH_SIZE == 0){
-                    createGuardiansBatch(orgInt, lineResults, batchMap, entry.getKey());
+                    createGuardiansBatch(orgInt, lineResults, batchMap, entry.getKey(), clientsMobileHistory);
                     batchMap = new HashMap<GuardianItem, ClientItem>();
                 }
             }
-            createGuardiansBatch(orgInt, lineResults, batchMap, entry.getKey());
+            createGuardiansBatch(orgInt, lineResults, batchMap, entry.getKey(), clientsMobileHistory);
             batchMap = new HashMap<GuardianItem, ClientItem>();
         }
     }
 
     private void createGuardiansBatch(int orgInt, Map<Integer, LineResult> lineResults,
-            Map<GuardianItem, ClientItem> createMap, Long idOfOrg) throws Exception {
+            Map<GuardianItem, ClientItem> createMap, Long idOfOrg, ClientsMobileHistory clientsMobileHistory)
+            throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -490,7 +500,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             for(Map.Entry<GuardianItem, ClientItem> entry : createMap.entrySet()) {
                 try {
                     Long idOfGuardian = createGuardian(persistenceSession, entry.getKey(), entry.getValue(), org,
-                            contractIds.get(i), newGuardiansVersions, clientRegistryVersion, clientGroup);
+                            contractIds.get(i), newGuardiansVersions, clientRegistryVersion, clientGroup, clientsMobileHistory);
                     i++;
                     newGuardiansVersions++;
                     clientRegistryVersion++;
@@ -513,20 +523,20 @@ public class RegistryLoadPage extends BasicWorkspacePage {
     }
 
     private void updateGuardians(int orgInt, Map<Integer, LineResult> lineResults,
-            Map<GuardianItem, GuardianData> updateMap) throws Exception {
+            Map<GuardianItem, GuardianData> updateMap, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Map<GuardianItem, GuardianData> batchMap = new HashMap<GuardianItem, GuardianData>();
         for(Map.Entry<GuardianItem, GuardianData> entry : updateMap.entrySet()) {
             batchMap.put(entry.getKey(), entry.getValue());
             if(batchMap.size() % MAX_BATCH_SIZE == 0){
-                updateGuardiansBatch(orgInt, lineResults, batchMap);
+                updateGuardiansBatch(orgInt, lineResults, batchMap, clientsMobileHistory);
                 batchMap = new HashMap<GuardianItem, GuardianData>();
             }
         }
-        updateGuardiansBatch(orgInt, lineResults, batchMap);
+        updateGuardiansBatch(orgInt, lineResults, batchMap, clientsMobileHistory);
     }
 
     private void updateGuardiansBatch(int orgInt, Map<Integer, LineResult> lineResults,
-            Map<GuardianItem, GuardianData> updateMap) throws Exception {
+            Map<GuardianItem, GuardianData> updateMap, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -539,7 +549,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
             for(Map.Entry<GuardianItem, GuardianData> entry : updateMap.entrySet()) {
                 Long idOfGuardian = updateGuardian(persistenceSession, entry.getKey(), entry.getValue(),
-                        newGuardiansVersions, clientRegistryVersion);
+                        newGuardiansVersions, clientRegistryVersion, clientsMobileHistory);
                 newGuardiansVersions++;
                 clientRegistryVersion++;
                 LineResult result = new LineResult(orgInt + "/" + entry.getKey().getCount(), 160,
@@ -557,7 +567,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
     }
 
     private Long updateGuardian(Session persistenceSession, GuardianItem guardianItem, GuardianData guardianData,
-            Long newGuardiansVersions, Long clientRegistryVersion) throws Exception {
+            Long newGuardiansVersions, Long clientRegistryVersion, ClientsMobileHistory clientsMobileHistory) throws Exception {
         if(guardianItem.getRelationType() != null){
             if(!guardianItem.getRelationType().equals(guardianData.getRelationType())) {
                 Query query = persistenceSession.createQuery(
@@ -573,6 +583,13 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 + "mobile = :mobile, phone = :phone, email = :email WHERE idOfClient = :idOfClient");
         query.setParameter("clientRegistryVersion", clientRegistryVersion);
         query.setParameter("mobile", guardianItem.getPhones().get(0));
+        //Сохраняем историю изменения клиента
+        Client client = (Client) persistenceSession.load(Client.class, guardianData.getIdOfGuardian());
+        if (client != null) {
+            client.initClientMobileHistory(clientsMobileHistory);
+            client.setMobile(guardianItem.getPhones().get(0));
+        }
+        //
         query.setParameter("phone", guardianItem.getPhones().size() > 1 ? guardianItem.getPhones().get(1) : null);
         query.setParameter("email", guardianItem.getEmail());
         query.setParameter("idOfClient", guardianData.getIdOfGuardian());
@@ -582,7 +599,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
     }
 
     private Long createGuardian(Session persistenceSession, GuardianItem guardianItem, ClientItem clientItem, Org org,
-            Long contractId, Long newGuardiansVersions, Long clientRegistryVersion, ClientGroup clientGroup) throws Exception {
+            Long contractId, Long newGuardiansVersions, Long clientRegistryVersion, ClientGroup clientGroup,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
         Long limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
 
         Person person = new Person(guardianItem.getFirstName(), guardianItem.getSurName(), guardianItem.getSecondName());
@@ -602,6 +620,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         if (clientGroup != null) {
             guardian.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         }
+        persistenceSession.persist(guardian);
+        guardian.initClientMobileHistory(clientsMobileHistory);
         guardian.setMobile(guardianItem.getPhones().get(0));
         logger.info("class : RegistryLoadPage, method : createGuardian line : 605, idOfClient : " + guardian.getIdOfClient() + " mobile : " + guardian.getMobile());
         if(guardianItem.getPhones().size() > 1){
@@ -611,7 +631,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         guardian.setAddress("");
         guardian.setEmail(guardianItem.getEmail());
         guardian.setDiscountMode(Client.DISCOUNT_MODE_NONE);
-        persistenceSession.persist(guardian);
+        persistenceSession.update(guardian);
 
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, org.getIdOfOrg());
 

@@ -38,6 +38,7 @@ public class PreorderOperationsService {
         try {
             runRelevancePreordersToMenu(params);
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(params);
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).checkPreorderClientGroups(params);
             logger.info("Successful end process relevance preorders");
         } catch(Exception e) {
             logger.error("Error in process relevance preorders ", e);

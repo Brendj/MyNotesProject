@@ -9,7 +9,10 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardService;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardServiceIml;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MockService;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -24,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @DependsOn("runtimeContext")
@@ -71,12 +76,18 @@ public class MeshClientCardRefService {
         }
     }
 
+    public void deleteRef(Integer id, String meshGUID) {
+        try {
+            meshCardService.deleteReferenceBetweenClientAndCardById(id, meshGUID);
+        } catch (Exception e){
+            log.error("Can't delete Ref (Error Correction)", e);
+        }
+    }
+
     public void changeRef(Card c) throws Exception {
         try {
             meshCardService.deleteReferenceBetweenClientAndCard(c.getMeshCardClientRef());
-            /*if(!c.getMeshCardClientRef().getSend()){
-                throw new Exception("Ref not deleted, process change owner skipped");
-            }*/
+
             MeshClientCardRef newRef = meshCardService.createReferenceBetweenClientAndCard(c);
             c.getMeshCardClientRef().setClient(newRef.getClient());
             c.getMeshCardClientRef().setIdOfRefInExternalSystem(newRef.getIdOfRefInExternalSystem());
@@ -135,5 +146,21 @@ public class MeshClientCardRefService {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
         }
+    }
+
+    public List<Category> getCardCategoryByClient(Client client) {
+        ResponsePersons person = meshCardService.findPersonById(client.getMeshGUID());
+        if(person == null){
+            return Collections.emptyList();
+        }
+
+        List<Category> res = new LinkedList<>();
+
+        for(Category c : person.getCategories()){
+            if(c.getCategoryId().equals(Category.CARD_CATEGORY_ID)){
+                res.add(c);
+            }
+        }
+        return res;
     }
 }

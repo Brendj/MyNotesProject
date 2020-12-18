@@ -482,8 +482,12 @@ public class Processor implements SyncProcessor {
         // Process ClientParamRegistry
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Полная синхронизация");
+            clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion);
+                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
         } catch (Exception e) {
             String message = String
                     .format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -1122,6 +1126,21 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
         fullProcessingPreorderFeedingStatus(request, responseSections);
@@ -1322,6 +1341,9 @@ public class Processor implements SyncProcessor {
         fullProcessingSyncSetting(request, syncHistory, responseSections);
 
         fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
+
+        //Секция обработки заявок от ЕМИАС
+        fullProcessingEMIAS(request, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -2083,8 +2105,12 @@ public class Processor implements SyncProcessor {
         try {
             SyncRequest.ClientParamRegistry clientParamRegistry = request.getClientParamRegistry();
             if (clientParamRegistry != null) {
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("Синхронизация по секциям (ConstructedSections)");
+                clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+                clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
                 processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds,
-                        clientsWithWrongVersion);
+                        clientsWithWrongVersion, clientsMobileHistory);
             }
         } catch (Exception e) {
             String message = String
@@ -2430,6 +2456,21 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
 
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         Date syncEndTime = new Date();
 
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
@@ -2529,6 +2570,21 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2621,6 +2677,21 @@ public class Processor implements SyncProcessor {
         } catch (Exception e) {
             String message = String.format("processReestrTaloonPreorder: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
             logger.error(message, e);
         }
 
@@ -2721,6 +2792,21 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2815,6 +2901,21 @@ public class Processor implements SyncProcessor {
             String message = String.format("processZeroTransactions: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
             logger.error(message, e);
         }
 
@@ -2950,6 +3051,21 @@ public class Processor implements SyncProcessor {
                     .format("Failed to process ClientGuardianRequest, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
             logger.error(message, e);
         }
 
@@ -3091,8 +3207,13 @@ public class Processor implements SyncProcessor {
         }
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
+
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Синхронизация типа GetClientParams (синхра клиентов)");
+            clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion);
+                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
         } catch (Exception e) {
             logger.error(String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -3131,6 +3252,20 @@ public class Processor implements SyncProcessor {
                     e);
         }
 
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
 
         Date syncEndTime = new Date();
 
@@ -3284,6 +3419,21 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("processCardRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
             logger.error(message, e);
         }
 
@@ -3591,6 +3741,21 @@ public class Processor implements SyncProcessor {
         } catch (Exception e) {
             String message = String.format("processMenuSupplier(): %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
             logger.error(message, e);
         }
 
@@ -4778,7 +4943,7 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
             SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds,
-            List<Long> clientsWithWrongVersion) throws Exception {
+            List<Long> clientsWithWrongVersion, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -4831,7 +4996,7 @@ public class Processor implements SyncProcessor {
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
                     processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg,
-                            allocatedClients, orgSet, clientsWithWrongVersion);
+                            allocatedClients, orgSet, clientsWithWrongVersion, clientsMobileHistory);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -4862,7 +5027,8 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg,
-            List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion) throws Exception {
+            List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -4927,6 +5093,7 @@ public class Processor implements SyncProcessor {
                     if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
                         client.setSsoid("");
                     }
+                    client.initClientMobileHistory(clientsMobileHistory);
                     client.setMobile(mobile);
                     logger.info("class : ClientManager, method : modifyClientTransactionFree line : 344, idOfClient : "
                             + client.getIdOfClient() + " mobile : " + client.getPhone());
@@ -5080,7 +5247,7 @@ public class Processor implements SyncProcessor {
             DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
             client.setClientRegistryVersion(version);
-
+            client.setUpdateTime(new Date());
             persistenceSession.update(client);
 
             persistenceSession.flush();
@@ -7295,6 +7462,21 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -7474,6 +7656,25 @@ public class Processor implements SyncProcessor {
             String message = String.format("fullProcessingPlanOrdersRestrictionsData: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingEMIAS(SyncRequest request, List<AbstractToElement> responseSections) {
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                EmiasSection emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                addToResponseSections(emiasSection, responseSections);
+                EmiasSectionForARMAnswer emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                addToResponseSections(emiasSectionForARMAnswer, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
             logger.error(message, e);
         }
     }
@@ -7804,6 +8005,21 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
         discardOrgSettingsSyncParam(request.getIdOfOrg());
+
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
 
         Date syncEndTime = new Date();
 

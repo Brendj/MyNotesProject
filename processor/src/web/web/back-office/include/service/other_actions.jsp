@@ -19,6 +19,9 @@
 <%--Тест лога --%>
 <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid borderless-grid-align-top" columns="2">
     <h:panelGrid styleClass="borderless-grid">
+
+        <a4j:commandButton value="Отправка уведомлений об отмене предзаказа" action="#{otherActionsPage.cancelPreorder}"
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
@@ -196,6 +199,8 @@
                 <a4j:commandButton value="Проверка соответствия меню и предзаказа" action="#{otherActionsPage.relevancePreordersToMenu()}" id="relevancePreordersToMenu"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
                 <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО" action="#{otherActionsPage.relevancePreordersToOrgFlag()}" id="relevancePreordersToOrgFlag"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Проверка группы клиента" action="#{otherActionsPage.checkPreorderClientGroups()}" id="checkPreorderClientGroups"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
                 <a4j:commandButton value="Пересчет количественных показателей по предзаказам" action="#{otherActionsPage.preordersCheck()}" id="preordersCheck"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />

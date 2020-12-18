@@ -8,13 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -319,7 +318,14 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 if (i.getGroup() != null) {
                     fieldConfig.setValue(ClientManager.FieldId.GROUP, i.getGroup());
                 }
-                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true, false);
+
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("Кнопка \"Зарегистрировать\" Сервис/Сверка/Сверка контингента/Поиск учащихся");
+                User user = MainPage.getSessionInstance().getCurrentUser();
+                clientsMobileHistory.setUser(user);
+                clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true,
+                        false, clientsMobileHistory);
                 ++nItems;
             }
             printMessage("Успешно зарегистрировано клиентов: " + nItems);

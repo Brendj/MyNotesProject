@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfSpecialDate;
-import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
-import ru.axetta.ecafe.processor.core.persistence.ProductionCalendar;
-import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -63,6 +60,12 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
     //Проверка доступности даты на изменение при получении заявок на питание из ПАОУ
     public boolean isGoodDate(Session session, Long idOfOrg, Date dateDone, Integer type) {
         try {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            if (org != null) {
+                //Если функционал проверки даты выключен для данной орг, то считаем что проверка прогла успешно
+                if (!org.getGooddatecheck())
+                    return true;
+            }
             Date currentDate = new Date();
             currentDate = CalendarUtils.startOfDay(currentDate);
             dateDone = CalendarUtils.startOfDay(dateDone);

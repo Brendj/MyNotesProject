@@ -114,6 +114,8 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     private Boolean useWebArm;
 
+    private Boolean goodDateCheck;
+
     private Long orgIdFromNsi;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
@@ -300,6 +302,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
         this.useWebArm = org.getUseWebArm();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
+        this.goodDateCheck = org.getGooddatecheck();
     }
 
     public String getFilterOrgs() {
@@ -844,4 +847,12 @@ public class OrgViewPage extends BasicWorkspacePage {
     public Long getOrgIdFromNsi() { return orgIdFromNsi; }
 
     public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
+
+    public Boolean getGoodDateCheck() {
+        return goodDateCheck;
+    }
+
+    public void setGoodDateCheck(Boolean goodDateCheck) {
+        this.goodDateCheck = goodDateCheck;
+    }
 }

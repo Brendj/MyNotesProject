@@ -70,11 +70,11 @@
             <column name="idOfDietType"/>
         </many-to-one>
 
-        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
             <column name="idOfContragent"/>
         </many-to-one>
 
-        <many-to-one name="wtOrgGroup" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
+        <many-to-one name="wtOrgGroup" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
             <column name="idOfOrgGroup"/>
         </many-to-one>
 
