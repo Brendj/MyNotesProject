@@ -432,7 +432,8 @@ public class SchoolApiService implements ISchoolApiService {
     }
 
     @Override
-    public void createClient(ClientGroup clientGroup, Client client, String username) throws Exception {
+    public void createClient(ClientGroup clientGroup, Client client, String username,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
         Client iacClient = DAOUtils.findClientByIacregid(persistanceSession, client.getIacRegId());
         Org clientGroupOrg = DAOUtils.findOrg(persistanceSession, clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
         client.setClientGroup(clientGroup);
@@ -482,6 +483,7 @@ public class SchoolApiService implements ISchoolApiService {
             clientPerson.setSecondName(client.getPerson().getSecondName());
             iacClient.setGender(client.getGender());
             iacClient.setBirthDate(client.getBirthDate());
+            client.initClientMobileHistory(clientsMobileHistory);
             iacClient.setMobile(client.getMobile());
             iacClient.setPassportSeries(client.getPassportSeries());
             iacClient.setPassportNumber(client.getPassportNumber());

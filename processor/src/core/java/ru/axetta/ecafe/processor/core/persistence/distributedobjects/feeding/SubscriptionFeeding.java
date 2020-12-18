@@ -203,6 +203,7 @@ public class SubscriptionFeeding extends DistributedObject{
         setStaff(((SubscriptionFeeding) distributedObject).getStaff());
         setGuidOfStaff(((SubscriptionFeeding) distributedObject).getGuidOfStaff());
         setFeedingType(((SubscriptionFeeding) distributedObject).getFeedingType());
+        setIdOfOrgLastChange(((SubscriptionFeeding) distributedObject).getIdOfOrgLastChange());
     }
 
     @Override
