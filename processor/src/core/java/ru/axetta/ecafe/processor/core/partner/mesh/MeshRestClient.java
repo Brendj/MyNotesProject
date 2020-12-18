@@ -60,7 +60,12 @@ public class MeshRestClient {
                 buffer.flush();
                 return buffer.toByteArray();
             } else {
-                throw new Exception("Mesh request has status " + statusCode);
+                String errorMessage = "Mesh request has status " + statusCode;
+                if (statusCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
+                    throw new MeshUnprocessableEntityException(errorMessage);
+                } else {
+                    throw new Exception(errorMessage);
+                }
             }
         } finally {
             httpMethod.releaseConnection();
