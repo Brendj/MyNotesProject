@@ -42,7 +42,6 @@ public interface OrderRepo extends JpaRepository<Order, OrderCompositeId> {
     nativeQuery = true)
     List<SupplyMSPOrders> fullInfo(@Param("begin")Long begin,
                                    @Param("end") Long end,
-                                   @Param("types") List<Integer> types,
                                    Pageable pageable);
 
     Integer countAllByCreatedDateBetweenAndOrderTypeIn(Long begin, Long end, List<Integer> types);
