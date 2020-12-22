@@ -336,6 +336,7 @@ public class MainPage implements Serializable {
     private final AllComplexReportPage allComplexReportPage = new AllComplexReportPage();
     private final TotalSalesPage totalSalesPage = new TotalSalesPage();
     private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
+    private final DishMenuWebARMPPReportPage dishMenuReportWebArmPP = new DishMenuWebARMPPReportPage();
 
     //Charts
     private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
@@ -7728,6 +7729,23 @@ public class MainPage implements Serializable {
         } finally {
 
         }
+        return null;
+    }
+
+    public DishMenuWebARMPPReportPage getDishMenuReportWebArmPP() {
+        return dishMenuReportWebArmPP;
+    }
+
+    public Object showDishMenuWebARMPPReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = dishMenuReportWebArmPP;
+        } catch (Exception e) {
+            logger.error("Failed to set DishMenuWebARMPPReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по блюдам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
         return null;
     }
 
