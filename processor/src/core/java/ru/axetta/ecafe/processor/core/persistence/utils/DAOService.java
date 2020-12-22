@@ -3065,4 +3065,11 @@ public class DAOService {
 
         return (CodeMSP) criteria.uniqueResult();
     }
+
+    public List<CategoryDiscount> getCategoryDiscountListNotDeletedTypeDiscount() {
+        TypedQuery<CategoryDiscount> q = entityManager
+                .createQuery("from CategoryDiscount where deletedState = false and categoryType = 0 order by categoryName",
+                        CategoryDiscount.class);
+        return q.getResultList();
+    }
 }

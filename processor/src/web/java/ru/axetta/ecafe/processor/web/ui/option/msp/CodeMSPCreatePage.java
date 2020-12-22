@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.option.msp;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
 import ru.axetta.ecafe.processor.core.persistence.CodeMspAgeTypeGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -24,10 +23,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.model.SelectItem;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 @Component
 @Scope("session")
@@ -64,24 +61,18 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
     private List<SelectItem> loadDiscounts() {
         List<SelectItem> result = new LinkedList<>();
         try {
-            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOService
-                    .getInstance().getCategoryDiscountDSZNList();
-            Set<CategoryDiscount> set = new HashSet<>();
+            List<CategoryDiscount> categoryDiscountList = DAOService
+                    .getInstance().getCategoryDiscountListNotDeletedTypeDiscount();
 
             result.add(new SelectItem(null, ""));
 
-            for(CategoryDiscountDSZN category : categoryDiscountDSZNList){
-                if(category.getCategoryDiscount() != null){
-                    set.add(category.getCategoryDiscount());
-                }
-            }
-
-            for(CategoryDiscount c : set){
+            for(CategoryDiscount c : categoryDiscountList){
                 SelectItem item = new SelectItem(
                         c.getIdOfCategoryDiscount(),
                         c.getCategoryName());
                 result.add(item);
             }
+
         } catch (Exception e){
             log.error("Can't load categoryDiscounts", e);
         }
