@@ -19,7 +19,7 @@ public class ClientDTSZNDiscountInfo {
     private Client client;
 
     @Column(name = "dtiszncode")
-    private Integer DTISZNcode;
+    private Long DTISZNCode;
 
     @Column(name = "datestart")
     private Long dateStart;
@@ -55,12 +55,12 @@ public class ClientDTSZNDiscountInfo {
         this.client = client;
     }
 
-    public Integer getDTISZNcode() {
-        return DTISZNcode;
+    public Long getDTISZNCode() {
+        return DTISZNCode;
     }
 
-    public void setDTISZNcode(Integer DTISZNcode) {
-        this.DTISZNcode = DTISZNcode;
+    public void setDTISZNCode(Long DTISZNcode) {
+        this.DTISZNCode = DTISZNcode;
     }
 
     public Long getDateStart() {

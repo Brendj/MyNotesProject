@@ -43,7 +43,7 @@ public class KafkaService {
         }
     }
 
-    private ListenableFuture sendAssign(String message){
+    public ListenableFuture sendAssign(String message){
         ListenableFuture<SendResult<String, String>> future = kafkaStarshipTemplate.send(this.topicAssignName, message);
         future.addCallback(new LoggingListenableFutureCallback(message));
         return future;

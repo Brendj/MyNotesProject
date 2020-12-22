@@ -4,6 +4,8 @@
 
 package ru.iteco.msp.models;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +47,17 @@ public class CategoryDiscount {
 
     @OneToOne(mappedBy = "categoryDiscount")
     private CategoryDiscountDTSZN categoryDiscountDTSZN;
+
+    @OneToMany(mappedBy = "categoryDiscount")
+    private List<CodeMSP> codeMSPs;
+
+    public List<CodeMSP> getCodeMSPs() {
+        return codeMSPs;
+    }
+
+    public void setCodeMSPs(List<CodeMSP> codeMSPs) {
+        this.codeMSPs = codeMSPs;
+    }
 
     public List<WtDiscountRule> getWtRules() {
         return wtRules;
@@ -101,5 +114,19 @@ public class CategoryDiscount {
     @Override
     public int hashCode() {
         return Objects.hash(idOfCategoryDiscount);
+    }
+
+    public CodeMSP getMSPByClient(Client client) {
+        if(CollectionUtils.isEmpty(codeMSPs)){
+            return null;
+        }
+        for(CodeMSP msp : codeMSPs){
+            for(CodeMspAgeTypeGroup group : msp.getAgeTypeGroupList()){
+                if(group.getAgeTypeGroup().equals(client.getAgeGroup())){
+                    return msp;
+                }
+            }
+        }
+        return  null;
     }
 }
