@@ -44,6 +44,7 @@ public class PreorderComplex {
     private Long idOfOrgOnCreate;
     private String mobile;
     private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
+    private Boolean cancelnotification;
 
     public static Integer getDaysOfRegularPreorders() {
         return Integer.parseInt(RuntimeContext
@@ -294,5 +295,13 @@ public class PreorderComplex {
 
     public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         this.mobileGroupOnCreate = mobileGroupOnCreate;
+    }
+
+    public Boolean getCancelnotification() {
+        return cancelnotification;
+    }
+
+    public void setCancelnotification(Boolean cancelnotification) {
+        this.cancelnotification = cancelnotification;
     }
 }

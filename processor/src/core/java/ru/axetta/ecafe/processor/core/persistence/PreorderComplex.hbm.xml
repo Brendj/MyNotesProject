@@ -49,5 +49,6 @@
         </property>
         <many-to-one name="regularPreorder" class="ru.axetta.ecafe.processor.core.persistence.RegularPreorder"
                      column="IdOfRegularPreorder" fetch="select"/>
+        <property name="cancelnotification" column="cancelnotification" type="boolean"/>
     </class>
 </hibernate-mapping>

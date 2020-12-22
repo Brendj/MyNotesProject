@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest;
 
+import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 
@@ -34,5 +35,14 @@ public class MockService implements MeshCardService {
     @Override
     public MeshClientCardRef createReferenceBetweenClientAndCard(Card card) {
         return null; // unsupported operation
+    }
+
+    @Override
+    public void deleteReferenceBetweenClientAndCardById(Integer id, String meshGUID) {
+    }
+
+    @Override
+    public ResponsePersons findPersonById(String meshGUID) {
+        return null;
     }
 }

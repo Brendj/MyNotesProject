@@ -3206,7 +3206,7 @@ public class MainPage implements Serializable {
         return clientOperationListPage;
     }
 
-    public Object showClientOperationListPage() {
+    public Object showClientOperationListPage(boolean full) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -3215,7 +3215,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            clientOperationListPage.fill(persistenceSession, selectedIdOfClient);
+            clientOperationListPage.fill(persistenceSession, selectedIdOfClient, full);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             currentWorkspacePage = clientOperationListPage;
@@ -3416,7 +3416,12 @@ public class MainPage implements Serializable {
                 dataSize = data.length;
                 inputStream = new ByteArrayInputStream(data);
             }
-            clientFileLoadPage.loadClients(inputStream, dataSize);
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Загрузка клиентов из файла");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+            clientFileLoadPage.loadClients(inputStream, dataSize, clientsMobileHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
@@ -10689,7 +10694,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             selectedClientGroupPage.fill(persistenceSession, selectedIdOfClient);
-            clientOperationListPage.fill(persistenceSession, selectedIdOfClient);
+            clientOperationListPage.fill(persistenceSession, selectedIdOfClient, false);
             clientViewPage.fill(persistenceSession, selectedIdOfClient);
             persistenceTransaction.commit();
             persistenceTransaction = null;

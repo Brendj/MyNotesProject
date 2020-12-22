@@ -320,7 +320,7 @@
 
         <rich:panelMenuItem id="viewClientOperationsMenuItem"
                             binding="#{mainPage.clientOperationListPage.mainMenuComponent}" label="Операции"
-                            action="#{mainPage.showClientOperationListPage}" reRender="workspaceForm" />
+                            action="#{mainPage.showClientOperationListPage(false)}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 

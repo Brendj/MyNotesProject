@@ -236,10 +236,17 @@ public class ReportDAOService {
     }
 
 
-    public boolean setClientMobilePhone(Long contractId, String mobile) {
+    public boolean setClientMobilePhone(Long contractId, String mobile, ClientsMobileHistory clientsMobileHistory) {
         Query q = entityManager.createQuery("update Client set mobile=:mobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
         q.setParameter("contractId", contractId);
+        //Сохраняем историю изменения клиента
+        Client client = DAOUtils.findClientByContractId(entityManager, contractId);
+        if (client != null) {
+            client.initClientMobileHistory(clientsMobileHistory);
+            client.setMobile(mobile);
+        }
+        //
         return q.executeUpdate() != 0;
     }
 

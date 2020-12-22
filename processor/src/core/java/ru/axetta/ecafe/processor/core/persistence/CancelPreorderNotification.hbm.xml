@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.CancelPreorderNotification" table="cf_cancel_preorder_notifications">
+        <id name="ifofcancelpreordernotifications" column="ifofcancelpreordernotifications" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient"
+                     update="false"/>
+        <property name="typename" column="typename" type="string"/>
+        <property name="preorderdate" column="preorderdate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="textmessage" column="textmessage" type="string"/>
+    </class>
+</hibernate-mapping>

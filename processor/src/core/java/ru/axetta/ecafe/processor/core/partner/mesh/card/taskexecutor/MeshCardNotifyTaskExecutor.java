@@ -6,12 +6,16 @@ package ru.axetta.ecafe.processor.core.partner.mesh.card.taskexecutor;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic.MeshClientCardRefService;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.CardPropertiesEnum;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.Parameter;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -23,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ejb.DependsOn;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 @DependsOn("runtimeContext")
@@ -81,10 +86,13 @@ public class MeshCardNotifyTaskExecutor {
                 if(c.getClient() != null && StringUtils.isEmpty(c.getClient().getMeshGUID())){
                     continue;
                 }
+
                 try {
                     transaction = session.beginTransaction();
 
-                    if(c.refNotExistsOrNotSending() && c.getClient() != null){ // Client exists, but no ref
+                    errorCorrection(c, session); // Устранение ошибок дублей связок и неоднозначности связей
+
+                    if(c.refNotExists() && c.getClient() != null) { // Client exists, but no ref
                         MeshClientCardRef ref = meshClientCardRefService.createRef(c);
                         c.setMeshCardClientRef(ref);
                     } else if(c.getClient() == null){ // Ref exists, but card without owner
@@ -104,6 +112,8 @@ public class MeshCardNotifyTaskExecutor {
 
                     transaction.commit();
                     transaction = null;
+
+                    session.flush();
                 } catch (Exception e){
                     log.error("", e);
                 } finally {
@@ -113,9 +123,65 @@ public class MeshCardNotifyTaskExecutor {
         } catch (Exception e){
             log.error("Critical exception, task skipped ", e);
         } finally {
-            HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
         }
+    }
+
+    private void errorCorrection(Card card, Session session) {
+        if(card.getMeshCardClientRef() == null){
+            return;
+        }
+        MeshClientCardRef ref = (MeshClientCardRef) session.merge(card.getMeshCardClientRef());
+
+        List<Category> categories = getDuplicateCards(meshClientCardRefService.getCardCategoryByClient(ref.getClient()),
+                card);
+        if(CollectionUtils.isEmpty(categories)){
+            return;
+        }
+
+        if(ref.getIdOfRefInExternalSystem() == null){
+            for(Category category : categories){
+                meshClientCardRefService.deleteRef(category.getId(), ref.getClient().getMeshGUID());
+            }
+            session.delete(ref);
+            card.setMeshCardClientRef(null);
+        } else {
+            for(Category category : categories){
+                if(category.getId().equals(ref.getIdOfRefInExternalSystem())){
+                    continue;
+                }
+                meshClientCardRefService.deleteRef(category.getId(), ref.getClient().getMeshGUID());
+            }
+        }
+    }
+
+    private List<Category> getDuplicateCards(List<Category> cardCategory, Card card) {
+        List<Category> result = new LinkedList<>();
+
+        for(Category c : cardCategory){
+            if(isDuplicate(c, card.getCardNo(), card.getCardPrintedNo())){
+                result.add(c);
+            }
+        }
+        return result;
+    }
+
+    private boolean isDuplicate(Category category, Long cardNo, Long cardPrintedNo) {
+        boolean firstCoincidence = false;
+        boolean secondCoincidence = false;
+
+        for(Object o : category.getParameterValues()){
+            Parameter p = (Parameter) o;
+            if(p.getName().equals(CardPropertiesEnum.CARD_UID.getFieldName())){
+                Long uid = Long.valueOf(p.getValue());
+                firstCoincidence = uid.equals(cardNo);
+            } else if (p.getName().equals(CardPropertiesEnum.BOARD_CARD_NUMBER.getFieldName())){
+                Long bordNum = Long.valueOf(p.getValue());
+                secondCoincidence = bordNum.equals(cardPrintedNo);
+            }
+        }
+
+        return firstCoincidence && secondCoincidence;
     }
 
     private Date getProcessingTime() {

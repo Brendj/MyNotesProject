@@ -9,11 +9,11 @@ import ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic.MeshClient
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.CardBlockService;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -90,7 +90,7 @@ public class CardServicesPage extends BasicWorkspacePage implements OrgListSelec
 
             Set<Org> targetOrgs = new HashSet<>();
             for (Long idOfOrg : idOfOrgList) {
-                if (allFriendlyOrgs) {
+                if (allFriendlyOrgs || CollectionUtils.isNotEmpty(DAOUtils.findFriendlyOrgIds(session, idOfOrg))) {
                     targetOrgs.addAll(DAOUtils.findAllFriendlyOrgs(session, idOfOrg));
                 } else {
                     targetOrgs.add(DAOUtils.findOrg(session, idOfOrg));
