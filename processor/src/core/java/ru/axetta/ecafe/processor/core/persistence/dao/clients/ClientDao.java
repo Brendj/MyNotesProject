@@ -159,7 +159,7 @@ public class ClientDao extends WritableJpaDao {
         return (String) criteria.uniqueResult();
     }
 
-    public int runGenerateGuardians(List idOfOrgs) throws Exception {
+    public int runGenerateGuardians(List idOfOrgs, ClientsMobileHistory clientsMobileHistory ) throws Exception {
         logger.info("Start generate guardians");
         List<ClientContactInfo> clientsGenerate = new ArrayList<ClientContactInfo>();
         int result = 0;
@@ -220,7 +220,7 @@ public class ClientDao extends WritableJpaDao {
                                 Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
                                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
                                 refreshClientGuadianData(child, cg, session);
-                                clearClientContacts(child, session, clientRegistryVersion);
+                                clearClientContacts(child, session, clientRegistryVersion, clientsMobileHistory);
                                 refreshGuardianData(guardian, session, clientRegistryVersion);
                                 logger.info(String.format("Cleared contacts from client id=%s", child.getIdOfClient()));
                                 session.save(child);
@@ -248,7 +248,7 @@ public class ClientDao extends WritableJpaDao {
         } finally {
             HibernateUtils.close(session, logger);
         }
-        createParentAndGuardianship(clientsGenerate);
+        createParentAndGuardianship(clientsGenerate, clientsMobileHistory);
         logger.info("End generate guardians");
         return result;
     }
@@ -271,7 +271,8 @@ public class ClientDao extends WritableJpaDao {
         return map;
     }
 
-    private void createParentAndGuardianship(List<ClientContactInfo> clientInfos) throws Exception {
+    private void createParentAndGuardianship(List<ClientContactInfo> clientInfos,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -320,7 +321,7 @@ public class ClientDao extends WritableJpaDao {
                         String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
                         Client clientId = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(), (ClientManager.ClientFieldConfig) createConfig, false, session,
-                                String.format(COMMENT_AUTO_CREATE, dateCreate));
+                                String.format(COMMENT_AUTO_CREATE, dateCreate), clientsMobileHistory);
 
                         //Создаем опекунскую связь
                         Long version = generateNewClientGuardianVersion(session);
@@ -371,7 +372,7 @@ public class ClientDao extends WritableJpaDao {
 
                         //Очищаем данные клиента (ребенка)
                         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
-                        clearClientContacts(client, session, clientRegistryVersion);
+                        clearClientContacts(client, session, clientRegistryVersion, clientsMobileHistory);
                         session.update(client);
                         session.flush();
                         transaction.commit();
@@ -388,7 +389,9 @@ public class ClientDao extends WritableJpaDao {
         }
     }
 
-    private void clearClientContacts(Client client, Session session, long clientRegistryVersion) throws Exception {
+    private void clearClientContacts(Client client, Session session, long clientRegistryVersion,
+            ClientsMobileHistory clientsMobileHistory ) throws Exception {
+        client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile("");
         client.setEmail("");
         client.setNotifyViaSMS(false);

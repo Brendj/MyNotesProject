@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.MeshRestClient;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.CardPropertiesEnum;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Parameter;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
@@ -27,7 +28,6 @@ public class MeshCardServiceIml implements MeshCardService {
     private final SimpleDateFormat sdfForIssueDate = new SimpleDateFormat("yyyy-MM-dd");
     private static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.card.rest.address";
     private static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.card.rest.api.key";
-    private static final Integer CARD_CATEGORY_ID = 1000;
 
     private MeshRestClient meshRestClient;
 
@@ -58,6 +58,15 @@ public class MeshCardServiceIml implements MeshCardService {
             log.error("Exception, when send POST-request", e);
         }
         return refCardClient;
+    }
+
+    @Override
+    public void deleteReferenceBetweenClientAndCardById(Integer id, String meshGUID) {
+        try {
+            meshRestClient.executeDeleteCategory(meshGUID, id);
+        } catch (Exception e){
+            log.error("Exception, when send DELETE-request (Error Correction)", e);
+        }
     }
 
     @Override
@@ -95,6 +104,20 @@ public class MeshCardServiceIml implements MeshCardService {
         return ref;
     }
 
+    public ResponsePersons findPersonById(String meshGUID){
+        String parameters = "expand=categories";
+        ResponsePersons meshResponses = null;
+        try {
+
+            byte[] response = meshRestClient.executeRequest("/persons/" + meshGUID + "?", parameters);
+            ObjectMapper objectMapper = new ObjectMapper();
+            meshResponses = objectMapper.readValue(response, ResponsePersons.class);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return meshResponses;
+    }
+
     private String getServiceAddress() throws Exception{
         String address = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_ADDRESS_PROPERTY, "");
         if (address.isEmpty()) throw new Exception("MESH REST address not specified");
@@ -110,7 +133,7 @@ public class MeshCardServiceIml implements MeshCardService {
     private Category buildCategory(String meshGUID, Card card) {
         Category category = new Category();
         category.setId(0);
-        category.setCategoryId(CARD_CATEGORY_ID);
+        category.setCategoryId(Category.CARD_CATEGORY_ID);
         category.setPersonId(meshGUID);
         category.setActualFrom(sdfForActualDates.format(card.getCreateTime()));
         category.setActualTo(sdfForActualDates.format(card.getValidTime()));

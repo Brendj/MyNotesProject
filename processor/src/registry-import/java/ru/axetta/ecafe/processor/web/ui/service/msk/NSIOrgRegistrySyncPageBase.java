@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -214,7 +211,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         displayMode = DISPLAY_NON_COMMENTED_MODE;
     }
 
-    public void doApply() {
+    public void doApply() throws Exception {
         resetMessages();
 
         List<Long> list = new ArrayList<Long>();
@@ -226,8 +223,13 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         if (list.size() < 1) {
             return;
         }
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("интерактивная сверка (Синхронизация организации с Реестрами)");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         List<RegistryChangeCallback> result = proceedRegistryChangeItemInternal(list,
-                RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
+                RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, clientsMobileHistory);
         doUpdate();
         if (result != null) {
             //  Ошибка
@@ -246,8 +248,9 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         }
     }
 
-    protected List<RegistryChangeCallback> proceedRegistryChangeItemInternal(List<Long> list, int operation, boolean fullNameValidation) {
-        return frontControllerProcessor.proceedRegistryChangeItem(list, operation, fullNameValidation);
+    protected List<RegistryChangeCallback> proceedRegistryChangeItemInternal(List<Long> list, int operation,
+            boolean fullNameValidation, ClientsMobileHistory clientsMobileHistory) {
+        return frontControllerProcessor.proceedRegistryChangeItem(list, operation, fullNameValidation, clientsMobileHistory);
     }
 
     public void doRefresh() {

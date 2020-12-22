@@ -9,6 +9,7 @@ import generated.emp_storage.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalProcess;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -150,8 +151,11 @@ public class EMPProcessor {
 
     public void runStorageMerge() throws EMPException {
         long l = System.currentTimeMillis();
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("Получение данных из ЕМП по расписанию");
+        clientsMobileHistory.setShowing("ЕМП");
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).runBindClients();
-        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(clientsMobileHistory);
         l = System.currentTimeMillis() - l;
         if(l > 50000){
             logger.warn("EMPProcessor time:" +  l);
@@ -204,7 +208,7 @@ public class EMPProcessor {
     }
 
     final String[] UPDATE_ATTRS=new String[]{ATTRIBUTE_SSOID_NAME, ATTRIBUTE_EMAIL_NAME, ATTRIBUTE_EMAIL_SEND, ATTRIBUTE_SMS_SEND, ATTRIBUTE_PUSH_SEND};
-    public void runReceiveUpdates() throws EMPException {
+    public void runReceiveUpdates(ClientsMobileHistory clientsMobileHistory) throws EMPException {
         if (!isAllowed()) {
             return;
         }
@@ -304,12 +308,14 @@ public class EMPProcessor {
                         changeSequence = e.getChangeSequence();
                         continue;
                     }
-                    updateByMobile(client.getMobile(), ruleId, synchDate, logStr, newSsoid, newEmail, newNotifyViaEmail, newNotifyViaSMS, newNotifyViaPUSH, null);
+                    updateByMobile(client.getMobile(), ruleId, synchDate, logStr, newSsoid, newEmail,
+                            newNotifyViaEmail, newNotifyViaSMS, newNotifyViaPUSH, null, clientsMobileHistory);
                 } else {
                     log(synchDate + "Полученное изменение из ЕМП не удалось связать (не найден клиент с л/c: "+ruleId+"): " + logStr.toString());
                 }
             } else if (!StringUtils.isBlank(newMsisdn) || !StringUtils.isBlank(oldMsisdn)) {
-                updateByMobile(newMsisdn, ruleId, synchDate, logStr, newSsoid, newEmail, newNotifyViaEmail, newNotifyViaSMS, newNotifyViaPUSH, oldMsisdn);
+                updateByMobile(newMsisdn, ruleId, synchDate, logStr, newSsoid, newEmail, newNotifyViaEmail,
+                        newNotifyViaSMS, newNotifyViaPUSH, oldMsisdn, clientsMobileHistory);
             } else {
                 log(synchDate + "Полученное изменение из ЕМП не удалось связать: " + logStr.toString());
             }
@@ -320,7 +326,7 @@ public class EMPProcessor {
         RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_EMP_CHANGE_SEQUENCE, changeSequence + 1);
         if (response.getResult().isHasMoreEntries()) {
             log(synchDate + "Изменения в ЕМП обработаны не до конца, запрос будет выполнен повторно");
-            RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
+            RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(clientsMobileHistory);
         }
         SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(SecurityJournalProcess.EventType.EMP_RECEIVE_UPDATES, new Date());
         processEnd.saveWithSuccess(true);
@@ -329,7 +335,8 @@ public class EMPProcessor {
     }
 
     private void updateByMobile(String mobile, String ruleId, String synchDate, StringBuilder logStr, String newSsoid,
-            String newEmail, String newNotifyViaEmail, String newNotifyViaSMS, String newNotifyViaPUSH, String oldMsisdn) {
+            String newEmail, String newNotifyViaEmail, String newNotifyViaSMS, String newNotifyViaPUSH, String oldMsisdn,
+            ClientsMobileHistory clientsMobileHistory) {
         List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(oldMsisdn != null ? oldMsisdn : mobile);
         if (clients.size() > 0) {
             String idsList = getClientIdsAsString(clients);
@@ -342,9 +349,12 @@ public class EMPProcessor {
                 if (newNotifyViaEmail!=null) cl.setNotifyViaEmail(newNotifyViaEmail.equalsIgnoreCase("true"));
                 if (newNotifyViaSMS!=null) cl.setNotifyViaSMS(newNotifyViaSMS.equalsIgnoreCase("true"));
                 if (newNotifyViaPUSH!=null) cl.setNotifyViaPUSH(newNotifyViaPUSH.equalsIgnoreCase("true"));
-                if ((oldMsisdn != null) && (mobile != null))
+                if ((oldMsisdn != null) && (mobile != null)) {
+                    cl.initClientMobileHistory(clientsMobileHistory);
                     cl.setMobile(mobile);
+                }
                 else if ((oldMsisdn != null) && (mobile == null)) {
+                    cl.initClientMobileHistory(clientsMobileHistory);
                     cl.setMobile("");
                     cl.setSsoid("");
                 }

@@ -362,7 +362,7 @@ public class Card {
         this.meshCardClientRef = meshCardClientRef;
     }
 
-    public boolean refNotExistsOrNotSending() {
-        return  getMeshCardClientRef() == null || !getMeshCardClientRef().getSend();
+    public boolean refNotExists() {
+        return  getMeshCardClientRef() == null;
     }
 }

@@ -476,7 +476,8 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
-    public boolean setClientMobilePhone(Long contractId, String mobile, Date dateConfirm) {
+    public boolean setClientMobilePhone(Long contractId, String mobile, Date dateConfirm,
+            ClientsMobileHistory clientsMobileHistory) {
         Query q = entityManager.createQuery(
                 "update Client set mobile=:mobile, lastConfirmMobile = :lastConfirmMobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
@@ -484,6 +485,13 @@ public class DAOService {
         q.setParameter("lastConfirmMobile", dateConfirm);
         logger.info("class : DAOService, method : setClientMobilePhone line : 382, contractId : " + contractId
                 + " mobile : " + mobile);
+        //Сохраняем историю изменения клиента
+        Client client = DAOUtils.findClientByContractId(entityManager, contractId);
+        if (client != null) {
+            client.initClientMobileHistory(clientsMobileHistory);
+            client.setMobile(mobile);
+        }
+        //
         return q.executeUpdate() != 0;
     }
 
@@ -3053,4 +3061,8 @@ public class DAOService {
     public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
         return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
     }
+    public List<Client> getClientsBySoid(String ssoid) {
+        return DAOUtils.getClientsBySsoid(entityManager, ssoid);
+    }
 }
+

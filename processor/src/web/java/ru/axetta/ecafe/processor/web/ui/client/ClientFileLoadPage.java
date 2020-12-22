@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -156,7 +157,8 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         // Nothing to do here
     }
 
-    public void loadClients(InputStream inputStream, long dataSize) throws Exception {
+    public void loadClients(InputStream inputStream, long dataSize, ClientsMobileHistory clientsMobileHistory)
+            throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         try {
@@ -197,7 +199,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                             continue;
                         }
                         result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
-                                this.checkFullNameUnique);
+                                this.checkFullNameUnique, clientsMobileHistory);
                         if (result.getResultCode() == 0) {
                             ++successLineNumber;
                         }
@@ -259,7 +261,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
     }
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig, Long idOfOrg, String line, int lineNo,
-            boolean checkFullNameUnique) throws Exception {
+            boolean checkFullNameUnique, ClientsMobileHistory clientsMobileHistory) throws Exception {
         String[] tokens = modifyData(line, lineNo);
         try {
             fieldConfig.setValues(tokens);
@@ -308,7 +310,8 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
 
         try {
-            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, true);
+            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, true,
+                    clientsMobileHistory);
             ClientManager.updateComment(idOfClient, MskNSIService.COMMENT_MANUAL_IMPORT);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 public class EMPLibraryEventType extends EMPAbstractEventType {
 
     public EMPLibraryEventType(String [] values) {
+        stream = STREAM;
         type = EMPEventTypeFactory.ENTER_LIBRARY;
         String libraryName = findValueInParams(new String[]{ExternalEventNotificationService.ORG_NAME}, values);
         this.getParameters().put(ExternalEventNotificationService.ORG_NAME, libraryName);
