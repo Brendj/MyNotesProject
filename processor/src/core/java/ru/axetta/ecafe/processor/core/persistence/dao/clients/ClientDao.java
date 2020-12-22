@@ -397,7 +397,7 @@ public class ClientDao extends WritableJpaDao {
         client.setNotifyViaSMS(false);
         client.setNotifyViaPUSH(false);
         client.setNotifyViaEmail(false);
-        client.setSsoid("");
+        //client.setSsoid("");
         client.setClientRegistryVersion(clientRegistryVersion);
     }
 
