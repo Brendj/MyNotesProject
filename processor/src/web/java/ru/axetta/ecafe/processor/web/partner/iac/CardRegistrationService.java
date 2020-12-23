@@ -8,10 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.CardState;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -34,7 +31,8 @@ public class CardRegistrationService {
     public static final String COMMENT_ADDED_FROM_IAC = "{Добавлен из ИАЦ}";
 
     public Client registerNewClient(Session session, String firstName, String secondName, String surname, Date birthDate, String guid,
-            String extId, String organizationGuid, String group, String benefit, Long contractId) throws Exception {
+            String extId, String organizationGuid, String group, String benefit, Long contractId,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
         ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
         fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, guid);
         fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(surname));
@@ -53,7 +51,8 @@ public class CardRegistrationService {
             throw new OrganizationNotFoundException(String.format("Organization not found: guid = %s", organizationGuid));
         }
 
-        Long idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, false, true);
+        Long idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, false,
+                true, clientsMobileHistory);
 
         return (Client) session.load(Client.class, idOfClient);
     }

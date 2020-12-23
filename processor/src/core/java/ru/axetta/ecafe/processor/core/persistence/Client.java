@@ -152,6 +152,7 @@ public class Client {
     private String parallel;
 
     private Boolean userOP;
+    private ClientsMobileHistory clientsMobileHistory = null;
 
     protected Client() {
         // For Hibernate only
@@ -218,6 +219,12 @@ public class Client {
             }
         }
         return hasDiscount;
+    }
+
+    public void initClientMobileHistory (ClientsMobileHistory clientsMobileHistory)
+    {
+        this.clientsMobileHistory = clientsMobileHistory;
+        clientsMobileHistory.setClient(this);
     }
 
     public boolean isDeletedOrLeaving() {
@@ -575,6 +582,29 @@ public class Client {
     }
 
     public void setMobile(String mobile) {
+        if (clientsMobileHistory != null)
+        {
+            if (this.mobile == null)
+                this.mobile = "";
+            if (mobile == null)
+                mobile = "";
+            if (!mobile.equals(this.mobile)) { //Для отсечения операции чтения
+                clientsMobileHistory.setCreatedate(new Date());
+                clientsMobileHistory.setOldmobile(this.mobile);
+                clientsMobileHistory.setNewmobile(mobile);
+                if (!this.mobile.isEmpty() || !mobile.isEmpty()) {
+                    if (this.mobile.isEmpty())
+                        clientsMobileHistory.setAction("Добавление");
+                    else {
+                        if (mobile.isEmpty())
+                            clientsMobileHistory.setAction("Удаление");
+                        else
+                            clientsMobileHistory.setAction("Изменение");
+                    }
+                    clientsMobileHistory.saveClientMobileHistoryInDB();
+                }
+            }
+        }
         this.mobile = mobile;
     }
 

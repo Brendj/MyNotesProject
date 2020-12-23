@@ -1251,7 +1251,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     @Override
-    public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation, String groupName) throws Exception {
+    public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList,
+            boolean fullNameValidation, String groupName, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
         List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
@@ -1283,7 +1284,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 try {
                     session = RuntimeContext.getInstance().createPersistenceSession();
                     transaction = session.beginTransaction();
-                    applyRegistryChange(session, change, fullNameValidation, iterator, groupName);
+                    applyRegistryChange(session, change, fullNameValidation, iterator, groupName, clientsMobileHistory);
                     transaction.commit();
                     transaction = null;
                     session.close();
@@ -1329,7 +1330,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
     }
 
-    public void applyRegistryChange(Session session, RegistryChange change, boolean fullNameValidation, Iterator<Long> iterator, String groupName) throws Exception {
+    public void applyRegistryChange(Session session, RegistryChange change, boolean fullNameValidation,
+            Iterator<Long> iterator, String groupName, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Client afterSaveClient = null;
 
             Client dbClient = null;
@@ -1380,7 +1382,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
                     createConfig.setValue(ClientManager.FieldId.CREATED_FROM, Integer.toString(ClientCreatedFromType.REGISTRY.getValue()));
                     afterSaveClient = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
-                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation,
+                            session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate), clientsMobileHistory);
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
                     change.setIdOfOrg(afterSaveClient.getOrg().getIdOfOrg());
 
@@ -1403,6 +1406,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     String dateDelete = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
                     commentsAddsDelete(dbClient, deleteCommentsAdds);
+                    dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
                     break;
                 case MOVE_OPERATION:
@@ -1442,6 +1446,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     addClientMigrationEntry(session, beforeMigrateOrg, beforeMigrationGroup, dbClient.getOrg(), dbClient, change);
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
+                    dbClient.setUpdateTime(new Date());
+                    session.save(dbClient);
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
@@ -1469,7 +1475,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
                             newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
-                            dbClient, session, true);
+                            dbClient, session, true, clientsMobileHistory);
 
                     if (!migration) {
                         if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {
@@ -1485,6 +1491,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         }
                     }
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
+                    dbClient.setUpdateTime(new Date());
+                    session.save(dbClient);
                     break;
                 default:
                     logger.error("Unknown update registry change operation " + change.getOperation());
@@ -1543,7 +1551,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         }
     }
 
-    private static void saveClientGuardians(RegistryChange registryChange, Iterator<Long> iterator) throws Exception {
+    private static void saveClientGuardians(RegistryChange registryChange, Iterator<Long> iterator,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
 
             Set<RegistryChangeGuardians> registryChangeGuardiansSet = registryChange.getRegistryChangeGuardiansSet();
 
@@ -1557,7 +1566,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     transaction = session.beginTransaction();
                     Long clientId = registryChange.getIdOfClient();
                     Long idOfOrg = registryChange.getIdOfOrg();
-                    ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId, iterator);
+                    ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId, iterator,
+                            clientsMobileHistory);
                     transaction.commit();
                     transaction = null;
                 } finally {
