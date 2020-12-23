@@ -33,7 +33,7 @@ public class SupplyMSPService {
     }
 
     public Integer countOrders(Date begin, Date end){
-        return orderRepo.countAllByCreatedDateBetweenAndOrderTypeIn(begin.getTime(), end.getTime(), DISCOUNT_TYPES);
+        return orderRepo.countDistinctByCreatedDateBetweenAndOrderTypeIn(begin.getTime(), end.getTime(), DISCOUNT_TYPES);
     }
 
     public List<SupplyMSPOrders> getDiscountOrders(Date begin, Date end, Pageable pageable){

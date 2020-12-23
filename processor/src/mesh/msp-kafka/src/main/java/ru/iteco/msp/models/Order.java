@@ -80,7 +80,7 @@ import java.util.Set;
         "       string_agg(cast(cd_dszn.code as text), ';')  as \"dtsznCodes\",\n" +
         "       cd.categoryname as \"categoryName\",\n" +
         "       o.orderdate as \"orderDate\",\n" +
-        "       o.rsum  as \"rSum\",\n" +
+        "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
         "       string_agg(od.menudetailname, ';')  as \"details\"\n" +
         " from cf_orders o\n" +
@@ -98,7 +98,7 @@ import java.util.Set;
         "         left join cf_code_msp ccm on dr.idofcode = ccm.idofcode\n" +
         "         join cf_orgs org on o.idoforg = org.idoforg\n" +
         "where o.state = 0\n" +
-        "  and c.idofclientgroup < 1100000000 \n" +
+        "  and (c.idofclientgroup < 1100000000 or c.idofclientgroup in (1100000120, 1100000080)) \n" +
         "  and o.createddate between :begin and :end \n" +
         "  and o.ordertype = 4 \n" +
         "  and od.menutype between 50 and 99\n" +
@@ -113,7 +113,7 @@ import java.util.Set;
         "       string_agg(cast(cd_dszn.code as text), ';')  as \"dtsznCodes\",\n" +
         "       cd.categoryname as \"categoryName\",\n" +
         "       o.orderdate as \"orderDate\",\n" +
-        "       o.rsum  as \"rSum\",\n" +
+        "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
         "       string_agg(od.menudetailname, ';')  as \"details\"\n" +
         " from cf_orders o\n" +
@@ -124,7 +124,7 @@ import java.util.Set;
         "         left join cf_categorydiscounts_dszn cd_dszn on cd.idofcategorydiscount = cd_dszn.idofcategorydiscount\n" +
         "         join cf_orgs org on o.idoforg = org.idoforg\n" +
         "where o.state = 0\n" +
-        "  and c.idofclientgroup < 1100000000 \n" +
+        "  and (c.idofclientgroup < 1100000000 or c.idofclientgroup in (1100000120, 1100000080)) \n" +
         "  and o.createddate between :begin and :end \n" +
         "  and o.ordertype = 6 \n" +
         "  and cd.idofcategorydiscount = 50 " +
