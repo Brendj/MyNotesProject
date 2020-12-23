@@ -7,6 +7,12 @@ package ru.iteco.msp.kafka.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import ru.iteco.msp.models.dto.SupplyMSPOrders;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SupplyEvent {
     private String person_id;
@@ -26,7 +32,15 @@ public class SupplyEvent {
         if(order.getDtsznCodes() != null){
             event.benefit_category_code = order.getDtsznCodes();
         } else {
-            event.benefit_category_name = order.getCategoryName();
+            if(order.getCategoryName().equals("Начальные классы")) {
+                event.benefit_category_name = order.getCategoryName();
+            } else {
+                List<String> discounts = new LinkedList<>(Arrays.asList(StringUtils.split(order.getCategoryName(),
+                        ";")));
+                discounts.remove("Начальные классы");
+
+                event.benefit_category_name = StringUtils.join(discounts, ";");
+            }
         }
         event.data = order.getDetails();
         event.date = order.getOrderDate().toString();

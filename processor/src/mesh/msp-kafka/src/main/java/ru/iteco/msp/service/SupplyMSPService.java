@@ -37,7 +37,6 @@ public class SupplyMSPService {
     }
 
     public List<SupplyMSPOrders> getDiscountOrders(Date begin, Date end, Pageable pageable){
-       // List<Order> orders = orderRepo.findAllByCreatedDateBetweenAndAndOrderTypeIn(begin.getTime(), end.getTime(), DISCOUNT_TYPES, pageable);
         List<SupplyMSPOrders> orders = orderRepo.fullInfo(begin.getTime(), end.getTime(), pageable);
         if(CollectionUtils.isEmpty(orders)){
             log.warn(String.format("No orders between %s and %s", format.format(begin), format.format(end)));
