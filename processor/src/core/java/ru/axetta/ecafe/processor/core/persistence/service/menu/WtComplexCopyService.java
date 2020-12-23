@@ -56,10 +56,11 @@ public class WtComplexCopyService {
             query.setParameter("idOfComplex", idOfComplex);
             List<WtComplex> list = query.list();
             for (WtComplex wtComplex : list) {
+                newValue = wtComplex.getIdOfComplex();
                 WtComplex oldComplex = (WtComplex)session.load(WtComplex.class, wtComplex.getIdOfParentComplex());
-                if (!oldComplex.getWtAgeGroupItem().equals(wtComplex.getWtAgeGroupItem())
-                        || !oldComplex.getWtComplexGroupItem().equals(wtComplex.getWtComplexGroupItem())
-                        || !oldComplex.getWtDietType().equals(wtComplex.getWtDietType())) {
+                if (!oldComplex.getWtAgeGroupItem().getIdOfAgeGroupItem().equals(wtComplex.getWtAgeGroupItem().getIdOfAgeGroupItem())
+                        || !oldComplex.getWtComplexGroupItem().getIdOfComplexGroupItem().equals(wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem())
+                        || !oldComplex.getWtDietType().getIdOfDietType().equals(wtComplex.getWtDietType().getIdOfDietType())) {
                     continue;
                 }
                 Query q = session.createSQLQuery("insert into cf_wt_discountrules_complexes (idofrule, idofcomplex) "
@@ -69,7 +70,6 @@ public class WtComplexCopyService {
                 q.setParameter("oldComplex", oldComplex.getIdOfComplex());
                 int count = q.executeUpdate();
                 logger.info(String.format("Комплекс ид=%s включен в %s правил соц скидок", wtComplex.getIdOfComplex(), count));
-                newValue = wtComplex.getIdOfComplex();
             }
             if (newValue > idOfComplex) {
                 DAOService.getInstance().setOnlineOptionValue(newValue.toString(), Option.OPTION_LAST_PROCESSED_WT_COMPLEX);
