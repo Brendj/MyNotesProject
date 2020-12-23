@@ -32,6 +32,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
     private static final Logger logger = LoggerFactory.getLogger(RequestsSupplierProcessor.class);
     private final RequestsSupplier requestsSupplier;
+    private final String WRONG_DONE_DATE = "CANT_CHANGE_GRP_ON_DATE";
 
     public RequestsSupplierProcessor(Session persistenceSession, RequestsSupplier requestsSupplier) {
         super(persistenceSession);
@@ -52,38 +53,49 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
             Long nextVersion = DOVersionRepository.updateClassVersion("GoodRequest", session);
             Long nextPositionVersion = DOVersionRepository.updateClassVersion("GoodRequestPosition", session);
-
+            boolean goodDate;
             for (RequestsSupplierItem item : requestsSupplier.getItems()) {
                 errorFound = !item.getResCode().equals(RequestsSupplierItem.ERROR_CODE_ALL_OK);
-
+                //Детали меню нужны только для ошибки с недопустимой датой
+                List<ResRequestsSupplierDetail> resRequestsSupplierDetailList = new ArrayList<>();
                 if (!errorFound) {
                     Long idOfOrg = item.getOrgId();
                     Date doneDate = item.getDoneDate();
 
                     List<RequestsSupplierDetail> requestsSupplierDetailList = item.getRequestsSupplierDetailList();
-                    boolean goodDate = true;
+                    ////////////Проверка на правильную дату
+                    goodDate = true;
                     if (requestsSupplierDetailList != null && requestsSupplierDetailList.size() > 0) {
                         Integer fType = -1;
                         for (RequestsSupplierDetail detail : requestsSupplierDetailList) {
-                            if (detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_GENERAL) ||
-                                detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_DISCOUNT) ||
-                                detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_PAID))
-                                fType = 0;
-                            if (detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_SUBSCRIPTION))
-                                fType = 1;
-                            if (fType != -1) {
-                                if (!isGoodDate(session, idOfOrg, doneDate, fType))
-                                    goodDate = false;
+                            if (detail.getfType() != null) {
+                                if (detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_GENERAL)
+                                        || detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_DISCOUNT) || detail
+                                        .getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_PAID))
+                                    fType = 0;
+                                if (detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_SUBSCRIPTION))
+                                    fType = 1;
+                                if (fType != -1) {
+                                    if (!isGoodDate(session, idOfOrg, doneDate, fType)) {
+                                        GoodRequestPosition goodRequestPosition =
+                                                DAOReadonlyService.getInstance().findGoodRequestPositionByGuid(detail.getGuid());
+                                        if (goodRequestPosition != null) {
+                                            ResRequestsSupplierDetail resRequestsSupplierDetail = new ResRequestsSupplierDetail(
+                                                    goodRequestPosition, detail.getGuid());
+                                            resRequestsSupplierDetailList.add(resRequestsSupplierDetail);
+                                        }
+                                        goodDate = false;
+                                    }
+                                }
                             }
-                            if (!goodDate)
-                                break;
                         }
                     }
+                    ////////////
                     if (!goodDate)
                     {
                         errorFound = true;
                         item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
-                        item.setErrorMessage("CANT_CHANGE_GRP_ON_DATE");
+                        item.setErrorMessage(WRONG_DONE_DATE);
                     }
                     else {
                         String guid = item.getGuid();
@@ -198,6 +210,11 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
                 resItem.setResultCode(item.getResCode());
                 resItem.setErrorMessage(item.getErrorMessage());
+                if (item.getErrorMessage() != null && item.getErrorMessage().equals(WRONG_DONE_DATE))
+                {
+                    if (!resRequestsSupplierDetailList.isEmpty())
+                        resItem.setResRequestsSupplierDetailList(resRequestsSupplierDetailList);
+                }
                 items.add(resItem);
             }
             session.flush();
