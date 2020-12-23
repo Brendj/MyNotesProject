@@ -58,7 +58,8 @@ public class WtComplexCopyService {
             for (WtComplex wtComplex : list) {
                 WtComplex oldComplex = (WtComplex)session.load(WtComplex.class, wtComplex.getIdOfParentComplex());
                 Query q = session.createSQLQuery("insert into cf_wt_discountrules_complexes (idofrule, idofcomplex) "
-                        + "select idofrule, :wtComplex from cf_wt_discountrules_complexes where idofcomplex = :oldComplex");
+                        + "select idofrule, :wtComplex from cf_wt_discountrules_complexes ttt where idofcomplex = :oldComplex "
+                        + "and not exists (select * from cf_wt_discountrules_complexes qqq where ttt.idofrule = qqq.idofrule and qqq.idofcomplex = :wtComplex)");
                 q.setParameter("wtComplex", wtComplex.getIdOfComplex());
                 q.setParameter("oldComplex", oldComplex.getIdOfComplex());
                 int count = q.executeUpdate();
