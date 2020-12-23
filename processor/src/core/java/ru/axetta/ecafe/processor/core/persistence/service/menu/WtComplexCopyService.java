@@ -25,6 +25,7 @@ import java.util.List;
 @Scope("singleton")
 public class WtComplexCopyService {
     private static final Logger logger = LoggerFactory.getLogger(WtComplexCopyService.class);
+    private static final String ALL = "Все";
 
     public void run() {
         if (!isOn()) return;
@@ -58,9 +59,7 @@ public class WtComplexCopyService {
             for (WtComplex wtComplex : list) {
                 newValue = wtComplex.getIdOfComplex();
                 WtComplex oldComplex = (WtComplex)session.load(WtComplex.class, wtComplex.getIdOfParentComplex());
-                if (!oldComplex.getWtAgeGroupItem().getIdOfAgeGroupItem().equals(wtComplex.getWtAgeGroupItem().getIdOfAgeGroupItem())
-                        || !oldComplex.getWtComplexGroupItem().getIdOfComplexGroupItem().equals(wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem())
-                        || !oldComplex.getWtDietType().getIdOfDietType().equals(wtComplex.getWtDietType().getIdOfDietType())) {
+                if (!copyRule(wtComplex, oldComplex)) {
                     continue;
                 }
                 Query q = session.createSQLQuery("insert into cf_wt_discountrules_complexes (idofrule, idofcomplex) "
@@ -83,6 +82,16 @@ public class WtComplexCopyService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private boolean copyRule(WtComplex wtComplex, WtComplex oldComplex) {
+        if (!oldComplex.getWtDietType().getIdOfDietType().equals(wtComplex.getWtDietType().getIdOfDietType())) return false;
+
+        boolean compareAgeGroup = (oldComplex.getWtAgeGroupItem().getDescription().contains(ALL) || wtComplex.getWtAgeGroupItem().getDescription().contains(ALL));
+        boolean compareComplexGroup = (oldComplex.getWtComplexGroupItem().getDescription().contains(ALL) || wtComplex.getWtComplexGroupItem().getDescription().contains(ALL));
+
+        return (compareAgeGroup || oldComplex.getWtAgeGroupItem().getIdOfAgeGroupItem().equals(wtComplex.getWtAgeGroupItem().getIdOfAgeGroupItem()))
+                && (compareComplexGroup || oldComplex.getWtComplexGroupItem().getIdOfComplexGroupItem().equals(wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()));
     }
 
 }
