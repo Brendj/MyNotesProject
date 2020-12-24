@@ -48,7 +48,7 @@ public class DiscountsService {
         List<String> dif = (List<String>) CollectionUtils.disjunction(first, second);
         List<Long> ids = new LinkedList<>();
         for(String idStr : dif){
-            if(!StringUtils.isNumeric(idStr)){
+            if(StringUtils.isNumeric(idStr)){
                 Long id = Long.parseLong(idStr);
                 ids.add(id);
             }

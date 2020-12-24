@@ -5,9 +5,9 @@
 package ru.iteco.msp.models;
 
 import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_code_msp")
@@ -23,14 +23,14 @@ public class CodeMSP {
     @JoinColumn(name = "idofcategorydiscount")
     private CategoryDiscount categoryDiscount;
 
-    @OneToMany(mappedBy = "codeMSP")
-    private List<CodeMspAgeTypeGroup> ageTypeGroupList = new LinkedList<>();
+    @OneToMany(mappedBy = "codeMSP", fetch = FetchType.EAGER)
+    private Set<CodeMspAgeTypeGroup> ageTypeGroupList = new HashSet<>();
 
-    public List<CodeMspAgeTypeGroup> getAgeTypeGroupList() {
+    public Set<CodeMspAgeTypeGroup> getAgeTypeGroupList() {
         return ageTypeGroupList;
     }
 
-    public void setAgeTypeGroupList(List<CodeMspAgeTypeGroup> ageTypeGroupList) {
+    public void setAgeTypeGroupList(Set<CodeMspAgeTypeGroup> ageTypeGroupList) {
         this.ageTypeGroupList = ageTypeGroupList;
     }
 

@@ -62,13 +62,13 @@ public class AssignTaskExecutor {
             Date end;
             AssignOperationType type;
             try {
-                begin = new Date();
+                end = new Date();
                 Date next = assignCronTrigger.nextExecutionTime(new SimpleTriggerContext());
-                long delta = next.getTime() - begin.getTime();
-                end = new Date(begin.getTime() - delta);
+                long delta = next.getTime() - end.getTime();
+                begin = new Date(end.getTime() - delta);
 
                 List<DiscountChangeHistory> discountChangeHistoryList = discountsService
-                        .getHistoryByTime(end);
+                        .getHistoryByTime(begin);
 
                 for (DiscountChangeHistory h : discountChangeHistoryList) {
                     if (StringUtils.isEmpty(h.getClient().getMeshGuid()) ||
@@ -132,10 +132,9 @@ public class AssignTaskExecutor {
             if(StringUtils.isBlank(s)){
                 return Collections.emptyList();
             }
-            String[] array = StringUtils.split(s, ",");
-            array = (String[]) Arrays.stream(array).sorted().toArray();
-
-            return Arrays.asList(array);
+            String[] arr = StringUtils.split(s, ",");
+            Arrays.sort(arr);
+            return Arrays.asList(arr);
         }
     }
 }

@@ -45,10 +45,10 @@ public class CategoryDiscount {
     )
     private List<WtDiscountRule> wtRules;
 
-    @OneToOne(mappedBy = "categoryDiscount")
+    @OneToOne(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
     private CategoryDiscountDTSZN categoryDiscountDTSZN;
 
-    @OneToMany(mappedBy = "categoryDiscount")
+    @OneToMany(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
     private List<CodeMSP> codeMSPs;
 
     public List<CodeMSP> getCodeMSPs() {
