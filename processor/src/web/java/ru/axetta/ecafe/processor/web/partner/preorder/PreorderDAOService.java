@@ -2045,7 +2045,7 @@ public class PreorderDAOService {
         int workDaysPast = 0;
         while (i < forbiddenDays) {
             boolean isWorkDateBySpecialDates = getIsWorkDate(isSixWorkWeek, result, specialDates, client);
-            Boolean isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isWeekendByProductionCalendar(currentDate, productionCalendar);
+            Boolean isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isWeekendByProductionCalendar(result, productionCalendar);
             if (isWorkDateBySpecialDates) i++;
             if (!isWeekend) workDaysPast++;
             result = CalendarUtils.addDays(result, 1);
