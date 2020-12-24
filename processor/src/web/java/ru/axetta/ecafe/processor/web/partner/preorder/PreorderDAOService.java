@@ -2045,7 +2045,7 @@ public class PreorderDAOService {
         int workDaysPast = 0;
         while (i < forbiddenDays) {
             boolean isWorkDateBySpecialDates = getIsWorkDate(isSixWorkWeek, result, specialDates, client);
-            Boolean isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isWeekendByProductionCalendar(result, productionCalendar);
+            Boolean isWeekend = isWeekendByProductionCalendar(result, productionCalendar);
             if (isWorkDateBySpecialDates) i++;
             if (!isWeekend) workDaysPast++;
             result = CalendarUtils.addDays(result, 1);
@@ -2053,7 +2053,12 @@ public class PreorderDAOService {
         return CalendarUtils.addDays(result, -workDaysPast);
     }
 
-
+    private boolean isWeekendByProductionCalendar(Date date, List<ProductionCalendar> productionCalendar) {
+        for (ProductionCalendar pc : productionCalendar) {
+            if (CalendarUtils.betweenDate(pc.getDay(), CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date))) return true;
+        }
+        return false;
+    }
 
     private boolean getIsWorkDate(boolean isSixWorkWeek, Date currentDate, List<SpecialDate> specialDates, Client client) {
         boolean isWorkDate = CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate); //без учета проиводственного календаря
