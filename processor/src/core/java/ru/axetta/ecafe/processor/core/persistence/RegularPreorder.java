@@ -67,7 +67,7 @@ public class RegularPreorder {
         this.mobileGroupOnCreate = mobileGroupOnCreate;
     }
 
-    private Date convertDate(Date date) throws Exception {
+    public static Date convertDate(Date date) throws Exception {
         String d = CalendarUtils.dateToString(date);
         return CalendarUtils.parseDate(d);
     }

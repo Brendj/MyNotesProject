@@ -1181,8 +1181,8 @@ public class PreorderDAOService {
                 + "where m.client = :client " + condition + " and m.deletedState = false and m.startDate = :startDate "
                 + "and m.endDate = :endDate");
         regularPreorderSelect.setParameter("client", client);
-        regularPreorderSelect.setParameter("startDate", startDate);
-        regularPreorderSelect.setParameter("endDate", endDate);
+        regularPreorderSelect.setParameter("startDate", RegularPreorder.convertDate(startDate));
+        regularPreorderSelect.setParameter("endDate", RegularPreorder.convertDate(endDate));
         if (isComplex)
             regularPreorderSelect.setParameter("idOfComplex", idOfComplex);
         else {
