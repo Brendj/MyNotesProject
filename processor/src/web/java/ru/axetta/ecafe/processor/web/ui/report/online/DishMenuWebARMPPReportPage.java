@@ -194,7 +194,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         if (selectidAgeGroup != -1)
         {
             properties
-                    .setProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP, selectidTypeFoodId.toString());
+                    .setProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP, selectidAgeGroup.toString());
         }
         properties
                 .setProperty(DishMenuWebArmPPReport.P_ARCHIVED, Boolean.toString(archived));

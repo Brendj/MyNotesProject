@@ -105,56 +105,69 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
         }
 
         public List<DishMenuWebArmPPItem> createDataSource(Session session) {
-
             List<DishMenuWebArmPPItem> dishMenuWebArmPPItems = new ArrayList<>();
 
-            //Org orgLoad;
-            //try {
-            //    orgLoad = (Org) session.load(Org.class, Long.parseLong(
-            //            StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG))));
-            //} catch (Exception e) {
-            //    orgLoad = null;
-            //}
-            //
-            //List<Long> idOfClients = parseStringAsLongList(P_ID_OF_CLIENTS);
-            //Boolean allFriendlyOrgs = Boolean
-            //        .parseBoolean(StringUtils.trimToEmpty(reportProperties.getProperty(P_ALL_FRIENDLY_ORGS)));
-            //String cardState = reportProperties.getProperty(P_CARD_STATUS);
-            //
-            //
-            //String filterOrgs = "";
-            //String filterClients = "";
-            //String filterStatus = "";
-            //if (orgLoad != null) {
-            //    if (allFriendlyOrgs) {
-            //        for (Org org : orgLoad.getFriendlyOrg()) {
-            //            filterOrgs += "'" + org.getIdOfOrg() + "',";
-            //        }
-            //        filterOrgs = filterOrgs.substring(0, filterOrgs.length() - 1);
-            //    } else {
-            //        filterOrgs = "'" + orgLoad.getIdOfOrg() + "'";
-            //    }
-            //    filterOrgs = " and co.idoforg in (" + filterOrgs + ") ";
-            //}
-            //if (idOfClients != null && !idOfClients.isEmpty()) {
-            //    for (Long idClient : idOfClients) {
-            //        filterClients += "'" + idClient + "',";
-            //    }
-            //    filterClients = filterClients.substring(0, filterClients.length() - 1);
-            //    filterClients = " and cc.idofclient in (" + filterClients + ") ";
-            //}
-            //if (cardState != null) {
-            //    if (cardState.equals(BlockUnblockCardReport.CardStateType.BLOCK.getDescription())) {
-            //        filterStatus = "  and ca.state = " + CardState.BLOCKED.getValue() + " ";
-            //    } else {
-            //        if (cardState.equals(BlockUnblockCardReport.CardStateType.UNBLOCK.getDescription())) {
-            //            filterStatus = "  and ca.state = " + CardState.ISSUED.getValue() + " ";
-            //        }
-            //    }
-            //}
+            List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
+            List<Long> idOfContragentList = parseStringAsLongList(DishMenuWebArmPPReport.P_ID_OF_CONTRAGENT);
+            String idTypeFoodIdString = StringUtils.trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_ID_OF_TYPES_FOOD));
+            Long idTypeFood;
+            try {
+                idTypeFood = Long.parseLong(idTypeFoodIdString);
+            } catch (Exception e) {
+                idTypeFood = null;
+            }
+            String idAgeGroupString = StringUtils.trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP));
+            Long idAgeGroup;
+            try {
+                idAgeGroup = Long.parseLong(idAgeGroupString);
+            } catch (Exception e)
+            {
+                idAgeGroup = null;
+            }
+            Boolean archived;
+            Integer archivedInt = 0;
+            try {
+                archived = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_ARCHIVED));
+                if (archived)
+                    archivedInt = 1;
+                else
+                    archivedInt = 0;
+            } catch (Exception e)
+            {
+                archived = null;
+            }
+
+            String filterOrgs = "";
+            String filterContragent = "";
+            String filterTypeFoodId = "";
+            String filterAgeGroup = "";
+            if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
+                for (Long idofOrg : idOfOrgList) {
+                    filterOrgs += "'" + idofOrg + "',";
+                }
+                filterOrgs = filterOrgs.substring(0, filterOrgs.length() - 1);
+                filterOrgs = " and cwco.idoforg in (" + filterOrgs + ") ";
+            }
+            if (idOfContragentList != null && !idOfContragentList.isEmpty()) {
+                for (Long idofContragent : idOfContragentList) {
+                    filterContragent += "'" + idofContragent + "',";
+                }
+                filterContragent = filterContragent.substring(0, filterContragent.length() - 1);
+                filterContragent = " and cwd.idofcontragent in (" + filterContragent + ") ";
+            }
+            if (idTypeFood != null)
+            {
+                filterTypeFoodId = " and cwgi.idofgroupitem = " + idTypeFood + " ";
+            }
+            if (idAgeGroup != null)
+            {
+                filterAgeGroup = " and cwag.idofagegroupitem = " + idAgeGroup + " ";
+            }
+
+            String fullWhere = " where (cwd.deletestate = 0 or cwd.deletestate = " + archivedInt + " ) " + filterOrgs + filterContragent + filterTypeFoodId + filterAgeGroup;
 
             Query dishitemsSQLQuery = session.createSQLQuery(
-                    "select cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"
+                    "select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"
                             + "cwd.dateofendmenuincluding, cwag.description as agegroup, cwpi.description as typeOfProduction,\n"
                             + "cwgi.description as typefood, cwc.description as category, cwci.description as subcategory, \n"
                             + "cwd.calories, cwd.qty, cwd.protein, cwd.fat, cwd.carbohydrates, cwd.barcode\n"
@@ -165,7 +178,11 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_wt_group_items cwgi on cwgi.idofgroupitem = cwgr.idofgroupitem\n"
                             + "left join cf_wt_categories cwc on cwc.idofcategory = cwd.idofcategory\n"
                             + "left join cf_wt_dish_categoryitem_relationships cwdc on cwdc.idofdish = cwd.idofdish\n"
-                            + "left join cf_wt_category_items cwci on cwci.idofcategoryitem = cwdc.idofcategoryitem\n");
+                            + "left join cf_wt_category_items cwci on cwci.idofcategoryitem = cwdc.idofcategoryitem\n"
+                            + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = cwd.idofdish\n"
+                            + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
+                            + "left join cf_wt_complexes_org cwco on cwco.idofcomplex = cwcid1.idofcomplex\n"
+                            + fullWhere);
 
             List dishitems = dishitemsSQLQuery.list();
             for (Object o : dishitems) {
@@ -224,6 +241,28 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                 }
             });
             return dishMenuWebArmPPItems;
+        }
+
+        private List<Long> parseStringAsLongList(String propertyName) {
+            try {
+                String propertyValueString = reportProperties.getProperty(propertyName);
+                if (propertyValueString == null)
+                    return new ArrayList<>();
+                String[] propertyValueArray = StringUtils.split(propertyValueString, ',');
+                List<Long> propertyValueList = new ArrayList<Long>();
+                for (String propertyValue : propertyValueArray) {
+                    try {
+                        propertyValueList.add(Long.parseLong(propertyValue));
+                    } catch (NumberFormatException e) {
+                        logger.error(
+                                String.format("Unable to parse propertyValue: property = %s, value = %s", propertyName,
+                                        propertyValue), e);
+                    }
+                }
+                return propertyValueList;
+            }catch (Exception e) {
+                return new ArrayList<>();
+            }
         }
     }
 }
