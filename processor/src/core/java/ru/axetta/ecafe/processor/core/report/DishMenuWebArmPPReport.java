@@ -57,6 +57,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
     private final static Logger logger = LoggerFactory.getLogger(DishMenuWebArmPPReport.class);
 
     final public static String P_ID_OF_CONTRAGENT = "idOfContragent";
+    final public static String P_ID_OF_COMPLEXES = "idOfComplexes";
     final public static String P_ID_OF_TYPES_FOOD = "idOfTypesFood";
     final public static String P_ID_OF_AGE_GROUP = "idOfAgeGroup";
     final public static String P_ARCHIVED = "archived";
@@ -109,6 +110,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
 
             List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
             List<Long> idOfContragentList = parseStringAsLongList(DishMenuWebArmPPReport.P_ID_OF_CONTRAGENT);
+            List<Long> idOfComplexesList = parseStringAsLongList(DishMenuWebArmPPReport.P_ID_OF_COMPLEXES);
             String idTypeFoodIdString = StringUtils
                     .trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_ID_OF_TYPES_FOOD));
             Long idTypeFood;
@@ -140,6 +142,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
 
             String filterOrgs = "";
             String filterContragent = "";
+            String filterComplexes = "";
             String filterTypeFoodId = "";
             String filterAgeGroup = "";
             if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
@@ -156,6 +159,13 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                 filterContragent = filterContragent.substring(0, filterContragent.length() - 1);
                 filterContragent = " and cwd.idofcontragent in (" + filterContragent + ") ";
             }
+            if (idOfComplexesList != null && !idOfComplexesList.isEmpty()) {
+                for (Long idofComplex : idOfComplexesList) {
+                    filterComplexes += "'" + idofComplex + "',";
+                }
+                filterComplexes = filterComplexes.substring(0, filterComplexes.length() - 1);
+                filterComplexes = " and cwco.idofcomplex in (" + filterComplexes + ") ";
+            }
             if (idTypeFood != null) {
                 filterTypeFoodId = " and cwgi.idofgroupitem = " + idTypeFood + " ";
             }
@@ -164,7 +174,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             }
 
             String fullWhere = " where (cwd.deletestate = 0 or cwd.deletestate = " + archivedInt + " ) " + filterOrgs
-                    + filterContragent + filterTypeFoodId + filterAgeGroup;
+                    + filterContragent + filterTypeFoodId + filterAgeGroup + filterComplexes;
 
             Query dishitemsSQLQuery = session.createSQLQuery(
                     "select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"

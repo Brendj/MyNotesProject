@@ -2739,7 +2739,7 @@ public class MainPage implements Serializable {
                     modalPages.push(complexWebListSelectPage);
                 }
             } catch (Exception e) {
-                logger.error("Failed to fill contragents list selection page", e);
+                logger.error("Failed to fill complex list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Ошибка при подготовке страницы выбора списка комплексов меню для Web-технолога: " + e.getMessage(), null));
             } finally {
@@ -2872,7 +2872,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            complexWebListSelectPage.completeContragentSelection(persistenceSession);
+            complexWebListSelectPage.completeComplexSelection(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             if (!modalPages.empty()) {

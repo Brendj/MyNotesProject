@@ -192,6 +192,11 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
             properties
                     .setProperty(DishMenuWebArmPPReport.P_ID_OF_CONTRAGENT, contragentIds);
         }
+
+        if (complexItems != null && !complexItems.isEmpty()) {
+            properties
+                    .setProperty(DishMenuWebArmPPReport.P_ID_OF_COMPLEXES, complexIds);
+        }
         if (selectidTypeFoodId != -1)
         {
             properties
@@ -243,7 +248,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
     public void complexListSelection(Session session, List<Long> idOfComplexs) throws Exception {
         complexItems.clear();
         for (Long idOfComplex : idOfComplexs) {
-            WtComplex wtComplex = (WtComplex) session.load(Contragent.class, idOfComplex);
+            WtComplex wtComplex = (WtComplex) session.load(WtComplex.class, idOfComplex);
             ComplexItem complexItem = new ComplexItem(wtComplex);
             complexItems.add(complexItem);
         }

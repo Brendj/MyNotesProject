@@ -10,7 +10,9 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -62,7 +64,7 @@ public class ComplexListSelectPage extends BasicPage {
         completeHandlers.push(handler);
     }
 
-    public void completeContragentSelection(Session session) throws Exception {
+    public void completeComplexSelection(Session session) throws Exception {
         List<String> list = Arrays.asList(StringUtils.split(selectedIds, ","));
         List<Long> selected = new ArrayList<Long>();
         for(String s : list){
@@ -146,7 +148,7 @@ public class ComplexListSelectPage extends BasicPage {
     public void fill(Session session) throws Exception {
         List<Item> items = new ArrayList<Item>();
         List<String> selectedIdsList = Arrays.asList(StringUtils.split(selectedIds, ","));
-        List complexes = retrieveContragents(session);
+        List complexes = retrieveComplexes(session);
         for (Object object : complexes) {
             WtComplex wtComplex = (WtComplex) object;
             Item item = new Item(wtComplex);
@@ -158,8 +160,11 @@ public class ComplexListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    private List retrieveContragents(Session session) throws HibernateException {
+    private List retrieveComplexes(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(WtComplex.class).addOrder(Order.asc("name"));
+        if (StringUtils.isNotEmpty(filter)) {
+            criteria.add(Restrictions.ilike("name", filter, MatchMode.ANYWHERE));
+        }
         List<WtComplex> complexByCriteria = criteria.list();
         return complexByCriteria; // criteria.list();
     }
