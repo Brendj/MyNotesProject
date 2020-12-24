@@ -2047,7 +2047,7 @@ public class PreorderDAOService {
             boolean isWorkDateBySpecialDates = getIsWorkDate(isSixWorkWeek, result, specialDates, client);
             Boolean isWeekend = isWeekendByProductionCalendar(result, productionCalendar);
             if (isWorkDateBySpecialDates) i++;
-            if (!isWeekend) workDaysPast++;
+            if (!isWeekend && !isWorkDateBySpecialDates) workDaysPast++;
             result = CalendarUtils.addDays(result, 1);
         }
         return CalendarUtils.addDays(result, -workDaysPast);
