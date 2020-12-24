@@ -118,6 +118,9 @@ public class AssignTaskExecutor {
             List<CategoryDiscount> newDif = discountsService.getDiffDiscounts(newDiscounts, oldDiscounts);
 
             for(CategoryDiscount d : newDif){
+                if(!d.getCategoryType().equals(0)){
+                    continue;
+                }
                 ClientDTSZNDiscountInfo info = null;
                 if(d.getCategoryDiscountDTSZN() != null){
                     info = discountsService.getLastInfoByClientAndCode(h.getClient(), d.getCategoryDiscountDTSZN().getCode());

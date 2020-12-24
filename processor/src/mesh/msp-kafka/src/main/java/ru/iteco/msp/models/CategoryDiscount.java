@@ -51,6 +51,17 @@ public class CategoryDiscount {
     @OneToMany(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
     private List<CodeMSP> codeMSPs;
 
+    @Column(name = "categorytype")
+    private Integer categoryType;
+
+    public Integer getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(Integer categoryType) {
+        this.categoryType = categoryType;
+    }
+
     public List<CodeMSP> getCodeMSPs() {
         return codeMSPs;
     }

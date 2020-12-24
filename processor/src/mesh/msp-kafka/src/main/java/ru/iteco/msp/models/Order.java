@@ -57,7 +57,7 @@ import java.util.Set;
         "         join cf_categorydiscounts cd on ((drcc.idofcategorydiscount = cd.idofcategorydiscount) or\n" +
         "                                         (wdrcc.idofcategorydiscount = cd.idofcategorydiscount))\n" +
         "         left join cf_categorydiscounts_dszn cd_dszn on cd.idofcategorydiscount = cd_dszn.idofcategorydiscount\n" +
-        "         left join cf_code_msp ccm on dr.idofcode = ccm.idofcode\n" +
+        "         left join cf_code_msp ccm on dr.idofcode = ccm.idofcode or wdr.idofcode = ccm.idofcode\n" +
         "         join cf_orgs org on o.idoforg = org.idoforg\n" +
         "where o.state = 0\n" +
         "  and (c.idofclientgroup < 1100000000 or c.idofclientgroup in (1100000120, 1100000080)) \n" +
