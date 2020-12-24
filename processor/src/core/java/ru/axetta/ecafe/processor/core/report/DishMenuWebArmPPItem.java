@@ -4,14 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import java.util.Date;
+
 public class DishMenuWebArmPPItem {
     private String codeISPP;
     private String dishname;
     private String componentsofdish;
     private String idcontragent;
     private String price;
-    private String dateFrom;
-    private String dateTo;
+    private Date dateFrom;
+    private Date dateTo;
     private String agegroup;
     private String typeOfProduction;
     private String typefood;
@@ -62,22 +64,6 @@ public class DishMenuWebArmPPItem {
 
     public void setPrice(String price) {
         this.price = price;
-    }
-
-    public String getDateFrom() {
-        return dateFrom;
-    }
-
-    public void setDateFrom(String dateFrom) {
-        this.dateFrom = dateFrom;
-    }
-
-    public String getDateTo() {
-        return dateTo;
-    }
-
-    public void setDateTo(String dateTo) {
-        this.dateTo = dateTo;
     }
 
     public String getAgegroup() {
@@ -166,5 +152,21 @@ public class DishMenuWebArmPPItem {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public Date getDateFrom() {
+        return dateFrom;
+    }
+
+    public void setDateFrom(Date dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+
+    public Date getDateTo() {
+        return dateTo;
+    }
+
+    public void setDateTo(Date dateTo) {
+        this.dateTo = dateTo;
     }
 }

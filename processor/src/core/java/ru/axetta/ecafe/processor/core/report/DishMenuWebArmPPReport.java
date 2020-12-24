@@ -109,31 +109,32 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
 
             List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
             List<Long> idOfContragentList = parseStringAsLongList(DishMenuWebArmPPReport.P_ID_OF_CONTRAGENT);
-            String idTypeFoodIdString = StringUtils.trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_ID_OF_TYPES_FOOD));
+            String idTypeFoodIdString = StringUtils
+                    .trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_ID_OF_TYPES_FOOD));
             Long idTypeFood;
             try {
                 idTypeFood = Long.parseLong(idTypeFoodIdString);
             } catch (Exception e) {
                 idTypeFood = null;
             }
-            String idAgeGroupString = StringUtils.trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP));
+            String idAgeGroupString = StringUtils
+                    .trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP));
             Long idAgeGroup;
             try {
                 idAgeGroup = Long.parseLong(idAgeGroupString);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 idAgeGroup = null;
             }
             Boolean archived;
             Integer archivedInt = 0;
             try {
                 archived = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_ARCHIVED));
-                if (archived)
+                if (archived) {
                     archivedInt = 1;
-                else
+                } else {
                     archivedInt = 0;
-            } catch (Exception e)
-            {
+                }
+            } catch (Exception e) {
                 archived = null;
             }
 
@@ -155,16 +156,15 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                 filterContragent = filterContragent.substring(0, filterContragent.length() - 1);
                 filterContragent = " and cwd.idofcontragent in (" + filterContragent + ") ";
             }
-            if (idTypeFood != null)
-            {
+            if (idTypeFood != null) {
                 filterTypeFoodId = " and cwgi.idofgroupitem = " + idTypeFood + " ";
             }
-            if (idAgeGroup != null)
-            {
+            if (idAgeGroup != null) {
                 filterAgeGroup = " and cwag.idofagegroupitem = " + idAgeGroup + " ";
             }
 
-            String fullWhere = " where (cwd.deletestate = 0 or cwd.deletestate = " + archivedInt + " ) " + filterOrgs + filterContragent + filterTypeFoodId + filterAgeGroup;
+            String fullWhere = " where (cwd.deletestate = 0 or cwd.deletestate = " + archivedInt + " ) " + filterOrgs
+                    + filterContragent + filterTypeFoodId + filterAgeGroup;
 
             Query dishitemsSQLQuery = session.createSQLQuery(
                     "select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"
@@ -188,42 +188,60 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             for (Object o : dishitems) {
                 Object[] row = (Object[]) o;
                 DishMenuWebArmPPItem dishMenuWebArmPPItem = new DishMenuWebArmPPItem();
-                if (row[0] != null)
-                dishMenuWebArmPPItem.setCodeISPP(row[0].toString());
-                if (row[1] != null)
-                dishMenuWebArmPPItem.setDishname(row[1].toString());
-                if (row[2] != null)
-                dishMenuWebArmPPItem.setComponentsofdish(row[2].toString());
-                if (row[3] != null)
-                dishMenuWebArmPPItem.setIdcontragent(row[3].toString());
-                if (row[4] != null)
-                dishMenuWebArmPPItem.setPrice(row[4].toString());
-                if (row[5] != null)
-                dishMenuWebArmPPItem.setDateFrom(row[5].toString());
-                if (row[6] != null)
-                dishMenuWebArmPPItem.setDateTo(row[6].toString());
-                if (row[7] != null)
-                dishMenuWebArmPPItem.setAgegroup(row[7].toString());
-                if (row[8] != null)
-                dishMenuWebArmPPItem.setTypeOfProduction(row[8].toString());
-                if (row[9] != null)
-                dishMenuWebArmPPItem.setTypefood(row[9].toString());
-                if (row[10] != null)
-                dishMenuWebArmPPItem.setCategory(row[10].toString());
-                if (row[11] != null)
+                if (row[0] != null) {
+                    dishMenuWebArmPPItem.setCodeISPP(row[0].toString());
+                }
+                if (row[1] != null) {
+                    dishMenuWebArmPPItem.setDishname(row[1].toString());
+                }
+                if (row[2] != null) {
+                    dishMenuWebArmPPItem.setComponentsofdish(row[2].toString());
+                }
+                if (row[3] != null) {
+                    dishMenuWebArmPPItem.setIdcontragent(row[3].toString());
+                }
+                if (row[4] != null) {
+                    dishMenuWebArmPPItem.setPrice(row[4].toString());
+                }
+                if (row[5] != null) {
+                    dishMenuWebArmPPItem.setDateFrom(new Date(((Timestamp) row[5]).getTime()));
+                }
+                if (row[6] != null) {
+                    dishMenuWebArmPPItem.setDateTo(new Date(((Timestamp) row[6]).getTime()));
+                }
+                if (row[7] != null) {
+                    dishMenuWebArmPPItem.setAgegroup(row[7].toString());
+                }
+                if (row[8] != null) {
+                    dishMenuWebArmPPItem.setTypeOfProduction(row[8].toString());
+                }
+                if (row[9] != null) {
+                    dishMenuWebArmPPItem.setTypefood(row[9].toString());
+                }
+                if (row[10] != null) {
+                    dishMenuWebArmPPItem.setCategory(row[10].toString());
+                }
+                if (row[11] != null) {
                     dishMenuWebArmPPItem.setSubcategory(row[11].toString());
-                if (row[12] != null)
-                dishMenuWebArmPPItem.setCalories(row[12].toString());
-                if (row[13] != null)
+                }
+                if (row[12] != null) {
+                    dishMenuWebArmPPItem.setCalories(row[12].toString());
+                }
+                if (row[13] != null) {
                     dishMenuWebArmPPItem.setQty(row[13].toString());
-                if (row[14] != null)
-                dishMenuWebArmPPItem.setProtein(row[14].toString());
-                if (row[15] != null)
-                dishMenuWebArmPPItem.setFat(row[15].toString());
-                if (row[16] != null)
-                dishMenuWebArmPPItem.setCarbohydrates(row[16].toString());
-                if (row[17] != null)
-                dishMenuWebArmPPItem.setBarcode(row[17].toString());
+                }
+                if (row[14] != null) {
+                    dishMenuWebArmPPItem.setProtein(row[14].toString());
+                }
+                if (row[15] != null) {
+                    dishMenuWebArmPPItem.setFat(row[15].toString());
+                }
+                if (row[16] != null) {
+                    dishMenuWebArmPPItem.setCarbohydrates(row[16].toString());
+                }
+                if (row[17] != null) {
+                    dishMenuWebArmPPItem.setBarcode(row[17].toString());
+                }
 
                 dishMenuWebArmPPItems.add(dishMenuWebArmPPItem);
 
@@ -246,8 +264,9 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
         private List<Long> parseStringAsLongList(String propertyName) {
             try {
                 String propertyValueString = reportProperties.getProperty(propertyName);
-                if (propertyValueString == null)
+                if (propertyValueString == null) {
                     return new ArrayList<>();
+                }
                 String[] propertyValueArray = StringUtils.split(propertyValueString, ',');
                 List<Long> propertyValueList = new ArrayList<Long>();
                 for (String propertyValue : propertyValueArray) {
@@ -260,7 +279,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     }
                 }
                 return propertyValueList;
-            }catch (Exception e) {
+            } catch (Exception e) {
                 return new ArrayList<>();
             }
         }

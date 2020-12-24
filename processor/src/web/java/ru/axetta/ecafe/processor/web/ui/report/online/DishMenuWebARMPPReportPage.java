@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -22,6 +23,7 @@ import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.webTechnolog.ComplexListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -40,7 +42,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.*;
 
-public class DishMenuWebARMPPReportPage extends OnlineReportPage implements ContragentListSelectPage.CompleteHandler {
+public class DishMenuWebARMPPReportPage extends OnlineReportPage implements ContragentListSelectPage.CompleteHandler,
+        ComplexListSelectPage.CompleteHandler{
 
     private final static Logger logger = LoggerFactory.getLogger(DishMenuWebARMPPReportPage.class);
 
@@ -54,8 +57,11 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
     private Boolean archived = false;
 
     private String contragentFilter = "Не выбрано";
+    private String complexFilter = "Не выбрано";
     private String contragentIds;
+    private String complexIds;
     private List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
+    private List<ComplexItem> complexItems = new ArrayList<ComplexItem>();
 
     public SelectItem[] getTypesOfFood() {
         List<WtGroupItem> wtGroupItems = DAOService.getInstance().getMapTypeFoods();
@@ -233,6 +239,36 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         contragentIds = ids.toString();
     }
 
+    @Override
+    public void complexListSelection(Session session, List<Long> idOfComplexs) throws Exception {
+        complexItems.clear();
+        for (Long idOfComplex : idOfComplexs) {
+            WtComplex wtComplex = (WtComplex) session.load(Contragent.class, idOfComplex);
+            ComplexItem complexItem = new ComplexItem(wtComplex);
+            complexItems.add(complexItem);
+        }
+        setComplexFilterInfo(complexItems);
+    }
+
+    private void setComplexFilterInfo(List<ComplexItem> complexItems) {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (complexItems.isEmpty()) {
+            complexFilter = "Не выбрано";
+        } else {
+            for (ComplexItem it : complexItems) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(it.getComplexName());
+                ids.append(it.getIdOfComplex());
+            }
+            complexFilter = str.toString();
+        }
+        complexIds = ids.toString();
+    }
+
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
     }
@@ -289,6 +325,30 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         this.contragentIds = contragentIds;
     }
 
+    public String getComplexIds() {
+        return complexIds;
+    }
+
+    public void setComplexIds(String complexIds) {
+        this.complexIds = complexIds;
+    }
+
+    public String getComplexFilter() {
+        return complexFilter;
+    }
+
+    public void setComplexFilter(String complexFilter) {
+        this.complexFilter = complexFilter;
+    }
+
+    public List<ComplexItem> getComplexItems() {
+        return complexItems;
+    }
+
+    public void setComplexItems(List<ComplexItem> complexItems) {
+        this.complexItems = complexItems;
+    }
+
     public static class ContragentItem {
 
         private final Long idOfContragent;
@@ -310,6 +370,26 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
 
         public String getContragentName() {
             return contragentName;
+        }
+    }
+
+    public static class ComplexItem {
+
+        private final Long idOfComplex;
+        private final String complexName;
+
+
+        public ComplexItem(WtComplex wtComplex) {
+            this.idOfComplex = wtComplex.getIdOfComplex();
+            this.complexName = wtComplex.getName();
+        }
+
+        public String getComplexName() {
+            return complexName;
+        }
+
+        public Long getIdOfComplex() {
+            return idOfComplex;
         }
     }
 }
