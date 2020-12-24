@@ -14,42 +14,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "cf_orders")
-@NamedEntityGraphs({
-        @NamedEntityGraph(
-                name = "order_with_detail_only",
-                attributeNodes = {
-                        @NamedAttributeNode("orderDetailSet")
-                }
-        ),
-        @NamedEntityGraph(
-                name = "full_info",
-                attributeNodes = {
-                    @NamedAttributeNode(
-                            value = "orderDetailSet",
-                            subgraph = "orderDetailSet.rule"
-                    ),
-                    @NamedAttributeNode(
-                            value = "client",
-                            subgraph = "client.discounts"
-                    ),
-                    @NamedAttributeNode("org")
-                },
-                subgraphs = {
-                    @NamedSubgraph(
-                            name = "orderDetailSet.rule",
-                            attributeNodes = {
-                                    @NamedAttributeNode("rule")
-                            }
-                    ),
-                    @NamedSubgraph(
-                            name = "client.discounts",
-                            attributeNodes = {
-                                    @NamedAttributeNode("discounts")
-                            }
-                    )
-                }
-        )
-})
 @SqlResultSetMapping(
         name = "fullInfo",
         classes = {
@@ -82,7 +46,7 @@ import java.util.Set;
         "       o.orderdate as \"orderDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
-        "       string_agg(od.menudetailname, ';')  as \"details\"\n" +
+        "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
@@ -113,7 +77,7 @@ import java.util.Set;
         "       o.orderdate as \"orderDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
-        "       string_agg(od.menudetailname, ';')  as \"details\"\n" +
+        "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
