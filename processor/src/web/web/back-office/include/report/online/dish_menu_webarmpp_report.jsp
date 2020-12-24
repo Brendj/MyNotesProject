@@ -9,127 +9,210 @@
   ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
   --%>
 
-<h:panelGrid id="detailedEnterEventReportPanel" binding="#{mainPage.dishMenuReportWebArmPP.pageComponent}"
-             styleClass="borderless-grid">
+<h:panelGrid id="dishMenuWabARMPPReportPanel" binding="#{mainPage.dishMenuReportWebArmPP.pageComponent}"
+             styleClass="borderless-grid" columns="1">
 
-    <h:outputText escape="true" value="Соисполнитель поставщика по умолчанию" styleClass="output-text" />
-    <h:panelGroup styleClass="borderless-div">
-        <h:inputText value="#{mainPage.dishMenuReportWebArmPP.contragent.contragentName}" readonly="true"
-                     styleClass="input-text long-field" style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                           reRender="modalContragentSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" >
-            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
-            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
-        </a4j:commandButton>
-    </h:panelGroup>
+    <h:panelGrid id="filterdishMenuWabARMPPReportPanel" columns="2">
+        <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
 
-    <h:outputText styleClass="output-text" escape="true" value="Организация" />
-    <h:panelGroup styleClass="borderless-div">
-        <h:inputText value="#{mainPage.orgOrderReportPage.filter}" readonly="true"
-                     styleClass="input-text long-field" style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" />
-    </h:panelGroup>
-
-
-
-        <h:outputText escape="true" value="Дата выборки test от" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.detailedEnterEventReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDateCalendar,detailedEnterEventReportPanel"
-                         actionListener="#{mainPage.detailedEnterEventReportPage.onReportPeriodChanged}" />
-        </rich:calendar>
-
-        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
-        <h:selectOneMenu id="endDatePeriodSelect"
-                         value="#{mainPage.detailedEnterEventReportPage.periodTypeMenu.periodType}"
-                         styleClass="input-text" style="width: 250px;">
-            <f:converter converterId="periodTypeConverter" />
-            <f:selectItems value="#{mainPage.detailedEnterEventReportPage.periodTypeMenu.items}" />
-            <a4j:support event="onchange" reRender="endDateCalendar,detailedEnterEventReportPanel"
-                         actionListener="#{mainPage.detailedEnterEventReportPage.onReportPeriodChanged}" />
-        </h:selectOneMenu>
-        <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-        <rich:calendar id="endDateCalendar" value="#{mainPage.detailedEnterEventReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDatePeriodSelect,detailedEnterEventReportPanel"
-                         actionListener="#{mainPage.detailedEnterEventReportPage.onEndDateSpecified}" />
-        </rich:calendar>
-
-        <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{mainPage.detailedEnterEventReportPage.filter}" readonly="true"
-                         styleClass="input-text long-field" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
-        </h:panelGroup>
-
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="false" value="Построить по всем дружественным организациям" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.detailedEnterEventReportPage.allFriendlyOrgs}"
-                                 styleClass="output-text">
-        </h:selectBooleanCheckbox>
-    </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Группа" styleClass="output-text" />
-        <h:selectOneMenu value="#{mainPage.detailedEnterEventReportPage.clientFilter.clientGroupId}"
-                         styleClass="input-text" style="width: 145px;">
-            <f:selectItems value="#{mainPage.detailedEnterEventReportPage.clientFilter.clientGroupsCustomItems}" />
-            <a4j:support event="onchange" reRender="showDeletedClients" />
-        </h:selectOneMenu>
-    </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Клиенты" />
-        <h:panelGroup id="clientFilter">
-            <a4j:commandButton value="..."
-                               action="#{mainPage.showClientSelectListPage(mainPage.detailedEnterEventReportPage.getClientList())}"
-                               reRender="modalClientListSelectorPanel,selectedClientList"
-                               oncomplete="if (#{facesContext.maximumSeverity == null})
-                                    #{rich:component('modalClientListSelectorPanel')}.show();" styleClass="command-link"
-                               style="width: 25px;" id="clientFilterButton">
-                <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
-                <f:setPropertyActionListener value="#{mainPage.detailedEnterEventReportPage.getStringClientList}"
-                                             target="#{mainPage.clientSelectListPage.clientFilter}" />
+            <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
+                               reRender="modalContragentListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                <f:setPropertyActionListener value="#{mainPage.dishMenuReportWebArmPP.contragentIds}"
+                                             target="#{mainPage.contragentListSelectPage.selectedIds}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                          value=" {#{mainPage.detailedEnterEventReportPage.filterClient}}" />
+            <h:outputText value=" {#{mainPage.dishMenuReportWebArmPP.contragentFilter}}" escape="true"
+                          styleClass="output-text" />
         </h:panelGroup>
+
+        <h:outputText escape="true" value="Организации" styleClass="output-text" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" id="dishMenuPanelModalOrgListSelectorPanel"
+                               reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="#{mainPage.dishMenuReportWebArmPP.filter}"
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.dishMenuReportWebArmPP.filter}}" />
+        </h:panelGroup>
+
+        <h:outputText styleClass="output-text" escape="true" value="Выбор типа питания" />
+        <h:selectOneMenu value="#{mainPage.dishMenuReportWebArmPP.selectidTypeFoodId}" >
+            <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getTypesOfFood()}"/>
+        </h:selectOneMenu>
+
+        <h:outputText styleClass="output-text" escape="true" value="Возрастной рацион" />
+        <h:selectOneMenu value="#{mainPage.dishMenuReportWebArmPP.selectidAgeGroup}" >
+            <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getAgeGroup()}"/>
+        </h:selectOneMenu>
+
+        <h:outputText styleClass="output-text" escape="true" value="Архивные" />
+        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.archived}"/>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Построить отчет" action="#{mainPage.dishMenuReportWebArmPP.buildReportHTML}"
+                               reRender="dishMenuWabARMPPReportPanel" styleClass="command-button"
+                               status="reportGenerateStatus" />
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.dishMenuReportWebArmPP.generateXLS}"
+                             styleClass="command-button" />
+            <a4j:status id="reportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.detailedEnterEventReportPage.buildReportHTML}"
-                           reRender="detailedEnterEventReportPanel" styleClass="command-button"
-                           status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.detailedEnterEventReportPage.generateXLS}"
-                         styleClass="command-button" />
-        <a4j:status id="reportGenerateStatus">
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+    <h:panelGrid styleClass="borderless-grid">
+        <h:outputText escape="true" value="Список блюд" styleClass="output-text" />
+        <rich:dataTable id="dishMenuWabARMPPReportTable" value="#{mainPage.dishMenuReportWebArmPP.items}"
+                        var="dishElement" rows="25" footerClass="data-table-footer" columnClasses="center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column
+center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column
+center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column, center-aligned-column">
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Код ИСПП" />
+                </f:facet>
+                <h:outputText value="#{dishElement.codeISPP}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Название" />
+                </f:facet>
+                <h:outputText value="#{dishElement.dishname}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Состав" />
+                </f:facet>
+                <h:outputText value="#{dishElement.componentsofdish}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Код поставщика" />
+                </f:facet>
+                <h:outputText value="#{dishElement.idcontragent}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Цена" />
+                </f:facet>
+                <h:outputText value="#{dishElement.price}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Дата в меню с" />
+                </f:facet>
+                <h:outputText value="#{dishElement.dateFrom}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Дата в меню по" />
+                </f:facet>
+                <h:outputText value="#{dishElement.dateTo}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Возрастная категория" />
+                </f:facet>
+                <h:outputText value="#{dishElement.agegroup}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Тип производства" />
+                </f:facet>
+                <h:outputText value="#{dishElement.typeOfProduction}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Тип питания" />
+                </f:facet>
+                <h:outputText value="#{dishElement.typefood}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Категория" />
+                </f:facet>
+                <h:outputText value="#{dishElement.category}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Подкатегория" />
+                </f:facet>
+                <h:outputText value="#{dishElement.subcategory}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Калории" />
+                </f:facet>
+                <h:outputText value="#{dishElement.calories}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Масса/Количество" />
+                </f:facet>
+                <h:outputText value="#{dishElement.qty}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Белки" />
+                </f:facet>
+                <h:outputText value="#{dishElement.protein}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Жиры" />
+                </f:facet>
+                <h:outputText value="#{dishElement.fat}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Углеводы" />
+                </f:facet>
+                <h:outputText value="#{dishElement.carbohydrates}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Штрих-код" />
+                </f:facet>
+                <h:outputText value="#{dishElement.barcode}" styleClass="output-text" />
+            </rich:column>
+            <f:facet name="footer">
+                <rich:datascroller for="dishMenuWabARMPPReportTable" renderIfSinglePage="false" maxPages="10"
+                                   fastControls="hide" stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:datascroller>
             </f:facet>
-        </a4j:status>
+        </rich:dataTable>
     </h:panelGrid>
-
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
-    <h:panelGrid styleClass="borderless-grid" id="reportPanel">
-        <c:if test="${not empty  mainPage.detailedEnterEventReportPage.htmlReport}">
-            <h:outputText escape="true" value="Детализированный отчет по посещению" styleClass="output-text" />
-            <f:verbatim>
-                <style type="text/css">
-                    div.htmlReportContent :empty {
-                        display: none;
-                    }
-                </style>
-                <div class="htmlReportContent"> ${mainPage.detailedEnterEventReportPage.htmlReport} </div>
-            </f:verbatim>
-            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
-        </c:if>
-    </h:panelGrid>
 </h:panelGrid>
 
