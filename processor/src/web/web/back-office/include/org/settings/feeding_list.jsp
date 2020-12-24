@@ -16,7 +16,7 @@
             <f:facet name="header">
                 <h:outputText value="Идентификатор"/>
             </f:facet>
-            <h:outputText value="#{setting.idOfSetting}" converter="copeckSumConverter"/>
+            <h:outputText value="#{setting.idOfSetting}"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
