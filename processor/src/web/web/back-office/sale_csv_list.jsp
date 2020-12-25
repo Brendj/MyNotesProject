@@ -8,7 +8,7 @@
     <h:outputText escape="false" value="Организация;Название;Цена за ед;Кол-во;Сумма без скидки;Сумма скидки;Кол-во со скидкой;Итоговая сумма;Время первой продажи;Время последней продажи" />
     <h:outputText escape="false" value="#{mainPage.endOfLine}" />
     <a4j:repeat value="#{mainPage.salesReportPage.salesReport.salesItems}" var="item">
-        <h:outputText escape="false" value="#{item.officialName};#{item.menuDetailName};#{item.rPrice};#{item.qty};#{item.sumPrice};#{item.discountForReport};#{item.qtyDiscount};#{item.total}" />
+        <h:outputText escape="false" value="#{item.officialName};#{item.menuDetailName};#{item.rPrice};#{item.qty};#{item.sumPrice};#{item.discountStr};#{item.qtyDiscount};#{item.total}" />
         <h:outputText escape="false" value=";" /><h:outputText escape="false" value="#{item.firstTimeSale}" converter="timeConverter" />
         <h:outputText escape="false" value=";" /><h:outputText escape="false" value="#{item.lastTimeSale}" converter="timeConverter" />
         <h:outputText escape="false" value="#{mainPage.endOfLine}" />
