@@ -183,30 +183,34 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                 filterComplexes = " and cwco.idofcomplex in (" + filterComplexes + ") ";
             }
             if (idTypeFood != null) {
-                filterTypeFoodId = " and cwgi.idofgroupitem = " + idTypeFood + " ";
+                filterTypeFoodId = " where cwgi.idofgroupitem = " + idTypeFood + " ";
             }
             if (idAgeGroup != null) {
                 filterAgeGroup = " and cwag.idofagegroupitem = " + idAgeGroup + " ";
             }
 
-            String fullWhere = " where (cwd.deletestate = 0 or cwd.deletestate = " + archivedInt + " ) and "
-                    + "(cwmc.deletestate = 0 or cwmc.deletestate = " + archivedInt + " ) "
-                    + "and (cwm.deletestate = 0 or cwm.deletestate = " + archivedInt + " ) "  + filterOrgs
-                    + filterContragent + filterTypeFoodId + filterAgeGroup + filterComplexes;
+            String fullWhere = " where (cwd.deletestate = 0 or cwd.deletestate = " + archivedInt + " ) "  + filterOrgs
+                    + filterContragent  + filterAgeGroup + filterComplexes;
 
             String sqlQueryBase =
-                    "select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"
+                    "select base2.idofdish, base2.dishname, base2.componentsofdish, base2.idofcontragent, base2.price, base2.dateofbeginmenuincluding, \n"
+                            + "base2.dateofendmenuincluding, base2.agegroup, base2.typeOfProduction,\n"
+                            + "base2.typefood, base2.category, string_agg(distinct cwci.description, ';' order by cwci.description) as subcategory, \n"
+                            + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode from\n"
+                            + "(select base1.idofdish, base1.dishname, base1.componentsofdish, base1.idofcontragent, base1.price, \n"
+                            + "base1.dateofbeginmenuincluding, base1.dateofendmenuincluding, base1.agegroup, base1.typeOfProduction,\n"
+                            + "string_agg(distinct cwgi.description, ';' order by cwgi.description) as typefood, base1.category, \n"
+                            + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode\n"
+                            + "from \n"
+                            + "(select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"
                             + "cwd.dateofendmenuincluding, cwag.description as agegroup, cwpi.description as typeOfProduction,\n"
-                            + "cwgi.description as typefood, cwc.description as category, cwci.description as subcategory, \n"
-                            + "cwd.calories, cwd.qty, cwd.protein, cwd.fat, cwd.carbohydrates, cwd.barcode\n"
-                            + "from cf_wt_dishes cwd\n"
+                            + "cwc.description as category,\n"
+                            + "cwd.calories, cwd.qty, cwd.protein, cwd.fat, cwd.carbohydrates, cwd.barcode, cwgr.idofgroupitem, cwd.deletestate as dishdel,\n"
+                            + "cwm.deletestate as menudel, cwmc.deletestate as compldel\n" + "from cf_wt_dishes cwd\n"
                             + "left join cf_wt_agegroup_items cwag on cwag.idofagegroupitem = cwd.idofagegroupitem\n"
                             + "left join cf_wt_typeofproduction_items cwpi on cwpi.idoftypeproductionitem = cwd.idoftypeofproductionitem\n"
                             + "left join cf_wt_dish_groupitem_relationships cwgr on cwgr.idofdish = cwd.idofdish\n"
-                            + "left join cf_wt_group_items cwgi on cwgi.idofgroupitem = cwgr.idofgroupitem\n"
                             + "left join cf_wt_categories cwc on cwc.idofcategory = cwd.idofcategory\n"
-                            + "left join cf_wt_dish_categoryitem_relationships cwdc on cwdc.idofdish = cwd.idofdish\n"
-                            + "left join cf_wt_category_items cwci on cwci.idofcategoryitem = cwdc.idofcategoryitem\n"
                             + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = cwd.idofdish\n"
                             + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
                             + "left join cf_wt_complexes cwmc on cwmc.idofcomplex = cwcid1.idofcomplex\n"
@@ -215,56 +219,65 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = cwd.idofdish\n"
                             + "left join cf_wt_menu_group_relationships cwmg on cwmg.id = cwmgr.idofmenumenugrouprelation\n"
                             + "left join cf_wt_menu cwm on cwm.idofmenu = cwmg.idofmenu"
-                             + fullWhere + " order by cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"
-                            + "cwd.dateofendmenuincluding, agegroup, typeOfProduction,\n"
-                            + "typefood, category, subcategory, cwd.calories, cwd.qty, cwd.protein, cwd.fat, cwd.carbohydrates, cwd.barcode";
+                            + fullWhere + ") as base1\n"
+                            + "left join cf_wt_group_items cwgi on cwgi.idofgroupitem = base1.idofgroupitem \n"
+                            + filterTypeFoodId
+                            + "group by base1.idofdish, base1.dishname, base1.componentsofdish, base1.idofcontragent, \n"
+                            + "base1.price, base1.dateofbeginmenuincluding,base1.dateofendmenuincluding, base1.agegroup, base1.typeOfProduction, \n"
+                            + "base1.category,\n"
+                            + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode) as base2\n"
+                            + "left join cf_wt_dish_categoryitem_relationships cwdc on cwdc.idofdish = base2.idofdish\n"
+                            + "left join cf_wt_category_items cwci on cwci.idofcategoryitem = cwdc.idofcategoryitem\n"
+                            + "group by base2.idofdish, base2.dishname, base2.componentsofdish, base2.idofcontragent, base2.price, base2.dateofbeginmenuincluding, \n"
+                            + "base2.dateofendmenuincluding, base2.agegroup, base2.typeOfProduction,\n"
+                            + "base2.typefood, base2.category, \n"
+                            + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode";
 
             ///////////////////
             if (bufet && incomplex) {
-                sqlQueryBase = "select part1.idofdish, part1.dishname, part1.componentsofdish, part1.idofcontragent, part1.price, part1.dateofbeginmenuincluding, \n"
-                        + "part1.dateofendmenuincluding, part1.agegroup, part1.typeOfProduction,\n"
-                        + "part1.typefood, part1.category, part1.subcategory, \n"
-                        + "part1.calories, part1.qty, part1.protein, part1.fat, part1.carbohydrates, part1.barcode, part1.countInMenu, part2.countInComplex from \n" + "(\n"
-                       + "select ROW_NUMBER () OVER (ORDER BY base.idofdish) as rownum,base.*, count (cwmg.idofmenu) as countInMenu from \n"
-                       + "(" + sqlQueryBase + ") as base\n"
-                       + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base.idofdish\n"
-                       + "left join cf_wt_menu_group_relationships cwmg on cwmg.id = cwmgr.idofmenumenugrouprelation\n"
-                       + "left join cf_wt_menu cwm on cwm.idofmenu = cwmg.idofmenu\n"
-                       + "group by base.idofdish, base.dishname, base.componentsofdish, base.idofcontragent, base.price, base.dateofbeginmenuincluding, \n"
-                       + "base.dateofendmenuincluding, base.agegroup, base.typeOfProduction,\n"
-                       + "base.typefood, base.category, base.subcategory, \n"
-                       + "base.calories, base.qty, base.protein, base.fat, base.carbohydrates, base.barcode) as part1\n"
-                       + "inner join\n"
-                       + "(select ROW_NUMBER () OVER (ORDER BY base.idofdish) as rownum, base.*, count (cwcid1.idofcomplex) as countInComplex from \n"
-                       + "(" + sqlQueryBase + ") as base\n"
-                       + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = base.idofdish\n"
-                       + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
-                       + "group by base.idofdish, base.dishname, base.componentsofdish, base.idofcontragent, base.price, base.dateofbeginmenuincluding, \n"
-                       + "base.dateofendmenuincluding, base.agegroup, base.typeOfProduction,\n"
-                       + "base.typefood, base.category, base.subcategory, \n"
-                       + "base.calories, base.qty, base.protein, base.fat, base.carbohydrates, base.barcode) as part2 on part1.rownum = part2.rownum";
+                sqlQueryBase = "select base4.*, base5.countInComplex from (\n"
+                        + "select base3.*, count (distinct cwm.idofmenu) as countInMenu from (" + sqlQueryBase + ") as base3\n"
+                        + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base3.idofdish\n"
+                        + "left join cf_wt_menu_group_relationships cwmg on cwmg.id = cwmgr.idofmenumenugrouprelation\n"
+                        + "left join (select * from cf_wt_menu where deletestate = 0) cwm on cwm.idofmenu = cwmg.idofmenu\n"
+                        + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                        + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
+                        + "base3.typefood, base3.category, base3.subcategory, \n"
+                        + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode) as base4\n"
+                        + "inner join \n"
+                        + "(select base3.*, count (distinct cwtc.idofcomplex) as countInComplex from \n"
+                        + "(" + sqlQueryBase + ") as base3\n"
+                        + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = base3.idofdish\n"
+                        + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
+                        + "left join (select * from cf_wt_complexes where deletestate = 0) cwtc on cwtc.idofcomplex = cwcid1.idofcomplex\n"
+                        + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                        + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
+                        + "base3.typefood, base3.category, base3.subcategory, \n"
+                        + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode) as base5\n"
+                        + "on base4.idofdish = base5.idofdish";
             } else
             {
                 if (bufet) {
-                    sqlQueryBase =  "select base.*, count (cwmg.idofmenu) as countInMenu from \n"
-                            + "(" + sqlQueryBase + ") as base\n"
-                            + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base.idofdish\n"
+                    sqlQueryBase =  "select base3.*, count (distinct cwm.idofmenu) as countInMenu from \n"
+                            + "(" + sqlQueryBase + ") as base3\n"
+                            + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base3.idofdish\n"
                             + "left join cf_wt_menu_group_relationships cwmg on cwmg.id = cwmgr.idofmenumenugrouprelation\n"
-                            + "left join cf_wt_menu cwm on cwm.idofmenu = cwmg.idofmenu\n"
-                            + "group by base.idofdish, base.dishname, base.componentsofdish, base.idofcontragent, base.price, base.dateofbeginmenuincluding, \n"
-                            + "base.dateofendmenuincluding, base.agegroup, base.typeOfProduction,\n"
-                            + "base.typefood, base.category, base.subcategory, \n"
-                            + "base.calories, base.qty, base.protein, base.fat, base.carbohydrates, base.barcode";
+                            + "left join (select * from cf_wt_menu where deletestate = 0) cwm on cwm.idofmenu = cwmg.idofmenu\n"
+                            + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                            + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
+                            + "base3.typefood, base3.category, base3.subcategory, \n"
+                            + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode;";
                 } else {
                     if (incomplex) {
-                        sqlQueryBase = "select base.*, count (cwcid1.idofcomplex) as countInComplex from \n"
-                                    + "(" + sqlQueryBase + ") as base\n"
-                                    + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = base.idofdish\n"
-                                    + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
-                                    + "group by base.idofdish, base.dishname, base.componentsofdish, base.idofcontragent, base.price, base.dateofbeginmenuincluding, \n"
-                                    + "base.dateofendmenuincluding, base.agegroup, base.typeOfProduction,\n"
-                                    + "base.typefood, base.category, base.subcategory, \n"
-                                    + "base.calories, base.qty, base.protein, base.fat, base.carbohydrates, base.barcode";
+                        sqlQueryBase = "select base3.*, count (distinct cwtc.idofcomplex) as countInComplex from \n"
+                                + "(" + sqlQueryBase + ") as base3\n"
+                                + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = base3.idofdish\n"
+                                + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
+                                + "left join (select * from cf_wt_complexes where deletestate = 0) cwtc on cwtc.idofcomplex = cwcid1.idofcomplex\n"
+                                + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                                + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
+                                + "base3.typefood, base3.category, base3.subcategory, \n"
+                                + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode;";
                     }
                 }
             }

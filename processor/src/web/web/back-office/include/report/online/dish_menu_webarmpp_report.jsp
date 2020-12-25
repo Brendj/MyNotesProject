@@ -133,14 +133,14 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                 <f:facet name="header">
                     <h:outputText value="Дата в меню с" />
                 </f:facet>
-                <h:outputText value="#{dishElement.dateFrom}" styleClass="output-text" converter="timeConverter"/>
+                <h:outputText value="#{dishElement.dateFrom}" styleClass="output-text" converter="dateConverter"/>
             </rich:column>
 
             <rich:column>
                 <f:facet name="header">
                     <h:outputText value="Дата в меню по" />
                 </f:facet>
-                <h:outputText value="#{dishElement.dateTo}" styleClass="output-text" converter="timeConverter"/>
+                <h:outputText value="#{dishElement.dateTo}" styleClass="output-text" converter="dateConverter"/>
             </rich:column>
 
             <rich:column>
