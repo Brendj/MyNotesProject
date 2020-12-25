@@ -10,7 +10,7 @@ public class DishMenuWebArmPPItem {
     private String codeISPP;
     private String dishname;
     private String componentsofdish;
-    private String idcontragent;
+    private String idsupplier;
     private String price;
     private Date dateFrom;
     private Date dateTo;
@@ -50,14 +50,6 @@ public class DishMenuWebArmPPItem {
 
     public void setComponentsofdish(String componentsofdish) {
         this.componentsofdish = componentsofdish;
-    }
-
-    public String getIdcontragent() {
-        return idcontragent;
-    }
-
-    public void setIdcontragent(String idcontragent) {
-        this.idcontragent = idcontragent;
     }
 
     public String getPrice() {
@@ -186,5 +178,13 @@ public class DishMenuWebArmPPItem {
 
     public void setCountInComplex(String countInComplex) {
         this.countInComplex = countInComplex;
+    }
+
+    public String getIdsupplier() {
+        return idsupplier;
+    }
+
+    public void setIdsupplier(String idsupplier) {
+        this.idsupplier = idsupplier;
     }
 }

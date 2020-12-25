@@ -56,8 +56,8 @@
                                reRender="modalComplexListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalComplexListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <%--<f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />--%>
-                <%--<f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />--%>
+                <f:setPropertyActionListener value="#{mainPage.dishMenuReportWebArmPP.idOfOrgList}" target="#{mainPage.complexWebListSelectPage.filterOrgs}" />
+                <f:setPropertyActionListener value="#{mainPage.dishMenuReportWebArmPP.contragentIds}" target="#{mainPage.complexWebListSelectPage.filterContagents}" />
                 <f:setPropertyActionListener value="#{mainPage.dishMenuReportWebArmPP.complexIds}"
                                              target="#{mainPage.complexWebListSelectPage.selectedIds}" />
             </a4j:commandButton>
@@ -119,7 +119,7 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                 <f:facet name="header">
                     <h:outputText value="Код поставщика" />
                 </f:facet>
-                <h:outputText value="#{dishElement.idcontragent}" styleClass="output-text" />
+                <h:outputText value="#{dishElement.idsupplier}" styleClass="output-text" />
             </rich:column>
 
             <rich:column>

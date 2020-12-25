@@ -3,6 +3,8 @@
  */
 
 package ru.axetta.ecafe.processor.web.ui.webTechnolog;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
@@ -18,6 +20,22 @@ import java.util.*;
 
 public class ComplexListSelectPage extends BasicPage {
     private String filter;
+
+    public String getFilterContagents() {
+        return filterContagents;
+    }
+
+    public void setFilterContagents(String filterContagents) {
+        this.filterContagents = filterContagents;
+    }
+
+    public List<Long> getFilterOrgs() {
+        return filterOrgs;
+    }
+
+    public void setFilterOrgs(List<Long> filterOrgs) {
+        this.filterOrgs = filterOrgs;
+    }
 
     public interface CompleteHandler {
         void complexListSelection(Session session, List<Long> idOfComplex) throws Exception;
@@ -59,6 +77,8 @@ public class ComplexListSelectPage extends BasicPage {
     private final Stack<CompleteHandler> completeHandlers = new Stack<CompleteHandler>();
     private List<Item> items = Collections.emptyList();
     private String selectedIds;
+    private String filterContagents;
+    private List<Long> filterOrgs;
 
     public void pushCompleteHandler(CompleteHandler handler) {
         completeHandlers.push(handler);
@@ -148,7 +168,23 @@ public class ComplexListSelectPage extends BasicPage {
     public void fill(Session session) throws Exception {
         List<Item> items = new ArrayList<Item>();
         List<String> selectedIdsList = Arrays.asList(StringUtils.split(selectedIds, ","));
-        List complexes = retrieveComplexes(session);
+        List<String> filtercontagent = Arrays.asList(StringUtils.split(filterContagents, ","));
+        List<Contragent> contragents = new ArrayList<>();
+        if (!filtercontagent.isEmpty()) {
+            for (String idContagents : filtercontagent) {
+                Contragent contragent = (Contragent) session.load(Contragent.class, Long.valueOf(idContagents));
+                contragents.add(contragent);
+            }
+        }
+        List<Org> orgs = new ArrayList<>();
+        if (filterOrgs != null) {
+            for (Long idOrg : filterOrgs) {
+                Org org = (Org) session.load(Org.class, idOrg);
+                orgs.add(org);
+            }
+        }
+
+        List complexes = retrieveComplexes(session, contragents, orgs);
         for (Object object : complexes) {
             WtComplex wtComplex = (WtComplex) object;
             Item item = new Item(wtComplex);
@@ -160,10 +196,14 @@ public class ComplexListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    private List retrieveComplexes(Session session) throws HibernateException {
+    private List retrieveComplexes(Session session, List<Contragent> contragents, List<Org> orgs) throws HibernateException {
         Criteria criteria = session.createCriteria(WtComplex.class).addOrder(Order.asc("name"));
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.ilike("name", filter, MatchMode.ANYWHERE));
+            if (contragents != null && !contragents.isEmpty())
+                criteria.add(Restrictions.in("contragent", contragents));
+            if (orgs != null && !orgs.isEmpty())
+                criteria.add(Restrictions.in("orgs", orgs));
         }
         List<WtComplex> complexByCriteria = criteria.list();
         return complexByCriteria; // criteria.list();

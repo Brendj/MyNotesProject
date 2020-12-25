@@ -193,16 +193,16 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     + filterContragent  + filterAgeGroup + filterComplexes;
 
             String sqlQueryBase =
-                    "select base2.idofdish, base2.dishname, base2.componentsofdish, base2.idofcontragent, base2.price, base2.dateofbeginmenuincluding, \n"
+                    "select base2.idofdish, base2.dishname, base2.componentsofdish, base2.code, base2.price, base2.dateofbeginmenuincluding, \n"
                             + "base2.dateofendmenuincluding, base2.agegroup, base2.typeOfProduction,\n"
                             + "base2.typefood, base2.category, string_agg(distinct cwci.description, ';' order by cwci.description) as subcategory, \n"
                             + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode from\n"
-                            + "(select base1.idofdish, base1.dishname, base1.componentsofdish, base1.idofcontragent, base1.price, \n"
+                            + "(select base1.idofdish, base1.dishname, base1.componentsofdish, base1.code, base1.price, \n"
                             + "base1.dateofbeginmenuincluding, base1.dateofendmenuincluding, base1.agegroup, base1.typeOfProduction,\n"
                             + "string_agg(distinct cwgi.description, ';' order by cwgi.description) as typefood, base1.category, \n"
                             + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode\n"
                             + "from \n"
-                            + "(select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.idofcontragent, cwd.price, cwd.dateofbeginmenuincluding, \n"
+                            + "(select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.code, cwd.price, cwd.dateofbeginmenuincluding, \n"
                             + "cwd.dateofendmenuincluding, cwag.description as agegroup, cwpi.description as typeOfProduction,\n"
                             + "cwc.description as category,\n"
                             + "cwd.calories, cwd.qty, cwd.protein, cwd.fat, cwd.carbohydrates, cwd.barcode, cwgr.idofgroupitem, cwd.deletestate as dishdel,\n"
@@ -222,13 +222,13 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + fullWhere + ") as base1\n"
                             + "left join cf_wt_group_items cwgi on cwgi.idofgroupitem = base1.idofgroupitem \n"
                             + filterTypeFoodId
-                            + "group by base1.idofdish, base1.dishname, base1.componentsofdish, base1.idofcontragent, \n"
+                            + "group by base1.idofdish, base1.dishname, base1.componentsofdish, base1.code, \n"
                             + "base1.price, base1.dateofbeginmenuincluding,base1.dateofendmenuincluding, base1.agegroup, base1.typeOfProduction, \n"
                             + "base1.category,\n"
                             + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode) as base2\n"
                             + "left join cf_wt_dish_categoryitem_relationships cwdc on cwdc.idofdish = base2.idofdish\n"
                             + "left join cf_wt_category_items cwci on cwci.idofcategoryitem = cwdc.idofcategoryitem\n"
-                            + "group by base2.idofdish, base2.dishname, base2.componentsofdish, base2.idofcontragent, base2.price, base2.dateofbeginmenuincluding, \n"
+                            + "group by base2.idofdish, base2.dishname, base2.componentsofdish, base2.code, base2.price, base2.dateofbeginmenuincluding, \n"
                             + "base2.dateofendmenuincluding, base2.agegroup, base2.typeOfProduction,\n"
                             + "base2.typefood, base2.category, \n"
                             + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode";
@@ -240,7 +240,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base3.idofdish\n"
                         + "left join cf_wt_menu_group_relationships cwmg on cwmg.id = cwmgr.idofmenumenugrouprelation\n"
                         + "left join (select * from cf_wt_menu where deletestate = 0) cwm on cwm.idofmenu = cwmg.idofmenu\n"
-                        + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                        + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                         + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                         + "base3.typefood, base3.category, base3.subcategory, \n"
                         + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode) as base4\n"
@@ -250,7 +250,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = base3.idofdish\n"
                         + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
                         + "left join (select * from cf_wt_complexes where deletestate = 0) cwtc on cwtc.idofcomplex = cwcid1.idofcomplex\n"
-                        + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                        + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                         + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                         + "base3.typefood, base3.category, base3.subcategory, \n"
                         + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode) as base5\n"
@@ -263,7 +263,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base3.idofdish\n"
                             + "left join cf_wt_menu_group_relationships cwmg on cwmg.id = cwmgr.idofmenumenugrouprelation\n"
                             + "left join (select * from cf_wt_menu where deletestate = 0) cwm on cwm.idofmenu = cwmg.idofmenu\n"
-                            + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                            + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                             + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                             + "base3.typefood, base3.category, base3.subcategory, \n"
                             + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode;";
@@ -274,7 +274,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                                 + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = base3.idofdish\n"
                                 + "left join cf_wt_complexes_items cwcid1 on cwcid1.idofcomplexitem = cwcid.idofcomplexitem\n"
                                 + "left join (select * from cf_wt_complexes where deletestate = 0) cwtc on cwtc.idofcomplex = cwcid1.idofcomplex\n"
-                                + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.idofcontragent, base3.price, base3.dateofbeginmenuincluding, \n"
+                                + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                                 + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                                 + "base3.typefood, base3.category, base3.subcategory, \n"
                                 + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode;";
@@ -297,7 +297,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     dishMenuWebArmPPItem.setComponentsofdish(row[2].toString());
                 }
                 if (row[3] != null) {
-                    dishMenuWebArmPPItem.setIdcontragent(row[3].toString());
+                    dishMenuWebArmPPItem.setIdsupplier(row[3].toString());
                 }
                 if (row[4] != null) {
                     dishMenuWebArmPPItem.setPrice(row[4].toString());
