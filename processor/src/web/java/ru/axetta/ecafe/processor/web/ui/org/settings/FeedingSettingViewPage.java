@@ -26,6 +26,8 @@ public class FeedingSettingViewPage extends BasicWorkspacePage {
     private Long idOfSetting;
     private String settingName;
     private Long limit;
+    private Long discount;
+    private Boolean useDiscount;
     private Date lastUpdate;
     private Set<Org> orgs;
     private String userName;
@@ -36,6 +38,8 @@ public class FeedingSettingViewPage extends BasicWorkspacePage {
         FeedingSetting setting = (FeedingSetting)session.load(FeedingSetting.class, idOfSetting);
         this.settingName = setting.getSettingName();
         this.limit = setting.getLimit();
+        this.discount = setting.getDiscount();
+        this.useDiscount = setting.getUseDiscount();
         this.lastUpdate = setting.getLastUpdate();
         this.userName = setting.getUser().getUserName();
         orgName = "";
@@ -118,5 +122,21 @@ public class FeedingSettingViewPage extends BasicWorkspacePage {
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
+    }
+
+    public Long getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Long discount) {
+        this.discount = discount;
+    }
+
+    public Boolean getUseDiscount() {
+        return useDiscount;
+    }
+
+    public void setUseDiscount(Boolean useDiscount) {
+        this.useDiscount = useDiscount;
     }
 }

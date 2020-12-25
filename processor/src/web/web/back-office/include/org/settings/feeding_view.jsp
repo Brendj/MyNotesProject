@@ -21,6 +21,14 @@
         <h:outputText escape="true" value="Сумма лимита" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.feedingSettingViewPage.limit}" styleClass="output-text long-field" converter="copeckSumConverter"/>
 
+        <h:outputText escape="true" value="Сумма скидки" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{mainPage.feedingSettingViewPage.discount}" styleClass="output-text long-field" converter="copeckSumConverter"/>
+
+        <h:outputText escape="true" value="Учитывать скидку при оплате платного плана" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.feedingSettingViewPage.useDiscount}" styleClass="output-text" readonly="true">
+            <a4j:support event="onchange" reRender="feedingSettingViewPage" />
+        </h:selectBooleanCheckbox>
+
         <h:outputText escape="true" value="Список организаций" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.feedingSettingViewPage.orgName}" styleClass="output-text long-field" />
 
