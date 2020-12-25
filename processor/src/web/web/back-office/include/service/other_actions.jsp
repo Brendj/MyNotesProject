@@ -245,6 +245,8 @@
         </rich:panel>
         <a4j:commandButton value="Отправка платежей в Атол" action="#{otherActionsPage.sendToAtol()}" id="sendToAtolButton"
                            styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+        <a4j:commandButton value="Обработка копий комплексов веб арма ПП" action="#{otherActionsPage.processWtComplexes()}" id="processWtComplexesButton"
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
         <rich:panel rendered="#{otherActionsPage.isSpb()}">
             <a4j:commandButton value="Обработка дублей клиентов" action="#{otherActionsPage.runProcessClientDoubles}" id="updateSpbClientDoubles"
                                title="Обработка дублей клиентов"

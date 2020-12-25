@@ -58,6 +58,10 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
+        <property name="idOfParentComplex">
+            <column name="idOfParentComplex" sql-type="long"/>
+        </property>
+
         <many-to-one name="wtComplexGroupItem" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem">
             <column name="idOfComplexGroupItem"/>
         </many-to-one>
