@@ -37,7 +37,7 @@
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Отчет по продажам" styleClass="output-text" />
         <rich:dataTable id="salesReportTable" value="#{mainPage.salesReportPage.salesReport.salesItems}"
-                        var="sale" rowKeyVar="row" rows="10" footerClass="data-table-footer"
+                        var="sale" rowKeyVar="row" rows="20" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
@@ -95,10 +95,10 @@
                     <h:outputText styleClass="output-text" value="#{sale.sumPrice}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.sumPriceDiscount}" />
+                    <h:outputText styleClass="output-text" value="#{sale.discountForReport}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.discountForReport}" />
+                    <h:outputText styleClass="output-text" value="#{sale.qtyDiscount}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sale.total}" />

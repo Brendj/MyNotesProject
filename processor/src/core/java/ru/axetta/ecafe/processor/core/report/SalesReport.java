@@ -64,7 +64,7 @@ public class SalesReport extends BasicReport {
                 query.setParameterList("destOrgs", idOfOrgList);
 
                 List resultList = query.list();
-                Map<String, SalesItem> map = new HashMap<>();
+                Map<String, SalesItem> map = new TreeMap<>();
 
                 for (Object result : resultList) {
                     Object[] sale = (Object[]) result;
@@ -76,15 +76,16 @@ public class SalesReport extends BasicReport {
                     Date firstTimeSale = new Date(((BigInteger) sale[5]).longValue());
                     Date lastTimeSale = new Date(((BigInteger) sale[6]).longValue());
                     Long qtyDiscount = ((BigInteger) sale[7]).longValue();
-                    String key = menuDetailName + rPrice;
+                    String key = menuDetailName + (rPrice + discount);
                     SalesItem salesItem = map.get(key);
                     if (salesItem == null) {
                         salesItem = new SalesItem(officialName, menuDetailName, rPrice, discount, qty, firstTimeSale,
                                 lastTimeSale, qtyDiscount);
                     }
                     salesItem.getDiscountSet().add(discount);
-                    salesItems.add(salesItem);
+                    map.put(key, salesItem);
                 }
+                salesItems.addAll(map.values());
             }
             return new SalesReport(generateTime, new Date().getTime() - generateTime.getTime(), salesItems);
         }
