@@ -3103,5 +3103,15 @@ public class DAOService {
     public List<Client> getClientsBySoid(String ssoid) {
         return DAOUtils.getClientsBySsoid(entityManager, ssoid);
     }
+
+    public List<WtGroupItem> getMapTypeFoods() {
+        Query q = entityManager.createQuery("SELECT wtGroup from WtGroupItem wtGroup");
+        return q.getResultList();
+    }
+
+    public List<WtAgeGroupItem> getAgeGroups() {
+        Query q = entityManager.createQuery("SELECT wtAge FROM WtAgeGroupItem wtAge");
+        return q.getResultList();
+    }
 }
 

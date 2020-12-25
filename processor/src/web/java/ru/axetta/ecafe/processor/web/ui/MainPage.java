@@ -67,6 +67,7 @@ import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPag
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.user.UserListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmLoadPage;
+import ru.axetta.ecafe.processor.web.ui.webTechnolog.ComplexListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -336,6 +337,7 @@ public class MainPage implements Serializable {
     private final AllComplexReportPage allComplexReportPage = new AllComplexReportPage();
     private final TotalSalesPage totalSalesPage = new TotalSalesPage();
     private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
+    private final DishMenuWebARMPPReportPage dishMenuReportWebArmPP = new DishMenuWebARMPPReportPage();
 
     //Charts
     private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
@@ -391,6 +393,7 @@ public class MainPage implements Serializable {
     private final ContragentSelectPage contragentSelectPage = new ContragentSelectPage();
     private final ContractSelectPage contractSelectPage = new ContractSelectPage();
     private final ContragentListSelectPage contragentListSelectPage = new ContragentListSelectPage();
+    private final ComplexListSelectPage complexWebListSelectPage = new ComplexListSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
@@ -2179,6 +2182,11 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object clearComplexListSelectedItemsList() {
+        complexWebListSelectPage.deselectAllItems();
+        return null;
+    }
+
     public Object selectAllOrgListSelectedItemsList() {
         orgListSelectPage.selectAllItems();
         updateOrgListSelectPage();
@@ -2671,6 +2679,11 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object selectAllComplexListSelectedItemsList() {
+        complexWebListSelectPage.selectAllItems();
+        return null;
+    }
+
     public Object showContragentListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
@@ -2698,6 +2711,40 @@ public class MainPage implements Serializable {
                 logger.error("Failed to fill contragents list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Ошибка при подготовке страницы выбора списка контрагентов: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
+    }
+
+    public Object showComplexListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ComplexListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                complexWebListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler) {
+                    complexWebListSelectPage
+                            .pushCompleteHandler((ComplexListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(complexWebListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill complex list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка комплексов меню для Web-технолога: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2819,6 +2866,38 @@ public class MainPage implements Serializable {
 
     }
 
+    public Object completeComplexListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            complexWebListSelectPage.completeComplexSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == complexWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            complexWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("Failed to complete complex Web-технолог list selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка комплексов: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+
+    }
+
     public Object cancelContragentListSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -2833,6 +2912,24 @@ public class MainPage implements Serializable {
             logger.error("{}", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+    public Object cancelComplexListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            complexWebListSelectPage.cancelContragentListSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == complexWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            complexWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("{}", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка комплексов: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7734,6 +7831,23 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public DishMenuWebARMPPReportPage getDishMenuReportWebArmPP() {
+        return dishMenuReportWebArmPP;
+    }
+
+    public Object showDishMenuWebARMPPReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = dishMenuReportWebArmPP;
+        } catch (Exception e) {
+            logger.error("Failed to set DishMenuWebARMPPReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по блюдам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public OrdersByManufacturerReportPage getOrdersByManufacturerReportPage() {
         return ordersByManufacturerReportPage;
     }
@@ -10720,5 +10834,9 @@ public class MainPage implements Serializable {
 
     public BlockUnblockReportPage getBlockUnblockReportPage() {
         return blockUnblockReportPage;
+    }
+
+    public ComplexListSelectPage getComplexWebListSelectPage() {
+        return complexWebListSelectPage;
     }
 }

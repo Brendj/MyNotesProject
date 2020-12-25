@@ -1566,7 +1566,15 @@
                             label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                             reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
     </rich:panelMenuGroup>
+    <%--@elvariable id="menuReportsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.MenuReportsPage"--%>
+    <rich:panelMenuGroup id="menuReportsPage" binding="#{menuReportsPage.mainMenuComponent}"
+                         label="Отчет по меню">
+        <a4j:support event="onclick" action="#{menuReportsPage.show}" reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="dishMenuReport" binding="#{mainPage.dishMenuReportWebArmPP.mainMenuComponent}"
+                            label="Отчет по блюдам" action="#{mainPage.showDishMenuWebARMPPReportPage}"
+                            reRender="workspaceForm" />
+    </rich:panelMenuGroup>
     <%--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"--%>
     <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"
                          rendered="#{mainPage.eligibleToViewHelpdesk}">
