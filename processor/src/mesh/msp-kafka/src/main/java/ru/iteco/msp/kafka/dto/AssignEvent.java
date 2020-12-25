@@ -29,7 +29,11 @@ public class AssignEvent {
         CodeMSP msp = categoryDiscount.getMSPByClient(client);
         event.setAction_code(msp == null ? null : msp.getCode().toString());
         if(categoryDiscount.getCategoryDiscountDTSZN() != null){
-            event.setBenefit_category_code(categoryDiscount.getCategoryDiscountDTSZN().getCode().toString());
+            if(categoryDiscount.getCategoryDiscountDTSZN().getCode().equals(0)){  // Иное
+                event.setBenefit_category_name("Иное");
+            } else {
+                event.setBenefit_category_code(categoryDiscount.getCategoryDiscountDTSZN().getCode().toString());
+            }
         } else {
             event.setBenefit_category_name(categoryDiscount.getCategoryName());
         }
