@@ -5077,10 +5077,6 @@ public class Processor implements SyncProcessor {
                 if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT)
                         && clientParamItem.getEmail() != null) {
                     String email = clientParamItem.getEmail();
-                    //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                    if (client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
-                        client.setSsoid("");
-                    }
                     client.setEmail(email);
                     if (!StringUtils.isEmpty(clientParamItem.getEmail())
                             && clientParamItem.getNotifyViaEmail() == null) {
@@ -5089,10 +5085,6 @@ public class Processor implements SyncProcessor {
                 }
                 if (clientParamItem.getMobilePhone() != null) {
                     String mobile = Client.checkAndConvertMobile(clientParamItem.getMobilePhone());
-                    //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                    if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
-                        client.setSsoid("");
-                    }
                     client.initClientMobileHistory(clientsMobileHistory);
                     client.setMobile(mobile);
                     logger.info("class : ClientManager, method : modifyClientTransactionFree line : 344, idOfClient : "
