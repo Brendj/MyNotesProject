@@ -104,7 +104,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 builder.setReportProperties(buildProperties());
-                items = builder.createDataSource(persistenceSession);
+                items = builder.createDataSource(persistenceSession, inBufet, inComplex);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {
@@ -169,12 +169,28 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
 
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFilename = "dishARMReport.jasper";
+        String templateShortFilename;
+        if (inBufet && inComplex) {
+            templateShortFilename = "dishARMReport_full.jasper";
+        } else
+        {
+            if (!inBufet && !inComplex) {
+                templateShortFilename = "dishARMReport.jasper";
+            } else {
+                if (inBufet && !inComplex)
+                    templateShortFilename = "dishARMReport_menu.jasper";
+                else
+                    templateShortFilename = "dishARMReport_complex.jasper";
+            }
+        }
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
             return null;
         }
+
+
+
         return templateFilename;
     }
 

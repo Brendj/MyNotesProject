@@ -98,18 +98,30 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
+            Boolean bufet;
+            try {
+                bufet = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_BUFET));
+            } catch (Exception e) {
+                bufet = false;
+            }
+            Boolean incomplex;
+            try {
+                incomplex = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_COMPLEX));
+            } catch (Exception e) {
+                incomplex = false;
+            }
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    new JRBeanCollectionDataSource(createDataSource(session)));
+                    new JRBeanCollectionDataSource(createDataSource(session, bufet, incomplex)));
             Date generateEndTime = new Date();
             return new DishMenuWebArmPPReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, null);
         }
 
-        public List<DishMenuWebArmPPItem> createDataSource(Session session) {
+        public List<DishMenuWebArmPPItem> createDataSource(Session session, boolean bufet, boolean incomplex) {
             List<DishMenuWebArmPPItem> dishMenuWebArmPPItems = new ArrayList<>();
 
             List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
@@ -142,19 +154,6 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                 }
             } catch (Exception e) {
                 archived = null;
-            }
-
-            Boolean bufet;
-            try {
-                bufet = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_BUFET));
-            } catch (Exception e) {
-                bufet = false;
-            }
-            Boolean incomplex;
-            try {
-                incomplex = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_COMPLEX));
-            } catch (Exception e) {
-                incomplex = false;
             }
 
             String filterOrgs = "";
