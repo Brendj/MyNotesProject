@@ -10,18 +10,16 @@ import ru.iteco.msp.service.SupplyMSPService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @Component
@@ -33,9 +31,6 @@ public class SupplyTaskExecutor {
     private final CronTrigger supplyCronTrigger;
     private final ThreadPoolTaskScheduler threadPoolSupplyTaskScheduler;
     private final KafkaService kafkaService;
-
-    @Value("${spring.profiles.active}")
-    private String activeProfile;
 
     public SupplyTaskExecutor(
             CronTrigger supplyCronTrigger,
@@ -60,13 +55,12 @@ public class SupplyTaskExecutor {
             Date begin;
             Date end;
             try {
-                if(activeProfile.contains("dev")){
-                    begin = getStartOfPeriod();
-                    end = getEndOfPeriod();
-                } else {
-                    begin = getStartOfPreviousMonth();
-                    end = getEndOfPreviousMonth();
-                }
+                end = new Date();
+                Date next = supplyCronTrigger.nextExecutionTime(new SimpleTriggerContext());
+                long delta = next.getTime() - end.getTime();
+                begin = new Date(end.getTime() - delta);
+                next = null;
+
                 Integer allRows = supplyMSPService.countOrders(begin, end);
 
                 if(allRows.equals(0)){
@@ -88,41 +82,6 @@ public class SupplyTaskExecutor {
             } catch (Exception e) {
                 log.error("Critical error in process sending supply MSP info, task interrupt", e);
             }
-        }
-
-        private Date getStartOfPreviousMonth() {
-            Calendar calendar = GregorianCalendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.add(Calendar.MONTH, -1);
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            return calendar.getTime();
-        }
-
-        private Date getEndOfPreviousMonth() {
-            Calendar calendar = GregorianCalendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.MILLISECOND, -1);
-            return calendar.getTime();
-        }
-
-        private Date getStartOfPeriod() {
-            Calendar calendar = GregorianCalendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.add(Calendar.MINUTE, -5);
-            return calendar.getTime();
-        }
-
-        private Date getEndOfPeriod() {
-            return new Date();
         }
     }
 }
