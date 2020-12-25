@@ -1052,6 +1052,9 @@
                                 label="Группы блюд" action="#{groupItemCatalogListPage.show}"
                                 reRender="workspaceForm" />--%>
         </rich:panelMenuGroup>
+        <%--@elvariable id="wtSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.WtSettingsReportPage"--%>
+        <rich:panelMenuItem id="wtSettingsReport" binding="#{wtSettingsReportPage.mainMenuComponent}"
+                            label="Настройки" action="#{wtSettingsReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 

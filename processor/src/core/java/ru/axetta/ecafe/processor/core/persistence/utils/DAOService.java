@@ -2578,6 +2578,14 @@ public class DAOService {
         return (String) list.get(0);
     }
 
+    public Integer getWtDaysForbid() {
+        try {
+            return new Integer(getOnlineOptionValue(Option.OPTION_WT_DAYS_FORBID));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     @Transactional
     public String getReviseLastDate() {
         try {

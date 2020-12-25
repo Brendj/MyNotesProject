@@ -180,7 +180,8 @@ public class Option {
             OPTION_CARD_AUTOBLOCK = 100210,
             OPTION_CARD_AUTOBLOCK_NODE = 100211,
             OPTION_CARD_AUTOBLOCK_DAYS = 100212,
-            OPTION_ENABLE_NOTIFICATIONS_SPECIAL = 100213;
+            OPTION_ENABLE_NOTIFICATIONS_SPECIAL = 100213,
+            OPTION_WT_DAYS_FORBID = 100214;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -332,7 +333,8 @@ public class Option {
             OPTION_CARD_AUTOBLOCK, "0 0 3 ? * 1",
             OPTION_CARD_AUTOBLOCK_NODE, "1001",
             OPTION_CARD_AUTOBLOCK_DAYS, "180",
-            OPTION_ENABLE_NOTIFICATIONS_SPECIAL, "1"
+            OPTION_ENABLE_NOTIFICATIONS_SPECIAL, "1",
+            OPTION_WT_DAYS_FORBID, "2"
 };
 
     private Long idOfOption;
