@@ -92,16 +92,16 @@
                     <h:outputText styleClass="output-text" value="#{sale.qty}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.sumPrice}" />
+                    <h:outputText styleClass="output-text" value="#{sale.sumPriceStr}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.discountForReport}" />
+                    <h:outputText styleClass="output-text" value="#{sale.discountStr}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sale.qtyDiscount}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.total}" />
+                    <h:outputText styleClass="output-text" value="#{sale.totalStr}" />
                 </rich:column>
                 <rich:column styleClass="center-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sale.firstTimeSale}" converter="timeConverter"/>
