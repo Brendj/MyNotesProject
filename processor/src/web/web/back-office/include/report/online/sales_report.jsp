@@ -63,6 +63,9 @@
                         <h:outputText styleClass="column-header" escape="true" value="Сумма скидки" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
+                        <h:outputText styleClass="column-header" escape="true" value="Количество со скидкой" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Итоговая сумма" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
@@ -93,6 +96,9 @@
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sale.sumPriceDiscount}" />
+                </rich:column>
+                <rich:column styleClass="right-aligned-column">
+                    <h:outputText styleClass="output-text" value="#{sale.discountForReport}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sale.total}" />
