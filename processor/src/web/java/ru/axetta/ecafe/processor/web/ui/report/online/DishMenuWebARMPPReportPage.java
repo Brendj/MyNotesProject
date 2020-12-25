@@ -55,6 +55,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
     private Long selectidTypeFoodId;
     private Long selectidAgeGroup;
     private Boolean archived = false;
+    private Boolean inBufet = false;
+    private Boolean inComplex = false;
 
     private String contragentFilter = "Не выбрано";
     private String complexFilter = "Не выбрано";
@@ -120,20 +122,14 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
         if (templateFilename != null) {
-            DetailedEnterEventReport.Builder builder = new DetailedEnterEventReport.Builder(templateFilename);
+            DishMenuWebArmPPReport.Builder builder = new DishMenuWebArmPPReport.Builder(templateFilename);
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             BasicReportJob report = null;
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-
-                if (idOfOrg == null) {
-                    printError(String.format("Выберите организацию "));
-                }
-
-                //builder.setReportProperties(buildProperties(persistenceSession));
-
+                builder.setReportProperties(buildProperties());
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -154,7 +150,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
                     facesContext.getResponseComplete();
                     facesContext.responseComplete();
                     response.setContentType("application/xls");
-                    response.setHeader("Content-disposition", "inline;filename=DetailedEnterEventReport.xls");
+                    response.setHeader("Content-disposition", "inline;filename=DishMenuReport.xls");
                     JRXlsExporter xlsExporter = new JRXlsExporter();
                     xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
                     xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
@@ -173,7 +169,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
 
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFilename = "DetailedEnterEventReport.jasper";
+        String templateShortFilename = "dishARMReport.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
@@ -209,6 +205,10 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         }
         properties
                 .setProperty(DishMenuWebArmPPReport.P_ARCHIVED, Boolean.toString(archived));
+        properties
+                .setProperty(DishMenuWebArmPPReport.P_BUFET, Boolean.toString(inBufet));
+        properties
+                .setProperty(DishMenuWebArmPPReport.P_COMPLEX, Boolean.toString(inComplex));
 
         return properties;
     }
@@ -352,6 +352,22 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
 
     public void setComplexItems(List<ComplexItem> complexItems) {
         this.complexItems = complexItems;
+    }
+
+    public Boolean getInBufet() {
+        return inBufet;
+    }
+
+    public void setInBufet(Boolean inBufet) {
+        this.inBufet = inBufet;
+    }
+
+    public Boolean getInComplex() {
+        return inComplex;
+    }
+
+    public void setInComplex(Boolean inComplex) {
+        this.inComplex = inComplex;
     }
 
     public static class ContragentItem {

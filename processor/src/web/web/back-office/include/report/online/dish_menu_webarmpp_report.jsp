@@ -68,6 +68,12 @@
         <h:outputText styleClass="output-text" escape="true" value="Архивные" />
         <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.archived}"/>
 
+        <h:outputText styleClass="output-text" escape="true" value="Нахождение в меню буфета" />
+        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.inBufet}"/>
+
+        <h:outputText styleClass="output-text" escape="true" value="Нахождение в комплексном меню" />
+        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.inComplex}"/>
+
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Построить отчет" action="#{mainPage.dishMenuReportWebArmPP.buildReportHTML}"
                                reRender="dishMenuWabARMPPReportPanel" styleClass="command-button"
@@ -213,6 +219,21 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                 </f:facet>
                 <h:outputText value="#{dishElement.barcode}" styleClass="output-text" />
             </rich:column>
+
+            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inBufet}">
+                <f:facet name="header">
+                    <h:outputText value="Нахождение в буфете" />
+                </f:facet>
+                <h:outputText value="#{dishElement.countInMenu}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inComplex}">
+                <f:facet name="header">
+                    <h:outputText value="Нахождение в комплексе" />
+                </f:facet>
+                <h:outputText value="#{dishElement.countInComplex}" styleClass="output-text" />
+            </rich:column>
+
             <f:facet name="footer">
                 <rich:datascroller for="dishMenuWabARMPPReportTable" renderIfSinglePage="false" maxPages="10"
                                    fastControls="hide" stepControls="auto" boundaryControls="hide">

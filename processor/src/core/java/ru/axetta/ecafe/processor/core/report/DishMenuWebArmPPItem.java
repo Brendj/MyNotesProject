@@ -25,6 +25,8 @@ public class DishMenuWebArmPPItem {
     private String fat;
     private String carbohydrates;
     private String barcode;
+    private String countInMenu;
+    private String countInComplex;
 
     public String getCodeISPP() {
         return codeISPP;
@@ -168,5 +170,21 @@ public class DishMenuWebArmPPItem {
 
     public void setDateTo(Date dateTo) {
         this.dateTo = dateTo;
+    }
+
+    public String getCountInMenu() {
+        return countInMenu;
+    }
+
+    public void setCountInMenu(String countInMenu) {
+        this.countInMenu = countInMenu;
+    }
+
+    public String getCountInComplex() {
+        return countInComplex;
+    }
+
+    public void setCountInComplex(String countInComplex) {
+        this.countInComplex = countInComplex;
     }
 }
