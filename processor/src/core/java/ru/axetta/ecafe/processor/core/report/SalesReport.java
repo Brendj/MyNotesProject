@@ -49,7 +49,7 @@ public class SalesReport extends BasicReport {
                         + " od.discount, sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate), sum(case when od.discount > 0 then od.qty else 0 end) "
                         + "from CF_Orders o join CF_OrderDetails od on (o.idOfOrder = od.idOfOrder and o.idOfOrg = od.idOfOrg) "
                         + "                 join CF_Orgs org on (org.idOfOrg = od.idOfOrg) \n"
-                        + "where o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate and od.menuType = :menuType "
+                        + "where o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate and (od.menuType = :menuType or od.menuType between :cmin and :cmax) "
                         + "  and o.state=0 and od.state=0 and (org.idOfOrg in (:orgs) or org.idOfOrg in "
                         + "  (select me.IdOfDestOrg from CF_MenuExchangeRules me where me.IdOfSourceOrg in (:destOrgs))) "
                         + "group by org.shortnameinfoservice, od.menuDetailName, od.rPrice, od.discount, od.qty "
@@ -60,6 +60,8 @@ public class SalesReport extends BasicReport {
                 query.setLong("fromCreatedDate", startDateLong);
                 query.setLong("toCreatedDate", endDateLong);
                 query.setInteger("menuType", OrderDetail.TYPE_DISH_ITEM);
+                query.setInteger("cmin", OrderDetail.TYPE_COMPLEX_MIN);
+                query.setInteger("cmax", OrderDetail.TYPE_COMPLEX_MAX);
                 query.setParameterList("orgs", idOfOrgList);
                 query.setParameterList("destOrgs", idOfOrgList);
 
