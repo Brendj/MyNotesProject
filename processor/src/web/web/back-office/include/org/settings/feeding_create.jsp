@@ -18,6 +18,14 @@
         <h:outputText escape="true" value="Сумма лимита" styleClass="output-text" />
         <h:inputText value="#{mainPage.feedingSettingCreatePage.limit}" styleClass="output-text long-field" converter="copeckSumConverter"/>
 
+        <h:outputText escape="true" value="Сумма скидки" styleClass="output-text" />
+        <h:inputText value="#{mainPage.feedingSettingCreatePage.discount}" styleClass="output-text long-field" converter="copeckSumConverter"/>
+
+        <h:outputText escape="true" value="Учитывать скидку при оплате платного плана" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.feedingSettingCreatePage.useDiscount}" styleClass="output-text">
+            <a4j:support event="onchange" reRender="feedingSettingCreatePage" />
+        </h:selectBooleanCheckbox>
+
         <h:outputText escape="true" value="Список организаций" styleClass="output-text" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"

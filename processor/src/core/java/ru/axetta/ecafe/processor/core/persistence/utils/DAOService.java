@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2578,6 +2578,14 @@ public class DAOService {
         return (String) list.get(0);
     }
 
+    public Integer getWtDaysForbid() {
+        try {
+            return new Integer(getOnlineOptionValue(Option.OPTION_WT_DAYS_FORBID));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     @Transactional
     public String getReviseLastDate() {
         try {
@@ -2600,6 +2608,15 @@ public class DAOService {
     public String getDeletedLastedDateMenu() {
         try {
             return getOnlineOptionValue(Option.OPTION_LAST_DELATED_DATE_MENU);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Transactional
+    public String getLastProcessedWtComplex() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_LAST_PROCESSED_WT_COMPLEX);
         } catch (Exception e) {
             return "";
         }

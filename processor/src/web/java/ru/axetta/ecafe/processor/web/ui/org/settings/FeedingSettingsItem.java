@@ -15,6 +15,8 @@ public class FeedingSettingsItem {
     private long idOfSetting;
     private String settingName;
     private Long limit;
+    private Long discount;
+    private Boolean useDiscount;
     private Date lastUpdate;
     private String userName;
 
@@ -22,8 +24,14 @@ public class FeedingSettingsItem {
         idOfSetting = setting.getIdOfSetting();
         settingName = setting.getSettingName();
         limit = setting.getLimit();
+        discount = setting.getDiscount();
+        useDiscount = setting.getUseDiscount();
         lastUpdate = setting.getLastUpdate();
         userName = setting.getUser().getUserName();
+    }
+
+    public String getUseDiscountString() {
+        return useDiscount ? "Да" : "Нет";
     }
 
     public long getIdOfSetting() {
@@ -64,5 +72,13 @@ public class FeedingSettingsItem {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public Long getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Long discount) {
+        this.discount = discount;
     }
 }
