@@ -51,16 +51,7 @@
                         <h:outputText styleClass="column-header" escape="true" value="Название" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Выход" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Вид производства" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Цена за ед"  />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Скидка на ед" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Количество" />
@@ -92,16 +83,7 @@
                     <h:outputText styleClass="output-text" value="#{sale.menuDetailName}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.menuOutput}" />
-                </rich:column>
-                <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.menuOrigin}" />
-                </rich:column>
-                <rich:column styleClass="right-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sale.rPrice}" />
-                </rich:column>
-                <rich:column styleClass="right-aligned-column">
-                    <h:outputText styleClass="output-text" value="#{sale.discount}" />
                 </rich:column>
                 <rich:column styleClass="right-aligned-column">
                     <h:outputText styleClass="output-text" value="#{sale.qty}" />

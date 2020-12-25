@@ -10,10 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  *  Онлайн отчеты -> Отчет по продажам
@@ -48,15 +45,15 @@ public class SalesReport extends BasicReport {
             List<SalesItem> salesItems = new ArrayList<SalesItem>();
             if (!idOfOrgList.isEmpty()) {
                 String preparedQuery =
-                          "select org.officialName, od.MenuDetailName, od.MenuOutput, od.MenuOrigin, od.rPrice, "
-                        + " od.discount, sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate) "
+                          "select org.shortnameinfoservice, od.MenuDetailName, od.rPrice, "
+                        + " od.discount, sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate), case when od.discount > 0 then sum(od.qty) else 0 end "
                         + "from CF_Orders o join CF_OrderDetails od on (o.idOfOrder = od.idOfOrder and o.idOfOrg = od.idOfOrg) "
                         + "                 join CF_Orgs org on (org.idOfOrg = od.idOfOrg) \n"
                         + "where o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate and od.menuType = :menuType "
                         + "  and o.state=0 and od.state=0 and (org.idOfOrg in (:orgs) or org.idOfOrg in "
                         + "  (select me.IdOfDestOrg from CF_MenuExchangeRules me where me.IdOfSourceOrg in (:destOrgs))) "
-                        + "group by org.officialName, od.menuDetailName, od.MenuOrigin, od.rPrice, od.MenuOutput, od.discount "
-                        + "order by org.officialName, od.MenuOrigin, od.menuDetailName";
+                        + "group by org.shortnameinfoservice, od.menuDetailName, od.rPrice, od.discount "
+                        + "order by org.shortnameinfoservice, od.menuDetailName";
                 Query query = session.createSQLQuery(preparedQuery);
                 long startDateLong = startDate.getTime();
                 long endDateLong = endDate.getTime();
@@ -67,20 +64,25 @@ public class SalesReport extends BasicReport {
                 query.setParameterList("destOrgs", idOfOrgList);
 
                 List resultList = query.list();
+                Map<String, SalesItem> map = new HashMap<>();
 
                 for (Object result : resultList) {
                     Object[] sale = (Object[]) result;
                     String officialName = (String) sale[0];
                     String menuDetailName = (String) sale[1];
-                    String menuOutput = (String) sale[2];
-                    Integer menuOrigin = (Integer) sale[3];
-                    Long rPrice = ((BigInteger) sale[4]).longValue();
-                    Long discount = ((BigInteger) sale[5]).longValue();
-                    Long qty = ((BigInteger) sale[6]).longValue();
-                    Date firstTimeSale = new Date(((BigInteger) sale[7]).longValue());
-                    Date lastTimeSale = new Date(((BigInteger) sale[8]).longValue());
-                    SalesItem salesItem = new SalesItem(officialName, menuDetailName, menuOutput, menuOrigin, rPrice,
-                            discount, qty, firstTimeSale, lastTimeSale);
+                    Long rPrice = ((BigInteger) sale[2]).longValue();
+                    Long discount = ((BigInteger) sale[3]).longValue();
+                    Long qty = ((BigInteger) sale[4]).longValue();
+                    Date firstTimeSale = new Date(((BigInteger) sale[5]).longValue());
+                    Date lastTimeSale = new Date(((BigInteger) sale[6]).longValue());
+                    Long qtyDiscount = ((BigInteger) sale[7]).longValue();
+                    String key = menuDetailName + rPrice;
+                    SalesItem salesItem = map.get(key);
+                    if (salesItem == null) {
+                        salesItem = new SalesItem(officialName, menuDetailName, rPrice, discount, qty, firstTimeSale,
+                                lastTimeSale, qtyDiscount);
+                    }
+                    salesItem.getDiscountSet().add(discount);
                     salesItems.add(salesItem);
                 }
             }
@@ -103,8 +105,6 @@ public class SalesReport extends BasicReport {
 
         private final String officialName; // Название организации
         private final String menuDetailName; // Название
-        private final String menuOutput; //Выход
-        private final Integer menuOrigin; // Вид производства,
         private final String rPrice; // Цена за ед
         private final String discount; // Скидка на ед
         private final Long qty; // Кол-во
@@ -113,6 +113,8 @@ public class SalesReport extends BasicReport {
         private final String total; // Итоговая сумма
         private final Date firstTimeSale; // Время первой продажи
         private final Date lastTimeSale; // Время последней продажи
+        private final Set<Long> discountSet = new HashSet<>();
+        private final Long qtyDiscount;
 
         public String getOfficialName() {
             return officialName;
@@ -120,14 +122,6 @@ public class SalesReport extends BasicReport {
 
         public String getMenuDetailName() {
             return menuDetailName;
-        }
-
-        public String getMenuOutput() {
-            return menuOutput;
-        }
-
-        public Integer getMenuOrigin() {
-            return menuOrigin;
         }
 
         public String getrPrice() {
@@ -162,12 +156,19 @@ public class SalesReport extends BasicReport {
             return lastTimeSale;
         }
 
-        public SalesItem(String officialName, String menuDetailName, String menuOutput, Integer menuOrigin, Long rPrice,
-                Long discount, Long qty, Date firstTimeSale, Date lastTimeSale) {
+        public String getDiscountForReport() {
+            String result = "";
+            for (Long d : discountSet) {
+                result += longToMoney(d) + " + ";
+            }
+            if (result.length() > 0) result = result.substring(0, result.length() - 3);
+            return result;
+        }
+
+        public SalesItem(String officialName, String menuDetailName, Long rPrice,
+                Long discount, Long qty, Date firstTimeSale, Date lastTimeSale, Long qtyDiscount) {
             this.officialName = officialName;
             this.menuDetailName = menuDetailName;
-            this.menuOutput = menuOutput;
-            this.menuOrigin = menuOrigin;
             this.rPrice = longToMoney(rPrice + discount);
             this.discount = longToMoney(discount);
             this.qty = qty;
@@ -176,6 +177,15 @@ public class SalesReport extends BasicReport {
             this.total = longToMoney(rPrice * qty);
             this.firstTimeSale = firstTimeSale;
             this.lastTimeSale = lastTimeSale;
+            this.qtyDiscount = qtyDiscount;
+        }
+
+        public Long getQtyDiscount() {
+            return qtyDiscount;
+        }
+
+        public Set<Long> getDiscountSet() {
+            return discountSet;
         }
     }
 
