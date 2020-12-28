@@ -402,6 +402,16 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         complexIds = ids.toString();
     }
 
+    public String getColourForSell(DishMenuWebArmPPItem dishMenuWebArmPPItem)
+    {
+        if (dishMenuWebArmPPItem.getArchived() == 1)
+        {
+            return "background: #cccccc;";
+        }
+        else
+            return "";
+    }
+
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
     }

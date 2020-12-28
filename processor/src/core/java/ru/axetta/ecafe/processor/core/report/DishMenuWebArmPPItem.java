@@ -27,6 +27,7 @@ public class DishMenuWebArmPPItem {
     private String barcode;
     private String countInMenu;
     private String countInComplex;
+    private Integer archived;
 
     public String getCodeISPP() {
         return codeISPP;
@@ -186,5 +187,13 @@ public class DishMenuWebArmPPItem {
 
     public void setIdsupplier(String idsupplier) {
         this.idsupplier = idsupplier;
+    }
+
+    public Integer getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Integer archived) {
+        this.archived = archived;
     }
 }
