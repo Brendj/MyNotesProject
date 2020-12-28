@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dishARMReport" pageWidth="2100" pageHeight="500" columnWidth="2060" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="7ab631b4-7dde-4abc-a0cc-1be46a7db70f">
 	<property name="ireport.zoom" value="1.0000000000000144"/>
-	<property name="ireport.x" value="1333"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<field name="codeISPP" class="java.lang.String"/>
 	<field name="dishname" class="java.lang.String"/>
 	<field name="componentsofdish" class="java.lang.String"/>
-	<field name="idcontragent" class="java.lang.String"/>
+	<field name="idsupplier" class="java.lang.String"/>
 	<field name="price" class="java.lang.String"/>
 	<field name="dateFrom" class="java.util.Date"/>
 	<field name="dateTo" class="java.util.Date"/>
@@ -389,7 +389,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{idcontragent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{idsupplier}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="1028" y="0" width="136" height="59" uuid="0a50fd17-7bda-42c1-91e3-20f36018b944"/>
