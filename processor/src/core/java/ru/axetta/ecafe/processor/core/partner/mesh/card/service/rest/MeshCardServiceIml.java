@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshRestClient;
+import ru.axetta.ecafe.processor.core.partner.mesh.MeshUnprocessableEntityException;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.CardPropertiesEnum;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Parameter;
@@ -14,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,9 @@ public class MeshCardServiceIml implements MeshCardService {
             byte[] response = meshRestClient.executeCreateCategory(card.getClient().getMeshGUID(), json);
             Category responseCategory = ob.readValue(response, Category.class);
             refCardClient = MeshClientCardRef.build(card, responseCategory.getId());
+        } catch (MeshUnprocessableEntityException e) {
+            refCardClient = MeshClientCardRef.build(card, null);
+            log.error(String.format("Cardno=%s got status %s", card.getCardNo(), HttpStatus.SC_UNPROCESSABLE_ENTITY));
         } catch (Exception e){
             refCardClient = MeshClientCardRef.build(card, null);
             log.error("Exception, when send POST-request", e);

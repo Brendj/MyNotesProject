@@ -1052,6 +1052,9 @@
                                 label="Группы блюд" action="#{groupItemCatalogListPage.show}"
                                 reRender="workspaceForm" />--%>
         </rich:panelMenuGroup>
+        <%--@elvariable id="wtSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.WtSettingsReportPage"--%>
+        <rich:panelMenuItem id="wtSettingsReport" binding="#{wtSettingsReportPage.mainMenuComponent}"
+                            label="Настройки" action="#{wtSettingsReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
@@ -1563,7 +1566,15 @@
                             label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                             reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
     </rich:panelMenuGroup>
+    <%--@elvariable id="menuReportsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.MenuReportsPage"--%>
+    <rich:panelMenuGroup id="menuReportsPage" binding="#{menuReportsPage.mainMenuComponent}"
+                         label="Отчет по меню">
+        <a4j:support event="onclick" action="#{menuReportsPage.show}" reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="dishMenuReport" binding="#{mainPage.dishMenuReportWebArmPP.mainMenuComponent}"
+                            label="Отчет по блюдам" action="#{mainPage.showDishMenuWebARMPPReportPage}"
+                            reRender="workspaceForm" />
+    </rich:panelMenuGroup>
     <%--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"--%>
     <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"
                          rendered="#{mainPage.eligibleToViewHelpdesk}">
@@ -1941,6 +1952,23 @@
 
 </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="codeMSPGroupMenu" binding="#{mainPage.codeMSPGroupPage.mainMenuComponent}"
+                         label="Справочник кодов МСП" rendered="#{mainPage.eligibleToViewRule}">
+        <a4j:support event="onclick" action="#{mainPage.showRuleGroupPage}" reRender="workspaceForm"/>
+        <%--@elvariable id="codeMSPCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.msp.CodeMSPCreatePage"--%>
+        <%--@elvariable id="codeMSPEditPage" type="ru.axetta.ecafe.processor.web.ui.option.msp.CodeMSPEditPage"--%>
+        <%--@elvariable id="codeMSPListPage" type="ru.axetta.ecafe.processor.web.ui.option.msp.CodeMSPListPage"--%>
+        <rich:panelMenuItem id="codeMSPListMenuItem" label="Список" binding="#{codeMSPListPage.mainMenuComponent}"
+                            action="#{codeMSPListPage.show}" reRender="workspaceForm"/>
+        <rich:panelMenuGroup id="selectedCodeMSPGroupMenu" label="#{codeMSPEditPage.code}" rendered="false">
+            <rich:panelMenuItem id="editcodeMSPMenuItem" binding="#{codeMSPEditPage.mainMenuComponent}"
+                                label="Редактирование"
+                                action="#{codeMSPEditPage.show}" reRender="workspaceForm"/>
+        </rich:panelMenuGroup>
+        <rich:panelMenuItem id="codeMSPCreateMenuItem" binding="#{codeMSPCreatePage.mainMenuComponent}"
+                            label="Регистрация"
+                            action="#{codeMSPCreatePage.show}" reRender="workspaceForm"/>
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="reportGroupMenu" binding="#{mainPage.reportGroupPage.mainMenuComponent}" label="Отчеты" rendered="#{!mainPage.eligibleToViewUsers}">

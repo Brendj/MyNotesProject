@@ -10994,25 +10994,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Map<String, List> headers = (Map<String, List>) context.getMessageContext().get(Message.PROTOCOL_HEADERS);
             List<String> ssoids = headers.get("User_ssoid");
             String ssoid = "";
-            ssoid = ssoids.get(0).trim();
-            if (!ssoid.isEmpty()) {
-                List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
-                List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
-                for (Client client: clients)
-                {
-                    if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
-                        client.setSsoid(ssoid);
-                        client.setUpdateTime(new Date());
-                        session.update(client);
+            if (ssoids != null && !ssoids.isEmpty()) {
+                ssoid = ssoids.get(0).trim();
+                if (!ssoid.isEmpty()) {
+                    List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
+                    List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
+                    for (Client client : clients) {
+                        if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
+                            client.setSsoid(ssoid);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
                     }
-                }
-                for (Client client: clientsSsoid)
-                {
-                    if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
-                        client.initClientMobileHistory(clientsMobileHistory);
-                        client.setMobile(cientMobile);
-                        client.setUpdateTime(new Date());
-                        session.update(client);
+                    for (Client client : clientsSsoid) {
+                        if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
+                            client.initClientMobileHistory(clientsMobileHistory);
+                            client.setMobile(cientMobile);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
                     }
                 }
             }

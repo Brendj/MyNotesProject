@@ -4,10 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,6 +76,7 @@ public class DiscountRule {
     private String complexesMap;
     private String subCategory;
     private Boolean deletedState;
+    private CodeMSP codeMSP;
 
     public String getComplexesMap() {
         return complexesMap;
@@ -128,6 +125,13 @@ public class DiscountRule {
         }
     }
 
+    public CodeMSP getCodeMSP() {
+        return codeMSP;
+    }
+
+    public void setCodeMSP(CodeMSP codeMSP) {
+        this.codeMSP = codeMSP;
+    }
 
     public Set<CategoryOrg> getCategoryOrgs() {
         return getCategoryOrgsInternal();

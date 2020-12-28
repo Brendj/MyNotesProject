@@ -356,7 +356,7 @@ public class EMPProcessor {
                 else if ((oldMsisdn != null) && (mobile == null)) {
                     cl.initClientMobileHistory(clientsMobileHistory);
                     cl.setMobile("");
-                    cl.setSsoid("");
+                    //cl.setSsoid("");
                 }
                 DAOService.getInstance().saveEntity(cl);
             }

@@ -956,10 +956,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setFlags(this.flags);
         client.setAddress(this.address);
         client.setPhone(this.phone);
-        //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-        if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
-            client.setSsoid("");
-        }
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Изменение клиента через редактирование");
         User user = MainPage.getSessionInstance().getCurrentUser();
@@ -968,10 +964,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile(mobile);
         client.setFax(this.fax);
-        //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-        if (client != null && client.getEmail() != null && !client.getEmail().equals(this.email)) {
-            client.setSsoid("");
-        }
         client.setEmail(this.email);
         client.setNotifyViaEmail(this.notifyViaEmail);
         client.setNotifyViaSMS(this.notifyViaSMS);

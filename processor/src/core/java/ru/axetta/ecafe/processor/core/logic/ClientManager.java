@@ -399,10 +399,6 @@ public class ClientManager {
                 if (mobilePhone == null) {
                     throw new Exception("Неправильный формат мобильного телефона");
                 }
-                //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if(client != null && client.getMobile() != null && !client.getMobile().equals(mobilePhone)) {
-                    client.setSsoid("");
-                }
                 client.initClientMobileHistory(clientsMobileHistory);
                 client.setMobile(mobilePhone);
                 logger.info("class : ClientManager, method : modifyClientTransactionFree line : 358, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
@@ -418,10 +414,6 @@ public class ClientManager {
             //tokens[15]);
             String email = fieldConfig.getValue(ClientManager.FieldId.EMAIL);
             if (email != null && StringUtils.isNotEmpty(email) && !RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT)) {
-                //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if(client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
-                    client.setSsoid("");
-                }
                 client.setEmail(email);
             }
             //tokens[16])

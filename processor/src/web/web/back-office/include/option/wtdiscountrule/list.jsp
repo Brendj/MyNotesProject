@@ -98,6 +98,9 @@
                     <h:outputText value="Тип условия" escape="true" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="Код МСП" escape="true" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="center-aligned-column">
                     <h:outputText value="Редактировать" escape="true" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
@@ -126,7 +129,9 @@
         <rich:column>
             <h:outputText value="#{item.operationor?'ИЛИ':'И'}"/>
         </rich:column>
-
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.codeMSP}"/>
+        </rich:column>
         <rich:column>
             <a4j:commandLink reRender="workspaceForm" action="#{wtRuleEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>

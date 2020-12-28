@@ -272,10 +272,19 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
         private List<CategoryDiscount> categoryDiscountList;
         private List<CategoryOrg> categoryOrgList;
         private String subCategory;
+        private String codeMSP;
         private int priority;
 
         public WtDiscountRule getWtEntity() {
             return wtEntity;
+        }
+
+        public String getCodeMSP() {
+            return codeMSP;
+        }
+
+        public void setCodeMSP(String codeMSP) {
+            this.codeMSP = codeMSP;
         }
 
         public void setWtEntity(WtDiscountRule wtEntity) {
@@ -360,6 +369,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
             this.description = wtDiscountRule.getDescription();
             this.priority = wtDiscountRule.getPriority();
             this.operationor = wtDiscountRule.isOperationOr();
+            this.codeMSP = wtDiscountRule.getCodeMSP() == null ? "" : wtDiscountRule.getCodeMSP().getCode().toString();
 
             this.categoryDiscountList = new LinkedList<>();
             if (!wtDiscountRule.getCategoryDiscounts().isEmpty()) {
