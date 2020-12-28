@@ -55,7 +55,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     private List<DishMenuWebArmPPItem> items;
     private Long selectidTypeFoodId;
     private Long selectidAgeGroup;
-    private Boolean archived = false;
+    private Long selectArchived;
     private Boolean inBufet = false;
     private Boolean inComplex = false;
 
@@ -87,6 +87,14 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
             items[n] = new SelectItem(wtAgeGroupItem.getIdOfAgeGroupItem(), wtAgeGroupItem.getDescription());
             ++n;
         }
+        return items;
+    }
+
+    public SelectItem[] getArchiveds() {
+        SelectItem[] items = new SelectItem[3];
+        items[0] = new SelectItem(1, "Без архивных");
+        items[1] = new SelectItem(2, "Включая архивные");
+        items[2] = new SelectItem(3, "Только архивные");
         return items;
     }
 
@@ -222,7 +230,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         if (selectidAgeGroup != -1) {
             properties.setProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP, selectidAgeGroup.toString());
         }
-        properties.setProperty(DishMenuWebArmPPReport.P_ARCHIVED, Boolean.toString(archived));
+        properties.setProperty(DishMenuWebArmPPReport.P_ARCHIVED, selectArchived.toString());
         properties.setProperty(DishMenuWebArmPPReport.P_BUFET, Boolean.toString(inBufet));
         properties.setProperty(DishMenuWebArmPPReport.P_COMPLEX, Boolean.toString(inComplex));
 
@@ -444,14 +452,6 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         this.selectidAgeGroup = selectidAgeGroup;
     }
 
-    public Boolean getArchived() {
-        return archived;
-    }
-
-    public void setArchived(Boolean archived) {
-        this.archived = archived;
-    }
-
     public String getContragentFilter() {
         return contragentFilter;
     }
@@ -506,6 +506,14 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
 
     public void setInComplex(Boolean inComplex) {
         this.inComplex = inComplex;
+    }
+
+    public Long getSelectArchived() {
+        return selectArchived;
+    }
+
+    public void setSelectArchived(Long selectArchived) {
+        this.selectArchived = selectArchived;
     }
 
     public static class ContragentItem {

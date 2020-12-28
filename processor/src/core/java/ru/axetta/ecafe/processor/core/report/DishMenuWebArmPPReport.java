@@ -143,17 +143,11 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             } catch (Exception e) {
                 idAgeGroup = null;
             }
-            Boolean archived;
-            Integer archivedInt = 0;
+            Integer archived = 1;
             try {
-                archived = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_ARCHIVED));
-                if (archived) {
-                    archivedInt = 1;
-                } else {
-                    archivedInt = 0;
-                }
+                archived = Integer.parseInt(reportProperties.getProperty(DishMenuWebArmPPReport.P_ARCHIVED));
             } catch (Exception e) {
-                archived = null;
+                archived = 1;
             }
 
             String filterOrgs = "";
@@ -161,6 +155,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             String filterComplexes = "";
             String filterTypeFoodId = "";
             String filterAgeGroup = "";
+            String filterArchived = "";
             if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
                 for (Long idofOrg : idOfOrgList) {
                     filterOrgs += "'" + idofOrg + "',";
@@ -189,7 +184,20 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                 filterAgeGroup = " and cwag.idofagegroupitem = " + idAgeGroup + " ";
             }
 
-            String fullWhere = " where (cwd.deletestate = 0 or cwd.deletestate = " + archivedInt + " ) "  + filterOrgs
+            if (archived == 1)
+            {
+                filterArchived = " where cwd.deletestate = 0";
+            }
+            if (archived == 2)
+            {
+                filterArchived = " where (cwd.deletestate = 0 or cwd.deletestate = 1) ";
+            }
+            if (archived == 3)
+            {
+                filterArchived = " where cwd.deletestate = 1 ";
+            }
+
+            String fullWhere = filterArchived  + filterOrgs
                     + filterContragent  + filterAgeGroup + filterComplexes;
 
             String sqlQueryBase =

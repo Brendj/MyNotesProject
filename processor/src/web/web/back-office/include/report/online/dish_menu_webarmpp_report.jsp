@@ -66,7 +66,9 @@
         </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Архивные" />
-        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.archived}"/>
+        <h:selectOneMenu value="#{mainPage.dishMenuReportWebArmPP.selectArchived}" >
+            <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getArchiveds()}"/>
+        </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Нахождение в меню буфета" />
         <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.inBufet}"/>
