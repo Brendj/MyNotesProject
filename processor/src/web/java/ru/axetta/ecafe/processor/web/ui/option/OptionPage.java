@@ -91,6 +91,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer syncLimits;
     private Integer simultaneousSyncThreads;
     private Integer simultaneousSyncTimeout;
+    private Integer simultaneousAccIncSyncTimeout;
     private Integer retryAfter;
     private Integer syncLimitFilter;
     private String syncRestrictFullSyncPeriods;
@@ -960,6 +961,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
         simultaneousSyncThreads = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
         simultaneousSyncTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
+        simultaneousAccIncSyncTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
         syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
@@ -1196,6 +1198,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
             runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_THREADS, simultaneousSyncThreads);
             runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT, simultaneousSyncTimeout);
+            runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT, simultaneousAccIncSyncTimeout);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITFILTER, syncLimitFilter);
             runtimeContext.setOptionValue(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS, syncRestrictFullSyncPeriods);
@@ -1458,5 +1461,13 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setEnableNotificationsSpecial(Boolean enableNotificationsSpecial) {
         this.enableNotificationsSpecial = enableNotificationsSpecial;
+    }
+
+    public Integer getSimultaneousAccIncSyncTimeout() {
+        return simultaneousAccIncSyncTimeout;
+    }
+
+    public void setSimultaneousAccIncSyncTimeout(Integer simultaneousAccIncSyncTimeout) {
+        this.simultaneousAccIncSyncTimeout = simultaneousAccIncSyncTimeout;
     }
 }

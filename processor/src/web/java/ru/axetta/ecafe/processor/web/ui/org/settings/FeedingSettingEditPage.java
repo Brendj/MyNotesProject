@@ -28,6 +28,8 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
     private Long idOfSetting;
     private String settingName;
     private Long limit;
+    private Long discount;
+    private Boolean useDiscount;
     private Date lastUpdate;
     private Set<Org> orgs;
     private String userName;
@@ -39,7 +41,9 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
     public void fill(Session session) {
         FeedingSetting setting = (FeedingSetting)session.load(FeedingSetting.class, idOfSetting);
         this.settingName = setting.getSettingName();
-        this.limit = setting.getLimit();
+        this.limit = setting.getLimit() == null ? null : setting.getLimit();
+        this.discount = setting.getDiscount() == null ? null : setting.getDiscount();
+        this.useDiscount = setting.getUseDiscount();
         this.lastUpdate = setting.getLastUpdate();
         this.userName = setting.getUser().getUserName();
         idOfOrgList.clear();
@@ -74,6 +78,14 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
     }
 
     public void updateSetting() {
+        if (limit == 0L) limit = null;
+        if (discount == 0L) discount = null;
+        if (limit == null && discount == null) {
+            printError("Сумма лимита или сумма скидки обязательно должны быть заполнены.");
+            return;
+        }
+        if (discount == null) useDiscount = false;
+
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -82,6 +94,8 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
             FeedingSetting setting = (FeedingSetting)persistenceSession.load(FeedingSetting.class, idOfSetting);
             setting.setSettingName(settingName);
             setting.setLimit(limit);
+            setting.setDiscount(discount);
+            setting.setUseDiscount(useDiscount);
             Set<Org> set = new HashSet<Org>();
             for (Long id : idOfOrgList) {
                 Org org = (Org) persistenceSession.load(Org.class, id);
@@ -174,5 +188,21 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public Long getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Long discount) {
+        this.discount = discount;
+    }
+
+    public Boolean getUseDiscount() {
+        return useDiscount;
+    }
+
+    public void setUseDiscount(Boolean useDiscount) {
+        this.useDiscount = useDiscount;
     }
 }

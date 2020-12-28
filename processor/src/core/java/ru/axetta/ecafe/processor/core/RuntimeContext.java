@@ -164,6 +164,14 @@ public class RuntimeContext implements ApplicationContextAware {
         this.extendCardServiceApiKey = extendCardServiceApiKey;
     }
 
+    public boolean isUseQueueForAllSyncs() {
+        return useQueueForAllSyncs;
+    }
+
+    public void setUseQueueForAllSyncs(boolean useQueueForAllSyncs) {
+        this.useQueueForAllSyncs = useQueueForAllSyncs;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -298,6 +306,7 @@ public class RuntimeContext implements ApplicationContextAware {
     Properties configProperties;
     SchemaVersionInfo currentSchemaVersionInfo;
     private boolean usePriceSms;
+    private boolean useQueueForAllSyncs;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
@@ -793,6 +802,7 @@ public class RuntimeContext implements ApplicationContextAware {
             }
 
             usePriceSms = getPropertiesValue("ecafe.processor.sms.usePrice", "true").equals("true");
+            useQueueForAllSyncs = getPropertiesValue("ecafe.processor.sync.useQueueForAllSyncs", "false").equals("true");
 
             runCheckSums();
 

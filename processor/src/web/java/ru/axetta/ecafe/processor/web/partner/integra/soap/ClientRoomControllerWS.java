@@ -4351,7 +4351,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
 
-        changeSsoid(guardMobile);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getSummaryByGuardMobile");
+        clientsMobileHistory.setShowing("Портал");
+
+        changeSsoid(guardMobile, clientsMobileHistory);
 
         Session session = null;
         try {
@@ -9306,7 +9310,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
 
-        changeSsoid(guardMobile);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getSummaryByGuardMobileMin");
+        clientsMobileHistory.setShowing("Портал");
+        changeSsoid(guardMobile, clientsMobileHistory);
 
         Session session = null;
         Transaction transaction = null;
@@ -9850,7 +9857,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new ClientGroupResult(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
 
-        changeSsoid(mobile);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getTypeClients");
+        clientsMobileHistory.setShowing("Портал");
+
+        changeSsoid(mobile, clientsMobileHistory);
 
         Session session = null;
         Transaction transaction = null;
@@ -10833,34 +10844,36 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private void changeSsoid(String cientMobile)
+    private void changeSsoid(String clientMobile, ClientsMobileHistory clientsMobileHistory)
     {
         Session session = null;
         Transaction transaction = null;
         try {
+            String cientMobile =Client.checkAndConvertMobile(clientMobile);
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Map<String, List> headers = (Map<String, List>) context.getMessageContext().get(Message.PROTOCOL_HEADERS);
             List<String> ssoids = headers.get("User_ssoid");
             String ssoid = "";
-            ssoid = ssoids.get(0).trim();
-            if (!ssoid.isEmpty()) {
-                List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
-                List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
-                for (Client client: clients)
-                {
-                    if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
-                        client.setSsoid(ssoid);
-                        client.setUpdateTime(new Date());
-                        session.update(client);
+            if (ssoids != null && !ssoids.isEmpty()) {
+                ssoid = ssoids.get(0).trim();
+                if (!ssoid.isEmpty()) {
+                    List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
+                    List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
+                    for (Client client : clients) {
+                        if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
+                            client.setSsoid(ssoid);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
                     }
-                }
-                for (Client client: clientsSsoid)
-                {
-                    if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
-                        client.setMobile(cientMobile);
-                        client.setUpdateTime(new Date());
-                        session.update(client);
+                    for (Client client : clientsSsoid) {
+                        if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
+                            client.initClientMobileHistory(clientsMobileHistory);
+                            client.setMobile(cientMobile);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
                     }
                 }
             }
@@ -10868,7 +10881,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction = null;
         } catch (Exception e) {
             logger.error(String.format("Error work with ssoid. guardMobile = %s",
-                    cientMobile), e);
+                    clientMobile), e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

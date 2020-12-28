@@ -39,6 +39,7 @@ public class Option {
             OPTION_RESTRICT_FULL_SYNC_PERIODS=18,
             OPTION_SIMULTANEOUS_SYNC_THREADS=19,
             OPTION_SIMULTANEOUS_SYNC_TIMEOUT=20,
+            OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT=21,
 
             OPTION_CHRONOPAY_SECTION=1000,
             OPTION_CHRONOPAY_RATE=1001,
@@ -78,6 +79,8 @@ public class Option {
             OPTION_BENEFITS_RECALC_ON=10021,
             OPTION_MSK_NSI_AUTOSYNC_ON =10022,
             OPTION_MSK_NSI_AUTOSYNC_UPD_TIME =10023,
+            OPTION_LAST_PROCESSED_WT_COMPLEX = 10024,
+
             OPTION_MSK_NSI_URL=100024,
             OPTION_MSK_NSI_USER=100025,
             OPTION_MSK_NSI_PASSWORD=100026,
@@ -178,7 +181,8 @@ public class Option {
             OPTION_CARD_AUTOBLOCK = 100210,
             OPTION_CARD_AUTOBLOCK_NODE = 100211,
             OPTION_CARD_AUTOBLOCK_DAYS = 100212,
-            OPTION_ENABLE_NOTIFICATIONS_SPECIAL = 100213;
+            OPTION_ENABLE_NOTIFICATIONS_SPECIAL = 100213,
+            OPTION_WT_DAYS_FORBID = 100214;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -198,6 +202,7 @@ public class Option {
             OPTION_RESTRICT_FULL_SYNC_PERIODS, "",
             OPTION_SIMULTANEOUS_SYNC_THREADS, "50",
             OPTION_SIMULTANEOUS_SYNC_TIMEOUT, "20",
+            OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT, "5",
             OPTION_SMPP_CLIENT_STATUS, "0",
             OPTION_CHRONOPAY_SECTION, "1", 
             OPTION_RBK_SECTION, "1", 
@@ -231,6 +236,7 @@ public class Option {
             OPTION_PROJECT_STATE_REPORT_ON, "0",
             OPTION_EXTERNAL_URL, "http://localhost:8080",
             OPTION_BENEFITS_RECALC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_UPD_TIME, null,
+            OPTION_LAST_PROCESSED_WT_COMPLEX, "0",
             OPTION_MSK_NSI_URL, "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService",
             OPTION_MSK_NSI_WSDL_URL, "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl",
             OPTION_MSK_NSI_USER, "UEK_SOAP",
@@ -329,7 +335,8 @@ public class Option {
             OPTION_CARD_AUTOBLOCK, "0 0 3 ? * 1",
             OPTION_CARD_AUTOBLOCK_NODE, "1001",
             OPTION_CARD_AUTOBLOCK_DAYS, "180",
-            OPTION_ENABLE_NOTIFICATIONS_SPECIAL, "1"
+            OPTION_ENABLE_NOTIFICATIONS_SPECIAL, "1",
+            OPTION_WT_DAYS_FORBID, "2"
 };
 
     private Long idOfOption;

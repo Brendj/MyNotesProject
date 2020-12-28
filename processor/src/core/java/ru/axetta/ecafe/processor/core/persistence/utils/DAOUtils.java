@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -5371,9 +5371,10 @@ public class DAOUtils {
                 + " left join crd.meshCardClientRef as ref "
                 + " where (crd.client.meshGUID not like '' and crd.client.meshGUID is not null) "
                 + " and ref is null "
-                + " and crd.org = :org "
+                + " and crd.org = :org and crd.state = :state "
         );
         query.setParameter("org", org);
+        query.setParameter("state", Card.ACTIVE_STATE);
 
         return query.list();
     }
@@ -5455,11 +5456,28 @@ public class DAOUtils {
         Query q = session.createSQLQuery("truncate cf_cancel_preorder_notifications");
         q.executeUpdate();
     }
-	
+
 	public static List<Client> getClientsBySsoid(EntityManager em, String ssoid) {
         return em.createQuery("from Client where ssoid = :ssoid")
                 .setParameter("ssoid", ssoid)
                 .getResultList();
     }
 
+
+    public static List<CodeMSP> getAllCodeMSP(Session session) {
+        Criteria criteria = session.createCriteria(CodeMSP.class);
+        return criteria.list();
+    }
+
+    public static List<String> getAllAgeTypeGroups(Session session) {
+        Query q = session.createSQLQuery(
+                "select distinct agetypegroup\n "
+                + "from cf_clients\n "
+                + "where meshguid is not null\n "
+                + "  and idofclientgroup < 1100000000\n "
+                + "  and agetypegroup is not null\n "
+                + "  and agetypegroup not like ''\n "
+                + "order by agetypegroup");
+        return q.list();
+    }
 }
