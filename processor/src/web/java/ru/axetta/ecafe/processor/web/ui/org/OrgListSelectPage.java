@@ -44,7 +44,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
     }
 
     public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
-        List<Long> idOfContragentList, MainPage mainPage) throws Exception {
+        List<Long> idOfContragentList, MainPage mainPage, Boolean webARM) throws Exception {
         if (isUpdate) {
             updateSelectedOrgs();
             mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
@@ -66,21 +66,22 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
             }
         }
         ///
-        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList, idOfContragentList);
+        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList, idOfContragentList, webARM);
         for (OrgShortItem orgShortItem : items) {
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
         this.items = items;
     }
 
-    public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
+    public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList,
+            Boolean webARM)
             throws Exception {
         if (isUpdate) {
             updateSelectedOrgs();
         } else {
             selectedOrgs.clear();
         }
-        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList, idOfContragentList);
+        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList, idOfContragentList, webARM);
         for (OrgShortItem orgShortItem : items) {
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }

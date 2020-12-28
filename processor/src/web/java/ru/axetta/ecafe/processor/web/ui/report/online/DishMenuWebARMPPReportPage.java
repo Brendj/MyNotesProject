@@ -316,11 +316,11 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
             List<Long> idOfContragentList = new ArrayList<>();
             for (ContragentItem contragentItem: contragentItems)
                 idOfContragentList.add(contragentItem.getIdOfContragent());
-            MainPage.getSessionInstance().showOrgListSelectPage(idOfContragentList);
+            MainPage.getSessionInstance().showOrgListSelectPageWebArm(idOfContragentList, Boolean.TRUE);
         }
         else
         {
-            MainPage.getSessionInstance().showOrgListSelectPage();
+            MainPage.getSessionInstance().showOrgListSelectPageWebArm(Boolean.TRUE);
         }
         return null;
     }
