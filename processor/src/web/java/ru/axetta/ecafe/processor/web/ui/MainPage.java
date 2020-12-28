@@ -1894,49 +1894,8 @@ public class MainPage implements Serializable {
         this.orgFilterPageName = orgFilterPageName;
     }
 
-    private Object showOrgListSelectPage(List<Long> idOfContragentOrgList) {
-        BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                orgListSelectPage.setFilter("");
-                orgListSelectPage.setIdFilter("");
-                orgListSelectPage.setRegion("");
-                orgListSelectPage.updateOrgTypesItems();
-                if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
-                } else {
-                    orgListSelectPage
-                            .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList, this);
-                }
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                orgListSelectPage.pushCompleteHandlerList((OrgListSelectPage.CompleteHandlerList) currentTopMostPage);
-                modalPages.push(orgListSelectPage);
-            } catch (Exception e) {
-                logger.error("Failed to fill org selection page", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора организации", null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-
-
-            }
-        }
-        return null;
-    }
-
-    public Object showOrgListSelectPage(Long idOfContragent) {
-        List<Long> idOfContragentList = new ArrayList<Long>();
-        idOfContragentList.add(idOfContragent);
+    public Object showOrgListSelectPage(List<Long> idOfContragents) {
+        List<Long> idOfContragentList = new ArrayList<Long>(idOfContragents);
 
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
@@ -2685,6 +2644,10 @@ public class MainPage implements Serializable {
     }
 
     public Object showContragentListSelectPage() {
+        return showContragentListSelectPage(null) ;
+    }
+
+    public Object showContragentListSelectPage(List<Long> idOfOrgs) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
                 || currentTopMostPage instanceof ContragentListSelectPage) {
@@ -2699,7 +2662,7 @@ public class MainPage implements Serializable {
                 if(contragentListSelectPage.getClassTypesString() != null){
                     classTypes = contragentListSelectPage.getClassTypesString();
                 }
-                contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes);
+                contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes, idOfOrgs);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
@@ -2714,8 +2677,6 @@ public class MainPage implements Serializable {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-
-
             }
         }
         return null;

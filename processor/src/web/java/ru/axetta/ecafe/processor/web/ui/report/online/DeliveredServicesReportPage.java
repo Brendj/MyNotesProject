@@ -96,7 +96,9 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             idOfContract = this.contractFilter.getContract().getIdOfContract();
         } catch (Exception e) {
         }
-        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragent);
+        List<Long> idOfContragentList = new ArrayList<>();
+        idOfContragentList.add(idOfContragent);
+        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragentList);
     }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
@@ -109,7 +111,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         resetOrg();
     }
 
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         super.completeOrgListSelection(orgMap);
         if (emptyOrgs()) {
             withoutFriendly = false;

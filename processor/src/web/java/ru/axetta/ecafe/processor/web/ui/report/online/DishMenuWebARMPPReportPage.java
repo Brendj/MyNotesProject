@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
@@ -43,7 +44,7 @@ import java.io.File;
 import java.util.*;
 
 public class DishMenuWebARMPPReportPage extends OnlineReportPage implements ContragentListSelectPage.CompleteHandler,
-        ComplexListSelectPage.CompleteHandler{
+        ComplexListSelectPage.CompleteHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(DishMenuWebARMPPReportPage.class);
 
@@ -229,6 +230,17 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         return properties;
     }
 
+    public Object showContragentListSelectPage() {
+        if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
+            MainPage.getSessionInstance().showContragentListSelectPage(idOfOrgList);
+        }
+        else
+        {
+            MainPage.getSessionInstance().showContragentListSelectPage();
+        }
+        return null;
+    }
+
     @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
             String classTypes) throws Exception {
@@ -239,6 +251,44 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
             contragentItems.add(contragentItem);
         }
         setContragentFilterInfo(contragentItems);
+        changeOrgsForContagents(contragentItems, new ArrayList<Long>(idOfOrgList));
+    }
+
+    private void changeOrgsForContagents(List<ContragentItem> contragentItems, List<Long> idofOrgs)
+    {
+        if (contragentItems != null && contragentItems != null) {
+            idOfOrgList = new ArrayList<>();
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                List<Long> idOrgs = new ArrayList<>();
+                for (ContragentItem contragentItem : contragentItems) {
+                    Contragent contragent = (Contragent) persistenceSession.get(Contragent.class, contragentItem.getIdOfContragent());
+                    for (Org org : contragent.getOrgs()) {
+                        idOrgs.add(org.getIdOfOrg());
+                    }
+                }
+                for (Long orgid : idofOrgs) {
+                    if (idOrgs.contains(orgid)) {
+                        idOfOrgList.add(orgid);
+                    }
+                }
+                Map<Long, String> orgMap = new HashMap<>();
+                for (Long idOfOrgs : idOfOrgList) {
+                    Org org = (Org) persistenceSession.get(Org.class, idOfOrgs);
+                    orgMap.put(org.getIdOfOrg(), org.getShortName());
+                }
+                setOrgFilterInfo(orgMap);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
     }
 
     private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
@@ -258,6 +308,73 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
             contragentFilter = str.toString();
         }
         contragentIds = ids.toString();
+    }
+
+
+    public Object showOrgListSelectPage() {
+        if (contragentItems != null && !contragentItems.isEmpty()) {
+            List<Long> idOfContragentList = new ArrayList<>();
+            for (ContragentItem contragentItem: contragentItems)
+                idOfContragentList.add(contragentItem.getIdOfContragent());
+            MainPage.getSessionInstance().showOrgListSelectPage(idOfContragentList);
+        }
+        else
+        {
+            MainPage.getSessionInstance().showOrgListSelectPage();
+        }
+        return null;
+    }
+
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if (orgMap != null) {
+            setOrgFilterInfo(orgMap);
+            changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
+        }
+    }
+
+    public void setOrgFilterInfo (Map<Long, String> orgMap) {
+        idOfOrgList = new ArrayList<Long>();
+        if (orgMap.isEmpty()) {
+            filter = "Не выбрано";
+        } else {
+            filter = "";
+            for (Long idOfOrg : orgMap.keySet()) {
+                idOfOrgList.add(idOfOrg);
+                filter = filter.concat(orgMap.get(idOfOrg) + "; ");
+            }
+            filter = filter.substring(0, filter.length() - 1);
+        }
+    }
+
+    private void changeContagentsForOrgs(List<Long> idOfOrgList, List<ContragentItem> contragentItems)
+    {
+        if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
+            this.contragentItems = new ArrayList<>();
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                List<Long> contragentsId = new ArrayList<>();
+                for (Long idOrg : idOfOrgList) {
+                    Org org = (Org) persistenceSession.get(Org.class, idOrg);
+                    contragentsId.add(org.getDefaultSupplier().getIdOfContragent());
+                }
+                for (ContragentItem contragentItem : contragentItems) {
+                    if (contragentsId.contains(contragentItem.idOfContragent)) {
+                        this.contragentItems.add(contragentItem);
+                    }
+                }
+                setContragentFilterInfo(this.contragentItems);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
     }
 
     @Override

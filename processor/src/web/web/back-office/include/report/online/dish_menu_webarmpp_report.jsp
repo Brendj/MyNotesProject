@@ -15,7 +15,7 @@
     <h:panelGrid id="filterdishMenuWabARMPPReportPanel" columns="2">
         <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
-            <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
+            <a4j:commandButton value="..." action="#{mainPage.dishMenuReportWebArmPP.showContragentListSelectPage}"
                                reRender="modalContragentListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
@@ -30,7 +30,7 @@
 
         <h:outputText escape="true" value="Организации" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" id="dishMenuPanelModalOrgListSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.dishMenuReportWebArmPP.showOrgListSelectPage}" id="dishMenuPanelModalOrgListSelectorPanel"
                                reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">

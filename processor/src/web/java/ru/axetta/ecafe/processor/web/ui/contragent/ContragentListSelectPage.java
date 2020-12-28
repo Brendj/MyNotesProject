@@ -184,11 +184,15 @@ public class ContragentListSelectPage extends BasicPage {
     }
 
     public void fill(Session session, int multiContrFlag, String classTypes) throws Exception {
+        fill(session, multiContrFlag, classTypes, null);
+    }
+
+    public void fill(Session session, int multiContrFlag, String classTypes, List<Long> idOfOrgs) throws Exception {
         this.multiContrFlag = multiContrFlag;
         this.classTypesString = classTypes;
         List<Item> items = new ArrayList<Item>();
         List<String> selectedIdsList = Arrays.asList(StringUtils.split(selectedIds, ","));
-        List contragents = retrieveContragents(session, classTypes);
+        List contragents = retrieveContragents(session, classTypes, idOfOrgs);
         for (Object object : contragents) {
             Contragent contragent = (Contragent) object;
             Item item = new Item(contragent);
@@ -200,7 +204,7 @@ public class ContragentListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
+    private List retrieveContragents(Session session, String classTypesString, List<Long> idOfOrgs) throws HibernateException {
         Criteria criteria = session.createCriteria(Contragent.class).addOrder(Order.asc("contragentName"));
 
         if(!"1".equals(classTypesString)) {
@@ -221,6 +225,11 @@ public class ContragentListSelectPage extends BasicPage {
                 exp = Restrictions.or(exp, Restrictions.eq("classId", Integer.parseInt(classTypes[i])));
             }
             criteria.add(exp);
+        }
+        if (idOfOrgs != null)
+        {
+            criteria.createAlias("orgsInternal", "orgs");
+            criteria.add(Restrictions.in("orgs.idOfOrg", idOfOrgs));
         }
         criteria.addOrder(Order.asc("contragentName"));
         List<Contragent> contragentsByCriteria = criteria.list();
