@@ -307,6 +307,10 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         contragentIds = ids.toString();
     }
 
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
 
     public Object showOrgListSelectPage() {
         if (contragentItems != null && !contragentItems.isEmpty()) {
