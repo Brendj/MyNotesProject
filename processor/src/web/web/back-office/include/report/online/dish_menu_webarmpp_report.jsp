@@ -34,7 +34,7 @@
                                reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{mainPage.dishMenuReportWebArmPP.filter}"
+                <f:setPropertyActionListener value="#{mainPage.dishMenuReportWebArmPP.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.dishMenuReportWebArmPP.filter}}" />
