@@ -1945,6 +1945,7 @@ public class MainPage implements Serializable {
 
     public Object showOrgListSelectPageWebArm(Boolean webARM) {
         webARMppFilter = webARM;
+        idOfContragentList = new ArrayList<>();
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
