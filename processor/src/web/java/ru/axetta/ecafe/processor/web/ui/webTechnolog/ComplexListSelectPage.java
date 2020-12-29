@@ -176,15 +176,8 @@ public class ComplexListSelectPage extends BasicPage {
                 contragents.add(contragent);
             }
         }
-        List<Org> orgs = new ArrayList<>();
-        if (filterOrgs != null) {
-            for (Long idOrg : filterOrgs) {
-                Org org = (Org) session.load(Org.class, idOrg);
-                orgs.add(org);
-            }
-        }
 
-        List complexes = retrieveComplexes(session, contragents, orgs);
+        List complexes = retrieveComplexes(session, contragents, filterOrgs);
         for (Object object : complexes) {
             WtComplex wtComplex = (WtComplex) object;
             Item item = new Item(wtComplex);
@@ -196,14 +189,16 @@ public class ComplexListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    private List retrieveComplexes(Session session, List<Contragent> contragents, List<Org> orgs) throws HibernateException {
+    private List retrieveComplexes(Session session, List<Contragent> contragents, List<Long> orgs) throws HibernateException {
         Criteria criteria = session.createCriteria(WtComplex.class).addOrder(Order.asc("name"));
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.ilike("name", filter, MatchMode.ANYWHERE));
-            if (contragents != null && !contragents.isEmpty())
-                criteria.add(Restrictions.in("contragent", contragents));
-            if (orgs != null && !orgs.isEmpty())
-                criteria.add(Restrictions.in("orgs", orgs));
+        }
+        if (contragents != null && !contragents.isEmpty())
+            criteria.add(Restrictions.in("contragent", contragents));
+        if (orgs != null && !orgs.isEmpty()) {
+            criteria.createAlias("orgs", "orgsIntrernal");
+            criteria.add(Restrictions.in("orgsIntrernal.idOfOrg", orgs));
         }
         List<WtComplex> complexByCriteria = criteria.list();
         return complexByCriteria; // criteria.list();

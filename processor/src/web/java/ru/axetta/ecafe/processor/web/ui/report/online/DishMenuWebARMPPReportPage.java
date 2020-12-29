@@ -257,6 +257,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         }
         setContragentFilterInfo(contragentItems);
         changeOrgsForContagents(contragentItems, new ArrayList<Long>(idOfOrgList));
+        setComplexFilterInfo(new ArrayList<ComplexItem>());
     }
 
     private void changeOrgsForContagents(List<ContragentItem> contragentItems, List<Long> idofOrgs) {
@@ -334,6 +335,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         if (orgMap != null) {
             setOrgFilterInfo(orgMap);
             changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
+            setComplexFilterInfo(new ArrayList<ComplexItem>());
         }
     }
 
