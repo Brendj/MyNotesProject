@@ -200,6 +200,7 @@ public class ComplexListSelectPage extends BasicPage {
             criteria.createAlias("orgs", "orgsIntrernal");
             criteria.add(Restrictions.in("orgsIntrernal.idOfOrg", orgs));
         }
+        criteria.add(Restrictions.eq("deleteState", 0));
         List<WtComplex> complexByCriteria = criteria.list();
         return complexByCriteria; // criteria.list();
     }
