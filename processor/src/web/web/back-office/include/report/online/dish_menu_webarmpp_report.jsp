@@ -71,10 +71,14 @@
         </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Нахождение в меню буфета" />
-        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.inBufet}"/>
+        <h:selectOneMenu value="#{mainPage.dishMenuReportWebArmPP.selectinBufet}" >
+            <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getFiltersForAddedColumns()}"/>
+        </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Нахождение в комплексном меню" />
-        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.inComplex}"/>
+        <h:selectOneMenu value="#{mainPage.dishMenuReportWebArmPP.selectinComplex}" >
+            <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getFiltersForAddedColumns()}"/>
+        </h:selectOneMenu>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Построить отчет" action="#{mainPage.dishMenuReportWebArmPP.buildReportHTML}"
@@ -222,7 +226,7 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                 <h:outputText value="#{dishElement.barcode}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inBufet}"
+            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.renderBufet()}"
                          style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Нахождение в буфете" />
@@ -230,7 +234,7 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                 <h:outputText value="#{dishElement.countInMenu}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inComplex}"
+            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.renderComplex()}"
                          style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Нахождение в комплексе" />

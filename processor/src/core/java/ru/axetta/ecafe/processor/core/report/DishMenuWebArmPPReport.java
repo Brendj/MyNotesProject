@@ -98,17 +98,17 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
-            Boolean bufet;
+            Integer bufet;
             try {
-                bufet = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_BUFET));
+                bufet = Integer.parseInt(reportProperties.getProperty(DishMenuWebArmPPReport.P_BUFET));
             } catch (Exception e) {
-                bufet = false;
+                bufet = 0;
             }
-            Boolean incomplex;
+            Integer incomplex;
             try {
-                incomplex = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_COMPLEX));
+                incomplex = Integer.parseInt(reportProperties.getProperty(DishMenuWebArmPPReport.P_COMPLEX));
             } catch (Exception e) {
-                incomplex = false;
+                incomplex = 0;
             }
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
@@ -121,7 +121,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     jasperPrint, startTime, endTime, null);
         }
 
-        public List<DishMenuWebArmPPItem> createDataSource(Session session, boolean bufet, boolean incomplex) {
+        public List<DishMenuWebArmPPItem> createDataSource(Session session, Integer bufet, Integer incomplex) {
             List<DishMenuWebArmPPItem> dishMenuWebArmPPItems = new ArrayList<>();
 
             List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
@@ -242,7 +242,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode, base2.dishdel";
 
             ///////////////////
-            if (bufet && incomplex) {
+            if (bufet>1 && incomplex>1) {
                 sqlQueryBase = "select base4.*, base5.countInComplex from (\n"
                         + "select base3.*, count (distinct cwm.idofmenu) as countInMenu from (" + sqlQueryBase + ") as base3\n"
                         + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base3.idofdish\n"
@@ -265,7 +265,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         + "on base4.idofdish = base5.idofdish";
             } else
             {
-                if (bufet) {
+                if (bufet>1) {
                     sqlQueryBase =  "select base3.*, count (distinct cwm.idofmenu) as countInMenu from \n"
                             + "(" + sqlQueryBase + ") as base3\n"
                             + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = base3.idofdish\n"
@@ -276,7 +276,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "base3.typefood, base3.category, base3.subcategory, \n"
                             + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel;";
                 } else {
-                    if (incomplex) {
+                    if (incomplex>1) {
                         sqlQueryBase = "select base3.*, count (distinct cwtc.idofcomplex) as countInComplex from \n"
                                 + "(" + sqlQueryBase + ") as base3\n"
                                 + "left join cf_wt_complex_items_dish cwcid on cwcid.idofdish = base3.idofdish\n"
@@ -356,7 +356,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         dishMenuWebArmPPItem.setArchived(0);
                     }
                 }
-                if (bufet && incomplex) {
+                if (bufet>1 && incomplex>1) {
                     if (row[19] != null) {
                         dishMenuWebArmPPItem.setCountInMenu(row[19].toString());
                     }
@@ -365,12 +365,12 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     }
                 } else
                 {
-                    if (bufet) {
+                    if (bufet>1) {
                         if (row[19] != null) {
                             dishMenuWebArmPPItem.setCountInMenu(row[19].toString());
                         }
                     } else {
-                        if (incomplex)
+                        if (incomplex>1)
                             if (row[19] != null) {
                                 dishMenuWebArmPPItem.setCountInComplex(row[19].toString());
                             }
