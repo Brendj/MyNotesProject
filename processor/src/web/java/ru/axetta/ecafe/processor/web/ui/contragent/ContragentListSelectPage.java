@@ -13,10 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import java.util.*;
 
@@ -232,6 +229,7 @@ public class ContragentListSelectPage extends BasicPage {
             criteria.add(Restrictions.in("orgs.idOfOrg", idOfOrgs));
         }
         criteria.addOrder(Order.asc("contragentName"));
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         List<Contragent> contragentsByCriteria = criteria.list();
         if(!"1".equals(classTypesString)) {
             Criteria criteria1 = session.createCriteria(Contragent.class);

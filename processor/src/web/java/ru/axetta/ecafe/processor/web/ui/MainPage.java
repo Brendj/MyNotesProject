@@ -158,6 +158,7 @@ public class MainPage implements Serializable {
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
     private Stack<BasicPage> modalPages = new Stack<BasicPage>();
 
+    private Boolean webARMppFilter = false;
     //Journals
     private final BasicWorkspacePage journalGroupPage = new BasicWorkspacePage();
     private final JournalBalancesReportPage journalBalancesReportPage = new JournalBalancesReportPage();
@@ -1897,10 +1898,9 @@ public class MainPage implements Serializable {
     public Object showOrgListSelectPage(List<Long> idOfContragents) {
         return showOrgListSelectPageWebArm(idOfContragents, null);
     }
-
     public Object showOrgListSelectPageWebArm(List<Long> idOfContragents, Boolean webARM) {
-        List<Long> idOfContragentList = new ArrayList<Long>(idOfContragents);
-
+        webARMppFilter = webARM;
+        this.idOfContragentList = new ArrayList<Long>(idOfContragents);
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -1916,11 +1916,11 @@ public class MainPage implements Serializable {
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList, webARM);
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList, webARMppFilter);
                 } else {
                     orgListSelectPage
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList, this, webARM);
+                                    idOfContragentList, this, webARMppFilter);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1944,6 +1944,8 @@ public class MainPage implements Serializable {
     }
 
     public Object showOrgListSelectPageWebArm(Boolean webARM) {
+        webARMppFilter = webARM;
+        idOfContragentList = new ArrayList<>();
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -1959,11 +1961,11 @@ public class MainPage implements Serializable {
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList, webARM);
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList, webARMppFilter);
                 } else {
                     orgListSelectPage
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList, this, webARM);
+                                    idOfContragentList, this, webARMppFilter);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -2096,11 +2098,11 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList, idOfContragentList, null);
+                orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList, idOfContragentList, webARMppFilter);
             } else {
                 orgListSelectPage
                         .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList,
-                                idOfContragentList, this, null);
+                                idOfContragentList, this, webARMppFilter);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2272,6 +2274,7 @@ public class MainPage implements Serializable {
     }
 
     public Object completeOrgListSelectionOk() {
+        webARMppFilter = false;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             orgListSelectPage.completeOrgListSelection(true);
@@ -2289,6 +2292,7 @@ public class MainPage implements Serializable {
     }
 
     public Object completeOrgListSelectionCancel() {
+        webARMppFilter = false;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             orgListSelectPage.completeOrgListSelection(false);

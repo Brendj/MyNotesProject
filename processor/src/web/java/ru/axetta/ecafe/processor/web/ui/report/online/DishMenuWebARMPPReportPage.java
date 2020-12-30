@@ -101,6 +101,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     public Object buildReportHTML() {
         if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
             printError("Выберите организацию или контрагента");
+            items = new ArrayList<>();
         } else {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             String templateFilename = checkIsExistFile();
@@ -134,6 +135,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     public void generateXLS(ActionEvent event) {
         if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
             printError("Выберите организацию или контрагента");
+            items = new ArrayList<>();
         } else {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             String templateFilename = checkIsExistFile();
@@ -314,6 +316,10 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
             contragentFilter = str.toString();
         }
         contragentIds = ids.toString();
+    }
+
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
 
