@@ -145,7 +145,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     }
 
     @Override
-    protected String getRNIPUrl() {
+    public String getRNIPUrl() {
         return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20);
     }
 
@@ -502,7 +502,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     private void InitRNIP21Service(Contragent contragent) throws MalformedURLException {
         synchronized (sync) {
             if (port21 == null) {
-                service21 = new SMEVMessageExchangeService();
+                service21 = getServiceImpl();
                 port21 = service21.getSMEVMessageExchangeEndpoint();
                 bindingProvider21 = (BindingProvider) port21;
                 URL endpoint = new URL(getRNIPUrl());
@@ -515,6 +515,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         final List<Handler> handlerChain = new ArrayList<Handler>();
         handlerChain.add(pfrSecuritySOAPHandler);
         bindingProvider21.getBinding().setHandlerChain(handlerChain);
+    }
+
+    protected SMEVMessageExchangeService getServiceImpl() {
+        return new SMEVMessageExchangeService();
     }
 
     protected RNIPSecuritySOAPHandlerV21 getSecurityHandler(String alias, String pass, Contragent contragent) {

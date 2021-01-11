@@ -30,7 +30,8 @@ public class RNIPLoadPaymentsServiceV22 extends RNIPLoadPaymentsServiceV21 {
     }
 
     @Override
-    protected String getRNIPUrl() {
+    public String getRNIPUrl() {
         return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V22);
     }
+
 }
