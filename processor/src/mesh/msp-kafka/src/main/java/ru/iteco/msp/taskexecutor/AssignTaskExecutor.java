@@ -95,15 +95,23 @@ public class AssignTaskExecutor {
                             kafkaService.sendAssign(mapper.writeValueAsString(event));
                         }
                     } else {
-                        int sizeOfNew = newDiscounts.size();
-                        int sizeOfOld = oldDiscounts.size();
+                        List<CategoryDiscount> dif = discountsService.getDiffDiscounts(newDiscounts, oldDiscounts);
 
-                        if(sizeOfNew > sizeOfOld){
-                            type = AssignOperationType.ADD;
-                        } else {
-                            type = AssignOperationType.DELETE;
+                        for(CategoryDiscount d : dif){
+                            if(!d.getCategoryType().equals(0)){
+                                continue;
+                            }
+                            type = getOperationType(oldDiscounts, newDiscounts, d.getIdOfCategoryDiscount().toString());
+
+                            ClientDTSZNDiscountInfo info = null;
+                            if(d.getCategoryDiscountDTSZN() != null){
+                                info = discountsService.getLastInfoByClientAndCode(h.getClient(),
+                                        d.getCategoryDiscountDTSZN().getCode());
+                            }
+                            AssignEvent event = AssignEvent.build(d, h.getClient(), type, info);
+
+                            kafkaService.sendAssign(mapper.writeValueAsString(event));
                         }
-                        sendMsg(newDiscounts, oldDiscounts, h, type);
                     }
                 }
 
@@ -113,21 +121,12 @@ public class AssignTaskExecutor {
             }
         }
 
-        private void sendMsg(List<String> newDiscounts, List<String> oldDiscounts, DiscountChangeHistory h,
-                AssignOperationType type) throws Exception{
-            List<CategoryDiscount> newDif = discountsService.getDiffDiscounts(newDiscounts, oldDiscounts);
-
-            for(CategoryDiscount d : newDif){
-                if(!d.getCategoryType().equals(0)){
-                    continue;
-                }
-                ClientDTSZNDiscountInfo info = null;
-                if(d.getCategoryDiscountDTSZN() != null){
-                    info = discountsService.getLastInfoByClientAndCode(h.getClient(), d.getCategoryDiscountDTSZN().getCode());
-                }
-                AssignEvent event = AssignEvent.build(d, h.getClient(), type, info);
-
-                kafkaService.sendAssign(mapper.writeValueAsString(event));
+        private AssignOperationType getOperationType(List<String> oldDiscounts, List<String> newDif,
+                                                     String idOfCategoryDiscount) {
+            if(oldDiscounts.contains(idOfCategoryDiscount)){
+                return AssignOperationType.DELETE;
+            } else {
+                return AssignOperationType.ADD;
             }
         }
 
