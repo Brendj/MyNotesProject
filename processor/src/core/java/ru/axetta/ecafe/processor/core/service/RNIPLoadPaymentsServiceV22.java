@@ -7,7 +7,9 @@ package ru.axetta.ecafe.processor.core.service;
 import generated.ru.mos.rnip.xsd.catalog._2_1.ServiceCatalogType;
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogRequest;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,5 +27,10 @@ public class RNIPLoadPaymentsServiceV22 extends RNIPLoadPaymentsServiceV21 {
     protected void setProperCatalogRequestSection(int requestType, ImportCatalogRequest importCatalogRequest,
             ServiceCatalogType serviceCatalogType) {
         importCatalogRequest.setServiceCatalog(serviceCatalogType);
+    }
+
+    @Override
+    protected String getRNIPUrl() {
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V22);
     }
 }
