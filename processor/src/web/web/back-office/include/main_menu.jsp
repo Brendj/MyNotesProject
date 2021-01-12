@@ -1203,9 +1203,6 @@
                                 reRender="workspaceForm" />
         </rich:panelMenuGroup>
 
-        <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
-        <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
-                            label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Сводный отчет по услугам (предварительный)"
@@ -1369,7 +1366,9 @@
         <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
                             label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
                             reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTransactionsReport}" />
-
+        <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
+        <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
+                            label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
