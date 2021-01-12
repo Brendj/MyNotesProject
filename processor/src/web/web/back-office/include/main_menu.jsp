@@ -1364,6 +1364,10 @@
                                     action="#{kznClientsStatisticEditPage.show}" reRender="workspaceForm" />
             </rich:panelMenuGroup>
         </rich:panelMenuGroup>
+        <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
+                            label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
+                            reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTransactionsReport}" />
+
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
@@ -1597,9 +1601,6 @@
 
     <%--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"--%>
 
-    <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
-                        label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
-                        reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTransactionsReport}" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
