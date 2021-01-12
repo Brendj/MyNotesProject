@@ -986,6 +986,11 @@
         <%--@elvariable id="preorderDoublePaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderDoublePaymentReportPage"--%>
         <rich:panelMenuItem id="preorderDoublePaymentMenuItem" binding="#{preorderDoublePaymentReportPage.mainMenuComponent}"
                             label="Проверка двойных оплат" action="#{preorderDoublePaymentReportPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preordersReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreordersReportPage"--%>
+        <rich:panelMenuItem id="preordersMenuItem" binding="#{preordersReportPage.mainMenuComponent}"
+                            label="Отчет по предзаказам" action="#{preordersReportPage.show}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
@@ -1165,10 +1170,7 @@
                             label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
                             reRender="workspaceForm" />
 
-        <%--@elvariable id="preordersReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreordersReportPage"--%>
-        <rich:panelMenuItem id="preordersMenuItem" binding="#{preordersReportPage.mainMenuComponent}"
-                            label="Отчет по предзаказам" action="#{preordersReportPage.show}"
-                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
                          label="Льготное питание" rendered="#{mainPage.eligibleToViewMealsReports}">
