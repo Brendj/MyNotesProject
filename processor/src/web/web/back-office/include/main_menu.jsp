@@ -1446,11 +1446,7 @@
                             label="Детализированный отчет отклонений оплаты льготного питания"
                             action="#{mainPage.showDetailedDeviationsWithoutCorpsReportPage}"
                             reRender="workspaceForm" />--%>
-        <rich:panelMenuItem id="detailedDeviationsWithoutCorpsNewReportMenuItem"
-                            binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.mainMenuComponent}"
-                            label="Детализированный отчет отклонений оплаты льготного питания"
-                            action="#{mainPage.showDetailedDeviationsWithoutCorpsNewReportPage}"
-                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
     <%--@elvariable id="financialControlPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FinancialControlPage"--%>
@@ -1471,11 +1467,11 @@
                             action="#{mainPage.showLatePaymentDetailedReportPage}"
                             reRender="workspaceForm"/>
 
-        <%--<rich:panelMenuItem id="adjustmentPaymentReportMenuItem"
-                            binding="#{mainPage.adjustmentPaymentReportPage.mainMenuComponent}"
-                            label="Отчет по ручной корректировке оплаты льготного питания"
-                            action="#{mainPage.showAdjustmentPaymentReportPage}"
-                            reRender="workspaceForm"/>--%>
+        <rich:panelMenuItem id="detailedDeviationsWithoutCorpsNewReportMenuItem"
+                            binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.mainMenuComponent}"
+                            label="Детализированный отчет отклонений оплаты льготного питания"
+                            action="#{mainPage.showDetailedDeviationsWithoutCorpsNewReportPage}"
+                            reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
     <%--@elvariable id="salesReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SalesReportGroupPage"--%>
