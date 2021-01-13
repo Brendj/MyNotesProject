@@ -10,13 +10,16 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.HistoryCard;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,7 +184,7 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
 
     @Override
     public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
-        return new TransactionsReport.Builder(templateFilename);
+        return new CreatedAndReissuedCardReport.Builder(templateFilename);
     }
 
     public static final class CreatedAndReissuedCardReportItem {
