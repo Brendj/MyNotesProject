@@ -393,7 +393,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         dishMenuWebArmPPItem.setArchived(0);
                     }
                 }
-                if (renderBufet(bufet) && renderComplex(incomplex)) {
+                if (bufet>1 && incomplex>1) {
                     if (row[19] != null) {
                         dishMenuWebArmPPItem.setCountInMenu(row[19].toString());
                     }
@@ -402,12 +402,12 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     }
                 } else
                 {
-                    if (renderBufet(bufet)) {
+                    if (bufet>1) {
                         if (row[19] != null) {
                             dishMenuWebArmPPItem.setCountInMenu(row[19].toString());
                         }
                     } else {
-                        if (renderComplex(incomplex))
+                        if (incomplex>1)
                             if (row[19] != null) {
                                 dishMenuWebArmPPItem.setCountInComplex(row[19].toString());
                             }
@@ -430,21 +430,6 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                 }
             });
             return dishMenuWebArmPPItems;
-        }
-
-        public Boolean renderBufet(Integer bufet)
-        {
-            if (bufet==2 || bufet==3)
-                return true;
-            else
-                return false;
-        }
-
-        public Boolean renderComplex(Integer incomplex) {
-            if (incomplex==2 || incomplex==3)
-                return true;
-            else
-                return false;
         }
 
         private List<Long> parseStringAsLongList(String propertyName) {
