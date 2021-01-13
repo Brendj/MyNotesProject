@@ -166,7 +166,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     filterOrgs += "'" + idofOrg + "',";
                 }
                 filterOrgs = filterOrgs.substring(0, filterOrgs.length() - 1);
-                filterOrgs = " and (cwco.idoforg in (" + filterOrgs + ") or cwgro.idoforg in (" + filterOrgs + "))";
+                filterOrgs = " and (cwco.idoforg in (" + filterOrgs + ") or cwgro.idoforg in (" + filterOrgs + ")) and (cwm.deletestate = 0 or cwmc.deletestate = 0) ";
             }
             if (idOfContragentList != null && !idOfContragentList.isEmpty()) {
                 for (Long idofContragent : idOfContragentList) {
