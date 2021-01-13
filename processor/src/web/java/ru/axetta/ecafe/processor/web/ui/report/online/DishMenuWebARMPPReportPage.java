@@ -354,9 +354,11 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
             for (ContragentItem contragentItem : contragentItems) {
                 idOfContragentList.add(contragentItem.getIdOfContragent());
             }
-            MainPage.getSessionInstance().showOrgListSelectPageWebArm(idOfContragentList, Boolean.TRUE);
+            //MainPage.getSessionInstance().showOrgListSelectPageWebArm(idOfContragentList, Boolean.TRUE);
+            MainPage.getSessionInstance().showOrgListSelectPageWebArm(idOfContragentList, null);
         } else {
-            MainPage.getSessionInstance().showOrgListSelectPageWebArm(Boolean.TRUE);
+            //MainPage.getSessionInstance().showOrgListSelectPageWebArm(Boolean.TRUE);
+            MainPage.getSessionInstance().showOrgListSelectPageWebArm(null);
         }
         return null;
     }

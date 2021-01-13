@@ -102,7 +102,7 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
 center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column, center-aligned-column">
             <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
-                    <h:outputText value="Код ИСПП" />
+                    <h:outputText value="ИС \"ПП\"" />
                 </f:facet>
                 <h:outputText value="#{dishElement.codeISPP}" styleClass="output-text"/>
             </rich:column>
