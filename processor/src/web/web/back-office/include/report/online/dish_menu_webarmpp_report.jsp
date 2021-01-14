@@ -80,6 +80,9 @@
             <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getFiltersForAddedColumns()}"/>
         </h:selectOneMenu>
 
+        <h:outputText escape="true" value="Поиск по названию" styleClass="output-text" />
+        <h:inputText value="#{mainPage.dishMenuReportWebArmPP.seachName}"/>
+
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Построить отчет" action="#{mainPage.dishMenuReportWebArmPP.buildReportHTML}"
                                reRender="dishMenuWabARMPPReportPanel" styleClass="command-button"

@@ -63,6 +63,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
     final public static String P_ARCHIVED = "archived";
     final public static String P_BUFET = "bufet";
     final public static String P_COMPLEX = "complex";
+    final public static String P_DISHNAME = "dishName";
 
     public DishMenuWebArmPPReport(Date generateTime, long generateDuration, JasperPrint jasperPrint, Date startTime,
             Date endTime, Long idOfOrg) {
@@ -149,6 +150,8 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             } catch (Exception e) {
                 archived = 1;
             }
+            String nameSeach = StringUtils
+                    .trimToEmpty(reportProperties.getProperty(DishMenuWebArmPPReport.P_DISHNAME));
 
             String filterOrgs = "";
             String filterContragent = "";
@@ -156,6 +159,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             String filterTypeFoodId = "";
             String filterAgeGroup = "";
             String filterArchived = "";
+            String filterNameDish = "";
             if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
                 for (Long idofOrg : idOfOrgList) {
                     filterOrgs += "'" + idofOrg + "',";
@@ -183,6 +187,10 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             if (idAgeGroup != null) {
                 filterAgeGroup = " and cwag.idofagegroupitem = " + idAgeGroup + " ";
             }
+            if (!nameSeach.isEmpty())
+            {
+                filterNameDish = " and cwd.dishname ilike '%" + nameSeach + "%'" + " ";
+            }
 
             if (archived == 1)
             {
@@ -198,7 +206,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             }
 
             String fullWhere = filterArchived  + filterOrgs
-                    + filterContragent  + filterAgeGroup + filterComplexes;
+                    + filterContragent  + filterAgeGroup + filterComplexes + filterNameDish;
 
             String sqlQueryBase =
                     "select base2.idofdish, base2.dishname, base2.componentsofdish, base2.code, base2.price, base2.dateofbeginmenuincluding, \n"
