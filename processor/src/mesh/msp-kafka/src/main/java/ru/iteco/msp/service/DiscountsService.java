@@ -12,6 +12,7 @@ import ru.iteco.msp.repo.DiscountChangeHistoryRepo;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -57,11 +58,20 @@ public class DiscountsService {
         return categoryDiscountRepo.findAllByIdOfCategoryDiscountIn(ids);
     }
 
+    public CategoryDiscount getDiscountByStrId(String idStr){
+        Long id = Long.parseLong(idStr);
+        return categoryDiscountRepo.findById(id).orElse(null);
+    }
+
     public CategoryDiscountDTSZN getCategoryDiscountDTSZNByCode(Long dtisznCode) {
         return categoryDiscountDTSZNRepo.findByCode(dtisznCode.intValue());
     }
 
     public ClientDTSZNDiscountInfo getLastInfoByClientAndCode(Client client, Integer code) {
         return clientDTSZNDiscountInfoRepo.findFirstByDTISZNCodeAndClientOrderByLastUpdateDesc(code.longValue(), client);
+    }
+
+    public List<DiscountChangeHistory> getDistinctHistoryByClient(Pageable pageable) {
+        return discountChangeHistoryRepo.getHistoryByDistinctClient(pageable);
     }
 }
