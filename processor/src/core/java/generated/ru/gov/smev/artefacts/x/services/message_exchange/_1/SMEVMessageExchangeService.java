@@ -1,8 +1,7 @@
 
 package generated.ru.gov.smev.artefacts.x.services.message_exchange._1;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.*;
@@ -21,15 +20,15 @@ public class SMEVMessageExchangeService
     extends Service
 {
 
-    private final static URL SMEVMESSAGEEXCHANGESERVICE_WSDL_LOCATION;
-    private final static WebServiceException SMEVMESSAGEEXCHANGESERVICE_EXCEPTION;
-    private final static QName SMEVMESSAGEEXCHANGESERVICE_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/1.2", "SMEVMessageExchangeService");
+    protected final static URL SMEVMESSAGEEXCHANGESERVICE_WSDL_LOCATION;
+    protected final static WebServiceException SMEVMESSAGEEXCHANGESERVICE_EXCEPTION;
+    protected final static QName SMEVMESSAGEEXCHANGESERVICE_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/1.2", "SMEVMessageExchangeService");
 
     static {
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20) + "?wsdl");
+            url = new URL(RNIPLoadPaymentsService.getRNIPServiceBean().getRNIPUrl() + "?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

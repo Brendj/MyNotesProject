@@ -476,7 +476,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
     @Override
     public BasicReportForAllOrgJob createInstance() {
-        return new TransactionsReport();
+        return new InteractiveCardDataReport();
     }
 
     @Override

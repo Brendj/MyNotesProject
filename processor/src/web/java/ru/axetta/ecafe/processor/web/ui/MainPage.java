@@ -9495,6 +9495,18 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT);
     }
 
+    public boolean isEligibleToWorkOnlineReportDocs() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT_DOCS);
+    }
+
+    public boolean isEligibleToWorkOnlineReportEEReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT);
+    }
+
+    public boolean isEligibleToWorkOnlineReportMenuReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT);
+    }
+
     public boolean isEligibleToMonitor() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_MONITORING);
     }
