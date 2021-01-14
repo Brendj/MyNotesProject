@@ -83,6 +83,11 @@
         <h:outputText escape="true" value="Поиск по названию" styleClass="output-text" />
         <h:inputText value="#{mainPage.dishMenuReportWebArmPP.seachName}"/>
 
+        <h:outputText escape="false" value="Выводить название контрагента" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.showContagentName}"
+                                 styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Построить отчет" action="#{mainPage.dishMenuReportWebArmPP.buildReportHTML}"
                                reRender="dishMenuWabARMPPReportPanel" styleClass="command-button"
@@ -231,6 +236,14 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                     <h:outputText value="Штрих-код" />
                 </f:facet>
                 <h:outputText value="#{dishElement.barcode}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}"
+                         rendered="#{mainPage.dishMenuReportWebArmPP.showContagentName}">
+                <f:facet name="header">
+                    <h:outputText value="Контрагент" />
+                </f:facet>
+                <h:outputText value="#{dishElement.contragentName}" styleClass="output-text" />
             </rich:column>
 
             <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.renderBufet()}"

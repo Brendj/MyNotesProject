@@ -65,6 +65,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     private String complexIds;
     private Long dishCount = 0L;
     private String seachName = "";
+    private Boolean showContagentName = false;
     private List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
     private List<ComplexItem> complexItems = new ArrayList<ComplexItem>();
 
@@ -597,6 +598,14 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
 
     public void setSeachName(String seachName) {
         this.seachName = seachName;
+    }
+
+    public Boolean getShowContagentName() {
+        return showContagentName;
+    }
+
+    public void setShowContagentName(Boolean showContagentName) {
+        this.showContagentName = showContagentName;
     }
 
     public static class ContragentItem {

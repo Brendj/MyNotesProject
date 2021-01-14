@@ -212,17 +212,19 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     "select base2.idofdish, base2.dishname, base2.componentsofdish, base2.code, base2.price, base2.dateofbeginmenuincluding, \n"
                             + "base2.dateofendmenuincluding, base2.agegroup, base2.typeOfProduction,\n"
                             + "base2.typefood, base2.category, string_agg(distinct cwci.description, ';' order by cwci.description) as subcategory, \n"
-                            + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode, base2.dishdel from\n"
+                            + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode, base2.dishdel, base2.contragentname from\n"
                             + "(select base1.idofdish, base1.dishname, base1.componentsofdish, base1.code, base1.price, \n"
                             + "base1.dateofbeginmenuincluding, base1.dateofendmenuincluding, base1.agegroup, base1.typeOfProduction,\n"
                             + "string_agg(distinct cwgi.description, ';' order by cwgi.description) as typefood, base1.category, \n"
-                            + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode, base1.dishdel\n"
+                            + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode, base1.dishdel, base1.contragentname\n"
                             + "from \n"
                             + "(select distinct cwd.idofdish, cwd.dishname, cwd.componentsofdish, cwd.code, cwd.price, cwd.dateofbeginmenuincluding, \n"
                             + "cwd.dateofendmenuincluding, cwag.description as agegroup, cwpi.description as typeOfProduction,\n"
                             + "cwc.description as category,\n"
                             + "cwd.calories, cwd.qty, cwd.protein, cwd.fat, cwd.carbohydrates, cwd.barcode, cwgr.idofgroupitem, cwd.deletestate as dishdel,\n"
-                            + "cwm.deletestate as menudel, cwmc.deletestate as compldel\n" + "from cf_wt_dishes cwd\n"
+                            + "cwm.deletestate as menudel, cwmc.deletestate as compldel, cc.contragentname \n"
+                            + "from cf_wt_dishes cwd \n"
+                            + "left join cf_contragents cc on cc.idofcontragent = cwd.idofcontragent \n"
                             + "left join cf_wt_agegroup_items cwag on cwag.idofagegroupitem = cwd.idofagegroupitem\n"
                             + "left join cf_wt_typeofproduction_items cwpi on cwpi.idoftypeproductionitem = cwd.idoftypeofproductionitem\n"
                             + "left join cf_wt_dish_groupitem_relationships cwgr on cwgr.idofdish = cwd.idofdish\n"
@@ -241,13 +243,13 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "group by base1.idofdish, base1.dishname, base1.componentsofdish, base1.code, \n"
                             + "base1.price, base1.dateofbeginmenuincluding,base1.dateofendmenuincluding, base1.agegroup, base1.typeOfProduction, \n"
                             + "base1.category,\n"
-                            + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode, base1.dishdel) as base2\n"
+                            + "base1.calories, base1.qty, base1.protein, base1.fat, base1.carbohydrates, base1.barcode, base1.dishdel, base1.contragentname) as base2\n"
                             + "left join cf_wt_dish_categoryitem_relationships cwdc on cwdc.idofdish = base2.idofdish\n"
                             + "left join cf_wt_category_items cwci on cwci.idofcategoryitem = cwdc.idofcategoryitem\n"
                             + "group by base2.idofdish, base2.dishname, base2.componentsofdish, base2.code, base2.price, base2.dateofbeginmenuincluding, \n"
                             + "base2.dateofendmenuincluding, base2.agegroup, base2.typeOfProduction,\n"
                             + "base2.typefood, base2.category, \n"
-                            + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode, base2.dishdel";
+                            + "base2.calories, base2.qty, base2.protein, base2.fat, base2.carbohydrates, base2.barcode, base2.dishdel, base2.contragentname";
 
             ///////////////////
             if (bufet>1 && incomplex>1) {
@@ -283,7 +285,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                         + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                         + "base3.typefood, base3.category, base3.subcategory, \n"
-                        + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel) as base4\n"
+                        + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel, base3.contragentname) as base4\n"
                         + "inner join \n"
                         + "(select base3.*, count (distinct cwtc.idofcomplex) as countInComplex from \n"
                         + "(" + sqlQueryBase + ") as base3\n"
@@ -293,7 +295,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                         + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                         + "base3.typefood, base3.category, base3.subcategory, \n"
-                        + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel) as base5\n"
+                        + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel, base3.contragentname) as base5\n"
                         + "on base4.idofdish = base5.idofdish " + filterCount;
             } else
             {
@@ -311,7 +313,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                             + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                             + "base3.typefood, base3.category, base3.subcategory, \n"
-                            + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel) as base4 "
+                            + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel, base3.contragentname) as base4 "
                             + filterCount;
 
                 } else {
@@ -329,7 +331,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                                 + "group by base3.idofdish, base3.dishname, base3.componentsofdish, base3.code, base3.price, base3.dateofbeginmenuincluding, \n"
                                 + "base3.dateofendmenuincluding, base3.agegroup, base3.typeOfProduction,\n"
                                 + "base3.typefood, base3.category, base3.subcategory, \n"
-                                + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel) as base4 "
+                                + "base3.calories, base3.qty, base3.protein, base3.fat, base3.carbohydrates, base3.barcode, base3.dishdel, base3.contragentname) as base4 "
                                 + filterCount;
                     }
                 }
@@ -401,29 +403,30 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                         dishMenuWebArmPPItem.setArchived(0);
                     }
                 }
+                if (row[19] != null) {
+                    dishMenuWebArmPPItem.setContragentName(row[19].toString());
+                }
                 if (bufet>1 && incomplex>1) {
-                    if (row[19] != null) {
-                        dishMenuWebArmPPItem.setCountInMenu(row[19].toString());
-                    }
                     if (row[20] != null) {
-                        dishMenuWebArmPPItem.setCountInComplex(row[20].toString());
+                        dishMenuWebArmPPItem.setCountInMenu(row[20].toString());
+                    }
+                    if (row[21] != null) {
+                        dishMenuWebArmPPItem.setCountInComplex(row[21].toString());
                     }
                 } else
                 {
                     if (bufet>1) {
-                        if (row[19] != null) {
-                            dishMenuWebArmPPItem.setCountInMenu(row[19].toString());
+                        if (row[20] != null) {
+                            dishMenuWebArmPPItem.setCountInMenu(row[20].toString());
                         }
                     } else {
                         if (incomplex>1)
-                            if (row[19] != null) {
-                                dishMenuWebArmPPItem.setCountInComplex(row[19].toString());
+                            if (row[20] != null) {
+                                dishMenuWebArmPPItem.setCountInComplex(row[20].toString());
                             }
                     }
                 }
-
                 dishMenuWebArmPPItems.add(dishMenuWebArmPPItem);
-
             }
 
             Collections.sort(dishMenuWebArmPPItems, new Comparator<DishMenuWebArmPPItem>() {
