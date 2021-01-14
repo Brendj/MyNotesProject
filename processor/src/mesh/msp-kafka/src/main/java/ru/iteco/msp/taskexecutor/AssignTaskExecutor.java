@@ -75,6 +75,7 @@ public class AssignTaskExecutor {
             try {
                 if(runPrimalLoad && !alreadyLoaded){
                     beginPrimalLoad();
+                    alreadyLoaded = true;
                 } else {
                     end = new Date();
                     Date next = assignCronTrigger.nextExecutionTime(new SimpleTriggerContext());
