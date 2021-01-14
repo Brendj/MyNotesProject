@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.RNIPVersion;
 import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
 
 import org.slf4j.Logger;
@@ -79,7 +81,8 @@ public class RNIPGetPaymentsServiceV21 {
                         rnipMessage.getIdOfRnipMessage(),
                         RuntimeContext.getAppContext().getBean(RNIPGetPaymentsServiceV21.class).getActiveCount(),
                         RuntimeContext.getAppContext().getBean(RNIPGetPaymentsServiceV21.class).getRemainingCapacity()));
-                RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class).processRnipMessage(rnipMessage);
+                RNIPLoadPaymentsServiceV21 service = getRNIPServiceBean();
+                service.processRnipMessage(rnipMessage);
             } catch (Exception e) {
                 logger.get().error("Error in processing rnip message async", e);
                 synchronized (rnipMessagesInProgress) {
@@ -92,6 +95,17 @@ public class RNIPGetPaymentsServiceV21 {
                     }
                 }
             }
+        }
+
+        public static RNIPLoadPaymentsServiceV21 getRNIPServiceBean() {
+            RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
+            switch (version) {
+                case RNIP_V21:
+                    return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class);
+                case RNIP_V22:
+                    return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV22", RNIPLoadPaymentsServiceV22.class);
+            }
+            return null;
         }
 
         public RnipMessage getRnipMessage() {

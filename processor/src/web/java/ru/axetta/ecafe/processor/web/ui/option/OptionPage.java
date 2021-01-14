@@ -91,6 +91,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer syncLimits;
     private Integer simultaneousSyncThreads;
     private Integer simultaneousSyncTimeout;
+    private Integer simultaneousAccIncSyncTimeout;
     private Integer retryAfter;
     private Integer syncLimitFilter;
     private String syncRestrictFullSyncPeriods;
@@ -121,6 +122,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String rnipProcessorInstance;
     private String RNIPPaymentsURL_v116;
     private String RNIPPaymentsURL_v20;
+    private String RNIPPaymentsURL_v22;
     private String RNIPPaymentsWorkingVersion;
     private Boolean NotifyByPushNewClients;
     private Boolean NotifyByEmailNewClients;
@@ -153,7 +155,8 @@ public class OptionPage extends BasicWorkspacePage {
     private String cardAutoBlockNode;
     private Integer cardAutoBlockDays;
 
-    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
+    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(),
+                                                  RNIPVersion.RNIP_V21.toString(), RNIPVersion.RNIP_V22.toString()};
 
     private List<BankOptionItem> banks;
 
@@ -960,6 +963,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
         simultaneousSyncThreads = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
         simultaneousSyncTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
+        simultaneousAccIncSyncTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
         syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
@@ -983,6 +987,7 @@ public class OptionPage extends BasicWorkspacePage {
         rnipProcessorInstance = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE);
         RNIPPaymentsURL_v116 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
         RNIPPaymentsURL_v20 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20);
+        RNIPPaymentsURL_v22 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V22);
         RNIPPaymentsWorkingVersion = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION);
         setNotifyByPushNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS));
         setNotifyByEmailNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS));
@@ -1196,6 +1201,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
             runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_THREADS, simultaneousSyncThreads);
             runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT, simultaneousSyncTimeout);
+            runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT, simultaneousAccIncSyncTimeout);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITFILTER, syncLimitFilter);
             runtimeContext.setOptionValue(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS, syncRestrictFullSyncPeriods);
@@ -1220,6 +1226,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE, rnipProcessorInstance);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116, RNIPPaymentsURL_v116);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20, RNIPPaymentsURL_v20);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V22, RNIPPaymentsURL_v22);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION, RNIPPaymentsWorkingVersion);
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS, getNotifyByEmailNewClients());
@@ -1458,5 +1465,21 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setEnableNotificationsSpecial(Boolean enableNotificationsSpecial) {
         this.enableNotificationsSpecial = enableNotificationsSpecial;
+    }
+
+    public Integer getSimultaneousAccIncSyncTimeout() {
+        return simultaneousAccIncSyncTimeout;
+    }
+
+    public void setSimultaneousAccIncSyncTimeout(Integer simultaneousAccIncSyncTimeout) {
+        this.simultaneousAccIncSyncTimeout = simultaneousAccIncSyncTimeout;
+    }
+
+    public String getRNIPPaymentsURL_v22() {
+        return RNIPPaymentsURL_v22;
+    }
+
+    public void setRNIPPaymentsURL_v22(String RNIPPaymentsURL_v22) {
+        this.RNIPPaymentsURL_v22 = RNIPPaymentsURL_v22;
     }
 }

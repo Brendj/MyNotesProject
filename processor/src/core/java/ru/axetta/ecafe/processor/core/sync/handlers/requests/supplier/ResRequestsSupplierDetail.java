@@ -22,6 +22,7 @@ public class ResRequestsSupplierDetail {
     private Integer tempClientsCount;
     private Boolean deletedState;
     private Long version;
+    private String data;
 
     public ResRequestsSupplierDetail() {
     }
@@ -40,9 +41,15 @@ public class ResRequestsSupplierDetail {
         this.version = goodRequestPosition.getGlobalVersion();
     }
 
+    public ResRequestsSupplierDetail(GoodRequestPosition grp, String guid) {
+        this.guid = guid;
+        this.data = "TC="+ grp.getTotalCount() + ", DSC=" + grp.getDailySampleCount() + ", TCC=" + grp.getTempClientsCount();
+    }
+
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
+        XMLUtils.setAttributeIfNotNull(element, "data", data);
         XMLUtils.setAttributeIfNotNull(element, "IdOfComplex", idOfComplex);
         XMLUtils.setAttributeIfNotNull(element, "IdOfDish", idOfDish);
         if (fType != null) {
@@ -145,5 +152,13 @@ public class ResRequestsSupplierDetail {
     @Override
     public int hashCode() {
         return Objects.hash(guid, fType, totalCount, dProbeCount, tempClientsCount, deletedState, version);
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

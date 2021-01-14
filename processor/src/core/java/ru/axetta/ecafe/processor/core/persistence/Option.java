@@ -39,6 +39,7 @@ public class Option {
             OPTION_RESTRICT_FULL_SYNC_PERIODS=18,
             OPTION_SIMULTANEOUS_SYNC_THREADS=19,
             OPTION_SIMULTANEOUS_SYNC_TIMEOUT=20,
+            OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT=21,
 
             OPTION_CHRONOPAY_SECTION=1000,
             OPTION_CHRONOPAY_RATE=1001,
@@ -181,7 +182,8 @@ public class Option {
             OPTION_CARD_AUTOBLOCK_NODE = 100211,
             OPTION_CARD_AUTOBLOCK_DAYS = 100212,
             OPTION_ENABLE_NOTIFICATIONS_SPECIAL = 100213,
-            OPTION_WT_DAYS_FORBID = 100214;
+            OPTION_WT_DAYS_FORBID = 100214,
+            OPTION_IMPORT_RNIP_PAYMENTS_URL_V22 = 100300;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -201,6 +203,7 @@ public class Option {
             OPTION_RESTRICT_FULL_SYNC_PERIODS, "",
             OPTION_SIMULTANEOUS_SYNC_THREADS, "50",
             OPTION_SIMULTANEOUS_SYNC_TIMEOUT, "20",
+            OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT, "5",
             OPTION_SMPP_CLIENT_STATUS, "0",
             OPTION_CHRONOPAY_SECTION, "1", 
             OPTION_RBK_SECTION, "1", 
@@ -334,7 +337,8 @@ public class Option {
             OPTION_CARD_AUTOBLOCK_NODE, "1001",
             OPTION_CARD_AUTOBLOCK_DAYS, "180",
             OPTION_ENABLE_NOTIFICATIONS_SPECIAL, "1",
-            OPTION_WT_DAYS_FORBID, "2"
+            OPTION_WT_DAYS_FORBID, "2",
+            OPTION_IMPORT_RNIP_PAYMENTS_URL_V22, "https://test.rnip.mos.ru:9090/frontend-service/MainService"
 };
 
     private Long idOfOption;

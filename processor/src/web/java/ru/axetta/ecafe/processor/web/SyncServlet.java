@@ -65,6 +65,7 @@ public class SyncServlet extends HttpServlet {
     private static final AtomicLong threadCounter = new AtomicLong();
     public static final int MAX_SYNCS = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
     public static final int permitsTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
+    public static final int permitsAccIncTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT);
     private static final Semaphore permitsForSync = new Semaphore(MAX_SYNCS, true);
     private final static ThreadLocal<Boolean> currentSyncWasGranted = new ThreadLocal<Boolean>(){
         @Override protected Boolean initialValue() { return false; }
@@ -163,8 +164,10 @@ public class SyncServlet extends HttpServlet {
             }
             ///////
             long currentTime = System.currentTimeMillis();
-            if (syncType != SyncType.TYPE_GET_ACC_INC) {
-                if (permitsForSync.tryAcquire(permitsTimeout, TimeUnit.MINUTES)) {
+            boolean useQueueForAllSyncs = runtimeContext.isUseQueueForAllSyncs();
+            if (useQueueForAllSyncs || syncType != SyncType.TYPE_GET_ACC_INC) {
+                long timeout = (syncType == SyncType.TYPE_GET_ACC_INC) ? permitsAccIncTimeout : permitsTimeout;
+                if (permitsForSync.tryAcquire(timeout, TimeUnit.MINUTES)) {
                     currentSyncWasGranted.set(true);
                 } else {
                     String message = "Failed to perform this sync. Wait timeout is expired. Available permits is " + permitsForSync.availablePermits();
