@@ -13,6 +13,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -32,7 +33,7 @@ import java.util.*;
  * Time: 14:34
  * To change this template use File | Settings | File Templates.
  */
-public class TransactionsReport extends BasicReportForAllOrgJob {
+public class TransactionsReport extends BasicReportForOrgJob {
     /*
     * Параметры отчета для добавления в правила и шаблоны
     *
@@ -63,29 +64,41 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
-    public static class Builder extends BasicReportForAllOrgJob.Builder {
+    public static class Builder extends BasicReportForOrgJob.Builder {
         private final String templateFilename;
         private boolean exportToHTML = false;
+        private long idOfOrg;
+        Boolean allFriendlyOrgs;
 
-        public Builder(String templateFilename) {
+        public Builder(String templateFilename, long idOfOrg, Boolean allFriendlyOrgs) {
             this.templateFilename = templateFilename;
+            this.idOfOrg = idOfOrg;
+            this.allFriendlyOrgs = allFriendlyOrgs;
         }
 
-        public Builder() {
+        public Builder(long idOfOrg, Boolean allFriendlyOrgs) {
             String templateName = TransactionsReport.class.getSimpleName();
             templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + templateName + ".jasper";
             exportToHTML = true;
+            this.idOfOrg = idOfOrg;
+            this.allFriendlyOrgs = allFriendlyOrgs;
         }
 
         @Override
         public TransactionsReport build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
-            return doBuild(session, startTime, endTime, calendar);
+            return doBuild(session, startTime, endTime, calendar, idOfOrg, allFriendlyOrgs);
         }
 
-        public TransactionsReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+        public TransactionsReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar, long idOfOrg, Boolean allFriendlyOrgs) throws Exception {
             if(startTime == null || endTime == null) {
                 throw new IllegalArgumentException("Не задан период");
+            }
+            if (endTime.before(startTime)) {
+                throw new IllegalArgumentException("Конечная дата не может быть меньше начальной");
+            }
+            if (CalendarUtils.getDifferenceInDays(startTime, endTime) > 31) {
+                throw new IllegalArgumentException("Период отчета не может превышать 1 месяца");
             }
 
             Date generateTime = new Date();
@@ -98,7 +111,7 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
             parameterMap.put("endDate", format.format(endTime));
 
 
-            List<TransactionsReportItem> items = findItems(session, startTime, endTime);
+            List<TransactionsReportItem> items = findItems(session, startTime, endTime, idOfOrg, allFriendlyOrgs);
             //  Если имя шаблона присутствует, значит строится для джаспера
             JasperPrint jasperPrint = JasperFillManager
                     .fillReport(templateFilename, parameterMap, createDataSource(items));
@@ -124,30 +137,32 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
         }
 
 
-        protected List<TransactionsReportItem> findItems(Session session, Date start, Date end) {
+        protected List<TransactionsReportItem> findItems(Session session, Date start, Date end, long idOfOrg, Boolean allFriendlyOrgs) {
             Map<Long, TransactionsReportItem> items = new HashMap<Long, TransactionsReportItem>();
 
-            getEvents(session, start, end, items);
-            getSales(session, start, end, items);
+            getEvents(session, start, end, items, idOfOrg, allFriendlyOrgs);
+            getSales(session, start, end, items, idOfOrg, allFriendlyOrgs);
 
             return new ArrayList<TransactionsReportItem>(items.values());
         }
 
 
         protected Map<Long, TransactionsReportItem> getEvents(Session session, Date start, Date end,
-                                                              Map<Long, TransactionsReportItem> items) {
+                                                              Map<Long, TransactionsReportItem> items, long idOfOrg, Boolean allFriendlyOrgs) {
+            String condition = allFriendlyOrgs ? " in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) " : " = :idOfOrg ";
             String sql = "select distinct ee.idofclient, o.idoforg, o.shortname, o.address, o.district, count(ee.idofenterevent) as event "
                     + "from cf_orgs as o "
                     + "left join cf_enterevents as ee on o.idoforg=ee.idoforg and (ee.passdirection=0 or ee.passdirection=1) and "
                     + "          ee.evtdatetime >= :startDate and "
                     + "          ee.evtdatetime < :endDate "
-                    + "where o.state<>0 "
+                    + "where o.state<>0 and o.IdOfOrg " + condition
                     + "group by o.idoforg, o.shortname, o.address, o.district, ee.idofclient "
                     + "order by o.shortname ";
 
             Query query = session.createSQLQuery(sql);
             query.setParameter("startDate", start.getTime());
             query.setParameter("endDate", end.getTime());
+            query.setParameter("idOfOrg", idOfOrg);
             List res = query.list();
             if(res == null) {
                 return Collections.EMPTY_MAP;
@@ -172,7 +187,8 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
 
 
         protected Map<Long, TransactionsReportItem> getSales(Session session, Date start, Date end,
-                                                             Map<Long, TransactionsReportItem> items) {
+                                                             Map<Long, TransactionsReportItem> items, long idOfOrg, Boolean allFriendlyOrgs) {
+            String condition = allFriendlyOrgs ? " in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) " : " = :idOfOrg ";
             String sql =
                         "select idoforg, shortname, address, district, count(*), isPaid, isComplex "
                       + "from ( "
@@ -188,7 +204,7 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
                       + "                oo.createddate >= :startDate and "
                       + "                oo.createddate < :endDate "
                       + "      join cf_orderdetails as od on od.idoforder=oo.idoforder "
-                      + "      where o.state<>0 "
+                      + "      where o.state<>0 and o.IdOfOrg " + condition
                       + "      order by o.shortname "
                       + "      ) as data "
                       + "group by idoforg, shortname, address, district, isPaid, isComplex "
@@ -197,6 +213,7 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
             Query query = session.createSQLQuery(sql);
             query.setParameter("startDate", start.getTime());
             query.setParameter("endDate", end.getTime());
+            query.setParameter("idOfOrg", idOfOrg);
             List res = query.list();
             for (Object entry : res) {
                 Object e[]         = (Object[]) entry;
@@ -243,7 +260,7 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
 
     public TransactionsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime, List<TransactionsReportItem> items) {
-        super(generateTime, generateDuration, print, startTime, endTime);
+        super(generateTime, generateDuration, print, startTime, endTime, 0L);
         this.items = items;
     }
 
@@ -259,13 +276,13 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
 
 
     @Override
-    public BasicReportForAllOrgJob createInstance() {
+    public BasicReportForOrgJob createInstance() {
         return new TransactionsReport();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
-        return new Builder(templateFilename);
+    public BasicReportForOrgJob.Builder createBuilder(String templateFilename) {
+        return new Builder(templateFilename, 0L, true);
     }
 
     @Override

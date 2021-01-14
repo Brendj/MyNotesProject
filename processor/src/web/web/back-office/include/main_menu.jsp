@@ -986,6 +986,11 @@
         <%--@elvariable id="preorderDoublePaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderDoublePaymentReportPage"--%>
         <rich:panelMenuItem id="preorderDoublePaymentMenuItem" binding="#{preorderDoublePaymentReportPage.mainMenuComponent}"
                             label="Проверка двойных оплат" action="#{preorderDoublePaymentReportPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preordersReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreordersReportPage"--%>
+        <rich:panelMenuItem id="preordersMenuItem" binding="#{preordersReportPage.mainMenuComponent}"
+                            label="Отчет по предзаказам" action="#{preordersReportPage.show}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
@@ -1165,10 +1170,7 @@
                             label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
                             reRender="workspaceForm" />
 
-        <%--@elvariable id="preordersReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreordersReportPage"--%>
-        <rich:panelMenuItem id="preordersMenuItem" binding="#{preordersReportPage.mainMenuComponent}"
-                            label="Отчет по предзаказам" action="#{preordersReportPage.show}"
-                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
                          label="Льготное питание" rendered="#{mainPage.eligibleToViewMealsReports}">
@@ -1201,9 +1203,6 @@
                                 reRender="workspaceForm" />
         </rich:panelMenuGroup>
 
-        <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
-        <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
-                            label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Сводный отчет по услугам (предварительный)"
@@ -1364,6 +1363,12 @@
                                     action="#{kznClientsStatisticEditPage.show}" reRender="workspaceForm" />
             </rich:panelMenuGroup>
         </rich:panelMenuGroup>
+        <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
+                            label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
+                            reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTransactionsReport}" />
+        <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
+        <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
+                            label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
@@ -1440,11 +1445,7 @@
                             label="Детализированный отчет отклонений оплаты льготного питания"
                             action="#{mainPage.showDetailedDeviationsWithoutCorpsReportPage}"
                             reRender="workspaceForm" />--%>
-        <rich:panelMenuItem id="detailedDeviationsWithoutCorpsNewReportMenuItem"
-                            binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.mainMenuComponent}"
-                            label="Детализированный отчет отклонений оплаты льготного питания"
-                            action="#{mainPage.showDetailedDeviationsWithoutCorpsNewReportPage}"
-                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
     <%--@elvariable id="financialControlPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FinancialControlPage"--%>
@@ -1465,11 +1466,11 @@
                             action="#{mainPage.showLatePaymentDetailedReportPage}"
                             reRender="workspaceForm"/>
 
-        <%--<rich:panelMenuItem id="adjustmentPaymentReportMenuItem"
-                            binding="#{mainPage.adjustmentPaymentReportPage.mainMenuComponent}"
-                            label="Отчет по ручной корректировке оплаты льготного питания"
-                            action="#{mainPage.showAdjustmentPaymentReportPage}"
-                            reRender="workspaceForm"/>--%>
+        <rich:panelMenuItem id="detailedDeviationsWithoutCorpsNewReportMenuItem"
+                            binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.mainMenuComponent}"
+                            label="Детализированный отчет отклонений оплаты льготного питания"
+                            action="#{mainPage.showDetailedDeviationsWithoutCorpsNewReportPage}"
+                            reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
     <%--@elvariable id="salesReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SalesReportGroupPage"--%>
@@ -1574,6 +1575,11 @@
         <rich:panelMenuItem id="dishMenuReport" binding="#{mainPage.dishMenuReportWebArmPP.mainMenuComponent}"
                             label="Отчет по блюдам" action="#{mainPage.showDishMenuWebARMPPReportPage}"
                             reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="clientsBenefitsReportMenuItem"
+                            binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
+                            label="Расчет комплексов по льготным правилам"
+                            action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" rendered="#{mainPage.eligibleToViewClientsBenefitsReport}" />
     </rich:panelMenuGroup>
     <%--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"--%>
     <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"
@@ -1589,15 +1595,9 @@
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}"
                         label="Свод по услугам" action="#{totalServicesReportPage.show}" reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTotalServicesReport}" />
-    <rich:panelMenuItem id="clientsBenefitsReportMenuItem"
-                        binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
-                        label="Расчет комплексов по льготным правилам"
-                        action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" rendered="#{mainPage.eligibleToViewClientsBenefitsReport}" />
+
     <%--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"--%>
 
-    <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
-                        label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
-                        reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTransactionsReport}" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
