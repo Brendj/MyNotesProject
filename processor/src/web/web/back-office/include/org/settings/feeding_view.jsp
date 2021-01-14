@@ -24,8 +24,13 @@
         <h:outputText escape="true" value="Сумма скидки" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.feedingSettingViewPage.discount}" styleClass="output-text long-field" converter="copeckSumConverter"/>
 
-        <h:outputText escape="true" value="Учитывать скидку при оплате платного плана" styleClass="output-text" />
+        <h:outputText escape="true" value="Скидка для комплексов" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.feedingSettingViewPage.useDiscount}" styleClass="output-text" readonly="true">
+            <a4j:support event="onchange" reRender="feedingSettingViewPage" />
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="true" value="Скидка для буфетной продукции" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.feedingSettingViewPage.useDiscountBuffet}" styleClass="output-text" readonly="true">
             <a4j:support event="onchange" reRender="feedingSettingViewPage" />
         </h:selectBooleanCheckbox>
 

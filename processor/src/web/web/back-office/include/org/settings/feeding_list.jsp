@@ -42,9 +42,15 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="Учитывать скидку при оплате" />
+                <h:outputText value="Скидка для комплексов" />
             </f:facet>
             <h:outputText value="#{setting.useDiscountString}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Скидка для буфетной продукции" />
+            </f:facet>
+            <h:outputText value="#{setting.useDiscountBuffetString}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

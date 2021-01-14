@@ -11,11 +11,13 @@ public class FeedingSettingOrgItem {
     private Long limit;
     private Long discount;
     private Boolean useDiscount;
+    private Boolean useDiscountBuffet;
 
-    public FeedingSettingOrgItem(Long limit, Long discount, Boolean useDiscount) {
+    public FeedingSettingOrgItem(Long limit, Long discount, Boolean useDiscount, Boolean useDiscountBuffet) {
         this.limit = limit;
         this.discount = discount;
         this.useDiscount = useDiscount;
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 
     public Long getLimit() {
@@ -40,5 +42,13 @@ public class FeedingSettingOrgItem {
 
     public void setUseDiscount(Boolean useDiscount) {
         this.useDiscount = useDiscount;
+    }
+
+    public Boolean getUseDiscountBuffet() {
+        return useDiscountBuffet;
+    }
+
+    public void setUseDiscountBuffet(Boolean useDiscountBuffet) {
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 }
