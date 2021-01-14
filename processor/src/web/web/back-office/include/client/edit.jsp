@@ -180,6 +180,8 @@
     <h:inputText value="#{mainPage.clientEditPage.clientGUID}" maxlength="64" styleClass="input-text long-field"/>
     <h:outputText escape="true" value="Идентификатор MESH GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.meshGUID}" maxlength="64" styleClass="input-text long-field"/>
+    <h:outputText escape="true" value="Идентификатор SSOID" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.clientSSOID}" maxlength="64" styleClass="input-text long-field"/>
     <h:outputText escape="true" value="Идентификатор REGID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientIacRegId}" maxlength="40" styleClass="input-text long-field"/>
 
