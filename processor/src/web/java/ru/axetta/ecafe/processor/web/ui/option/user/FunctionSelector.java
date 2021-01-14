@@ -85,7 +85,9 @@ public class FunctionSelector {
             );
     private static final List<String> onlineReportFuncs = Arrays
             .asList(
-                    Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX,
+                    Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
+                    Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX,
                     Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
                     Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS,
                     Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
@@ -183,6 +185,9 @@ public class FunctionSelector {
                     .equalsIgnoreCase(Function.FUNC_CLIENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_REPORT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_DOCS) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()

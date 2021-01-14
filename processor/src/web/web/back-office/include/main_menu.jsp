@@ -1271,7 +1271,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="acceptanceActGroupMenu" binding="#{mainPage.acceptanceActGroupMenu.mainMenuComponent}"
-                         label="Документы" >
+                         label="Документы" rendered="#{mainPage.eligibleToWorkOnlineReportDocs}">
         <a4j:support event="onclick" action="#{mainPage.showAcceptanceGroupMenu}" reRender="workspaceForm" />
         <%--@elvariable id="acceptanceOfCompletedWorksActPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AcceptanceOfCompletedWorksActPage"--%>
         <rich:panelMenuItem id="acceptanceOfCompletedWorksActMenuItem"
@@ -1545,7 +1545,7 @@
 
     <%--@elvariable id="passReportsGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PassReportsGroupPage"--%>
     <rich:panelMenuGroup id="passReportsGroupPageMenu" binding="#{passReportsGroupPage.mainMenuComponent}"
-                         label="Отчеты по проходам">
+                         label="Отчеты по проходам" rendered="#{mainPage.eligibleToWorkOnlineReportEEReport}">
         <a4j:support event="onclick" action="#{passReportsGroupPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="detailedEnterEventReportMenuItem" binding="#{mainPage.detailedEnterEventReportPage.mainMenuComponent}"
@@ -1568,7 +1568,7 @@
     </rich:panelMenuGroup>
     <%--@elvariable id="menuReportsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.MenuReportsPage"--%>
     <rich:panelMenuGroup id="menuReportsPage" binding="#{menuReportsPage.mainMenuComponent}"
-                         label="Отчет по меню">
+                         label="Отчет по меню" rendered="#{mainPage.eligibleToWorkOnlineReportMenuReport}">
         <a4j:support event="onclick" action="#{menuReportsPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="dishMenuReport" binding="#{mainPage.dishMenuReportWebArmPP.mainMenuComponent}"
