@@ -30,7 +30,11 @@ public class SupplyEvent {
         event.person_id = order.getMeshGUID();
         event.benefit_code = order.getCode() == null ? null : order.getCode().toString();
         if(order.getDtsznCodes() != null){
-            event.benefit_category_code = order.getDtsznCodes();
+            if(order.getDtsznCodes().equals("0")){  // Иное
+                event.benefit_category_name = "Иное";
+            } else {
+                event.benefit_category_code = order.getDtsznCodes();
+            }
         } else {
             if(order.getCategoryName().equals("Начальные классы")) {
                 event.benefit_category_name = order.getCategoryName();

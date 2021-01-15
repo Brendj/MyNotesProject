@@ -12,7 +12,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "cf_categorydiscounts")
-@NamedEntityGraphs({
+/*@NamedEntityGraphs({
         @NamedEntityGraph(name = "only_discount"),
         @NamedEntityGraph(
                 name = "discount.categoryDiscountDTSZN",
@@ -20,7 +20,7 @@ import java.util.Objects;
                         @NamedAttributeNode(value = "categoryDiscountDTSZN")
                 }
         )
-})
+})*/
 public class CategoryDiscount {
     @Id
     @Column(name = "idofcategorydiscount")

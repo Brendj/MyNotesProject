@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "cf_discountrules")
-@NamedEntityGraphs({
+/*@NamedEntityGraphs({
         @NamedEntityGraph(name = "rule_only"),
         @NamedEntityGraph(
                 name = "rule.categoryDiscounts",
@@ -24,7 +24,7 @@ import java.util.Objects;
                         )
                 }
         )
-})
+})*/
 public class DiscountRule {
     @Id
     @Column(name = "idofrule")

@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "cf_clients")
-@NamedEntityGraphs({
+/*@NamedEntityGraphs({
         @NamedEntityGraph(
                 name = "only_client"
         ),
@@ -29,7 +29,7 @@ import java.util.Objects;
                       )
                 }
         )
-})
+})*/
 public class Client {
 
     @Id

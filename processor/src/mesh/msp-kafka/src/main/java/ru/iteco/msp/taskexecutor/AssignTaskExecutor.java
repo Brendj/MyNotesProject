@@ -25,6 +25,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -35,7 +37,7 @@ import java.util.List;
 @Component
 public class AssignTaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(AssignTaskExecutor.class);
-    private static final int SAMPLE_SIZE = 100000;
+    private static final int SAMPLE_SIZE = 500;
 
     private final CronTrigger assignCronTrigger;
     private final ThreadPoolTaskScheduler threadPoolAssignTaskScheduler;
@@ -68,10 +70,12 @@ public class AssignTaskExecutor {
     class RunnableTask implements Runnable{
 
         @Override
+        @Transactional
         public void run() {
             Date begin;
             Date end;
             AssignOperationType type;
+
             try {
                 if(runPrimalLoad && !alreadyLoaded){
                     beginPrimalLoad();
@@ -133,10 +137,11 @@ public class AssignTaskExecutor {
             }
         }
 
-        private void beginPrimalLoad() {
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void beginPrimalLoad() {
             int i = 0;
             try {
-                Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("client", "registrationDate"));
+                Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("idOfClient").and(Sort.by("registrationDate").descending()));
                 List<DiscountChangeHistory> discountChangeHistoryList = discountsService.getDistinctHistoryByClient(pageable);
                 while (CollectionUtils.isNotEmpty(discountChangeHistoryList)) {
                     for(DiscountChangeHistory h : discountChangeHistoryList){
@@ -162,7 +167,7 @@ public class AssignTaskExecutor {
                     }
 
                     i += SAMPLE_SIZE;
-                    pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("client").and(Sort.by("registrationDate").descending()));
+                    pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("idOfClient").and(Sort.by("registrationDate").descending()));
                     discountChangeHistoryList = discountsService.getDistinctHistoryByClient(pageable);
                 }
             } catch (Exception e) {
