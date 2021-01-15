@@ -216,7 +216,11 @@ public class ContragentListSelectPage extends BasicPage {
             criteria.add(Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE));
         }
         if (StringUtils.isNotEmpty(classTypesString)) {
-            String[] classTypes = classTypesString.split(",");
+            String[] classTypes;
+            if (classTypesString.equals("3")) //Класс типа 3 используется только для отсечения ОПЕРАТОРА
+                classTypes = new String[]{"2"};
+            else
+                classTypes = classTypesString.split(",");
             Criterion exp = Restrictions.eq("classId", Integer.parseInt(classTypes[0]));
             for (int i = 1; i < classTypes.length; i++) {
                 exp = Restrictions.or(exp, Restrictions.eq("classId", Integer.parseInt(classTypes[i])));
@@ -231,7 +235,7 @@ public class ContragentListSelectPage extends BasicPage {
         criteria.addOrder(Order.asc("contragentName"));
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         List<Contragent> contragentsByCriteria = criteria.list();
-        if(!"1".equals(classTypesString)) {
+        if(!"1".equals(classTypesString) && !"3".equals(classTypesString)) {
             Criteria criteria1 = session.createCriteria(Contragent.class);
             criteria1.add(Restrictions.eq("contragentName", OPERATOR));
             Contragent operator = (Contragent) criteria1.uniqueResult();
