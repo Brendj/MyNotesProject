@@ -15,7 +15,8 @@
     <h:panelGrid id="filterdishMenuWabARMPPReportPanel" columns="2">
         <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
-            <a4j:commandButton value="..." action="#{mainPage.dishMenuReportWebArmPP.showContragentListSelectPage}" disabled="#{!mainPage.dishMenuReportWebArmPP.notEmptySelectedOrg}"
+            <a4j:commandButton value="..." action="#{mainPage.dishMenuReportWebArmPP.showContragentListSelectPage}"
+                               disabled="#{!mainPage.dishMenuReportWebArmPP.emptySelectedOrg}"
                                reRender="modalContragentListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
@@ -53,6 +54,7 @@
         <h:outputText escape="true" value="Выбор комплекса" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
             <a4j:commandButton value="..." action="#{mainPage.showComplexListSelectPage}"
+                               disabled="#{!mainPage.dishMenuReportWebArmPP.showComplexList}"
                                reRender="modalComplexListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalComplexListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">

@@ -323,7 +323,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
-    public boolean isNotEmptySelectedOrg() {
+    public boolean isEmptySelectedOrg() {
         if (idOfOrgList == null)
             return true;
         else
@@ -397,6 +397,19 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
                 HibernateUtils.close(persistenceSession, logger);
             }
         }
+    }
+
+    public boolean isShowComplexList() {
+        if (idOfOrgList == null || idOfOrgList.isEmpty())
+        {
+            if (contragentItems == null || contragentItems.isEmpty())
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+
     }
 
     @Override
