@@ -262,8 +262,10 @@ public class ClientBalanceByOrgReport extends BasicReportForContragentJob {
                 }
             }
 
-            List infos = DAOService.getInstance().getClientBalanceInfos(orgs_str, groupWhere, endTime,
+            List infos = DAOService.getInstance().getClientBalanceInfosWithoutMigrations(orgs_str, groupWhere, endTime,
                     new Date(System.currentTimeMillis()), "");
+            infos.addAll(DAOService.getInstance().getClientBalanceInfosWithMigrations(orgs_str, groupWhere, endTime,
+                    new Date(System.currentTimeMillis()), "", idOfOrgList));
             for (Org org : orgs) {
                 OrgBalanceInfo orgItem = new OrgBalanceInfo();
                 Long idOfOrg = org.getIdOfOrg();

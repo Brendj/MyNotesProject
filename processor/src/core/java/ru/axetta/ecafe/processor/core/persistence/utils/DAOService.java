@@ -2417,6 +2417,68 @@ public class DAOService {
         //return DAOUtils.existClientPayment(session, null, idOfPayment);
     }
 
+    public List getClientBalanceInfosWithMigrations(String where, String where2, Date begDate, Date endDate, String clientWhere, List<Long> idOfOrgList) {
+        //Находим клиентов с историей перемещений между ОО или по группам
+        String str_query = "select c.idofclient, h.idoforg from cf_clientmigrationhistory h join cf_clients c on h.idofclient = c.idofclient "
+                + "join cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                + "where h.registrationdate between :begDate and :endDate and "
+                + "h.registrationdate = (select max(registrationdate) from cf_clientmigrationhistory hh where hh.idofclient = h.idofclient and hh.registrationdate < :begDate) "
+                + "and h.idoforg in (" + where + ") " + where2
+                + " union "
+                + "select c.idofclient, h.idoforg from cf_clientgroup_migrationhistory h join cf_clients c on h.idofclient = c.idofclient "
+                + "join cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                + "where h.registrationdate between :begDate and :endDate and "
+                + "h.registrationdate = (select max(registrationdate) from cf_clientgroup_migrationhistory hh where hh.idofclient = h.idofclient and hh.registrationdate < :begDate) "
+                + "and h.idoforg in (" + where + ") " + where2;
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("begDate", begDate.getTime());
+        q.setParameter("endDate", endDate.getTime());
+        List list =  q.getResultList();
+        Map<Long, Long> clients = new HashMap();
+        for (Object obj : list) {
+            //Определяем, находился ли клиент в одной из нужных организаций на дату отчета
+            Object[] row = (Object[]) obj;
+            Long idOfClient = HibernateUtils.getDbLong(row[0]);
+            Long idOfOrg = HibernateUtils.getDbLong(row[1]);
+            if (idOfOrgList.contains(idOfOrg)) clients.put(idOfClient, idOfOrg);
+        }
+        str_query = "SELECT :idOfClient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+                + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
+                + "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
+                + ":idOfOrg as idoforg "
+                + "FROM cf_clients c INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                + where2 + " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idofclient = :idOfClient";
+        List result = new ArrayList();
+        for (Map.Entry<Long, Long> entry : clients.entrySet()) {
+            q = entityManager.createNativeQuery(str_query);
+            q.setParameter("begDate", begDate.getTime());
+            q.setParameter("endDate", endDate.getTime());
+            q.setParameter("idOfClient", entry.getKey());
+            q.setParameter("idOfOrg", entry.getValue());
+            result.add(q.getResultList());
+        }
+        return result;
+    }
+
+    public List getClientBalanceInfosWithoutMigrations(String where, String where2, Date begDate, Date endDate, String clientWhere) {
+        String str_query =
+                "SELECT c.idofclient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+                        + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
+                        + "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
+                        + "o.idoforg as idoforg "
+                        + "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                        + where2 + " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where
+                        + ") " + clientWhere
+                        + " and c.idofclient not in (select idofclient from cf_clientmigrationhistory where registrationdate between :begDate and :endDate and idoforg in("
+                        + where + ")) "
+                        + "and c.idofclient not in (select idofclient from cf_clientgroup_migrationhistory where registrationdate between :begDate and :endDate and idoforg in("
+                        + where + "))";
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("begDate", begDate.getTime());
+        q.setParameter("endDate", endDate.getTime());
+        return q.getResultList();
+    }
+
     public List getClientBalanceInfos(String where, String where2, Date begDate, Date endDate, String clientWhere) {
         String str_query =
                 "SELECT c.idofclient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
