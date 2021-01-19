@@ -321,6 +321,13 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
+    public boolean isNotEmptySelectedOrg() {
+        if (idOfOrgList == null)
+            return true;
+        else
+            return idOfOrgList.isEmpty();
+    }
+
 
     public Object showOrgListSelectPage() {
         if (contragentItems != null && !contragentItems.isEmpty()) {
@@ -341,7 +348,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
             setOrgFilterInfo(orgMap);
-            changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
+            //changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
         }
     }
 
