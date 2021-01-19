@@ -2421,13 +2421,13 @@ public class DAOService {
         //Находим клиентов с историей перемещений между ОО или по группам
         String str_query = "select c.idofclient, h.idoforg from cf_clientmigrationhistory h join cf_clients c on h.idofclient = c.idofclient "
                 + "join cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
-                + "where h.registrationdate between :begDate and :endDate and "
+                + "where exists (select * from cf_clientmigrationhistory hhh where hhh.idofclient = h.idofclient and hhh.registrationdate between :begDate and :endDate) and "
                 + "h.registrationdate = (select max(registrationdate) from cf_clientmigrationhistory hh where hh.idofclient = h.idofclient and hh.registrationdate < :begDate) "
                 + "and h.idoforg in (" + where + ") " + where2
                 + " union "
                 + "select c.idofclient, h.idoforg from cf_clientgroup_migrationhistory h join cf_clients c on h.idofclient = c.idofclient "
                 + "join cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
-                + "where h.registrationdate between :begDate and :endDate and "
+                + "where exists (select * from cf_clientgroup_migrationhistory hhh where hhh.idofclient = h.idofclient and hhh.registrationdate between :begDate and :endDate) and "
                 + "h.registrationdate = (select max(registrationdate) from cf_clientgroup_migrationhistory hh where hh.idofclient = h.idofclient and hh.registrationdate < :begDate) "
                 + "and h.idoforg in (" + where + ") " + where2;
         Query q = entityManager.createNativeQuery(str_query);
@@ -2442,7 +2442,7 @@ public class DAOService {
             Long idOfOrg = HibernateUtils.getDbLong(row[1]);
             if (idOfOrgList.contains(idOfOrg)) clients.put(idOfClient, idOfOrg);
         }
-        str_query = "SELECT :idOfClient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+        str_query = "SELECT :idOfClient, (select o.shortname from cf_orgs o where idoforg = :idOfOrg) as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
                 + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
                 + "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
                 + ":idOfOrg as idoforg "
@@ -2455,7 +2455,7 @@ public class DAOService {
             q.setParameter("endDate", endDate.getTime());
             q.setParameter("idOfClient", entry.getKey());
             q.setParameter("idOfOrg", entry.getValue());
-            result.add(q.getResultList());
+            result.addAll(q.getResultList());
         }
         return result;
     }
@@ -2469,8 +2469,8 @@ public class DAOService {
                         + "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
                         + where2 + " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where
                         + ") " + clientWhere
-                        + " and c.idofclient not in (select idofclient from cf_clientmigrationhistory where registrationdate between :begDate and :endDate and idoforg in("
-                        + where + ")) "
+                        + " and c.idofclient not in (select idofclient from cf_clientmigrationhistory where registrationdate between :begDate and :endDate and (idoforg in("
+                        + where + ") or idofoldorg in (" + where + "))) "
                         + "and c.idofclient not in (select idofclient from cf_clientgroup_migrationhistory where registrationdate between :begDate and :endDate and idoforg in("
                         + where + "))";
         Query q = entityManager.createNativeQuery(str_query);
