@@ -20,6 +20,7 @@
         <module>nsi-sync</module>
         <module>card-sync</module>
         <module>msp-kafka</module>
+        <module>transit-discount-history</module>
     </modules>
 
     <properties>
