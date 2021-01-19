@@ -258,7 +258,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
             contragentItems.add(contragentItem);
         }
         setContragentFilterInfo(contragentItems);
-        changeOrgsForContagents(contragentItems, new ArrayList<Long>(idOfOrgList));
+        if (contragentItems != null && !contragentItems.isEmpty())
+            changeOrgsForContagents(contragentItems, new ArrayList<Long>(idOfOrgList));
     }
 
     private void changeOrgsForContagents(List<ContragentItem> contragentItems, List<Long> idofOrgs) {
@@ -348,7 +349,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
             setOrgFilterInfo(orgMap);
-            //changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
+            if (idOfOrgList != null && !idOfOrgList.isEmpty())
+                changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
         }
     }
 
