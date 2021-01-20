@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.taskexecutor;
+package ru.iteco.transit.taskexecutor;
 
-import ru.iteco.msp.models.CategoryDiscount;
-import ru.iteco.msp.models.DiscountChangeHistory;
-import ru.iteco.msp.models.enums.OperationType;
-import ru.iteco.msp.service.ClientDiscountHistoryService;
-import ru.iteco.msp.service.DiscountsService;
+import ru.iteco.transit.models.CategoryDiscount;
+import ru.iteco.transit.models.DiscountChangeHistory;
+import ru.iteco.transit.models.enums.OperationType;
+import ru.iteco.transit.service.ClientDiscountHistoryService;
+import ru.iteco.transit.service.DiscountsService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ public class TransitTaskExecutor {
     private final DiscountsService discountsService;
     private final ClientDiscountHistoryService clientDiscountHistoryService;
 
-    private static final int SAMPLE_SIZE = 50000;
+    private static final int SAMPLE_SIZE = 5000;
 
     public TransitTaskExecutor(
             CronTrigger transitCronTrigger,
@@ -72,6 +72,10 @@ public class TransitTaskExecutor {
                                 .isBlank(h.getOldCategoriesDiscounts()))) {
                             continue;
                         }
+                        log.info(String
+                                .format("Process history Client ID: %d, New discounts: %s, Old discounts: %s",
+                                        h.getClient().getIdOfClient(), h.getCategoriesDiscounts(), h.getOldCategoriesDiscounts()
+                                ));
                         List<String> newDiscounts = getSortedSplitList(h.getCategoriesDiscounts());
                         List<String> oldDiscounts = getSortedSplitList(h.getOldCategoriesDiscounts());
                         OperationType type;
@@ -84,10 +88,6 @@ public class TransitTaskExecutor {
 
                             for(String id : newDiscounts){
                                 CategoryDiscount discount = discountsService.getDiscountByStrId(id);
-                                if(!discount.getCategoryType().equals(0)){
-                                    continue;
-                                }
-
                                 clientDiscountHistoryService.save(discount, h.getClient(), h.getRegistrationDate(),
                                         h.getComment(), type);
                             }
@@ -95,9 +95,6 @@ public class TransitTaskExecutor {
                             List<CategoryDiscount> dif = discountsService.getDiffDiscounts(newDiscounts, oldDiscounts);
 
                             for (CategoryDiscount d : dif) {
-                                if (!d.getCategoryType().equals(0)) {
-                                    continue;
-                                }
                                 type = getOperationType(oldDiscounts, newDiscounts, d.getIdOfCategoryDiscount().toString());
 
                                 clientDiscountHistoryService.save(d, h.getClient(), h.getRegistrationDate(),

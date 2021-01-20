@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.config;
+package ru.iteco.transit.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

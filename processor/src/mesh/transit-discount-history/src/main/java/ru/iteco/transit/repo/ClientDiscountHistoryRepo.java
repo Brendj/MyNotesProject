@@ -2,9 +2,9 @@
  * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.repo;
+package ru.iteco.transit.repo;
 
-import ru.iteco.msp.models.ClientDiscountHistory;
+import ru.iteco.transit.models.ClientDiscountHistory;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,23 +1,17 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.models;
+package ru.iteco.transit.models;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
 @Table(name = "cf_categorydiscounts")
-@NamedEntityGraphs({
-        @NamedEntityGraph(name = "only_discount"),
-        @NamedEntityGraph(
-                name = "discount.categoryDiscountDTSZN",
-                attributeNodes = {
-                        @NamedAttributeNode(value = "categoryDiscountDTSZN")
-                }
-        )
-})
 public class CategoryDiscount {
     @Id
     @Column(name = "idofcategorydiscount")

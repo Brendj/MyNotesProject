@@ -2,13 +2,13 @@
  * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.service;
+package ru.iteco.transit.service;
 
-import ru.iteco.msp.models.CategoryDiscount;
-import ru.iteco.msp.models.Client;
-import ru.iteco.msp.models.ClientDiscountHistory;
-import ru.iteco.msp.models.enums.OperationType;
-import ru.iteco.msp.repo.ClientDiscountHistoryRepo;
+import ru.iteco.transit.models.CategoryDiscount;
+import ru.iteco.transit.models.Client;
+import ru.iteco.transit.models.ClientDiscountHistory;
+import ru.iteco.transit.models.enums.OperationType;
+import ru.iteco.transit.repo.ClientDiscountHistoryRepo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

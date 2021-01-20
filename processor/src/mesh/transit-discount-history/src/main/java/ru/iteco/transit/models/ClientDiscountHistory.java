@@ -2,9 +2,9 @@
  * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.models;
+package ru.iteco.transit.models;
 
-import ru.iteco.msp.models.enums.OperationType;
+import ru.iteco.transit.models.enums.OperationType;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -13,6 +13,7 @@ import java.util.Objects;
 @Table(name = "cf_client_discount_history")
 public class ClientDiscountHistory {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idofclientdiscounthistory")
     private Long idOfClientDiscountHistory;
 

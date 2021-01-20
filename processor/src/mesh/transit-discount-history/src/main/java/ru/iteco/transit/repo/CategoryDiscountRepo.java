@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.repo;
+package ru.iteco.transit.repo;
 
-import ru.iteco.msp.models.CategoryDiscount;
+import ru.iteco.transit.models.CategoryDiscount;
 
 import org.springframework.data.repository.CrudRepository;
 

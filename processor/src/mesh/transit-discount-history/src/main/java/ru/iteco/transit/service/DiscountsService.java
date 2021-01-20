@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.service;
+package ru.iteco.transit.service;
 
-import ru.iteco.msp.models.CategoryDiscount;
-import ru.iteco.msp.models.DiscountChangeHistory;
-import ru.iteco.msp.repo.CategoryDiscountRepo;
-import ru.iteco.msp.repo.DiscountChangeHistoryRepo;
+import ru.iteco.transit.models.CategoryDiscount;
+import ru.iteco.transit.models.DiscountChangeHistory;
+import ru.iteco.transit.repo.CategoryDiscountRepo;
+import ru.iteco.transit.repo.DiscountChangeHistoryRepo;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

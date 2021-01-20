@@ -1,4 +1,8 @@
-package ru.iteco.msp;
+/*
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.iteco.transit;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.models;
+package ru.iteco.transit.models;
 
 import javax.persistence.*;
 import java.util.Objects;
