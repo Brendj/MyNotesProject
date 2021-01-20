@@ -316,7 +316,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
             contragentItems.add(contragentItem);
         }
         setContragentFilterInfo(contragentItems);
-        changeOrgsForContagents(contragentItems, new ArrayList<Long>(idOfOrgList));
+        if (contragentItems != null && !contragentItems.isEmpty())
+            changeOrgsForContagents(contragentItems, new ArrayList<Long>(idOfOrgList));
         setComplexFilterInfo(new ArrayList<ComplexItem>());
     }
 
@@ -380,6 +381,13 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
+    public boolean isEmptySelectedOrg() {
+        if (idOfOrgList == null)
+            return true;
+        else
+            return idOfOrgList.isEmpty();
+    }
+
 
     public Object showOrgListSelectPage() {
         if (contragentItems != null && !contragentItems.isEmpty()) {
@@ -400,7 +408,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
             setOrgFilterInfo(orgMap);
-            changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
+            if (idOfOrgList != null && !idOfOrgList.isEmpty())
+                changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
             setComplexFilterInfo(new ArrayList<ComplexItem>());
         }
     }
@@ -446,6 +455,19 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
                 HibernateUtils.close(persistenceSession, logger);
             }
         }
+    }
+
+    public boolean isShowComplexList() {
+        if (idOfOrgList == null || idOfOrgList.isEmpty())
+        {
+            if (contragentItems == null || contragentItems.isEmpty())
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+
     }
 
     @Override
