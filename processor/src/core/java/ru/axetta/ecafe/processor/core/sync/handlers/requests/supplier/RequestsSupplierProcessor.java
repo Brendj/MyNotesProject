@@ -17,10 +17,14 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.util.*;
 
@@ -28,6 +32,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
     private static final Logger logger = LoggerFactory.getLogger(RequestsSupplierProcessor.class);
     private final RequestsSupplier requestsSupplier;
+    private final String WRONG_DONE_DATE = "CANT_CHANGE_GRP_ON_DATE";
 
     public RequestsSupplierProcessor(Session persistenceSession, RequestsSupplier requestsSupplier) {
         super(persistenceSession);
@@ -48,119 +53,155 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
             Long nextVersion = DOVersionRepository.updateClassVersion("GoodRequest", session);
             Long nextPositionVersion = DOVersionRepository.updateClassVersion("GoodRequestPosition", session);
-
+            boolean goodDate;
             for (RequestsSupplierItem item : requestsSupplier.getItems()) {
                 errorFound = !item.getResCode().equals(RequestsSupplierItem.ERROR_CODE_ALL_OK);
-
+                //Детали меню нужны только для ошибки с недопустимой датой
+                List<ResRequestsSupplierDetail> resRequestsSupplierDetailList = new ArrayList<>();
                 if (!errorFound) {
-
-                    String guid = item.getGuid();
                     Long idOfOrg = item.getOrgId();
-                    String number = item.getNumber();
-                    Date dateOfGoodsRequest = item.getDateOfGoodsRequest();
                     Date doneDate = item.getDoneDate();
-                    RequestsSupplierTypeEnum type = item.getType();
-                    String staffGuid = item.getStaffGuid();
-                    Boolean deletedState = item.getDeletedState();
 
-                    Long versionFromClient = item.getVersion();
-
-                    GoodRequest goodRequest = DAOReadonlyService.getInstance().findGoodRequestByGuid(guid);
-
-                    if ((versionFromClient == null && goodRequest != null) || (versionFromClient != null
-                            && goodRequest != null && versionFromClient < goodRequest.getGlobalVersion())) {
-                        errorFound = true;
-                        item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
-                        item.setErrorMessage("GoodRequest versions conflict");
-                    } else {
-                        if (goodRequest != null) {
-                            goodRequest.setLastUpdate(new Date(System.currentTimeMillis()));
-                        }
-                        if (goodRequest == null) {
-                            goodRequest = item.getGoodRequest();
-                            goodRequest.setGlobalVersionOnCreate(nextVersion);
-                            goodRequest.setCreatedDate(new Date(System.currentTimeMillis()));
-                        }
-
-                        Staff staff = DAOReadonlyService.getInstance().findStaffByGuid(staffGuid);
-                        if (staff == null) {
-                            item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
-                            item.setErrorMessage("No such a staff record");
-                        }
-
-                        goodRequest.setOrgOwner(idOfOrg);
-                        goodRequest.setNumber(number);
-                        goodRequest.setGlobalVersion(nextVersion);
-                        goodRequest.setDeletedState(deletedState);
-                        goodRequest.setDoneDate(doneDate);
-                        goodRequest.setDateOfGoodsRequest(dateOfGoodsRequest);
-                        goodRequest.setState(DocumentState.FOLLOW);
-                        goodRequest.setRequestType(type.ordinal());
-                        goodRequest.setStaff(staff);
-                        goodRequest.setGuidOfStaff(staffGuid);
-                        goodRequest.setSendAll(SendToAssociatedOrgs.SendToMain);
-
-                        session.saveOrUpdate(goodRequest);
-
-                        List<RequestsSupplierDetail> requestsSupplierDetailList = item.getRequestsSupplierDetailList();
-                        if (requestsSupplierDetailList != null && requestsSupplierDetailList.size() > 0) {
-                            for (RequestsSupplierDetail detail : requestsSupplierDetailList) {
-
-                                Long detailVersionFromClient = detail.getVersion();
-                                String detailGuid = detail.getGuid();
-
-                                GoodRequestPosition goodRequestPosition = DAOReadonlyService.getInstance()
-                                        .findGoodRequestPositionByGuid(detailGuid);
-
-                                if ((detailVersionFromClient == null && goodRequestPosition != null) || (
-                                        detailVersionFromClient != null && goodRequestPosition != null
-                                                && detailVersionFromClient < goodRequestPosition.getGlobalVersion())) {
-                                    errorFound = true;
-                                    item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
-                                    item.setErrorMessage("GoodRequestPosition versions conflict");
-                                } else {
-                                    if (goodRequestPosition != null) {
-                                        final Long lastTotalCount = goodRequestPosition.getTotalCount();
-                                        final Long lastDailySampleCount = goodRequestPosition.getDailySampleCount();
-                                        final Long lastTempClientsCount = goodRequestPosition.getTempClientsCount();
-                                        goodRequestPosition.setLastTotalCount(lastTotalCount);
-                                        goodRequestPosition.setLastDailySampleCount(lastDailySampleCount);
-                                        goodRequestPosition.setLastTempClientsCount(lastTempClientsCount);
-                                        goodRequestPosition.setLastUpdate(new Date(System.currentTimeMillis()));
-                                        goodRequestPosition.setNotified(false);
+                    List<RequestsSupplierDetail> requestsSupplierDetailList = item.getRequestsSupplierDetailList();
+                    ////////////Проверка на правильную дату
+                    goodDate = true;
+                    if (requestsSupplierDetailList != null && requestsSupplierDetailList.size() > 0) {
+                        Integer fType = -1;
+                        for (RequestsSupplierDetail detail : requestsSupplierDetailList) {
+                            if (detail.getfType() != null) {
+                                if (detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_GENERAL)
+                                        || detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_DISCOUNT) || detail
+                                        .getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_PAID))
+                                    fType = 0;
+                                if (detail.getfType().equals(RequestsSupplierDetailTypeEnum.REQUEST_TYPE_SUBSCRIPTION))
+                                    fType = 1;
+                                if (fType != -1) {
+                                    if (!isGoodDate(session, idOfOrg, doneDate, fType)) {
+                                        GoodRequestPosition goodRequestPosition =
+                                                DAOReadonlyService.getInstance().findGoodRequestPositionByGuid(detail.getGuid());
+                                        if (goodRequestPosition != null) {
+                                            ResRequestsSupplierDetail resRequestsSupplierDetail = new ResRequestsSupplierDetail(
+                                                    goodRequestPosition, detail.getGuid());
+                                            resRequestsSupplierDetailList.add(resRequestsSupplierDetail);
+                                        }
+                                        goodDate = false;
                                     }
-                                    if (goodRequestPosition == null) {
-                                        goodRequestPosition = detail.getGoodRequestPosition();
-                                        goodRequestPosition.setGlobalVersionOnCreate(nextPositionVersion);
-                                        goodRequestPosition.setCreatedDate(new Date(System.currentTimeMillis()));
-                                    }
-
-                                    goodRequestPosition.setOrgOwner(idOfOrg);
-                                    goodRequestPosition.setGoodRequest(goodRequest);
-                                    if (detail.getIdOfComplex() != null) {
-                                        goodRequestPosition.setComplexId(detail.getIdOfComplex().intValue());
-                                    }
-                                    goodRequestPosition.setIdOfDish(detail.getIdOfDish());
-                                    goodRequestPosition.setFeedingType(detail.getfType().ordinal());
-                                    goodRequestPosition.setNetWeight(0L);
-                                    goodRequestPosition.setUnitsScale(UnitScale.UNITS);
-                                    goodRequestPosition.setTotalCount(detail.getTotalCount().longValue());
-                                    if (detail.getdProbeCount() != null) {
-                                        goodRequestPosition.setDailySampleCount(detail.getdProbeCount().longValue());
-                                    }
-                                    if (detail.getTempClientsCount() != null) {
-                                        goodRequestPosition.setTempClientsCount(detail.getTempClientsCount().longValue());
-                                    }
-                                    goodRequestPosition.setGlobalVersion(nextPositionVersion);
-                                    goodRequestPosition.setDeletedState(detail.getDeletedState());
-
-                                    session.saveOrUpdate(goodRequestPosition);
-
-                                    listForNotifications.add(goodRequestPosition);
                                 }
                             }
                         }
-                        resItem = new ResRequestsSupplierItem(goodRequest.getGuid(), goodRequest.getGlobalVersion());
+                    }
+                    ////////////
+                    if (!goodDate)
+                    {
+                        errorFound = true;
+                        item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
+                        item.setErrorMessage(WRONG_DONE_DATE);
+                    }
+                    else {
+                        String guid = item.getGuid();
+                        String number = item.getNumber();
+                        Date dateOfGoodsRequest = item.getDateOfGoodsRequest();
+                        RequestsSupplierTypeEnum type = item.getType();
+                        String staffGuid = item.getStaffGuid();
+                        Boolean deletedState = item.getDeletedState();
+
+                        Long versionFromClient = item.getVersion();
+
+                        GoodRequest goodRequest = DAOReadonlyService.getInstance().findGoodRequestByGuid(guid);
+
+                        if ((versionFromClient == null && goodRequest != null) || (versionFromClient != null
+                                && goodRequest != null && versionFromClient < goodRequest.getGlobalVersion())) {
+                            errorFound = true;
+                            item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
+                            item.setErrorMessage("GoodRequest versions conflict");
+                        } else {
+                            if (goodRequest != null) {
+                                goodRequest.setLastUpdate(new Date(System.currentTimeMillis()));
+                            }
+                            if (goodRequest == null) {
+                                goodRequest = item.getGoodRequest();
+                                goodRequest.setGlobalVersionOnCreate(nextVersion);
+                                goodRequest.setCreatedDate(new Date(System.currentTimeMillis()));
+                            }
+
+                            Staff staff = DAOReadonlyService.getInstance().findStaffByGuid(staffGuid);
+                            if (staff == null) {
+                                item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
+                                item.setErrorMessage("No such a staff record");
+                            }
+
+                            goodRequest.setOrgOwner(idOfOrg);
+                            goodRequest.setNumber(number);
+                            goodRequest.setGlobalVersion(nextVersion);
+                            goodRequest.setDeletedState(deletedState);
+                            goodRequest.setDoneDate(doneDate);
+                            goodRequest.setDateOfGoodsRequest(dateOfGoodsRequest);
+                            goodRequest.setState(DocumentState.FOLLOW);
+                            goodRequest.setRequestType(type.ordinal());
+                            goodRequest.setStaff(staff);
+                            goodRequest.setGuidOfStaff(staffGuid);
+                            goodRequest.setSendAll(SendToAssociatedOrgs.SendToMain);
+
+                            session.saveOrUpdate(goodRequest);
+
+                            if (requestsSupplierDetailList != null && requestsSupplierDetailList.size() > 0) {
+                                for (RequestsSupplierDetail detail : requestsSupplierDetailList) {
+
+                                    Long detailVersionFromClient = detail.getVersion();
+                                    String detailGuid = detail.getGuid();
+
+                                    GoodRequestPosition goodRequestPosition = DAOReadonlyService.getInstance().findGoodRequestPositionByGuid(detailGuid);
+
+                                    if ((detailVersionFromClient == null && goodRequestPosition != null) || (
+                                            detailVersionFromClient != null && goodRequestPosition != null
+                                                    && detailVersionFromClient < goodRequestPosition.getGlobalVersion())) {
+                                        errorFound = true;
+                                        item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
+                                        item.setErrorMessage("GoodRequestPosition versions conflict");
+                                    } else {
+                                        if (goodRequestPosition != null) {
+                                            final Long lastTotalCount = goodRequestPosition.getTotalCount();
+                                            final Long lastDailySampleCount = goodRequestPosition.getDailySampleCount();
+                                            final Long lastTempClientsCount = goodRequestPosition.getTempClientsCount();
+                                            goodRequestPosition.setLastTotalCount(lastTotalCount);
+                                            goodRequestPosition.setLastDailySampleCount(lastDailySampleCount);
+                                            goodRequestPosition.setLastTempClientsCount(lastTempClientsCount);
+                                            goodRequestPosition.setLastUpdate(new Date(System.currentTimeMillis()));
+                                            goodRequestPosition.setNotified(false);
+                                        }
+                                        if (goodRequestPosition == null) {
+                                            goodRequestPosition = detail.getGoodRequestPosition();
+                                            goodRequestPosition.setGlobalVersionOnCreate(nextPositionVersion);
+                                            goodRequestPosition.setCreatedDate(new Date(System.currentTimeMillis()));
+                                        }
+
+                                        goodRequestPosition.setOrgOwner(idOfOrg);
+                                        goodRequestPosition.setGoodRequest(goodRequest);
+                                        if (detail.getIdOfComplex() != null) {
+                                            goodRequestPosition.setComplexId(detail.getIdOfComplex().intValue());
+                                        }
+                                        goodRequestPosition.setIdOfDish(detail.getIdOfDish());
+                                        goodRequestPosition.setFeedingType(detail.getfType().ordinal());
+                                        goodRequestPosition.setNetWeight(0L);
+                                        goodRequestPosition.setUnitsScale(UnitScale.UNITS);
+                                        goodRequestPosition.setTotalCount(detail.getTotalCount().longValue());
+                                        if (detail.getdProbeCount() != null) {
+                                            goodRequestPosition.setDailySampleCount(detail.getdProbeCount().longValue());
+                                        }
+                                        if (detail.getTempClientsCount() != null) {
+                                            goodRequestPosition.setTempClientsCount(detail.getTempClientsCount().longValue());
+                                        }
+                                        goodRequestPosition.setGlobalVersion(nextPositionVersion);
+                                        goodRequestPosition.setDeletedState(detail.getDeletedState());
+
+                                        session.saveOrUpdate(goodRequestPosition);
+
+                                        listForNotifications.add(goodRequestPosition);
+                                    }
+                                }
+                            }
+                            resItem = new ResRequestsSupplierItem(goodRequest.getGuid(), goodRequest.getGlobalVersion());
+                        }
                     }
                 }
                 if (errorFound) {
@@ -169,6 +210,11 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
                 resItem.setResultCode(item.getResCode());
                 resItem.setErrorMessage(item.getErrorMessage());
+                if (item.getErrorMessage() != null && item.getErrorMessage().equals(WRONG_DONE_DATE))
+                {
+                    if (!resRequestsSupplierDetailList.isEmpty())
+                        resItem.setResRequestsSupplierDetailList(resRequestsSupplierDetailList);
+                }
                 items.add(resItem);
             }
             session.flush();
@@ -233,5 +279,6 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
     public RequestsSupplier getRequestsSupplier() {
         return requestsSupplier;
     }
+
 
 }

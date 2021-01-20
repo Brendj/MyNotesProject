@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.DataAllEvents;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
@@ -179,7 +180,7 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getCardListBySan") CardListResult getCardList(@WebParam(name = "san") String san);
 
     @WebMethod(operationName = "getEnterEventList")
-    EnterEventListResult getEnterEventList(@WebParam(name = "contractId") Long contractId,
+    DataAllEvents getEnterEventList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "getNEnterEventList")

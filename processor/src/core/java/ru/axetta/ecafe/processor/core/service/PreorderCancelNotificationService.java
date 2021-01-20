@@ -119,8 +119,8 @@ public class PreorderCancelNotificationService {
         //
         String goodtime = RuntimeContext.getInstance().getConfigProperties().
                 getProperty("ecafe.processor.preorder.cancel.notification.goodtime", "08:00-22:00");
-        String goodH = goodtime.substring(0,4);
-        String goodM = goodtime.substring(5,10);
+        String goodH = goodtime.substring(0,5);
+        String goodM = goodtime.substring(6,11);
         DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
         Date dateH = format.parse(goodH);
         Date dateM = format.parse(goodM);

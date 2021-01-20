@@ -4,14 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.client.request;
 
-import ru.axetta.ecafe.processor.core.persistence.CardTemp;
 import ru.axetta.ecafe.processor.core.persistence.CardTempOperation;
-import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleItem;
-import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 
 import org.hibernate.Session;
 

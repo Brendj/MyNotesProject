@@ -137,6 +137,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.confirmVisualRecognition = confirmVisualRecognition;
     }
 
+    public String getClientSSOID() {
+        return clientSSOID;
+    }
+
+    public void setClientSSOID(String clientSSOID) {
+        this.clientSSOID = clientSSOID;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -310,6 +318,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long externalId;
     private String clientGUID;
     private String meshGUID;
+    private String clientSSOID;
     private String clientIacRegId;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new ArrayList<SelectItem>();
@@ -998,6 +1007,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             client.setMeshGUID(meshGUID);
         }
+        if(StringUtils.isEmpty(clientSSOID)){
+            client.setSsoid(null);
+        } else {
+            client.setSsoid(clientSSOID);
+        }
         if (this.clientIacRegId == null || this.clientIacRegId.isEmpty()) {
             client.setIacRegId(null);
         } else {
@@ -1241,6 +1255,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
         this.meshGUID = client.getMeshGUID();
+        this.clientSSOID = client.getSsoid();
         this.clientIacRegId = client.getIacRegId();
         this.discountMode = client.getDiscountMode();
         /* filter fill*/
