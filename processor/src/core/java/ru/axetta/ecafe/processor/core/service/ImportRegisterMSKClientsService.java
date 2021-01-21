@@ -475,7 +475,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 if (dbClient == null) {
                     dbClient = nsiGuidMap.get(emptyIfNull(pupil.getGuid()));
                 }
-                if (dbClient == null || dbClient.isDeletedOrLeaving()) {
+                if (dbClient == null || dbClient.isDeletedOrLeaving() || StringUtils.isNotEmpty(dbClient.getMeshGUID())) {
                     continue;
                 }
                 log(synchDate + "Удаление " + emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
