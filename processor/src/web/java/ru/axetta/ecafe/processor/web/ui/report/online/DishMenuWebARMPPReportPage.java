@@ -293,6 +293,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         properties.setProperty(DishMenuWebArmPPReport.P_ARCHIVED, selectArchived.toString());
         properties.setProperty(DishMenuWebArmPPReport.P_BUFET, selectinBufet.toString());
         properties.setProperty(DishMenuWebArmPPReport.P_COMPLEX, selectinComplex.toString());
+        properties.setProperty(DishMenuWebArmPPReport.P_SHOW_CONTAGENT, showContagentName.toString());
 
         return properties;
     }

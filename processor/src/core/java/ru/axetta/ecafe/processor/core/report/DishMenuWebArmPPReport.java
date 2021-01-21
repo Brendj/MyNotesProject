@@ -60,6 +60,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
     final public static String P_ID_OF_COMPLEXES = "idOfComplexes";
     final public static String P_ID_OF_TYPES_FOOD = "idOfTypesFood";
     final public static String P_ID_OF_AGE_GROUP = "idOfAgeGroup";
+    final public static String P_SHOW_CONTAGENT = "showcontagent";
     final public static String P_ARCHIVED = "archived";
     final public static String P_BUFET = "bufet";
     final public static String P_COMPLEX = "complex";
@@ -111,7 +112,9 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
             } catch (Exception e) {
                 incomplex = 0;
             }
+            Boolean showcontagent = Boolean.parseBoolean(reportProperties.getProperty(DishMenuWebArmPPReport.P_SHOW_CONTAGENT));
             Map<String, Object> parameterMap = new HashMap<String, Object>();
+            parameterMap.put("showcontragent", showcontagent);
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             calendar.setTime(startTime);
