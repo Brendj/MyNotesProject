@@ -972,7 +972,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         client.initClientMobileHistory(clientsMobileHistory);
         String ssoidOld = client.getSsoid();
-        client.setMobile(mobile);
+        if (ssoidOld == null)
+            ssoidOld = "";
+        if (clientSSOID == null)
+            clientSSOID = "";
+        if (ssoidOld.equals(clientSSOID))
+            client.setMobile(mobile);
+        else
+            client.setMobileNotClearSsoid(mobile);
         client.setFax(this.fax);
         client.setEmail(this.email);
         client.setNotifyViaEmail(this.notifyViaEmail);
@@ -1009,15 +1016,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setMeshGUID(meshGUID);
         }
         if (client.getClearedSsoid()) {
-            if (ssoidOld != null && clientSSOID != null)
-            {
-                if (ssoidOld.equals(clientSSOID))
-                    clientSSOID = "";
-            }
-            if (ssoidOld == null && clientSSOID == null)
-            {
-                clientSSOID = "";
-            }
+            clientSSOID = "";
             client.setClearedSsoid(false);
         }
         if(StringUtils.isEmpty(clientSSOID)){

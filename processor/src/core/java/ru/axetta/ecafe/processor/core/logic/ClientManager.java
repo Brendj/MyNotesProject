@@ -1115,17 +1115,16 @@ public class ClientManager {
         session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
         String ssoidOld = clientGuardianToSave.getSsoid();
-        clientGuardianToSave.setMobile(mobile);
+        if (ssoidOld == null)
+            ssoidOld = "";
+        if (ssoid == null)
+            ssoid = "";
+        if (ssoidOld.equals(ssoid))
+            clientGuardianToSave.setMobile(mobile);
+        else
+            clientGuardianToSave.setMobileNotClearSsoid(mobile);
         if (clientGuardianToSave.getClearedSsoid()) {
-            if (ssoidOld != null && ssoid != null)
-            {
-                if (ssoidOld.equals(ssoid))
-                    ssoid = "";
-            }
-            if (ssoidOld == null && ssoid == null)
-            {
-                    ssoid = "";
-            }
+            ssoid = "";
             clientGuardianToSave.setClearedSsoid(false);
         }
         if (ssoid != null) {

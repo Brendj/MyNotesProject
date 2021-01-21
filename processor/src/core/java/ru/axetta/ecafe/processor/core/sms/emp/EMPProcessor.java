@@ -355,17 +355,16 @@ public class EMPProcessor {
                 else if ((oldMsisdn != null) && (mobile == null)) {
                     cl.initClientMobileHistory(clientsMobileHistory);
                     String ssoidOld = cl.getSsoid();
-                    cl.setMobile("");
+                    if (ssoidOld == null)
+                        ssoidOld = "";
+                    if (newSsoid == null)
+                        newSsoid = "";
+                    if (ssoidOld.equals(newSsoid))
+                        cl.setMobile(mobile);
+                    else
+                        cl.setMobileNotClearSsoid(mobile);
                     if (cl.getClearedSsoid()) {
-                        if (ssoidOld != null && newSsoid != null)
-                        {
-                            if (ssoidOld.equals(newSsoid))
-                                newSsoid = "";
-                        }
-                        if (ssoidOld == null && newSsoid == null)
-                        {
-                            newSsoid = "";
-                        }
+                        newSsoid = "";
                         cl.setClearedSsoid(false);
                     }
                 }
