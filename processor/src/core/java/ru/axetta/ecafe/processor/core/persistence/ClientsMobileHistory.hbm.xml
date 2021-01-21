@@ -24,6 +24,7 @@
         <property name="staffguid" column="staffguid" type="string"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
                      update="false"/>
+        <property name="oldssoid" column="oldssoid" type="string"/>
     </class>
 </hibernate-mapping>
 

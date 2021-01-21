@@ -581,6 +581,8 @@ public class Client {
         return mobile;
     }
 
+    private Boolean clearSsoid = true;
+    private Boolean clearedSsoid = false;
     public void setMobile(String mobile) {
         if (clientsMobileHistory != null)
         {
@@ -596,6 +598,11 @@ public class Client {
                     if (this.mobile.isEmpty())
                         clientsMobileHistory.setAction("Добавление");
                     else {
+                        if (clearSsoid) {
+                            clientsMobileHistory.setOldssoid(this.ssoid);
+                            this.ssoid = "";
+                            clearedSsoid = true;
+                        }
                         if (mobile.isEmpty())
                             clientsMobileHistory.setAction("Удаление");
                         else
@@ -606,6 +613,11 @@ public class Client {
             }
         }
         this.mobile = mobile;
+    }
+    public void setMobileNotClearSsoid(String mobile) {
+        clearSsoid = true;
+        this.setMobile(mobile);
+        clearSsoid = false;
     }
 
     public String getEmail() {
@@ -1271,5 +1283,13 @@ public class Client {
 
     public void setVendor(SmartWatchVendor vendor) {
         this.vendor = vendor;
+    }
+
+    public Boolean getClearedSsoid() {
+        return clearedSsoid;
+    }
+
+    public void setClearedSsoid(Boolean clearedSsoid) {
+        this.clearedSsoid = clearedSsoid;
     }
 }

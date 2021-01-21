@@ -1114,8 +1114,23 @@ public class ClientManager {
         clientGuardianToSave.setPassportSeries(passportSeries);
         session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
+        String ssoidOld = clientGuardianToSave.getSsoid();
         clientGuardianToSave.setMobile(mobile);
-        if (ssoid != null) clientGuardianToSave.setSsoid(ssoid);
+        if (clientGuardianToSave.getClearedSsoid()) {
+            if (ssoidOld != null && ssoid != null)
+            {
+                if (ssoidOld.equals(ssoid))
+                    ssoid = "";
+            }
+            if (ssoidOld == null && ssoid == null)
+            {
+                    ssoid = "";
+            }
+            clientGuardianToSave.setClearedSsoid(false);
+        }
+        if (ssoid != null) {
+            clientGuardianToSave.setSsoid(ssoid);
+        }
         if (guid != null) clientGuardianToSave.setClientGUID(guid);
 
         if (gender != null) {

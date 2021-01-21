@@ -344,7 +344,6 @@ public class EMPProcessor {
                     "}. Для всех " + clients.size() + " клиентов [" + idsList + "] с подпиской на телефон данного клиента [" +
                     mobile + "] применяются изменения: "+logStr.toString());
             for (Client cl : clients) {
-                if (newSsoid!=null && !newSsoid.equals("")) cl.setSsoid(newSsoid);
                 if (newEmail!=null) cl.setEmail(newEmail);
                 if (newNotifyViaEmail!=null) cl.setNotifyViaEmail(newNotifyViaEmail.equalsIgnoreCase("true"));
                 if (newNotifyViaSMS!=null) cl.setNotifyViaSMS(newNotifyViaSMS.equalsIgnoreCase("true"));
@@ -355,9 +354,22 @@ public class EMPProcessor {
                 }
                 else if ((oldMsisdn != null) && (mobile == null)) {
                     cl.initClientMobileHistory(clientsMobileHistory);
+                    String ssoidOld = cl.getSsoid();
                     cl.setMobile("");
-                    //cl.setSsoid("");
+                    if (cl.getClearedSsoid()) {
+                        if (ssoidOld != null && newSsoid != null)
+                        {
+                            if (ssoidOld.equals(newSsoid))
+                                newSsoid = "";
+                        }
+                        if (ssoidOld == null && newSsoid == null)
+                        {
+                            newSsoid = "";
+                        }
+                        cl.setClearedSsoid(false);
+                    }
                 }
+                if (newSsoid!=null && !newSsoid.equals("")) cl.setSsoid(newSsoid);
                 DAOService.getInstance().saveEntity(cl);
             }
         } else {
