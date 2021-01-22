@@ -14,7 +14,6 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
@@ -227,24 +226,15 @@ public class DAOReadExternalsService {
         query.setParameter("endDate", nextToEndDate);
         query.setParameter("idOfClient", client.getIdOfClient());
         return query.getResultList();*/
-        Query query = entityManager.createNativeQuery("select idofclientpayment from CF_ClientPayments cp inner join CF_Transactions tt on cp.IdOfTransaction=tt.IdOfTransaction "
+        Query query = entityManager.createNativeQuery("select cp.idofclientpayment, cp.paysum, cp.createddate, cp.paymentmethod, cp.addpaymentmethod, cp.addidofpayment, cg.contragentname "
+                + "from CF_ClientPayments cp join CF_Transactions tt on cp.IdOfTransaction=tt.IdOfTransaction "
+                + "left join cf_contragents cg on cp.idofcontragent = cg.idofcontragent "
                 + "where cp.PayType = :payType and cast(cp.CreatedDate as numeric) >= :startDate and cast(cp.CreatedDate as numeric) < :endDate and tt.IdOfClient = :idOfClient");
         query.setParameter("payType", subBalanceNum != null && subBalanceNum.equals(1) ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", nextToEndDate.getTime());
         query.setParameter("idOfClient", client.getIdOfClient());
-        List list = query.getResultList();
-
-        if (list.size() == 0) return new ArrayList<ClientPayment>();
-
-        List<Long> list2 = new ArrayList<>();
-        for (Object obj : list) {
-            long idOfClientPayment = HibernateUtils.getDbLong(obj);
-            list2.add(idOfClientPayment);
-        }
-        Query q = entityManager.createQuery("select cp from ClientPayment cp where cp.idOfClientPayment in :list order by createTime");
-        q.setParameter("list", list2);
-        return q.getResultList();
+        return query.getResultList();
     }
 
     public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent, boolean vp) {

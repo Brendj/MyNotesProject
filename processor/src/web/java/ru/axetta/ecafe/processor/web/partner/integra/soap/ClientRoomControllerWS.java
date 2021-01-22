@@ -2658,11 +2658,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (nRecs++ > MAX_RECS) {
                 break;
             }
-            ClientPayment cp = (ClientPayment) o;
+            Object[] row = (Object[]) o;
             Payment payment = new Payment();
-            payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, cp));
-            payment.setSum(cp.getPaySum());
-            payment.setTime(toXmlDateTime(cp.getCreateTime()));
+            payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, (String) row[6], (Integer) row[3], (String) row[4], (String) row[5]));
+            payment.setSum(HibernateUtils.getDbLong(row[1]));
+            payment.setTime(toXmlDateTime(new Date(((BigInteger) row[2]).longValue())));
             paymentList.getP().add(payment);
         }
         data.setPaymentList(paymentList);
