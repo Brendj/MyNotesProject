@@ -582,7 +582,6 @@ public class Client {
     }
 
     private Boolean clearSsoid = true;
-    private Boolean clearedSsoid = false;
     public void setMobile(String mobile) {
         if (clientsMobileHistory != null)
         {
@@ -601,7 +600,6 @@ public class Client {
                         if (clearSsoid) {
                             clientsMobileHistory.setOldssoid(this.ssoid);
                             this.ssoid = "";
-                            clearedSsoid = true;
                         }
                         if (mobile.isEmpty())
                             clientsMobileHistory.setAction("Удаление");
@@ -1283,13 +1281,5 @@ public class Client {
 
     public void setVendor(SmartWatchVendor vendor) {
         this.vendor = vendor;
-    }
-
-    public Boolean getClearedSsoid() {
-        return clearedSsoid;
-    }
-
-    public void setClearedSsoid(Boolean clearedSsoid) {
-        this.clearedSsoid = clearedSsoid;
     }
 }
