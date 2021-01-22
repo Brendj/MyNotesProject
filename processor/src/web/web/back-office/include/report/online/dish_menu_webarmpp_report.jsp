@@ -114,6 +114,14 @@
                         var="dishElement" rows="25" footerClass="data-table-footer" columnClasses="center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column
 center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column
 center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column, center-aligned-column">
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}"
+                         rendered="#{mainPage.dishMenuReportWebArmPP.showContagentName}">
+                <f:facet name="header">
+                    <h:outputText value="Контрагент" />
+                </f:facet>
+                <h:outputText value="#{dishElement.contragentName}" styleClass="output-text" />
+            </rich:column>
+            
             <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="ИС \"ПП\"" />
@@ -238,14 +246,6 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                     <h:outputText value="Штрих-код" />
                 </f:facet>
                 <h:outputText value="#{dishElement.barcode}" styleClass="output-text" />
-            </rich:column>
-
-            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}"
-                         rendered="#{mainPage.dishMenuReportWebArmPP.showContagentName}">
-                <f:facet name="header">
-                    <h:outputText value="Контрагент" />
-                </f:facet>
-                <h:outputText value="#{dishElement.contragentName}" styleClass="output-text" />
             </rich:column>
 
             <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.renderBufet()}"
