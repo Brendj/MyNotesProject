@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
@@ -163,12 +164,32 @@ public class DAOReadExternalsService {
     }
 
     public List<Order> getClientOrdersByPeriod(Client client, Date startTime, Date endTime) {
-        Query query = entityManager.createQuery("select order from Order order where order.client = :client and order.createTime between "
+        /*Query query = entityManager.createQuery("select order from Order order where order.client = :client and order.createTime between "
                 + ":startTime and :endTime order by createTime");
         query.setParameter("client", client);
         query.setParameter("startTime", startTime);
         query.setParameter("endTime", endTime);
-        return query.getResultList();
+        return query.getResultList();*/
+        Query query = entityManager.createNativeQuery("SELECT idoforg, idoforder FROM (SELECT idoforg, idoforder, createddate FROM CF_Orders order0_ WHERE order0_.IdOfClient = :client) qq "
+                + "WHERE (cast(CreatedDate AS NUMERIC) BETWEEN :startTime AND :endTime)");
+        query.setParameter("client", client.getIdOfClient());
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        List list = query.getResultList();
+
+        List<Order> result = new ArrayList<>();
+        if (list.size() == 0) return result;
+
+        List<CompositeIdOfOrder> list2 = new ArrayList<>();
+        for (Object obj : list) {
+            Object[] row = (Object[]) obj;
+            long idOfOrg = HibernateUtils.getDbLong(row[0]);
+            long idOfOrder = HibernateUtils.getDbLong(row[1]);
+            list2.add(new CompositeIdOfOrder(idOfOrg, idOfOrder));
+        }
+        Query q = entityManager.createQuery("select order from Order order where order.compositeIdOfOrder in :list order by createTime");
+        q.setParameter("list", list2);
+        return q.getResultList();
     }
 
     public List<OrderDetail> getOrderDetailsByOrders(List<Order> orders) {
