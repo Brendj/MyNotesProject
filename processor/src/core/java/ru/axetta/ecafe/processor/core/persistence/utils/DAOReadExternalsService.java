@@ -240,11 +240,20 @@ public class DAOReadExternalsService {
 
     public List getPaymentsList(Client client, Integer subBalanceNum, Date endDate, Date startDate) {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
-        Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "
+        /*Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "
                 + "cp.createTime >= :startDate and cp.createTime < :endDate and tr.client.idOfClient = :idOfClient order by cp.createTime asc");
         query.setParameter("payType", subBalanceNum != null && subBalanceNum.equals(1) ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", nextToEndDate);
+        query.setParameter("idOfClient", client.getIdOfClient());
+        return query.getResultList();*/
+        Query query = entityManager.createNativeQuery("select cp.idofclientpayment, cp.paysum, cp.createddate, cp.paymentmethod, cp.addpaymentmethod, cp.addidofpayment, cg.contragentname "
+                + "from CF_ClientPayments cp join CF_Transactions tt on cp.IdOfTransaction=tt.IdOfTransaction "
+                + "left join cf_contragents cg on cp.idofcontragent = cg.idofcontragent "
+                + "where cp.PayType = :payType and cast(cp.CreatedDate as numeric) >= :startDate and cast(cp.CreatedDate as numeric) < :endDate and tt.IdOfClient = :idOfClient");
+        query.setParameter("payType", subBalanceNum != null && subBalanceNum.equals(1) ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
+        query.setParameter("startDate", startDate.getTime());
+        query.setParameter("endDate", nextToEndDate.getTime());
         query.setParameter("idOfClient", client.getIdOfClient());
         return query.getResultList();
     }
