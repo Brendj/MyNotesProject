@@ -1119,10 +1119,14 @@ public class ClientManager {
             ssoidOld = "";
         if (ssoid == null)
             ssoid = "";
-        if (!ssoidOld.equals(ssoid))
+        if (ssoidOld.equals(ssoid))
             clientGuardianToSave.setMobile(mobile);
         else
             clientGuardianToSave.setMobileNotClearSsoid(mobile);
+        if (clientGuardianToSave.getClearedSsoid()) {
+            ssoid = "";
+            clientGuardianToSave.setClearedSsoid(false);
+        }
         if (ssoid != null) {
             clientGuardianToSave.setSsoid(ssoid);
         }

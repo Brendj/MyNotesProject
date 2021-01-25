@@ -976,7 +976,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             ssoidOld = "";
         if (clientSSOID == null)
             clientSSOID = "";
-        if (!ssoidOld.equals(clientSSOID))
+        if (ssoidOld.equals(clientSSOID))
             client.setMobile(mobile);
         else
             client.setMobileNotClearSsoid(mobile);
@@ -1014,6 +1014,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setMeshGUID(null);
         } else {
             client.setMeshGUID(meshGUID);
+        }
+        if (client.getClearedSsoid()) {
+            clientSSOID = "";
+            client.setClearedSsoid(false);
         }
         if(StringUtils.isEmpty(clientSSOID)){
             client.setSsoid(null);
