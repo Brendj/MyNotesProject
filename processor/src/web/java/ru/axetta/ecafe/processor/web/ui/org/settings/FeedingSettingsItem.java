@@ -17,6 +17,7 @@ public class FeedingSettingsItem {
     private Long limit;
     private Long discount;
     private Boolean useDiscount;
+    private Boolean useDiscountBuffet;
     private Date lastUpdate;
     private String userName;
 
@@ -26,12 +27,17 @@ public class FeedingSettingsItem {
         limit = setting.getLimit();
         discount = setting.getDiscount();
         useDiscount = setting.getUseDiscount();
+        useDiscountBuffet = setting.getUseDiscountBuffet();
         lastUpdate = setting.getLastUpdate();
         userName = setting.getUser().getUserName();
     }
 
     public String getUseDiscountString() {
         return useDiscount ? "Да" : "Нет";
+    }
+
+    public String getUseDiscountBuffetString() {
+        return useDiscountBuffet ? "Да" : "Нет";
     }
 
     public long getIdOfSetting() {
@@ -80,5 +86,13 @@ public class FeedingSettingsItem {
 
     public void setDiscount(Long discount) {
         this.discount = discount;
+    }
+
+    public Boolean getUseDiscountBuffet() {
+        return useDiscountBuffet;
+    }
+
+    public void setUseDiscountBuffet(Boolean useDiscountBuffet) {
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 }

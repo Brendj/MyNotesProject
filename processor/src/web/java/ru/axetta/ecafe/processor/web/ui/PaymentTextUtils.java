@@ -23,6 +23,25 @@ public class PaymentTextUtils {
 
     }
 
+    public static String buildTransferInfo(Session session, String contragentName, Integer paymentMethod, String addPaymentMethod, String addIdOfPayment) throws Exception {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (null != contragentName) {
+            stringBuilder.append(contragentName);
+        }
+        if (paymentMethod != ClientPayment.SYNC_PAYMENT_METHOD) {
+            appendIfNotEmpty(stringBuilder, " - ");
+            stringBuilder.append(ClientPayment.PAYMENT_METHOD_NAMES[paymentMethod]);
+        }
+        if (StringUtils.isNotEmpty(addPaymentMethod)) {
+            appendIfNotEmpty(stringBuilder, " - ");
+            stringBuilder.append(addPaymentMethod);
+            if (StringUtils.isNotEmpty(addIdOfPayment)) {
+                stringBuilder.append(" - номер платежного документа ").append(addIdOfPayment);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
     public static String buildTransferInfo(Session session, ClientPayment clientPayment) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
         Contragent contragent = (Contragent)session.merge(clientPayment.getContragent());

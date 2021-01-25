@@ -76,6 +76,7 @@ public class DirectiveElement implements AbstractToElement{
             if (feedingSettingOrgItem.getDiscount() != null)
                 directiveItemList.add(new DirectiveItem("FeedingSettingDiscount", feedingSettingOrgItem.getDiscount().toString()));
             directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscount", feedingSettingOrgItem.getUseDiscount() ? "1" : "0"));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscountBuffet", feedingSettingOrgItem.getUseDiscountBuffet() ? "1" : "0"));
         }
 
         directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getHaveNewLP())?"1":"0"));
@@ -135,6 +136,7 @@ public class DirectiveElement implements AbstractToElement{
             if (feedingSettingOrgItem.getDiscount() != null)
                 directiveItemList.add(new DirectiveItem("FeedingSettingDiscount", feedingSettingOrgItem.getDiscount().toString()));
             directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscount", feedingSettingOrgItem.getUseDiscount() ? "1" : "0"));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscountBuffet", feedingSettingOrgItem.getUseDiscountBuffet() ? "1" : "0"));
         }
 
         boolean cardDoublesAllowed = VersionUtils.doublesOnlyAllowed();
