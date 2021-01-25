@@ -53,20 +53,10 @@ public class DiscountManager {
             history.setRegistryDate(new Date());
             history.setCategoryDiscount(uncommon);
 
-            ClientDiscountHistoryOperationTypeEnum type = getType(oldDiscounts, newDiscounts, uncommon);
+            ClientDiscountHistoryOperationTypeEnum type = ClientDiscountHistoryOperationTypeEnum
+                    .getType(oldDiscounts, newDiscounts, uncommon);
             history.setOperationType(type);
-            session.save(type);
-        }
-    }
-
-    private static ClientDiscountHistoryOperationTypeEnum getType(Set<CategoryDiscount> oldDiscounts,
-            Set<CategoryDiscount> newDiscounts, CategoryDiscount discount) {
-        if(oldDiscounts.contains(discount) && newDiscounts.contains(discount)){
-            return ClientDiscountHistoryOperationTypeEnum.CHANGE;
-        } else if(newDiscounts.contains(discount)){
-            return ClientDiscountHistoryOperationTypeEnum.ADD;
-        } else {
-            return ClientDiscountHistoryOperationTypeEnum.DELETE;
+            session.save(history);
         }
     }
 
