@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -36,7 +37,37 @@ public class DiscountManager {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newDiscountMode, oldDiscountMode,
                 extractCategoryIdsFromDiscountSet(newDiscounts), extractCategoryIdsFromDiscountSet(oldDiscounts));
         discountChangeHistory.setComment(comment);
+
+        saveNewClientDiscountHistoryRecord(session, client, oldDiscounts, newDiscounts, comment);
         session.save(discountChangeHistory);
+    }
+
+    private static void saveNewClientDiscountHistoryRecord(Session session, Client client,
+            Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment) {
+        List<CategoryDiscount> disjunctions = (List<CategoryDiscount>) CollectionUtils.disjunction(newDiscounts, oldDiscounts);
+
+        for(CategoryDiscount uncommon : disjunctions){
+            ClientDiscountHistory history = new ClientDiscountHistory();
+            history.setClient(client);
+            history.setComment(comment);
+            history.setRegistryDate(new Date());
+            history.setCategoryDiscount(uncommon);
+
+            ClientDiscountHistoryOperationTypeEnum type = getType(oldDiscounts, newDiscounts, uncommon);
+            history.setOperationType(type);
+            session.save(type);
+        }
+    }
+
+    private static ClientDiscountHistoryOperationTypeEnum getType(Set<CategoryDiscount> oldDiscounts,
+            Set<CategoryDiscount> newDiscounts, CategoryDiscount discount) {
+        if(oldDiscounts.contains(discount) && newDiscounts.contains(discount)){
+            return ClientDiscountHistoryOperationTypeEnum.CHANGE;
+        } else if(newDiscounts.contains(discount)){
+            return ClientDiscountHistoryOperationTypeEnum.ADD;
+        } else {
+            return ClientDiscountHistoryOperationTypeEnum.DELETE;
+        }
     }
 
     private static String extractCategoryIdsFromDiscountSet(Set<CategoryDiscount> categoryDiscounts) {
