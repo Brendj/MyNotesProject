@@ -44,19 +44,26 @@ public class DiscountManager {
 
     private static void saveNewClientDiscountHistoryRecord(Session session, Client client,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment) {
-        List<CategoryDiscount> disjunctions = (List<CategoryDiscount>) CollectionUtils.disjunction(newDiscounts, oldDiscounts);
 
-        for(CategoryDiscount uncommon : disjunctions){
-            ClientDiscountHistory history = new ClientDiscountHistory();
-            history.setClient(client);
-            history.setComment(comment);
-            history.setRegistryDate(new Date());
-            history.setCategoryDiscount(uncommon);
+        if(!oldDiscounts.equals(newDiscounts)) {
+            List<CategoryDiscount> disjunctions = (List<CategoryDiscount>) CollectionUtils
+                    .disjunction(newDiscounts, oldDiscounts);
+            for (CategoryDiscount uncommon : disjunctions) {
+                ClientDiscountHistory history = new ClientDiscountHistory();
+                history.setClient(client);
+                history.setComment(comment);
+                history.setRegistryDate(new Date());
+                history.setCategoryDiscount(uncommon);
 
-            ClientDiscountHistoryOperationTypeEnum type = ClientDiscountHistoryOperationTypeEnum
-                    .getType(oldDiscounts, newDiscounts, uncommon);
-            history.setOperationType(type);
-            session.save(history);
+                ClientDiscountHistoryOperationTypeEnum type = ClientDiscountHistoryOperationTypeEnum
+                        .getType(oldDiscounts, newDiscounts, uncommon);
+                history.setOperationType(type);
+                session.save(history);
+            }
+        } else {
+            for(CategoryDiscount discount : newDiscounts){
+                // todo add one-to-many field in Client
+            }
         }
     }
 
