@@ -472,10 +472,13 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         for (ExpandedPupilInfo pupil : pupils) {
             if (pupil.deleted) {
                 Client dbClient = meshGuidMap.get(emptyIfNull(pupil.getMeshGUID()));
-                if (dbClient == null) {
+                if (dbClient == null ) {
                     dbClient = nsiGuidMap.get(emptyIfNull(pupil.getGuid()));
+                    if(dbClient != null && StringUtils.isNotEmpty(dbClient.getMeshGUID())){
+                        continue;
+                    }
                 }
-                if (dbClient == null || dbClient.isDeletedOrLeaving() || StringUtils.isNotEmpty(dbClient.getMeshGUID())) {
+                if (dbClient == null || dbClient.isDeletedOrLeaving()) {
                     continue;
                 }
                 log(synchDate + "Удаление " + emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
