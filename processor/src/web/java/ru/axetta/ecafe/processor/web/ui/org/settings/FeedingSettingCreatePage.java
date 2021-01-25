@@ -28,6 +28,7 @@ public class FeedingSettingCreatePage extends BasicWorkspacePage implements OrgL
     private Long limit;
     private Long discount;
     private Boolean useDiscount;
+    private Boolean useDiscountBuffet;
     private Set<Org> orgs;
     private static final Logger logger = LoggerFactory.getLogger(FeedingSettingCreatePage.class);
     private List<Long> idOfOrgList = new ArrayList<Long>();
@@ -54,7 +55,7 @@ public class FeedingSettingCreatePage extends BasicWorkspacePage implements OrgL
                 return;
             }
             if (discount == null) useDiscount = false;
-            FeedingSetting setting = new FeedingSetting(settingName, limit, discount, useDiscount, new HashSet<Org>());
+            FeedingSetting setting = new FeedingSetting(settingName, limit, discount, useDiscount, useDiscountBuffet, new HashSet<Org>());
             Set<Org> set = new HashSet<Org>();
             for (Long id : idOfOrgList) {
                 Org org = (Org) persistenceSession.load(Org.class, id);
@@ -139,5 +140,13 @@ public class FeedingSettingCreatePage extends BasicWorkspacePage implements OrgL
 
     public void setUseDiscount(Boolean useDiscount) {
         this.useDiscount = useDiscount;
+    }
+
+    public Boolean getUseDiscountBuffet() {
+        return useDiscountBuffet;
+    }
+
+    public void setUseDiscountBuffet(Boolean useDiscountBuffet) {
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 }

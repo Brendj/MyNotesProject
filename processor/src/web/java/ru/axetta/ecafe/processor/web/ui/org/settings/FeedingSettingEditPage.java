@@ -30,6 +30,7 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
     private Long limit;
     private Long discount;
     private Boolean useDiscount;
+    private Boolean useDiscountBuffet;
     private Date lastUpdate;
     private Set<Org> orgs;
     private String userName;
@@ -44,6 +45,7 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
         this.limit = setting.getLimit() == null ? null : setting.getLimit();
         this.discount = setting.getDiscount() == null ? null : setting.getDiscount();
         this.useDiscount = setting.getUseDiscount();
+        this.useDiscountBuffet = setting.getUseDiscountBuffet();
         this.lastUpdate = setting.getLastUpdate();
         this.userName = setting.getUser().getUserName();
         idOfOrgList.clear();
@@ -96,6 +98,7 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
             setting.setLimit(limit);
             setting.setDiscount(discount);
             setting.setUseDiscount(useDiscount);
+            setting.setUseDiscountBuffet(useDiscountBuffet);
             Set<Org> set = new HashSet<Org>();
             for (Long id : idOfOrgList) {
                 Org org = (Org) persistenceSession.load(Org.class, id);
@@ -204,5 +207,13 @@ public class FeedingSettingEditPage extends BasicWorkspacePage implements OrgLis
 
     public void setUseDiscount(Boolean useDiscount) {
         this.useDiscount = useDiscount;
+    }
+
+    public Boolean getUseDiscountBuffet() {
+        return useDiscountBuffet;
+    }
+
+    public void setUseDiscountBuffet(Boolean useDiscountBuffet) {
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 }
