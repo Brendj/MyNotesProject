@@ -538,7 +538,8 @@
             <param-name>resteasy.resources</param-name>
             <param-value>
                 ru.axetta.ecafe.processor.web.partner.schoolapi.SchoolRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.clients.ClientsRestController
+                ru.axetta.ecafe.processor.web.partner.schoolapi.clients.ClientsRestController,
+                ru.axetta.ecafe.processor.web.partner.schoolapi.groups.GroupsRestController
             </param-value>
         </init-param>
         <init-param>

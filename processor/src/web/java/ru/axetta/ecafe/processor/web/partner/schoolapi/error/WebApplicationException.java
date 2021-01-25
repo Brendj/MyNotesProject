@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.error;
 
-public class WebApplicationException extends Exception {
+public class WebApplicationException extends RuntimeException {
     private Integer errorCode = 500;
 
     public WebApplicationException(String message){
