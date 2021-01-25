@@ -25,10 +25,19 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
 
 
         WebApplicationErrorResponse errorResponse = new WebApplicationErrorResponse(status.getReasonPhrase(),
-                status.getStatusCode(), e.getMessage(), ExceptionUtils.getStackTrace(e),
-                uriInfo.getRequestUri().toString());
+                status.getStatusCode(), e.getMessage(), ExceptionUtils.getStackTrace(e), getUriString());
         return Response.status(status).header(Header.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .entity(errorResponse).build();
+    }
+
+    private String getUriString() {
+        try {
+            return uriInfo.getRequestUri().toString();
+        }
+        catch(Exception ex){
+
+        }
+        return "";
     }
 
 }
