@@ -1126,7 +1126,7 @@
 
 
             <rich:column>
-                <h:outputText value="#{mig.balance}" styleClass="output-text" />
+                <h:outputText value="#{mig.balance}" styleClass="output-text" converter="copeckSumConverter" />
             </rich:column>
 
 

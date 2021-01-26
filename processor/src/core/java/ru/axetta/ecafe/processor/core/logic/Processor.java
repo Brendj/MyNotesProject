@@ -5057,6 +5057,7 @@ public class Processor implements SyncProcessor {
             } else {
                 Long orgOwner = clientParamItem.getOrgOwner();
                 boolean changeOrg = false;
+                Org oldOrg = client.getOrg();
                 if (orgOwner != null) {
                     Org org = (Org) persistenceSession.get(Org.class, orgOwner);
                     changeOrg = !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg());
@@ -5155,7 +5156,7 @@ public class Processor implements SyncProcessor {
 
                 /* заносим клиента в группу */
                 if (StringUtils.isNotEmpty(clientParamItem.getGroupName())) {
-                    ClientGroup clientGroup;
+                    ClientGroup  clientGroup;
                     if (changeOrg) {
                         clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
                                 client.getOrg().getIdOfOrg(), clientParamItem.getGroupName());
@@ -5170,11 +5171,17 @@ public class Processor implements SyncProcessor {
                         orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                     }
 
-                    if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
-                        ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
-                                clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                                ClientGroupMigrationHistory.MODIFY_IN_ARM
-                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                    if (changeOrg) {
+                        ClientManager.addClientMigrationEntry(persistenceSession, oldOrg, client.getClientGroup(),
+                                client.getOrg(), client, ClientGroupMigrationHistory.MODIFY_IN_ARM
+                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGroup.getGroupName());
+                    } else {
+                        if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
+                            ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
+                                    clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
+                                    ClientGroupMigrationHistory.MODIFY_IN_ARM
+                                            .concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                        }
                     }
                     client.setClientGroup(clientGroup);
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
