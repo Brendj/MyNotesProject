@@ -266,7 +266,7 @@
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}">
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItemsAll(mainPage.userCreatePage.isSupplierReport)}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text" />
         </rich:column>
