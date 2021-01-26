@@ -162,7 +162,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         }
     }
 
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         super.completeOrgListSelection(orgMap);
         if (emptyOrgs()) {
             includeAllBuildings = false;

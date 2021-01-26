@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
@@ -42,8 +43,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.*;
 
-public class DishMenuWebARMPPReportPage extends OnlineReportPage implements ContragentListSelectPage.CompleteHandler,
-        ComplexListSelectPage.CompleteHandler{
+public class DishMenuWebARMPPReportPage extends OnlineReportPage
+        implements ContragentListSelectPage.CompleteHandler, ComplexListSelectPage.CompleteHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(DishMenuWebARMPPReportPage.class);
 
@@ -67,11 +68,11 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
 
     public SelectItem[] getTypesOfFood() {
         List<WtGroupItem> wtGroupItems = DAOService.getInstance().getMapTypeFoods();
-        SelectItem[] items = new SelectItem[wtGroupItems.size()+1];
-        items[0]=new SelectItem(-1, "Не выбрано");
-        int n=1;
+        SelectItem[] items = new SelectItem[wtGroupItems.size() + 1];
+        items[0] = new SelectItem(-1, "Не выбрано");
+        int n = 1;
         for (WtGroupItem wtGroupItem : wtGroupItems) {
-            items[n]=new SelectItem(wtGroupItem.getIdOfGroupItem(), wtGroupItem.getDescription());
+            items[n] = new SelectItem(wtGroupItem.getIdOfGroupItem(), wtGroupItem.getDescription());
             ++n;
         }
         return items;
@@ -79,90 +80,101 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
 
     public SelectItem[] getAgeGroup() {
         List<WtAgeGroupItem> ageGroups = DAOService.getInstance().getAgeGroups();
-        SelectItem[] items = new SelectItem[ageGroups.size()+1];
-        items[0]=new SelectItem(-1, "Не выбрано");
-        int n=1;
+        SelectItem[] items = new SelectItem[ageGroups.size() + 1];
+        items[0] = new SelectItem(-1, "Не выбрано");
+        int n = 1;
         for (WtAgeGroupItem wtAgeGroupItem : ageGroups) {
-            items[n]=new SelectItem(wtAgeGroupItem.getIdOfAgeGroupItem(), wtAgeGroupItem.getDescription());
+            items[n] = new SelectItem(wtAgeGroupItem.getIdOfAgeGroupItem(), wtAgeGroupItem.getDescription());
             ++n;
         }
         return items;
     }
 
     public Object buildReportHTML() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile();
+        if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
+            printError("Выберите организацию или контрагента");
+            items = new ArrayList<>();
+        } else {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            String templateFilename = checkIsExistFile();
 
-        if (templateFilename == null) {
-            return null;
-        }
-        DishMenuWebArmPPReport.Builder builder = new DishMenuWebArmPPReport.Builder(templateFilename);
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            try {
-                persistenceSession = runtimeContext.createReportPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                builder.setReportProperties(buildProperties());
-                items = builder.createDataSource(persistenceSession, inBufet, inComplex);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
+            if (templateFilename == null) {
+                return null;
             }
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
+            DishMenuWebArmPPReport.Builder builder = new DishMenuWebArmPPReport.Builder(templateFilename);
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                try {
+                    persistenceSession = runtimeContext.createReportPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    builder.setReportProperties(buildProperties());
+                    items = builder.createDataSource(persistenceSession, inBufet, inComplex);
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
+                }
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            }
         }
         return items;
     }
 
     public void generateXLS(ActionEvent event) {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile();
-        if (templateFilename != null) {
-            DishMenuWebArmPPReport.Builder builder = new DishMenuWebArmPPReport.Builder(templateFilename);
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            BasicReportJob report = null;
-            try {
-                persistenceSession = runtimeContext.createReportPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                builder.setReportProperties(buildProperties());
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                logger.error("Failed export report : ", e);
-                printError("Ошибка при подготовке отчета: " + e.getMessage());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
-
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            try {
-                if (report != null) {
-                    HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
-                            .getResponse();
-                    ServletOutputStream servletOutputStream = response.getOutputStream();
-                    facesContext.getResponseComplete();
-                    facesContext.responseComplete();
-                    response.setContentType("application/xls");
-                    response.setHeader("Content-disposition", "inline;filename=DishMenuReport.xls");
-                    JRXlsExporter xlsExporter = new JRXlsExporter();
-                    xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-                    xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-                    xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-                    xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-                    xlsExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                    xlsExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-                    xlsExporter.exportReport();
-                    servletOutputStream.close();
+        if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
+            printError("Выберите организацию или контрагента");
+            items = new ArrayList<>();
+        } else {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            String templateFilename = checkIsExistFile();
+            if (templateFilename != null) {
+                DishMenuWebArmPPReport.Builder builder = new DishMenuWebArmPPReport.Builder(templateFilename);
+                Session persistenceSession = null;
+                Transaction persistenceTransaction = null;
+                BasicReportJob report = null;
+                try {
+                    persistenceSession = runtimeContext.createReportPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    builder.setReportProperties(buildProperties());
+                    report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                } catch (Exception e) {
+                    logger.error("Failed export report : ", e);
+                    printError("Ошибка при подготовке отчета: " + e.getMessage());
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
                 }
-            } catch (Exception e) {
-                logAndPrintMessage("Ошибка при выгрузке отчета:", e);
+
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                try {
+                    if (report != null) {
+                        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                                .getResponse();
+                        ServletOutputStream servletOutputStream = response.getOutputStream();
+                        facesContext.getResponseComplete();
+                        facesContext.responseComplete();
+                        response.setContentType("application/xls");
+                        response.setHeader("Content-disposition", "inline;filename=DishMenuReport.xls");
+                        JRXlsExporter xlsExporter = new JRXlsExporter();
+                        xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                        xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                        xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                        xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                        xlsExporter
+                                .setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                        xlsExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                        xlsExporter.exportReport();
+                        servletOutputStream.close();
+                    }
+                } catch (Exception e) {
+                    logAndPrintMessage("Ошибка при выгрузке отчета:", e);
+                }
             }
         }
     }
@@ -172,15 +184,15 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         String templateShortFilename;
         if (inBufet && inComplex) {
             templateShortFilename = "dishARMReport_full.jasper";
-        } else
-        {
+        } else {
             if (!inBufet && !inComplex) {
                 templateShortFilename = "dishARMReport.jasper";
             } else {
-                if (inBufet && !inComplex)
+                if (inBufet && !inComplex) {
                     templateShortFilename = "dishARMReport_menu.jasper";
-                else
+                } else {
                     templateShortFilename = "dishARMReport_complex.jasper";
+                }
             }
         }
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
@@ -188,7 +200,6 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
             return null;
         }
-
 
 
         return templateFilename;
@@ -201,32 +212,32 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
         }
 
         if (contragentItems != null && !contragentItems.isEmpty()) {
-            properties
-                    .setProperty(DishMenuWebArmPPReport.P_ID_OF_CONTRAGENT, contragentIds);
+            properties.setProperty(DishMenuWebArmPPReport.P_ID_OF_CONTRAGENT, contragentIds);
         }
 
         if (complexItems != null && !complexItems.isEmpty()) {
-            properties
-                    .setProperty(DishMenuWebArmPPReport.P_ID_OF_COMPLEXES, complexIds);
+            properties.setProperty(DishMenuWebArmPPReport.P_ID_OF_COMPLEXES, complexIds);
         }
-        if (selectidTypeFoodId != -1)
-        {
-            properties
-                    .setProperty(DishMenuWebArmPPReport.P_ID_OF_TYPES_FOOD, selectidTypeFoodId.toString());
+        if (selectidTypeFoodId != -1) {
+            properties.setProperty(DishMenuWebArmPPReport.P_ID_OF_TYPES_FOOD, selectidTypeFoodId.toString());
         }
-        if (selectidAgeGroup != -1)
-        {
-            properties
-                    .setProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP, selectidAgeGroup.toString());
+        if (selectidAgeGroup != -1) {
+            properties.setProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP, selectidAgeGroup.toString());
         }
-        properties
-                .setProperty(DishMenuWebArmPPReport.P_ARCHIVED, Boolean.toString(archived));
-        properties
-                .setProperty(DishMenuWebArmPPReport.P_BUFET, Boolean.toString(inBufet));
-        properties
-                .setProperty(DishMenuWebArmPPReport.P_COMPLEX, Boolean.toString(inComplex));
+        properties.setProperty(DishMenuWebArmPPReport.P_ARCHIVED, Boolean.toString(archived));
+        properties.setProperty(DishMenuWebArmPPReport.P_BUFET, Boolean.toString(inBufet));
+        properties.setProperty(DishMenuWebArmPPReport.P_COMPLEX, Boolean.toString(inComplex));
 
         return properties;
+    }
+
+    public Object showContragentListSelectPage() {
+        if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
+            MainPage.getSessionInstance().showContragentListSelectPage(idOfOrgList);
+        } else {
+            MainPage.getSessionInstance().showContragentListSelectPage();
+        }
+        return null;
     }
 
     @Override
@@ -239,6 +250,45 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
             contragentItems.add(contragentItem);
         }
         setContragentFilterInfo(contragentItems);
+        if (contragentItems != null && !contragentItems.isEmpty())
+            changeOrgsForContagents(contragentItems, new ArrayList<Long>(idOfOrgList));
+    }
+
+    private void changeOrgsForContagents(List<ContragentItem> contragentItems, List<Long> idofOrgs) {
+        if (contragentItems != null && contragentItems != null) {
+            idOfOrgList = new ArrayList<>();
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                List<Long> idOrgs = new ArrayList<>();
+                for (ContragentItem contragentItem : contragentItems) {
+                    Contragent contragent = (Contragent) persistenceSession
+                            .get(Contragent.class, contragentItem.getIdOfContragent());
+                    for (Org org : contragent.getOrgs()) {
+                        idOrgs.add(org.getIdOfOrg());
+                    }
+                }
+                for (Long orgid : idofOrgs) {
+                    if (idOrgs.contains(orgid)) {
+                        idOfOrgList.add(orgid);
+                    }
+                }
+                Map<Long, String> orgMap = new HashMap<>();
+                for (Long idOfOrgs : idOfOrgList) {
+                    Org org = (Org) persistenceSession.get(Org.class, idOfOrgs);
+                    orgMap.put(org.getIdOfOrg(), org.getShortName());
+                }
+                setOrgFilterInfo(orgMap);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
     }
 
     private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
@@ -258,6 +308,85 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage implements Cont
             contragentFilter = str.toString();
         }
         contragentIds = ids.toString();
+    }
+
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
+    public boolean isNotEmptySelectedOrg() {
+        if (idOfOrgList == null)
+            return true;
+        else
+            return idOfOrgList.isEmpty();
+    }
+
+
+    public Object showOrgListSelectPage() {
+        if (contragentItems != null && !contragentItems.isEmpty()) {
+            List<Long> idOfContragentList = new ArrayList<>();
+            for (ContragentItem contragentItem : contragentItems) {
+                idOfContragentList.add(contragentItem.getIdOfContragent());
+            }
+            //MainPage.getSessionInstance().showOrgListSelectPageWebArm(idOfContragentList, Boolean.TRUE);
+            MainPage.getSessionInstance().showOrgListSelectPageWebArm(idOfContragentList, null);
+        } else {
+            //MainPage.getSessionInstance().showOrgListSelectPageWebArm(Boolean.TRUE);
+            MainPage.getSessionInstance().showOrgListSelectPageWebArm(null);
+        }
+        return null;
+    }
+
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if (orgMap != null) {
+            setOrgFilterInfo(orgMap);
+            if (idOfOrgList != null && !idOfOrgList.isEmpty())
+                changeContagentsForOrgs(idOfOrgList, new ArrayList<>(contragentItems));
+        }
+    }
+
+    public void setOrgFilterInfo(Map<Long, String> orgMap) {
+        idOfOrgList = new ArrayList<Long>();
+        if (orgMap.isEmpty()) {
+            filter = "Не выбрано";
+        } else {
+            filter = "";
+            for (Long idOfOrg : orgMap.keySet()) {
+                idOfOrgList.add(idOfOrg);
+                filter = filter.concat(orgMap.get(idOfOrg) + "; ");
+            }
+            filter = filter.substring(0, filter.length() - 1);
+        }
+    }
+
+    private void changeContagentsForOrgs(List<Long> idOfOrgList, List<ContragentItem> contragentItems) {
+        if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
+            this.contragentItems = new ArrayList<>();
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                List<Long> contragentsId = new ArrayList<>();
+                for (Long idOrg : idOfOrgList) {
+                    Org org = (Org) persistenceSession.get(Org.class, idOrg);
+                    contragentsId.add(org.getDefaultSupplier().getIdOfContragent());
+                }
+                for (ContragentItem contragentItem : contragentItems) {
+                    if (contragentsId.contains(contragentItem.idOfContragent)) {
+                        this.contragentItems.add(contragentItem);
+                    }
+                }
+                setContragentFilterInfo(this.contragentItems);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
     }
 
     @Override

@@ -166,7 +166,7 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                     filterOrgs += "'" + idofOrg + "',";
                 }
                 filterOrgs = filterOrgs.substring(0, filterOrgs.length() - 1);
-                filterOrgs = " and (cwco.idoforg in (" + filterOrgs + ") or cwgro.idoforg in (" + filterOrgs + "))";
+                filterOrgs = " and (cwco.idoforg in (" + filterOrgs + ") or cwmo.idoforg in (" + filterOrgs + ")  or cwgro.idoforg in (" + filterOrgs + ") or cwgro1.idoforg in (" + filterOrgs + ")) and (cwm.deletestate = 0 or cwmc.deletestate = 0) ";
             }
             if (idOfContragentList != null && !idOfContragentList.isEmpty()) {
                 for (Long idofContragent : idOfContragentList) {
@@ -218,7 +218,9 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_wt_complexes_org cwco on cwco.idofcomplex = cwcid1.idofcomplex\n"
                             + "left join cf_wt_menu_group_dish_relationships cwmgr on cwmgr.idofdish = cwd.idofdish\n"
                             + "left join cf_wt_menu_group_relationships cwmg on cwmg.id = cwmgr.idofmenumenugrouprelation\n"
-                            + "left join cf_wt_menu cwm on cwm.idofmenu = cwmg.idofmenu"
+                            + "left join cf_wt_menu cwm on cwm.idofmenu = cwmg.idofmenu\n"
+                            + "left join cf_wt_org_group_relations cwgro1 on cwgro1.idoforggroup = cwm.idoforggroup\n"
+                            + "left join cf_wt_menu_org cwmo on cwmo.idofmenu = cwm.idofmenu\n"
                             + fullWhere + ") as base1\n"
                             + "left join cf_wt_group_items cwgi on cwgi.idofgroupitem = base1.idofgroupitem \n"
                             + filterTypeFoodId
