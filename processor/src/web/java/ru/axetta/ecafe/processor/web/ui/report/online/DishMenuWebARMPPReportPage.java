@@ -63,6 +63,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     private String complexFilter = "Не выбрано";
     private String contragentIds;
     private String complexIds;
+    private Long dishCount = 0L;
     private List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
     private List<ComplexItem> complexItems = new ArrayList<ComplexItem>();
 
@@ -111,6 +112,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
             printError("Выберите организацию или контрагента");
             items = new ArrayList<>();
+            setDishCount(0L);
         } else {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             String templateFilename = checkIsExistFile();
@@ -127,6 +129,10 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
                     persistenceTransaction = persistenceSession.beginTransaction();
                     builder.setReportProperties(buildProperties());
                     items = builder.createDataSource(persistenceSession, selectinBufet.intValue(), selectinComplex.intValue());
+                    if (items != null)
+                        setDishCount((long) items.size());
+                    else
+                        setDishCount(0L);
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
                 } finally {
@@ -145,6 +151,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
             printError("Выберите организацию или контрагента");
             items = new ArrayList<>();
+            setDishCount(0L);
         } else {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             String templateFilename = checkIsExistFile();
@@ -571,6 +578,14 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
 
     public void setSelectinComplex(Long selectinComplex) {
         this.selectinComplex = selectinComplex;
+    }
+
+    public Long getDishCount() {
+        return dishCount;
+    }
+
+    public void setDishCount(Long dishCount) {
+        this.dishCount = dishCount;
     }
 
     public static class ContragentItem {

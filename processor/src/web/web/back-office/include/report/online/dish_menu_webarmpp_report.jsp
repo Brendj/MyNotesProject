@@ -82,12 +82,16 @@
             <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getFiltersForAddedColumns()}"/>
         </h:selectOneMenu>
 
-        <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Построить отчет" action="#{mainPage.dishMenuReportWebArmPP.buildReportHTML}"
                                reRender="dishMenuWabARMPPReportPanel" styleClass="command-button"
                                status="reportGenerateStatus" />
             <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.dishMenuReportWebArmPP.generateXLS}"
                              styleClass="command-button" />
+            <a4j:commandButton value="Легенда"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('dishMenuLegentPanel')}.show();"
+                               styleClass="command-link">
+            </a4j:commandButton>
             <a4j:status id="reportGenerateStatus">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -256,7 +260,21 @@ center-aligned-column,center-aligned-column,center-aligned-column,center-aligned
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
+        <h:outputText escape="true" value="Количество: #{mainPage.dishMenuReportWebArmPP.dishCount}" styleClass="output-text" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
+
+<rich:modalPanel id="dishMenuLegentPanel" width="370" height="100" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('dishMenuLegentPanel')}.hide();return false;" />
+    <f:facet name="header">
+        <h:outputText escape="true" value="Легенда" />
+    </f:facet>
+    <h:panelGrid styleClass="borderless-grid">
+        <h:outputText escape="false" value="Серым цветом выделены архивные блюда"/>
+        <a4j:commandButton value="Ok"
+                           oncomplete="#{rich:component('dishMenuLegentPanel')}.hide();"
+                           styleClass="command-button" />
+    </h:panelGrid>
+</rich:modalPanel>
