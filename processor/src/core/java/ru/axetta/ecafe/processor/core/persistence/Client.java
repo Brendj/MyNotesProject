@@ -595,14 +595,14 @@ public class Client {
                 clientsMobileHistory.setOldmobile(this.mobile);
                 clientsMobileHistory.setNewmobile(mobile);
                 if (!this.mobile.isEmpty() || !mobile.isEmpty()) {
+                    if (clearSsoid) {
+                        clientsMobileHistory.setOldssoid(this.ssoid);
+                        this.ssoid = "";
+                        clearedSsoid = true;
+                    }
                     if (this.mobile.isEmpty())
                         clientsMobileHistory.setAction("Добавление");
                     else {
-                        if (clearSsoid) {
-                            clientsMobileHistory.setOldssoid(this.ssoid);
-                            this.ssoid = "";
-                            clearedSsoid = true;
-                        }
                         if (mobile.isEmpty())
                             clientsMobileHistory.setAction("Удаление");
                         else
