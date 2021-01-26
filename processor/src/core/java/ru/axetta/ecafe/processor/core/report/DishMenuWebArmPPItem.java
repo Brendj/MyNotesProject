@@ -28,6 +28,7 @@ public class DishMenuWebArmPPItem {
     private String countInMenu;
     private String countInComplex;
     private Integer archived;
+    private String contragentName;
 
     public String getCodeISPP() {
         return codeISPP;
@@ -195,5 +196,13 @@ public class DishMenuWebArmPPItem {
 
     public void setArchived(Integer archived) {
         this.archived = archived;
+    }
+
+    public String getContragentName() {
+        return contragentName;
+    }
+
+    public void setContragentName(String contragentName) {
+        this.contragentName = contragentName;
     }
 }

@@ -64,6 +64,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     private String contragentIds;
     private String complexIds;
     private Long dishCount = 0L;
+    private String seachName = "";
+    private Boolean showContagentName = false;
     private List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
     private List<ComplexItem> complexItems = new ArrayList<ComplexItem>();
 
@@ -109,11 +111,20 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     }
 
     public Object buildReportHTML() {
+        boolean good = true;
         if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
             printError("Выберите организацию или контрагента");
             items = new ArrayList<>();
             setDishCount(0L);
-        } else {
+            good = false;
+        }
+        if (!seachName.trim().isEmpty() && seachName.trim().length() < 3) {
+            printError("Фильтр по названию должен содержать минимум 3 символа");
+            items = new ArrayList<>();
+            setDishCount(0L);
+            good = false;
+        }
+        if (good) {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             String templateFilename = checkIsExistFile();
 
@@ -148,11 +159,21 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     }
 
     public void generateXLS(ActionEvent event) {
+        boolean good = true;
         if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
             printError("Выберите организацию или контрагента");
             items = new ArrayList<>();
             setDishCount(0L);
-        } else {
+            good = false;
+        }
+        if (!seachName.trim().isEmpty() && seachName.trim().length() < 3) {
+            printError("Фильтр по названию должен содержать минимум 3 символа");
+            items = new ArrayList<>();
+            setDishCount(0L);
+            good = false;
+        }
+        if (good)
+        {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             String templateFilename = checkIsExistFile();
             if (templateFilename != null) {
@@ -264,9 +285,15 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         if (selectidAgeGroup != -1) {
             properties.setProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP, selectidAgeGroup.toString());
         }
+
+        if (!seachName.trim().isEmpty())
+        {
+            properties.setProperty(DishMenuWebArmPPReport.P_DISHNAME, seachName.trim());
+        }
         properties.setProperty(DishMenuWebArmPPReport.P_ARCHIVED, selectArchived.toString());
         properties.setProperty(DishMenuWebArmPPReport.P_BUFET, selectinBufet.toString());
         properties.setProperty(DishMenuWebArmPPReport.P_COMPLEX, selectinComplex.toString());
+        properties.setProperty(DishMenuWebArmPPReport.P_SHOW_CONTAGENT, showContagentName.toString());
 
         return properties;
     }
@@ -586,6 +613,22 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
 
     public void setDishCount(Long dishCount) {
         this.dishCount = dishCount;
+    }
+
+    public String getSeachName() {
+        return seachName;
+    }
+
+    public void setSeachName(String seachName) {
+        this.seachName = seachName;
+    }
+
+    public Boolean getShowContagentName() {
+        return showContagentName;
+    }
+
+    public void setShowContagentName(Boolean showContagentName) {
+        this.showContagentName = showContagentName;
     }
 
     public static class ContragentItem {
