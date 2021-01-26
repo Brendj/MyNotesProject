@@ -1346,6 +1346,7 @@
                                reRender="historyChangeMobile"
                                styleClass="command-button" />
         </h:panelGrid>
+        <h:form>
         <rich:dataTable id="historyChangeMobile" value="#{mainPage.clientOperationListPage.clientsMobileHistories}"
                         var="item" rows="8"
                         columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
@@ -1368,7 +1369,7 @@
                 </f:facet>
                 <h:outputText escape="true" value="#{item.action}" styleClass="output-text" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" sortBy="#{item.createdate}">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Дата" />
                 </f:facet>
@@ -1393,6 +1394,7 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
+        </h:form>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

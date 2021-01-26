@@ -234,7 +234,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             criteria.add(Restrictions.eq("client", client))
                     .add(Restrictions.ge("createdate", startTime))
                     .add(Restrictions.le("createdate", endTime))
-                    .addOrder(Order.asc("createdate"));
+                    .addOrder(Order.desc("createdate"));
             clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
         }
 
@@ -313,7 +313,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             criteria.add(Restrictions.eq("client", client))
                     //.add(Restrictions.ge("createdate", startTime))
                     //.add(Restrictions.le("createdate", endTime))
-                    .addOrder(Order.asc("createdate"));
+                    .addOrder(Order.desc("createdate"));
             clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
         } catch (Exception e) {
 
