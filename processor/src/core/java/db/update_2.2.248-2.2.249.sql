@@ -22,7 +22,7 @@ update cf_wt_dishes set protein = 0 where cf_wt_dishes.protein is null;
 update cf_wt_dishes set fat = 0 where fat is null;
 update cf_wt_dishes set carbohydrates = 0 where cf_wt_dishes.carbohydrates is null;
 update cf_wt_dishes set calories = 0 where cf_wt_dishes.calories is null;
-update cf_wt_dishes set qty = '0' where qty is null || qty like '';
+update cf_wt_dishes set qty = '0' where qty is null or qty like '';
 
 alter table cf_wt_dishes alter column protein set not null;
 alter table cf_wt_dishes alter column fat set not null;
