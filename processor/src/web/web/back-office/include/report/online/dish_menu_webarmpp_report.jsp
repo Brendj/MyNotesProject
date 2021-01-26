@@ -66,7 +66,9 @@
         </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Архивные" />
-        <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.archived}"/>
+        <h:selectOneMenu value="#{mainPage.dishMenuReportWebArmPP.selectArchived}" >
+            <f:selectItems value="#{mainPage.dishMenuReportWebArmPP.getArchiveds()}"/>
+        </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Нахождение в меню буфета" />
         <h:selectBooleanCheckbox value="#{mainPage.dishMenuReportWebArmPP.inBufet}"/>
@@ -94,140 +96,142 @@
                         var="dishElement" rows="25" footerClass="data-table-footer" columnClasses="center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column
 center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column
 center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column,center-aligned-column, center-aligned-column">
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="ИС \"ПП\"" />
                 </f:facet>
-                <h:outputText value="#{dishElement.codeISPP}" styleClass="output-text" />
+                <h:outputText value="#{dishElement.codeISPP}" styleClass="output-text"/>
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Название" />
                 </f:facet>
                 <h:outputText value="#{dishElement.dishname}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Состав" />
                 </f:facet>
                 <h:outputText value="#{dishElement.componentsofdish}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Код поставщика" />
                 </f:facet>
                 <h:outputText value="#{dishElement.idsupplier}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Цена" />
                 </f:facet>
                 <h:outputText value="#{dishElement.price}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Дата в меню с" />
                 </f:facet>
                 <h:outputText value="#{dishElement.dateFrom}" styleClass="output-text" converter="dateConverter"/>
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Дата в меню по" />
                 </f:facet>
                 <h:outputText value="#{dishElement.dateTo}" styleClass="output-text" converter="dateConverter"/>
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Возрастная категория" />
                 </f:facet>
                 <h:outputText value="#{dishElement.agegroup}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Тип производства" />
                 </f:facet>
                 <h:outputText value="#{dishElement.typeOfProduction}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Тип питания" />
                 </f:facet>
                 <h:outputText value="#{dishElement.typefood}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Категория" />
                 </f:facet>
                 <h:outputText value="#{dishElement.category}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Подкатегория" />
                 </f:facet>
                 <h:outputText value="#{dishElement.subcategory}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Калории" />
                 </f:facet>
                 <h:outputText value="#{dishElement.calories}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Масса/Количество" />
                 </f:facet>
                 <h:outputText value="#{dishElement.qty}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Белки" />
                 </f:facet>
                 <h:outputText value="#{dishElement.protein}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Жиры" />
                 </f:facet>
                 <h:outputText value="#{dishElement.fat}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Углеводы" />
                 </f:facet>
                 <h:outputText value="#{dishElement.carbohydrates}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column>
+            <rich:column style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Штрих-код" />
                 </f:facet>
                 <h:outputText value="#{dishElement.barcode}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inBufet}">
+            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inBufet}"
+                         style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Нахождение в буфете" />
                 </f:facet>
                 <h:outputText value="#{dishElement.countInMenu}" styleClass="output-text" />
             </rich:column>
 
-            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inComplex}">
+            <rich:column rendered="#{mainPage.dishMenuReportWebArmPP.inComplex}"
+                         style="#{mainPage.dishMenuReportWebArmPP.getColourForSell(dishElement)}">
                 <f:facet name="header">
                     <h:outputText value="Нахождение в комплексе" />
                 </f:facet>
