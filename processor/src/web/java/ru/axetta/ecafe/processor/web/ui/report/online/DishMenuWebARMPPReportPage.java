@@ -56,8 +56,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     private Long selectidTypeFoodId;
     private Long selectidAgeGroup;
     private Long selectArchived;
-    private Boolean inBufet = false;
-    private Boolean inComplex = false;
+    private Long selectinBufet = 1L;
+    private Long selectinComplex = 1L;
 
     private String contragentFilter = "Не выбрано";
     private String complexFilter = "Не выбрано";
@@ -98,6 +98,15 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         return items;
     }
 
+    public SelectItem[] getFiltersForAddedColumns() {
+        SelectItem[] items = new SelectItem[4];
+        items[0] = new SelectItem(1, "Не выбрано");
+        items[1] = new SelectItem(2, "Включая нахождения");
+        items[2] = new SelectItem(3, "Только с нахождениями");
+        items[3] = new SelectItem(4, "Без нахождения");
+        return items;
+    }
+
     public Object buildReportHTML() {
         if (idOfOrgList.isEmpty() && contragentItems.isEmpty()) {
             printError("Выберите организацию или контрагента");
@@ -117,7 +126,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
                     persistenceSession = runtimeContext.createReportPersistenceSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     builder.setReportProperties(buildProperties());
-                    items = builder.createDataSource(persistenceSession, inBufet, inComplex);
+                    items = builder.createDataSource(persistenceSession, selectinBufet.intValue(), selectinComplex.intValue());
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
                 } finally {
@@ -190,13 +199,15 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateShortFilename;
-        if (inBufet && inComplex) {
+        boolean inBufetBool = Boolean.parseBoolean(renderBufet());
+        boolean inComplexBool = Boolean.parseBoolean(renderComplex());
+        if (inBufetBool && inComplexBool) {
             templateShortFilename = "dishARMReport_full.jasper";
         } else {
-            if (!inBufet && !inComplex) {
+            if (!inBufetBool && !inComplexBool) {
                 templateShortFilename = "dishARMReport.jasper";
             } else {
-                if (inBufet && !inComplex) {
+                if (inBufetBool && !inComplexBool) {
                     templateShortFilename = "dishARMReport_menu.jasper";
                 } else {
                     templateShortFilename = "dishARMReport_complex.jasper";
@@ -211,6 +222,20 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
 
 
         return templateFilename;
+    }
+
+    public String  renderBufet() {
+        if (selectinBufet.intValue()==2 || selectinBufet.intValue()==3)
+            return "true";
+        else
+            return "false";
+    }
+
+    public String renderComplex() {
+        if (selectinComplex.intValue()==2 || selectinComplex.intValue()==3)
+            return "true";
+        else
+            return "false";
     }
 
     private Properties buildProperties() {
@@ -233,8 +258,8 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
             properties.setProperty(DishMenuWebArmPPReport.P_ID_OF_AGE_GROUP, selectidAgeGroup.toString());
         }
         properties.setProperty(DishMenuWebArmPPReport.P_ARCHIVED, selectArchived.toString());
-        properties.setProperty(DishMenuWebArmPPReport.P_BUFET, Boolean.toString(inBufet));
-        properties.setProperty(DishMenuWebArmPPReport.P_COMPLEX, Boolean.toString(inComplex));
+        properties.setProperty(DishMenuWebArmPPReport.P_BUFET, selectinBufet.toString());
+        properties.setProperty(DishMenuWebArmPPReport.P_COMPLEX, selectinComplex.toString());
 
         return properties;
     }
@@ -524,28 +549,28 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
         this.complexItems = complexItems;
     }
 
-    public Boolean getInBufet() {
-        return inBufet;
-    }
-
-    public void setInBufet(Boolean inBufet) {
-        this.inBufet = inBufet;
-    }
-
-    public Boolean getInComplex() {
-        return inComplex;
-    }
-
-    public void setInComplex(Boolean inComplex) {
-        this.inComplex = inComplex;
-    }
-
     public Long getSelectArchived() {
         return selectArchived;
     }
 
     public void setSelectArchived(Long selectArchived) {
         this.selectArchived = selectArchived;
+    }
+
+    public Long getSelectinBufet() {
+        return selectinBufet;
+    }
+
+    public void setSelectinBufet(Long selectinBufet) {
+        this.selectinBufet = selectinBufet;
+    }
+
+    public Long getSelectinComplex() {
+        return selectinComplex;
+    }
+
+    public void setSelectinComplex(Long selectinComplex) {
+        this.selectinComplex = selectinComplex;
     }
 
     public static class ContragentItem {
