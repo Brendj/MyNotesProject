@@ -284,4 +284,41 @@ where cp.idofuser in (select cu.idofuser from cf_users cu where cu.idofrole = 5)
 where cf.functionname in ('enterEventRprt', 'financialControl', 'informRprts', 'cardRprts', 'onlineRprtBenefit', 'onlineRprtActivity',
                           'clientsBenefitsRprt','manualRprt', 'messageARMinOO'));
 
+create sequence cf_wt_org_relation_aud_seq maxvalue 2147483647;
+
+create table cf_wt_org_relation_aud
+(
+  idofevent    bigint    not null,
+  idofcomplex  bigint,
+  idofmenu     bigint,
+  idoforggroup bigint,
+  idoforg      bigint    not null,
+  deletestate  integer   not null,
+  version      bigint    not null,
+  createdate   timestamp not null,
+  idofuser     bigint    not null,
+  constraint cf_wt_org_relation_aud_pk primary key (idofevent)
+);
+
+create function cf_wt_org_relation_aud_inc_version() returns trigger
+LANGUAGE 'plpgsql' as '
+DECLARE
+  max_version bigint;
+BEGIN
+  max_version := (SELECT max(a.version) FROM cf_wt_org_relation_aud a);
+  IF (max_version IS NULL) THEN
+    max_version = 0;
+  END IF;
+  NEW.version := max_version + 1;
+  RETURN NEW;
+END ';
+
+CREATE TRIGGER cf_wt_org_relation_aud_inc_version BEFORE INSERT
+ON cf_wt_org_relation_aud FOR EACH ROW EXECUTE PROCEDURE cf_wt_org_relation_aud_inc_version();
+
+drop trigger cf_wt_org_relation_aud_inc_version on cf_wt_org_relation_aud;
+CREATE TRIGGER cf_wt_org_relation_aud_inc_version BEFORE INSERT OR UPDATE
+ON cf_wt_org_relation_aud FOR EACH ROW EXECUTE PROCEDURE cf_wt_org_relation_aud_inc_version();
+
+
 --! ФИНАЛИЗИРОВАН 26.01.2021, НЕ МЕНЯТЬ
