@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -44,27 +43,8 @@ public class DiscountManager {
 
     private static void saveNewClientDiscountHistoryRecord(Session session, Client client,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment) {
-
-        if(!oldDiscounts.equals(newDiscounts)) {
-            List<CategoryDiscount> disjunctions = (List<CategoryDiscount>) CollectionUtils
-                    .disjunction(newDiscounts, oldDiscounts);
-            for (CategoryDiscount uncommon : disjunctions) {
-                ClientDiscountHistory history = new ClientDiscountHistory();
-                history.setClient(client);
-                history.setComment(comment);
-                history.setRegistryDate(new Date());
-                history.setCategoryDiscount(uncommon);
-
-                ClientDiscountHistoryOperationTypeEnum type = ClientDiscountHistoryOperationTypeEnum
-                        .getType(oldDiscounts, newDiscounts, uncommon);
-                history.setOperationType(type);
-                session.save(history);
-            }
-        } else {
-            for(CategoryDiscount discount : newDiscounts){
-                // todo add one-to-many field in Client
-            }
-        }
+        ClientDiscountHistoryService service = RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class);
+        service.saveClientDiscountHistoryByOldScheme(session, client, oldDiscounts, newDiscounts, comment);
     }
 
     private static String extractCategoryIdsFromDiscountSet(Set<CategoryDiscount> categoryDiscounts) {

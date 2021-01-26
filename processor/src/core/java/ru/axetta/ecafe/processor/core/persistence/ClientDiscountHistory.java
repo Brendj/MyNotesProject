@@ -15,6 +15,18 @@ public class ClientDiscountHistory {
     private CategoryDiscount categoryDiscount;
     private String comment;
 
+    public static ClientDiscountHistory build(Client client, String comment, CategoryDiscount discount,
+            ClientDiscountHistoryOperationTypeEnum type){
+        ClientDiscountHistory history = new ClientDiscountHistory();
+        history.setClient(client);
+        history.setComment(comment);
+        history.setRegistryDate(new Date());
+        history.setCategoryDiscount(discount);
+        history.setOperationType(type);
+
+        return history;
+    }
+
     public Long getIdOfClientDiscountHistory() {
         return idOfClientDiscountHistory;
     }
