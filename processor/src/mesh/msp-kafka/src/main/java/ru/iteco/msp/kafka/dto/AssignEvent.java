@@ -27,7 +27,7 @@ public class AssignEvent {
         event.setPerson_id(client.getMeshGuid());
 
         CodeMSP msp = categoryDiscount.getMSPByClient(client);
-        event.setAction_code(msp == null ? null : msp.getCode().toString());
+        event.setBenefit_code(msp == null ? null : msp.getCode().toString());
         if(categoryDiscount.getCategoryDiscountDTSZN() != null){
             if(categoryDiscount.getCategoryDiscountDTSZN().getCode().equals(0)){  // Иное
                 event.setBenefit_category_name("Иное");
