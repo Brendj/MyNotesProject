@@ -1987,7 +1987,7 @@ public class PreorderDAOService {
 
     private List<PreorderComplex> getPreorderComplexesByClient(RegularPreorder regularPreorder, Date dateFrom, Date dateTo) {
         return em.createQuery("select pc from PreorderComplex pc "
-                + "where pc.client = :client and pc.prerderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
+                + "where pc.client = :client and pc.preorderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
                 + "order by pc.createdDate desc, pc.lastUpdate desc")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("dateFrom", dateFrom)
