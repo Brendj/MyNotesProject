@@ -1689,9 +1689,11 @@ public class PreorderDAOService {
             deleteGeneratedPreordersByRegular((Session) em.getDelegate(), regularPreorder, PreorderState.OK);
         }
 
-        //получаем список всех предзаказов (в т.ч. удаленные)
+        //получаем список всех предзаказов по регуляру (в т.ч. удаленные)
         List<PreorderComplex> preorderComplexes = getPreorderComplexesByRegular(regularPreorder, currentDate, dateTo);
 
+        //все предзаказы клиента за период,
+        List<PreorderComplex> preordersForClient = getPreorderComplexesByClient(regularPreorder, currentDate, dateTo);
 
         currentDate = CalendarUtils.startOfDayInUTC(CalendarUtils.addHours(currentDate, 12));
 
@@ -1721,6 +1723,16 @@ public class PreorderDAOService {
                 logger.info("Weekend or not generated day");
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
+            }
+
+            //проверяем, нет ли на дату удаленного пользователем предзаказа
+            PreorderComplex pc2 = findPreorderComplexOnDate(preordersForClient, currentDate, null);
+            if (pc2 != null) {
+                if (pc2.getDeletedState() && pc2.getState() == PreorderState.OK && pc2.getLastUpdate().after(regularPreorder.getCreatedDate())) {
+                    logger.info("Client deleted preorder on this date earlier");
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
+                }
             }
 
             boolean isWtMenu = regularPreorder.getClient().getOrg().getUseWebArm();
@@ -1970,6 +1982,17 @@ public class PreorderDAOService {
                 + "order by pc.createdDate desc")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("regularPreorder", regularPreorder)
+                .getResultList();
+    }
+
+    private List<PreorderComplex> getPreorderComplexesByClient(RegularPreorder regularPreorder, Date dateFrom, Date dateTo) {
+        return em.createQuery("select pc from PreorderComplex pc "
+                + "where pc.client = :client and pc.prerderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
+                + "order by pc.createdDate desc, pc.lastUpdate desc")
+                .setParameter("client", regularPreorder.getClient())
+                .setParameter("dateFrom", dateFrom)
+                .setParameter("dateTo", dateTo)
+                .setParameter("idOfComplex", regularPreorder.getIdOfComplex())
                 .getResultList();
     }
 
