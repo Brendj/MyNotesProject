@@ -437,7 +437,7 @@ public class FunctionSelector {
                     }
                     onlineReportItems.add(item);
                 }
-                if (onlineReportItemsSupplierReport.contains(item.getFunctionName())) {
+                if (onlineReportFuncsForSupplierReport.contains(item.getFunctionName())) {
                     if (selectedFunctions != null && selectedFunctions.contains(function)) {
                         item.setSelected(true);
                     }
