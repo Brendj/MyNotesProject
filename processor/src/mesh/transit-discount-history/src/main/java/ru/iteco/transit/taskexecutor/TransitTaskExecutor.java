@@ -17,12 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,105 +28,90 @@ import java.util.List;
 public class TransitTaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(TransitTaskExecutor.class);
 
-    private final CronTrigger transitCronTrigger;
-    private final ThreadPoolTaskScheduler threadPoolTransitTaskScheduler;
     private final DiscountsService discountsService;
     private final ClientDiscountHistoryService clientDiscountHistoryService;
 
     private static final int SAMPLE_SIZE = 5000;
 
     public TransitTaskExecutor(
-            CronTrigger transitCronTrigger,
-            ThreadPoolTaskScheduler threadPoolTransitTaskScheduler,
             DiscountsService discountsService,
             ClientDiscountHistoryService clientDiscountHistoryService){
-        this.transitCronTrigger = transitCronTrigger;
-        this.threadPoolTransitTaskScheduler = threadPoolTransitTaskScheduler;
         this.discountsService = discountsService;
         this.clientDiscountHistoryService = clientDiscountHistoryService;
     }
 
-    @PostConstruct
-    public void buildRunnableTask(){
-        threadPoolTransitTaskScheduler.schedule(new RunnableTask(), transitCronTrigger);
-    }
+    @Transactional
+    public void run() {
+        try {
+            int i = 0;
 
-    class RunnableTask implements Runnable{
+            Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("registrationDate"));
+            List<DiscountChangeHistory> discountChangeHistoryList = discountsService
+                    .getHistory(pageable);
 
-        @Override
-        @Transactional
-        public void run() {
-            try {
-                int i = 0;
+            while(CollectionUtils.isNotEmpty(discountChangeHistoryList)) {
+                for (DiscountChangeHistory h : discountChangeHistoryList) {
+                    if (StringUtils.isEmpty(h.getClient().getMeshGuid()) || (StringUtils.isBlank(h.getCategoriesDiscounts()) && StringUtils
+                            .isBlank(h.getOldCategoriesDiscounts()))) {
+                        continue;
+                    }
+                    log.info(String
+                            .format("Process history Client ID: %d, New discounts: %s, Old discounts: %s",
+                                    h.getClient().getIdOfClient(), h.getCategoriesDiscounts(), h.getOldCategoriesDiscounts()
+                            ));
+                    List<String> newDiscounts = getSortedSplitList(h.getCategoriesDiscounts());
+                    List<String> oldDiscounts = getSortedSplitList(h.getOldCategoriesDiscounts());
+                    OperationType type;
 
-                Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("registrationDate"));
-                List<DiscountChangeHistory> discountChangeHistoryList = discountsService
-                        .getHistory(pageable);
-
-                while(CollectionUtils.isNotEmpty(discountChangeHistoryList)) {
-                    for (DiscountChangeHistory h : discountChangeHistoryList) {
-                        if (StringUtils.isEmpty(h.getClient().getMeshGuid()) || (StringUtils.isBlank(h.getCategoriesDiscounts()) && StringUtils
-                                .isBlank(h.getOldCategoriesDiscounts()))) {
+                    if (newDiscounts.equals(oldDiscounts)) {
+                        if (h.getOldDiscountMode().equals(h.getDiscountMode())) {
                             continue;
                         }
-                        log.info(String
-                                .format("Process history Client ID: %d, New discounts: %s, Old discounts: %s",
-                                        h.getClient().getIdOfClient(), h.getCategoriesDiscounts(), h.getOldCategoriesDiscounts()
-                                ));
-                        List<String> newDiscounts = getSortedSplitList(h.getCategoriesDiscounts());
-                        List<String> oldDiscounts = getSortedSplitList(h.getOldCategoriesDiscounts());
-                        OperationType type;
+                        type = OperationType.CHANGE;
 
-                        if (newDiscounts.equals(oldDiscounts)) {
-                            if (h.getOldDiscountMode().equals(h.getDiscountMode())) {
-                                continue;
-                            }
-                            type = OperationType.CHANGE;
+                        for(String id : newDiscounts){
+                            CategoryDiscount discount = discountsService.getDiscountByStrId(id);
+                            clientDiscountHistoryService.save(discount, h.getClient(), h.getRegistrationDate(),
+                                    h.getComment(), type);
+                        }
+                    } else {
+                        List<CategoryDiscount> dif = discountsService.getDiffDiscounts(newDiscounts, oldDiscounts);
 
-                            for(String id : newDiscounts){
-                                CategoryDiscount discount = discountsService.getDiscountByStrId(id);
-                                clientDiscountHistoryService.save(discount, h.getClient(), h.getRegistrationDate(),
-                                        h.getComment(), type);
-                            }
-                        } else {
-                            List<CategoryDiscount> dif = discountsService.getDiffDiscounts(newDiscounts, oldDiscounts);
+                        for (CategoryDiscount d : dif) {
+                            type = getOperationType(oldDiscounts, newDiscounts, d.getIdOfCategoryDiscount().toString());
 
-                            for (CategoryDiscount d : dif) {
-                                type = getOperationType(oldDiscounts, newDiscounts, d.getIdOfCategoryDiscount().toString());
-
-                                clientDiscountHistoryService.save(d, h.getClient(), h.getRegistrationDate(),
-                                        h.getComment(), type);
-                            }
+                            clientDiscountHistoryService.save(d, h.getClient(), h.getRegistrationDate(),
+                                    h.getComment(), type);
                         }
                     }
-
-                    i += SAMPLE_SIZE;
-                    pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("registrationDate"));
-                    discountChangeHistoryList = discountsService.getHistory(pageable);
                 }
-            } catch (Exception e) {
-                log.error("Critical error in process transit category change history to new entity, task interrupt", e);
-            }
-        }
 
-        private OperationType getOperationType(List<String> oldDiscounts, List<String> newDif,
-                String idOfCategoryDiscount) {
-            if(oldDiscounts.contains(idOfCategoryDiscount) && newDif.contains(idOfCategoryDiscount)){
-                return OperationType.CHANGE;
-            } else if(oldDiscounts.contains(idOfCategoryDiscount)){
-                return OperationType.DELETE;
-            } else {
-                return OperationType.ADD;
+                i += SAMPLE_SIZE;
+                pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("registrationDate"));
+                discountChangeHistoryList = discountsService.getHistory(pageable);
             }
+        } catch (Exception e) {
+            log.error("Critical error in process transit category change history to new entity, task interrupt", e);
         }
+    }
 
-        private List<String> getSortedSplitList(String s) {
-            if(StringUtils.isBlank(s)){
-                return Collections.emptyList();
-            }
-            String[] arr = StringUtils.split(s, ",");
-            Arrays.sort(arr);
-            return Arrays.asList(arr);
+    private OperationType getOperationType(List<String> oldDiscounts, List<String> newDif,
+                                           String idOfCategoryDiscount) {
+        if(oldDiscounts.contains(idOfCategoryDiscount) && newDif.contains(idOfCategoryDiscount)){
+            return OperationType.CHANGE;
+        } else if(oldDiscounts.contains(idOfCategoryDiscount)){
+            return OperationType.DELETE;
+        } else {
+            return OperationType.ADD;
         }
+    }
+
+    private List<String> getSortedSplitList(String s) {
+        if(StringUtils.isBlank(s)){
+            return Collections.emptyList();
+        }
+        String[] arr = StringUtils.split(s, ",");
+        Arrays.sort(arr);
+        return Arrays.asList(arr);
     }
 }
