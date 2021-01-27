@@ -159,18 +159,18 @@ public class User {
     }
 
     public enum DefaultRole{
-        DEFAULT(0,"1. Настраиваемая роль"),
-        ADMIN(1,"2. Администратор"),
-        SUPPLIER(2,"3. Поставщик питания"),
-        MONITORING(3,"4. Мониторинг"),
-        ADMIN_SECURITY(4, "5. Администратор ИБ"),
-        SUPPLIER_REPORT(5, "6. Отчетность поставщика питания"),
-        CARD_OPERATOR(6, "7. Оператор по картам"),
-        DIRECTOR(7, "8. Директор школы"),
-        PRODUCTION_DIRECTOR(8, "9. Заведующий производством"),
-        INFORMATION_SYSTEM_OPERATOR(9,"10. Оператор ИС"),
-        CLASSROOM_TEACHER(10,"11. Классный руководитель"),
-        CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"12. Классный руководитель с оплатой питания");
+        DEFAULT(0,"Настраиваемая роль"),
+        ADMIN(1,"Администратор"),
+        SUPPLIER(2,"Поставщик питания"),
+        MONITORING(3,"Мониторинг"),
+        ADMIN_SECURITY(4, "Администратор ИБ"),
+        SUPPLIER_REPORT(5, "Отчетность поставщика питания"),
+        CARD_OPERATOR(6, "Оператор по картам"),
+        DIRECTOR(7, "Директор школы"),
+        PRODUCTION_DIRECTOR(8, "Заведующий производством"),
+        INFORMATION_SYSTEM_OPERATOR(9,"Оператор ИС"),
+        CLASSROOM_TEACHER(10,"Классный руководитель"),
+        CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания");
 
 
         private Integer identification;

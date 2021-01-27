@@ -175,7 +175,7 @@ public class PreorderCancelNotificationService {
                 }
             }
 
-            ////отправка представителям
+            //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
                     if (ClientManager.allowedGuardianshipNotification(session, destGuardian.getIdOfClient(),

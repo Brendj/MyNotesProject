@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.InvalidContentException;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangePortType;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangeService;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.*;
@@ -62,6 +63,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     public static final String SUCCESS_CODE = "0 -";
     public static final String NODATA_CODE = "NO_DATA -";
     public static final String EMPTY_PACKET = "Empty packet, rerequest sent";
+    public static final String ALREADY_PROCESSED = "уже обрабатывался";
 
     private final static ThreadLocal<String> hasError = new ThreadLocal<String>(){
         @Override protected String initialValue() { return null; }
@@ -590,6 +592,14 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         try {
             port21.ack(ackRequest);
             RnipDAOService.getInstance().saveAsAckSent(rnipMessage);
+        } catch (InvalidContentException e) {
+            try {
+                if (e.getMessage().contains(ALREADY_PROCESSED)) {
+                    RnipDAOService.getInstance().saveAsAckSent(rnipMessage);
+                }
+            } catch (Exception ee) {
+                loggerSendAck.error("Error in process Ack response rnip 2.1: ", ee);
+            }
         } catch (Exception e) {
             loggerSendAck.error("Error in request to rnip 2.1", e);
             return;

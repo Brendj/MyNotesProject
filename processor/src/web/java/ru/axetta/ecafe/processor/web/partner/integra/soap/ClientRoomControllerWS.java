@@ -11009,7 +11009,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     for (Client client : clientsSsoid) {
                         if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
                             client.initClientMobileHistory(clientsMobileHistory);
-                            client.setMobile(cientMobile);
+                            client.setMobileNotClearSsoid(cientMobile);
                             client.setUpdateTime(new Date());
                             session.update(client);
                         }

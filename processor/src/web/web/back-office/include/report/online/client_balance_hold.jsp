@@ -44,12 +44,12 @@
         </h:panelGroup>
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="2">
+    <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Обновить" action="#{clientBalanceHoldPage.reload}"
                            reRender="clientBalanceHoldPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton" />
-        <h:commandButton value="Выгрузить в CSV" action="#{clientBalanceHoldPage.showClientBalanceHoldCSVList}"
-                         styleClass="command-button" />
+        <%--<h:commandButton value="Выгрузить в CSV" action="#{clientBalanceHoldPage.showClientBalanceHoldCSVList}"
+                         styleClass="command-button" />--%>
     </h:panelGrid>
 
     <a4j:status id="reportGenerateStatus">
