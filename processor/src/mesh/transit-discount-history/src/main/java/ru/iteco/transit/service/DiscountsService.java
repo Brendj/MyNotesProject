@@ -11,6 +11,8 @@ import ru.iteco.transit.repo.DiscountChangeHistoryRepo;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Component
 public class DiscountsService {
+    private static final Logger log = LoggerFactory.getLogger(DiscountsService.class);
+
     private final DiscountChangeHistoryRepo discountChangeHistoryRepo;
     private final CategoryDiscountRepo categoryDiscountRepo;
 
@@ -34,7 +38,14 @@ public class DiscountsService {
     }
 
     public CategoryDiscount getDiscountByStrId(String idStr){
-        Long id = Long.parseLong(idStr);
+        Long id = null;
+        try {
+            id = Long.parseLong(idStr);
+        } catch (Exception e){
+            log.error(String.format("Get exception when parse ID %s", idStr), e);
+            return null;
+        }
+
         return categoryDiscountRepo.findById(id).orElse(null);
     }
 
