@@ -31,7 +31,7 @@ public class TransitTaskExecutor {
     private final DiscountsService discountsService;
     private final ClientDiscountHistoryService clientDiscountHistoryService;
 
-    private static final int SAMPLE_SIZE = 5000;
+    private static final int SAMPLE_SIZE = 1000;
 
     public TransitTaskExecutor(
             DiscountsService discountsService,
@@ -71,6 +71,10 @@ public class TransitTaskExecutor {
 
                         for(String id : newDiscounts){
                             CategoryDiscount discount = discountsService.getDiscountByStrId(id);
+                            if(discount == null){
+                                log.warn(String.format("No find discounts by ID: %s", id));
+                                continue;
+                            }
                             clientDiscountHistoryService.save(discount, h.getClient(), h.getRegistrationDate(),
                                     h.getComment(), type);
                         }
