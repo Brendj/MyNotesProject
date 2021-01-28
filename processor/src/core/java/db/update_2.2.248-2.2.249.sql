@@ -320,5 +320,7 @@ drop trigger cf_wt_org_relation_aud_inc_version on cf_wt_org_relation_aud;
 CREATE TRIGGER cf_wt_org_relation_aud_inc_version BEFORE INSERT OR UPDATE
 ON cf_wt_org_relation_aud FOR EACH ROW EXECUTE PROCEDURE cf_wt_org_relation_aud_inc_version();
 
+--убираем ограничение not null
+alter table cf_wt_org_relation_aud alter column idoforg drop not null;
 
 --! ФИНАЛИЗИРОВАН 26.01.2021, НЕ МЕНЯТЬ
