@@ -54,7 +54,12 @@ public class DiscountsService {
         List<Long> ids = new LinkedList<>();
         for(String idStr : dif){
             if(StringUtils.isNumeric(idStr)){
-                Long id = Long.parseLong(idStr);
+                Long id = null;
+                try {
+                    id = Long.parseLong(idStr);
+                } catch (Exception ignore){
+                    continue;
+                }
                 ids.add(id);
             }
         }
