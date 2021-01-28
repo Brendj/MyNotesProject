@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -59,5 +60,19 @@ public class ClientDiscountHistoryService {
             }
         }
         return null;
+    }
+
+    public void saveChangeHistoryByDiscountInfo(Session session, ClientDtisznDiscountInfo discountInfo, String comment) {
+          if(discountInfo == null){
+              return;
+          }
+          CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                  .getCategoryDiscountDSZNByDSZNCode(session, discountInfo.getDtisznCode());
+          CategoryDiscount discount = categoryDiscountDSZN.getCategoryDiscount();
+
+         ClientDiscountHistory history = ClientDiscountHistory.build(discountInfo.getClient(),
+                 comment, discount, ClientDiscountHistoryOperationTypeEnum.CHANGE);
+
+         session.save(history);
     }
 }
