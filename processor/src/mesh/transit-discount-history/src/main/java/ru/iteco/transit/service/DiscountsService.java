@@ -15,11 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
 
 @Component
+@Transactional
 public class DiscountsService {
     private static final Logger log = LoggerFactory.getLogger(DiscountsService.class);
 
