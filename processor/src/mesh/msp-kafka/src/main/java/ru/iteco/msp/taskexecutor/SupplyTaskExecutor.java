@@ -8,6 +8,7 @@ import ru.iteco.msp.kafka.KafkaService;
 import ru.iteco.msp.models.dto.SupplyMSPOrders;
 import ru.iteco.msp.service.SupplyMSPService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -67,17 +68,18 @@ public class SupplyTaskExecutor {
                     log.warn("No Orders, skipped");
                     return;
                 }
+                Pageable pageable = PageRequest.of(0, SAMPLE_SIZE, Sort.by("createdDate"));
+                List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
 
-                for(int i = 0; i < allRows; i += SAMPLE_SIZE){
-                    Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("createdDate"));
-
-                    List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
-
+                while (CollectionUtils.isNotEmpty(orderList)){
                     for(SupplyMSPOrders o : orderList){
                         kafkaService.sendSupplyMSP(o);
                     }
                     orderList.clear();
                     orderList = null;
+
+                    pageable = pageable.next();
+                    orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
                 }
             } catch (Exception e) {
                 log.error("Critical error in process sending supply MSP info, task interrupt", e);

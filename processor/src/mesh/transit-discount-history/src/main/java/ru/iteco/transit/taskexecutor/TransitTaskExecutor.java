@@ -31,7 +31,7 @@ public class TransitTaskExecutor {
     private final DiscountsService discountsService;
     private final ClientDiscountHistoryService clientDiscountHistoryService;
 
-    private static final int SAMPLE_SIZE = 1000;
+    private static final int SAMPLE_SIZE = 500;
 
     public TransitTaskExecutor(
             DiscountsService discountsService,
@@ -43,9 +43,7 @@ public class TransitTaskExecutor {
     @Transactional
     public void run() {
         try {
-            int i = 0;
-
-            Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("registrationDate"));
+            Pageable pageable = PageRequest.of(0, SAMPLE_SIZE, Sort.by("registrationDate"));
             List<DiscountChangeHistory> discountChangeHistoryList = discountsService
                     .getHistory(pageable);
 
@@ -89,11 +87,11 @@ public class TransitTaskExecutor {
                         }
                     }
                 }
-
-                i += SAMPLE_SIZE;
-                pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("registrationDate"));
+                discountChangeHistoryList = null;
+                pageable = pageable.next();
                 discountChangeHistoryList = discountsService.getHistory(pageable);
             }
+            log.info("Process done");
         } catch (Exception e) {
             log.error("Critical error in process transit category change history to new entity, task interrupt", e);
         }
