@@ -840,6 +840,7 @@ public class PreorderDAOService {
         boolean isWtMenu = org.getUseWebArm();  // меню веб-технолога
 
         Session session = (Session)emReport.getDelegate();
+        if (guardianMobile != null && guardianMobile.equals("")) guardianMobile = null;
         List<Client> clientsByMobile = PreorderUtils.getClientsByMobile(session, client.getIdOfClient(), guardianMobile);
         Integer value = PreorderUtils.getClientGroupResult(session, clientsByMobile);
         PreorderMobileGroupOnCreateType mobileGroupOnCreate;
