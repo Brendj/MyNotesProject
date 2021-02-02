@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groups.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -27,7 +28,7 @@ class CreateMiddleGroupCommand {
 
     private Logger logger = LoggerFactory.getLogger(CreateMiddleGroupCommand.class);
     private final RuntimeContext runtimeContext;
-    private static final int DUPLICATE_GROUP_NAME = 409, GROUP_NOT_FOUND = 404;
+    private static final int DUPLICATE_GROUP_NAME = 409, GROUP_NOT_FOUND = 404, GROUP_NOT_PREDEFINED = 410;
 
     @Autowired
     public CreateMiddleGroupCommand(RuntimeContext runtimeContext) {
@@ -39,6 +40,11 @@ class CreateMiddleGroupCommand {
         Session session = null;
         Transaction transaction = null;
         try {
+            boolean isPredefined = isPredefined(idOfGroupClients);
+            if (!isPredefined) {
+                throw new WebApplicationException(GROUP_NOT_PREDEFINED, String.format("Group with ID='%d' not predefined", idOfGroupClients));
+            }
+
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Long mainBuildingOrgId = getMainBuilding(session, idOfOrg);
@@ -66,14 +72,22 @@ class CreateMiddleGroupCommand {
         }
     }
 
+    private boolean isPredefined(Long idOfGroupClients) {
+        ClientGroup.Predefined predefinedGroup = ClientGroup.Predefined.parse(idOfGroupClients);
+        return predefinedGroup != null;
+    }
+
     public MiddleGroupResponse updateGroup(Long idOfGroupClients, Long idOfOrg, MiddleGroupRequest request) {
         MiddleGroupResponse response;
         Session session = null;
         Transaction transaction = null;
         try {
+            boolean isPredefined = isPredefined(idOfGroupClients);
+            if (!isPredefined) {
+                throw new WebApplicationException(GROUP_NOT_PREDEFINED, String.format("Group with ID='%d' not predefined", idOfGroupClients));
+            }
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-
             GroupNamesToOrgs foundCurrentGroup = foundMiddleGroupById(session, request.getId());
             if (foundCurrentGroup != null) {
                 Long mainBuildingOrgId = getMainBuilding(session, idOfOrg);
