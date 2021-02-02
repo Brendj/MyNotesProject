@@ -8,9 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.MoveClientResult;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.MoveClientToGroup;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.MoveClientsResponse;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateItem;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateResult;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientsUpdateResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,16 +36,16 @@ class MoveClientsCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public MoveClientsResponse moveClients(Collection<MoveClientToGroup> moveClientToGroups)
+    public ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups)
             throws WebApplicationException {
-        MoveClientsResponse result = new MoveClientsResponse();
+        ClientsUpdateResponse result = new ClientsUpdateResponse();
         if (moveClientToGroups.size() == 0) {
             return result;
         }
         try {
             long version = updateClientRegistryVersion(null);
-            for (MoveClientToGroup moveClientToGroup : moveClientToGroups) {
-                MoveClientResult moveClientResult = moveClientToOtherGroup(moveClientToGroup, version);
+            for (ClientUpdateItem moveClientToGroup : moveClientToGroups) {
+                ClientUpdateResult moveClientResult = moveClientToOtherGroup(moveClientToGroup, version);
                 result.getClients().add(moveClientResult);
             }
         } catch (Exception e) {
@@ -54,7 +54,7 @@ class MoveClientsCommand {
         return result;
     }
 
-    private MoveClientResult moveClientToOtherGroup(MoveClientToGroup movedClient, long version) {
+    private ClientUpdateResult moveClientToOtherGroup(ClientUpdateItem movedClient, long version) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
 
@@ -64,18 +64,18 @@ class MoveClientsCommand {
 
             Client client = (Client) persistenceSession.get(Client.class, movedClient.getIdOfClient());
             if (client == null) {
-                return MoveClientResult.error(movedClient.getIdOfClient(),
+                return ClientUpdateResult.error(movedClient.getIdOfClient(),
                         String.format("Client with ID='%d' not found", movedClient.getIdOfClient()));
             }
 
             String error = updateClientGroupOrGetError(movedClient, persistenceSession, client);
             if (!StringUtils.isEmpty(error)) {
-                return MoveClientResult.error(movedClient.getIdOfClient(), error);
+                return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
             }
 
             error = updateMiddleGroupOrGetError(movedClient, persistenceSession, client);
             if (!StringUtils.isEmpty(error)) {
-                return MoveClientResult.error(movedClient.getIdOfClient(), error);
+                return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
             }
             client.setClientRegistryVersion(version);
 
@@ -83,17 +83,17 @@ class MoveClientsCommand {
             persistenceSession.flush();
             persistenceTransaction.commit();
 
-            return MoveClientResult.success(movedClient.getIdOfClient());
+            return ClientUpdateResult.success(movedClient.getIdOfClient());
         } catch (Exception e) {
             logger.error("Error in moved client to other group, ", e);
-            return MoveClientResult.error(movedClient.getIdOfClient(), e.getMessage());
+            return ClientUpdateResult.error(movedClient.getIdOfClient(), e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
     }
 
-    private String updateMiddleGroupOrGetError(MoveClientToGroup movedClient, Session persistenceSession,
+    private String updateMiddleGroupOrGetError(ClientUpdateItem movedClient, Session persistenceSession,
             Client client) {
         if (movedClient.getIdOfMiddleGroup() != null) {
             // перемещение в дочернюю группу
@@ -113,7 +113,7 @@ class MoveClientsCommand {
         return StringUtils.EMPTY;
     }
 
-    private String updateClientGroupOrGetError(MoveClientToGroup movedClient, Session persistenceSession,
+    private String updateClientGroupOrGetError(ClientUpdateItem movedClient, Session persistenceSession,
             Client client) {
 
         if (!isChangeGroupClient(client, movedClient)) {
@@ -137,9 +137,8 @@ class MoveClientsCommand {
         return StringUtils.EMPTY;
     }
 
-    private boolean isChangeGroupClient(Client client, MoveClientToGroup movedClient) {
+    private boolean isChangeGroupClient(Client client, ClientUpdateItem movedClient) {
         return client.getClientGroup() == null || !client.getIdOfClientGroup().equals(movedClient.getIdOfClientGroup())
                 || !client.getClientGroup().getCompositeIdOfClientGroup().getIdOfOrg().equals(movedClient.getIdOfOrg());
     }
-
 }

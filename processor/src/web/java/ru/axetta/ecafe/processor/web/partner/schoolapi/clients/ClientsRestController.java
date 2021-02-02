@@ -6,8 +6,8 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.MoveClientsRequest;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.MoveClientsResponse;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientsUpdateRequest;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientsUpdateResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.service.SchoolApiClientsService;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.AuthorityUtils;
@@ -30,12 +30,24 @@ public class ClientsRestController {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path(value = "/move")
-    public Response moveClients(MoveClientsRequest moveClientsRequest) throws WebApplicationException {
+    public Response moveClients(ClientsUpdateRequest moveClientsRequest) throws WebApplicationException {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        MoveClientsResponse responseMovedClient = getService().moveClients(moveClientsRequest.getMoveClients());
-        return Response.ok().entity(responseMovedClient).build();
+        ClientsUpdateResponse response = getService().moveClients(moveClientsRequest.getUpdateClients());
+        return Response.ok().entity(response).build();
+    }
+
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path(value="/plan/exclude")
+    public Response planExclude(ClientsUpdateRequest request){
+        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+            throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        }
+        ClientsUpdateResponse response = getService().excludeClientsFromPlan(request.getUpdateClients());
+        return Response.ok().entity(response).build();
     }
 
     private SchoolApiClientsService getService() {
