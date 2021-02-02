@@ -80,6 +80,7 @@ import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -9115,8 +9116,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
-            if (client.getAgeTypeGroup() != null && client.getAgeTypeGroup()
-                    .equals(Client.GROUP_NAME[Client.GROUP_SCHOOL])) {
+            if (client.getAgeTypeGroup() != null && ArrayUtils.contains(Client.GROUP_NAME_SCHOOL, client.getAgeTypeGroup())) {
                 //Если клиент школьник
                 if (StringUtils.isEmpty(client.getClientGUID())) {
                     return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
