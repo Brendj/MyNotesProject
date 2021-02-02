@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -215,30 +214,12 @@ public class GoodRequestRepository {
 
     @Transactional
     public GoodRequest save(GoodRequest goodRequest){
-        TypedQuery<DOVersion> query = entityManager
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
-                        DOVersion.class);
-        query.setParameter("distributedObjectClassName", "GoodRequest".toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName("GoodRequest");
+        Long version = DAOService.getInstance().getDistributedObjectVersion("GoodRequest");
         if(goodRequest.getGlobalId()==null){
             goodRequest.setGlobalVersion(version);
-            entityManager.persist(doVersion);
             entityManager.persist(goodRequest);
         } else {
             goodRequest.setGlobalVersion(version);
-            entityManager.persist(doVersion);
             goodRequest=entityManager.merge(goodRequest);
         }
         return goodRequest;
@@ -246,30 +227,12 @@ public class GoodRequestRepository {
 
     @Transactional
     public GoodRequestPosition save(GoodRequestPosition goodRequestPosition){
-        TypedQuery<DOVersion> query = entityManager
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
-                        DOVersion.class);
-        query.setParameter("distributedObjectClassName", "GoodRequestPosition".toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName("GoodRequestPosition");
+        Long version = DAOService.getInstance().getDistributedObjectVersion("GoodRequestPosition");
         if(goodRequestPosition.getGlobalId()==null){
             goodRequestPosition.setGlobalVersion(version);
-            entityManager.persist(doVersion);
             entityManager.persist(goodRequestPosition);
         } else {
             goodRequestPosition.setGlobalVersion(version);
-            entityManager.persist(doVersion);
             goodRequestPosition=entityManager.merge(goodRequestPosition);
         }
         return goodRequestPosition;
@@ -278,52 +241,18 @@ public class GoodRequestRepository {
     @Transactional
     public void delete(GoodRequest goodRequest){
         goodRequest = entityManager.merge(goodRequest);
-        TypedQuery<DOVersion> query = entityManager
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
-                        DOVersion.class);
-        query.setParameter("distributedObjectClassName", "GoodRequest".toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName("GoodRequest");
+        Long version = DAOService.getInstance().getDistributedObjectVersion("GoodRequest");
         goodRequest.setDeletedState(true);
         goodRequest.setGlobalVersion(version);
-        entityManager.persist(doVersion);
         goodRequest = entityManager.merge(goodRequest);
     }
 
     @Transactional
     public void delete(GoodRequestPosition goodRequestPosition){
         goodRequestPosition = entityManager.merge(goodRequestPosition);
-        TypedQuery<DOVersion> query = entityManager
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
-                        DOVersion.class);
-        query.setParameter("distributedObjectClassName", "GoodRequestPosition".toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName("GoodRequestPosition");
+        Long version = DAOService.getInstance().getDistributedObjectVersion("GoodRequestPosition");
         goodRequestPosition.setDeletedState(true);
         goodRequestPosition.setGlobalVersion(version);
-        entityManager.persist(doVersion);
         goodRequestPosition = entityManager.merge(goodRequestPosition);
     }
 

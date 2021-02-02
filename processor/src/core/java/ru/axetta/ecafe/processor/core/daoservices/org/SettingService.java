@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.org;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingValueParser;
@@ -13,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -124,24 +124,7 @@ public class SettingService {
     }
 
     public Long updateAndGetDOVersion() {
-        final String qlString = "from DOVersion where distributedObjectClassName=:distributedObjectClassName";
-        TypedQuery<DOVersion> query = entityManager.createQuery(qlString, DOVersion.class);
-        query.setParameter("distributedObjectClassName", "ECafeSettings");
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion;
-        Long version;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName("ECafeSettings");
-        entityManager.persist(doVersion);
-        return version;
+        return DAOService.getInstance().getDistributedObjectVersion("ECafeSettings");
     }
 
     /* Вывести список всех возможных принтеров организации */

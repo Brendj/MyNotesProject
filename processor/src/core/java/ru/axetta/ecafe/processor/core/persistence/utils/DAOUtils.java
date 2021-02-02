@@ -3054,6 +3054,35 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static long getDistributedObjectVersion(Session session, String name) {
+        try {
+            return getDistributedObjectVersionFromSequence(session, name);
+        } catch (Exception e) {
+            createDistributedObjectSequence(session, name);
+            return getDistributedObjectVersionFromSequence(session, name);
+        }
+    }
+
+    private static void createDistributedObjectSequence(Session session, String name) {
+        Query query = session.createSQLQuery(String.format("create sequence %s", DAOService.getInstance().getDistributedObjectSequenceName(name)));
+        query.executeUpdate();
+        query = session.createSQLQuery(String.format("select setval('%s', "
+                        + "(select coalesce(max(currentversion), 0) + 1 from cf_do_versions where upper(distributedobjectclassname) = :name))",
+                DAOService.getInstance().getDistributedObjectSequenceName(name)));
+        query.setParameter("name", name.toUpperCase());
+        query.executeUpdate();
+    }
+
+    private static long getDistributedObjectVersionFromSequence(Session session, String name) {
+        long version = 0L;
+        Query query = session.createSQLQuery(String.format("select nextval('%s')", DAOService.getInstance().getDistributedObjectSequenceName(name)));
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = HibernateUtils.getDbLong(o);
+        }
+        return version;
+    }
+
     public static long nextVersionByProhibitionsMenu(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery("select max(proh.version) from cf_Prohibitions as proh");

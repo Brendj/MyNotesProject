@@ -4,16 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.daoservices;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,20 +18,7 @@ import javax.persistence.PersistenceContext;
 public class DOVersionRepository {
 
     public static Long updateClassVersion(String doClass, Session persistenceSession) {
-        Long version;Criteria criteria = persistenceSession.createCriteria(DOVersion.class);
-        criteria.add(Restrictions.eq("distributedObjectClassName", doClass).ignoreCase());
-        criteria.setMaxResults(1);
-        DOVersion doVersion = (DOVersion) criteria.uniqueResult();
-        if(doVersion == null){
-            doVersion = new DOVersion();
-            doVersion.setDistributedObjectClassName(doClass);
-            version = 0L;
-        } else {
-            version = doVersion.getCurrentVersion() + 1;
-        }
-        doVersion.setCurrentVersion(version);
-        persistenceSession.save(doVersion);
-        return version;
+        return DAOUtils.getDistributedObjectVersion(persistenceSession, doClass);
     }
 
 }

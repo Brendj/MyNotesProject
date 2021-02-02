@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -20,7 +19,6 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -161,32 +159,8 @@ public class ContractItem extends AbstractEntityItem<Contract> {
     }
 
     public void saveGlobalVersion(EntityManager entityManager, Contract contract) {
-        TypedQuery<DOVersion> query = entityManager
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
-                        DOVersion.class);
-        query.setParameter("distributedObjectClassName", "Contract".toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName("Contract");
-        if(contract.getGlobalId()==null){
-            contract.setGlobalVersion(version);
-            entityManager.persist(doVersion);
-            //entityManager.persist(contract);
-        } else {
-            contract.setGlobalVersion(version);
-            entityManager.persist(doVersion);
-            //contract=entityManager.merge(contract);
-        }
+        Long version = DAOService.getInstance().getDistributedObjectVersion("Contract");
+        contract.setGlobalVersion(version);
     }
 
     @Override
