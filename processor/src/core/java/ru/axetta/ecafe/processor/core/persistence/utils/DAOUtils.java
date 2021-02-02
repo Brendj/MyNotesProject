@@ -3054,6 +3054,20 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static long getDistributedObjectVersion(Session session, String name) {
+        return getDistributedObjectVersionFromSequence(session, name);
+    }
+
+    private static long getDistributedObjectVersionFromSequence(Session session, String name) {
+        long version = 0L;
+        Query query = session.createSQLQuery(String.format("select nextval('%s')", DAOService.getInstance().getDistributedObjectSequenceName(name)));
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = HibernateUtils.getDbLong(o);
+        }
+        return version;
+    }
+
     public static long nextVersionByProhibitionsMenu(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery("select max(proh.version) from cf_Prohibitions as proh");

@@ -23,6 +23,7 @@ public class FeedingSetting {
     private Long limit;
     private Long discount;
     private Boolean useDiscount;
+    private Boolean useDiscountBuffet;
     private Date lastUpdate;
     private Set<Org> orgsInternal = new HashSet<Org>();
     private User user;
@@ -31,10 +32,11 @@ public class FeedingSetting {
 
     }
 
-    public FeedingSetting(String settingName, Long limit, Long discount, Boolean useDiscount, Set<Org> orgs) {
+    public FeedingSetting(String settingName, Long limit, Long discount, Boolean useDiscount, Boolean useDiscountBuffet, Set<Org> orgs) {
         this.settingName = settingName;
         this.limit = limit;
         this.discount = discount;
+        this.useDiscountBuffet = useDiscountBuffet;
         this.useDiscount = useDiscount;
         this.orgsInternal = orgs;
         this.lastUpdate = new Date();
@@ -148,5 +150,13 @@ public class FeedingSetting {
 
     public void setUseDiscount(Boolean useDiscount) {
         this.useDiscount = useDiscount;
+    }
+
+    public Boolean getUseDiscountBuffet() {
+        return useDiscountBuffet;
+    }
+
+    public void setUseDiscountBuffet(Boolean useDiscountBuffet) {
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 }

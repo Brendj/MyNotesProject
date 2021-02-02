@@ -343,7 +343,16 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE, item.getReverseMonthOfSale(),
                             session, lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
                     org.setDenyPayPlanForTimeDifference(item.getDenyPayPlanForTimeDifference());
-                    org.setUseWebArm(item.getUseWebArm());
+
+                    if(!item.getUseWebArm().equals(org.getUseWebArm())){
+                        org.setUseWebArm(item.getUseWebArm());
+                        for(Org friendlyOrg : org.getFriendlyOrg()){
+                            if(friendlyOrg.equals(org)){
+                                continue;
+                            }
+                            friendlyOrg.setUseWebArm(item.getUseWebArm());
+                        }
+                    }
 
                     org.setOneActiveCard(item.getOneActiveCard());
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED, item.getEnableDuplicateCard(), session,

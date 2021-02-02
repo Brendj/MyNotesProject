@@ -28,6 +28,7 @@ public class FeedingSettingViewPage extends BasicWorkspacePage {
     private Long limit;
     private Long discount;
     private Boolean useDiscount;
+    private Boolean useDiscountBuffet;
     private Date lastUpdate;
     private Set<Org> orgs;
     private String userName;
@@ -40,6 +41,7 @@ public class FeedingSettingViewPage extends BasicWorkspacePage {
         this.limit = setting.getLimit();
         this.discount = setting.getDiscount();
         this.useDiscount = setting.getUseDiscount();
+        this.useDiscountBuffet = setting.getUseDiscountBuffet();
         this.lastUpdate = setting.getLastUpdate();
         this.userName = setting.getUser().getUserName();
         orgName = "";
@@ -138,5 +140,13 @@ public class FeedingSettingViewPage extends BasicWorkspacePage {
 
     public void setUseDiscount(Boolean useDiscount) {
         this.useDiscount = useDiscount;
+    }
+
+    public Boolean getUseDiscountBuffet() {
+        return useDiscountBuffet;
+    }
+
+    public void setUseDiscountBuffet(Boolean useDiscountBuffet) {
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 }

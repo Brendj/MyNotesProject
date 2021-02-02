@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientDiscountHistoryService;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
@@ -14,6 +15,7 @@ import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
@@ -24,6 +26,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +43,9 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private ApplicationForFoodReportItem currentItem;
     private List<ApplicationForFoodReportItem> deletedItems = new ArrayList<>();
     private List<ApplicationForFoodReportItem> changeDatesItems = new ArrayList<>();
+
+    @Autowired
+    private ClientDiscountHistoryService clientDiscountHistoryService;
 
     private List<SelectItem> statuses = readAllItems();
     private String status;
@@ -300,6 +306,9 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 item.getApplicationForFood().setDiscountDateEnd(item.getEndDate());
                 session.update(item.getApplicationForFood());
                 builder.save(session, clientDTISZNDiscountVersion);
+
+                clientDiscountHistoryService.saveChangeHistoryByDiscountInfo(session, info,
+                        DiscountChangeHistory.MODIFY_IN_WEBAPP + MainPage.getSessionInstance().getCurrentUser().getUserName());
             }
             transaction.commit();
             transaction = null;

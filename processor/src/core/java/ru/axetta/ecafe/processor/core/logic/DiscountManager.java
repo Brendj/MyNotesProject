@@ -36,7 +36,15 @@ public class DiscountManager {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newDiscountMode, oldDiscountMode,
                 extractCategoryIdsFromDiscountSet(newDiscounts), extractCategoryIdsFromDiscountSet(oldDiscounts));
         discountChangeHistory.setComment(comment);
+
+        saveNewClientDiscountHistoryRecord(session, client, oldDiscounts, newDiscounts, comment);
         session.save(discountChangeHistory);
+    }
+
+    private static void saveNewClientDiscountHistoryRecord(Session session, Client client,
+            Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment) {
+        ClientDiscountHistoryService service = RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class);
+        service.saveClientDiscountHistoryByOldScheme(session, client, oldDiscounts, newDiscounts, comment);
     }
 
     private static String extractCategoryIdsFromDiscountSet(Set<CategoryDiscount> categoryDiscounts) {
