@@ -326,22 +326,7 @@ public class DAOService {
     }
 
     public long getDistributedObjectVersion(String name) {
-        try {
-            return getDistributedObjectVersionFromSequence(name);
-        } catch (Exception e) {
-            createDistributedObjectSequence(name);
-            return getDistributedObjectVersionFromSequence(name);
-        }
-    }
-
-    private void createDistributedObjectSequence(String name) {
-        Query query = entityManager.createNativeQuery(String.format("create sequence %s", getDistributedObjectSequenceName(name)));
-        query.executeUpdate();
-        query = entityManager.createNativeQuery(String.format("select setval('%s', "
-                + "(select coalesce(max(currentversion), 0) + 1 from cf_do_versions where upper(distributedobjectclassname) = :name))",
-                getDistributedObjectSequenceName(name)));
-        query.setParameter("name", name.toUpperCase());
-        query.executeUpdate();
+        return getDistributedObjectVersionFromSequence(name);
     }
 
     public String getDistributedObjectSequenceName(String name) {

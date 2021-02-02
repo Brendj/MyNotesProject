@@ -3055,22 +3055,7 @@ public class DAOUtils {
     }
 
     public static long getDistributedObjectVersion(Session session, String name) {
-        try {
-            return getDistributedObjectVersionFromSequence(session, name);
-        } catch (Exception e) {
-            createDistributedObjectSequence(session, name);
-            return getDistributedObjectVersionFromSequence(session, name);
-        }
-    }
-
-    private static void createDistributedObjectSequence(Session session, String name) {
-        Query query = session.createSQLQuery(String.format("create sequence %s", DAOService.getInstance().getDistributedObjectSequenceName(name)));
-        query.executeUpdate();
-        query = session.createSQLQuery(String.format("select setval('%s', "
-                        + "(select coalesce(max(currentversion), 0) + 1 from cf_do_versions where upper(distributedobjectclassname) = :name))",
-                DAOService.getInstance().getDistributedObjectSequenceName(name)));
-        query.setParameter("name", name.toUpperCase());
-        query.executeUpdate();
+        return getDistributedObjectVersionFromSequence(session, name);
     }
 
     private static long getDistributedObjectVersionFromSequence(Session session, String name) {
