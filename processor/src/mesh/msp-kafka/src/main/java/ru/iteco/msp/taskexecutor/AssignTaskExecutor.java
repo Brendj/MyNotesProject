@@ -5,11 +5,12 @@
 package ru.iteco.msp.taskexecutor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.iteco.msp.enums.AssignOperationType;
 import ru.iteco.msp.kafka.KafkaService;
 import ru.iteco.msp.kafka.dto.AssignEvent;
 import ru.iteco.msp.models.CategoryDiscount;
-import ru.iteco.msp.models.CategoryDiscountDTSZN;
 import ru.iteco.msp.models.ClientDTSZNDiscountInfo;
+import ru.iteco.msp.models.ClientDiscountHistory;
 import ru.iteco.msp.models.DiscountChangeHistory;
 import ru.iteco.msp.service.DiscountsService;
 
@@ -29,10 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class AssignTaskExecutor {
@@ -77,9 +75,10 @@ public class AssignTaskExecutor {
             Date begin;
             Date end;
             AssignOperationType type;
+            ClientDTSZNDiscountInfo info = null;
 
             try {
-                if(runPrimalLoad && !alreadyLoaded){
+                if (runPrimalLoad && !alreadyLoaded) {
                     beginPrimalLoad();
                     alreadyLoaded = true;
                 } else {
@@ -88,55 +87,41 @@ public class AssignTaskExecutor {
                     long delta = next.getTime() - end.getTime();
                     begin = new Date(end.getTime() - delta);
 
-                    List<DiscountChangeHistory> discountChangeHistoryList = discountsService.getHistoryByTime(begin);
+                    List<ClientDiscountHistory> discountChangeHistoryList = discountsService.getNewHistoryByTime(begin);
 
-                    for (DiscountChangeHistory h : discountChangeHistoryList) {
-                        if (StringUtils.isEmpty(h.getClient().getMeshGuid()) || (StringUtils.isBlank(h.getCategoriesDiscounts()) && StringUtils
-                                .isBlank(h.getOldCategoriesDiscounts()))) {
+                    for (ClientDiscountHistory h : discountChangeHistoryList) {
+                        if (StringUtils.isEmpty(h.getClient().getMeshGuid())) {
                             continue;
                         }
-                        List<String> newDiscounts = getSortedSplitList(h.getCategoriesDiscounts());
-                        List<String> oldDiscounts = getSortedSplitList(h.getOldCategoriesDiscounts());
-
-                        if (newDiscounts.equals(oldDiscounts)) {
-                            if (h.getOldDiscountMode().equals(h.getDiscountMode())) {
-                                continue;
-                            }
-                            type = AssignOperationType.CHANGE;
-
-                            List<ClientDTSZNDiscountInfo> changedDiscounts = discountsService
-                                    .getChangedDiscounts(h.getClient(), begin, end);
-                            for (ClientDTSZNDiscountInfo info : changedDiscounts) {
-                                CategoryDiscountDTSZN categoryDiscountDTSZN = discountsService.getCategoryDiscountDTSZNByCode(info.getDTISZNCode());
-                                AssignEvent event = AssignEvent
-                                        .build(categoryDiscountDTSZN.getCategoryDiscount(), h.getClient(), type, info);
-
-                                kafkaService.sendAssign(mapper.writeValueAsString(event));
-                            }
-                        } else {
-                            List<CategoryDiscount> dif = discountsService.getDiffDiscounts(newDiscounts, oldDiscounts);
-
-                            for (CategoryDiscount d : dif) {
-                                if (!d.getCategoryType().equals(0)) {
-                                    continue;
-                                }
-                                type = getOperationType(oldDiscounts, newDiscounts, d.getIdOfCategoryDiscount().toString());
-
-                                ClientDTSZNDiscountInfo info = null;
-                                if (d.getCategoryDiscountDTSZN() != null) {
-                                    info = discountsService.getLastInfoByClientAndCode(h.getClient(),
-                                            d.getCategoryDiscountDTSZN().getCode());
-                                }
-                                AssignEvent event = AssignEvent.build(d, h.getClient(), type, info);
-
-                                kafkaService.sendAssign(mapper.writeValueAsString(event));
-                            }
+                        type = AssignOperationType.getAssignTypeByOperationType(h.getOperationType());
+                        if(AssignOperationType.CHANGE.equals(type) || h.getCategoryDiscount().getCategoryDiscountDTSZN() != null){
+                            info = discountsService.getChangedDiscounts(
+                                    h.getCategoryDiscount().getCategoryDiscountDTSZN().getCode(), h.getClient(),
+                                    takeThreeMinute(h.getRegistryDate()), addThreeMinute(h.getRegistryDate())
+                            );
                         }
+
+                        AssignEvent event = AssignEvent.build(h.getCategoryDiscount(), h.getClient(), type, info);
+                        kafkaService.sendAssign(mapper.writeValueAsString(event));
                     }
                 }
             } catch (Exception e) {
                 log.error("Critical error in process sending assign MSP-discounts info, task interrupt", e);
             }
+        }
+
+        private Date takeThreeMinute(Long time) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(time);
+            calendar.add(Calendar.MINUTE, -3);
+            return calendar.getTime();
+        }
+
+        private Date addThreeMinute(Long time) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(time);
+            calendar.add(Calendar.MINUTE, 3);
+            return calendar.getTime();
         }
 
         @Transactional(propagation = Propagation.SUPPORTS)
@@ -172,15 +157,6 @@ public class AssignTaskExecutor {
                 }
             } catch (Exception e) {
                 log.error("Critical error in process sending primary discount change history records, task interrupt", e);
-            }
-        }
-
-        private AssignOperationType getOperationType(List<String> oldDiscounts, List<String> newDif,
-                                                     String idOfCategoryDiscount) {
-            if(oldDiscounts.contains(idOfCategoryDiscount)){
-                return AssignOperationType.DELETE;
-            } else {
-                return AssignOperationType.ADD;
             }
         }
 

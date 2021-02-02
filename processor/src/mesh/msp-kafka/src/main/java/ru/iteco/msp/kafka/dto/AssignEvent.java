@@ -5,11 +5,11 @@
 package ru.iteco.msp.kafka.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import ru.iteco.msp.enums.AssignOperationType;
 import ru.iteco.msp.models.CategoryDiscount;
 import ru.iteco.msp.models.Client;
 import ru.iteco.msp.models.ClientDTSZNDiscountInfo;
 import ru.iteco.msp.models.CodeMSP;
-import ru.iteco.msp.taskexecutor.AssignOperationType;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssignEvent {

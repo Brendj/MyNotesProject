@@ -5,10 +5,7 @@
 package ru.iteco.msp.service;
 
 import ru.iteco.msp.models.*;
-import ru.iteco.msp.repo.CategoryDiscountDTSZNRepo;
-import ru.iteco.msp.repo.CategoryDiscountRepo;
-import ru.iteco.msp.repo.ClientDTSZNDiscountInfoRepo;
-import ru.iteco.msp.repo.DiscountChangeHistoryRepo;
+import ru.iteco.msp.repo.*;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,20 +22,25 @@ public class DiscountsService {
     private final ClientDTSZNDiscountInfoRepo clientDTSZNDiscountInfoRepo;
     private final CategoryDiscountRepo categoryDiscountRepo;
     private final CategoryDiscountDTSZNRepo categoryDiscountDTSZNRepo;
+    private final ClientDiscountHistoryRepo clientDiscountHistoryRepo;
 
     public DiscountsService(
             DiscountChangeHistoryRepo discountChangeHistoryRepo,
             ClientDTSZNDiscountInfoRepo clientDTSZNDiscountInfoRepo,
             CategoryDiscountRepo categoryDiscountRepo,
-            CategoryDiscountDTSZNRepo categoryDiscountDTSZNRepo){
+            CategoryDiscountDTSZNRepo categoryDiscountDTSZNRepo,
+            ClientDiscountHistoryRepo clientDiscountHistoryRepo){
         this.discountChangeHistoryRepo = discountChangeHistoryRepo;
         this.clientDTSZNDiscountInfoRepo = clientDTSZNDiscountInfoRepo;
         this.categoryDiscountRepo = categoryDiscountRepo;
         this.categoryDiscountDTSZNRepo = categoryDiscountDTSZNRepo;
+        this.clientDiscountHistoryRepo = clientDiscountHistoryRepo;
     }
 
-    public List<ClientDTSZNDiscountInfo> getChangedDiscounts(Client client, Date begin, Date end) {
-        return clientDTSZNDiscountInfoRepo.findAllByClientAndLastUpdate(client, begin.getTime(), end.getTime());
+    public ClientDTSZNDiscountInfo getChangedDiscounts(Integer code, Client client, Date begin, Date end) {
+        return clientDTSZNDiscountInfoRepo
+                .findFirstByDTISZNCodeAndClientAndLastUpdateBetweenOrderByLastUpdateDesc(code.longValue(), client,
+                        begin.getTime(), end.getTime());
     }
 
     public List<DiscountChangeHistory> getHistoryByTime(Date end) {
@@ -73,5 +75,9 @@ public class DiscountsService {
 
     public List<DiscountChangeHistory> getDistinctHistoryByClient(Pageable pageable) {
         return discountChangeHistoryRepo.getHistoryByDistinctClient(pageable);
+    }
+
+    public List<ClientDiscountHistory> getNewHistoryByTime(Date date) {
+        return clientDiscountHistoryRepo.getAllByRegistryDateGreaterThanEqual(date.getTime());
     }
 }
