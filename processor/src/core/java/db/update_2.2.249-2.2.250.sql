@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
+
+-- Новой сущности для хранения новой истории по изменению льготы (#874)
 CREATE TABLE cf_client_discount_history
 (
     idOfClientDiscountHistory BIGSERIAL PRIMARY KEY,
@@ -19,3 +21,5 @@ COMMENT ON COLUMN cf_client_discount_history.registryDate IS 'Дата реги�
 COMMENT ON COLUMN cf_client_discount_history.idOfClient IS 'Ссылка на клиента, у которого изменилась льгота';
 COMMENT ON COLUMN cf_client_discount_history.idOfCategoryDiscount IS 'Ссылка на измененную льготу';
 COMMENT ON COLUMN cf_client_discount_history.comment IS 'Комментарий';
+
+--! ФИНАЛИЗИРОВАН 02.02.2021, НЕ МЕНЯТЬ
