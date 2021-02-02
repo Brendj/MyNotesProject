@@ -37,12 +37,14 @@ import java.util.List;
 @Component
 public class AssignTaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(AssignTaskExecutor.class);
-    private static final int SAMPLE_SIZE = 500;
 
     private final CronTrigger assignCronTrigger;
     private final ThreadPoolTaskScheduler threadPoolAssignTaskScheduler;
     private final KafkaService kafkaService;
     private final DiscountsService discountsService;
+
+    @Value(value = "${kafka.task.execution.assign.samplesize}")
+    private Integer sampleSize;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -139,14 +141,13 @@ public class AssignTaskExecutor {
 
         @Transactional(propagation = Propagation.SUPPORTS)
         public void beginPrimalLoad() {
-            int i = 0;
             try {
-                Pageable pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("idOfClient").and(Sort.by("registrationDate").descending()));
+                Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("idOfClient").and(Sort.by("registrationDate").descending()));
                 List<DiscountChangeHistory> discountChangeHistoryList = discountsService.getDistinctHistoryByClient(pageable);
                 while (CollectionUtils.isNotEmpty(discountChangeHistoryList)) {
                     for(DiscountChangeHistory h : discountChangeHistoryList){
-                        if (StringUtils.isEmpty(h.getClient().getMeshGuid()) || (StringUtils.isBlank(h.getCategoriesDiscounts()) && StringUtils
-                                .isBlank(h.getOldCategoriesDiscounts()))) {
+                        if (StringUtils.isEmpty(h.getClient().getMeshGuid()) ||
+                                (StringUtils.isBlank(h.getCategoriesDiscounts()) && StringUtils.isBlank(h.getOldCategoriesDiscounts()))) {
                             continue;
                         }
                         List<String> discounts = getSortedSplitList(h.getCategoriesDiscounts());
@@ -166,8 +167,7 @@ public class AssignTaskExecutor {
 
                     }
 
-                    i += SAMPLE_SIZE;
-                    pageable = PageRequest.of(i, SAMPLE_SIZE, Sort.by("idOfClient").and(Sort.by("registrationDate").descending()));
+                    pageable = pageable.next();
                     discountChangeHistoryList = discountsService.getDistinctHistoryByClient(pageable);
                 }
             } catch (Exception e) {
