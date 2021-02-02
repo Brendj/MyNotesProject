@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
@@ -326,28 +325,27 @@ public class DAOService {
         return entityManager.find(ConfigurationProvider.class, idOfConfigurationProvider);
     }
 
+    public long getDistributedObjectVersion(String name) {
+        return getDistributedObjectVersionFromSequence(name);
+    }
+
+    public String getDistributedObjectSequenceName(String name) {
+        return "DO_VERSION_" + name.toUpperCase() + "_SEQ";
+    }
+
+    private long getDistributedObjectVersionFromSequence(String name) {
+        long version = 0L;
+        Query query = entityManager.createNativeQuery(String.format("select nextval('%s')", getDistributedObjectSequenceName(name)));
+        Object o = query.getSingleResult();
+        if (o != null) {
+            version = HibernateUtils.getDbLong(o);
+        }
+        return version;
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long updateVersionByDistributedObjects(String name) {
-        TypedQuery<DOVersion> query = entityManager
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
-                        DOVersion.class);
-        query.setParameter("distributedObjectClassName", name.toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName(name);
-        entityManager.persist(doVersion);
-        entityManager.flush();
-        return version;
+        return getDistributedObjectVersion(name);
     }
 
     public void removeTechnologicalMap(Long idOfTechnologicalMaps) {

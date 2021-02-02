@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
@@ -37,8 +36,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -591,24 +590,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     }
 
     public <T extends ConsumerRequestDistributedObject> T save(Session session, T object, String className) {
-        Query query = session
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName");
-        query.setParameter("distributedObjectClassName", className.toUpperCase());
-        List<DOVersion> doVersionList = query.list();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-            doVersion.setDistributedObjectClassName(className);
-            session.save(doVersion);
-        } else {
-            doVersion = (DOVersion) session.load(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-            session.merge(doVersion);
-        }
+        Long version = DAOUtils.getDistributedObjectVersion(session, className);
         object.setGlobalVersion(version);
 
         if(object.getGlobalId()==null){
