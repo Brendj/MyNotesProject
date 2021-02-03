@@ -451,8 +451,10 @@
                        onclick="#{rich:component('clientDeletePanel')}.show();"
                        styleClass="command-button" >
     </a4j:commandButton>
-    <a4j:commandButton value="Отзыв ПД" action="#{mainPage.deletePDinForm}"
-                       reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable" ajaxSingle="true" styleClass="command-button" />
+    <a4j:commandButton value="Отзыв ПД" action="#{mainPage.clientEditPage.deletePDClient()}"
+                       reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
+                       ajaxSingle="true" styleClass="command-button"
+                       rendered="#{mainPage.clientEditPage.predefined()}"/>
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
