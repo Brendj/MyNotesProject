@@ -49,4 +49,6 @@ BEGIN
 
 select create_do_versions_sequences();
 
+CREATE INDEX cf_goods_requests_positions_globalversion_idx ON cf_goods_requests_positions USING btree (globalversion);
+
 --! ФИНАЛИЗИРОВАН 02.02.2021, НЕ МЕНЯТЬ
