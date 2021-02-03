@@ -503,6 +503,7 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.isNull("idOfClientGroup"));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return (SpecialDate) criteria.uniqueResult();
     }
 
@@ -513,6 +514,7 @@ public class DAOUtils {
         criteria.add(Restrictions.ge("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.isNull("idOfClientGroup"));
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return criteria.list();
     }
 
