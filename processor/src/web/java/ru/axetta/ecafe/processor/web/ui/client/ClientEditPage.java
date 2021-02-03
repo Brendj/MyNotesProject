@@ -1170,6 +1170,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
+    public void deletePDClient(Long idOfClient) throws Exception {
+        this.person.firstName="Ручная обработка";
+        this.person.secondName="";
+        this.person.surname="Отзыв на обработку ПД";
+        this.mobile="";
+        this.clientSSOID="";
+        removeListGuardianItems.clear();
+        removeListGuardianItems.addAll(clientGuardianItems);
+        clientGuardianItems.clear();
+        removeListWardItems.clear();
+        removeListWardItems.addAll(clientWardItems);
+        clientWardItems.clear();
+        this.idOfClientGroup = ClientGroup.Predefined.CLIENT_LEAVING.getValue();
+        this.clientGroupName = ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup();
+    }
+
     private void validateExistingGuardians() throws Exception {
         if(clientGuardianItems.isEmpty()) {
             return;

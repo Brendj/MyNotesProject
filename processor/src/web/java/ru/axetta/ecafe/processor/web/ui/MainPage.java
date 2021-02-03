@@ -3238,6 +3238,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object deletePDinForm() throws Exception {
+        clientEditPage.deletePDClient(selectedIdOfClient);
+        //updateSelectedMainMenu();
+        return null;
+    }
+
     public Object updateClient() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (clientEditPage.isChangePassword() && !StringUtils
