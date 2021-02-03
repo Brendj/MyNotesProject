@@ -524,6 +524,7 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return (SpecialDate) criteria.uniqueResult();
     }
 
