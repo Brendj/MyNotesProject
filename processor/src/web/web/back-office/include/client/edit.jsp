@@ -454,7 +454,7 @@
     <a4j:commandButton value="Отзыв ПД" action="#{mainPage.clientEditPage.deletePDClient()}"
                        reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
                        ajaxSingle="true" styleClass="command-button"
-                       rendered="#{mainPage.clientEditPage.predefined()}"/>
+                       rendered="#{!mainPage.clientEditPage.predefined()}"/>
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
