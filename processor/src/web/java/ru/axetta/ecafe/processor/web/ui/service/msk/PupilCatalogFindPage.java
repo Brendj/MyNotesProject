@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
+import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSearchService;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -78,8 +78,8 @@ public class PupilCatalogFindPage extends BasicWorkspacePage {
                     return;
                 }
             }
-            RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class).loadPersons(0, meshId, familyName, firstName, secondName);
-            pupilInfos =  RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class).getMeshResponses();
+            RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).loadPersons(0, meshId, familyName, firstName, secondName);
+            pupilInfos =  RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().get();
         } catch (Exception e) {
             super.logAndPrintMessage("Ошибка получения данных", e);
         }

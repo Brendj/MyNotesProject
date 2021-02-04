@@ -25,6 +25,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
@@ -35,7 +36,8 @@ import java.util.*;
  * Created by nuc on 12.08.2020.
  */
 @DependsOn("runtimeContext")
-@Component
+@Primary
+@Component("meshPersonsSyncService")
 public class MeshPersonsSyncService {
     public static final String MESH_REST_PERSONS_URL = "/persons?";
     public static final String MESH_REST_PERSONS_EXPAND = "education,categories";
@@ -54,9 +56,8 @@ public class MeshPersonsSyncService {
     private static final String OUT_ORG_GROUP_PREFIX = "Вне";
 
     private MeshRestClient meshRestClient;
-    List<ResponsePersons> meshResponses;
 
-    private MeshPersonsSyncService(){
+    protected MeshPersonsSyncService(){
         String serviceAddress;
         String apiKey;
         try {
@@ -67,45 +68,42 @@ public class MeshPersonsSyncService {
             this.meshRestClient = null;
         }
     }
-
+    protected void processMeshResponse(List<ResponsePersons> meshResponses){
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+            Map<Integer, MeshTrainingForm> trainingForms = getTrainingForms(session);
+            for (ResponsePersons person : meshResponses) {
+                processPerson(session, person, trainingForms);
+            }
+            RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().set(meshResponses);
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in load persons from Mesh", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
 
     public void loadPersons(long idOfOrg, String meshId, String lastName, String firstName, String patronymic) throws Exception {
         logger.info("Start load persons from MESH");
         String parameters = String.format("filter=%s&expand=%s&top=%s", URLEncoder
                 .encode(getFilter(idOfOrg, meshId, lastName, firstName, patronymic), "UTF-8"), getExpand(), getTop());
-        try {
             byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
             ObjectMapper objectMapper = new ObjectMapper();
             TypeFactory typeFactory = objectMapper.getTypeFactory();
             CollectionType collectionType = typeFactory.constructCollectionType(
                     List.class, ResponsePersons.class);
-            meshResponses = objectMapper.readValue(response, collectionType);
+            List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
             logger.info(String.format("Found %s persons in MESH", meshResponses.size()));
-            Session session = null;
-            Transaction transaction = null;
-            try {
-                session = RuntimeContext.getInstance().createPersistenceSession();
-                session.setFlushMode(FlushMode.COMMIT);
-                transaction = session.beginTransaction();
-                Map<Integer, MeshTrainingForm> trainingForms = getTrainingForms(session);
-                for (ResponsePersons person : meshResponses) {
-                    processPerson(session, person, trainingForms);
-                }
-                transaction.commit();
-                transaction = null;
-            } finally {
-                HibernateUtils.rollback(transaction, logger);
-                HibernateUtils.close(session, logger);
-            }
+            processMeshResponse(meshResponses);
             logger.info("End load persons from MESH");
-        } catch (Exception e) {
-            logger.error("Error in load persons from Mesh", e);
-        }
-    }
-
-    public List<ResponsePersons> getMeshResponses() {
-        return meshResponses;
     }
 
     private Map<Integer, MeshTrainingForm> getTrainingForms(Session session) {
@@ -122,7 +120,7 @@ public class MeshPersonsSyncService {
         return map;
     }
 
-    private boolean isHomeStudy(Education education, Map<Integer, MeshTrainingForm> trainingForms) throws Exception {
+    protected boolean isHomeStudy(Education education, Map<Integer, MeshTrainingForm> trainingForms) throws Exception {
         if (education.getActualFrom() == null && education.getEducationFormId() == null)
             throw new Exception("Arguments educationForm and educationFormId are NULL");
         Integer id = education.getEducationForm() == null ? education.getEducationFormId() : education.getEducationForm().getId();
@@ -131,7 +129,7 @@ public class MeshPersonsSyncService {
         return trainingForm.getEducation_form().contains(OUT_ORG_GROUP_PREFIX);
     }
 
-    private void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms) {
+    protected void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms) {
         String personguid = "";
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -167,7 +165,6 @@ public class MeshPersonsSyncService {
             Long organizationid = education.getOrganizationId().longValue();
             String patronymic = person.getPatronymic();
             String guidnsi = null;
-            String idIsPp = null;
             try {
                 Category category = findCategory(person);
                 guidnsi = category.getParameterValues().get(0).toString();
@@ -191,17 +188,12 @@ public class MeshPersonsSyncService {
             meshSyncPerson.setLastupdateRest(new Date());
             meshSyncPerson.setDeletestate(deleted);
             meshSyncPerson.setInvaliddata(false);
-            person.setClassName(classname);
-            person.setOoId(organizationid.toString());
-            person.setGuidNsi(guidnsi);
-            person.setTraining_end_at(df.format(endTraining));
-            person.setIdIsPp(searchByMeshGuid(guidnsi));
             session.saveOrUpdate(meshSyncPerson);
         } catch (Exception e) {
             logger.error(String.format("Error in process Mesh person with guid %s: ", personguid), e);
         }
     }
-    private String searchByMeshGuid(String guid){
+    protected String searchByMeshGuid(String guid){
         try {
             Client client = RuntimeContext.getAppContext().getBean(DAOService.class).getClientByGuid(guid);
             return client.getIdOfClient().toString();
@@ -211,7 +203,7 @@ public class MeshPersonsSyncService {
         }
     }
 
-    private Education findEducation(ResponsePersons person) {
+    protected Education findEducation(ResponsePersons person) {
         try {
             Collections.sort(person.getEducation());
             return person.getEducation().get(person.getEducation().size() - 1);
@@ -221,7 +213,7 @@ public class MeshPersonsSyncService {
         }
     }
 
-    private Category findCategory(ResponsePersons person) {
+    protected Category findCategory(ResponsePersons person) {
         try {
             Collections.sort(person.getCategories());
             for (int i = person.getCategories().size() - 1; i > -1; i--) {
@@ -246,16 +238,7 @@ public class MeshPersonsSyncService {
         List<And> list = new ArrayList<>();
         MeshJsonFilter filter = new MeshJsonFilter();
 
-        if (idOfOrg == 0){
-            if (!StringUtils.isEmpty(meshIds)) {
-                And andOrg = new And();
-                andOrg.setField("person_id");
-                andOrg.setOp(FILTER_VALUE_EQUALS);
-                andOrg.setValue(meshIds);
-                list.add(andOrg);
-            }
-        }
-        else {
+        if (meshIds.equals("null")){
             Long meshId = DAOService.getInstance().getMeshIdByOrg(idOfOrg);
             if (meshId == null)
                 throw new Exception("У организации не указан МЭШ ид.");
@@ -264,6 +247,15 @@ public class MeshPersonsSyncService {
             andOrg.setOp(FILTER_VALUE_EQUALS);
             andOrg.setValue(meshId.toString());
             list.add(andOrg);
+        }
+        else {
+            if (!StringUtils.isEmpty(meshIds)) {
+                And andOrg = new And();
+                andOrg.setField("person_id");
+                andOrg.setOp(FILTER_VALUE_EQUALS);
+                andOrg.setValue(meshIds);
+                list.add(andOrg);
+            }
         }
         if (!StringUtils.isEmpty(lastName)) {
             And andLastname = new And();
