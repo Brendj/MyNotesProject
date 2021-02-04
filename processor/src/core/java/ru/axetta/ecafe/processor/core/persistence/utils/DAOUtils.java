@@ -2220,6 +2220,13 @@ public class DAOUtils {
         return (Good) criteria.uniqueResult();
     }
 
+    public static Long findIdOfGoodByGuid(Session session, String guidOfGood) {
+        Query query = session.createSQLQuery("select idofgood from cf_goods where guid = :guid");
+        query.setParameter("guid", guidOfGood);
+        Object obj = query.uniqueResult();
+        return HibernateUtils.getDbLong(obj);
+    }
+
     public static WtComplex findWtComplexById(Session session, Long idOfComplex) {
         Criteria criteria = session.createCriteria(WtComplex.class);
         criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
