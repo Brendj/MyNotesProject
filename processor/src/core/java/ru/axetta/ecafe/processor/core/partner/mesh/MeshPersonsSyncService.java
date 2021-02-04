@@ -53,8 +53,9 @@ public class MeshPersonsSyncService {
     private static final String OUT_ORG_GROUP_PREFIX = "Вне";
 
     private MeshRestClient meshRestClient;
+    List<ResponsePersons> meshResponses;
 
-    public MeshPersonsSyncService(){
+    private MeshPersonsSyncService(){
         String serviceAddress;
         String apiKey;
         try {
@@ -68,17 +69,17 @@ public class MeshPersonsSyncService {
 
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
 
-    public void loadPersons(long idOfOrg, String lastName, String firstName, String patronymic) throws Exception {
+    public void loadPersons(long idOfOrg, String meshId, String lastName, String firstName, String patronymic) throws Exception {
         logger.info("Start load persons from MESH");
         String parameters = String.format("filter=%s&expand=%s&top=%s", URLEncoder
-                .encode(getFilter(idOfOrg, lastName, firstName, patronymic), "UTF-8"), getExpand(), getTop());
+                .encode(getFilter(idOfOrg, meshId, lastName, firstName, patronymic), "UTF-8"), getExpand(), getTop());
         try {
             byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
             ObjectMapper objectMapper = new ObjectMapper();
             TypeFactory typeFactory = objectMapper.getTypeFactory();
             CollectionType collectionType = typeFactory.constructCollectionType(
                     List.class, ResponsePersons.class);
-            List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
+            meshResponses = objectMapper.readValue(response, collectionType);
             logger.info(String.format("Found %s persons in MESH", meshResponses.size()));
             Session session = null;
             Transaction transaction = null;
@@ -100,6 +101,10 @@ public class MeshPersonsSyncService {
         } catch (Exception e) {
             logger.error("Error in load persons from Mesh", e);
         }
+    }
+
+    public List<ResponsePersons> getMeshResponses() {
+        return meshResponses;
     }
 
     private Map<Integer, MeshTrainingForm> getTrainingForms(Session session) {
@@ -161,11 +166,18 @@ public class MeshPersonsSyncService {
             Long organizationid = education.getOrganizationId().longValue();
             String patronymic = person.getPatronymic();
             String guidnsi = null;
+            String idIsPp = null;
             try {
                 Category category = findCategory(person);
                 guidnsi = category.getParameterValues().get(0).toString();
             } catch (Exception e) {
                 logger.info("Not found NSI guid for person with mesh guid " + personguid);
+            }
+            try {
+                Category category = findCategory(person);
+                idIsPp = category.getId().toString();
+            } catch (Exception e) {
+                logger.info("Not found id IS PP for person with mesh guid " + personguid);
             }
             MeshSyncPerson meshSyncPerson = (MeshSyncPerson)session.get(MeshSyncPerson.class, personguid);
             if (meshSyncPerson == null) meshSyncPerson = new MeshSyncPerson(personguid);
@@ -183,8 +195,12 @@ public class MeshPersonsSyncService {
             meshSyncPerson.setLastupdateRest(new Date());
             meshSyncPerson.setDeletestate(deleted);
             meshSyncPerson.setInvaliddata(false);
+            person.setClassName(classname);
+            person.setOoId(organizationid.toString());
+            person.setGuidNsi(guidnsi);
+            person.setTraining_end_at(df.format(endTraining));
+            person.setIdIsPp(idIsPp);
             session.saveOrUpdate(meshSyncPerson);
-
         } catch (Exception e) {
             logger.error(String.format("Error in process Mesh person with guid %s: ", personguid), e);
         }
@@ -221,16 +237,29 @@ public class MeshPersonsSyncService {
         return RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_PERSONS_TOP_PROPEERTY, TOP_DEFAULT);
     }
 
-    private String getFilter(long idOfOrg, String lastName, String firstName, String patronymic) throws Exception {
-        Long meshId = DAOService.getInstance().getMeshIdByOrg(idOfOrg);
-        if (meshId == null) throw new Exception("У организации не указан МЭШ ид.");
-        MeshJsonFilter filter = new MeshJsonFilter();
+    private String getFilter(long idOfOrg, String meshIds, String lastName, String firstName, String patronymic) throws Exception {
         List<And> list = new ArrayList<>();
-        And andOrg = new And();
-        andOrg.setField(FILTER_VALUE_ORG);
-        andOrg.setOp(FILTER_VALUE_EQUALS);
-        andOrg.setValue(meshId.toString());
-        list.add(andOrg);
+        MeshJsonFilter filter = new MeshJsonFilter();
+
+        if (idOfOrg == 0){
+            if (!StringUtils.isEmpty(meshIds)) {
+                And andOrg = new And();
+                andOrg.setField("person_id");
+                andOrg.setOp(FILTER_VALUE_EQUALS);
+                andOrg.setValue(meshIds);
+                list.add(andOrg);
+            }
+        }
+        else {
+            Long meshId = DAOService.getInstance().getMeshIdByOrg(idOfOrg);
+            if (meshId == null)
+                throw new Exception("У организации не указан МЭШ ид.");
+            And andOrg = new And();
+            andOrg.setField(FILTER_VALUE_ORG);
+            andOrg.setOp(FILTER_VALUE_EQUALS);
+            andOrg.setValue(meshId.toString());
+            list.add(andOrg);
+        }
         if (!StringUtils.isEmpty(lastName)) {
             And andLastname = new And();
             andLastname.setField(FILTER_VALUE_LASTNAME);
