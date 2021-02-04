@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.MeshSyncPerson;
 import ru.axetta.ecafe.processor.core.persistence.MeshTrainingForm;
@@ -173,12 +174,7 @@ public class MeshPersonsSyncService {
             } catch (Exception e) {
                 logger.info("Not found NSI guid for person with mesh guid " + personguid);
             }
-            try {
-                Category category = findCategory(person);
-                idIsPp = category.getId().toString();
-            } catch (Exception e) {
-                logger.info("Not found id IS PP for person with mesh guid " + personguid);
-            }
+
             MeshSyncPerson meshSyncPerson = (MeshSyncPerson)session.get(MeshSyncPerson.class, personguid);
             if (meshSyncPerson == null) meshSyncPerson = new MeshSyncPerson(personguid);
             meshSyncPerson.setBirthdate(birthdate);
@@ -199,10 +195,19 @@ public class MeshPersonsSyncService {
             person.setOoId(organizationid.toString());
             person.setGuidNsi(guidnsi);
             person.setTraining_end_at(df.format(endTraining));
-            person.setIdIsPp(idIsPp);
+            person.setIdIsPp(searchByMeshGuid(guidnsi));
             session.saveOrUpdate(meshSyncPerson);
         } catch (Exception e) {
             logger.error(String.format("Error in process Mesh person with guid %s: ", personguid), e);
+        }
+    }
+    private String searchByMeshGuid(String guid){
+        try {
+            Client client = RuntimeContext.getAppContext().getBean(DAOService.class).getClientByGuid(guid);
+            return client.getIdOfClient().toString();
+        }catch (NullPointerException e){
+            logger.error("idOfClient not found");
+            return null;
         }
     }
 
