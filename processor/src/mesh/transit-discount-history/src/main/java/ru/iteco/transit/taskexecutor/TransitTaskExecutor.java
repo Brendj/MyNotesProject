@@ -52,8 +52,9 @@ public class TransitTaskExecutor {
                         continue;
                     }
                     log.info(String
-                            .format("Process history Client ID: %d, New discounts: %s, Old discounts: %s",
-                                    h.getClient().getIdOfClient(), h.getCategoriesDiscounts(), h.getOldCategoriesDiscounts()
+                            .format("Process history ID: %d Client ID: %d, New discounts: %s, Old discounts: %s",
+                                    h.getIdOfDiscountChange(), h.getClient().getIdOfClient(),
+                                    h.getCategoriesDiscounts(), h.getOldCategoriesDiscounts()
                             ));
                     List<String> newDiscounts = getSortedSplitList(h.getCategoriesDiscounts());
                     List<String> oldDiscounts = getSortedSplitList(h.getOldCategoriesDiscounts());
