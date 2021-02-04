@@ -56,8 +56,8 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
             private List<Long> sumRow; // лист стоимости
 
             public ReportItem() {
-                countRow = new ArrayList<Integer>();
-                sumRow = new ArrayList<Long>();
+                countRow = new LinkedList<>();
+                sumRow = new LinkedList<>();
                 for (float f = 0; f < 32; f++) {
                     countRow.add(0);
                     sumRow.add(0L);
@@ -143,10 +143,12 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
             HashMap<Integer, ReportItem> mapItems = new HashMap<Integer, ReportItem>(31);
             List<ReportItem> resultRows = new LinkedList<ReportItem>();
             Calendar c = Calendar.getInstance();
-            Query query = session.createSQLQuery("SELECT o.CreatedDate, SUM(od.Qty*od.RPrice) as SUM, SUM(od.Qty) as COUNT, od.menudetailname "
-                + "FROM CF_ORDERS o,  CF_ORDERDETAILS od "
-                + "WHERE (o.idOfOrg=:idOfOrg) AND (od.idOfOrder=o.idOfOrder) AND (od.RPrice > 0) "
-                + "AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 "
+            Query query = session.createSQLQuery(
+                    "SELECT o.CreatedDate, SUM(od.Qty*od.RPrice) as SUM, SUM(od.Qty) as COUNT, od.menudetailname "
+                + "FROM CF_ORDERS o "
+                + "JOIN CF_ORDERDETAILS od ON od.idoforder = o.idoforder AND o.idoforg = od.idoforg "
+                + "WHERE (o.idOfOrg=:idOfOrg) AND (od.RPrice > 0) "
+                + "AND o.CreatedDate BETWEEN :startTime AND :endTime and o.state=0 and od.state=0 "
                 + "group by o.CreatedDate, od.menudetailname "
                 + "order by od.menudetailname;");
 
@@ -154,15 +156,14 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
             query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
             query.setParameter("idOfOrg", org.getIdOfOrg());
 
-            List resultList = query.list();
+            List<Object[]> resultList = query.list();
             ReportItem tmp;
             int i = 1;
-            for (Object o : resultList) {
-                Object vals[]=(Object[])o;
+            for (Object[] vals : resultList) {
                 String orderName = (String)vals[3];
                 Long sum = Long.parseLong(vals[1].toString());
                 Integer count = Integer.parseInt(vals[2].toString());
-                Long time = Long.parseLong(vals[0].toString());
+                long time = Long.parseLong(vals[0].toString());
                 tmp = mapItems.get(orderName.hashCode());
                 if (tmp == null) {
                     tmp = new ReportItem();
