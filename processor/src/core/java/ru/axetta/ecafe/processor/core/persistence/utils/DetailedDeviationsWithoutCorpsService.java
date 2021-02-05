@@ -337,7 +337,6 @@ public class DetailedDeviationsWithoutCorpsService {
         } else if (number == 11L) {
             clientAllBenefits.add(-111L);
         }
-
         return clientAllBenefits;
     }
 
@@ -350,9 +349,10 @@ public class DetailedDeviationsWithoutCorpsService {
                 List<Long> categoryDiscountsList = new ArrayList<Long>();
 
                 for (Object idsCategoryDiscounts : categoryDiscounts) {
-                    categoryDiscountsList.add(Long.parseLong(StringUtils.trim((String) idsCategoryDiscounts)));
+                    try {
+                        categoryDiscountsList.add(Long.parseLong(StringUtils.trim((String) idsCategoryDiscounts)));
+                    } catch (NumberFormatException ignored) {}
                 }
-
                 if (clientBenefits.containsAll(categoryDiscountsList)) {
                     discountRulesResult.add(discount);
                 }
