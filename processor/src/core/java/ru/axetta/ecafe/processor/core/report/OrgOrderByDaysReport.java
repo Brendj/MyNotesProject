@@ -25,6 +25,7 @@ import java.util.*;
  * Time: 13:46
  * Продажи за месяц
  */
+@Deprecated // Отчет устарел и работает кривовато. На проде МСК не используется
 public class OrgOrderByDaysReport extends BasicReportForOrgJob {
     /*
     * Параметры отчета для добавления в правила и шаблоны
