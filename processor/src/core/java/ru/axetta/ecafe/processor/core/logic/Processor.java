@@ -5928,9 +5928,8 @@ public class Processor implements SyncProcessor {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            persistenceSession.refresh(org);
             List<ProhibitionMenu> prohibitionMenuList;
             prohibitionMenuList = getProhibitionMenuForOrgSinceVersion(persistenceSession, org, version);
             for (ProhibitionMenu prohibitionMenu : prohibitionMenuList) {

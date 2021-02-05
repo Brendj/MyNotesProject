@@ -291,14 +291,8 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
     public static List<Client> findNewerClients(Session session, Collection<Org> orgs, long clientRegistryVersion) {
-        //Query query = session.createQuery(
-        //        "from Client cl where (cl.idOfClientGroup not in (:cg) or cl.idOfClientGroup is null) and cl.org in (:orgs) and clientRegistryVersion > :version")
-        //        .setParameterList("cg", new Long[]{
-        //                ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-        //                ClientGroup.Predefined.CLIENT_DELETED.getValue()})
-        //        .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
-        //return (List<Client>) query.list();
-        Query query = session.createQuery("from Client cl where cl.org in (:orgs) and clientRegistryVersion > :version")
+        Query query = session.createQuery("from Client cl join fetch cl.person join fetch cl.contractPerson join fetch cl.categoriesInternal join fetch cl.categoriesDSZNInternal "
+                + "where cl.org in (:orgs) and clientRegistryVersion > :version")
                 .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
         return (List<Client>) query.list();
     }
@@ -3047,11 +3041,12 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static List<ProhibitionMenu> getProhibitionMenuForOrgSinceVersion(Session session, Org org, long version) {
+        Org organization = (Org)session.load(Org.class, org.getIdOfOrg());
         Criteria criteria = session.createCriteria(ProhibitionMenu.class);
-        if (org.getFriendlyOrg().isEmpty()) {
-            criteria.createCriteria("client").add(Restrictions.eq("org", org));
+        if (organization.getFriendlyOrg().isEmpty()) {
+            criteria.createCriteria("client").add(Restrictions.eq("org", organization));
         } else {
-            criteria.createCriteria("client").add(Restrictions.in("org", org.getFriendlyOrg()));
+            criteria.createCriteria("client").add(Restrictions.in("org", organization.getFriendlyOrg()));
         }
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
