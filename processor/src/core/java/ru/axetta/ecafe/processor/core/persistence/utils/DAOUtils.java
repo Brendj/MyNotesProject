@@ -291,7 +291,8 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
     public static List<Client> findNewerClients(Session session, Collection<Org> orgs, long clientRegistryVersion) {
-        Query query = session.createQuery("from Client cl join fetch cl.person join fetch cl.contractPerson join fetch cl.categoriesInternal join fetch cl.categoriesDSZNInternal "
+        Query query = session.createQuery("from Client cl join fetch cl.person join fetch cl.contractPerson "
+                + "left join fetch cl.categoriesInternal left join fetch cl.categoriesDSZNInternal "
                 + "where cl.org in (:orgs) and clientRegistryVersion > :version")
                 .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
         return (List<Client>) query.list();
