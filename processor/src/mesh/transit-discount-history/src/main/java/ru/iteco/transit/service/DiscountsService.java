@@ -68,4 +68,8 @@ public class DiscountsService {
 
         return categoryDiscountRepo.findAllByIdOfCategoryDiscountIn(ids);
     }
+
+    public List<DiscountChangeHistory> getHistoryGreatThenRegistryDate(Pageable pageable, Long lastProcessRegistryDate) {
+        return discountChangeHistoryRepo.getAllByRegistrationDateGreaterThan(pageable, lastProcessRegistryDate);
+    }
 }

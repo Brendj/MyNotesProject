@@ -15,4 +15,6 @@ import java.util.List;
 public interface DiscountChangeHistoryRepo extends JpaRepository<DiscountChangeHistory, Long> {
     @Query(value = "SELECT dch FROM DiscountChangeHistory dch")
     List<DiscountChangeHistory> getAll(Pageable pageable);
+
+    List<DiscountChangeHistory> getAllByRegistrationDateGreaterThan(Pageable pageable, Long registrationDate);
 }

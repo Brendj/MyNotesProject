@@ -9,6 +9,7 @@ import ru.iteco.transit.models.DiscountChangeHistory;
 import ru.iteco.transit.models.enums.OperationType;
 import ru.iteco.transit.service.ClientDiscountHistoryService;
 import ru.iteco.transit.service.DiscountsService;
+import ru.iteco.transit.service.FileSupportService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,21 +30,32 @@ public class TransitTaskExecutor {
 
     private final DiscountsService discountsService;
     private final ClientDiscountHistoryService clientDiscountHistoryService;
+    private final FileSupportService fileSupportService;
 
     private static final int SAMPLE_SIZE = 500;
 
     public TransitTaskExecutor(
             DiscountsService discountsService,
-            ClientDiscountHistoryService clientDiscountHistoryService){
+            ClientDiscountHistoryService clientDiscountHistoryService,
+            FileSupportService fileSupportService){
         this.discountsService = discountsService;
         this.clientDiscountHistoryService = clientDiscountHistoryService;
+        this.fileSupportService = fileSupportService;
     }
 
     public void run() {
         try {
+            Long lastProcessRegistryDate = fileSupportService.getLastProcessRegistryDate();
+            List<DiscountChangeHistory> discountChangeHistoryList = null;
+
             Pageable pageable = PageRequest.of(0, SAMPLE_SIZE, Sort.by("registrationDate"));
-            List<DiscountChangeHistory> discountChangeHistoryList = discountsService
-                    .getHistory(pageable);
+
+            if(lastProcessRegistryDate == null) {
+                discountChangeHistoryList = discountsService.getHistory(pageable);
+            } else {
+                discountChangeHistoryList = discountsService
+                        .getHistoryGreatThenRegistryDate(pageable, lastProcessRegistryDate);
+            }
 
             while(CollectionUtils.isNotEmpty(discountChangeHistoryList)) {
                 for (DiscountChangeHistory h : discountChangeHistoryList) {
@@ -85,6 +97,7 @@ public class TransitTaskExecutor {
                                     h.getComment(), type);
                         }
                     }
+                    fileSupportService.writeLastProcessRegistryDate(h.getRegistrationDate());
                 }
                 discountChangeHistoryList = null;
                 pageable = pageable.next();
