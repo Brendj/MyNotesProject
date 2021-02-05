@@ -256,7 +256,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private List<NotificationSettingItem> notificationSettings;
     private List<ClientDiscountItem> clientDiscountItems;
 
-    public List<ClientDiscountItem> getClientDiscountItems(){
+    public List<ClientDiscountItem> getClientDiscountItems() {
         return clientDiscountItems;
     }
 
@@ -698,7 +698,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public void setClientIacRegId(String clientIacRegId) {
-        this.clientIacRegId =  clientIacRegId;
+        this.clientIacRegId = clientIacRegId;
     }
 
     public Boolean getSpecialMenu() {
@@ -738,8 +738,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
         this.clientGroupName = client.getClientGroup() == null ? "" : client.getClientGroup().getGroupName();
-        this.idOfClientGroup = client.getClientGroup() == null ? null : client.getClientGroup()
-                .getCompositeIdOfClientGroup().getIdOfClientGroup();
+        this.idOfClientGroup = client.getClientGroup() == null ? null
+                : client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
 
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
@@ -800,10 +800,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public boolean getOldFlagsShow() {
-        if (clientGuardianItems == null) return true;
+        if (clientGuardianItems == null)
+            return true;
         boolean result = true;
         for (ClientGuardianItem item : clientGuardianItems) {
-            if (!item.getDisabled()) return false;
+            if (!item.getDisabled())
+                return false;
         }
         return result;
     }
@@ -816,7 +818,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public boolean existAddedWards() {
         for (ClientGuardianItem item : clientWardItems) {
-            if (item.getIsNew()) return true;
+            if (item.getIsNew())
+                return true;
         }
         return false;
     }
@@ -828,18 +831,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public void completeClientSelection(Session session, Long idOfClient) throws Exception {
         if (null != idOfClient) {
             Client client = (Client) session.load(Client.class, idOfClient);
-            if (typeAddClient == null) return;
+            if (typeAddClient == null)
+                return;
             if (typeAddClient.equals("guardian")) {
                 if (!guardianExists(idOfClient))
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
+                            ClientGuardianRepresentType.UNKNOWN, false));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
+                            ClientGuardianRepresentType.UNKNOWN, false));
             }
         }
     }
@@ -874,14 +880,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void printMessage(String msg) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        facesContext.addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 
     public void printMessage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        facesContext.addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_WARN, "NOT OK", null));
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "NOT OK", null));
     }
 
     public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
@@ -894,9 +898,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        if((this.org.getIdOfOrg() == null && idOfOrg != null) ||
-                (this.org.getIdOfOrg() != null && idOfOrg == null) ||
-                (this.org.getIdOfOrg() != null && !this.org.getIdOfOrg().equals(idOfOrg))) {
+        if ((this.org.getIdOfOrg() == null && idOfOrg != null) || (this.org.getIdOfOrg() != null && idOfOrg == null)
+                || (this.org.getIdOfOrg() != null && !this.org.getIdOfOrg().equals(idOfOrg))) {
             this.clientGroupName = "";
             this.idOfClientGroup = null;
         }
@@ -924,7 +927,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (mobile == null) {
             throw new Exception("Неверный формат мобильного телефона");
         }
-        if(discountMode.equals(Client.DISCOUNT_MODE_NONE) && !idOfCategoryList.isEmpty()){
+        if (discountMode.equals(Client.DISCOUNT_MODE_NONE) && !idOfCategoryList.isEmpty()) {
             idOfCategoryList = Collections.emptyList();
             clientDiscountItems = Collections.emptyList();
         }
@@ -950,7 +953,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Set<Org> orgSet = client.getOrg().getFriendlyOrg();
             for (Org o : orgSet) {
-                if(o.getIdOfOrg().equals(org.getIdOfOrg())){
+                if (o.getIdOfOrg().equals(org.getIdOfOrg())) {
                     isFriendlyReplaceOrg = true;
                     break;
                 }
@@ -965,8 +968,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setFlags(this.flags);
         client.setAddress(this.address);
         client.setPhone(this.phone);
-        ClientsMobileHistory clientsMobileHistory =
-                new ClientsMobileHistory("Изменение клиента через редактирование");
+        ClientsMobileHistory clientsMobileHistory = new ClientsMobileHistory("Изменение клиента через редактирование");
         User user = MainPage.getSessionInstance().getCurrentUser();
         clientsMobileHistory.setUser(user);
         clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
@@ -1010,7 +1012,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setClientGUID(this.clientGUID);
         }
 
-        if(StringUtils.isEmpty(meshGUID)){
+        if (StringUtils.isEmpty(meshGUID)) {
             client.setMeshGUID(null);
         } else {
             client.setMeshGUID(meshGUID);
@@ -1019,7 +1021,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientSSOID = "";
             client.setClearedSsoid(false);
         }
-        if(StringUtils.isEmpty(clientSSOID)){
+        if (StringUtils.isEmpty(clientSSOID)) {
             client.setSsoid(null);
         } else {
             client.setSsoid(clientSSOID);
@@ -1045,7 +1047,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             categoryCriteria.addOrder(Order.asc("idOfCategoryDiscount"));
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
-                if(isReplaceOrg && !isFriendlyReplaceOrg && categoryDiscount.getEligibleToDelete()){
+                if (isReplaceOrg && !isFriendlyReplaceOrg && categoryDiscount.getEligibleToDelete()) {
                     DiscountManager.archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
                     continue;
                 }
@@ -1058,9 +1060,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
             discountMode = categoryDiscountSet.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-            DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet,
-                    client.getDiscountMode(), discountMode,
-                    DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
+            DiscountManager
+                    .saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet,
+                            client.getDiscountMode(), discountMode,
+                            DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
             client.setLastDiscountsUpdate(new Date());
         }
 
@@ -1070,10 +1073,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         client.setCategories(categoryDiscountSet);
 
-        if(this.disablePlanCreation && this.disablePlanCreationDate == null) {
+        if (this.disablePlanCreation && this.disablePlanCreationDate == null) {
             client.setDisablePlanCreationDate(new Date());
         }
-        if(!this.disablePlanCreation) {
+        if (!this.disablePlanCreation) {
             client.setDisablePlanCreationDate(null);
         }
 
@@ -1106,14 +1109,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
             }
 
-            if(StringUtils.isEmpty(this.clientGroupName)) {
+            if (StringUtils.isEmpty(this.clientGroupName)) {
                 this.idOfClientGroup = ClientGroup.Predefined.CLIENT_DISPLACED.getValue();
                 this.clientGroupName = ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup();
             }
 
             ClientGroup clientGroup = DAOUtils
-                    .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
-                            this.clientGroupName);
+                    .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(), this.clientGroupName);
             if (clientGroup == null) {
                 clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
                         ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
@@ -1138,9 +1140,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 ClientManager.archiveApplicationForFoodIfClientLeaving(persistenceSession, client, idOfClientGroup);
             }
         } else {
-            if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) ||
-                    (this.idOfClientGroup == null && client.getIdOfClientGroup() != null) ||
-                    (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
+            if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) || (this.idOfClientGroup == null
+                    && client.getIdOfClientGroup() != null) || (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
                 ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, this.idOfClientGroup,
                         this.clientGroupName, ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
                                 .getExternalContext().getRemoteUser());
@@ -1168,6 +1169,29 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
+    }
+
+    public void deletePDClient() throws Exception {
+        this.person.firstName = "Ручная обработка";
+        this.person.secondName = "";
+        this.person.surname = "Отзыв на обработку ПД";
+        this.mobile = "";
+        this.clientSSOID = "";
+        removeListGuardianItems.clear();
+        removeListGuardianItems.addAll(clientGuardianItems);
+        clientGuardianItems.clear();
+        removeListWardItems.clear();
+        removeListWardItems.addAll(clientWardItems);
+        clientWardItems.clear();
+        this.idOfClientGroup = ClientGroup.Predefined.CLIENT_LEAVING.getValue();
+        this.clientGroupName = ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup();
+    }
+
+    public boolean predefined() {
+        if(ClientGroup.Predefined.parse(this.clientGroupName) == null)
+            return true;
+        else
+            return false;
     }
 
     private void validateExistingGuardians() throws Exception {
