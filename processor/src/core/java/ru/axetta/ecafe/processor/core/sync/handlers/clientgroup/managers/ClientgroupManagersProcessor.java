@@ -34,9 +34,11 @@ import java.util.List;
 public class ClientgroupManagersProcessor extends AbstractGroupProcessor<ResClientgroupManagers> {
     private static final Logger logger = LoggerFactory.getLogger(ClientgroupManagersProcessor.class);
     private final ClientGroupManagerRequest clientGroupManagerRequest;
+    protected final SessionFactory sessionFactorySlave;
 
-    public ClientgroupManagersProcessor(SessionFactory sessionFactory, ClientGroupManagerRequest clientGroupManagerRequest) {
+    public ClientgroupManagersProcessor(SessionFactory sessionFactory, SessionFactory sessionFactorySlave, ClientGroupManagerRequest clientGroupManagerRequest) {
         super(sessionFactory);
+        this.sessionFactorySlave = sessionFactorySlave;
         this.clientGroupManagerRequest = clientGroupManagerRequest;
     }
 
@@ -146,7 +148,7 @@ public class ClientgroupManagersProcessor extends AbstractGroupProcessor<ResClie
         Transaction persistenceTransaction = null;
         ClientgroupManagerData clientgroupManagerData = null;
         try {
-            persistenceSession = sessionFactory.openSession();
+            persistenceSession = sessionFactorySlave.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientgroupManagerData = executeProcess(persistenceSession,idOfOrg);
             persistenceTransaction.commit();
