@@ -42,258 +42,258 @@ public class EzdController {
     private static final int SETTING_TYPE = 11001;
     private static final long TIME_MAX = 39600000; //11:00
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "test")
-    public List<testRez> test() {
-        logger.info("Начало работы сервиса сбора данных для ЭЖД");
-        ResponseToEZD responseToEZD = new ResponseToEZD();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-
-        //Количество дней для загрузки
-        Integer countDayz;
-        try {
-            countDayz = Integer
-                    .valueOf(runtimeContext.getConfigProperties().getProperty("ecafe.processor.ezd.days", "1"));
-            if (countDayz == null) {
-                countDayz = 1;
-            }
-        } catch (Exception e) {
-            countDayz = 1;
-        }
-        logger.info(String.format("Сбор на %s дней вперед", countDayz.toString()));
-
-        //Вычисление результата запроса
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Date date = new Date();
-            Date currentDate = CalendarUtils.startOfDay(date);
-
-
-            logger.info("Старт начала сбора данных по производственному календарю");
-            //Загружаем все данные производственного календаря
-            List<ProductionCalendar> productionCalendars = DAOUtils
-                    .getAllDateFromProdactionCalendarForFutureDates(persistenceSession);
-            if (productionCalendars == null) {
-                productionCalendars = new ArrayList<>();
-            }
-            logger.info(String.format("Всего записей по производственному календарю - %s",
-                    String.valueOf(productionCalendars.size())));
-
-            currentDate = getWorkedDateForProdactionCalendar(currentDate, productionCalendars);
-
-            //Если время более 11:00, то на сегодня менять нельзя
-            if (new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime() > TIME_MAX) {
-                currentDate = CalendarUtils.addOneDay(currentDate);
-                //currentDate = getWorkedDateForProdactionCalendar (currentDate, productionCalendars);
-            }
-
-            logger.info("Старт начала сбора данных по учебному календарю");
-            //Загружаем все данные учебного календаря
-            List<RequestsEzdSpecialDateView> requestsEzdSpecialDateViews = DAOUtils
-                    .getAllDateFromsSpecialDatesForEZD(persistenceSession);
-            if (requestsEzdSpecialDateViews == null) {
-                requestsEzdSpecialDateViews = new ArrayList<>();
-            }
-            logger.info(String.format("Всего записей по учебному календарю - %s",
-                    String.valueOf(requestsEzdSpecialDateViews.size())));
-
-            logger.info("Старт начала сбора настроек, полученных с АРМ для организаций");
-            //Настройка с АРМ для всех id Org
-            Map<Long, Integer> allIdtoSetiings = OrgSettingDAOUtils
-                    .getOrgSettingItemByOrgAndType(persistenceSession, null, SETTING_TYPE);
-            if (allIdtoSetiings == null) {
-                allIdtoSetiings = new HashMap<>();
-            }
-            logger.info(String.format("Всего настроек с АРМ - %s", String.valueOf(allIdtoSetiings.size())));
-
-            //Получаем все данные для отправки в ЭЖД
-            List<RequestsEzdView> requestsEzdViews = null;
-            requestsEzdViews = DAOUtils.getAllDateFromViewEZD(persistenceSession, null, null);
-            if (requestsEzdViews == null) {
-                requestsEzdViews = new ArrayList<>();
-            }
-
-            Map<Long, List<Date>> massCorrectDates = new HashMap<>();
-
-            Long counter = 0L;
-            for (RequestsEzdView requestsEzdView : requestsEzdViews) {
-                Date startedDate = currentDate;
-                String curGroupName = requestsEzdView.getGroupname();
-                Long curOrg = requestsEzdView.getIdoforg();
-                //Сколько дней пропустить
-                Integer countwait = allIdtoSetiings.get(curOrg);
-                if (countwait != null) {
-                    boolean flag = false;
-                    do {
-                        startedDate = getWorkedDateForProdactionCalendar(startedDate, productionCalendars);
-                        Integer weekend = getWeekendFromSpecDates(curGroupName, curOrg, startedDate,
-                                requestsEzdSpecialDateViews);
-                        if (weekend == null || weekend == 0) {
-                            //3.2
-                            countwait = countwait - 1;
-                            if (countwait == 0) {
-                                flag = true;
-                            }
-                        }
-                        startedDate = CalendarUtils.addOneDay(startedDate);
-                    } while (!flag);
-                }
-                List<Date> dates = new ArrayList<>();
-                dates.add(startedDate);
-                massCorrectDates.put(counter, dates);
-                counter++;
-            }
-
-            for (int i = 0; i < massCorrectDates.size(); i++) {
-                List<Date> dates = massCorrectDates.get((long) i);
-                RequestsEzdView requestsEzdView = requestsEzdViews.get(i);
-                Date startedDate = CalendarUtils.addOneDay(dates.get(0));
-                Integer countMax = countDayz;
-                //4.1
-                boolean flagend = false;
-                ////////////////////////////
-                boolean flag;
-                ProductionCalendar productionCalendarSaved = null;
-                boolean flag2;
-
-                do {
-                    do {
-                        flag = false;
-                        flag2 = false;
-                        for (ProductionCalendar productionCalendar : productionCalendars) {
-                            if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(startedDate)) {
-                                flag = true;
-                                productionCalendarSaved = productionCalendar;
-                                break;
-                            }
-                        }
-                        //4.1.1
-                        if (flag) {
-                            if (productionCalendarSaved.getFlag() == 2) {
-                                flag2 = true;
-                            }
-
-                            if (!flag2) {
-                                Integer week = getWeekendFromSpecDates(requestsEzdView.getGroupname(),
-                                        requestsEzdView.getIdoforg(), startedDate, requestsEzdSpecialDateViews);
-                                if (week != null && week == 0) {
-                                    dates.add(startedDate);
-                                    countMax = countMax - 1;
-                                    if (countMax == 0) {
-                                        flagend = true;
-                                    }
-                                } else {
-                                    flag2 = true;
-                                }
-                                if (week == null && CalendarUtils.getDayOfWeek(startedDate) == Calendar.SATURDAY) {
-                                    if (DAOReadonlyService.getInstance()
-                                            .isSixWorkWeekOrgAndGroup(requestsEzdView.getIdoforg(), requestsEzdView.getGroupname())) {
-                                        dates.add(startedDate);
-                                        countMax = countMax - 1;
-                                        if (countMax == 0) {
-                                            flagend = true;
-                                        }
-                                    } else {
-                                        flag2 = true;
-                                    }
-                                }
-                            }
-                        } else {
-                            //4.2
-                            Integer week = getWeekendFromSpecDates(requestsEzdView.getGroupname(),
-                                    requestsEzdView.getIdoforg(), startedDate, requestsEzdSpecialDateViews);
-                            if (week == null || week == 0) {
-                                dates.add(startedDate);
-                                countMax = countMax - 1;
-                                if (countMax == 0) {
-                                    flagend = true;
-                                }
-                            } else {
-                                flag2 = true;
-                            }
-                        }
-                        startedDate = CalendarUtils.addOneDay(startedDate);
-                    } while (flag2 && !flagend);
-                } while (!flagend);
-            }
-            Long counter2 = 0L;
-            List<testRez> rezList = new ArrayList<>();
-            for (RequestsEzdView requestsEzdView : requestsEzdViews) {
-                testRez testRez1 = new testRez();
-                testRez1.setCurGroupName(requestsEzdView.getGroupname());
-                testRez1.setEkisid(requestsEzdView.getEkisid());
-                testRez1.setGuid(requestsEzdView.getOrgguid());
-                testRez1.setIdOforg(requestsEzdView.getIdoforg());
-                List<Date> detre = massCorrectDates.get((long) counter2);
-                List<String> datesStr = new ArrayList<>();
-                for (Date date1 : detre) {
-                    datesStr.add(new SimpleDateFormat("dd.MM.yyyy").format(date1));
-                }
-                testRez1.setDates(datesStr);
-                counter2++;
-                rezList.add(testRez1);
-            }
-            return rezList;
-
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    private class testRez {
-
-        private String curGroupName;
-        private Long ekisid;
-        private String guid;
-        private Long idOforg;
-        private List<String> dates;
-
-        public String getCurGroupName() {
-            return curGroupName;
-        }
-
-        public void setCurGroupName(String curGroupName) {
-            this.curGroupName = curGroupName;
-        }
-
-        public Long getEkisid() {
-            return ekisid;
-        }
-
-        public void setEkisid(Long ekisid) {
-            this.ekisid = ekisid;
-        }
-
-        public String getGuid() {
-            return guid;
-        }
-
-        public void setGuid(String guid) {
-            this.guid = guid;
-        }
-
-        public Long getIdOforg() {
-            return idOforg;
-        }
-
-        public void setIdOforg(Long idOforg) {
-            this.idOforg = idOforg;
-        }
-
-        public List<String> getDates() {
-            return dates;
-        }
-
-        public void setDates(List<String> dates) {
-            this.dates = dates;
-        }
-    }
+    //@POST
+    //@Consumes(MediaType.APPLICATION_JSON)
+    //@Produces(MediaType.APPLICATION_JSON)
+    //@Path(value = "test")
+    //public List<testRez> test() {
+    //    logger.info("Начало работы сервиса сбора данных для ЭЖД");
+    //    ResponseToEZD responseToEZD = new ResponseToEZD();
+    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
+    //    Session persistenceSession = null;
+    //    Transaction persistenceTransaction = null;
+    //
+    //    //Количество дней для загрузки
+    //    Integer countDayz;
+    //    try {
+    //        countDayz = Integer
+    //                .valueOf(runtimeContext.getConfigProperties().getProperty("ecafe.processor.ezd.days", "1"));
+    //        if (countDayz == null) {
+    //            countDayz = 1;
+    //        }
+    //    } catch (Exception e) {
+    //        countDayz = 1;
+    //    }
+    //    logger.info(String.format("Сбор на %s дней вперед", countDayz.toString()));
+    //
+    //    //Вычисление результата запроса
+    //    try {
+    //        persistenceSession = runtimeContext.createPersistenceSession();
+    //        persistenceTransaction = persistenceSession.beginTransaction();
+    //
+    //        Date date = new Date();
+    //        Date currentDate = CalendarUtils.startOfDay(date);
+    //
+    //
+    //        logger.info("Старт начала сбора данных по производственному календарю");
+    //        //Загружаем все данные производственного календаря
+    //        List<ProductionCalendar> productionCalendars = DAOUtils
+    //                .getAllDateFromProdactionCalendarForFutureDates(persistenceSession);
+    //        if (productionCalendars == null) {
+    //            productionCalendars = new ArrayList<>();
+    //        }
+    //        logger.info(String.format("Всего записей по производственному календарю - %s",
+    //                String.valueOf(productionCalendars.size())));
+    //
+    //        currentDate = getWorkedDateForProdactionCalendar(currentDate, productionCalendars);
+    //
+    //        //Если время более 11:00, то на сегодня менять нельзя
+    //        if (new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime() > TIME_MAX) {
+    //            currentDate = CalendarUtils.addOneDay(currentDate);
+    //            //currentDate = getWorkedDateForProdactionCalendar (currentDate, productionCalendars);
+    //        }
+    //
+    //        logger.info("Старт начала сбора данных по учебному календарю");
+    //        //Загружаем все данные учебного календаря
+    //        List<RequestsEzdSpecialDateView> requestsEzdSpecialDateViews = DAOUtils
+    //                .getAllDateFromsSpecialDatesForEZD(persistenceSession);
+    //        if (requestsEzdSpecialDateViews == null) {
+    //            requestsEzdSpecialDateViews = new ArrayList<>();
+    //        }
+    //        logger.info(String.format("Всего записей по учебному календарю - %s",
+    //                String.valueOf(requestsEzdSpecialDateViews.size())));
+    //
+    //        logger.info("Старт начала сбора настроек, полученных с АРМ для организаций");
+    //        //Настройка с АРМ для всех id Org
+    //        Map<Long, Integer> allIdtoSetiings = OrgSettingDAOUtils
+    //                .getOrgSettingItemByOrgAndType(persistenceSession, null, SETTING_TYPE);
+    //        if (allIdtoSetiings == null) {
+    //            allIdtoSetiings = new HashMap<>();
+    //        }
+    //        logger.info(String.format("Всего настроек с АРМ - %s", String.valueOf(allIdtoSetiings.size())));
+    //
+    //        //Получаем все данные для отправки в ЭЖД
+    //        List<RequestsEzdView> requestsEzdViews = null;
+    //        requestsEzdViews = DAOUtils.getAllDateFromViewEZD(persistenceSession, null, null);
+    //        if (requestsEzdViews == null) {
+    //            requestsEzdViews = new ArrayList<>();
+    //        }
+    //
+    //        Map<Long, List<Date>> massCorrectDates = new HashMap<>();
+    //
+    //        Long counter = 0L;
+    //        for (RequestsEzdView requestsEzdView : requestsEzdViews) {
+    //            Date startedDate = currentDate;
+    //            String curGroupName = requestsEzdView.getGroupname();
+    //            Long curOrg = requestsEzdView.getIdoforg();
+    //            //Сколько дней пропустить
+    //            Integer countwait = allIdtoSetiings.get(curOrg);
+    //            if (countwait != null) {
+    //                boolean flag = false;
+    //                do {
+    //                    startedDate = getWorkedDateForProdactionCalendar(startedDate, productionCalendars);
+    //                    Integer weekend = getWeekendFromSpecDates(curGroupName, curOrg, startedDate,
+    //                            requestsEzdSpecialDateViews);
+    //                    if (weekend == null || weekend == 0) {
+    //                        //3.2
+    //                        countwait = countwait - 1;
+    //                        if (countwait == 0) {
+    //                            flag = true;
+    //                        }
+    //                    }
+    //                    startedDate = CalendarUtils.addOneDay(startedDate);
+    //                } while (!flag);
+    //            }
+    //            List<Date> dates = new ArrayList<>();
+    //            dates.add(startedDate);
+    //            massCorrectDates.put(counter, dates);
+    //            counter++;
+    //        }
+    //
+    //        for (int i = 0; i < massCorrectDates.size(); i++) {
+    //            List<Date> dates = massCorrectDates.get((long) i);
+    //            RequestsEzdView requestsEzdView = requestsEzdViews.get(i);
+    //            Date startedDate = CalendarUtils.addOneDay(dates.get(0));
+    //            Integer countMax = countDayz;
+    //            //4.1
+    //            boolean flagend = false;
+    //            ////////////////////////////
+    //            boolean flag;
+    //            ProductionCalendar productionCalendarSaved = null;
+    //            boolean flag2;
+    //
+    //            do {
+    //                do {
+    //                    flag = false;
+    //                    flag2 = false;
+    //                    for (ProductionCalendar productionCalendar : productionCalendars) {
+    //                        if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(startedDate)) {
+    //                            flag = true;
+    //                            productionCalendarSaved = productionCalendar;
+    //                            break;
+    //                        }
+    //                    }
+    //                    //4.1.1
+    //                    if (flag) {
+    //                        if (productionCalendarSaved.getFlag() == 2) {
+    //                            flag2 = true;
+    //                        }
+    //
+    //                        if (!flag2) {
+    //                            Integer week = getWeekendFromSpecDates(requestsEzdView.getGroupname(),
+    //                                    requestsEzdView.getIdoforg(), startedDate, requestsEzdSpecialDateViews);
+    //                            if (week != null && week == 0) {
+    //                                dates.add(startedDate);
+    //                                countMax = countMax - 1;
+    //                                if (countMax == 0) {
+    //                                    flagend = true;
+    //                                }
+    //                            } else {
+    //                                flag2 = true;
+    //                            }
+    //                            if (week == null && CalendarUtils.getDayOfWeek(startedDate) == Calendar.SATURDAY) {
+    //                                if (DAOReadonlyService.getInstance()
+    //                                        .isSixWorkWeekOrgAndGroup(requestsEzdView.getIdoforg(), requestsEzdView.getGroupname())) {
+    //                                    dates.add(startedDate);
+    //                                    countMax = countMax - 1;
+    //                                    if (countMax == 0) {
+    //                                        flagend = true;
+    //                                    }
+    //                                } else {
+    //                                    flag2 = true;
+    //                                }
+    //                            }
+    //                        }
+    //                    } else {
+    //                        //4.2
+    //                        Integer week = getWeekendFromSpecDates(requestsEzdView.getGroupname(),
+    //                                requestsEzdView.getIdoforg(), startedDate, requestsEzdSpecialDateViews);
+    //                        if (week == null || week == 0) {
+    //                            dates.add(startedDate);
+    //                            countMax = countMax - 1;
+    //                            if (countMax == 0) {
+    //                                flagend = true;
+    //                            }
+    //                        } else {
+    //                            flag2 = true;
+    //                        }
+    //                    }
+    //                    startedDate = CalendarUtils.addOneDay(startedDate);
+    //                } while (flag2 && !flagend);
+    //            } while (!flagend);
+    //        }
+    //        Long counter2 = 0L;
+    //        List<testRez> rezList = new ArrayList<>();
+    //        for (RequestsEzdView requestsEzdView : requestsEzdViews) {
+    //            testRez testRez1 = new testRez();
+    //            testRez1.setCurGroupName(requestsEzdView.getGroupname());
+    //            testRez1.setEkisid(requestsEzdView.getEkisid());
+    //            testRez1.setGuid(requestsEzdView.getOrgguid());
+    //            testRez1.setIdOforg(requestsEzdView.getIdoforg());
+    //            List<Date> detre = massCorrectDates.get((long) counter2);
+    //            List<String> datesStr = new ArrayList<>();
+    //            for (Date date1 : detre) {
+    //                datesStr.add(new SimpleDateFormat("dd.MM.yyyy").format(date1));
+    //            }
+    //            testRez1.setDates(datesStr);
+    //            counter2++;
+    //            rezList.add(testRez1);
+    //        }
+    //        return rezList;
+    //
+    //    } catch (Exception e) {
+    //        return new ArrayList<>();
+    //    }
+    //}
+    //
+    //private class testRez {
+    //
+    //    private String curGroupName;
+    //    private Long ekisid;
+    //    private String guid;
+    //    private Long idOforg;
+    //    private List<String> dates;
+    //
+    //    public String getCurGroupName() {
+    //        return curGroupName;
+    //    }
+    //
+    //    public void setCurGroupName(String curGroupName) {
+    //        this.curGroupName = curGroupName;
+    //    }
+    //
+    //    public Long getEkisid() {
+    //        return ekisid;
+    //    }
+    //
+    //    public void setEkisid(Long ekisid) {
+    //        this.ekisid = ekisid;
+    //    }
+    //
+    //    public String getGuid() {
+    //        return guid;
+    //    }
+    //
+    //    public void setGuid(String guid) {
+    //        this.guid = guid;
+    //    }
+    //
+    //    public Long getIdOforg() {
+    //        return idOforg;
+    //    }
+    //
+    //    public void setIdOforg(Long idOforg) {
+    //        this.idOforg = idOforg;
+    //    }
+    //
+    //    public List<String> getDates() {
+    //        return dates;
+    //    }
+    //
+    //    public void setDates(List<String> dates) {
+    //        this.dates = dates;
+    //    }
+    //}
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -330,7 +330,7 @@ public class EzdController {
 
         //Вычисление результата запроса
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createExternalServicesPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Date date = new Date();
