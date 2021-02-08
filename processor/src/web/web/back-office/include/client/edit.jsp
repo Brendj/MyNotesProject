@@ -441,7 +441,7 @@
     <h:outputText escape="true" value="Дополнительно" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.cardRequest}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
 </h:panelGrid>
-<h:panelGrid columns="4" styleClass="borderless-grid">
+<h:panelGrid columns="5" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateClient}" reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
                        styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{mainPage.showClientEditPage}"
@@ -451,6 +451,10 @@
                        onclick="#{rich:component('clientDeletePanel')}.show();"
                        styleClass="command-button" >
     </a4j:commandButton>
+    <a4j:commandButton value="Отзыв ПД" action="#{mainPage.clientEditPage.deletePDClient()}"
+                       reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
+                       ajaxSingle="true" styleClass="command-button"
+                       rendered="#{!mainPage.clientEditPage.predefined()}"/>
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">

@@ -153,6 +153,16 @@ public class DAOReadonlyService {
         return result;
     }
 
+    public SpecialDate findSpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findSpecialDate(session, compositeIdOfSpecialDate);
+    }
+
+    public SpecialDate findSpecialDateWithGroup(CompositeIdOfSpecialDate compositeIdOfSpecialDate, Long idOfClientGroup) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findSpecialDateWithGroup(session, compositeIdOfSpecialDate, idOfClientGroup);
+    }
+
     public List<EnterEvent> getEnterEventsByOrgAndGroup(long idOfOrg, String groupName, Date beginDate, Date endDate) {
         Query query = entityManager.createQuery(
                 "select e from EnterEvent e inner join e.client c inner join c.clientGroup g "

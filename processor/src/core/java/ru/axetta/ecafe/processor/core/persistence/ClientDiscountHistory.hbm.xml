@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientDiscountHistory" table="cf_client_discount_history">
+        <id name="idOfClientDiscountHistory" column="idOfClientDiscountHistory" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="comment" column="comment" type="string" length="128" not-null="true" />
+        <property name="operationType" column="operationType" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientDiscountHistoryOperationTypeEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="registryDate" column="registryDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" />
+        <many-to-one name="categoryDiscount" class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" not-null="true"
+                     column="idOfCategoryDiscount"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" not-null="true"
+                     column="idOfClient"/>
+
+    </class>
+</hibernate-mapping>

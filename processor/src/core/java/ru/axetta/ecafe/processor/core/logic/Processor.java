@@ -168,6 +168,7 @@ public class Processor implements SyncProcessor {
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private static final int RESPONSE_MENU_PERIOD_IN_DAYS = 7;
     private final SessionFactory persistenceSessionFactory;
+    private final SessionFactory persistenceSessionFactorySlave;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS =
             RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.accRegistryUpdate.timeClient", 7) * 24 * 60
@@ -175,8 +176,10 @@ public class Processor implements SyncProcessor {
 
     private ProcessorUtils processorUtils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
 
-    public Processor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
+    public Processor(SessionFactory persistenceSessionFactory, SessionFactory persistenceSessionFactorySlave,
+            EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
+        this.persistenceSessionFactorySlave = persistenceSessionFactorySlave;
         this.eventNotificator = eventNotificator;
     }
 
@@ -966,7 +969,7 @@ public class Processor implements SyncProcessor {
             ClientGroupManagerRequest clientGroupManagerRequest = request.getClientGroupManagerRequest();
             if (clientGroupManagerRequest != null) {
                 ClientgroupManagersProcessor processor = new ClientgroupManagersProcessor(persistenceSessionFactory,
-                        clientGroupManagerRequest);
+                        persistenceSessionFactorySlave, clientGroupManagerRequest);
                 ResClientgroupManagers resClientgroupManagers = processor.process();
                 ClientgroupManagerData clientgroupManagerData = processor.processData(request.getIdOfOrg());
                 responseSections.add(resClientgroupManagers);
@@ -1438,6 +1441,7 @@ public class Processor implements SyncProcessor {
             ClientGroupManagerRequest clientGroupManagerRequest = request.getClientGroupManagerRequest();
             if (clientGroupManagerRequest != null) {
                 ClientgroupManagersProcessor processor = new ClientgroupManagersProcessor(persistenceSessionFactory,
+                        persistenceSessionFactorySlave,
                         clientGroupManagerRequest);
                 ResClientgroupManagers resClientgroupManagers = processor.process();
                 addToResponseSections(resClientgroupManagers, responseSections);
@@ -5057,6 +5061,7 @@ public class Processor implements SyncProcessor {
             } else {
                 Long orgOwner = clientParamItem.getOrgOwner();
                 boolean changeOrg = false;
+                Org oldOrg = client.getOrg();
                 if (orgOwner != null) {
                     Org org = (Org) persistenceSession.get(Org.class, orgOwner);
                     changeOrg = !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg());
@@ -5155,7 +5160,7 @@ public class Processor implements SyncProcessor {
 
                 /* заносим клиента в группу */
                 if (StringUtils.isNotEmpty(clientParamItem.getGroupName())) {
-                    ClientGroup clientGroup;
+                    ClientGroup  clientGroup;
                     if (changeOrg) {
                         clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
                                 client.getOrg().getIdOfOrg(), clientParamItem.getGroupName());
@@ -5170,11 +5175,17 @@ public class Processor implements SyncProcessor {
                         orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                     }
 
-                    if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
-                        ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
-                                clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                                ClientGroupMigrationHistory.MODIFY_IN_ARM
-                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                    if (changeOrg) {
+                        ClientManager.addClientMigrationEntry(persistenceSession, oldOrg, client.getClientGroup(),
+                                client.getOrg(), client, ClientGroupMigrationHistory.MODIFY_IN_ARM
+                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGroup.getGroupName());
+                    } else {
+                        if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
+                            ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
+                                    clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
+                                    ClientGroupMigrationHistory.MODIFY_IN_ARM
+                                            .concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                        }
                     }
                     client.setClientGroup(clientGroup);
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -5921,9 +5932,8 @@ public class Processor implements SyncProcessor {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            persistenceSession.refresh(org);
             List<ProhibitionMenu> prohibitionMenuList;
             prohibitionMenuList = getProhibitionMenuForOrgSinceVersion(persistenceSession, org, version);
             for (ProhibitionMenu prohibitionMenu : prohibitionMenuList) {

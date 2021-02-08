@@ -291,14 +291,9 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
     public static List<Client> findNewerClients(Session session, Collection<Org> orgs, long clientRegistryVersion) {
-        //Query query = session.createQuery(
-        //        "from Client cl where (cl.idOfClientGroup not in (:cg) or cl.idOfClientGroup is null) and cl.org in (:orgs) and clientRegistryVersion > :version")
-        //        .setParameterList("cg", new Long[]{
-        //                ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-        //                ClientGroup.Predefined.CLIENT_DELETED.getValue()})
-        //        .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
-        //return (List<Client>) query.list();
-        Query query = session.createQuery("from Client cl where cl.org in (:orgs) and clientRegistryVersion > :version")
+        Query query = session.createQuery("from Client cl join fetch cl.person join fetch cl.contractPerson "
+                + "left join fetch cl.categoriesInternal left join fetch cl.categoriesDSZNInternal "
+                + "where cl.org in (:orgs) and clientRegistryVersion > :version")
                 .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
         return (List<Client>) query.list();
     }
@@ -503,6 +498,7 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.isNull("idOfClientGroup"));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return (SpecialDate) criteria.uniqueResult();
     }
 
@@ -513,6 +509,7 @@ public class DAOUtils {
         criteria.add(Restrictions.ge("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.isNull("idOfClientGroup"));
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return criteria.list();
     }
 
@@ -522,6 +519,7 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return (SpecialDate) criteria.uniqueResult();
     }
 
@@ -2220,6 +2218,13 @@ public class DAOUtils {
         return (Good) criteria.uniqueResult();
     }
 
+    public static Long findIdOfGoodByGuid(Session session, String guidOfGood) {
+        Query query = session.createSQLQuery("select idofgood from cf_goods where guid = :guid");
+        query.setParameter("guid", guidOfGood);
+        Object obj = query.uniqueResult();
+        return HibernateUtils.getDbLong(obj);
+    }
+
     public static WtComplex findWtComplexById(Session session, Long idOfComplex) {
         Criteria criteria = session.createCriteria(WtComplex.class);
         criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
@@ -3044,14 +3049,29 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static List<ProhibitionMenu> getProhibitionMenuForOrgSinceVersion(Session session, Org org, long version) {
+        Org organization = (Org)session.load(Org.class, org.getIdOfOrg());
         Criteria criteria = session.createCriteria(ProhibitionMenu.class);
-        if (org.getFriendlyOrg().isEmpty()) {
-            criteria.createCriteria("client").add(Restrictions.eq("org", org));
+        if (organization.getFriendlyOrg().isEmpty()) {
+            criteria.createCriteria("client").add(Restrictions.eq("org", organization));
         } else {
-            criteria.createCriteria("client").add(Restrictions.in("org", org.getFriendlyOrg()));
+            criteria.createCriteria("client").add(Restrictions.in("org", organization.getFriendlyOrg()));
         }
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
+    }
+
+    public static long getDistributedObjectVersion(Session session, String name) {
+        return getDistributedObjectVersionFromSequence(session, name);
+    }
+
+    private static long getDistributedObjectVersionFromSequence(Session session, String name) {
+        long version = 0L;
+        Query query = session.createSQLQuery(String.format("select nextval('%s')", DAOService.getInstance().getDistributedObjectSequenceName(name)));
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = HibernateUtils.getDbLong(o);
+        }
+        return version;
     }
 
     public static long nextVersionByProhibitionsMenu(Session session) {

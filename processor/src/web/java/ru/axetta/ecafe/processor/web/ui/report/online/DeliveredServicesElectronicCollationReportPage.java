@@ -95,7 +95,9 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
             idOfContract = this.contractFilter.getContract().getIdOfContract();
         } catch (Exception e) {
         }
-        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragent);
+        List<Long> idOfContragents = new ArrayList<>();
+        idOfContragents.add(idOfContragent);
+        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragents);
     }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
@@ -110,7 +112,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
         resetOrg();
     }
 
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         super.completeOrgListSelection(orgMap);
         if (emptyOrgs()) {
             withoutFriendly = false;
