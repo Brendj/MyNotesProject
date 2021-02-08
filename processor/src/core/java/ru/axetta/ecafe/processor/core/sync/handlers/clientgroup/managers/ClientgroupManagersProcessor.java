@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -34,11 +35,9 @@ import java.util.List;
 public class ClientgroupManagersProcessor extends AbstractGroupProcessor<ResClientgroupManagers> {
     private static final Logger logger = LoggerFactory.getLogger(ClientgroupManagersProcessor.class);
     private final ClientGroupManagerRequest clientGroupManagerRequest;
-    protected final SessionFactory sessionFactorySlave;
 
-    public ClientgroupManagersProcessor(SessionFactory sessionFactory, SessionFactory sessionFactorySlave, ClientGroupManagerRequest clientGroupManagerRequest) {
+    public ClientgroupManagersProcessor(SessionFactory sessionFactory, ClientGroupManagerRequest clientGroupManagerRequest) {
         super(sessionFactory);
-        this.sessionFactorySlave = sessionFactorySlave;
         this.clientGroupManagerRequest = clientGroupManagerRequest;
     }
 
@@ -148,7 +147,7 @@ public class ClientgroupManagersProcessor extends AbstractGroupProcessor<ResClie
         Transaction persistenceTransaction = null;
         ClientgroupManagerData clientgroupManagerData = null;
         try {
-            persistenceSession = sessionFactorySlave.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientgroupManagerData = executeProcess(persistenceSession,idOfOrg);
             persistenceTransaction.commit();

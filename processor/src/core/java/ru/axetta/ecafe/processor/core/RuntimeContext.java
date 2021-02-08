@@ -738,7 +738,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
             smsUserCodeSender = createUserCodeSender(properties);
 
-            processor = createProcessor(sessionFactory, reportsSessionFactory, eventNotificator);
+            processor = createProcessor(sessionFactory, eventNotificator);
             this.syncProcessor = processor;
             this.cardManager = createCardManagerProcessor(properties, sessionFactory, eventNotificator);
             paymentProcessor = createPaymentProcessor(properties, sessionFactory, eventNotificator);
@@ -1135,12 +1135,11 @@ public class RuntimeContext implements ApplicationContextAware {
 
 
     private static Processor createProcessor(SessionFactory sessionFactory,
-            SessionFactory sessionFactorySlave,
             EventNotificator eventNotificator) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating processor.");
         }
-        Processor processor = new Processor(sessionFactory, sessionFactorySlave, eventNotificator);
+        Processor processor = new Processor(sessionFactory, eventNotificator);
         if (logger.isDebugEnabled()) {
             logger.debug("Processor created.");
         }

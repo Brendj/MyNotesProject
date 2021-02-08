@@ -168,7 +168,6 @@ public class Processor implements SyncProcessor {
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private static final int RESPONSE_MENU_PERIOD_IN_DAYS = 7;
     private final SessionFactory persistenceSessionFactory;
-    private final SessionFactory persistenceSessionFactorySlave;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS =
             RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.accRegistryUpdate.timeClient", 7) * 24 * 60
@@ -176,10 +175,9 @@ public class Processor implements SyncProcessor {
 
     private ProcessorUtils processorUtils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
 
-    public Processor(SessionFactory persistenceSessionFactory, SessionFactory persistenceSessionFactorySlave,
+    public Processor(SessionFactory persistenceSessionFactory,
             EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
-        this.persistenceSessionFactorySlave = persistenceSessionFactorySlave;
         this.eventNotificator = eventNotificator;
     }
 
@@ -969,7 +967,7 @@ public class Processor implements SyncProcessor {
             ClientGroupManagerRequest clientGroupManagerRequest = request.getClientGroupManagerRequest();
             if (clientGroupManagerRequest != null) {
                 ClientgroupManagersProcessor processor = new ClientgroupManagersProcessor(persistenceSessionFactory,
-                        persistenceSessionFactorySlave, clientGroupManagerRequest);
+                        clientGroupManagerRequest);
                 ResClientgroupManagers resClientgroupManagers = processor.process();
                 ClientgroupManagerData clientgroupManagerData = processor.processData(request.getIdOfOrg());
                 responseSections.add(resClientgroupManagers);
@@ -1441,7 +1439,6 @@ public class Processor implements SyncProcessor {
             ClientGroupManagerRequest clientGroupManagerRequest = request.getClientGroupManagerRequest();
             if (clientGroupManagerRequest != null) {
                 ClientgroupManagersProcessor processor = new ClientgroupManagersProcessor(persistenceSessionFactory,
-                        persistenceSessionFactorySlave,
                         clientGroupManagerRequest);
                 ResClientgroupManagers resClientgroupManagers = processor.process();
                 addToResponseSections(resClientgroupManagers, responseSections);
