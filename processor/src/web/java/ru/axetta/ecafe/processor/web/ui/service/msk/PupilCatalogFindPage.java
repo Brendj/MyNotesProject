@@ -71,10 +71,12 @@ public class PupilCatalogFindPage extends BasicWorkspacePage {
             if (StringUtils.isEmpty(meshId)){
                 if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(familyName)) {
                     printError("При поиске без Mesh GUID необходимо указать фамилию и имя");
+                    RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().get().clear();
                     return;
                 }
                 if (StringUtils.isEmpty(firstName) && StringUtils.isEmpty(familyName)) {
                     printError("Укажите Mesh GUID или фамилию и имя");
+                    RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().get().clear();
                     return;
                 }
             }
