@@ -26,6 +26,11 @@ $ java -jar msp-kafka.jar --ASSIGN_CRON="0 */10 * ? * *"
 $ java -jar msp-kafka.jar --SUPPLY_CRON="0 0 12 6 * ?"
 ```
 
+* Запуск первичной загрузки факта назначения МСП:
+```shell script
+$ java -jar msp-kafka.jar --PRIMARY_LOAD=false
+```
+
 Доступны 3 конфигурации:
 * postgres-dev - Для подключения к Казанской тестовой среде (включается по умолчанию);
 * postgres-devmsk - Для тестирование на тестовом Московском контуре;
