@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
@@ -74,9 +75,9 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                     SpecialDate specialDate = null;
 
                     if (StringUtils.isEmpty(groupName)) {
-                        specialDate = DAOUtils.findSpecialDate(session, compositeId);
+                        specialDate = DAOReadonlyService.getInstance().findSpecialDate(compositeId);
                     } else {
-                        specialDate = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfClientGroup);
+                        specialDate = DAOReadonlyService.getInstance().findSpecialDateWithGroup(compositeId, idOfClientGroup);
                     }
                     Boolean isWeekend = item.getIsWeekend();
                     Boolean deleted = item.getDelete();
@@ -129,7 +130,7 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                         }
                         if (wasModified) {
                             specialDate.setVersion(nextVersion);
-                            session.update(specialDate);
+                            session.merge(specialDate);
                         }
                     }
 
