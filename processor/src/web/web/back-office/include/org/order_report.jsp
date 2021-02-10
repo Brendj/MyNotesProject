@@ -44,10 +44,12 @@
     <h:panelGrid styleClass="borderless-grid">
         <rich:dataTable id="orgOrderReportTable" value="#{mainPage.orgOrderReportPage.orgOrderReport.org.clientGroups}"
                         var="clientGroup" rows="5"
-                        columnClasses="left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
+                        columnClasses="left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
-                    <rich:column colspan="4" />
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText escape="true" value="Номер л/с" styleClass="column-header" />
+                    </rich:column>
                     <rich:column styleClass="center-aligned-column">
                         <h:outputText escape="true" value="Покупки по картам" styleClass="column-header" />
                     </rich:column>
@@ -65,7 +67,7 @@
                     <rich:column styleClass="center-aligned-column">
                         <h:outputText escape="true" value="Сумма дотаций" styleClass="column-header" />
                     </rich:column>
-                    <rich:column colspan="4" breakBefore="true" styleClass="left-aligned-column">
+                    <rich:column colspan="1" breakBefore="true" styleClass="left-aligned-column">
                         <h:outputText escape="true" value="#{mainPage.orgOrderReportPage.shortName}"
                                       styleClass="column-header" />
                     </rich:column>
@@ -97,7 +99,7 @@
                 </rich:columnGroup>
             </f:facet>
 
-            <rich:column colspan="4">
+            <rich:column colspan="1">
                 <h:outputText escape="true" value="#{clientGroup.groupName}" styleClass="output-text"
                               style="font-weight: bold;" />
             </rich:column>
@@ -123,19 +125,10 @@
             </rich:column>
 
             <rich:subTable value="#{clientGroup.clients}" var="client"
-                           columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
+                           columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
                 <rich:column>
                     <h:outputText escape="true" value="#{client.contractId}" converter="contractIdConverter"
                                   styleClass="output-text" />
-                </rich:column>
-                <rich:column>
-                    <h:outputText escape="true" value="#{client.person.surname}" styleClass="output-text" />
-                </rich:column>
-                <rich:column>
-                    <h:outputText escape="true" value="#{client.person.firstName}" styleClass="output-text" />
-                </rich:column>
-                <rich:column>
-                    <h:outputText escape="true" value="#{client.person.secondName}" styleClass="output-text" />
                 </rich:column>
                 <rich:column>
                     <h:outputText escape="true" value="#{client.totalOrderSumByCard}" converter="copeckSumConverter"
