@@ -13,6 +13,10 @@ public class ClientUpdateItem {
     private Long idOfMiddleGroup;
     private Date startExcludeDate;
     private Date endExcludedDate;
+    private Integer gender;
+    private Date birthDate;
+    private Boolean confirmVisualRecognition;
+    private String mobile;
 
     public Long getIdOfClient() {
         return idOfClient;
@@ -60,5 +64,37 @@ public class ClientUpdateItem {
 
     public void setEndExcludedDate(Date endExcludedDate) {
         this.endExcludedDate = endExcludedDate;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Boolean getConfirmVisualRecognition() {
+        return confirmVisualRecognition;
+    }
+
+    public void setConfirmVisualRecognition(Boolean confirmVisualRecognition) {
+        this.confirmVisualRecognition = confirmVisualRecognition;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }
