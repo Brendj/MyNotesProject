@@ -4,10 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
 /**
@@ -17,18 +13,9 @@ import java.util.List;
  * Time: 13:27
  * To change this template use File | Settings | File Templates.
  */
-@XmlType(propOrder = {
-        "clientSummary",
-        "resultCode",
-        "description"
-})
-
-@XmlRootElement(name="clientSummaryBaseListResult")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class ClientSummaryBaseListResult {
+public class ClientSummaryBaseListResult extends Result {
     private List<ClientSummaryBase> clientSummary;
-    public Long resultCode;
-    public String description;
+
 
     public ClientSummaryBaseListResult(List<ClientSummaryBase> clientSummary, Long resultCode, String description) {
         this.clientSummary = clientSummary;
@@ -43,21 +30,5 @@ public class ClientSummaryBaseListResult {
 
     public void setClientSummary(List<ClientSummaryBase> clientSummary) {
         this.clientSummary = clientSummary;
-    }
-
-    public Long getResultCode() {
-        return this.resultCode;
-    }
-
-    public void setResultCode(Long resultCode) {
-        this.resultCode = resultCode;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

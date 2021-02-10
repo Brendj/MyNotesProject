@@ -9439,8 +9439,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<ClientSummaryBase> list = new ArrayList<>();
         list.add(summaryBase);
         result.setClientSummary(list);
-        result.resultCode = RC_OK;
-        result.description = RC_OK_DESC;
         return result;
     }
 
