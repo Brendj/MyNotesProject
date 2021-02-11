@@ -1059,12 +1059,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
-            discountMode = categoryDiscountSet.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-            DiscountManager
-                    .saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet,
-                            client.getDiscountMode(), discountMode,
-                            DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
-            client.setLastDiscountsUpdate(new Date());
+            try {
+                discountMode = categoryDiscountSet.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet, client.getDiscountMode(), discountMode,
+                        DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
+                client.setLastDiscountsUpdate(new Date());
+            } catch (Exception ignore){}
         }
 
         if (null != discountMode) {
