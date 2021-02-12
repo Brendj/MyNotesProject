@@ -1036,9 +1036,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         client.setPayForSMS(this.payForSMS);
 
-        if (discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size() == 0) {
-            throw new Exception("Выберите хотя бы одну категорию льгот");
-        }
         /* категори скидок */
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (this.idOfCategoryList.size() != 0) {
