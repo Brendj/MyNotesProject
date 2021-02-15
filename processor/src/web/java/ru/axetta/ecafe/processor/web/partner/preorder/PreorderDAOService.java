@@ -2136,7 +2136,8 @@ public class PreorderDAOService {
 
     private PreorderMenuDetail findPreorderMenuDetail(Date date, Client client, Long armIdOfMenu) {
         Query query = em.createQuery("select pmd from PreorderMenuDetail pmd "
-                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu ");
+                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu "
+                + "order by pmd.idOfPreorderMenuDetail desc");
         query.setParameter("client", client);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
