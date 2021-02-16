@@ -52,6 +52,7 @@ public class Card {
     private Visitor visitor;
     private Org org;
     private Long cardNo;
+    private Long longCardNo;
     private Integer cardType;
     private Date createTime;
     private Date updateTime;
@@ -113,6 +114,14 @@ public class Card {
     public boolean isActive() {
         if (state == null) return false;
         return state.equals(CardState.ISSUED.getValue()) || state.equals(CardState.TEMPISSUED.getValue());
+    }
+
+    public Long getLongCardNo() {
+        return longCardNo;
+    }
+
+    public void setLongCardNo(Long longCardNo) {
+        this.longCardNo = longCardNo;
     }
 
     public static boolean isSocial(int type) {

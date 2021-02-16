@@ -47,7 +47,7 @@ public class SpecialCardsController extends HttpServlet {
             return new ResponseItem(ResponseItem.ERROR_INVALID_TYPE, ResponseItem.ERROR_INVALID_TYPE_MESSAGE);
         }
         try{
-            cardService.registerNewSpecial(idOfOrg, cardNo, cardPrintedNo, type, null);
+            cardService.registerNewSpecial(idOfOrg, cardNo, cardPrintedNo, type, null, null);
         } catch (Exception e){
             if (e.getMessage().contains("ConstraintViolationException")) {
                 return new ResponseItem(ResponseItem.ERROR_DUPLICATE, ResponseItem.ERROR_DUPLICATE_CARD_MESSAGE);

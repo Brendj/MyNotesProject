@@ -38,6 +38,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
     private Long idOfCard;
     private ClientItem client;
     private Long cardNo;
+    private Long longCardNo;
     private Integer cardType;
     private Date updateTime;
     private Integer state;
@@ -83,6 +84,14 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
 
     public void setCardNo(Long cardNo) {
         this.cardNo = cardNo;
+    }
+
+    public Long getLongCardNo() {
+        return longCardNo;
+    }
+
+    public void setLongCardNo(Long longCardNo) {
+        this.longCardNo = longCardNo;
     }
 
     public Integer getCardType() {
@@ -201,8 +210,8 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         User user = MainPage.getSessionInstance().getCurrentUser();
         runtimeContext.getCardManager()
                 .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
-                        this.lifeState, CardLockReasonMenu.getDescriptionByValue(lockReasonState), this.issueTime, this.externalId,
-                        user);
+                        this.lifeState, CardLockReasonMenu.getDescriptionByValue(lockReasonState), this.issueTime,
+                        this.externalId, user);
         fill(session, this.idOfCard);
     }
 
@@ -215,6 +224,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         }
 
         this.cardNo = card.getCardNo();
+        this.longCardNo = card.getLongCardNo();
         this.cardType = card.getCardType();
         this.updateTime = card.getUpdateTime();
         this.state = card.getState();

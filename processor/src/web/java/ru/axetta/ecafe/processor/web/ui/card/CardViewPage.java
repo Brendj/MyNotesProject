@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.card;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
-import ru.axetta.ecafe.processor.web.ui.card.items.HistoryCardItem;
 
 import org.hibernate.Session;
 
@@ -29,6 +28,7 @@ public class CardViewPage extends BasicWorkspacePage {
     private Long idOfCard;
     private ClientItem client;
     private Long cardNo;
+    private Long longCardNo;
     private Integer cardType;
     private Date createTime;
     private Date updateTime;
@@ -98,6 +98,14 @@ public class CardViewPage extends BasicWorkspacePage {
         this.externalId = externalId;
     }
 
+    public Long getLongCardNo() {
+        return longCardNo;
+    }
+
+    public void setLongCardNo(Long longCardNo) {
+        this.longCardNo = longCardNo;
+    }
+
     public HistoryCardListViewPage getHistoryCardListViewPage() {
         return historyCardListViewPage;
     }
@@ -112,6 +120,7 @@ public class CardViewPage extends BasicWorkspacePage {
         }
 
         this.cardNo = card.getCardNo();
+        this.longCardNo = card.getLongCardNo();
         this.cardType = card.getCardType();
         this.createTime = card.getCreateTime();
         this.updateTime = card.getUpdateTime();

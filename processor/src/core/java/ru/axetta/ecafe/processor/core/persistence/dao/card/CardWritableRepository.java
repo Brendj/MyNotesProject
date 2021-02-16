@@ -119,28 +119,28 @@ public class CardWritableRepository extends WritableJpaDao {
         return (result > 0);
     }
 
-    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,
+    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignVerifyRes, Integer cardSignCertNum, Boolean isLongUid) throws Exception {
         checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type, cardNo);
-        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid);
+        return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, isLongUid);
     }
 
-    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
+    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,  Long longCardNo, Integer cardSignVerifyRes,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
         checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type, cardNo);
-        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid, cardTransitionState);
+        return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, isLongUid, cardTransitionState);
     }
 
-    public Card createCardSpecial(Org org, long cardNo, long cardPrintedNo, int type,
+    public Card createCardSpecial(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignCertNum) throws Exception {
         if (cardExistsInSpecial(cardNo)) {
-            return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, null);
+            return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, null);
         } else {
             throw new Exception("cardNo not found");
         }
     }
 
-    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
+    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
@@ -149,6 +149,9 @@ public class CardWritableRepository extends WritableJpaDao {
         card.setTransitionState(cardTransitionState);
         if (null != isLongUid)
             card.setIsLongUid(isLongUid);
+        if(null != longCardNo){
+            card.setLongCardNo(longCardNo);
+        }
         if (org.getNeedVerifyCardSign() && !(cardSignCertNum == null || cardSignCertNum == 0) && !Card.isSocial(type))
             card.setCardSignCertNum(cardSignCertNum);
 
@@ -156,9 +159,9 @@ public class CardWritableRepository extends WritableJpaDao {
         return card;
     }
 
-    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
+    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignCertNum, Boolean isLongUid) throws Exception {
-        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid,
+        return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, isLongUid,
                 CardTransitionState.OWN.getCode());
     }
 

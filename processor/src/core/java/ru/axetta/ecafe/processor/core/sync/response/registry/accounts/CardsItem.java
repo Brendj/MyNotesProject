@@ -56,6 +56,7 @@ public class CardsItem {
         this.visistorId = visistorId;
         this.contractId = contractId;
         this.printedNo = printedNo;
+        this.isLongUid = isLongUid;
     }
 
     public CardsItem(Card card, Client client) {

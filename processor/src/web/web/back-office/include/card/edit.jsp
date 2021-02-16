@@ -25,6 +25,9 @@
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardEditPage.cardNo}" converter="cardNoConverter" readonly="true" maxlength="18"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Длинный номер карты" styleClass="output-text" />
+    <h:inputText value="#{mainPage.cardEditPage.longCardNo}" converter="cardNoConverter" readonly="true" maxlength="18"
+                 styleClass="input-text" />
     <h:outputText escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardEditPage.cardPrintedNo}" converter="cardPrintedNoConverter" readonly="true" maxlength="18"
                  styleClass="input-text" />

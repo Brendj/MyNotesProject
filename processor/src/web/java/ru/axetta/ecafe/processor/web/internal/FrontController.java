@@ -1100,13 +1100,13 @@ public class FrontController extends HttpServlet {
     public Long registerCard(@WebParam(name = "orgId") Long orgId, @WebParam(name = "clientId") Long clientId,
             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "cardPrintedNo") Long cardPrintedNo,
             @WebParam(name = "cardType") int cardType, @WebParam(name = "issuedTime") Date issuedTime,
-            @WebParam(name = "validTime") Date validTime) throws FrontControllerException {
+            @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
         checkRequestValidity(orgId);
         ///
         try {
             return RuntimeContext.getInstance().getCardManager()
-                    .createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE, validTime, Card.ISSUED_LIFE_STATE, "",
-                            issuedTime, cardPrintedNo);
+                    .createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE, validTime, Card.ISSUED_LIFE_STATE,
+                            "", issuedTime, cardPrintedNo, longCardNo);
         } catch (Exception e) {
             logger.error("Failed registerCard", e);
             throw new FrontControllerException(String.format("Ошибка при регистрации карты: %s", e.getMessage()), e);
@@ -1628,8 +1628,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum,
-            @WebParam(name = "isLongUid") boolean isLongUid, @WebParam(name = "forceRegister") Integer forceRegister)
-            throws FrontControllerException {
+            @WebParam(name = "isLongUid") boolean isLongUid, @WebParam(name = "forceRegister") Integer forceRegister,
+            @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         logger.info(String.format(
                 "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s",
@@ -1660,7 +1660,7 @@ public class FrontController extends HttpServlet {
             }
             if (null == exCard) {
                 card = cardService
-                        .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
+                        .registerNew(org, cardNo, cardPrintedNo, type, longCardNo, cardSignVerifyRes, cardSignCertNum, isLongUid);
             } else {
                 if (VersionUtils.compareClientVersionForRegisterCard(persistenceSession, idOfOrg) < 0) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
@@ -1682,8 +1682,8 @@ public class FrontController extends HttpServlet {
                 }
 
                 card = cardService
-                        .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid,
-                                CardTransitionState.BORROWED.getCode());
+                        .registerNew(org, cardNo, cardPrintedNo, type, longCardNo, cardSignVerifyRes, cardSignCertNum,
+                                isLongUid, CardTransitionState.BORROWED.getCode());
 
                 if (secondRegisterAllowed && exCard.getState() != CardState.BLOCKED.getValue()) {
                     cardService.blockAndReset(exCard.getCardNo(), exCard.getOrg().getIdOfOrg(),
