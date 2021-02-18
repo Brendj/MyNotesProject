@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -173,7 +174,7 @@ public class OrganizationStructure implements AbstractToElement {
             element.setAttribute("multiCardModeEnabled", multiCardModeEnabled ? "1" : "0");
             element.setAttribute("receiveRequestsFromEZD", preorderlp ? "1" : "0");
             element.setAttribute("UseWebArm", useWebArm ? "1" : "0");
-            element.setAttribute("UseLongCardId", useLongCardId ? "1" : "0");
+            element.setAttribute("UseLongCardId", BooleanUtils.toBoolean(useLongCardId) ? "1" : "0");
             return element;
         }
 
