@@ -106,6 +106,8 @@ public class ResponsePersons {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    private String className, guidNsi, ooId, training_end_at, idIsPp;
+
     @JsonProperty("id")
     public Integer getId() {
         return id;
@@ -416,4 +418,43 @@ public class ResponsePersons {
         this.additionalProperties.put(name, value);
     }
 
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getGuidNsi() {
+        return guidNsi;
+    }
+
+    public void setGuidNsi(String guidNsi) {
+        this.guidNsi = guidNsi;
+    }
+
+    public String getOoId() {
+        return ooId;
+    }
+
+    public void setOoId(String ooId) {
+        this.ooId = ooId;
+    }
+
+    public String getTraining_end_at() {
+        return training_end_at;
+    }
+
+    public void setTraining_end_at(String training_end_at) {
+        this.training_end_at = training_end_at;
+    }
+
+    public String getIdIsPp() {
+        return idIsPp;
+    }
+
+    public void setIdIsPp(String idIsPp) {
+        this.idIsPp = idIsPp;
+    }
 }
