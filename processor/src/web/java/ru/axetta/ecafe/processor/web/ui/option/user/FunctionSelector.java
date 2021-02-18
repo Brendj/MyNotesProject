@@ -101,6 +101,12 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_COVERAGENUTRITION,
                     Function.FUNC_RESTRICT_TRANSACTIONS_REPORT, Function.FUNC_COUNT_CURRENT_POSITIONS,
                     Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_FEEDING_SETTINGS_ADMIN);
+    private static final List<String> blockedForSupplierReport = Arrays
+            .asList(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT, Function.FUNC_RESTRICT_FINANCIAL_CONTROL,
+                    Function.FUNC_RESTRICT_INFORM_REPORTS, Function.FUNC_RESTRICT_CARD_REPORTS,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT, Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY,
+                    Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_MANUAL_REPORT,
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO);
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
@@ -249,6 +255,11 @@ public class FunctionSelector {
         Set<Function> supplierReportFunctions = new HashSet<Function>();
         for (Function function : allFunctions) {
             if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
+                supplierReportFunctions.add(function);
+            }
+            //Добавляем функции, которые должны быть у Отчетность поставщика питания (911)
+            if (blockedForSupplierReport.contains(function.getFunctionName()))
+            {
                 supplierReportFunctions.add(function);
             }
         }
@@ -466,6 +477,22 @@ public class FunctionSelector {
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
         this.optionsItems = optionsItems;
+    }
+
+    public Set<Function> getSelectedForForSupplierReportFunction(Session session)
+    {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List<Function> allFunctions = allFunctionsCriteria.list();
+        Set<Function> supplierReportFunctions = new HashSet<Function>();
+        for (Function function : allFunctions) {
+            //Добавляем функции, которые должны быть у Отчетность поставщика питания (911)
+            if (blockedForSupplierReport.contains(function.getFunctionName()))
+            {
+                supplierReportFunctions.add(function);
+            }
+        }
+        supplierReportFunctions.addAll(getSelected(session));
+        return supplierReportFunctions;
     }
 
     public Set<Function> getSelected(Session session) throws HibernateException {
