@@ -28,7 +28,7 @@ public class ClientNotificationSetting {
         SMS_NOTIFY_SUMMARY_WEEK(1400000000L, "Оповещать по итогам недели", EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK),
         SMS_NOTIFY_LOW_BALANCE(1500000000L, "Оповещать о снижении баланса", EventNotificationService.NOTIFICATION_LOW_BALANCE),
         SMS_NOTIFY_MUSEUM(1600000000L, "Оповещение о получении и аннулировании билета в музей", false), // Содержит NOTIFICATION_NOENTER_MUSEUM и NOTIFICATION_ENTER_MUSEUM, см метод parseByBinding()
-        //SMS_NOTIFY_CULTURE(1700000000L, "Оповещение о посещении зданий учреждений Минкультуры", false),
+        SMS_NOTIFY_CULTURE(1700000000L, "Оповещение о посещении зданий учреждений Минкультуры (управляется флагом \"Оповещать о проходах\")", false),
         SMS_NOTIFY_SPECIAL(1800000000L, "Служебные оповещения", true);
 
         private Long value;
