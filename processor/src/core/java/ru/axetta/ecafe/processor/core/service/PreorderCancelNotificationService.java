@@ -170,7 +170,7 @@ public class PreorderCancelNotificationService {
                     value += new SimpleDateFormat("yyyy-MM-dd").format(datemessage.getKey());
                     value += datemessage.getValue();
                     values = EventNotificationService.attachToValues
-                            (type.getKey() + "_day_" + counttype, value, values);
+                            (type.getKey() + "_den_" + counttype, value, values);
                     counttype++;
                 }
             }
