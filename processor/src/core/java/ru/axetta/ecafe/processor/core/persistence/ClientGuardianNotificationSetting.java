@@ -31,7 +31,7 @@ public class ClientGuardianNotificationSetting {
         SMS_NOTIFY_SUMMARY_WEEK(1400000000L, "Оповещать по итогам недели", EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK),
         SMS_NOTIFY_LOW_BALANCE(1500000000L, "Оповещать о снижении баланса", EventNotificationService.NOTIFICATION_LOW_BALANCE),
         SMS_NOTIFY_MUSEUM(1600000000L, "Оповещение о получении и аннулировании билета в музей", false),
-        SMS_NOTIFY_CULTURE(1700000000L, "Оповещение о посещении зданий учреждений Минкультуры", false),
+        //SMS_NOTIFY_CULTURE(1700000000L, "Оповещение о посещении зданий учреждений Минкультуры", false),
         SMS_NOTIFY_SPECIAL(1800000000L, "Служебные оповещения", false);
 
         private Long value;
