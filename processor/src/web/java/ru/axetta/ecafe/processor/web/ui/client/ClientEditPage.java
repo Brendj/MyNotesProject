@@ -1082,11 +1082,29 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
+            //Для 17 типа мы не можем менять напрямую, только через 11
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
+            {
+                continue;
+            }
+
+
             ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
             if (item.isEnabled()) {
                 client.getNotificationSettings().add(newSetting);
             } else {
                 client.getNotificationSettings().remove(newSetting);
+            }
+
+            //Если поменяли 11, то меняем и 17 событие
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
+            {
+                ClientNotificationSetting culture = new ClientNotificationSetting(client, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
+                if (item.isEnabled()) {
+                    client.getNotificationSettings().add(culture);
+                } else {
+                    client.getNotificationSettings().remove(culture);
+                }
             }
         }
 
