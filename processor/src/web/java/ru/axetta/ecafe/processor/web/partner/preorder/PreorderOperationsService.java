@@ -62,9 +62,19 @@ public class PreorderOperationsService {
         List<PreorderComplex> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderComplexListForRelevanceToMenu(params);
         int counter = 0;
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        String message;
+        Set<Long> complexes = new HashSet<>();
         for (PreorderComplex preorderComplex : list) {
             try {
-                logger.info(String.format("Start processing record %s from %s, idOfPreorderComplex=%s", ++counter, list.size(), preorderComplex.getIdOfPreorderComplex()));
+                boolean found = complexes.contains(preorderComplex.getIdOfPreorderComplex());
+                message = String.format("Start processing record %s from %s, idOfPreorderComplex=%s", ++counter, list.size(), preorderComplex.getIdOfPreorderComplex());
+                if (found) message += ". Record skipped";
+                logger.info(message);
+                if (found) {
+                    continue;
+                } else {
+                    complexes.add(preorderComplex.getIdOfPreorderComplex());
+                }
                 // проверка с логированием перенесена в relevancePreordersToMenu
                 //if (preorderComplex.getIdOfGoodsRequestPosition() != null)
                 //    continue;
