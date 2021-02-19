@@ -25,8 +25,8 @@ public class SchoolApiClientsServiceImpl implements SchoolApiClientsService {
     private UpdateClientCommand updateClientCommand;
 
     @Override
-    public ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups) throws WebApplicationException {
-        return moveClientsCommand.moveClients(moveClientToGroups);
+    public ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups, User user) throws WebApplicationException {
+        return moveClientsCommand.moveClients(moveClientToGroups, user);
     }
 
     @Override

@@ -5,9 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.clients.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateItem;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateResult;
@@ -54,7 +52,7 @@ class UpdateClientCommand {
             setGender(request.getGender(), client);
             setConfirmVideo(request.getConfirmVisualRecognition(), client);
             setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(), client);
-            setGroupAndMiddleGroup(request, client, session);
+            setGroupAndMiddleGroup(request, client, session, user);
             client.setClientRegistryVersion(version);
             session.update(client);
             session.flush();
@@ -73,19 +71,25 @@ class UpdateClientCommand {
         }
     }
 
-    private void setGroupAndMiddleGroup(ClientUpdateItem request, Client client, Session session) {
+    private void setGroupAndMiddleGroup(ClientUpdateItem request, Client client, Session session, User user) {
         if (request.getIdOfClientGroup() == null) {
             return;
         }
         if (!client.getIdOfClientGroup().equals(request.getIdOfClientGroup())) {
+
+            ClientGroup moveToGroup = (ClientGroup) session.get(ClientGroup.class,
+                    new CompositeIdOfClientGroup(request.getIdOfOrg(), request.getIdOfClientGroup()));
+            if (moveToGroup == null) {
+                throw new WebApplicationException(NOT_FOUND, String.format("Group of client with ID='%d' not found", request.getIdOfClientGroup()));
+            }
             // обновляем группу
-            String result = moveClientsCommand
-                    .updateClientGroupOrGetError(request.getIdOfClientGroup(), request.getIdOfOrg(), session, client);
+            String result = moveClientsCommand.updateClientGroupOrGetError(session, moveToGroup, client, user, false);
             if (result != null) {
                 throw new WebApplicationException(result);
             }
             // обновляем подгруппу если нужно
-            result = moveClientsCommand.updateMiddleGroupOrGetError(request.getIdOfClientGroup(), request.getIdOfMiddleGroup(), session, client);
+            result = moveClientsCommand.updateMiddleGroupOrGetError(session, request.getIdOfClientGroup(), request.getIdOfMiddleGroup(),
+                    client);
             if (result != null) {
                 throw new WebApplicationException(result);
             }
@@ -135,7 +139,7 @@ class UpdateClientCommand {
         clientsMobileHistory.setUser(user);
         clientsMobileHistory.setOrg(user.getOrg());
         clientsMobileHistory.setShowing(
-                String.format("WebАРМ, пользователь с ид: %d, name: %s", user.getIdOfUser(), user.getUserName()));
+                String.format("Веб-АРМ, пользователь с ид: %d, name: %s", user.getIdOfUser(), user.getUserName()));
         client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile(mobilePhone);
     }

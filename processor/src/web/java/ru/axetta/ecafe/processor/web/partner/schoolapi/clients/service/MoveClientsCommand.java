@@ -36,7 +36,7 @@ class MoveClientsCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups)
+    public ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups, User user)
             throws WebApplicationException {
         ClientsUpdateResponse result = new ClientsUpdateResponse();
         if (moveClientToGroups.size() == 0) {
@@ -45,7 +45,7 @@ class MoveClientsCommand {
         try {
             long version = updateClientRegistryVersion(null);
             for (ClientUpdateItem moveClientToGroup : moveClientToGroups) {
-                ClientUpdateResult moveClientResult = moveClientToOtherGroup(moveClientToGroup, version);
+                ClientUpdateResult moveClientResult = moveClientToOtherGroup(moveClientToGroup, version, user);
                 result.getClients().add(moveClientResult);
             }
         } catch (Exception e) {
@@ -54,52 +54,109 @@ class MoveClientsCommand {
         return result;
     }
 
-    private ClientUpdateResult moveClientToOtherGroup(ClientUpdateItem movedClient, long version) {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
+    private ClientUpdateResult moveClientToOtherGroup(ClientUpdateItem movedClient, long version, User user) {
+        Session session = null;
+        Transaction transaction = null;
 
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
 
-            Client client = (Client) persistenceSession.get(Client.class, movedClient.getIdOfClient());
+            Client client = (Client) session.get(Client.class, movedClient.getIdOfClient());
             if (client == null) {
                 return ClientUpdateResult.error(movedClient.getIdOfClient(),
                         String.format("Client with ID='%d' not found", movedClient.getIdOfClient()));
             }
+            ClientGroup moveToGroup = (ClientGroup) session.get(ClientGroup.class,
+                    new CompositeIdOfClientGroup(movedClient.getIdOfOrg(), movedClient.getIdOfClientGroup()));
 
-            String error = updateClientGroupOrGetError(movedClient.getIdOfClientGroup(), movedClient.getIdOfOrg(), persistenceSession, client);
+            if (moveToGroup == null) {
+                return ClientUpdateResult.error(movedClient.getIdOfClient(),
+                        String.format("Group of client with ID='%d' not found", movedClient.getIdOfClientGroup()));
+            }
+
+            boolean isChangeOrg = isChangeOrg(client, movedClient.getIdOfOrg());
+            if (isChangeOrg) {
+                String error = updateOrgOrGetError(session, movedClient.getIdOfOrg(), client, moveToGroup, user);
+                if (!StringUtils.isEmpty(error)) {
+                    return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
+                }
+            }
+
+            String error = updateClientGroupOrGetError(session, moveToGroup, client, user, isChangeOrg);
             if (!StringUtils.isEmpty(error)) {
                 return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
             }
 
-            error = updateMiddleGroupOrGetError(movedClient.getIdOfMiddleGroup(), movedClient.getIdOfMiddleGroup(), persistenceSession, client);
+            error = updateMiddleGroupOrGetError(session, movedClient.getIdOfMiddleGroup(), movedClient.getIdOfMiddleGroup(),
+                    client);
             if (!StringUtils.isEmpty(error)) {
                 return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
             }
             client.setClientRegistryVersion(version);
 
-            persistenceSession.update(client);
-            persistenceSession.flush();
-            persistenceTransaction.commit();
+            session.update(client);
+            session.flush();
+            transaction.commit();
 
             return ClientUpdateResult.success(movedClient.getIdOfClient());
         } catch (Exception e) {
             logger.error("Error in moved client to other group, ", e);
             return ClientUpdateResult.error(movedClient.getIdOfClient(), e.getMessage());
         } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
-    String updateMiddleGroupOrGetError(Long idOfClientGroup, Long idOfMiddleGroup, Session session, Client client) {
+    private boolean isChangeOrg(Client client, Long idOfOrg) {
+        return idOfOrg != null && !client.getOrg().getIdOfOrg().equals(idOfOrg);
+    }
+
+    private String updateOrgOrGetError(Session session, Long idOfOrg, Client client, ClientGroup moveToGroup,
+                                       User user) {
+        Object newOrg = session.load(Org.class, idOfOrg);
+        if (newOrg == null) {
+            return String.format("Organization with ID='%d' not found", idOfOrg);
+        }
+        try {
+            // миграция клиента м/у организациями
+            ClientManager
+                    .addClientMigrationEntry(session, client.getOrg(), client.getClientGroup(), (Org) newOrg, client,
+                            ClientGroupMigrationHistory.MODIFY_IN_WEB_ARM
+                                    .concat(user != null ? user.getUserName() : ""),
+                            moveToGroup.getGroupName());
+            client.setOrg((Org) newOrg);
+            return StringUtils.EMPTY;
+        } catch (Exception ex) {
+            logger.error("Error in move client to other org, ", ex);
+            return ex.getMessage();
+        }
+    }
+
+    String updateClientGroupOrGetError(Session session, ClientGroup moveToGroup, Client client, User user, boolean isChangeOrg) {
+        if (!isChangeGroupClient(client, moveToGroup.getCompositeIdOfClientGroup())) {
+            return StringUtils.EMPTY;
+        }
+        if (!isChangeOrg) {
+            // миграция клиента м/у группами в рамках одной оо
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
+                    moveToGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), moveToGroup.getGroupName(),
+                    ClientGroupMigrationHistory.MODIFY_IN_WEB_ARM.concat(user != null ? user.getUserName() : ""));
+        }
+        client.setClientGroup(moveToGroup);
+        client.setIdOfClientGroup(moveToGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        return StringUtils.EMPTY;
+    }
+
+    String updateMiddleGroupOrGetError(Session session, Long idOfClientGroup, Long idOfMiddleGroup, Client client) {
         if (idOfMiddleGroup != null) {
             // перемещение в дочернюю группу
             GroupNamesToOrgs middleGroupEntity = (GroupNamesToOrgs) session
                     .get(GroupNamesToOrgs.class, idOfMiddleGroup);
             if (middleGroupEntity == null || !middleGroupEntity.getIsMiddleGroup()) {
-                return String.format("Middle group with ID='%d' not found or is not the middle group ", idOfClientGroup);
+                return String
+                        .format("Middle group with ID='%d' not found or is not the middle group ", idOfClientGroup);
             }
             // если дочерние группы различаются
             if (client.getMiddleGroup() == null || !client.getMiddleGroup().equals(middleGroupEntity.getGroupName())) {
@@ -111,30 +168,10 @@ class MoveClientsCommand {
         return StringUtils.EMPTY;
     }
 
-    String updateClientGroupOrGetError(Long idOfClientGroup, Long idOfOrg, Session session, Client client) {
-
-        if (!isChangeGroupClient(client, idOfClientGroup, idOfOrg)) {
-            return StringUtils.EMPTY;
-        }
-
-        ClientGroup clientGroup = (ClientGroup) session
-                .get(ClientGroup.class, new CompositeIdOfClientGroup(idOfOrg, idOfClientGroup));
-        if (clientGroup == null) {
-            return String.format("Group of client with ID='%d' not found", idOfClientGroup);
-        }
-        if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
-            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
-                    clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                    ClientGroupMigrationHistory.MODIFY_IN_ARM.concat(String.format(" (ид. ОО=%s)", idOfOrg)));
-
-            client.setClientGroup(clientGroup);
-            client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-        }
-        return StringUtils.EMPTY;
+    private boolean isChangeGroupClient(Client client, CompositeIdOfClientGroup compositeIdOfClientGroup) {
+        return client.getClientGroup() == null || !client.getClientGroup().getCompositeIdOfClientGroup()
+                .equals(compositeIdOfClientGroup);
     }
 
-    private boolean isChangeGroupClient(Client client, Long idOfClientGroup, Long idOfOrg) {
-        return client.getClientGroup() == null || !client.getIdOfClientGroup().equals(idOfClientGroup) || !client
-                .getClientGroup().getCompositeIdOfClientGroup().getIdOfOrg().equals(idOfOrg);
-    }
+
 }
