@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 import java.util.Date;
 
 public class MeshSyncPerson {
+    private String meshId;
     private String personguid;
     private Date createdate;
     private Date lastupdate;
@@ -25,6 +26,8 @@ public class MeshSyncPerson {
     private Integer educationstageid;
     private String comment;
     private String guidnsi;
+    private String training_end_at;
+    private String idIsPp;
 
     public MeshSyncPerson() {
 
@@ -179,5 +182,29 @@ public class MeshSyncPerson {
 
     public void setLastupdateRest(Date lastupdateRest) {
         this.lastupdateRest = lastupdateRest;
+    }
+
+    public String getMeshId() {
+        return meshId;
+    }
+
+    public void setMeshId(String meshId) {
+        this.meshId = meshId;
+    }
+
+    public String getTraining_end_at() {
+        return training_end_at;
+    }
+
+    public void setTraining_end_at(String training_end_at) {
+        this.training_end_at = training_end_at;
+    }
+
+    public String getIdIsPp() {
+        return idIsPp;
+    }
+
+    public void setIdIsPp(String idIsPp) {
+        this.idIsPp = idIsPp;
     }
 }

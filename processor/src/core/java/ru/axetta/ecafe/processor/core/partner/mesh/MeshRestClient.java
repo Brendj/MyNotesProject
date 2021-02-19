@@ -49,7 +49,6 @@ public class MeshRestClient {
             int statusCode = httpClient.executeMethod(httpMethod);
             if (statusCode == HttpStatus.SC_OK) {
                 InputStream inputStream = httpMethod.getResponseBodyAsStream();
-                //return IOUtils.toByteArray(inputStream);
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 int nRead;
                 byte[] data = new byte[1024*1024];
