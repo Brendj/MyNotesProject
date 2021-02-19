@@ -33,8 +33,8 @@
         <property name="officialName" column="officialname" type="string" length="255"/>
         <property name="officialNameFrom" column="officialnamefrom" type="string" length="255"/>
 
-        <property name="address" column="address" type="string" length="255"/>
-        <property name="addressFrom" column="addressfrom" type="string" length="255"/>
+        <property name="address" column="address" type="string" length="512"/>
+        <property name="addressFrom" column="addressfrom" type="string" length="512"/>
         <property name="city" column="city" type="string" length="255"/>
         <property name="cityFrom" column="cityfrom" type="string" length="255"/>
         <property name="region" column="region" type="string" length="255"/>
@@ -56,8 +56,8 @@
         <property name="egissoIdFrom" column="egissoIdFrom" type="string" length="128"/>
         <property name="municipalDistrict" column="municipal_district" type="string" length="256"/>
         <property name="municipalDistrictFrom" column="municipal_districtFrom" type="string" length="256"/>
-        <property name="shortAddress" column="short_address" type="string" length="128"/>
-        <property name="shortAddressFrom" column="short_addressFrom" type="string" length="128"/>
+        <property name="shortAddress" column="short_address" type="string" length="512"/>
+        <property name="shortAddressFrom" column="short_addressFrom" type="string" length="512"/>
 
         <property name="guid" column="guid" type="string" length="255"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>

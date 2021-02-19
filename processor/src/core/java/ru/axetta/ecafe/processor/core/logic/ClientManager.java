@@ -2006,8 +2006,21 @@ public class ClientManager {
         if (notificationItems == null) return;
         Set<ClientGuardianNotificationSetting> dbSettings = clientGuardian.getNotificationSettings();
         for (NotificationSettingItem item : notificationItems) {
+            //Для 17 типа мы не можем менять напрямую, только через 11
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
+            {
+                continue;
+            }
+
             ClientGuardianNotificationSetting newSetting = new ClientGuardianNotificationSetting(clientGuardian, item.getNotifyType());
             createOrRemoveSetting(dbSettings, newSetting, item.isEnabled());
+
+            //Если поменяли 11, то меняем и 17 событие
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
+            {
+                ClientGuardianNotificationSetting culture = new ClientGuardianNotificationSetting(clientGuardian, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
+                createOrRemoveSetting(dbSettings, culture, item.isEnabled());
+            }
         }
         boolean defaultPredefineFound = false;
         for (ClientGuardianNotificationSetting dbSetting : dbSettings) {

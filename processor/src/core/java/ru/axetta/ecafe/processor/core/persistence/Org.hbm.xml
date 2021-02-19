@@ -20,8 +20,8 @@
         <property name="shortName" column="ShortName" type="string" length="128" unique="true" not-null="true"/>
         <property name="shortNameInfoService" column="ShortNameInfoService" type="string" length="128"/>
         <property name="officialName" column="OfficialName" type="string" length="256" not-null="true"/>
-        <property name="address" column="Address" type="string" length="256" not-null="true"/>
-        <property name="shortAddress" column="ShortAddress" type="string" length="128"/>
+        <property name="address" column="Address" type="string" length="512" not-null="true"/>
+        <property name="shortAddress" column="ShortAddress" type="string" length="512"/>
         <property name="phone" column="Phone" type="string" length="32"/>
         <many-to-one name="officialPerson" class="ru.axetta.ecafe.processor.core.persistence.Person"
                      column="IdOfOfficialPerson" not-null="true" fetch="select"/>

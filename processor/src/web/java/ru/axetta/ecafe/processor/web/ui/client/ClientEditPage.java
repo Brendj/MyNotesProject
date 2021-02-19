@@ -1036,9 +1036,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         client.setPayForSMS(this.payForSMS);
 
-        if (discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size() == 0) {
-            throw new Exception("Выберите хотя бы одну категорию льгот");
-        }
         /* категори скидок */
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (this.idOfCategoryList.size() != 0) {
@@ -1059,12 +1056,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
-            discountMode = categoryDiscountSet.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-            DiscountManager
-                    .saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet,
-                            client.getDiscountMode(), discountMode,
-                            DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
-            client.setLastDiscountsUpdate(new Date());
+            try {
+                discountMode = categoryDiscountSet.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet, client.getDiscountMode(), discountMode,
+                        DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
+                client.setLastDiscountsUpdate(new Date());
+            } catch (Exception ignore){}
         }
 
         if (null != discountMode) {
@@ -1082,11 +1079,29 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
+            //Для 17 типа мы не можем менять напрямую, только через 11
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
+            {
+                continue;
+            }
+
+
             ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
             if (item.isEnabled()) {
                 client.getNotificationSettings().add(newSetting);
             } else {
                 client.getNotificationSettings().remove(newSetting);
+            }
+
+            //Если поменяли 11, то меняем и 17 событие
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
+            {
+                ClientNotificationSetting culture = new ClientNotificationSetting(client, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
+                if (item.isEnabled()) {
+                    client.getNotificationSettings().add(culture);
+                } else {
+                    client.getNotificationSettings().remove(culture);
+                }
             }
         }
 

@@ -2581,7 +2581,9 @@ public class PreorderDAOService {
         Set<Long> set = new HashSet<Long>();
         for (PreorderComplex complex : list) {
             if (!set.contains(complex.getIdOfPreorderComplex())) {
-                sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
+                if (complex.getAmount() > 0) {
+                    sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
+                }
                 set.add(complex.getIdOfPreorderComplex());
                 for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
                     sum += (pmd.getMenuDetailPrice() * pmd.getAmount()) - pmd.getUsedSum();
