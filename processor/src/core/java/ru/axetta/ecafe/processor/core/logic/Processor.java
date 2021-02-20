@@ -6514,6 +6514,7 @@ public class Processor implements SyncProcessor {
                     enterEvent.setPassDirection(e.getPassDirection());
                     enterEvent.setEventCode(e.getEventCode());
                     enterEvent.setIdOfCard(e.getIdOfCard());
+                    enterEvent.setLongCardId(e.getLongCardId());
                     enterEvent.setClient(clientFromEnterEvent);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
                     // Проверка корректности времени

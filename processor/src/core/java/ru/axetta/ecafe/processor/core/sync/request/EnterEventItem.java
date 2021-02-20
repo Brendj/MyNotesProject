@@ -1,8 +1,6 @@
 package ru.axetta.ecafe.processor.core.sync.request;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.LoadContext;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 
 import org.w3c.dom.Node;
 
@@ -35,6 +33,7 @@ public class EnterEventItem {
     private final Long guardianId;
     private final Integer childPassChecker;
     private final Long childPassCheckerId;
+    private final Long longCardId;
     //private final Long idOfClientGroup;
 
     public static EnterEventItem build(Node enterEventNode, LoadContext loadContext) throws Exception{
@@ -114,15 +113,20 @@ public class EnterEventItem {
             childPassCheckerId = Long.parseLong(
                     enterEventNode.getAttributes().getNamedItem("ChildPassCheckerId").getTextContent());
         }
+        Long longCardId = null;
+        if (enterEventNode.getAttributes().getNamedItem("LongCardId") != null) {
+            childPassCheckerId = Long.parseLong(
+                    enterEventNode.getAttributes().getNamedItem("LongCardId").getTextContent());
+        }
         return new EnterEventItem(idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode,
                 idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
-                docSerialNum, issueDocDate, visitDateTime, guardianId, childPassChecker, childPassCheckerId);
+                docSerialNum, issueDocDate, visitDateTime, guardianId, childPassChecker, childPassCheckerId, longCardId);
     }
 
     EnterEventItem(long idOfEnterEvent, String enterName, String turnstileAddr, int passDirection, int eventCode,
             Long idOfCard, Long idOfClient, Long idOfTempCard, Date evtDateTime, Long idOfVisitor,
             String visitorFullName, Integer docType, String docSerialNum, Date issueDocDate, Date visitDateTime,
-            Long guardianId, Integer childPassChecker, Long childPassCheckerId) {
+            Long guardianId, Integer childPassChecker, Long childPassCheckerId, Long longCardId) {
         this.idOfEnterEvent = idOfEnterEvent;
         this.enterName = enterName;
         this.turnstileAddr = turnstileAddr;
@@ -141,6 +145,7 @@ public class EnterEventItem {
         this.guardianId = guardianId;
         this.childPassChecker = childPassChecker;
         this.childPassCheckerId = childPassCheckerId;
+        this.longCardId = longCardId;
         //this.idOfClientGroup = idOfClientGroup;
     }
 
@@ -214,6 +219,10 @@ public class EnterEventItem {
 
     public Long getChildPassCheckerId() {
         return childPassCheckerId;
+    }
+
+    public Long getLongCardId() {
+        return longCardId;
     }
 
     /*public Long getIdOfClientGroup() {
