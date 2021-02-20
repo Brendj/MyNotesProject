@@ -437,6 +437,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setUseWebArm(useWebArm);
         org.setGooddatecheck(goodDateCheck);
         org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
+        org.setUseLongCardNo(useLongCardNo);
 
         session.update(org);
         fill(org);
