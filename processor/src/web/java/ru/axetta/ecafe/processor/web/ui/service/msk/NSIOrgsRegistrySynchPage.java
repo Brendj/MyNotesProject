@@ -650,6 +650,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.shortAddressFrom = registryChange.getShortAddressFrom();
             this.municipalDistrict = registryChange.getMunicipalDistrict();
             this.municipalDistrictFrom = registryChange.getMunicipalDistrictFrom();
+            this.globalId = registryChange.getGlobalId();
+            this.globalIdFrom = registryChange.getGlobalIdFrom();
 
             this.selected = registryChange.getApplied() ? true: false;
             boolean doAdd;
@@ -708,6 +710,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.founderFrom = registryChangeItem.getFounderFrom();
             this.subordination = registryChangeItem.getSubordination();
             this.subordinationFrom = registryChangeItem.getSubordinationFrom();
+            this.globalId = registryChangeItem.getGlobalId();
+            this.globalIdFrom = registryChangeItem.getGlobalIdFrom();
 
             this.selected = registryChangeItem.getOperationType().equals(OrgRegistryChange.CREATE_OPERATION) ? false : true;
         }
