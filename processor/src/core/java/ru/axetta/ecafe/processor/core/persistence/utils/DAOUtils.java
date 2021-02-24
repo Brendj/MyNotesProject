@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -5499,5 +5499,31 @@ public class DAOUtils {
                 + "  and agetypegroup not like ''\n "
                 + "order by agetypegroup");
         return q.list();
+    }
+
+    public static Card findCardByLongCardNoExtended(Session session, Long longCardNo,
+            Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
+        if (longCardNo == null) return null;
+        try {
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("longCardNo", longCardNo));
+
+            if (idOfClient != null || idOfGuardian != null || idOfVisitor != null) {
+                List<Long> ids = new LinkedList<>();
+                if (idOfClient != null) ids.add(idOfClient);
+                if (idOfGuardian != null) ids.add(idOfGuardian);
+                if (idOfVisitor != null) ids.add(idOfVisitor);
+                if (!ids.isEmpty())
+                    criteria.add(Restrictions.in("client.idOfClient", ids));
+            }
+
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Error in findCardByCardNoExtended", e);
+            return null;
+        }
+    }
     }
 }
