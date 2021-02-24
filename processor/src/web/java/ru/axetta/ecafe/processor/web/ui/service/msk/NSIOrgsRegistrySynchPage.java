@@ -57,6 +57,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         if (!RuntimeContext.getInstance().isNSI3()) {
             orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
         }
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_NSI_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EKIS_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EGISSO_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, "", ""));
@@ -478,6 +479,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 item.setOldValue(orgForEdit.getGuidFrom());
                 item.setNewValue(orgForEdit.getGuidReestr());
             }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_NSI_ID)) {
+                item.setOldValue(orgForEdit.getGlobalIdFromNullSafe());
+                item.setNewValue(orgForEdit.getGlobalIdReestrNullSafe());
+            }
             if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_EKIS_ID)) {
                 item.setOldValue(orgForEdit.getEkisIdFromNullSafe());
                 item.setNewValue(orgForEdit.getEkisIdReestrNullSafe());
@@ -602,6 +607,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String founderFrom;
         protected String subordination;
         protected String subordinationFrom;
+        protected Long globalId;
+        protected Long globalIdFrom;
 
         private boolean selected = false;
 
@@ -973,6 +980,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(ekisId, ekisIdFrom);
         }
 
+        public String getGlobalId() {
+            return getResultString(globalId, globalIdFrom);
+        }
+
         public String getGuidReestr() {
             return guid;
         }
@@ -1127,6 +1138,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getEkisIdFromNullSafe() {
             return ekisIdFrom == null ? "" : ekisIdFrom.toString();
+        }
+
+        public String getGlobalIdReestrNullSafe() {
+            return globalId == null ? "" : globalId.toString();
+        }
+
+        public String getGlobalIdFromNullSafe() {
+            return globalIdFrom == null ? "" : globalIdFrom.toString();
         }
 
         public String getEgissoIdFrom() {

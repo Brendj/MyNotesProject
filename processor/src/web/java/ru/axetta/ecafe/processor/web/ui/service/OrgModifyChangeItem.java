@@ -26,7 +26,9 @@ public class OrgModifyChangeItem {
         this.valueName = valueName;
         this.oldValue = oldValue;
         this.newValue = newValue;
-        if (valueName.equals(ImportRegisterOrgsService.VALUE_EKIS_ID) || valueName.equals(ImportRegisterOrgsService.VALUE_EGISSO_ID)) {
+        if (valueName.equals(ImportRegisterOrgsService.VALUE_EKIS_ID)
+                || valueName.equals(ImportRegisterOrgsService.VALUE_EGISSO_ID)
+                || valueName.equals(ImportRegisterOrgsService.VALUE_NSI_ID)) {
             this.selected = RuntimeContext.getAppContext().getBean("OrgMskNSIService", OrgMskNSIService.class).getNSIService() instanceof OrgNSI3DAOService;
         } else {
             this.selected = true;
