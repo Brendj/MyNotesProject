@@ -1116,11 +1116,12 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "changeCardOwner")
     public void changeCardOwner(@WebParam(name = "orgId") Long orgId, @WebParam(name = "newOwnerId") Long newOwnerId,
             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "changeTime") Date changeTime,
-            @WebParam(name = "validTime") Date validTime) throws FrontControllerException {
+            @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo)
+            throws FrontControllerException {
         checkRequestValidity(orgId);
         ///
         try {
-            RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
+            RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, longCardNo, changeTime, validTime);
         } catch (Exception e) {
             logger.error("Failed changeCardOwner", e);
             throw new FrontControllerException(String.format("Ошибка при смене владельца карты: %s", e.getMessage()),
@@ -2160,11 +2161,12 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name = "cardNo") Long cardNo,
-            @WebParam(name = "idOfOrg") Long idOfOrg) throws FrontControllerException {
+            @WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "longCardNo") Long longCardNo)
+            throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
         ResponseItem responseItem = new ResponseItem();
         try {
-            Card card = CardService.getInstance().unblockOrReturnCard(cardNo, idOfOrg);
+            Card card = CardService.getInstance().unblockOrReturnCard(cardNo, longCardNo, idOfOrg);
             CardService.getInstance().updateSyncStatus(card, idOfOrg, 0L, true);
             responseItem.code = ResponseItem.OK;
             responseItem.message = ResponseItem.OK_MESSAGE;

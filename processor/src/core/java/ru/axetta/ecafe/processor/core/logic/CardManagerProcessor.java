@@ -82,7 +82,12 @@ public class CardManagerProcessor implements CardManager {
             throw new Exception("Клиент не найден: " + idOfClient);
         }
         logger.debug("check exist card");
-        Card c = findCardByCardNo(persistenceSession, cardNo);
+        Card c = null;
+        if(longCardNo == null) {
+            c = findCardByCardNo(persistenceSession, cardNo);
+        } else {
+            c = findCardByLongCardNo(persistenceSession, longCardNo);
+        }
         if (c != null ) {
             String errorMessage = String.format("Карта %s уже зарегистрирована", cardNo);
             if(c.getClient() != null) errorMessage += String.format(" на клиента с л/с=%s", c.getClient().getContractId());
@@ -125,6 +130,7 @@ public class CardManagerProcessor implements CardManager {
         card.setLockReason(lockReason);
         card.setOrg(client.getOrg());
         card.setTransitionState(CardTransitionState.OWN.getCode());
+        card.setLongCardNo(longCardNo);
         persistenceSession.save(card);
 
         //История карты при создании новой карты
@@ -133,7 +139,8 @@ public class CardManagerProcessor implements CardManager {
         historyCard.setTransaction(transaction);
         historyCard.setUpDatetime(new Date());
         historyCard.setNewOwner(client);
-        historyCard.setInformationAboutCard("Регистрация новой карты №: " + card.getCardNo());
+        historyCard.setInformationAboutCard("Регистрация новой карты №: " + card.getCardNo()
+                + " Длинный номер: " + card.getLongCardNo());
         historyCard.setUser(cardOperatorUser);
         persistenceSession.save(historyCard);
         return card.getIdOfCard();
@@ -359,12 +366,13 @@ public class CardManagerProcessor implements CardManager {
     }
 
     @Override
-    public void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception {
-        changeCardOwner(idOfClient, cardNo, changeTime, validTime, null);
+    public void changeCardOwner(Long idOfClient, Long cardNo, Long longCardNo, Date changeTime, Date validTime) throws Exception {
+        changeCardOwner(idOfClient, cardNo, longCardNo, changeTime, validTime, null);
     }
 
     @Override
-    public void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime, User cardOperatorUser) throws Exception {
+    public void changeCardOwner(Long idOfClient, Long cardNo, Long longCardNo,  Date changeTime, Date validTime,
+            User cardOperatorUser) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {

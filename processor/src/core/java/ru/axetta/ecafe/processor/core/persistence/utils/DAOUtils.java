@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -5499,5 +5499,13 @@ public class DAOUtils {
                 + "  and agetypegroup not like ''\n "
                 + "order by agetypegroup");
         return q.list();
+    }
+
+    public static Card findCardByLongCardNo(Session persistenceSession, Long longCardNo) {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("longCardNo", longCardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
     }
 }
