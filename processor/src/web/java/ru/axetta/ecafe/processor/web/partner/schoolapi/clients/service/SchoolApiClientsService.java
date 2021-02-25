@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationExcep
 import java.util.Collection;
 
 public interface SchoolApiClientsService {
-    ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups) throws WebApplicationException;
+    ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups, User user) throws WebApplicationException;
 
     ClientsUpdateResponse excludeClientsFromPlan(Collection<ClientUpdateItem> updateClients);
 

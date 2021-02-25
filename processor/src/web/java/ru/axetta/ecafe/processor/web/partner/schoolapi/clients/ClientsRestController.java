@@ -13,12 +13,9 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientsUpdate
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.service.SchoolApiClientsService;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.AuthorityUtils;
-import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.*;
@@ -37,11 +34,13 @@ public class ClientsRestController {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetailsImpl principal = (JwtUserDetailsImpl) authentication.getPrincipal();
-        User user = null;
-        ClientUpdateResult response = getService().updateClient(idOfClient, request, user);
+        ClientUpdateResult response = getService().updateClient(idOfClient, request, getUser());
         return Response.ok().entity(response).build();
+    }
+
+    private User getUser() {
+        AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
+        return authorityUtils.findCurrentUser();
     }
 
     @PUT
@@ -51,7 +50,7 @@ public class ClientsRestController {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        ClientsUpdateResponse response = getService().moveClients(moveClientsRequest.getUpdateClients());
+        ClientsUpdateResponse response = getService().moveClients(moveClientsRequest.getUpdateClients(), getUser());
         return Response.ok().entity(response).build();
     }
 
