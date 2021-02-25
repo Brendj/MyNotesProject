@@ -10,3 +10,6 @@ COMMENT ON COLUMN cf_cards.longCardNo IS 'Длинный UID-идентифик�
 
 ALTER TABLE cf_cards_temp ADD COLUMN longCardNo BIGINT;
 COMMENT ON COLUMN cf_cards_temp.longCardNo IS 'Длинный UID-идентификатор карты';
+
+ALTER TABLE cf_cards_temp ADD COLUMN isLongUID BOOLEAN;
+COMMENT ON COLUMN cf_cards_temp.isLongUID IS 'Режим длинных UID';
