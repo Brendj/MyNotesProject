@@ -25,6 +25,8 @@ public class CardTemp {
     private Date validDate;
     private Client client;
     private Visitor visitor;
+    private Long longCardNo;
+    private Boolean isLongUID;
     //private ClientTypeEnum clientTypeEnum;
     private int visitorType;
 
@@ -121,6 +123,22 @@ public class CardTemp {
     //    this.clientTypeEnum = clientTypeEnum;
     //}
 
+
+    public Long getLongCardNo() {
+        return longCardNo;
+    }
+
+    public void setLongCardNo(Long longCardNo) {
+        this.longCardNo = longCardNo;
+    }
+
+    public Boolean getLongUID() {
+        return isLongUID;
+    }
+
+    public void setLongUID(Boolean longUID) {
+        isLongUID = longUID;
+    }
 
     public int getVisitorType() {
         return visitorType;
