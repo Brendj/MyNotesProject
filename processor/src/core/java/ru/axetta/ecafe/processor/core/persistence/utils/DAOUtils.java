@@ -5532,7 +5532,6 @@ public class DAOUtils {
             return null;
         }
     }
-    }
 
     public static Card findCardByLongCardNo(Session persistenceSession, Long longCardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
