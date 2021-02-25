@@ -539,7 +539,8 @@
             <param-value>
                 ru.axetta.ecafe.processor.web.partner.schoolapi.SchoolRestController,
                 ru.axetta.ecafe.processor.web.partner.schoolapi.clients.ClientsRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.groups.GroupsRestController
+                ru.axetta.ecafe.processor.web.partner.schoolapi.groups.GroupsRestController,
+                ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.GuardiansRestController
             </param-value>
         </init-param>
         <init-param>
