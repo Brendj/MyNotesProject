@@ -31,13 +31,13 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
 
     @Override
     protected void fillOrgGuids(Query query, ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) {
-        query.setParameterList("guids", orgGuids.getOrgEkisIds());
+        query.setParameterList("guids", orgGuids.getOrgNSIIds());
     }
 
     public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> list = new ArrayList<String>();
-        if (orgGuids.getOrgEkisIds().size() == 0) {
-            return "У организации не задан ЕКИС Id";
+        if (orgGuids.getOrgNSIIds().size() == 0) {
+            return "У организации не задан НСИ-3 Id";
         }
         Boolean guidOK;
         Session session = null;
@@ -45,10 +45,10 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            for (String ekisId : orgGuids.getOrgEkisIds()) {
+            for (String nsiId : orgGuids.getOrgNSIIds()) {
                 //Проверка на существование ЕКИС Ид ОО в выгрузке
-                Query query = session.createSQLQuery("select ekisId from cf_registry_file where ekisId = :ekisId limit 1");
-                query.setParameter("ekisId", ekisId);
+                Query query = session.createSQLQuery("select global_id from cf_kf_organization_registry where global_id = :globalId limit 1");
+                query.setParameter("globalId", nsiId);
                 try {
                     Object res = query.uniqueResult();
                     guidOK = (res != null);
@@ -57,9 +57,9 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
                 }
                 if (!guidOK) {
                     String badGuidString = "";
-                    List<Org> orgs = DAOService.getInstance().findOrgsByEkisId(Long.parseLong(ekisId));
+                    List<Org> orgs = DAOService.getInstance().findOrgsByNSIId(Long.parseLong(nsiId));
                     for (Org o : orgs) {
-                        badGuidString += String.format("ЕКИС Ид: %s, Ид. организации: %s, Название организации: %s;\n", ekisId, o.getIdOfOrg(), o.getShortNameInfoService());
+                        badGuidString += String.format("НСИ-3 Ид: %s, Ид. организации: %s, Название организации: %s;\n", nsiId, o.getIdOfOrg(), o.getShortNameInfoService());
                     }
                     list.add(badGuidString);
                 }
