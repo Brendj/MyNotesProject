@@ -628,6 +628,12 @@ public class DAOUtils {
         return (CardTemp) criteria.uniqueResult();
     }
 
+    public static CardTemp findCardTempByLongCardNo(Session persistenceSession, Long longCardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
+        criteria.add(Restrictions.eq("longCardNo", longCardNo));
+        return (CardTemp) criteria.uniqueResult();
+    }
+
     public static User findUser(Session persistenceSession, long idOfUser) throws Exception {
         return (User) persistenceSession.get(User.class, idOfUser);
     }
@@ -2712,7 +2718,8 @@ public class DAOUtils {
     // TODO: воспользоваться диклоративными пособами генерации запроса и на выходи получать только TempCardOperationItem
     public static CardTempOperation getLastTempCardOperationByOrgAndCartNo(Session session, Long idOfOrg, Long cardNo) {
         Query query = session.createQuery(
-                "select operation from CardTempOperation operation left join operation.cardTemp card  where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
+                "select operation from CardTempOperation operation left join operation.cardTemp card "
+                   + " where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("cardNo", cardNo);
         List list = query.list();

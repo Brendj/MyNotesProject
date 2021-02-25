@@ -33,7 +33,7 @@ public interface CardManager {
     Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo, Long longCardNo, User user) throws Exception;;
 
-    void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception;
+    void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo, Long longCardNo) throws Exception;
 
     void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId) throws Exception;

@@ -190,14 +190,14 @@ public class CardManagerProcessor implements CardManager {
     }
 
     @Override
-    public void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception {
+    public void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo, Long longCardNo) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            createTempCard(persistenceSession, idOfOrg, cardNo, cardPrintedNo);
+            createTempCard(persistenceSession, idOfOrg, cardNo, cardPrintedNo, longCardNo);
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -208,18 +208,33 @@ public class CardManagerProcessor implements CardManager {
         }
     }
 
-    private void createTempCard(Session persistenceSession, Long idOfOrg, long cardNo, String cardPrintedNo)
+    private void createTempCard(Session persistenceSession, Long idOfOrg, long cardNo, String cardPrintedNo,
+            Long longCardNo)
             throws Exception {
         Org org = getOrgReference(persistenceSession, idOfOrg);
         if (org == null) {
             throw new Exception(String.format("Организация не найдена: %d", idOfOrg));
         }
-        Card c = findCardByCardNo(persistenceSession, cardNo);
+
+        Card c = null;
+        if(longCardNo == null) {
+            c = findCardByCardNo(persistenceSession, cardNo);
+        } else {
+            c = findCardByLongCardNo(persistenceSession, longCardNo);
+        }
+
         if (c != null) {
             throw new Exception(
                     String.format("Карта уже зарегистрирована на клиента: %d", c.getClient().getIdOfClient()));
         }
-        CardTemp cardTemp = findCardTempByCardNo(persistenceSession, cardNo);
+
+        CardTemp cardTemp = null;
+        if(longCardNo == null) {
+            cardTemp = findCardTempByCardNo(persistenceSession, cardNo);
+        } else {
+            cardTemp = findCardTempByLongCardNo(persistenceSession, longCardNo);
+        }
+
         if (cardTemp != null) {
             if (cardTemp.getOrg().getIdOfOrg().equals(idOfOrg)) {
                 cardTemp.setCardPrintedNo(cardPrintedNo);
@@ -230,7 +245,7 @@ public class CardManagerProcessor implements CardManager {
                         cardTemp.getCardStation()));
             }
         } else {
-            cardTemp = new CardTemp(org, cardNo, cardPrintedNo);
+            cardTemp = new CardTemp(org, cardNo, cardPrintedNo, longCardNo);
         }
         persistenceSession.save(cardTemp);
     }
