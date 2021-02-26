@@ -48,7 +48,7 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
             for (String nsiId : orgGuids.getOrgNSIIds()) {
                 //Проверка на существование ЕКИС Ид ОО в выгрузке
                 Query query = session.createSQLQuery("select global_id from cf_kf_organization_registry where global_id = :globalId limit 1");
-                query.setParameter("globalId", nsiId);
+                query.setParameter("globalId", Long.parseLong(nsiId));
                 try {
                     Object res = query.uniqueResult();
                     guidOK = (res != null);
