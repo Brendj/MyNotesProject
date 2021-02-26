@@ -179,8 +179,7 @@ public class Card {
         return cardNo;
     }
 
-    private void setCardNo(Long cardNo) {
-        // For Hibernate only
+    public void setCardNo(Long cardNo) {
         this.cardNo = cardNo;
     }
 

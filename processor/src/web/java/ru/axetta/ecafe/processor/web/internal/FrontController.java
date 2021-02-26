@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -2658,5 +2659,52 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    @WebMethod(operationName = "updateCardFieldsRequest")
+    public UpdateCardFieldsResponse updateCardFieldsRequest(@WebParam(name = "cardInfo") CardInfo info)
+            throws FrontControllerException {
+        UpdateCardFieldsResponse result = new UpdateCardFieldsResponse();
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            for(CardInfoItem item : info.getItems()){
+                Card c = (Card) persistenceSession.get(Card.class, item.getProcessingCardId());
+
+                if (c == null){
+                    logger.warn(
+                            String.format("Card CardNo: %d LongCardId: %d not found",
+                                    item.getCardNo(), item.getLongCardId())
+                    );
+
+                    result.setCode(ResponseItem.ERROR_INTERNAL);
+                    result.getProblemProcessingCardIds().add(item.getProcessingCardId());
+                    continue;
+                }
+                c.setLongCardNo(item.getLongCardId());
+                c.setCardNo(item.getCardNo());
+                c.setIsLongUid(BooleanUtils.toBoolean(item.getIsLongId()));
+                c.setUpdateTime(new Date());
+
+                persistenceSession.update(c);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            persistenceSession.close();
+        } catch (Exception e){
+            logger.error("Error in updateCardFieldsRequest", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
     }
 }
