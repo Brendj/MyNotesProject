@@ -2687,7 +2687,6 @@ public class FrontController extends HttpServlet {
                     continue;
                 }
                 c.setLongCardNo(item.getLongCardId());
-                c.setCardNo(item.getCardNo());
                 c.setIsLongUid(BooleanUtils.toBoolean(item.getIsLongId()));
                 c.setUpdateTime(new Date());
 

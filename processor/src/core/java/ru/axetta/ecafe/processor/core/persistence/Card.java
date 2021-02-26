@@ -179,7 +179,7 @@ public class Card {
         return cardNo;
     }
 
-    public void setCardNo(Long cardNo) {
+    private void setCardNo(Long cardNo) {
         this.cardNo = cardNo;
     }
 
