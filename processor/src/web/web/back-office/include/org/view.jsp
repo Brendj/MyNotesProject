@@ -233,17 +233,17 @@
 <br />
 <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
 <h:panelGrid id="orgViewGrid_cards" styleClass="borderless-grid" columns="2">
-    <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
+    <h:outputText escape="true" value="Разрешить один активный ЭИ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.oneActiveCard}"  styleClass="input-text" disabled="true"  />
-    <h:outputText escape="true" value="Цифровая подпись при регистрации карты" styleClass="output-text" />
+    <h:outputText escape="true" value="Цифровая подпись при регистрации ЭИ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.needVirifyCardSign}"  styleClass="input-text" disabled="true"  />
     <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.workInSummerTime}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Заявки на посещение других ОО" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.requestForVisitsToOtherOrg}" styleClass="input-text" disabled="true" />
-    <h:outputText escape="true" value="Использование обучающимися нескольких идентификаторов в ОО" styleClass="output-text" />
+    <h:outputText escape="true" value="Использование обучающимися нескольких ЭИ в ОО" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.multiCardModeEnabled}" styleClass="input-text" disabled="true" />
-    <h:outputText escape="true" value="Использовать длинные идентификаторы карт" styleClass="output-text" />
+    <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useLongCardNo}" styleClass="input-text" disabled="true" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">

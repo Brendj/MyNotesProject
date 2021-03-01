@@ -227,12 +227,12 @@
     <br />
     <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
     <h:panelGrid id="orgCreateGrid_cards" styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
+        <h:outputText escape="true" value="Разрешить один активный ЭИ" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.oneActiveCard}"  styleClass="input-text"  />
-        <h:outputText escape="true" value="Цифровая подпись при регистрации карты" styleClass="output-text" />
+        <h:outputText escape="true" value="Цифровая подпись при регистрации ЭИ" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.needVerifyCardSign}"  styleClass="input-text"  />
-        <h:outputText escape="true" value="Использовать длинные идентификаторы карт" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardNo}" styleClass="input-text" disabled="true" />
+        <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardId}" styleClass="input-text" disabled="true" />
     </h:panelGrid>
 <br />
 <rich:separator />
