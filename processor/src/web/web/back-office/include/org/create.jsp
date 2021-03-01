@@ -232,7 +232,7 @@
         <h:outputText escape="true" value="Цифровая подпись при регистрации ЭИ" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.needVerifyCardSign}"  styleClass="input-text"  />
         <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardId}" styleClass="input-text" disabled="true" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardId}" styleClass="input-text" />
     </h:panelGrid>
 <br />
 <rich:separator />
