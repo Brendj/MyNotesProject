@@ -601,6 +601,9 @@ public class FrontController extends HttpServlet {
     public VisitorItem checkVisitorByCard(@WebParam(name = "orgId") Long idOfOrg,
             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -684,6 +687,9 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         TempCardOperationItem tempCardOperationItem = null;
@@ -713,6 +719,9 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardPrintedNo") String cardPrintedNo,  @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         ///
         try {
             RuntimeContext.getInstance().getCardManager().createTempCard(idOfOrg, cardNo, cardPrintedNo, longCardNo);
@@ -1030,6 +1039,9 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -1124,6 +1136,9 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardType") int cardType, @WebParam(name = "issuedTime") Date issuedTime,
             @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
         checkRequestValidity(orgId);
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         ///
         try {
             return RuntimeContext.getInstance().getCardManager()
@@ -1141,6 +1156,9 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(orgId);
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         ///
         try {
             RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, longCardNo, changeTime, validTime);
@@ -1654,6 +1672,9 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "isLongUid") boolean isLongUid, @WebParam(name = "forceRegister") Integer forceRegister,
             @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         logger.info(String.format(
                 "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s",
                 idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid));
@@ -2186,6 +2207,9 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
+        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+            longCardNo = null;
+        }
         ResponseItem responseItem = new ResponseItem();
         try {
             Card card = CardService.getInstance().unblockOrReturnCard(cardNo, longCardNo, idOfOrg);
