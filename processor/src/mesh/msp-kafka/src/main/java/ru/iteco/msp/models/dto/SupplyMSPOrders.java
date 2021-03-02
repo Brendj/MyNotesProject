@@ -15,6 +15,7 @@ public class SupplyMSPOrders {
     private Long rSum;
     private Long organizationId;
     private String details;
+    private Integer fration;
 
     public SupplyMSPOrders() {
     }
@@ -31,6 +32,14 @@ public class SupplyMSPOrders {
         this.rSum = rSum;
         this.organizationId = organizationId;
         this.details = details;
+    }
+
+    public Integer getFration() {
+        return fration;
+    }
+
+    public void setFration(Integer fration) {
+        this.fration = fration;
     }
 
     public Long getIdOfOrg() {

@@ -47,6 +47,7 @@ import java.util.Set;
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
         "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
+        "       od.fration as \"fration\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
@@ -78,6 +79,7 @@ import java.util.Set;
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
         "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
+        "       od.fration as \"fration\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
