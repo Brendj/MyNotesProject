@@ -12,25 +12,23 @@
 
 package ru.iteco.emias.kafka.Request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * Данные об освобождении от посещения ОО
  */
-@Schema(description = "Данные об освобождении от посещения ОО")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2021-02-28T22:45:51.033+03:00[Europe/Moscow]")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonExemption {
   @SerializedName("id")
-  private Long id = null;
+  private String id = null;
 
   @SerializedName("person_id")
-  private String personId = null;
+  private String person_id = null;
 
   @SerializedName("items")
   private List<PersonExemptionItem> items = null;
@@ -39,29 +37,19 @@ public class PersonExemption {
   private Integer reason = null;
 
   @SerializedName("created_at")
-  private OffsetDateTime createdAt = null;
-
-  public PersonExemption id(Long id) {
-    this.id = id;
-    return this;
-  }
+  private String created_at = null;
 
    /**
-   * Идентификатор события
+   * Идентификатор сообщения
    * @return id
   **/
-  @Schema(required = true, description = "Идентификатор события")
-  public Long getId() {
+  @Schema(required = true, description = "Идентификатор сообщения")
+  public String getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
-  }
-
-  public PersonExemption personId(String personId) {
-    this.personId = personId;
-    return this;
   }
 
    /**
@@ -69,25 +57,12 @@ public class PersonExemption {
    * @return personId
   **/
   @Schema(required = true, description = "Идентификатор персоны МЭШ.Контингента")
-  public String getPersonId() {
-    return personId;
+  public String getPerson_id() {
+    return person_id;
   }
 
-  public void setPersonId(String personId) {
-    this.personId = personId;
-  }
-
-  public PersonExemption items(List<PersonExemptionItem> items) {
-    this.items = items;
-    return this;
-  }
-
-  public PersonExemption addItemsItem(PersonExemptionItem itemsItem) {
-    if (this.items == null) {
-      this.items = new ArrayList<>();
-    }
-    this.items.add(itemsItem);
-    return this;
+  public void setPerson_id(String person_id) {
+    this.person_id = person_id;
   }
 
    /**
@@ -103,16 +78,11 @@ public class PersonExemption {
     this.items = items;
   }
 
-  public PersonExemption reason(Integer reason) {
-    this.reason = reason;
-    return this;
-  }
-
    /**
    * Основание: 1 - Справка 095/у 2 - Рекомендация по освобождению от посещения ОУ 
    * @return reason
   **/
-  @Schema(description = "Основание: 1 - Справка 095/у 2 - Рекомендация по освобождению от посещения ОУ ")
+  @Schema(required = true, description = "Основание: 1 - Справка 095/у 2 - Рекомендация по освобождению от посещения ОУ ")
   public Integer getReason() {
     return reason;
   }
@@ -121,44 +91,22 @@ public class PersonExemption {
     this.reason = reason;
   }
 
-  public PersonExemption createdAt(OffsetDateTime createdAt) {
-    this.createdAt = createdAt;
-    return this;
-  }
-
    /**
    * Дата и время события
    * @return createdAt
   **/
   @Schema(required = true, description = "Дата и время события")
-  public OffsetDateTime getCreatedAt() {
-    return createdAt;
+  public String getCreated_at() {
+    return created_at;
   }
 
-  public void setCreatedAt(OffsetDateTime createdAt) {
-    this.createdAt = createdAt;
-  }
-
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    PersonExemption personExemption = (PersonExemption) o;
-    return Objects.equals(this.id, personExemption.id) &&
-        Objects.equals(this.personId, personExemption.personId) &&
-        Objects.equals(this.items, personExemption.items) &&
-        Objects.equals(this.reason, personExemption.reason) &&
-        Objects.equals(this.createdAt, personExemption.createdAt);
+  public void setCreated_at(String created_at) {
+    this.created_at = created_at;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, personId, items, reason, createdAt);
+    return Objects.hash(id, person_id, items, reason, created_at);
   }
 
 
@@ -168,10 +116,10 @@ public class PersonExemption {
     sb.append("class PersonExemption {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    personId: ").append(toIndentedString(personId)).append("\n");
+    sb.append("    personId: ").append(toIndentedString(person_id)).append("\n");
     sb.append("    items: ").append(toIndentedString(items)).append("\n");
     sb.append("    reason: ").append(toIndentedString(reason)).append("\n");
-    sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
+    sb.append("    createdAt: ").append(toIndentedString(created_at)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -186,5 +134,4 @@ public class PersonExemption {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
 }

@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.PartitionOffset;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
@@ -27,17 +29,16 @@ public class KafkaService {
 
     @KafkaListener(topics = "#{'${kafka.topic.emias}'}")
 
-//        @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.card}'}", partitionOffsets = {
-//            @PartitionOffset(partition = "0", initialOffset = "830696")}))//for tests
+//        @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.emias}'}", partitionOffsets = {
+//            @PartitionOffset(partition = "0", initialOffset = "0")}))//for tests
     public void meshListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
-        PersonExemption request = objectMapper.readValue(message, PersonExemption.class);
-        emiasProcessorService.processEmiasRequest(request);
-    }
-
-    //@PostConstruct
-    public void test()
-    {
-        emiasProcessorService.processEmiasRequest(null);
+        try {
+            PersonExemption request = objectMapper.readValue(message, PersonExemption.class);
+            emiasProcessorService.processEmiasRequest(request);
+        } catch (Exception e)
+        {
+            log.error("internal error " + e);
+        }
     }
 }

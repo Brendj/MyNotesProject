@@ -12,48 +12,38 @@
 
 package ru.iteco.emias.kafka.Request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 /**
  * Данные о периоде освобождения от посещения ОО
  */
 @Schema(description = "Данные о периоде освобождения от посещения ОО")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2021-02-28T22:45:51.033+03:00[Europe/Moscow]")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonExemptionItem {
   @SerializedName("from")
-  private LocalDate from = null;
+  private String from = null;
 
   @SerializedName("to")
-  private LocalDate to = null;
+  private String to = null;
 
   @SerializedName("hazard_level_id")
-  private Integer hazardLevelId = null;
-
-  public PersonExemptionItem from(LocalDate from) {
-    this.from = from;
-    return this;
-  }
+  private Integer hazard_level_id = null;
 
    /**
    * Дата начала периода
    * @return from
   **/
   @Schema(required = true, description = "Дата начала периода")
-  public LocalDate getFrom() {
+  public String getFrom() {
     return from;
   }
 
-  public void setFrom(LocalDate from) {
+  public void setFrom(String from) {
     this.from = from;
-  }
-
-  public PersonExemptionItem to(LocalDate to) {
-    this.to = to;
-    return this;
   }
 
    /**
@@ -61,17 +51,12 @@ public class PersonExemptionItem {
    * @return to
   **/
   @Schema(required = true, description = "Дата окончания периода")
-  public LocalDate getTo() {
+  public String getTo() {
     return to;
   }
 
-  public void setTo(LocalDate to) {
+  public void setTo(String to) {
     this.to = to;
-  }
-
-  public PersonExemptionItem hazardLevelId(Integer hazardLevelId) {
-    this.hazardLevelId = hazardLevelId;
-    return this;
   }
 
    /**
@@ -79,32 +64,17 @@ public class PersonExemptionItem {
    * @return hazardLevelId
   **/
   @Schema(required = true, description = "Уровень опасности: 0 - нейтральный 1 - высокий ")
-  public Integer getHazardLevelId() {
-    return hazardLevelId;
+  public Integer getHazard_level_id() {
+    return hazard_level_id;
   }
 
-  public void setHazardLevelId(Integer hazardLevelId) {
-    this.hazardLevelId = hazardLevelId;
-  }
-
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    PersonExemptionItem personExemptionItem = (PersonExemptionItem) o;
-    return Objects.equals(this.from, personExemptionItem.from) &&
-        Objects.equals(this.to, personExemptionItem.to) &&
-        Objects.equals(this.hazardLevelId, personExemptionItem.hazardLevelId);
+  public void setHazard_level_id(Integer hazard_level_id) {
+    this.hazard_level_id = hazard_level_id;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(from, to, hazardLevelId);
+    return Objects.hash(from, to, hazard_level_id);
   }
 
 
@@ -115,7 +85,7 @@ public class PersonExemptionItem {
     
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
     sb.append("    to: ").append(toIndentedString(to)).append("\n");
-    sb.append("    hazardLevelId: ").append(toIndentedString(hazardLevelId)).append("\n");
+    sb.append("    hazardLevelId: ").append(toIndentedString(hazard_level_id)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -130,5 +100,4 @@ public class PersonExemptionItem {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
 }

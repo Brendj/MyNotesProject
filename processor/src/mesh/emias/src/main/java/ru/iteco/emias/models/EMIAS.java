@@ -7,14 +7,13 @@ package ru.iteco.emias.models;
 import org.hibernate.annotations.GenericGenerator;
 import ru.iteco.emias.audit.AuditEntity;
 import ru.iteco.emias.audit.AuditEntityListener;
-import ru.iteco.emias.audit.Auditable;
 
 import javax.persistence.*;
 
 @Entity
 @EntityListeners(AuditEntityListener.class)
 @Table(name = "cf_emias")
-public class EMIAS implements Auditable {
+public class EMIAS {
 
     public EMIAS() {
         // for Hibernate
@@ -63,18 +62,15 @@ public class EMIAS implements Auditable {
     @Column(name = "hazard_level_id")
     private Integer hazard_level_id;
 
+    @Column(name = "errormessage")
+    private String errormessage;
+
+    @Column(name = "idemias")
+    private String idemias;
+
     @Embedded
     private AuditEntity auditEntity;
 
-    @Override
-    public AuditEntity getAudit() {
-        return auditEntity;
-    }
-
-    @Override
-    public void setAudit(AuditEntity audit) {
-        this.auditEntity = audit;
-    }
     public Boolean getKafka() {
         return kafka;
     }
@@ -145,5 +141,29 @@ public class EMIAS implements Auditable {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public String getErrormessage() {
+        return errormessage;
+    }
+
+    public void setErrormessage(String errormessage) {
+        this.errormessage = errormessage;
+    }
+
+    public AuditEntity getAuditEntity() {
+        return auditEntity;
+    }
+
+    public void setAuditEntity(AuditEntity auditEntity) {
+        this.auditEntity = auditEntity;
+    }
+
+    public String getIdemias() {
+        return idemias;
+    }
+
+    public void setIdemias(String idemias) {
+        this.idemias = idemias;
     }
 }

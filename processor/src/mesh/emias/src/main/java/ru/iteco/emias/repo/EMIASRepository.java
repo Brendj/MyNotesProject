@@ -11,7 +11,7 @@ public interface EMIASRepository extends JpaRepository<EMIAS, Long> {
     @Query(value =
             "select * from cf_emias where guid=:guid and kafka is true",
             nativeQuery = true)
-    List<EMIAS> findEmiasbyGuid(@Param("guid") String guid);
+    List<EMIAS> findEmiasbyMeshGuidClient(@Param("guid") String guid);
 
 
     @Query(value =

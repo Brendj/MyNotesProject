@@ -2887,7 +2887,7 @@ public class DAOService {
 
     public List findEMIASbyClientandBeetwenDates(Client client, Date startDate, Date endDate) {
         Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
-                + "and em.dateLiberate between :begDate and :endDate ");
+                + "and em.dateLiberate between :begDate and :endDate and em.kafka<>true");
         query.setParameter("guid", client.getClientGUID());
         query.setParameter("begDate", startDate);
         query.setParameter("endDate", endDate);

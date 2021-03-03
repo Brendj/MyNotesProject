@@ -27,6 +27,9 @@ public class EMIAS {
     private Boolean accepted;
     private Long deletedemiasid;
     private Long version;
+    private Boolean kafka;
+    private Boolean archive;
+    private Integer hazard_level_id;
 
    public EMIAS(){}
 
@@ -125,5 +128,29 @@ public class EMIAS {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public Boolean getKafka() {
+        return kafka;
+    }
+
+    public void setKafka(Boolean kafka) {
+        this.kafka = kafka;
+    }
+
+    public Boolean getArchive() {
+        return archive;
+    }
+
+    public void setArchive(Boolean archive) {
+        this.archive = archive;
+    }
+
+    public Integer getHazard_level_id() {
+        return hazard_level_id;
+    }
+
+    public void setHazard_level_id(Integer hazard_level_id) {
+        this.hazard_level_id = hazard_level_id;
     }
 }

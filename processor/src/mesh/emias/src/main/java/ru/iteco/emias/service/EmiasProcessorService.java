@@ -9,9 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.iteco.emias.kafka.Request.PersonExemption;
 import ru.iteco.emias.kafka.Request.PersonExemptionItem;
+import ru.iteco.emias.models.Client;
 import ru.iteco.emias.models.EMIAS;
 
-import java.time.ZoneId;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -26,8 +27,26 @@ public class EmiasProcessorService {
     }
 
     public void processEmiasRequest(PersonExemption request) {
+        Date created_at;
+        try {
+            SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            created_at = formater.parse(request.getCreated_at());
+        } catch (Exception e)
+        {
+            serviceBD.writeRecord(request.getId(), request.getPerson_id(), "Ошибка при форматировании даты из СОУР "
+                    + e.getMessage());
+            return;
+        }
+
+        Client client = serviceBD.getClientByMeshGuid(request.getPerson_id());;
+        if (client == null)
+        {
+            serviceBD.writeRecord(request.getId(), request.getPerson_id(), "Клиент с таким MeshGuid не найден");
+            return;
+        }
+
         //Получаем список уже имеющихся данных по этому клиенту
-        List<EMIAS> emiasInBD = serviceBD.getEmiasByGuid(request.getPersonId());
+        List<EMIAS> emiasInBD = serviceBD.getEmiasByGuid(request.getPerson_id());
 
         List<PersonExemptionItem> emiasItems = request.getItems();
         if (emiasItems == null || emiasItems.isEmpty())
@@ -38,18 +57,35 @@ public class EmiasProcessorService {
         }
         //Если пришли новые периоды
         serviceBD.setArchivedFlag(emiasInBD, true);
+        SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
         for (PersonExemptionItem personExemptionItem: emiasItems)
         {
-            Date dateTo = Date.from(personExemptionItem.getTo().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date dateTo;
+            try {
+                dateTo = formater.parse(personExemptionItem.getTo());
+            } catch (Exception e)
+            {
+                serviceBD.writeRecord(request.getId(), request.getPerson_id(), "Ошибка при форматировании даты To "
+                        + e.getMessage());
+                continue;
+            }
+            Date dateFrom;
+            try {
+                dateFrom = formater.parse(personExemptionItem.getFrom());
+            } catch (Exception e)
+            {
+                serviceBD.writeRecord(request.getId(), request.getPerson_id(), "Ошибка при форматировании даты From "
+                        + e.getMessage());
+                continue;
+            }
+
             if (dateTo.before(new Date()))
             {
                 //Если конечная дата меньше текущей, то такие записи не обрабатываем
                 break;
             }
-            Date createDate = Date.from(request.getCreatedAt().toInstant());
-            Date dateFrom = Date.from(personExemptionItem.getFrom().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            serviceBD.writeRecord(request.getId(), request.getPersonId(), createDate, dateFrom, dateTo,
-                    personExemptionItem.getHazardLevelId());
+            serviceBD.writeRecord(request.getId(), request.getPerson_id(), created_at, dateFrom, dateTo,
+                    personExemptionItem.getHazard_level_id());
         }
     }
 }
