@@ -30,6 +30,7 @@ import java.util.Set;
                                 @ColumnResult(name = "rSum", type = Long.class),
                                 @ColumnResult(name = "organizationId", type = Long.class),
                                 @ColumnResult(name = "details", type = String.class),
+                                @ColumnResult(name = "fration", type = Integer.class)
                         }
                 )
         }
@@ -46,7 +47,7 @@ import java.util.Set;
         "       o.orderdate as \"orderDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
-        "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
+        "       string_agg(distinct od.menudetailname, ';')  as \"details\",\n" +
         "       od.fration as \"fration\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
@@ -67,7 +68,7 @@ import java.util.Set;
         "  and od.menutype between 50 and 99\n" +
         "  and od.idofrule is not null\n" +
         "  and (cd.idofcategorydiscount >= 0 or cd.idofcategorydiscount = -90)\n" +
-        "  group by 1,2,3,4,7,8,9" +
+        "  group by 1,2,3,4,7,8,9,11 " +
         " union distinct " +
         "       select o.idoforg as \"idOfOrg\",\n" +
         "       o.idoforder as \"idOfOrder\",\n" +
@@ -78,7 +79,7 @@ import java.util.Set;
         "       o.orderdate as \"orderDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
-        "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
+        "       string_agg(distinct od.menudetailname, ';')  as \"details\",\n" +
         "       od.fration as \"fration\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
@@ -95,7 +96,7 @@ import java.util.Set;
         "  and od.menutype between 50 and 99\n" +
         "  and od.idofrule is not null\n" +
         "  and (cd.idofcategorydiscount >= 0 or cd.idofcategorydiscount = -90)\n" +
-        "  group by 1,2,3,4,7,8,9 "
+        "  group by 1,2,3,4,7,8,9,11 "
 )
 public class Order {
     public static final int DISCOUNT_TYPE = 4;
