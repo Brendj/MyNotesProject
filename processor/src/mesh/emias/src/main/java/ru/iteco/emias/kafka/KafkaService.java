@@ -34,6 +34,7 @@ public class KafkaService {
     public void meshListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
         try {
+            log.info(String.format("Offset %d, Partition_ID %d, Received JSON: %s", offset, partitionId, message));
             PersonExemption request = objectMapper.readValue(message, PersonExemption.class);
             emiasProcessorService.processEmiasRequest(request);
         } catch (Exception e)

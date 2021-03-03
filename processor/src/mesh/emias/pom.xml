@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ru.iteco</groupId>
-    <artifactId>emias</artifactId>
+    <artifactId>emias-kafka</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>emias</name>
     <description>work with Emias</description>
@@ -119,6 +119,7 @@
                 </executions>
             </plugin>
         </plugins>
+        <finalName>emias-kafka</finalName>
     </build>
 
 </project>
