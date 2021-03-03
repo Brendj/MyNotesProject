@@ -36,7 +36,7 @@ public class ExemptionVisitingSectionForARMAnswer implements AbstractToElement {
         else {
             Collections.sort(items, new Comparator<ExemptionVisitingSyncFromAnswerARMPOJO>() {
                 public int compare(ExemptionVisitingSyncFromAnswerARMPOJO o1, ExemptionVisitingSyncFromAnswerARMPOJO o2) {
-                    return o1.getIdEventEMIAS().compareTo(o2.getIdEventEMIAS());
+                    return o1.getIdExemption().compareTo(o2.getIdExemption());
                 }
             });
         }

@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.EMIAS;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -16,7 +15,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +41,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
         for (ExemptionVisitingSyncFromARMPOJO pojo : exemptionVisitingRequest.getItems()) {
             ExemptionVisitingSyncFromAnswerARMPOJO exemptionVisitingSyncFromAnswerARMPOJO = new ExemptionVisitingSyncFromAnswerARMPOJO();
             try {
-                exemptionVisitingSyncFromAnswerARMPOJO.setIdEventEMIAS(pojo.getIdEMIAS());
+                exemptionVisitingSyncFromAnswerARMPOJO.setIdExemption(pojo.getIdEMIAS());
                 EMIAS emias = (EMIAS) session.get(EMIAS.class, pojo.getIdEMIAS());
                 Long version = 0L;
                 if (emias.getAccepted() != null && pojo.getAccepted() != null) {
@@ -79,19 +77,20 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
 
         List<EMIAS> EMIASFromDB = DAOReadonlyService.getInstance().getExemptionVisitingForMaxVersionAndIdOrg(maxVersionFromARM, friendlyOrg);
 
-        //fullEmiasAnswerForARM.setMaxVersion(maxVersionFromDB);
         for (EMIAS emias : EMIASFromDB) {
 
             ExemptionVisitingSyncPOJO exemptionVisitingSyncPOJO = new ExemptionVisitingSyncPOJO();
+            exemptionVisitingSyncPOJO.setIdExemption(emias.getIdEventEMIAS());
+            exemptionVisitingSyncPOJO.setArchive(emias.getArchive());
+            exemptionVisitingSyncPOJO.setHazard_level_id(emias.getHazard_level_id());
             exemptionVisitingSyncPOJO.setMeshguid(emias.getGuid());
-            exemptionVisitingSyncPOJO.setIdEMIAS(emias.getIdEventEMIAS());
-            exemptionVisitingSyncPOJO.setDateLiberate(emias.getDateLiberate());
             exemptionVisitingSyncPOJO.setStartDateLiberate(emias.getStartDateLiberate());
             exemptionVisitingSyncPOJO.setEndDateLiberate(emias.getEndDateLiberate());
-            exemptionVisitingSyncPOJO.setCreateDate(emias.getCreateDate());
-            exemptionVisitingSyncPOJO.setUpdateDate(emias.getUpdateDate());
+            exemptionVisitingSyncPOJO.setDateLiberate(emias.getDateLiberate());
             exemptionVisitingSyncPOJO.setAccepted(emias.getAccepted());
             exemptionVisitingSyncPOJO.setVersion(emias.getVersion());
+            exemptionVisitingSyncPOJO.setCreateDate(emias.getCreateDate());
+            exemptionVisitingSyncPOJO.setUpdateDate(emias.getUpdateDate());
             fullExemptionVisitingAnswerForARM.getItems().add(exemptionVisitingSyncPOJO);
         }
         return fullExemptionVisitingAnswerForARM;

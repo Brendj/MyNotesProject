@@ -12,23 +12,28 @@ import org.w3c.dom.Element;
 import java.util.Date;
 
 public class ExemptionVisitingSyncPOJO {
+    private Long idExemption;
+    private Boolean archive;
+    private Integer hazard_level_id;
+
     private String meshguid;
-    private Long idEMIAS;
     private Date dateLiberate;
     private Date startDateLiberate;
     private Date endDateLiberate;
     private Date createDate;
     private Date updateDate;
-    private Boolean accepted;
     private Long version;
+    private Boolean accepted;
 
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("Record");
+        element.setAttribute("idExemption", idExemption.toString());
+        element.setAttribute("archive", archive == null ? "false" : accepted.toString());
+        element.setAttribute("hazard_level_id", hazard_level_id == null ? "0" : hazard_level_id.toString());
         element.setAttribute("meshguid", meshguid);
-        element.setAttribute("idEMIAS",idEMIAS.toString());
-        element.setAttribute("dateLiberate", CalendarUtils.dateTimeToString(dateLiberate));
         element.setAttribute("startDateLiberate",CalendarUtils.dateShortToStringFullYear(startDateLiberate));
         element.setAttribute("endDateLiberate",CalendarUtils.dateShortToStringFullYear(endDateLiberate));
+        element.setAttribute("dateLiberate", CalendarUtils.dateTimeToString(dateLiberate));
         element.setAttribute("accepted", accepted == null ? "false" : accepted.toString());
         element.setAttribute("version", version == null ? "-1" : version.toString());
         return element;
@@ -90,12 +95,12 @@ public class ExemptionVisitingSyncPOJO {
         this.version = version;
     }
 
-    public Long getIdEMIAS() {
-        return idEMIAS;
+    public Long getIdExemption() {
+        return idExemption;
     }
 
-    public void setIdEMIAS(Long idEMIAS) {
-        this.idEMIAS = idEMIAS;
+    public void setIdExemption(Long idExemption) {
+        this.idExemption = idExemption;
     }
 
     public String getMeshguid() {
@@ -104,5 +109,21 @@ public class ExemptionVisitingSyncPOJO {
 
     public void setMeshguid(String meshguid) {
         this.meshguid = meshguid;
+    }
+
+    public Boolean getArchive() {
+        return archive;
+    }
+
+    public void setArchive(Boolean archive) {
+        this.archive = archive;
+    }
+
+    public Integer getHazard_level_id() {
+        return hazard_level_id;
+    }
+
+    public void setHazard_level_id(Integer hazard_level_id) {
+        this.hazard_level_id = hazard_level_id;
     }
 }

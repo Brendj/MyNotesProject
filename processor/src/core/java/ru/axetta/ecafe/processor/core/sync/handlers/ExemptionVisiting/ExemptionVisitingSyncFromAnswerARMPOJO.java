@@ -8,27 +8,27 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class ExemptionVisitingSyncFromAnswerARMPOJO {
-    private Long idEventEMIAS;
+    private Long idExemption;
     private String errormessage;
     private Long version;
 
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("Record");
-        element.setAttribute("idEMIAS", idEventEMIAS == null ? "" : idEventEMIAS.toString());
+        element.setAttribute("idExemption", idExemption == null ? "" : idExemption.toString());
         element.setAttribute("errormessage", errormessage == null ? "" : errormessage);
         element.setAttribute("Version", version == null ? "0" : Long.toString(version));
         return element;
     }
 
 
-    public Long getIdEventEMIAS() {
-        if (idEventEMIAS == null)
+    public Long getIdExemption() {
+        if (idExemption == null)
             return 0L;
-        return idEventEMIAS;
+        return idExemption;
     }
 
-    public void setIdEventEMIAS(Long idEventEMIAS) {
-        this.idEventEMIAS = idEventEMIAS;
+    public void setIdExemption(Long idExemption) {
+        this.idExemption = idExemption;
     }
 
     public String getErrormessage() {
