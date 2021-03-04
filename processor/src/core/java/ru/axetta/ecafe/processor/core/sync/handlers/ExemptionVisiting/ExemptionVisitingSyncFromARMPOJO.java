@@ -8,12 +8,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class ExemptionVisitingSyncFromARMPOJO {
-    private Long idEMIAS;
+    private Long idExemption;
     private Boolean accepted;
 
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("Record");
-        element.setAttribute("idEMIAS",idEMIAS.toString());
+        element.setAttribute("idExemption", idExemption == null ? "" : idExemption.toString());
         element.setAttribute("accepted", accepted == null ? "false" : accepted.toString());
         return element;
     }
@@ -26,11 +26,11 @@ public class ExemptionVisitingSyncFromARMPOJO {
         this.accepted = accepted;
     }
 
-    public Long getIdEMIAS() {
-        return idEMIAS;
+    public Long getIdExemption() {
+        return idExemption;
     }
 
-    public void setIdEMIAS(Long idEMIAS) {
-        this.idEMIAS = idEMIAS;
+    public void setIdExemption(Long idExemption) {
+        this.idExemption = idExemption;
     }
 }

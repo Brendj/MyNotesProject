@@ -28,7 +28,7 @@ public class ExemptionVisitingSyncPOJO {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("Record");
         element.setAttribute("idExemption", idExemption.toString());
-        element.setAttribute("archive", archive == null ? "false" : accepted.toString());
+        element.setAttribute("archive", archive == null ? "false" : archive.toString());
         element.setAttribute("hazard_level_id", hazard_level_id == null ? "0" : hazard_level_id.toString());
         element.setAttribute("meshguid", meshguid);
         element.setAttribute("startDateLiberate",CalendarUtils.dateShortToStringFullYear(startDateLiberate));

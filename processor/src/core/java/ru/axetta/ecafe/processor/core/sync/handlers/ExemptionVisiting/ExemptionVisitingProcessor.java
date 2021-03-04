@@ -41,8 +41,8 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
         for (ExemptionVisitingSyncFromARMPOJO pojo : exemptionVisitingRequest.getItems()) {
             ExemptionVisitingSyncFromAnswerARMPOJO exemptionVisitingSyncFromAnswerARMPOJO = new ExemptionVisitingSyncFromAnswerARMPOJO();
             try {
-                exemptionVisitingSyncFromAnswerARMPOJO.setIdExemption(pojo.getIdEMIAS());
-                EMIAS emias = (EMIAS) session.get(EMIAS.class, pojo.getIdEMIAS());
+                exemptionVisitingSyncFromAnswerARMPOJO.setIdExemption(pojo.getIdExemption());
+                EMIAS emias = (EMIAS) session.get(EMIAS.class, pojo.getIdExemption());
                 Long version = 0L;
                 if (emias.getAccepted() != null && pojo.getAccepted() != null) {
                     if (!emias.getAccepted().equals(pojo.getAccepted())) {
@@ -80,7 +80,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
         for (EMIAS emias : EMIASFromDB) {
 
             ExemptionVisitingSyncPOJO exemptionVisitingSyncPOJO = new ExemptionVisitingSyncPOJO();
-            exemptionVisitingSyncPOJO.setIdExemption(emias.getIdEventEMIAS());
+            exemptionVisitingSyncPOJO.setIdExemption(emias.getIdOfEMIAS());
             exemptionVisitingSyncPOJO.setArchive(emias.getArchive());
             exemptionVisitingSyncPOJO.setHazard_level_id(emias.getHazard_level_id());
             exemptionVisitingSyncPOJO.setMeshguid(emias.getGuid());

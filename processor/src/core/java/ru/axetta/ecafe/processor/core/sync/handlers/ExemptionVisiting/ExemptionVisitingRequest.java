@@ -24,7 +24,7 @@ public class ExemptionVisitingRequest implements SectionRequest {
         while (nodeElement != null) {
             if (nodeElement.getNodeName().equals("Record")) {
                 ExemptionVisitingSyncFromARMPOJO exemptionVisitingSyncFromARMPOJO = new ExemptionVisitingSyncFromARMPOJO();
-                exemptionVisitingSyncFromARMPOJO.setIdEMIAS(XMLUtils.getLongAttributeValue(nodeElement, "idEMIAS"));
+                exemptionVisitingSyncFromARMPOJO.setIdExemption(XMLUtils.getLongAttributeValue(nodeElement, "idExemption"));
                 exemptionVisitingSyncFromARMPOJO
                         .setAccepted(Boolean.valueOf(XMLUtils.getAttributeValue(nodeElement, "accepted")));
                 items.add(exemptionVisitingSyncFromARMPOJO);
