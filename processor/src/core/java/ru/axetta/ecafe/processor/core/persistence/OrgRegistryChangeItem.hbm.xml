@@ -69,6 +69,8 @@
         <property name="founderFrom" column="founderFrom" type="string" length="512"/>
         <property name="subordination" column="subordination" type="string" length="512"/>
         <property name="subordinationFrom" column="subordinationFrom" type="string" length="512"/>
+        <property name="globalId" column="globalId" type="long"/>
+        <property name="globalIdFrom" column="globalIdFrom" type="long"/>
 
     </class>
 </hibernate-mapping>
