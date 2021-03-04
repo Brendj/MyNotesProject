@@ -5,6 +5,7 @@
 package ru.iteco.msp.kafka.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import ru.iteco.msp.enums.OrderDetailFRationType;
 import ru.iteco.msp.models.dto.SupplyMSPOrders;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +47,7 @@ public class SupplyEvent {
                 event.benefit_category_name = StringUtils.join(discounts, ";");
             }
         }
-        event.data = order.getDetails();
+        event.data = order.getDetails() + OrderDetailFRationType.getByCode(order.getFration());
         event.date = order.getOrderDate().toString();
         event.amount = order.getrSum();
         event.organization_id = order.getOrganizationId();
