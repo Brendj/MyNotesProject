@@ -3173,5 +3173,11 @@ public class DAOService {
         Query q = entityManager.createQuery("SELECT wtAge FROM WtAgeGroupItem wtAge");
         return q.getResultList();
     }
+    public void updateExemptionVisiting() {
+        Query query = entityManager.createQuery(
+                "update EMIAS set archive=true where endDateLiberate<:currentDate");
+        query.setParameter("currentDate", new Date());
+        query.executeUpdate();
+    }
 }
 
