@@ -44,7 +44,9 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
                 exemptionVisitingSyncFromAnswerARMPOJO.setIdExemption(pojo.getIdExemption());
                 EMIAS emias = (EMIAS) session.get(EMIAS.class, pojo.getIdExemption());
                 Long version = 0L;
-                if (emias.getAccepted() != null && pojo.getAccepted() != null) {
+                if (emias.getAccepted() == null)
+                    emias.setAccepted(false);
+                if (pojo.getAccepted() != null) {
                     if (!emias.getAccepted().equals(pojo.getAccepted())) {
                         version = DAOUtils.getMaxVersionOfExemptionVisiting(session) + 1;
                         emias.setAccepted(pojo.getAccepted());
