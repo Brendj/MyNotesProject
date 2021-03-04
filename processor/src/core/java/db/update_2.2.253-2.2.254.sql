@@ -16,7 +16,7 @@ COMMENT ON COLUMN cf_orgregistrychange.globalIdFrom IS 'Идентификато
 COMMENT ON COLUMN cf_orgregistrychange_item.globalId IS 'Идентификатор НСИ-3';
 COMMENT ON COLUMN cf_orgregistrychange_item.globalIdFrom IS 'Идентификатор НСИ-3 в ИСПП';
 
--- Миграции БД при обновлении веб АРМа ПП до v 1.25
+-- Миграции БД при обновлении веб АРМа ПП до v1.25
 drop trigger complex_org_inc_ver on cf_wt_complexes_org;
 drop trigger menu_org_inc_ver on cf_wt_menu_org;
 drop trigger org_group_org_inc_ver on cf_wt_org_group_relations;
