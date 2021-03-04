@@ -153,10 +153,7 @@ public class AccountsRegistryHandler {
 
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
-        ClientReadOnlyRepository clientDao = ClientReadOnlyRepository.getInstance();
-        List<Client> clientList = clientDao.findAllActiveByOrgAndUpdateDate(idOfOrgs,lastAccRegistrySyncDate);
-
-        // Добавляем карты временных посетителей (мигрантов)
+        List<Client> clientList = new ArrayList<>();
         clientList.addAll(Processor.getMigrants(idOfOrg));
 
         for (Client client : clientList) {
