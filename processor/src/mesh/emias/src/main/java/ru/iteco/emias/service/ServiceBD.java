@@ -59,6 +59,7 @@ public class ServiceBD {
                 emias.setVersion(1L);
             else
                 emias.setVersion(maxVersion+1);
+            emias.setProcessed(false);
             emiasRepository.save(emias);
         } catch (Exception e)
         {
@@ -83,6 +84,7 @@ public class ServiceBD {
                 emias.setVersion(1L);
             else
                 emias.setVersion(maxVersion+1);
+            emias.setProcessed(true);
             emiasRepository.save(emias);
         } catch (Exception e)
         {

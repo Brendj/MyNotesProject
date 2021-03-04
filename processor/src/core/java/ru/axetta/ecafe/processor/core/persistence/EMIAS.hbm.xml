@@ -26,6 +26,7 @@
         <property name="kafka" column="kafka" type="boolean"/>
         <property name="archive" column="archive" type="boolean"/>
         <property name="hazard_level_id" column="hazard_level_id" type="integer"/>
+        <property name="processed" column="processed" type="boolean"/>
     </class>
 </hibernate-mapping>
 

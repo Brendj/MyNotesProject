@@ -30,6 +30,7 @@ public class EMIAS {
     private Boolean kafka;
     private Boolean archive;
     private Integer hazard_level_id;
+    private Boolean processed;
 
    public EMIAS(){}
 
@@ -152,5 +153,13 @@ public class EMIAS {
 
     public void setHazard_level_id(Integer hazard_level_id) {
         this.hazard_level_id = hazard_level_id;
+    }
+
+    public Boolean getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(Boolean processed) {
+        this.processed = processed;
     }
 }

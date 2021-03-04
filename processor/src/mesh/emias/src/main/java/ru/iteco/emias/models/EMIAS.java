@@ -68,6 +68,9 @@ public class EMIAS {
     @Column(name = "idemias")
     private String idemias;
 
+    @Column(name = "processed")
+    private Boolean processed;
+
     @Embedded
     private AuditEntity auditEntity;
 
@@ -165,5 +168,13 @@ public class EMIAS {
 
     public void setIdemias(String idemias) {
         this.idemias = idemias;
+    }
+
+    public Boolean getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(Boolean processed) {
+        this.processed = processed;
     }
 }
