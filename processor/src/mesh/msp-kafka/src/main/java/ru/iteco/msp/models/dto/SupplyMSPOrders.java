@@ -15,12 +15,14 @@ public class SupplyMSPOrders {
     private Long rSum;
     private Long organizationId;
     private String details;
+    private Integer fration;
 
     public SupplyMSPOrders() {
     }
 
     public SupplyMSPOrders(Long idOfOrg, Long idOfOrder, String meshGUID, Integer code, String dtsznCodes,
-                           String categoryName, Long orderDate, Long rSum, Long organizationId, String details) {
+                           String categoryName, Long orderDate, Long rSum, Long organizationId, String details,
+                           Integer fration) {
         this.idOfOrg = idOfOrg;
         this.idOfOrder = idOfOrder;
         this.meshGUID = meshGUID;
@@ -31,6 +33,15 @@ public class SupplyMSPOrders {
         this.rSum = rSum;
         this.organizationId = organizationId;
         this.details = details;
+        this.fration = fration;
+    }
+
+    public Integer getFration() {
+        return fration;
+    }
+
+    public void setFration(Integer fration) {
+        this.fration = fration;
     }
 
     public Long getIdOfOrg() {
