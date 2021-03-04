@@ -1006,9 +1006,9 @@ public class DAOService {
         return findOrgByRegistryDataByMainField(uniqueAddressId, "guid", guid, inn, unom, unad, skipThirdPart);
     }
 
-    public List<Org> findOrgsByEkisId(Long ekisId) {
-        Query q = entityManager.createQuery("select org from Org org where org.ekisId = :ekisId");
-        q.setParameter("ekisId", ekisId);
+    public List<Org> findOrgsByNSIId(Long nsiId) {
+        Query q = entityManager.createQuery("select org from Org org where org.orgIdFromNsi = :nsiId");
+        q.setParameter("nsiId", nsiId);
         return q.getResultList();
     }
 
