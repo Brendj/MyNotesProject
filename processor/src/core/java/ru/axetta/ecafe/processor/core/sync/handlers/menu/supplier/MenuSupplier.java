@@ -146,13 +146,17 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "DishesRequest": {
+                    Set<Long> contragents = new HashSet<>();
+                    contragents.add(contragent.getIdOfContragent());
                     dishes = DAOReadonlyService.getInstance().getDishesListFromVersion(entry.getValue(), contragent);
                     for (Org item : friendlyOrgs) {
                         Contragent itemContragent = DAOReadonlyService.getInstance()
                                 .findDefaultSupplier(item.getIdOfOrg());
+                        if (contragents.contains(itemContragent.getIdOfContragent())) continue;
                         Set<WtDish> friendlyItems = DAOReadonlyService.getInstance()
                                 .getDishesListFromVersion(entry.getValue(), itemContragent);
                         dishes.addAll(friendlyItems);
+                        contragents.add(itemContragent.getIdOfContragent());
                     }
                     break;
                 }
