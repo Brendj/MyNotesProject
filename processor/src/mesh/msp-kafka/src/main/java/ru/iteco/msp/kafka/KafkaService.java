@@ -39,7 +39,7 @@ public class KafkaService {
             sendSupply(msg);
         } catch (Exception e){
             log.error(String.format("Can't send Order ID:%s ID OO:%s",
-                    order.getOrderDate(), order.getIdOfOrg()), e);
+                    order.getCreatedDate(), order.getIdOfOrg()), e);
         }
     }
 

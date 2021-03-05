@@ -64,6 +64,9 @@ public class SupplyTaskExecutor {
                     end = reportingDate.getEndPeriod();
                     begin = reportingDate.getBeginPeriod();
 
+                    log.info(begin.toString());
+                    log.info(end.toString());
+
                     Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("createdDate"));
                     List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
 
