@@ -221,10 +221,17 @@ public class CardService {
         }
     }
 
-    public Card unblockOrReturnCard(Long cardNo, Long idOfOrg) throws Exception {
-        Card card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
+    public Card unblockOrReturnCard(Long cardNo, Long longCardNo, Long idOfOrg) throws Exception {
+        Card card = null;
+        if(longCardNo == null){
+            card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
+        } else {
+            card = cardWritableRepository.findByLongCardNo(longCardNo, idOfOrg);
+        }
         if (null == card) {
-            throw new CardNotFoundException(String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg));
+            throw new CardNotFoundException(
+                    String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg)
+            );
         }
 
         if (CardState.TEMPBLOCKED.getValue() == card.getState()) {

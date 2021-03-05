@@ -180,7 +180,6 @@ public class Card {
     }
 
     private void setCardNo(Long cardNo) {
-        // For Hibernate only
         this.cardNo = cardNo;
     }
 

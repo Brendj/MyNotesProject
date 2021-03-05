@@ -482,4 +482,14 @@ public class CardWritableRepository extends WritableJpaDao {
         }else
             return false;
     }
+
+    public Card findByLongCardNo(Long longCardNo, Long idOfOrg) {
+        TypedQuery<Card> query = entityManager.createQuery(
+                "from Card c left join fetch c.client inner join fetch c.org "
+                        + "where c.longCardNo=:longCardNo and c.org.idOfOrg=:idOfOrg", Card.class);
+        query.setParameter("longCardNo",longCardNo);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setMaxResults(1);
+        return query.getSingleResult();
+    }
 }
