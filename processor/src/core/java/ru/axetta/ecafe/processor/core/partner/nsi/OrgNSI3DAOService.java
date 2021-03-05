@@ -59,7 +59,8 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "trim(addr.address_asur) as address_asur, "                          //18
                 + "trim(addr.district) as district, "                               //19
                 + "trim(org.founder) as founder, "                                 //20
-                + "trim(org.subordination_value) as subordination "                      //21
+                + "trim(org.subordination_value) as subordination, "                      //21
+                + "org.global_id "                                                 //22
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
@@ -97,10 +98,13 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
             item.setMunicipalDistrict((String)row[19]);
             item.setFounder((String)row[20]);
             item.setSubordination((String)row[21]);
+            if (row[22] != null) {
+                item.setGlobalId(((BigInteger) row[22]).longValue());
+            }
 
             ImportRegisterOrgsService.OrgInfo info;
 
-            Org fOrg = DAOService.getInstance().findOrgByRegistryDataByMainField(item.getUniqueAddressId(), "ekisId", item.getEkisId(),
+            Org fOrg = DAOService.getInstance().findOrgByRegistryDataByMainField(item.getUniqueAddressId(), "orgIdFromNsi", item.getGlobalId(),
                     item.getInn(), item.getUnom(), item.getUnad(), true);
 
             if (fOrg != null) {
@@ -131,7 +135,7 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
     @Override
     protected ImportRegisterOrgsService.OrgInfo getInfoWithAddToResult(List<ImportRegisterOrgsService.OrgInfo> result, Object[] row) {
         for (ImportRegisterOrgsService.OrgInfo info : result) {
-            if (row[9] != null && (((BigInteger) row[9]).longValue() == (info.getEkisId()))) {
+            if (row[22] != null && (((BigInteger) row[22]).longValue() == (info.getGlobalId()))) {
                 return info;
             }
         }

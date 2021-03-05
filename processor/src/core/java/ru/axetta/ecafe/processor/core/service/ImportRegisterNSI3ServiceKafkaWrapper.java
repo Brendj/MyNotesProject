@@ -46,7 +46,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
         if(!workWithKafka) {
             innerServices.fillOrgGuids(query, orgGuids);
         } else {
-            query.setParameterList("guids", orgGuids.getOrgEkisIdsLong());
+            query.setParameterList("guids", orgGuids.getOrgNSIIdsLong());
         }
     }
 
@@ -78,7 +78,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "                   LEFT JOIN cf_kf_ct_educationlevel AS el ON p.educationstageid = el.id\n"
                     + "                   LEFT JOIN cf_kf_ct_gender AS g ON p.genderid = g.id\n"
                     + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON p.parallelid = prll.id\n"
-                    + "  WHERE p.invaliddata IS FALSE and o.ekisId IN :guids";
+                    + "  WHERE p.invaliddata IS FALSE and o.organizationidfromnsi IN :guids";
         }
     }
 

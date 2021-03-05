@@ -62,6 +62,8 @@
         <property name="founderFrom" column="founderFrom" type="string" length="512"/>
         <property name="subordination" column="subordination" type="string" length="512"/>
         <property name="subordinationFrom" column="subordinationFrom" type="string" length="512"/>
+        <property name="globalId" column="globalId" type="long"/>
+        <property name="globalIdFrom" column="globalIdFrom" type="long"/>
 
         <set name="orgs" lazy="false" cascade="all" order-by="operationType, address">
             <key column="mainRegistry"/>
