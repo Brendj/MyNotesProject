@@ -13,7 +13,9 @@ import ru.iteco.emias.models.Client;
 import ru.iteco.emias.models.EMIAS;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -79,13 +81,24 @@ public class EmiasProcessorService {
                 continue;
             }
 
-            if (dateTo.before(new Date()))
+            if (endOfDay(dateTo).before(new Date()))
             {
                 //Если конечная дата меньше текущей, то такие записи не обрабатываем
-                break;
+                continue;
             }
             serviceBD.writeRecord(request.getId(), request.getPerson_id(), created_at, dateFrom, dateTo,
                     personExemptionItem.getHazard_level_id());
         }
+    }
+
+    public static Date endOfDay(Date date) {
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTime(date);
+        c.set(Calendar.MILLISECOND, 999);
+        c.set(Calendar.MILLISECOND, 999);
+        c.set(Calendar.SECOND, 59);
+        c.set(Calendar.MINUTE, 59);
+        c.set(Calendar.HOUR_OF_DAY, 23);
+        return c.getTime();
     }
 }

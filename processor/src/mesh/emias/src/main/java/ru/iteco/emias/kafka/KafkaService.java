@@ -28,7 +28,6 @@ public class KafkaService {
     }
 
     @KafkaListener(topics = "#{'${kafka.topic.emias}'}")
-
 //        @KafkaListener(topicPartitions = @TopicPartition(topic = "#{'${kafka.topic.emias}'}", partitionOffsets = {
 //            @PartitionOffset(partition = "0", initialOffset = "0")}))//for tests
     public void meshListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
