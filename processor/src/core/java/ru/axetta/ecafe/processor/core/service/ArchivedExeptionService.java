@@ -37,10 +37,24 @@ public class ArchivedExeptionService {
     final static String AUTO_ARCHIVED = "AutoArchivedExeption";
     final EventNotificationService notificationService = RuntimeContext.getAppContext()
             .getBean(EventNotificationService.class);
-    public static class sendNotification implements Job {
+    public static class archivedExeption implements Job {
 
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class)
+                        .start(persistenceSession);
+                persistenceTransaction.commit();
+            } catch (Exception e) {
+            }
+        }
+
+        public static void manualStart() throws JobExecutionException {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -76,7 +90,7 @@ public class ArchivedExeptionService {
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
                 getProperty("ecafe.processor.exemptionvisiting.archived.time", "0 0 5 ? * * *");
         try {
-            JobDetail jobDetailSync = new JobDetail(AUTO_ARCHIVED, Scheduler.DEFAULT_GROUP, sendNotification.class);
+            JobDetail jobDetailSync = new JobDetail(AUTO_ARCHIVED, Scheduler.DEFAULT_GROUP, archivedExeption.class);
             SchedulerFactory sfb = new StdSchedulerFactory();
             Scheduler scheduler = sfb.getScheduler();
 

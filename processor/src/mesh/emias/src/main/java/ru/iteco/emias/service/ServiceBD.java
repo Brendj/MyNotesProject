@@ -92,4 +92,24 @@ public class ServiceBD {
         }
         return true;
     }
+
+    public boolean changeRecord (EMIAS emias, String emiasId, Date createDate, Integer hazardLevelId)
+    {
+        try {
+            emias.setIdemias(emiasId);
+            emias.setDateliberate(createDate.getTime());
+            Long maxVersion = emiasRepository.getMaxVersion();
+            emias.setHazard_level_id(hazardLevelId);
+            if (maxVersion == null)
+                emias.setVersion(1L);
+            else
+                emias.setVersion(maxVersion+1);
+            emias.setProcessed(true);
+            emiasRepository.save(emias);
+        } catch (Exception e)
+        {
+            return false;
+        }
+        return true;
+    }
 }

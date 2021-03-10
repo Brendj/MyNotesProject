@@ -4,6 +4,7 @@
 
 package ru.iteco.emias.service;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,7 @@ import ru.iteco.emias.models.Client;
 import ru.iteco.emias.models.EMIAS;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EmiasProcessorService {
@@ -57,8 +55,6 @@ public class EmiasProcessorService {
             serviceBD.setArchivedFlag(emiasInBD, true);
             return;
         }
-        //Если пришли новые периоды
-        serviceBD.setArchivedFlag(emiasInBD, true);
         SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
         for (PersonExemptionItem personExemptionItem: emiasItems)
         {
@@ -86,9 +82,29 @@ public class EmiasProcessorService {
                 //Если конечная дата меньше текущей, то такие записи не обрабатываем
                 continue;
             }
+            boolean reWrite = false;
+            //Если нашли такой период в БД
+            Iterator<EMIAS> emiasIterator = emiasInBD.iterator();
+            while (emiasIterator.hasNext()) {
+                EMIAS emias = emiasIterator.next();//получаем следующий элемент
+                if (emias.getStartdateliberate().equals(dateFrom.getTime()) &&
+                        emias.getEnddateliberate().equals(dateTo.getTime()) &&
+                        !emias.getArchive())
+                {
+                    reWrite = true;
+                    serviceBD.changeRecord(emias, request.getId(), created_at, personExemptionItem.getHazard_level_id());
+                    //Удаляем из списка подлежащих архивации
+                    emiasIterator.remove();
+                    break;
+                }
+
+            }
+            if (!reWrite)
             serviceBD.writeRecord(request.getId(), request.getPerson_id(), created_at, dateFrom, dateTo,
                     personExemptionItem.getHazard_level_id());
         }
+        //Старым периодам ставим флаг архивный
+        serviceBD.setArchivedFlag(emiasInBD, true);
     }
 
     public static Date endOfDay(Date date) {
