@@ -969,6 +969,8 @@ public class DAOReadonlyService {
                 complexes.addAll(complexesOrgGroups);
             }
 
+            Query queryDeletedComplexes = entityManager.createNativeQuery("select  from cf_wt_org_relation_aud");
+
             for (WtComplex complex : complexes) {
                 Query query = entityManager
                         .createQuery("SELECT item from WtComplexesItem item left join fetch item.dishes dish where item.wtComplex = :complex");
