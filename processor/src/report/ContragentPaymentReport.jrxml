@@ -232,7 +232,7 @@
 				<textFieldExpression><![CDATA[$F{payMethod}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="406" y="0" width="45" height="19" uuid="e69f46e4-b99e-4d58-ae03-5035d2968637"/>
+				<reportElement stretchType="RelativeToBandHeight" x="406" y="0" width="45" height="19" uuid="e69f46e4-b99e-4d58-ae03-5035d2968637"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
