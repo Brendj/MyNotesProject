@@ -929,8 +929,11 @@ public class DAOReadonlyService {
         List list = queryDeletedMenus.getResultList();
         for (Object obj : list) {
             Long idOfMenu = HibernateUtils.getDbLong(obj);
-            WtMenu wtMenu = entityManager.find(WtMenu.class, idOfMenu);
-            offlineMenus.add(wtMenu);
+            Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
+                    + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                    + "where menu.idOfMenu = :idOfMenu");
+            query.setParameter("idOfMenu", idOfMenu);
+            offlineMenus.add((WtMenu)query.getSingleResult());
         }
         return offlineMenus;
     }
@@ -964,8 +967,12 @@ public class DAOReadonlyService {
         List list = queryDeletedComplexes.getResultList();
         for (Object obj : list) {
             Long idOfComplex = HibernateUtils.getDbLong(obj);
-            WtComplex wtComplex = entityManager.find(WtComplex.class, idOfComplex);
-            offlineComplexes.add(wtComplex);
+            Query query = entityManager.createQuery(
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items "
+                            + "left join fetch complex.orgs orgs "
+                            + "left join fetch items.dishes dishes where complex.idOfComplex = :idOfComplex");
+            query.setParameter("idOfComplex", idOfComplex);
+            offlineComplexes.add((WtComplex)query.getSingleResult());
         }
         return offlineComplexes;
     }
