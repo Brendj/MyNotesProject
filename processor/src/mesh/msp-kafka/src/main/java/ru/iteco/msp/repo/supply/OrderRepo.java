@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.repo;
+package ru.iteco.msp.repo.supply;
 
 import ru.iteco.msp.models.Order;
 import ru.iteco.msp.models.compositeId.OrderCompositeId;
