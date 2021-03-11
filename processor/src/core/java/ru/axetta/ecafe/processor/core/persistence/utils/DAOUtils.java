@@ -1972,7 +1972,7 @@ public class DAOUtils {
     }
 
     public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session);
+        Long version = getMaxVersionEMIAS(session, false);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -1987,7 +1987,7 @@ public class DAOUtils {
     }
 
     public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session);
+        Long version = getMaxVersionEMIAS(session, false);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -2002,12 +2002,15 @@ public class DAOUtils {
         session.save(emias);
     }
 
-    public static Long getMaxVersionEMIAS(Session session) {
+    public static Long getMaxVersionEMIAS(Session session, Boolean kafka) {
         Long version = 0L;
         try {
             Criteria criteria = session.createCriteria(EMIAS.class);
             criteria.setProjection(Projections.max("version"));
-            criteria.add(Restrictions.not(Restrictions.eq("kafka", true)));
+            if (kafka)
+                criteria.add(Restrictions.eq("kafka", true));
+            else
+                criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
             Object result = criteria.uniqueResult();
             if (result != null) {
                 Long currentMaxVersion = (Long) result;
