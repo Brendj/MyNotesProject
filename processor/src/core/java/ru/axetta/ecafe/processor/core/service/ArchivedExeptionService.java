@@ -69,24 +69,24 @@ public class ArchivedExeptionService {
         }
     }
 
-    //public static boolean isOn() {
-    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    //    String instance = runtimeContext.getNodeName();
-    //    String reqInstance = runtimeContext.getConfigProperties().
-    //            getProperty("ecafe.processor.preorder.cancel.notification.node", "1");
-    //    String[] nodes = reqInstance.split(",");
-    //    for (String node : nodes) {
-    //        if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
-    //                && instance.trim().equals(node.trim())) {
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().
+                getProperty("ecafe.processor.archived.exeption.node", "6");
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
+                    && instance.trim().equals(node.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void scheduleSync() throws Exception {
-        //if (!isOn())
-        //    return;
+        if (!isOn())
+            return;
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
                 getProperty("ecafe.processor.exemptionvisiting.archived.time", "0 0 5 ? * * *");
         try {
