@@ -1972,7 +1972,7 @@ public class DAOUtils {
     }
 
     public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session);
+        Long version = getMaxVersionEMIAS(session, false);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -1987,17 +1987,7 @@ public class DAOUtils {
     }
 
     public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session);
-
-        //Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
-        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
-        //EMIAS emiasUpdated;
-        //try {
-        //    emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
-        //}catch (Exception e)
-        //{
-        //    emiasUpdated = null;
-        //}
+        Long version = getMaxVersionEMIAS(session, false);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -2010,29 +2000,17 @@ public class DAOUtils {
         emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
         emias.setVersion(version);
         session.save(emias);
-
-        //clientCardsCriteria = session.createCriteria(EMIAS.class);
-        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        //EMIAS emiasNEW;
-        //try {
-        //    emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
-        //}catch (Exception e)
-        //{
-        //    emiasNEW = null;
-        //}
-        //
-        //if (emiasUpdated != null && emiasNEW != null) {
-        //    emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
-        //    emiasUpdated.setUpdateDate(new Date());
-        //    session.update(emiasUpdated);
-        //}
     }
 
-    public static Long getMaxVersionEMIAS(Session session) {
+    public static Long getMaxVersionEMIAS(Session session, Boolean kafka) {
         Long version = 0L;
         try {
             Criteria criteria = session.createCriteria(EMIAS.class);
             criteria.setProjection(Projections.max("version"));
+            if (kafka)
+                criteria.add(Restrictions.eq("kafka", true));
+            else
+                criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
             Object result = criteria.uniqueResult();
             if (result != null) {
                 Long currentMaxVersion = (Long) result;
@@ -5265,6 +5243,7 @@ public class DAOUtils {
         try {
             Criteria criteria = session.createCriteria(EMIAS.class);
             criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
+            criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
             return criteria.list();
         } catch (Exception e) {
             return new ArrayList<EMIAS>();
@@ -5272,7 +5251,13 @@ public class DAOUtils {
     }
 
     public static Long getMaxVersionOfEmias(Session session) {
-        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em");
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em where em.kafka <> true");
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+    public static Long getMaxVersionOfExemptionVisiting(Session session) {
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em where em.kafka = true");
         Long maxVer = (Long) query.uniqueResult();
         return maxVer == null ? 0 : maxVer;
     }
@@ -5280,6 +5265,7 @@ public class DAOUtils {
     public static List<EMIAS> getEmiasForMaxVersion(Long maxVersion, Session session) {
         Criteria criteria = session.createCriteria(EMIAS.class);
         criteria.add(Restrictions.gt("version", maxVersion));
+        criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
         return criteria.list();
     }
 

@@ -2,69 +2,41 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence;
+package ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting;
+
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.Date;
 
-/**
- * Created with IntelliJ IDEA.
- * User: timur
- * Date: 07.08.12
- * Time: 11:15
- * To change this template use File | Settings | File Templates.
- */
-public class EMIAS {
+public class ExemptionVisitingSyncPOJO {
+    private Long idExemption;
+    private Boolean archive;
+    private Integer hazard_level_id;
 
-    private Long idOfEMIAS;
-    private String guid;
-    private Long idEventEMIAS;
-    private Long typeEventEMIAS;
+    private String meshguid;
     private Date dateLiberate;
     private Date startDateLiberate;
     private Date endDateLiberate;
     private Date createDate;
     private Date updateDate;
-    private Boolean accepted;
-    private Long deletedemiasid;
     private Long version;
-    private Boolean kafka;
-    private Boolean archive;
-    private Integer hazard_level_id;
-    private Boolean processed;
+    private Boolean accepted;
 
-   public EMIAS(){}
-
-
-    public Long getIdOfEMIAS() {
-        return idOfEMIAS;
-    }
-
-    public void setIdOfEMIAS(Long idOfEMIAS) {
-        this.idOfEMIAS = idOfEMIAS;
-    }
-
-    public String getGuid() {
-        return guid;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }
-
-    public Long getIdEventEMIAS() {
-        return idEventEMIAS;
-    }
-
-    public void setIdEventEMIAS(Long idEventEMIAS) {
-        this.idEventEMIAS = idEventEMIAS;
-    }
-
-    public Long getTypeEventEMIAS() {
-        return typeEventEMIAS;
-    }
-
-    public void setTypeEventEMIAS(Long typeEventEMIAS) {
-        this.typeEventEMIAS = typeEventEMIAS;
+    public Element toElement(Document document) throws Exception {
+        Element element = document.createElement("Record");
+        element.setAttribute("idExemption", idExemption.toString());
+        element.setAttribute("archive", archive == null ? "false" : archive.toString());
+        element.setAttribute("hazard_level_id", hazard_level_id == null ? "0" : hazard_level_id.toString());
+        element.setAttribute("meshguid", meshguid);
+        element.setAttribute("startDateLiberate",CalendarUtils.dateShortToStringFullYear(startDateLiberate));
+        element.setAttribute("endDateLiberate",CalendarUtils.dateShortToStringFullYear(endDateLiberate));
+        element.setAttribute("dateLiberate", CalendarUtils.dateTimeToString(dateLiberate));
+        element.setAttribute("accepted", accepted == null ? "false" : accepted.toString());
+        element.setAttribute("version", version == null ? "-1" : version.toString());
+        return element;
     }
 
     public Date getDateLiberate() {
@@ -115,14 +87,6 @@ public class EMIAS {
         this.accepted = accepted;
     }
 
-    public Long getDeletedemiasid() {
-        return deletedemiasid;
-    }
-
-    public void setDeletedemiasid(Long deletedemiasid) {
-        this.deletedemiasid = deletedemiasid;
-    }
-
     public Long getVersion() {
         return version;
     }
@@ -131,12 +95,20 @@ public class EMIAS {
         this.version = version;
     }
 
-    public Boolean getKafka() {
-        return kafka;
+    public Long getIdExemption() {
+        return idExemption;
     }
 
-    public void setKafka(Boolean kafka) {
-        this.kafka = kafka;
+    public void setIdExemption(Long idExemption) {
+        this.idExemption = idExemption;
+    }
+
+    public String getMeshguid() {
+        return meshguid;
+    }
+
+    public void setMeshguid(String meshguid) {
+        this.meshguid = meshguid;
     }
 
     public Boolean getArchive() {
@@ -153,13 +125,5 @@ public class EMIAS {
 
     public void setHazard_level_id(Integer hazard_level_id) {
         this.hazard_level_id = hazard_level_id;
-    }
-
-    public Boolean getProcessed() {
-        return processed;
-    }
-
-    public void setProcessed(Boolean processed) {
-        this.processed = processed;
     }
 }

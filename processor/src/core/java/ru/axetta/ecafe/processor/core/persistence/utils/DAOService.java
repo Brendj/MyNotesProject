@@ -2887,7 +2887,7 @@ public class DAOService {
 
     public List findEMIASbyClientandBeetwenDates(Client client, Date startDate, Date endDate) {
         Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
-                + "and em.dateLiberate between :begDate and :endDate ");
+                + "and em.dateLiberate between :begDate and :endDate and em.kafka<>true");
         query.setParameter("guid", client.getClientGUID());
         query.setParameter("begDate", startDate);
         query.setParameter("endDate", endDate);
@@ -3172,6 +3172,13 @@ public class DAOService {
     public List<WtAgeGroupItem> getAgeGroups() {
         Query q = entityManager.createQuery("SELECT wtAge FROM WtAgeGroupItem wtAge");
         return q.getResultList();
+    }
+    public void updateExemptionVisiting() {
+        Query query = entityManager.createQuery(
+                "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate");
+        query.setParameter("currentDate", CalendarUtils.startOfDay(new Date()));
+        query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
+        query.executeUpdate();
     }
 }
 
