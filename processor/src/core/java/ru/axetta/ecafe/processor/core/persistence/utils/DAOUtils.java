@@ -5243,7 +5243,7 @@ public class DAOUtils {
         try {
             Criteria criteria = session.createCriteria(EMIAS.class);
             criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
-            criteria.add(Restrictions.not(Restrictions.eq("kafka", true)));
+            criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
             return criteria.list();
         } catch (Exception e) {
             return new ArrayList<EMIAS>();
@@ -5265,7 +5265,7 @@ public class DAOUtils {
     public static List<EMIAS> getEmiasForMaxVersion(Long maxVersion, Session session) {
         Criteria criteria = session.createCriteria(EMIAS.class);
         criteria.add(Restrictions.gt("version", maxVersion));
-        criteria.add(Restrictions.not(Restrictions.eq("kafka", true)));
+        criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
         return criteria.list();
     }
 
