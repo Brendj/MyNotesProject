@@ -7254,11 +7254,22 @@ public class Processor implements SyncProcessor {
         if (payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
             contractId = contractId + "01";
         }
+        String ratation = "";
+        for (Purchase purchase : payment.getPurchases()) {
+            if (purchase.getType() != null && purchase.getType() > 0 && purchase.getType() < 100) {
+                ratation = OrderDetailFRationType.fromInteger(purchase.getfRation()).toString();
+                break;
+            }
+        }
+
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(payment.getTime());
-        return new String[]{
+        String[] values = new String[]{
                 "date", date, "contractId", contractId, "others", CurrencyStringUtils.copecksToRubles(others),
                 "complexes", CurrencyStringUtils.copecksToRubles(complexes), "empTime", empTime};
+        if (!ratation.isEmpty())
+            return EventNotificationService.attachToValues(EventNotificationService.PARAM_FRATION, ratation, values);
+        return values;
     }
 
     public void runRegularPaymentsIfEnabled(SyncRequest request) {
