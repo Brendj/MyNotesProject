@@ -7064,6 +7064,7 @@ public class Processor implements SyncProcessor {
         for (Purchase purchase : payment.getPurchases()) {
             if (purchase.getType() != null && purchase.getType() > 0 && purchase.getType() < 100) {
                 ratation = OrderDetailFRationType.fromInteger(purchase.getfRation()).toString();
+                break;
             }
         }
 
