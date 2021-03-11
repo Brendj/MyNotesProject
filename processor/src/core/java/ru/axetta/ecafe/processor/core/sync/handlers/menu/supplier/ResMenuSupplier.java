@@ -47,7 +47,9 @@ public class ResMenuSupplier implements AbstractToElement {
     private Set<WtDish> dishes;
     private Set<WtMenuGroup> menuGroups;
     private Set<WtMenu> menus;
+    private Set<WtMenu> offlineMenus;
     private Set<WtComplex> complexes;
+    private Set<WtComplex> offlineComplexes;
     private Set<WtComplexExcludeDays> excludeDays;
 
     private Long idOfOrg;
@@ -68,7 +70,9 @@ public class ResMenuSupplier implements AbstractToElement {
         dishes = new HashSet<>();
         menuGroups = new HashSet<>();
         menus = new HashSet<>();
+        offlineMenus = new HashSet<>();
         complexes = new HashSet<>();
+        offlineComplexes = new HashSet<>();
         excludeDays = new HashSet<>();
         idOfOrg = null;
     }
@@ -84,7 +88,9 @@ public class ResMenuSupplier implements AbstractToElement {
         dishes = menuSupplier.getDishes();
         menuGroups = menuSupplier.getMenuGroups();
         menus = menuSupplier.getMenus();
+        offlineMenus = menuSupplier.getOfflineMenus();
         complexes = menuSupplier.getComplexes();
+        offlineComplexes = menuSupplier.getOfflineComplexes();
         excludeDays = menuSupplier.getExcludeDays();
         idOfOrg = menuSupplier.getIdOfOrg();
     }
@@ -142,15 +148,33 @@ public class ResMenuSupplier implements AbstractToElement {
         Element menusElem = document.createElement("Menus");
         for (WtMenu menu : menus) {
             if (DAOReadonlyService.getInstance().isMenuItemAvailable (menu.getIdOfMenu())) {
+                if (offlineMenus.contains(menu)) {
+                    menu.setDeleteState(1);
+                }
                 menusElem.appendChild(menuToElement(document, menu));
             } else {
                 logger.error("В буфетном меню id=" + menu.getIdOfMenu() + " блюда встречаются больше 1 раза");
             }
         }
+        for (WtMenu menu : offlineMenus) {
+            if (!menus.contains(menu)) {
+                menu.setDeleteState(1);
+                menusElem.appendChild(menuToElement(document, menu));
+            }
+        }
 
         Element complexesElem = document.createElement("Complexes");
         for (WtComplex complex : complexes) {
+            if (offlineComplexes.contains(complex)) {
+                complex.setDeleteState(1);
+            }
             complexesElem.appendChild(complexToElement(document, complex));
+        }
+        for (WtComplex complex : offlineComplexes) {
+            if (!complexes.contains(complex)) {
+                complex.setDeleteState(1);
+                complexesElem.appendChild(complexToElement(document, complex));
+            }
         }
 
         Element excludeDaysElem = document.createElement("ExcludeDays");

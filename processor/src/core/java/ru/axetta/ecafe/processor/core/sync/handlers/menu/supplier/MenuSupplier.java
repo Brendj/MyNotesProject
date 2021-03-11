@@ -51,7 +51,9 @@ public class MenuSupplier implements SectionRequest {
     private Set<WtDish> dishes = new HashSet<>();
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
     private Set<WtMenu> menus = new HashSet<>();
+    private Set<WtMenu> offlineMenus = new HashSet<>();
     private Set<WtComplex> complexes = new HashSet<>();
+    private Set<WtComplex> offlineComplexes = new HashSet<>();
     private Set<WtComplexExcludeDays> excludeDays = new HashSet<>();
 
     private Integer resCode;
@@ -157,14 +159,13 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "MenuGroupsRequest": {
-                    //menuGroups = DAOReadonlyService.getInstance()
-                    //        .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
                     menuGroups = DAOReadonlyService.getInstance()
                             .getMenuGroupsSetFromVersion(entry.getValue(), contragent);
                     break;
                 }
                 case "MenusRequest": {
                     menus = DAOReadonlyService.getInstance().getMenusSetFromVersion(entry.getValue(), contragent, org);
+                    offlineMenus = DAOReadonlyService.getInstance().getOfflineMenusSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "ComplexesRequest": {
@@ -177,6 +178,8 @@ public class MenuSupplier implements SectionRequest {
                                 .getComplexesSetFromVersion(entry.getValue(), itemContragent, item);
                         complexes.addAll(friendlyItems);
                     }
+                    offlineComplexes = DAOReadonlyService.getInstance()
+                            .getOfflineComplexesSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "ExcludeDaysRequest": {
@@ -321,4 +324,19 @@ public class MenuSupplier implements SectionRequest {
         this.resCode = resCode;
     }
 
+    public Set<WtComplex> getOfflineComplexes() {
+        return offlineComplexes;
+    }
+
+    public void setOfflineComplexes(Set<WtComplex> offlineComplexes) {
+        this.offlineComplexes = offlineComplexes;
+    }
+
+    public Set<WtMenu> getOfflineMenus() {
+        return offlineMenus;
+    }
+
+    public void setOfflineMenus(Set<WtMenu> offlineMenus) {
+        this.offlineMenus = offlineMenus;
+    }
 }
