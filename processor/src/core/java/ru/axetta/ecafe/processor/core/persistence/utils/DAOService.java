@@ -524,10 +524,11 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
-    public boolean setClientExpenditureLimit(Long contractId, long limit) {
+    public boolean setClientExpenditureLimit(Long contractId, long limit, long version) {
         Query q = entityManager
-                .createQuery("update Client set expenditureLimit=:expenditureLimit where contractId=:contractId");
+                .createQuery("update Client set expenditureLimit=:expenditureLimit, clientRegistryVersion = :version where contractId=:contractId");
         q.setParameter("expenditureLimit", limit);
+        q.setParameter("version", version);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
