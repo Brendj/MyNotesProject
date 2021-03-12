@@ -922,7 +922,7 @@ public class DAOReadonlyService {
     public Set<WtMenu> getOfflineMenusSetFromVersion(Long version, Org org) {
         Set<WtMenu> offlineMenus = new HashSet<>();
         Query queryDeletedMenus = entityManager.createNativeQuery("select idofmenu from cf_wt_org_relation_aud a "
-                + "where a.versionofmenu > :version and a.deletestate = 1 "
+                + "where a.versionofmenu > :version and a.deletestate = 1 and a.idofmenu is not null "
                 + "and (a.idoforg = :idoforg or exists (select * from cf_wt_org_group_relations r where r.idoforggroup = a.idoforggroup and r.idoforg = :idoforg))");
         queryDeletedMenus.setParameter("version", version);
         queryDeletedMenus.setParameter("idoforg", org.getIdOfOrg());
@@ -960,7 +960,7 @@ public class DAOReadonlyService {
     public Set<WtComplex> getOfflineComplexesSetFromVersion(Long version, Org org) {
         Set<WtComplex> offlineComplexes = new HashSet<>();
         Query queryDeletedComplexes = entityManager.createNativeQuery("select idofcomplex from cf_wt_org_relation_aud a "
-                + "where a.versionofcomplex > :version and a.deletestate = 1 "
+                + "where a.versionofcomplex > :version and a.deletestate = 1 and a.idofcomplex is not null "
                 + "and (a.idoforg = :idoforg or exists (select * from cf_wt_org_group_relations r where r.idoforggroup = a.idoforggroup and r.idoforg = :idoforg))");
         queryDeletedComplexes.setParameter("version", version);
         queryDeletedComplexes.setParameter("idoforg", org.getIdOfOrg());
