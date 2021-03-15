@@ -3131,14 +3131,6 @@ public class DAOService {
         return DAOUtils.getComplexesByWtDiscountRule(entityManager, discountRule);
     }
 
-    public List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryDiscountsByWtDiscountRule(entityManager, discountRule);
-    }
-
-    public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
-    }
-
     public CodeMSP findCodeNSPByCode(Integer code) {
         if(code == null){
             return null;

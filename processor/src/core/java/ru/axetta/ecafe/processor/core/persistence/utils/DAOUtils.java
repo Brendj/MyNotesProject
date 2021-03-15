@@ -2084,18 +2084,6 @@ public class DAOUtils {
                 .getResultList();
     }
 
-    public static List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
-        return em.createQuery("select rule.categoryDiscounts from WtDiscountRule rule where rule = :discountRule")
-                .setParameter("discountRule", discountRule)
-                .getResultList();
-    }
-
-    public static List<CategoryOrg> getCategoryOrgsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
-        return em.createQuery("select rule.categoryOrgs from WtDiscountRule rule where rule = :discountRule")
-                .setParameter("discountRule", discountRule)
-                .getResultList();
-    }
-
     public static List getCategoryDiscountListWithIds(EntityManager em, List<Long> idOfCategoryList) {
         javax.persistence.Query q = em
                 .createQuery("from CategoryDiscount where idOfCategoryDiscount in (:idOfCategoryList)");
