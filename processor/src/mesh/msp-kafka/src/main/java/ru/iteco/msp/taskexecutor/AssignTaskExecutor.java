@@ -138,6 +138,13 @@ public class AssignTaskExecutor {
                         List<String> discounts = getSortedSplitList(h.getCategoriesDiscounts());
                         for(String categoryId : discounts){
                             CategoryDiscount discount = discountsService.getDiscountByStrId(categoryId);
+                            if(discount == null){
+                                log.warn("Not exist discount by ID:" + categoryId);
+                                continue;
+                            }
+                            if(discount.getCategoryType() != 0){
+                                continue;
+                            }
 
                             ClientDTSZNDiscountInfo info = null;
                             if (discount.getCategoryDiscountDTSZN() != null) {
