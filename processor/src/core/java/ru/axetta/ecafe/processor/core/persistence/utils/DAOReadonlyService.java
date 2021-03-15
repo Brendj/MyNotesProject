@@ -1261,13 +1261,13 @@ public class DAOReadonlyService {
     }
 
     public List<CategoryOrg> getAllWtCategoryOrgs(List<WtDiscountRule> wtDiscountRules) {
-        return entityManager.createQuery("select rule.categoryOrgs from WtDiscountRule rule where rule in :discountRules")
+        return entityManager.createQuery("select distinct rule.categoryOrgs from WtDiscountRule rule where rule in :discountRules")
                 .setParameter("discountRules", wtDiscountRules)
                 .getResultList();
     }
 
     public List<CategoryDiscount> getAllWtCategoryDiscounts(List<WtDiscountRule> wtDiscountRules) {
-        return entityManager.createQuery("select rule.categoryDiscounts from WtDiscountRule rule where rule in :discountRules")
+        return entityManager.createQuery("select distinct rule.categoryDiscounts from WtDiscountRule rule where rule in :discountRules")
                 .setParameter("discountRules", wtDiscountRules)
                 .getResultList();
     }
