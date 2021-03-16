@@ -669,7 +669,7 @@ public class SyncResponse {
                     element.setAttribute("SsoId", this.ssoId);
                 }
                 if (this.expenditureLimit != null) {
-                    element.setAttribute("ExpenditureLimit", String.valueOf(expenditureLimit));
+                    element.setAttribute("MaxDailyLimit", String.valueOf(expenditureLimit));
                 }
                 return element;
             }
