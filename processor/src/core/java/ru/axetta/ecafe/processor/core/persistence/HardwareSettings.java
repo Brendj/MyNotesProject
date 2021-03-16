@@ -25,6 +25,7 @@ public class HardwareSettings implements Serializable {
     private Date lastUpdateForCPUHost;
     private Long version;
     private CompositeIdOfHardwareSettings compositeIdOfHardwareSettings;
+    private Long idOfHardwareSetting;
 
     public HardwareSettings() {
     }
@@ -139,5 +140,13 @@ public class HardwareSettings implements Serializable {
 
     public void setCompositeIdOfHardwareSettings(CompositeIdOfHardwareSettings compositeIdOfHardwareSettings) {
         this.compositeIdOfHardwareSettings = compositeIdOfHardwareSettings;
+    }
+
+    public Long getIdOfHardwareSetting() {
+        return idOfHardwareSetting;
+    }
+
+    public void setIdOfHardwareSetting(Long idOfHardwareSetting) {
+        this.idOfHardwareSetting = idOfHardwareSetting;
     }
 }

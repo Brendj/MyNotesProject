@@ -13,7 +13,7 @@
         </id>
         <many-to-one name="hardwareSettings" class="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" not-null="true">
             <column name="IdOfOrg"/>
-            <column name="IdOfHardwareSetting"/>
+            <column name="ipHost"/>
         </many-to-one>
         <property name="moduleType" column="ModuleType" type="integer" not-null="true"/>
         <property name="installStatus" column="InstallStatus" type="integer" not-null="true"/>

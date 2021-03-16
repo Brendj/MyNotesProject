@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -5296,10 +5296,10 @@ public class DAOUtils {
         return version;
     }
 
-    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
-            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+    public static HardwareSettings getHardwareSettingsByOrgAndHostIP(Session session,
+            String ip, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
-        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.ipHost", ip));
         criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
         return (HardwareSettings) criteria.uniqueResult();
     }

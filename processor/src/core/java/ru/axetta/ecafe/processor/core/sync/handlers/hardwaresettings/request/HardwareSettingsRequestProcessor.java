@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request;
 
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings;
+import ru.axetta.ecafe.processor.core.persistence.HardwareSettings;
 import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -15,8 +16,8 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,45 +33,41 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
     }
 
     public ResHardwareSettingsRequest process() {
-
         ResHardwareSettingsRequest result = new ResHardwareSettingsRequest();
+        List<ResHardwareSettingsRequestItem> items = new LinkedList<>();
 
-        List<ResHardwareSettingsRequestItem> items = new ArrayList<ResHardwareSettingsRequestItem>();
         try {
             boolean errorFound;
             Long orgOwner = hardwareSettingsRequest.getOrgOwner();
             Long nextVersion = DAOUtils.nextVersionByHardwareSettingsRequest(session);
             StringBuilder errorMessage = new StringBuilder();
 
-            for (List<HardwareSettingsRequestItem> sectionItem : hardwareSettingsRequest.getSectionItem()) {
-                ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = null;
+            for (HardwareSettingsRequestHSItem hsItem : hardwareSettingsRequest.getSectionItem()) {
+                HardwareSettings hardwareSettings = null;
                 int status = 1;
-                HashMap<Integer, HardwareSettingsMT> listMT = new HashMap<Integer, HardwareSettingsMT>();
-                for (HardwareSettingsRequestItem item : sectionItem) {
+
+                hardwareSettings = DAOUtils
+                        .getHardwareSettingsByOrgAndHostIP(session,
+                                hsItem.getIpItem().getValue(), orgOwner);
+                if (null == hardwareSettings) {
+                    Org org = (Org) session.get(Org.class, orgOwner);
+
+                    hardwareSettings = new HardwareSettings();
+                    hardwareSettings.setOrg(org);
+
+                    CompositeIdOfHardwareSettings compositeIdOfHardwareSettings = new CompositeIdOfHardwareSettings(
+                            orgOwner, hsItem.getIpItem().getValue());
+                    hardwareSettings.setCompositeIdOfHardwareSettings(compositeIdOfHardwareSettings);
+                }
+                hardwareSettings.setIdOfHardwareSetting(hsItem.getIdOfHardwareSetting());
+
+                HashMap<Integer, HardwareSettingsMT> listMT = new HashMap<>();
+                for (HardwareSettingsRequestItem item : hsItem.getItems()) {
                     String moduleType = item.getType();
                     errorFound = !item.getResCode().equals(HardwareSettingsRequestItem.ERROR_CODE_ALL_OK);
                     switch (moduleType) {
-                        case "HS":
-                            if (!errorFound) {
-                                HardwareSettingsRequestHSItem hsItem = (HardwareSettingsRequestHSItem) item;
-                                hardwareSettings = DAOUtils
-                                        .getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(session,
-                                                hsItem.getIdOfHardwareSetting(), orgOwner);
-                                if (null == hardwareSettings) {
-                                    hardwareSettings = new ru.axetta.ecafe.processor.core.persistence.HardwareSettings();
-                                    Org org = (Org) session.get(Org.class, orgOwner);
-                                    hardwareSettings.setOrg(org);
-                                    CompositeIdOfHardwareSettings compositeIdOfHardwareSettings = new ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings(
-                                            orgOwner, hsItem.getIdOfHardwareSetting());
-                                    hardwareSettings.setCompositeIdOfHardwareSettings(compositeIdOfHardwareSettings);
-                                }
-                            } else {
-                                errorMessage.append("Section HS not found ");
-                                status = 0;
-                            }
-                            break;
                         case "MT":
-                            if (!errorFound && hardwareSettings != null) {
+                            if (!errorFound) {
                                 HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) item;
                                 HardwareSettingsMT settingsMT = new HardwareSettingsMT();
                                 settingsMT.setModuleType(mtItem.getValue());
@@ -84,7 +81,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
                             break;
                         case "IP":
-                            if (!errorFound && hardwareSettings != null) {
+                            if (!errorFound) {
                                 HardwareSettingsRequestIPItem ipItem = (HardwareSettingsRequestIPItem) item;
                                 hardwareSettings.setIpHost(ipItem.getValue());
                                 hardwareSettings.setLastUpdateForIPHost(ipItem.getLastUpdate());
@@ -95,7 +92,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                             }
                             break;
                         case "DotNetVer":
-                            if (!errorFound && hardwareSettings != null) {
+                            if (!errorFound) {
                                 HardwareSettingsRequestDotNetVerItem dotNetVerItem = (HardwareSettingsRequestDotNetVerItem) item;
                                 hardwareSettings.setDotNetVer(dotNetVerItem.getValue());
                                 hardwareSettings.setLastUpdateForDotNetVer(dotNetVerItem.getLastUpdate());
@@ -105,7 +102,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                             }
                             break;
                         case "OsVer":
-                            if (!errorFound && hardwareSettings != null) {
+                            if (!errorFound) {
                                 HardwareSettingsRequestOsVerItem osVerItem = (HardwareSettingsRequestOsVerItem) item;
                                 hardwareSettings.setoSVer(osVerItem.getValue());
                                 hardwareSettings.setLastUpdateForOSVer(osVerItem.getLastUpdate());
@@ -115,7 +112,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                             }
                             break;
                         case "RAM":
-                            if (!errorFound && hardwareSettings != null) {
+                            if (!errorFound) {
                                 HardwareSettingsRequestRAMItem ramItem = (HardwareSettingsRequestRAMItem) item;
                                 hardwareSettings.setRamSize(ramItem.getValue());
                                 hardwareSettings.setLastUpdateForRAMSize(ramItem.getLastUpdate());
@@ -125,7 +122,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                             }
                             break;
                         case "CPU":
-                            if (!errorFound && hardwareSettings != null) {
+                            if (!errorFound) {
                                 HardwareSettingsRequestCPUItem cpuItem = (HardwareSettingsRequestCPUItem) item;
                                 hardwareSettings.setCpuHost(cpuItem.getValue());
                                 hardwareSettings.setLastUpdateForCPUHost(cpuItem.getLastUpdate());
@@ -135,7 +132,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                             }
                             break;
                         case "CR":
-                            if (!errorFound && hardwareSettings != null) {
+                            if (!errorFound) {
                                 HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) item;
 
                                 HardwareSettingsMT tempCR = listMT
@@ -151,10 +148,13 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                     }
                 }
                 hardwareSettings.setVersion(nextVersion);
+
                 if (status == 1) {
                     session.saveOrUpdate(hardwareSettings);
+                    session.flush();
+
                     for (Map.Entry<Integer, HardwareSettingsMT> entry : listMT.entrySet()) {
-                        ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT;
+                        HardwareSettingsMT hardwareSettingsMT;
                         hardwareSettingsMT = DAOUtils.getHardwareSettingsMTByIdAndModuleType(session,
                                 hardwareSettings.getCompositeIdOfHardwareSettings(), entry.getValue().getModuleType());
 

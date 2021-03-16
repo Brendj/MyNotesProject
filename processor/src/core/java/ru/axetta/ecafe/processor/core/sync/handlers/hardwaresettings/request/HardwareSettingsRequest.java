@@ -5,13 +5,13 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request;
 
 
-import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items.HardwareSettingsRequestHSItem;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,11 +20,17 @@ public class HardwareSettingsRequest implements SectionRequest {
     public static final String SECTION_NAME = "HardwareSettings";
 
     private final Long orgOwner;
-    private final List<List<HardwareSettingsRequestItem>> sectionItem;
+    private final List<HardwareSettingsRequestHSItem> sectionItem;
 
     public enum ModuleType {
-        HS("HS"), MT("MT"), IP("IP"), DOTNETVER("DotNetVer"), OSVER("OsVer"), RAM("RAM"), CPU("CPU"), READERS(
-                "Readers");
+        HS("HS"),
+        MT("MT"),
+        IP("IP"),
+        DOTNETVER("DotNetVer"),
+        OSVER("OsVer"),
+        RAM("RAM"),
+        CPU("CPU"),
+        READERS("Readers");
 
         private final String section;
         static Map<Integer, ModuleType> map = new HashMap<>();
@@ -54,68 +60,13 @@ public class HardwareSettingsRequest implements SectionRequest {
     }
 
     public HardwareSettingsRequest(Node hardwareSettingNode, Long orgOwner) {
-
         this.orgOwner = orgOwner;
-        this.sectionItem = new ArrayList<List<HardwareSettingsRequestItem>>();
-        List<HardwareSettingsRequestItem> items;
+        this.sectionItem = new LinkedList<>();
         Node hsNode = hardwareSettingNode.getFirstChild();
 
         while (null != hsNode) {
-            if (Node.ELEMENT_NODE == hsNode.getNodeType() && hsNode.getNodeName().equals("HS")) {
-                HardwareSettingsRequestHSItem hsItem = null;
-                items = new ArrayList<HardwareSettingsRequestItem>();
-                hsItem = HardwareSettingsRequestHSItem.build(hsNode);
-                items.add(hsItem);
-                Node itemNode = hsNode.getFirstChild();
-                while (null != itemNode) {
-                    if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        ModuleType moduleType = ModuleType.fromString(itemNode.getNodeName());
-                        HardwareSettingsRequestItem item = null;
-                        if (moduleType == null) {
-                            itemNode = itemNode.getNextSibling();
-                            continue;
-                        }
-                        switch (moduleType) {
-                            case MT:
-                                item = HardwareSettingsRequestMTItem.build(itemNode);
-                                break;
-                            case IP:
-                                item = HardwareSettingsRequestIPItem.build(itemNode);
-                                break;
-                            case DOTNETVER:
-                                item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
-                                break;
-                            case OSVER:
-                                item = HardwareSettingsRequestOsVerItem.build(itemNode);
-                                break;
-                            case RAM:
-                                item = HardwareSettingsRequestRAMItem.build(itemNode);
-                                break;
-                            case CPU:
-                                item = HardwareSettingsRequestCPUItem.build(itemNode);
-                                break;
-                            case READERS:
-                                Node readersNode = itemNode.getFirstChild();
-                                HardwareSettingsRequestItem crItem;
-                                List<HardwareSettingsRequestItem> crItemList = new ArrayList<>();
-                                while (null != readersNode) {
-                                    if (Node.ELEMENT_NODE == readersNode.getNodeType()) {
-                                        crItem = HardwareSettingsRequestCRItem.build(readersNode);
-                                        crItemList.add(crItem);
-                                    }
-                                    readersNode = readersNode.getNextSibling();
-                                }
-                                items.addAll(crItemList);
-                                break;
-                        }
-                        if (item != null) {
-                            items.add(item);
-                        }
-                    }
-                    itemNode = itemNode.getNextSibling();
-                }
-                sectionItem.add(items);
-            }
+            HardwareSettingsRequestHSItem hsItem = HardwareSettingsRequestHSItem.build(hsNode);
+            sectionItem.add(hsItem);
             hsNode = hsNode.getNextSibling();
         }
     }
@@ -133,7 +84,7 @@ public class HardwareSettingsRequest implements SectionRequest {
         return orgOwner;
     }
 
-    public List<List<HardwareSettingsRequestItem>> getSectionItem() {
+    public List<HardwareSettingsRequestHSItem> getSectionItem() {
         return sectionItem;
     }
 

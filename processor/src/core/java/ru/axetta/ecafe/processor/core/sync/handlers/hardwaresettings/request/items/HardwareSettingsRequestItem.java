@@ -17,7 +17,7 @@ public abstract class HardwareSettingsRequestItem {
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
 
-    public Date lastUpdate;
+    private Date lastUpdate;
     private String type;
     private String errorMessage;
     private Integer resCode;
@@ -99,5 +99,4 @@ public abstract class HardwareSettingsRequestItem {
     public void setResCode(Integer resCode) {
         this.resCode = resCode;
     }
-
 }
