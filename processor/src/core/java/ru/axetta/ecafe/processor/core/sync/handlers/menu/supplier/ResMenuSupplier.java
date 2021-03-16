@@ -148,9 +148,6 @@ public class ResMenuSupplier implements AbstractToElement {
         Element menusElem = document.createElement("Menus");
         for (WtMenu menu : menus) {
             if (DAOReadonlyService.getInstance().isMenuItemAvailable (menu.getIdOfMenu())) {
-                if (offlineMenus.contains(menu)) {
-                    menu.setDeleteState(1);
-                }
                 menusElem.appendChild(menuToElement(document, menu));
             } else {
                 logger.error("В буфетном меню id=" + menu.getIdOfMenu() + " блюда встречаются больше 1 раза");
@@ -165,9 +162,6 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Element complexesElem = document.createElement("Complexes");
         for (WtComplex complex : complexes) {
-            if (offlineComplexes.contains(complex)) {
-                complex.setDeleteState(1);
-            }
             complexesElem.appendChild(complexToElement(document, complex));
         }
         for (WtComplex complex : offlineComplexes) {
