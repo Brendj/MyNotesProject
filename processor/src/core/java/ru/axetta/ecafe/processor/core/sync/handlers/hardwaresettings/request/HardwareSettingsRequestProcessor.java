@@ -60,6 +60,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                     hardwareSettings.setCompositeIdOfHardwareSettings(compositeIdOfHardwareSettings);
                 }
                 hardwareSettings.setIdOfHardwareSetting(hsItem.getIdOfHardwareSetting());
+                hardwareSettings.setLastUpdateForIPHost(hsItem.getIpItem().getLastUpdate());
 
                 HashMap<Integer, HardwareSettingsMT> listMT = new HashMap<>();
                 for (HardwareSettingsRequestItem item : hsItem.getItems()) {
@@ -79,17 +80,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 status = 0;
                             }
 
-                            break;
-                        case "IP":
-                            if (!errorFound) {
-                                HardwareSettingsRequestIPItem ipItem = (HardwareSettingsRequestIPItem) item;
-                                hardwareSettings.setIpHost(ipItem.getValue());
-                                hardwareSettings.setLastUpdateForIPHost(ipItem.getLastUpdate());
-
-                            } else {
-                                errorMessage.append("Section IP not found ");
-                                status = 0;
-                            }
                             break;
                         case "DotNetVer":
                             if (!errorFound) {
@@ -159,7 +149,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 hardwareSettings.getCompositeIdOfHardwareSettings(), entry.getValue().getModuleType());
 
                         if (null == hardwareSettingsMT) {
-                            hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
+                            hardwareSettingsMT = new HardwareSettingsMT();
                         }
                         hardwareSettingsMT.setHardwareSettings(hardwareSettings);
                         hardwareSettingsMT.setModuleType(entry.getValue().getModuleType());
@@ -167,6 +157,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         hardwareSettingsMT.setLastUpdate(entry.getValue().getLastUpdate());
                         hardwareSettingsMT.setFirmwareVer(entry.getValue().getFirmwareVer());
                         hardwareSettingsMT.setReaderName(entry.getValue().getReaderName());
+                        hardwareSettingsMT.setIdOfHardwareSetting(hardwareSettings.getIdOfHardwareSetting());
                         session.saveOrUpdate(hardwareSettingsMT);
                     }
                 }

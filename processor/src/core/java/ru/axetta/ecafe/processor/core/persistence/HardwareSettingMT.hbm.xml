@@ -16,6 +16,7 @@
             <column name="ipHost"/>
         </many-to-one>
         <property name="moduleType" column="ModuleType" type="integer" not-null="true"/>
+        <property name="idOfHardwareSetting" column="idOfHardwareSetting" type="long" not-null="true"/>
         <property name="installStatus" column="InstallStatus" type="integer" not-null="true"/>
         <property name="lastUpdate" column="LastUpdate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
