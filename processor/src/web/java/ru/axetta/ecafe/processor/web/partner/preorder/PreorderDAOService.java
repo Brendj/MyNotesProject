@@ -1449,7 +1449,7 @@ public class PreorderDAOService {
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
         Date preorderDate = preorderComplex.getPreorderDate();
 
-        WtComplex wtComplex = getWtComplex(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderDate);
+        WtComplex wtComplex = getWtComplex(preorderComplex, preorderComplex.getArmComplexId(), preorderDate);
 
         if (wtComplex == null) {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
@@ -2467,14 +2467,19 @@ public class PreorderDAOService {
         }
     }
 
-    private WtComplex getWtComplex(Client client, Integer idOfComplex, Date date) {
+    private WtComplex getWtComplex(PreorderComplex preorderComplex, Integer idOfComplex, Date date) {
+        Org org = emReport.getReference(Org.class, preorderComplex.getIdOfOrgOnCreate());
+        return getWtComplex(org, preorderComplex.getClient(), idOfComplex, date);
+    }
+
+    private WtComplex getWtComplex(Org org, Client client, Integer idOfComplex, Date date) {
         Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
                 + "LEFT JOIN complex.wtOrgGroup orgGroup "
                 + "WHERE complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                 + "AND complex.deleteState = 0 "
                 + "AND complex.idOfComplex = :idOfComplex "
                 + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) ");
-        query.setParameter("org", client.getOrg());
+        query.setParameter("org", org);
         query.setParameter("idOfComplex", idOfComplex.longValue());
         query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
         query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.DATE);
@@ -2485,6 +2490,10 @@ public class PreorderDAOService {
                     idOfComplex, date, client.getIdOfClient()), e);
             return null;
         }
+    }
+
+    private WtComplex getWtComplex(Client client, Integer idOfComplex, Date date) {
+        return getWtComplex(client.getOrg(), client, idOfComplex, date);
     }
 
     private WtDish getWtDish(Long idOfDish, Date date) {
