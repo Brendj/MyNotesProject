@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class HardwareSettingsRequestHSItem {
                     case READERS:
                         Node readersNode = itemNode.getFirstChild();
                         HardwareSettingsRequestItem crItem;
-                        List<HardwareSettingsRequestItem> crItemList = new ArrayList<>();
+                        List<HardwareSettingsRequestItem> crItemList = new LinkedList<>();
                         while (null != readersNode) {
                             if (Node.ELEMENT_NODE == readersNode.getNodeType()) {
                                 crItem = HardwareSettingsRequestCRItem.build(readersNode);

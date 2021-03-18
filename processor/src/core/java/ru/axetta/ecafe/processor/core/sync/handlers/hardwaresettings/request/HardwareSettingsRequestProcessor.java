@@ -17,8 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardwareSettingsRequest> {
@@ -34,7 +32,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
     public ResHardwareSettingsRequest process() {
         ResHardwareSettingsRequest result = new ResHardwareSettingsRequest();
-        List<ResHardwareSettingsRequestItem> items = new LinkedList<>();
 
         try {
             boolean errorFound;
@@ -47,8 +44,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 int status = 1;
 
                 hardwareSettings = DAOUtils
-                        .getHardwareSettingsByOrgAndHostIP(session,
-                                hsItem.getIpItem().getValue(), orgOwner);
+                        .getHardwareSettingsByOrgAndHostIP(session, hsItem.getIpItem().getValue(), orgOwner);
                 if (null == hardwareSettings) {
                     Org org = (Org) session.get(Org.class, orgOwner);
 
@@ -62,12 +58,12 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 hardwareSettings.setIdOfHardwareSetting(hsItem.getIdOfHardwareSetting());
                 hardwareSettings.setLastUpdateForIPHost(hsItem.getIpItem().getLastUpdate());
 
-                HashMap<Integer, HardwareSettingsMT> listMT = new HashMap<>();
+                Map<Integer, HardwareSettingsMT> listMT = new HashMap<>();
                 for (HardwareSettingsRequestItem item : hsItem.getItems()) {
-                    String moduleType = item.getType();
+                    HardwareSettingsRequest.ModuleType moduleType = item.getType();
                     errorFound = !item.getResCode().equals(HardwareSettingsRequestItem.ERROR_CODE_ALL_OK);
                     switch (moduleType) {
-                        case "MT":
+                        case MT:
                             if (!errorFound) {
                                 HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) item;
                                 HardwareSettingsMT settingsMT = new HardwareSettingsMT();
@@ -81,7 +77,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                             }
 
                             break;
-                        case "DotNetVer":
+                        case DOTNETVER:
                             if (!errorFound) {
                                 HardwareSettingsRequestDotNetVerItem dotNetVerItem = (HardwareSettingsRequestDotNetVerItem) item;
                                 hardwareSettings.setDotNetVer(dotNetVerItem.getValue());
@@ -91,7 +87,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 status = 0;
                             }
                             break;
-                        case "OsVer":
+                        case OSVER:
                             if (!errorFound) {
                                 HardwareSettingsRequestOsVerItem osVerItem = (HardwareSettingsRequestOsVerItem) item;
                                 hardwareSettings.setoSVer(osVerItem.getValue());
@@ -101,7 +97,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 status = 0;
                             }
                             break;
-                        case "RAM":
+                        case RAM:
                             if (!errorFound) {
                                 HardwareSettingsRequestRAMItem ramItem = (HardwareSettingsRequestRAMItem) item;
                                 hardwareSettings.setRamSize(ramItem.getValue());
@@ -111,7 +107,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 status = 0;
                             }
                             break;
-                        case "CPU":
+                        case CPU:
                             if (!errorFound) {
                                 HardwareSettingsRequestCPUItem cpuItem = (HardwareSettingsRequestCPUItem) item;
                                 hardwareSettings.setCpuHost(cpuItem.getValue());
@@ -121,7 +117,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 status = 0;
                             }
                             break;
-                        case "CR":
+                        case CR:
                             if (!errorFound) {
                                 HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) item;
 
@@ -162,13 +158,12 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                     }
                 }
 
-                items.add(new ResHardwareSettingsRequestItem(status, errorMessage.toString()));
+                result.getItems().add(new ResHardwareSettingsRequestItem(status, errorMessage.toString()));
             }
         } catch (Exception e) {
             logger.error("Error saving HardwareSettingsRequest", e);
             return null;
         }
-        result.setItems(items);
         return result;
     }
 }

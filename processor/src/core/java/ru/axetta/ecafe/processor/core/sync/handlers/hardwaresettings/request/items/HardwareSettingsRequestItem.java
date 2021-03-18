@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -16,27 +17,28 @@ public abstract class HardwareSettingsRequestItem {
 
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
+    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     private Date lastUpdate;
-    private String type;
+    private HardwareSettingsRequest.ModuleType type;
     private String errorMessage;
     private Integer resCode;
 
-    public HardwareSettingsRequestItem (Date lastUpdate, String type, String errorMessage) {
+    public HardwareSettingsRequestItem (Date lastUpdate, HardwareSettingsRequest.ModuleType type, String errorMessage) {
         this.lastUpdate = lastUpdate;
         this.type = type;
         this.errorMessage = errorMessage;
-        if(errorMessage.equals("")) {
+        if(errorMessage.isEmpty()) {
             this.setResCode(ERROR_CODE_ALL_OK);
         } else {
             this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
         }
     }
 
-    public HardwareSettingsRequestItem(String type, String errorMessage) {
+    public HardwareSettingsRequestItem(HardwareSettingsRequest.ModuleType type, String errorMessage) {
         this.type = type;
         this.errorMessage = errorMessage;
-        if(errorMessage.equals("")) {
+        if(errorMessage.isEmpty()) {
             this.setResCode(ERROR_CODE_ALL_OK);
         } else {
             this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
@@ -48,7 +50,6 @@ public abstract class HardwareSettingsRequestItem {
         String requestDateString = XMLUtils.getAttributeValue(itemNode, "LastUpdate");
         if (StringUtils.isNotEmpty(requestDateString)) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                 lastUpdate = simpleDateFormat.parse(requestDateString);
             } catch (Exception e) {
                 errorMessage.append("Attribute LastUpdate not found or incorrect");
@@ -62,7 +63,7 @@ public abstract class HardwareSettingsRequestItem {
     public static String getValue(Node itemNode, StringBuilder errorMessage) {
 
         String value = XMLUtils.getAttributeValue(itemNode, "Value");
-        if (null == value || StringUtils.isEmpty(value)) {
+        if (StringUtils.isEmpty(value)) {
             errorMessage.append("Attribute Value not found");
         }
         return value;
@@ -76,11 +77,11 @@ public abstract class HardwareSettingsRequestItem {
         this.lastUpdate = lastUpdate;
     }
 
-    public String getType() {
+    public HardwareSettingsRequest.ModuleType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(HardwareSettingsRequest.ModuleType type) {
         this.type = type;
     }
 

@@ -10,10 +10,8 @@ import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 
 import org.w3c.dom.Node;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class HardwareSettingsRequest implements SectionRequest {
 
@@ -30,10 +28,10 @@ public class HardwareSettingsRequest implements SectionRequest {
         OSVER("OsVer"),
         RAM("RAM"),
         CPU("CPU"),
-        READERS("Readers");
+        READERS("Readers"),
+        CR("CR");
 
         private final String section;
-        static Map<Integer, ModuleType> map = new HashMap<>();
 
         ModuleType(String section) {
             this.section = section;
@@ -43,14 +41,8 @@ public class HardwareSettingsRequest implements SectionRequest {
             return section;
         }
 
-        static {
-            for (ModuleType moduleType : ModuleType.values()) {
-                map.put(moduleType.ordinal(), moduleType);
-            }
-        }
-
         public static ModuleType fromString(String description) {
-            for (ModuleType e : map.values()) {
+            for(ModuleType e : ModuleType.values()){
                 if (e.section.equals(description)) {
                     return e;
                 }
