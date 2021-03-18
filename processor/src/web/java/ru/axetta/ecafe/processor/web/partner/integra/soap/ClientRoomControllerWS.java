@@ -62,6 +62,9 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.iac.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventItem;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventList;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.DataAllEvents;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
@@ -78,6 +81,7 @@ import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -2656,11 +2660,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (nRecs++ > MAX_RECS) {
                 break;
             }
-            ClientPayment cp = (ClientPayment) o;
+            Object[] row = (Object[]) o;
             Payment payment = new Payment();
-            payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, cp));
-            payment.setSum(cp.getPaySum());
-            payment.setTime(toXmlDateTime(cp.getCreateTime()));
+            payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, (String) row[6], (Integer) row[3], (String) row[4], (String) row[5]));
+            payment.setSum(HibernateUtils.getDbLong(row[1]));
+            payment.setTime(toXmlDateTime(new Date(((BigInteger) row[2]).longValue())));
             paymentList.getP().add(payment);
         }
         data.setPaymentList(paymentList);
@@ -3874,21 +3878,42 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public EnterEventListResult getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
+    public DataAllEvents getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
         authenticateRequest(contractId);
+        DataAllEvents dataAllEvents = new DataAllEvents();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createExternalServicesPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
 
-        Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                    Session session, Transaction transaction) throws Exception {
-                processEnterEventList(client, data, objectFactory, session, endDate, startDate, false);
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            List<Client> clients = clientCriteria.list();
+
+            if (clients.isEmpty()) {
+                dataAllEvents.setResultCode(RC_CLIENT_NOT_FOUND);
+                dataAllEvents.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+            } else if (clients.size() > 1) {
+                dataAllEvents.setResultCode(RC_SEVERAL_CLIENTS_WERE_FOUND);
+                dataAllEvents.setDescription(RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
+            } else {
+                Client client = clients.get(0);
+                dataAllEvents.setEnterEventList(processAllEventList(client, persistenceSession, endDate, startDate));
+                dataAllEvents.setResultCode(RC_OK);
+                dataAllEvents.setDescription(RC_OK_DESC);
             }
-        });
 
-        EnterEventListResult enterEventListResult = new EnterEventListResult();
-        enterEventListResult.enterEventList = data.getEnterEventList();
-        enterEventListResult.resultCode = data.getResultCode();
-        enterEventListResult.description = data.getDescription();
-        return enterEventListResult;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            dataAllEvents.setResultCode(RC_INTERNAL_ERROR);
+            dataAllEvents.setDescription(e.toString());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return dataAllEvents;
     }
 
     @Override
@@ -4017,6 +4042,121 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventWithRepList.getE().add(enterEventWithRepItem);
         }
         data.setEnterEventWithRepList(enterEventWithRepList);
+    }
+
+    private AllEventList processAllEventList(Client client, Session session,
+            Date endDate, Date startDate) throws Exception {
+        Date nextToEndDate = DateUtils.addDays(endDate, 1);
+        /*Запрос на получение данных из таблицы EnterEvents*/
+        Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
+        enterEventCriteria.add(Restrictions.eq("client", client));
+        enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<EnterEvent> enterEvents = enterEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы EnterEvents -- */
+
+        /*Запрос на получение данных из таблицы EnterEventsManual*/
+        Criteria manualEventCriteria = session.createCriteria(EnterEventManual.class);
+        manualEventCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        manualEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        manualEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        manualEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<EnterEventManual> manualEvents = manualEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы EnterEventsManual -- */
+
+        /*Запрос на получение данных из таблицы ExternalEventsManual*/
+        List<ExternalEventType> externalType = new ArrayList();
+        externalType.add(ExternalEventType.CULTURE);
+        externalType.add(ExternalEventType.MUSEUM);
+        externalType.add(ExternalEventType.LIBRARY);
+        Criteria externalEventCriteria = session.createCriteria(ExternalEvent.class);
+        externalEventCriteria.add(Restrictions.eq("client", client));
+        externalEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        externalEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        externalEventCriteria.add(Restrictions.in("evtType", externalType));
+        externalEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<ExternalEvent> externalEvents = externalEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы ExternalEventsManual -- */
+
+        Locale locale = new Locale("ru", "RU");
+        Calendar calendar = Calendar.getInstance(locale);
+
+        AllEventList enterEventList = new AllEventList();
+        int nRecs = 0;
+
+        for (EnterEvent enterEvent : enterEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(enterEvent.getEvtDateTime()));
+            calendar.setTime(enterEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setDirection(enterEvent.getPassDirection());
+            enterEventItem.setAddress(enterEvent.getOrg().getAddress());
+            enterEventItem.setShortNameInfoService(enterEvent.getOrg().getShortNameInfoService());
+            enterEventItem.setChildPassCheckerMethod(enterEvent.getChildPassChecker());
+            final Long checkerId = enterEvent.getChildPassCheckerId();
+            if (checkerId != null) {
+                Client checker = DAOUtils.findClient(session, checkerId);
+                enterEventItem.setChildPassChecker(checker.getPerson().getFullName());
+            }
+            enterEventList.getE().add(enterEventItem);
+        }
+
+        for (EnterEventManual manualEvent : manualEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(manualEvent.getEvtDateTime()));
+            calendar.setTime(manualEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setDirection(EnterEvent.CHECKED_BY_TEACHER_EXT);
+            Org org = (Org) session.load(Org.class, manualEvent.getIdOfOrg());
+            enterEventItem.setAddress(org.getAddress());
+            enterEventItem.setShortNameInfoService(org.getShortNameInfoService());
+            enterEventList.getE().add(enterEventItem);
+        }
+        for (ExternalEvent externalEvent : externalEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(externalEvent.getEvtDateTime()));
+            calendar.setTime(externalEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+
+            if (externalEvent.getEvtType().equals(ExternalEventType.MUSEUM)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                enterEventItem.setDirection(1000);
+                enterEventItem.setDirectionText("выдан билет в музее");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.MUSEUM)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                enterEventItem.setDirection(1001);
+                enterEventItem.setDirectionText("возврат билета в музей");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.CULTURE)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                enterEventItem.setDirection(2000);
+                enterEventItem.setDirectionText("вход в здание учреждения культуры");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.CULTURE)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                enterEventItem.setDirection(2001);
+                enterEventItem.setDirectionText("выход из здания учреждения культуры");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.LIBRARY)) {
+                enterEventItem.setDirection(3000);
+                enterEventItem.setDirectionText("вход в библтотеку");
+            }
+            enterEventItem.setAddress(externalEvent.getAddress());
+            enterEventItem.setShortNameInfoService(externalEvent.getOrgShortName());
+            enterEventList.getE().add(enterEventItem);
+        }
+        return enterEventList;
     }
 
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -4352,7 +4492,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
 
-        changeSsoid(guardMobile);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getSummaryByGuardMobile");
+        clientsMobileHistory.setShowing("Портал");
+
+        changeSsoid(guardMobile, clientsMobileHistory);
 
         Session session = null;
         try {
@@ -8973,8 +9117,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
-            if (client.getAgeTypeGroup() != null && client.getAgeTypeGroup()
-                    .equals(Client.GROUP_NAME[Client.GROUP_SCHOOL])) {
+            if (client.getAgeTypeGroup() != null && ArrayUtils.contains(Client.GROUP_NAME_SCHOOL, client.getAgeTypeGroup())) {
                 //Если клиент школьник
                 if (StringUtils.isEmpty(client.getClientGUID())) {
                     return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
@@ -9297,6 +9440,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<ClientSummaryBase> list = new ArrayList<>();
         list.add(summaryBase);
         result.setClientSummary(list);
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
         return result;
     }
 
@@ -9307,7 +9452,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
 
-        changeSsoid(guardMobile);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getSummaryByGuardMobileMin");
+        clientsMobileHistory.setShowing("Портал");
+        changeSsoid(guardMobile, clientsMobileHistory);
 
         Session session = null;
         Transaction transaction = null;
@@ -9851,7 +9999,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new ClientGroupResult(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
 
-        changeSsoid(mobile);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getTypeClients");
+        clientsMobileHistory.setShowing("Портал");
+
+        changeSsoid(mobile, clientsMobileHistory);
 
         Session session = null;
         Transaction transaction = null;
@@ -10834,34 +10986,36 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private void changeSsoid(String cientMobile)
+    private void changeSsoid(String clientMobile, ClientsMobileHistory clientsMobileHistory)
     {
         Session session = null;
         Transaction transaction = null;
         try {
+            String cientMobile =Client.checkAndConvertMobile(clientMobile);
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Map<String, List> headers = (Map<String, List>) context.getMessageContext().get(Message.PROTOCOL_HEADERS);
             List<String> ssoids = headers.get("User_ssoid");
             String ssoid = "";
-            ssoid = ssoids.get(0).trim();
-            if (!ssoid.isEmpty()) {
-                List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
-                List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
-                for (Client client: clients)
-                {
-                    if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
-                        client.setSsoid(ssoid);
-                        client.setUpdateTime(new Date());
-                        session.update(client);
+            if (ssoids != null && !ssoids.isEmpty()) {
+                ssoid = ssoids.get(0).trim();
+                if (!ssoid.isEmpty()) {
+                    List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
+                    List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
+                    for (Client client : clients) {
+                        if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
+                            client.setSsoid(ssoid);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
                     }
-                }
-                for (Client client: clientsSsoid)
-                {
-                    if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
-                        client.setMobile(cientMobile);
-                        client.setUpdateTime(new Date());
-                        session.update(client);
+                    for (Client client : clientsSsoid) {
+                        if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
+                            client.initClientMobileHistory(clientsMobileHistory);
+                            client.setMobileNotClearSsoid(cientMobile);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
                     }
                 }
             }
@@ -10869,7 +11023,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction = null;
         } catch (Exception e) {
             logger.error(String.format("Error work with ssoid. guardMobile = %s",
-                    cientMobile), e);
+                    clientMobile), e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

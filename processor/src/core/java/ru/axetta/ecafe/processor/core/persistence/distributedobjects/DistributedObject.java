@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.logic.GoodDateForOrders;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -30,7 +31,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 
-public abstract class DistributedObject{
+public abstract class DistributedObject extends GoodDateForOrders{
 
     /* Идентификатор объекта */
     protected Long globalId;

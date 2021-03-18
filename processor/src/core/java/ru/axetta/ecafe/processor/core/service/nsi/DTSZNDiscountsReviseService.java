@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service.nsi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientDiscountHistoryService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
@@ -600,6 +601,7 @@ public class DTSZNDiscountsReviseService {
 
     public void runTaskDB(String guid) throws Exception {
         ReviseDAOService.DiscountItemsWithTimestamp discountItemList;
+        ClientDiscountHistoryService service = RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class);
 
         if (StringUtils.isEmpty(guid)) {
             Date deltaDate = null;
@@ -727,6 +729,10 @@ public class DTSZNDiscountsReviseService {
                         discountInfo.setSource(DATA_SOURCE_TYPE_MARKER_OU);
                         session.merge(discountInfo);
                         logger.info(String.format("ClientDtisznDiscountInfo OK. wasModified: %s", wasModified ? "true" : "false"));
+                        if(wasModified){
+                            service.saveChangeHistoryByDiscountInfo(session, discountInfo,
+                                    DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                        }
                     } else {
                         // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
                         // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
@@ -822,7 +828,7 @@ public class DTSZNDiscountsReviseService {
                     Long isppCode = categoryDiscountDSZN.getCategoryDiscount()
                             .getIdOfCategoryDiscount(); //код льготы ИСПП для льготы из Инфо
                     Set<CategoryDiscount> discounts = client.getCategories();
-                    Set oldDiscounts = client.getCategories();
+                    Set<CategoryDiscount> oldDiscounts = client.getCategories();
                     Integer oldDiscountMode = client.getDiscountMode();
 
                     for (Iterator<CategoryDiscount> iterator = discounts.iterator(); iterator.hasNext(); ) {

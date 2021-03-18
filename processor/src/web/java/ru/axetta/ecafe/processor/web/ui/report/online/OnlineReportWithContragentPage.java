@@ -48,7 +48,7 @@ public abstract class OnlineReportWithContragentPage extends OnlineReportPage {
         return contragentFilter;
     }
 
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         //  Если заполняем орги (true), то вызываем родительский метод
         if (selectIdOfOrgList){
             super.completeOrgListSelection(orgMap);

@@ -153,6 +153,16 @@ public class DAOReadonlyService {
         return result;
     }
 
+    public SpecialDate findSpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findSpecialDate(session, compositeIdOfSpecialDate);
+    }
+
+    public SpecialDate findSpecialDateWithGroup(CompositeIdOfSpecialDate compositeIdOfSpecialDate, Long idOfClientGroup) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findSpecialDateWithGroup(session, compositeIdOfSpecialDate, idOfClientGroup);
+    }
+
     public List<EnterEvent> getEnterEventsByOrgAndGroup(long idOfOrg, String groupName, Date beginDate, Date endDate) {
         Query query = entityManager.createQuery(
                 "select e from EnterEvent e inner join e.client c inner join c.clientGroup g "
@@ -742,7 +752,7 @@ public class DAOReadonlyService {
 
     public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
         try {
-            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers");
+            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and ce.kafka<>true");
             query.setParameter("vers", maxVersion);
             List<EMIAS> emias = query.getResultList();
             //Фильтрация по орг
@@ -750,6 +760,32 @@ public class DAOReadonlyService {
             while (emiasIterator.hasNext()) {
                 EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
                 Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
+                if (cl == null) {
+                    //Удаляем "удаленных" клиентов
+                    emiasIterator.remove();
+                    continue;
+                }
+                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
+                    //Удаляем "чужих" клиентов
+                    emiasIterator.remove();
+                }
+            }
+            return emias;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
+        try {
+            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and ce.kafka=true and ce.processed = true");
+            query.setParameter("vers", maxVersion);
+            List<EMIAS> emias = query.getResultList();
+            //Фильтрация по орг
+            Iterator<EMIAS> emiasIterator = emias.iterator();
+            while (emiasIterator.hasNext()) {
+                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
+                Client cl = DAOUtils.findClientByMeshGuid(entityManager.unwrap(Session.class), emias1.getGuid());
                 if (cl == null) {
                     //Удаляем "удаленных" клиентов
                     emiasIterator.remove();

@@ -164,6 +164,14 @@ public class RuntimeContext implements ApplicationContextAware {
         this.extendCardServiceApiKey = extendCardServiceApiKey;
     }
 
+    public boolean isUseQueueForAllSyncs() {
+        return useQueueForAllSyncs;
+    }
+
+    public void setUseQueueForAllSyncs(boolean useQueueForAllSyncs) {
+        this.useQueueForAllSyncs = useQueueForAllSyncs;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -298,6 +306,7 @@ public class RuntimeContext implements ApplicationContextAware {
     Properties configProperties;
     SchemaVersionInfo currentSchemaVersionInfo;
     private boolean usePriceSms;
+    private boolean useQueueForAllSyncs;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
@@ -738,7 +747,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
             smsUserCodeSender = createUserCodeSender(properties);
 
-            processor = createProcessor(properties, sessionFactory, eventNotificator);
+            processor = createProcessor(sessionFactory, eventNotificator);
             this.syncProcessor = processor;
             this.cardManager = createCardManagerProcessor(properties, sessionFactory, eventNotificator);
             paymentProcessor = createPaymentProcessor(properties, sessionFactory, eventNotificator);
@@ -796,12 +805,14 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(CardBlockUnblockService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(MeshCardNotifyTaskExecutor.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();
             }
 
             usePriceSms = getPropertiesValue("ecafe.processor.sms.usePrice", "true").equals("true");
+            useQueueForAllSyncs = getPropertiesValue("ecafe.processor.sync.useQueueForAllSyncs", "false").equals("true");
 
             runCheckSums();
 
@@ -1133,7 +1144,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
 
-    private static Processor createProcessor(Properties properties, SessionFactory sessionFactory,
+    private static Processor createProcessor(SessionFactory sessionFactory,
             EventNotificator eventNotificator) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating processor.");

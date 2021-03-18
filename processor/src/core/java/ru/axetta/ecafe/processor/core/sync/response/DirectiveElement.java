@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TradeAccountConfigChange;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.FeedingSettingOrgItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -68,9 +69,14 @@ public class DirectiveElement implements AbstractToElement{
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
 
-        Long feedingSettingLimit = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
-        if (feedingSettingLimit != null) {
-            directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
+        FeedingSettingOrgItem feedingSettingOrgItem = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
+        if (feedingSettingOrgItem != null) {
+            if (feedingSettingOrgItem.getLimit() != null)
+              directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingOrgItem.getLimit().toString()));
+            if (feedingSettingOrgItem.getDiscount() != null)
+                directiveItemList.add(new DirectiveItem("FeedingSettingDiscount", feedingSettingOrgItem.getDiscount().toString()));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscount", feedingSettingOrgItem.getUseDiscount() ? "1" : "0"));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscountBuffet", feedingSettingOrgItem.getUseDiscountBuffet() ? "1" : "0"));
         }
 
         directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getHaveNewLP())?"1":"0"));
@@ -123,9 +129,14 @@ public class DirectiveElement implements AbstractToElement{
         Boolean allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
         directiveItemList.add(new DirectiveItem("REGISTRY_CHANGE_EMPLOYEE", allowRegistryChangeEmployee ? "1" : "0"));
 
-        Long feedingSettingLimit = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
-        if (feedingSettingLimit != null) {
-            directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
+        FeedingSettingOrgItem feedingSettingOrgItem = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
+        if (feedingSettingOrgItem != null) {
+            if (feedingSettingOrgItem.getLimit() != null)
+                directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingOrgItem.getLimit().toString()));
+            if (feedingSettingOrgItem.getDiscount() != null)
+                directiveItemList.add(new DirectiveItem("FeedingSettingDiscount", feedingSettingOrgItem.getDiscount().toString()));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscount", feedingSettingOrgItem.getUseDiscount() ? "1" : "0"));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscountBuffet", feedingSettingOrgItem.getUseDiscountBuffet() ? "1" : "0"));
         }
 
         boolean cardDoublesAllowed = VersionUtils.doublesOnlyAllowed();

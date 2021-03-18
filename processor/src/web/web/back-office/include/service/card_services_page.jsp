@@ -29,8 +29,6 @@
                     </a4j:commandButton>
                     <h:outputText styleClass="output-text" escape="true" value=" {#{cardServicesPage.filter}}" />
                 </h:panelGroup>
-                <h:outputText styleClass="output-text" escape="true" value="Учитывать дружественные ОО" />
-                <h:selectBooleanCheckbox value="#{cardServicesPage.allFriendlyOrgs}" styleClass="checkboxes" />
                 <a4j:commandButton value="Отправить ЭИ в МЭШ" id="CardServicesSentToMeshButton"
                                    action="#{cardServicesPage.sendCardsToMESH()}" styleClass="command-button"
                                    status="cardServicesPanelreportGenerateStatus"

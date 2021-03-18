@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -146,7 +147,7 @@ public class ClientgroupManagersProcessor extends AbstractGroupProcessor<ResClie
         Transaction persistenceTransaction = null;
         ClientgroupManagerData clientgroupManagerData = null;
         try {
-            persistenceSession = sessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientgroupManagerData = executeProcess(persistenceSession,idOfOrg);
             persistenceTransaction.commit();

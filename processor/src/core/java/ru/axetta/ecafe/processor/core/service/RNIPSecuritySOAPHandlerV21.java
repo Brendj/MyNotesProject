@@ -51,16 +51,16 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
             keyStore.load(null, null);
             privateKey = (PrivateKey) keyStore.getKey(containerAlias, containerPassword.toCharArray());
             cert = (X509Certificate) keyStore.getCertificate(containerAlias);
-            //System.setProperty("org.apache.xml.security.resource.config", "resource/jcp.xml");
             org.apache.xml.security.Init.init();
-            /*ru.CryptoPro.JCPxml.xmldsig.JCPXMLDSigInit.init();
-            try {
-                org.apache.xml.security.transforms.Transform.register(SmevTransformSpi.ALGORITHM_URN, SmevTransformSpi.class.getName());
-                logger.info("SmevTransformSpi has been initialized");
-            } catch (AlgorithmAlreadyRegisteredException e) {
-                logger.info("SmevTransformSpi Algorithm already registered: " + e.getMessage());
-            }*/
         }
+    }
+
+    protected void additionalTaskOnOutboundMessage(Document doc) {
+        //В версии 2.1 ничего не делаем
+    }
+
+    protected void additionalTaskOnInboundMessage(Document doc) {
+        //В версии 2.1 ничего не делаем
     }
 
     @Override
@@ -88,10 +88,8 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
                         org.apache.xml.security.transforms.Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS,
                         (XMLStructure) null);
                 transformList.add(transformC14N);
-                //final Transform transformSMEV = fac.newTransform(
-                //        SmevTransformSpi.ALGORITHM_URN,
-                //        (XMLStructure) null);
-                //transformList.add(transformSMEV);
+
+                additionalTaskOnOutboundMessage(doc);
 
                 Element token = (Element)doc.getElementsByTagName("ns2:CallerInformationSystemSignature").item(0);
                 Element assertionNode = (Element)doc.getElementsByTagName("ns2:SenderProvidedRequestData").item(0);
@@ -134,6 +132,7 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
 
             } else {
                 doc = soapPart.getEnvelope().getOwnerDocument();
+                additionalTaskOnInboundMessage(doc);
                 String msg = toString(doc);
                 messageLogger.LogPacket(msg, IRNIPMessageToLog.MESSAGE_IN);
             }

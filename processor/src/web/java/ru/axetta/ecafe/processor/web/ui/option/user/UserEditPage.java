@@ -219,8 +219,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 }
             }
             if (role != null && role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
-                //user.setFunctions(functionSelector.getSupplierReportFunctions(session));
-                user.setFunctions(functionSelector.getSelected(session));
+                user.setFunctions(functionSelector.getSelectedForForSupplierReportFunction(session));
                 user.setRoleName(role.toString());
                 if (contragentItems.isEmpty()) {
                     this.printError("Список контрагентов пуст.");

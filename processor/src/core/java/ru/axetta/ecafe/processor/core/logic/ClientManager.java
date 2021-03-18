@@ -399,10 +399,6 @@ public class ClientManager {
                 if (mobilePhone == null) {
                     throw new Exception("Неправильный формат мобильного телефона");
                 }
-                //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if(client != null && client.getMobile() != null && !client.getMobile().equals(mobilePhone)) {
-                    client.setSsoid("");
-                }
                 client.initClientMobileHistory(clientsMobileHistory);
                 client.setMobile(mobilePhone);
                 logger.info("class : ClientManager, method : modifyClientTransactionFree line : 358, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
@@ -418,10 +414,6 @@ public class ClientManager {
             //tokens[15]);
             String email = fieldConfig.getValue(ClientManager.FieldId.EMAIL);
             if (email != null && StringUtils.isNotEmpty(email) && !RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT)) {
-                //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if(client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
-                    client.setSsoid("");
-                }
                 client.setEmail(email);
             }
             //tokens[16])
@@ -1122,8 +1114,22 @@ public class ClientManager {
         clientGuardianToSave.setPassportSeries(passportSeries);
         session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
-        clientGuardianToSave.setMobile(mobile);
-        if (ssoid != null) clientGuardianToSave.setSsoid(ssoid);
+        String ssoidOld = clientGuardianToSave.getSsoid();
+        if (ssoidOld == null)
+            ssoidOld = "";
+        if (ssoid == null)
+            ssoid = "";
+        if (ssoidOld.equals(ssoid))
+            clientGuardianToSave.setMobile(mobile);
+        else
+            clientGuardianToSave.setMobileNotClearSsoid(mobile);
+        if (clientGuardianToSave.getClearedSsoid()) {
+            ssoid = "";
+            clientGuardianToSave.setClearedSsoid(false);
+        }
+        if (ssoid != null) {
+            clientGuardianToSave.setSsoid(ssoid);
+        }
         if (guid != null) clientGuardianToSave.setClientGUID(guid);
 
         if (gender != null) {
@@ -2000,8 +2006,21 @@ public class ClientManager {
         if (notificationItems == null) return;
         Set<ClientGuardianNotificationSetting> dbSettings = clientGuardian.getNotificationSettings();
         for (NotificationSettingItem item : notificationItems) {
+            //Для 17 типа мы не можем менять напрямую, только через 11
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
+            {
+                continue;
+            }
+
             ClientGuardianNotificationSetting newSetting = new ClientGuardianNotificationSetting(clientGuardian, item.getNotifyType());
             createOrRemoveSetting(dbSettings, newSetting, item.isEnabled());
+
+            //Если поменяли 11, то меняем и 17 событие
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
+            {
+                ClientGuardianNotificationSetting culture = new ClientGuardianNotificationSetting(clientGuardian, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
+                createOrRemoveSetting(dbSettings, culture, item.isEnabled());
+            }
         }
         boolean defaultPredefineFound = false;
         for (ClientGuardianNotificationSetting dbSetting : dbSettings) {

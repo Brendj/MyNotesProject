@@ -472,8 +472,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         for (ExpandedPupilInfo pupil : pupils) {
             if (pupil.deleted) {
                 Client dbClient = meshGuidMap.get(emptyIfNull(pupil.getMeshGUID()));
-                if (dbClient == null) {
+                if (dbClient == null ) {
                     dbClient = nsiGuidMap.get(emptyIfNull(pupil.getGuid()));
+                    if(dbClient != null && StringUtils.isNotEmpty(dbClient.getMeshGUID())){
+                        continue;
+                    }
                 }
                 if (dbClient == null || dbClient.isDeletedOrLeaving()) {
                     continue;
@@ -1180,17 +1183,17 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     public static class OrgRegistryGUIDInfo {
         Set<String> orgGuids;
         String guidInfo;
-        private Set<String> orgEkisIds;
-        private Set<Long> orgEkisIdsLong; // TODO: пересмотреть необходимость держать 2 одинаковых по сути поля, но с разными типами данных
-        private String ekisInfo;
+        private Set<String> orgNSIIds;
+        private Set<Long> orgNSIIdsLong; // TODO: пересмотреть необходимость держать 2 одинаковых по сути поля, но с разными типами данных
+        private String nsiInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
             Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
             orgGuids = new HashSet<String>();
             guidInfo = "";
-            orgEkisIds = new HashSet<>();
-            orgEkisIdsLong = new HashSet<>();
-            ekisInfo = "";
+            orgNSIIds = new HashSet<>();
+            orgNSIIdsLong = new HashSet<>();
+            nsiInfo = "";
             for (Org o : orgs) {
                 if (StringUtils.isEmpty(o.getGuid())) {
                     continue;
@@ -1202,20 +1205,20 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 orgGuids.add(o.getGuid());
             }
             for (Org o : orgs) {
-                if (o.getEkisId() == null) continue;
-                if (ekisInfo.length() > 0) ekisInfo += ", ";
-                ekisInfo += o.getOrgNumberInName() + ": " + o.getEkisId().toString();
-                orgEkisIds.add(o.getEkisId().toString());
-                orgEkisIdsLong.add(o.getEkisId());
+                if (o.getOrgIdFromNsi() == null) continue;
+                if (nsiInfo.length() > 0) nsiInfo += ", ";
+                nsiInfo += o.getOrgNumberInName() + ": " + o.getOrgIdFromNsi().toString();
+                orgNSIIds.add(o.getOrgIdFromNsi().toString());
+                orgNSIIdsLong.add(o.getOrgIdFromNsi());
             }
         }
 
-        public Set<Long> getOrgEkisIdsLong() {
-            return orgEkisIdsLong;
+        public Set<Long> getOrgNSIIdsLong() {
+            return orgNSIIdsLong;
         }
 
-        public void setOrgEkisIdsLong(Set<Long> orgEkisIdsLong) {
-            this.orgEkisIdsLong = orgEkisIdsLong;
+        public void setOrgNSIIdsLong(Set<Long> orgNSIIdsLong) {
+            this.orgNSIIdsLong = orgNSIIdsLong;
         }
 
         public Set<String> getOrgGuids() {
@@ -1226,12 +1229,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             return guidInfo;
         }
 
-        public Set<String> getOrgEkisIds() {
-            return orgEkisIds;
+        public Set<String> getOrgNSIIds() {
+            return orgNSIIds;
         }
 
-        public String getEkisInfo() {
-            return ekisInfo;
+        public String getNsiInfo() {
+            return nsiInfo;
         }
     }
 
@@ -1655,7 +1658,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
         OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
         log(synchDate + "Производится синхронизация для " + org.getOfficialName() + " GUID [" + orgGuids.getGuidInfo()
-                + "] + EKIS Id [" + orgGuids.getEkisInfo() + "]", logBuffer);
+                + "] + NSI Id [" + orgGuids.getNsiInfo() + "]", logBuffer);
 
         SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
                 SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());

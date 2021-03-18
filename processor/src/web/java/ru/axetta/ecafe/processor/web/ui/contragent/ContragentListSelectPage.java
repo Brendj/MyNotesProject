@@ -13,10 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import java.util.*;
 
@@ -184,11 +181,15 @@ public class ContragentListSelectPage extends BasicPage {
     }
 
     public void fill(Session session, int multiContrFlag, String classTypes) throws Exception {
+        fill(session, multiContrFlag, classTypes, null);
+    }
+
+    public void fill(Session session, int multiContrFlag, String classTypes, List<Long> idOfOrgs) throws Exception {
         this.multiContrFlag = multiContrFlag;
         this.classTypesString = classTypes;
         List<Item> items = new ArrayList<Item>();
         List<String> selectedIdsList = Arrays.asList(StringUtils.split(selectedIds, ","));
-        List contragents = retrieveContragents(session, classTypes);
+        List contragents = retrieveContragents(session, classTypes, idOfOrgs);
         for (Object object : contragents) {
             Contragent contragent = (Contragent) object;
             Item item = new Item(contragent);
@@ -200,7 +201,7 @@ public class ContragentListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
+    private List retrieveContragents(Session session, String classTypesString, List<Long> idOfOrgs) throws HibernateException {
         Criteria criteria = session.createCriteria(Contragent.class).addOrder(Order.asc("contragentName"));
 
         if(!"1".equals(classTypesString)) {
@@ -215,16 +216,26 @@ public class ContragentListSelectPage extends BasicPage {
             criteria.add(Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE));
         }
         if (StringUtils.isNotEmpty(classTypesString)) {
-            String[] classTypes = classTypesString.split(",");
+            String[] classTypes;
+            if (classTypesString.equals("3")) //Класс типа 3 используется только для отсечения ОПЕРАТОРА
+                classTypes = new String[]{"2"};
+            else
+                classTypes = classTypesString.split(",");
             Criterion exp = Restrictions.eq("classId", Integer.parseInt(classTypes[0]));
             for (int i = 1; i < classTypes.length; i++) {
                 exp = Restrictions.or(exp, Restrictions.eq("classId", Integer.parseInt(classTypes[i])));
             }
             criteria.add(exp);
         }
+        if (idOfOrgs != null)
+        {
+            criteria.createAlias("orgsInternal", "orgs");
+            criteria.add(Restrictions.in("orgs.idOfOrg", idOfOrgs));
+        }
         criteria.addOrder(Order.asc("contragentName"));
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         List<Contragent> contragentsByCriteria = criteria.list();
-        if(!"1".equals(classTypesString)) {
+        if(!"1".equals(classTypesString) && !"3".equals(classTypesString)) {
             Criteria criteria1 = session.createCriteria(Contragent.class);
             criteria1.add(Restrictions.eq("contragentName", OPERATOR));
             Contragent operator = (Contragent) criteria1.uniqueResult();

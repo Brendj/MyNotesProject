@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
+import ru.axetta.ecafe.processor.core.persistence.service.menu.WtComplexCopyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -116,6 +117,11 @@ public class OtherActionsPage extends OnlineReportPage {
     public void cancelPreorder() throws Exception {
        PreorderCancelNotificationService.sendNotification.manualStart();
         printMessage("Отправка уведомлений об отмене предзаказа выполнена");
+    }
+
+    public void archvedExeption() throws Exception {
+        ArchivedExeptionService.archivedExeption.manualStart();
+        printMessage("Архивирование событий выполнено");
     }
 
     public void runImportRegisterClients() throws Exception {
@@ -665,6 +671,12 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void sendToAtol() {
         RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
+        printMessage("Отправка платежей в Атол выполнена");
+    }
+
+    public void processWtComplexes() {
+        RuntimeContext.getAppContext().getBean(WtComplexCopyService.class).runTask();
+        printMessage("Обработка копий комплексов веб арма ПП выполнена");
     }
 
     public void preorderRequestsManualGenerate() throws Exception {

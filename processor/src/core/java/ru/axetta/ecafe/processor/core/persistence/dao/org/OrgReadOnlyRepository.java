@@ -7,13 +7,13 @@ package ru.axetta.ecafe.processor.core.persistence.dao.org;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -49,15 +49,14 @@ public class OrgReadOnlyRepository extends BaseJpaDao {
         return false;
     }
 
-    public Long getFeedingSettingLimit(long idOfOrg) {
-        Query query = entityManager.createNativeQuery("select limitamount from cf_feeding_settings fs "
+    public FeedingSettingOrgItem getFeedingSettingLimit(long idOfOrg) {
+        Query query = entityManager.createNativeQuery("select limitamount, discountamount, usediscount, usediscountbuffet from cf_feeding_settings fs "
                 + "join cf_feeding_settings_orgs fso on fs.idofsetting = fso.idofsetting "
                 + "where fso.idoforg = :idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
-        try {
-            return ((BigInteger)query.getSingleResult()).longValue();
-        } catch (Exception e) {
-            return null;
-        }
+        List list = query.getResultList();
+        if (list.size() == 0) return null;
+        Object[] row = (Object[]) list.get(0);
+        return new FeedingSettingOrgItem(HibernateUtils.getDbLong(row[0]), HibernateUtils.getDbLong(row[1]), HibernateUtils.getDbBoolean(row[2]), HibernateUtils.getDbBoolean(row[3]));
     }
 }

@@ -332,6 +332,8 @@
                     <h:inputText value="#{optionPage.RNIPPaymentsURL_v116}" styleClass="input-text" size="100" />
                     <h:outputText escape="true" value="URL сервиса РНИП v2.1" styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPPaymentsURL_v20}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="URL сервиса РНИП v2.2" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPPaymentsURL_v22}" styleClass="input-text" size="100" />
                     <h:outputText escape="true" value="Обращаться к сервису РНИП версии" styleClass="output-text" />
                     <h:selectOneMenu value="#{optionPage.RNIPPaymentsWorkingVersion}" styleClass="input-text">
                         <f:selectItems value="#{optionPage.RNIPWorkingVersions}" />
@@ -417,6 +419,9 @@
                     <h:outputText escape="true" value="Таймаут ожидания одновременно обрабатываемых синхронизаций, минуты"
                                   styleClass="output-text" />
                     <h:inputText value="#{optionPage.simultaneousSyncTimeout}" styleClass="input-text" size="3" />
+                    <h:outputText escape="true" value="Таймаут ожидания одновременно обрабатываемых быстрых синхронизаций, минуты"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.simultaneousAccIncSyncTimeout}" styleClass="input-text" size="3" />
                     <h:outputText escape="true" value="Периоды запрета полной синхронизации"
                                   styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRestrictFullSyncPeriods}" styleClass="input-text" size="25" />

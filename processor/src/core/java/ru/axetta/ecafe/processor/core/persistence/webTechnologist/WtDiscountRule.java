@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -56,6 +57,18 @@ public class WtDiscountRule {
             joinColumns = @JoinColumn(name = "idOfRule"),
             inverseJoinColumns = @JoinColumn(name = "idOfCategoryDiscount"))
     private Set<CategoryDiscount> categoryDiscounts = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "idodcode")
+    private CodeMSP codeMSP;
+
+    public CodeMSP getCodeMSP() {
+        return codeMSP;
+    }
+
+    public void setCodeMSP(CodeMSP codeMSP) {
+        this.codeMSP = codeMSP;
+    }
 
     public Long getIdOfRule() {
         return idOfRule;

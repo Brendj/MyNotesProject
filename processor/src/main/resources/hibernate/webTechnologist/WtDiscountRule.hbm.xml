@@ -45,5 +45,6 @@
             <key column="idOfRule"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="idOfCategoryDiscount"/>
         </set>
+        <many-to-one name="codeMSP" class="ru.axetta.ecafe.processor.core.persistence.CodeMSP" lazy="false" column="idofcode" />
     </class>
 </hibernate-mapping>

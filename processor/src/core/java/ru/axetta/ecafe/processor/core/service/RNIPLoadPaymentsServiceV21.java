@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.InvalidContentException;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangePortType;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangeService;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.*;
@@ -62,6 +63,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     public static final String SUCCESS_CODE = "0 -";
     public static final String NODATA_CODE = "NO_DATA -";
     public static final String EMPTY_PACKET = "Empty packet, rerequest sent";
+    public static final String ALREADY_PROCESSED = "уже обрабатывался";
 
     private final static ThreadLocal<String> hasError = new ThreadLocal<String>(){
         @Override protected String initialValue() { return null; }
@@ -145,7 +147,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     }
 
     @Override
-    protected String getRNIPUrl() {
+    public String getRNIPUrl() {
         return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20);
     }
 
@@ -247,6 +249,15 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return response;
     }
 
+    protected void setProperCatalogRequestSection(int requestType, ImportCatalogRequest importCatalogRequest,
+            ServiceCatalogType serviceCatalogType) {
+        if (requestType == RNIPLoadPaymentsService.REQUEST_MODIFY_CATALOG) {
+            importCatalogRequest.setChanges(serviceCatalogType);
+        } else if (requestType == RNIPLoadPaymentsService.REQUEST_CREATE_CATALOG) {
+            importCatalogRequest.setServiceCatalog(serviceCatalogType);
+        }
+    }
+
     public SendRequestResponse executeModifyCatalogV21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
         InitRNIP21Service(contragent);
 
@@ -263,11 +274,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
         generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory serviceCatalogObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory();
         ServiceCatalogType serviceCatalogType = serviceCatalogObjectFactory.createServiceCatalogType();
-        if (requestType == RNIPLoadPaymentsService.REQUEST_MODIFY_CATALOG) {
-            importCatalogRequest.setChanges(serviceCatalogType);
-        } else if (requestType == RNIPLoadPaymentsService.REQUEST_CREATE_CATALOG) {
-            importCatalogRequest.setServiceCatalog(serviceCatalogType);
-        }
+        setProperCatalogRequestSection(requestType, importCatalogRequest, serviceCatalogType);
         //importCatalogRequest.setServiceCatalog(serviceCatalogType);
         serviceCatalogType.setId(String.format("I_%s", UUID.randomUUID().toString()));
         serviceCatalogType.setName("Изменение");
@@ -497,7 +504,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     private void InitRNIP21Service(Contragent contragent) throws MalformedURLException {
         synchronized (sync) {
             if (port21 == null) {
-                service21 = new SMEVMessageExchangeService();
+                service21 = getServiceImpl();
                 port21 = service21.getSMEVMessageExchangeEndpoint();
                 bindingProvider21 = (BindingProvider) port21;
                 URL endpoint = new URL(getRNIPUrl());
@@ -506,10 +513,18 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
         String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
-        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
+        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = getSecurityHandler(alias, pass, contragent);
         final List<Handler> handlerChain = new ArrayList<Handler>();
         handlerChain.add(pfrSecuritySOAPHandler);
         bindingProvider21.getBinding().setHandlerChain(handlerChain);
+    }
+
+    protected SMEVMessageExchangeService getServiceImpl() {
+        return new SMEVMessageExchangeService();
+    }
+
+    protected RNIPSecuritySOAPHandlerV21 getSecurityHandler(String alias, String pass, Contragent contragent) {
+        return new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
     }
 
     @Override
@@ -577,6 +592,14 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         try {
             port21.ack(ackRequest);
             RnipDAOService.getInstance().saveAsAckSent(rnipMessage);
+        } catch (InvalidContentException e) {
+            try {
+                if (e.getMessage().contains(ALREADY_PROCESSED)) {
+                    RnipDAOService.getInstance().saveAsAckSent(rnipMessage);
+                }
+            } catch (Exception ee) {
+                loggerSendAck.error("Error in process Ack response rnip 2.1: ", ee);
+            }
         } catch (Exception e) {
             loggerSendAck.error("Error in request to rnip 2.1", e);
             return;

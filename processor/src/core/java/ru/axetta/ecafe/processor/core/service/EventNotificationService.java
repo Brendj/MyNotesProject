@@ -945,6 +945,12 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
                 }
 
+                if (!findValueInParams(new String[]{PARAM_FRATION}, values).isEmpty())
+                {
+                    String ration = findValueInParams(new String[]{PARAM_FRATION}, values);
+                    empType.getParameters().put(PARAM_FRATION, ration);
+                }
+
                 //  дата только для платного комплекса + льготного комплекса
                 if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
                    findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
@@ -953,7 +959,6 @@ public class EventNotificationService {
                     String complexName = findValueInParams(new String[]{PARAM_COMPLEX_NAME}, values);
                     empType.getParameters().put(PARAM_COMPLEX_NAME, complexName);
                 }
-
 
                 //  сумма только для буфет + платное
                 String amountPrice = findValueInParams(new String[]{PARAM_AMOUNT_PRICE}, values);

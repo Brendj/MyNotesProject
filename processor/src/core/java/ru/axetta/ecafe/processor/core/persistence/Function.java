@@ -143,6 +143,12 @@ public class Function {
     public static final String FUNCD_COVERAGENUTRITION = "Отчет по охвату питания";
     public static final String FUNC_RESTRICT_CARD_SIGNS = "cardSingsRestrict";
     public static final String FUNCD_RESTRICT_CARD_SIGNS = "Закрыть подраздел 'Цифровые подписи'";
+    public static final String FUNC_WORK_ONLINE_REPORT_DOCS = "onlineRprtDocs";
+    public static final String FUNCD_WORK_ONLINE_REPORT_DOCS = "Онлайн отчеты - Документы";
+    public static final String FUNC_WORK_ONLINE_REPORT_EE_REPORT = "onlineRprtEEReport";
+    public static final String FUNCD_WORK_ONLINE_REPORT_EE_REPORT = "Онлайн отчеты - Отчеты по проходам";
+    public static final String FUNC_WORK_ONLINE_REPORT_MENU_REPORT = "onlineRprtMenuReport";
+    public static final String FUNCD_WORK_ONLINE_REPORT_MENU_REPORT = "Онлайн отчеты - Отчет по меню";
 
     private Long idOfFunction;
     private String functionName;

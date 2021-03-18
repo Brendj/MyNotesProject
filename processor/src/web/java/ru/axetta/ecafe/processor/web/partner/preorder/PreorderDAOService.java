@@ -840,6 +840,7 @@ public class PreorderDAOService {
         boolean isWtMenu = org.getUseWebArm();  // меню веб-технолога
 
         Session session = (Session)emReport.getDelegate();
+        if (guardianMobile != null && guardianMobile.equals("")) guardianMobile = null;
         List<Client> clientsByMobile = PreorderUtils.getClientsByMobile(session, client.getIdOfClient(), guardianMobile);
         Integer value = PreorderUtils.getClientGroupResult(session, clientsByMobile);
         PreorderMobileGroupOnCreateType mobileGroupOnCreate;
@@ -1181,8 +1182,8 @@ public class PreorderDAOService {
                 + "where m.client = :client " + condition + " and m.deletedState = false and m.startDate = :startDate "
                 + "and m.endDate = :endDate");
         regularPreorderSelect.setParameter("client", client);
-        regularPreorderSelect.setParameter("startDate", startDate);
-        regularPreorderSelect.setParameter("endDate", endDate);
+        regularPreorderSelect.setParameter("startDate", RegularPreorder.convertDate(startDate));
+        regularPreorderSelect.setParameter("endDate", RegularPreorder.convertDate(endDate));
         if (isComplex)
             regularPreorderSelect.setParameter("idOfComplex", idOfComplex);
         else {
@@ -1593,7 +1594,7 @@ public class PreorderDAOService {
     }
 
     private void deleteGeneratedPreordersByRegular(Session session, RegularPreorder regularPreorder, PreorderState state) throws Exception {
-        Date dateFrom = getStartDateForGeneratePreordersInternal(regularPreorder.getClient());
+        Date dateFrom = getStartDateForGeneratePreordersInternal(regularPreorder.getClient(), null);
         long nextVersion = DAOUtils.nextVersionByPreorderComplex(session);
         org.hibernate.Query delQuery = session.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, state = :state, version = :version "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
@@ -1681,17 +1682,20 @@ public class PreorderDAOService {
         //данные из производственного календаря за период
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(currentDate, dateTo, regularPreorder.getClient().getOrg().getIdOfOrg());
         List<OrgGoodRequest> preorderRequests = getOrgGoodRequests(regularPreorder.getClient().getOrg().getIdOfOrg(), currentDate, dateTo);
-        currentDate = getStartDateForGeneratePreordersInternal(regularPreorder.getClient());
+        List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(new Date(), dateTo);
+        currentDate = getStartDateForGeneratePreordersInternal(regularPreorder.getClient(), productionCalendar);
 
         if (currentDate.before(regularPreorder.getStartDate())) currentDate = regularPreorder.getStartDate();
         if (doDeleteExisting) {
             deleteGeneratedPreordersByRegular((Session) em.getDelegate(), regularPreorder, PreorderState.OK);
         }
 
-        //получаем список всех предзаказов (в т.ч. удаленные)
+        //получаем список всех предзаказов по регуляру (в т.ч. удаленные)
         List<PreorderComplex> preorderComplexes = getPreorderComplexesByRegular(regularPreorder, currentDate, dateTo);
 
-        List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(new Date(), dateTo);
+        //все предзаказы клиента за период,
+        List<PreorderComplex> preordersForClient = getPreorderComplexesByClient(regularPreorder, currentDate, dateTo);
+
         currentDate = CalendarUtils.startOfDayInUTC(CalendarUtils.addHours(currentDate, 12));
 
         while (currentDate.before(dateTo) || currentDate.equals(dateTo)) {
@@ -1720,6 +1724,16 @@ public class PreorderDAOService {
                 logger.info("Weekend or not generated day");
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
+            }
+
+            //проверяем, нет ли на дату удаленного пользователем предзаказа
+            PreorderComplex pc2 = findPreorderComplexOnDate(preordersForClient, currentDate, null);
+            if (pc2 != null) {
+                if (pc2.getDeletedState() && pc2.getState() == PreorderState.OK && pc2.getLastUpdate().after(regularPreorder.getCreatedDate())) {
+                    logger.info("Client deleted preorder on this date earlier");
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
+                }
             }
 
             boolean isWtMenu = regularPreorder.getClient().getOrg().getUseWebArm();
@@ -1972,6 +1986,17 @@ public class PreorderDAOService {
                 .getResultList();
     }
 
+    private List<PreorderComplex> getPreorderComplexesByClient(RegularPreorder regularPreorder, Date dateFrom, Date dateTo) {
+        return em.createQuery("select pc from PreorderComplex pc "
+                + "where pc.client = :client and pc.preorderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
+                + "order by pc.createdDate desc, pc.lastUpdate desc")
+                .setParameter("client", regularPreorder.getClient())
+                .setParameter("dateFrom", dateFrom)
+                .setParameter("dateTo", dateTo)
+                .setParameter("idOfComplex", regularPreorder.getIdOfComplex())
+                .getResultList();
+    }
+
     private void testAndDeleteRegularPreorder(RegularPreorder regularPreorder) {
         if (!CalendarUtils.betweenDate(new Date(), regularPreorder.getStartDate(), regularPreorder.getEndDate())) return;
         Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc join pc.preorderMenuDetails pmd "
@@ -2028,9 +2053,10 @@ public class PreorderDAOService {
         return query.getResultList();
     }
 
-    private Date getStartDateForGeneratePreordersInternal(Client client) throws Exception {
+    private Date getStartDateForGeneratePreordersInternal(Client client, List<ProductionCalendar> productionCalendar) throws Exception {
         Date currentDate = CalendarUtils.startOfDay(new Date());
         Date dateTo = CalendarUtils.addDays(new Date(), PreorderComplex.getDaysOfRegularPreorders()-1);
+        if (productionCalendar == null) productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(new Date(), dateTo);
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(currentDate, dateTo, client.getOrg().getIdOfOrg());//данные из производственного календаря за период
         Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client); //настройка - количество дней запрета редактирования
         if (forbiddenDays == null) {
@@ -2040,12 +2066,22 @@ public class PreorderDAOService {
         boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(client.getOrg().getIdOfOrg(), groupName);
         int i = 0;
         Date result = CalendarUtils.addDays(currentDate, 1);
+        int workDaysPast = 0;
         while (i < forbiddenDays) {
-            boolean isWorkDate = getIsWorkDate(isSixWorkWeek, result, specialDates, client);
-            if (isWorkDate) i++;
+            boolean isWorkDateBySpecialDates = getIsWorkDate(isSixWorkWeek, result, specialDates, client);
+            Boolean isWeekend = isWeekendByProductionCalendar(result, productionCalendar);
+            if (isWorkDateBySpecialDates) i++;
+            if (!isWeekend && !isWorkDateBySpecialDates) workDaysPast++;
             result = CalendarUtils.addDays(result, 1);
         }
-        return result;
+        return CalendarUtils.addDays(result, -workDaysPast);
+    }
+
+    private boolean isWeekendByProductionCalendar(Date date, List<ProductionCalendar> productionCalendar) {
+        for (ProductionCalendar pc : productionCalendar) {
+            if (CalendarUtils.betweenDate(pc.getDay(), CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date))) return true;
+        }
+        return false;
     }
 
     private boolean getIsWorkDate(boolean isSixWorkWeek, Date currentDate, List<SpecialDate> specialDates, Client client) {
@@ -2100,7 +2136,8 @@ public class PreorderDAOService {
 
     private PreorderMenuDetail findPreorderMenuDetail(Date date, Client client, Long armIdOfMenu) {
         Query query = em.createQuery("select pmd from PreorderMenuDetail pmd "
-                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu ");
+                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu "
+                + "order by pmd.idOfPreorderMenuDetail desc");
         query.setParameter("client", client);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
@@ -2569,7 +2606,9 @@ public class PreorderDAOService {
         Set<Long> set = new HashSet<Long>();
         for (PreorderComplex complex : list) {
             if (!set.contains(complex.getIdOfPreorderComplex())) {
-                sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
+                if (complex.getAmount() > 0) {
+                    sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
+                }
                 set.add(complex.getIdOfPreorderComplex());
                 for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
                     sum += (pmd.getMenuDetailPrice() * pmd.getAmount()) - pmd.getUsedSum();
@@ -2998,45 +3037,6 @@ public class PreorderDAOService {
         query.setParameter("idOfChildren", child.getIdOfClient());
         query.setParameter("guardianMobile", guardianMobile);
         return query.getResultList();
-    }
-
-    @Transactional
-    public void deletePreordersByClient(Client client) throws Exception {
-        Query query = em.createQuery("select pc from PreorderComplex pc where pc.client = :client and pc.preorderDate > :date and pc.deletedState = false");
-        query.setParameter("client", client);
-        query.setParameter("date", new Date());
-        List<PreorderComplex> list = query.getResultList();
-        if (list.size() == 0) return;
-        /*Integer days = DAOUtils.getPreorderFeedingForbiddenDays(client.getOrg().getIdOfOrg());
-        if (days != null) days++;
-        else {
-            days = PreorderComplex.DEFAULT_FORBIDDEN_DAYS + 1;
-        }
-        Date dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), days));*/
-        Date dateFrom = getStartDateForGeneratePreordersInternal(client);
-        long nextVersion = nextVersionByPreorderComplex();
-        for (PreorderComplex preorderComplex : list) {
-            preorderComplex.deleteByChangeOrg(nextVersion, preorderComplex.getPreorderDate().after(dateFrom));
-            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                preorderMenuDetail.deleteByChangeOrg(nextVersion, preorderComplex.getPreorderDate().after(dateFrom));
-                em.merge(preorderMenuDetail);
-            }
-            em.merge(preorderComplex);
-        }
-        query = em.createQuery("update RegularPreorder set deletedState = true, lastUpdate = :date where client = :client and endDate > :date");
-        query.setParameter("date", new Date());
-        query.setParameter("client", client);
-        query.executeUpdate();
-    }
-
-    @Transactional
-    public Integer getMenuSyncCountDays(Long idOfOrg) {
-        Org org = emReport.find(Org.class, idOfOrg);
-        if (org.getConfigurationProvider() == null) {
-            return PreorderComplex.DEFAULT_MENU_SYNC_COUNT_DAYS;
-        } else {
-            return org.getConfigurationProvider().getMenuSyncCountDays();
-        }
     }
 
     public Org findOrg(long idOfOrg) {

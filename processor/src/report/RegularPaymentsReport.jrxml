@@ -37,14 +37,14 @@
 	<title>
 		<band height="74" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="0556b26a-db2d-4368-bc5a-3ceb8f3fac01" x="0" y="0" width="1060" height="30"/>
+				<reportElement x="-134" y="0" width="1060" height="30" uuid="0556b26a-db2d-4368-bc5a-3ceb8f3fac01"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Отчет по регулярным платежам]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="f871eb10-036a-4eb0-b969-867c93372de0" x="0" y="30" width="1060" height="16">
+				<reportElement x="-134" y="30" width="1060" height="16" uuid="f871eb10-036a-4eb0-b969-867c93372de0">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -55,7 +55,7 @@
 				<textFieldExpression><![CDATA["За период: " + $V{startDate} + " - " + $V{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="88de1320-9f4a-4c16-be2a-ec5c9d8310ef" style="Column header" mode="Transparent" x="0" y="47" width="93" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="0" y="47" width="93" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="88de1320-9f4a-4c16-be2a-ec5c9d8310ef"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -70,7 +70,7 @@
 				<text><![CDATA[Время платежа]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0513d990-898f-416d-aa11-b473d67fa3ef" style="Column header" mode="Transparent" x="93" y="47" width="74" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="93" y="47" width="74" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="0513d990-898f-416d-aa11-b473d67fa3ef"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -85,7 +85,7 @@
 				<text><![CDATA[Идентификатор]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="9fdf93ff-0676-414e-8f00-510d2dcb1800" style="Column header" mode="Transparent" x="167" y="47" width="127" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="167" y="47" width="127" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="9fdf93ff-0676-414e-8f00-510d2dcb1800"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -100,7 +100,7 @@
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="db61e5d5-f8e6-4e1e-b79d-45560d0adc9b" style="Column header" mode="Transparent" x="294" y="47" width="72" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="294" y="47" width="72" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="db61e5d5-f8e6-4e1e-b79d-45560d0adc9b"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -115,52 +115,7 @@
 				<text><![CDATA[Номер л/с]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0c69c917-c8df-40f2-82b4-38455a60c2f7" style="Column header" mode="Transparent" x="366" y="47" width="94" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Фамилия]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="10ef2a97-bc89-43a7-be94-c511bc142780" style="Column header" mode="Transparent" x="460" y="47" width="86" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Имя]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="a26455ae-f47e-4606-a768-296eafb70d16" style="Column header" mode="Transparent" x="546" y="47" width="86" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Отчество]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="ff4e2361-68e9-4269-9706-93c9ccfcf157" style="Column header" mode="Transparent" x="632" y="47" width="53" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="366" y="47" width="53" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="ff4e2361-68e9-4269-9706-93c9ccfcf157"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -175,7 +130,7 @@
 				<text><![CDATA[Сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1bdcaf4b-2ea7-4cfa-88e4-dbd13a0420d2" style="Column header" mode="Transparent" x="685" y="47" width="72" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="419" y="47" width="72" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="1bdcaf4b-2ea7-4cfa-88e4-dbd13a0420d2"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -190,7 +145,7 @@
 				<text><![CDATA[Баланс до пополнения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="55337fbb-ce79-4a77-ba66-d6108b4f7219" style="Column header" mode="Transparent" x="757" y="47" width="64" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="491" y="47" width="64" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="55337fbb-ce79-4a77-ba66-d6108b4f7219"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -205,7 +160,7 @@
 				<text><![CDATA[Платеж успешный]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ba12ce42-cacc-45bc-a4d4-d333802fb1e6" style="Column header" mode="Transparent" x="821" y="47" width="75" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="555" y="47" width="75" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="ba12ce42-cacc-45bc-a4d4-d333802fb1e6"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -220,7 +175,7 @@
 				<text><![CDATA[RRN транзакции]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c8fb8a27-ca11-46dd-bccf-f1bdb382208c" style="Column header" mode="Transparent" x="896" y="47" width="75" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="630" y="47" width="75" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="c8fb8a27-ca11-46dd-bccf-f1bdb382208c"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -235,7 +190,7 @@
 				<text><![CDATA[Статус платежа]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1ef75dbc-2345-486f-97ce-e4b5a9b09d82" style="Column header" mode="Transparent" x="971" y="47" width="89" height="27" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="705" y="47" width="89" height="27" forecolor="#000000" backcolor="#FFFFFF" uuid="1ef75dbc-2345-486f-97ce-e4b5a9b09d82"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -257,7 +212,7 @@
 	<detail>
 		<band height="21">
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="83ec6cca-e11f-4869-ab41-60ce544a9590" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="93" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="93" height="20" uuid="83ec6cca-e11f-4869-ab41-60ce544a9590"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -271,7 +226,7 @@
 				<textFieldExpression><![CDATA[$F{paymentDate}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="2261969f-09ee-4e85-9b9f-7f4296f19a24" positionType="Float" stretchType="RelativeToBandHeight" x="167" y="0" width="127" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="167" y="0" width="127" height="20" uuid="2261969f-09ee-4e85-9b9f-7f4296f19a24"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -285,7 +240,7 @@
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="ae42b084-b54f-4fb1-b9a2-0a74f6121174" positionType="Float" stretchType="RelativeToBandHeight" x="294" y="0" width="72" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="294" y="0" width="72" height="20" uuid="ae42b084-b54f-4fb1-b9a2-0a74f6121174"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -298,50 +253,8 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{contractId}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="8b84e332-7ffa-433d-91ba-a4020369c5bc" positionType="Float" stretchType="RelativeToBandHeight" x="366" y="0" width="94" height="20"/>
-				<box topPadding="1" leftPadding="2">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement>
-					<font size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{surname}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="2b71d64b-61b6-4b76-9b45-3e307215511a" positionType="Float" stretchType="RelativeToBandHeight" x="460" y="0" width="86" height="20"/>
-				<box topPadding="1" leftPadding="2">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement>
-					<font size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="93560359-fa0b-4883-8a1e-7de64e0398b1" positionType="Float" stretchType="RelativeToBandHeight" x="546" y="0" width="86" height="20"/>
-				<box topPadding="1" leftPadding="2">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement>
-					<font size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{secondName}]]></textFieldExpression>
-			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00">
-				<reportElement uuid="e91f9427-2de8-4590-a4b4-581c468bd33f" positionType="Float" stretchType="RelativeToBandHeight" x="632" y="0" width="53" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="366" y="0" width="53" height="20" uuid="e91f9427-2de8-4590-a4b4-581c468bd33f"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -355,7 +268,7 @@
 				<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{paymentSum})) / 100.00]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00">
-				<reportElement uuid="a4a46167-a00d-442d-adaf-367ca48ef6f1" positionType="Float" stretchType="RelativeToBandHeight" x="685" y="0" width="72" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="419" y="0" width="72" height="20" uuid="a4a46167-a00d-442d-adaf-367ca48ef6f1"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -369,7 +282,7 @@
 				<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{clientBalance})) / 100.00]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="6376c21a-7d83-4821-b578-e0fd62bc318e" positionType="Float" stretchType="RelativeToBandHeight" x="757" y="0" width="64" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="491" y="0" width="64" height="20" uuid="6376c21a-7d83-4821-b578-e0fd62bc318e"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -383,7 +296,7 @@
 				<textFieldExpression><![CDATA[$F{success}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="5815b4bc-9396-4781-98dd-b2b5a2f0f539" positionType="Float" stretchType="RelativeToBandHeight" x="821" y="0" width="75" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="555" y="0" width="75" height="20" uuid="5815b4bc-9396-4781-98dd-b2b5a2f0f539"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -397,7 +310,7 @@
 				<textFieldExpression><![CDATA[$F{rrn}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="95379ea2-947a-4d79-b215-c41e882d8fa6" positionType="Float" stretchType="RelativeToBandHeight" x="896" y="0" width="75" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="630" y="0" width="75" height="20" uuid="95379ea2-947a-4d79-b215-c41e882d8fa6"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -411,7 +324,7 @@
 				<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="92c7bcf9-9b36-47ca-b440-b4108d918457" positionType="Float" stretchType="RelativeToBandHeight" x="971" y="0" width="89" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="705" y="0" width="89" height="20" uuid="92c7bcf9-9b36-47ca-b440-b4108d918457"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -425,7 +338,7 @@
 				<textFieldExpression><![CDATA[$F{errorMessage}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="6c8dc383-f828-48fa-877f-c742e7ab9171" positionType="Float" stretchType="RelativeToBandHeight" x="93" y="0" width="74" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="93" y="0" width="74" height="20" uuid="6c8dc383-f828-48fa-877f-c742e7ab9171"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

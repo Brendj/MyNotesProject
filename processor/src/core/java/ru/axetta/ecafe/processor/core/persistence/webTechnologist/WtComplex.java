@@ -97,6 +97,8 @@ public class WtComplex {
     @Column(name = "start_cycle_day")
     private Integer startCycleDay;
 
+    private Long idOfParentComplex;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "cf_wt_complexes_org",
             joinColumns = @JoinColumn(name = "IdOfComplex"),
@@ -383,5 +385,13 @@ public class WtComplex {
         return Objects
                 .hash(idOfComplex, name, price, beginDate, endDate, cycleMotion, dayInCycle, version, guid, createDate,
                         lastUpdate, deleteState, composite, startCycleDay);
+    }
+
+    public Long getIdOfParentComplex() {
+        return idOfParentComplex;
+    }
+
+    public void setIdOfParentComplex(Long idOfParentComplex) {
+        this.idOfParentComplex = idOfParentComplex;
     }
 }

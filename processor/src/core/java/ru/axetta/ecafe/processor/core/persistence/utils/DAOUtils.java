@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -291,14 +291,9 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
     public static List<Client> findNewerClients(Session session, Collection<Org> orgs, long clientRegistryVersion) {
-        //Query query = session.createQuery(
-        //        "from Client cl where (cl.idOfClientGroup not in (:cg) or cl.idOfClientGroup is null) and cl.org in (:orgs) and clientRegistryVersion > :version")
-        //        .setParameterList("cg", new Long[]{
-        //                ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-        //                ClientGroup.Predefined.CLIENT_DELETED.getValue()})
-        //        .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
-        //return (List<Client>) query.list();
-        Query query = session.createQuery("from Client cl where cl.org in (:orgs) and clientRegistryVersion > :version")
+        Query query = session.createQuery("from Client cl join fetch cl.person join fetch cl.contractPerson "
+                + "left join fetch cl.categoriesInternal left join fetch cl.categoriesDSZNInternal "
+                + "where cl.org in (:orgs) and clientRegistryVersion > :version")
                 .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
         return (List<Client>) query.list();
     }
@@ -503,6 +498,7 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.isNull("idOfClientGroup"));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return (SpecialDate) criteria.uniqueResult();
     }
 
@@ -513,6 +509,7 @@ public class DAOUtils {
         criteria.add(Restrictions.ge("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.isNull("idOfClientGroup"));
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return criteria.list();
     }
 
@@ -522,6 +519,7 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
         criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+        criteria.setFetchMode("orgOwner", FetchMode.JOIN);
         return (SpecialDate) criteria.uniqueResult();
     }
 
@@ -1974,7 +1972,7 @@ public class DAOUtils {
     }
 
     public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session);
+        Long version = getMaxVersionEMIAS(session, false);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -1989,17 +1987,7 @@ public class DAOUtils {
     }
 
     public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session);
-
-        //Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
-        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
-        //EMIAS emiasUpdated;
-        //try {
-        //    emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
-        //}catch (Exception e)
-        //{
-        //    emiasUpdated = null;
-        //}
+        Long version = getMaxVersionEMIAS(session, false);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -2012,29 +2000,17 @@ public class DAOUtils {
         emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
         emias.setVersion(version);
         session.save(emias);
-
-        //clientCardsCriteria = session.createCriteria(EMIAS.class);
-        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        //EMIAS emiasNEW;
-        //try {
-        //    emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
-        //}catch (Exception e)
-        //{
-        //    emiasNEW = null;
-        //}
-        //
-        //if (emiasUpdated != null && emiasNEW != null) {
-        //    emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
-        //    emiasUpdated.setUpdateDate(new Date());
-        //    session.update(emiasUpdated);
-        //}
     }
 
-    public static Long getMaxVersionEMIAS(Session session) {
+    public static Long getMaxVersionEMIAS(Session session, Boolean kafka) {
         Long version = 0L;
         try {
             Criteria criteria = session.createCriteria(EMIAS.class);
             criteria.setProjection(Projections.max("version"));
+            if (kafka)
+                criteria.add(Restrictions.eq("kafka", true));
+            else
+                criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
             Object result = criteria.uniqueResult();
             if (result != null) {
                 Long currentMaxVersion = (Long) result;
@@ -2218,6 +2194,13 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(Good.class);
         criteria.add(Restrictions.eq("guid", guidOfGood));
         return (Good) criteria.uniqueResult();
+    }
+
+    public static Long findIdOfGoodByGuid(Session session, String guidOfGood) {
+        Query query = session.createSQLQuery("select idofgood from cf_goods where guid = :guid");
+        query.setParameter("guid", guidOfGood);
+        Object obj = query.uniqueResult();
+        return HibernateUtils.getDbLong(obj);
     }
 
     public static WtComplex findWtComplexById(Session session, Long idOfComplex) {
@@ -3044,14 +3027,29 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static List<ProhibitionMenu> getProhibitionMenuForOrgSinceVersion(Session session, Org org, long version) {
+        Org organization = (Org)session.load(Org.class, org.getIdOfOrg());
         Criteria criteria = session.createCriteria(ProhibitionMenu.class);
-        if (org.getFriendlyOrg().isEmpty()) {
-            criteria.createCriteria("client").add(Restrictions.eq("org", org));
+        if (organization.getFriendlyOrg().isEmpty()) {
+            criteria.createCriteria("client").add(Restrictions.eq("org", organization));
         } else {
-            criteria.createCriteria("client").add(Restrictions.in("org", org.getFriendlyOrg()));
+            criteria.createCriteria("client").add(Restrictions.in("org", organization.getFriendlyOrg()));
         }
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
+    }
+
+    public static long getDistributedObjectVersion(Session session, String name) {
+        return getDistributedObjectVersionFromSequence(session, name);
+    }
+
+    private static long getDistributedObjectVersionFromSequence(Session session, String name) {
+        long version = 0L;
+        Query query = session.createSQLQuery(String.format("select nextval('%s')", DAOService.getInstance().getDistributedObjectSequenceName(name)));
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = HibernateUtils.getDbLong(o);
+        }
+        return version;
     }
 
     public static long nextVersionByProhibitionsMenu(Session session) {
@@ -5245,6 +5243,7 @@ public class DAOUtils {
         try {
             Criteria criteria = session.createCriteria(EMIAS.class);
             criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
+            criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
             return criteria.list();
         } catch (Exception e) {
             return new ArrayList<EMIAS>();
@@ -5252,7 +5251,13 @@ public class DAOUtils {
     }
 
     public static Long getMaxVersionOfEmias(Session session) {
-        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em");
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em where em.kafka <> true");
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+    public static Long getMaxVersionOfExemptionVisiting(Session session) {
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em where em.kafka = true");
         Long maxVer = (Long) query.uniqueResult();
         return maxVer == null ? 0 : maxVer;
     }
@@ -5260,6 +5265,7 @@ public class DAOUtils {
     public static List<EMIAS> getEmiasForMaxVersion(Long maxVersion, Session session) {
         Criteria criteria = session.createCriteria(EMIAS.class);
         criteria.add(Restrictions.gt("version", maxVersion));
+        criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
         return criteria.list();
     }
 
@@ -5371,9 +5377,10 @@ public class DAOUtils {
                 + " left join crd.meshCardClientRef as ref "
                 + " where (crd.client.meshGUID not like '' and crd.client.meshGUID is not null) "
                 + " and ref is null "
-                + " and crd.org = :org "
+                + " and crd.org = :org and crd.state = :state "
         );
         query.setParameter("org", org);
+        query.setParameter("state", Card.ACTIVE_STATE);
 
         return query.list();
     }
@@ -5455,11 +5462,28 @@ public class DAOUtils {
         Query q = session.createSQLQuery("truncate cf_cancel_preorder_notifications");
         q.executeUpdate();
     }
-	
+
 	public static List<Client> getClientsBySsoid(EntityManager em, String ssoid) {
         return em.createQuery("from Client where ssoid = :ssoid")
                 .setParameter("ssoid", ssoid)
                 .getResultList();
     }
 
+
+    public static List<CodeMSP> getAllCodeMSP(Session session) {
+        Criteria criteria = session.createCriteria(CodeMSP.class);
+        return criteria.list();
+    }
+
+    public static List<String> getAllAgeTypeGroups(Session session) {
+        Query q = session.createSQLQuery(
+                "select distinct agetypegroup\n "
+                + "from cf_clients\n "
+                + "where meshguid is not null\n "
+                + "  and idofclientgroup < 1100000000\n "
+                + "  and agetypegroup is not null\n "
+                + "  and agetypegroup not like ''\n "
+                + "order by agetypegroup");
+        return q.list();
+    }
 }

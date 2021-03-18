@@ -4,17 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
-import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -66,10 +67,11 @@ public class RuleCreatePage extends BasicWorkspacePage
     private Integer discountRate = 100;
     private Integer[] selectedComplexIds;
     private int subCategory = -1;
+    private Integer codeMSP;
+    private List<SelectItem> allMSP = loadAllMSP();
+
     @Autowired
     private DAOService daoService;
-
-
 
     public List<SelectItem> getAvailableComplexs() {
         final List<ComplexRole> complexRoles = daoService.findComplexRoles();
@@ -95,6 +97,44 @@ public class RuleCreatePage extends BasicWorkspacePage
             res.add(new SelectItem(i, group));
         }
         return res;
+    }
+
+    private List<SelectItem> loadAllMSP() {
+        List<CodeMSP> items = Collections.emptyList();
+        List<SelectItem> result = new LinkedList<>();
+
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            items = DAOUtils.getAllCodeMSP(session);
+            session.close();
+
+            result.add(new SelectItem(null, ""));
+            for(CodeMSP code : items){
+                SelectItem selectItem = new SelectItem(code.getCode(), code.getCode().toString());
+                result.add(selectItem);
+            }
+
+            return result;
+        } finally {
+            HibernateUtils.close(session, getLogger());
+        }
+    }
+
+    public List<SelectItem> getAllMSP() {
+        return allMSP;
+    }
+
+    public void setAllMSP(List<SelectItem> allMSP) {
+        this.allMSP = allMSP;
+    }
+
+    public Integer getCodeMSP() {
+        return codeMSP;
+    }
+
+    public void setCodeMSP(Integer codeMSP) {
+        this.codeMSP = codeMSP;
     }
 
     public int getSubCategory() {
@@ -124,7 +164,6 @@ public class RuleCreatePage extends BasicWorkspacePage
     public void setOperationOr(Boolean operationOr) {
         this.operationOr = operationOr;
     }
-
 
     public int getPriority() {
         return priority;
@@ -271,6 +310,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setOperationOr(operationOr);
         discountRule.setDeletedState(false);
         discountRule.setCategoryDiscounts(categoryDiscounts);
+        discountRule.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (!this.idOfCategoryList.isEmpty()) {
             List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);

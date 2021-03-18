@@ -29,10 +29,8 @@ import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
- * User: i.semenov
- * Date: 16.03.16
- * Time: 16:33
- * To change this template use File | Settings | File Templates.
+ * User: a.voinov
+ * Date: 04.03.21
  */
 
 @Component
@@ -119,8 +117,8 @@ public class PreorderCancelNotificationService {
         //
         String goodtime = RuntimeContext.getInstance().getConfigProperties().
                 getProperty("ecafe.processor.preorder.cancel.notification.goodtime", "08:00-22:00");
-        String goodH = goodtime.substring(0,4);
-        String goodM = goodtime.substring(5,10);
+        String goodH = goodtime.substring(0,5);
+        String goodM = goodtime.substring(6,11);
         DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
         Date dateH = format.parse(goodH);
         Date dateM = format.parse(goodM);
@@ -170,12 +168,12 @@ public class PreorderCancelNotificationService {
                     value += new SimpleDateFormat("yyyy-MM-dd").format(datemessage.getKey());
                     value += datemessage.getValue();
                     values = EventNotificationService.attachToValues
-                            (type.getKey() + "_day_" + counttype, value, values);
+                            (type.getKey() + "_den_" + counttype, value, values);
                     counttype++;
                 }
             }
 
-            ////отправка представителям
+            //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
                     if (ClientManager.allowedGuardianshipNotification(session, destGuardian.getIdOfClient(),
