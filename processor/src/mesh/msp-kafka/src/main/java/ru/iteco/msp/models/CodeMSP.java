@@ -23,7 +23,7 @@ public class CodeMSP {
     @JoinColumn(name = "idofcategorydiscount")
     private CategoryDiscount categoryDiscount;
 
-    @OneToMany(mappedBy = "codeMSP", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "codeMSP")
     private Set<CodeMspAgeTypeGroup> ageTypeGroupList = new HashSet<>();
 
     public Set<CodeMspAgeTypeGroup> getAgeTypeGroupList() {

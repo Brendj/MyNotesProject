@@ -7,20 +7,11 @@ package ru.iteco.msp.models;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_categorydiscounts")
-/*@NamedEntityGraphs({
-        @NamedEntityGraph(name = "only_discount"),
-        @NamedEntityGraph(
-                name = "discount.categoryDiscountDTSZN",
-                attributeNodes = {
-                        @NamedAttributeNode(value = "categoryDiscountDTSZN")
-                }
-        )
-})*/
 public class CategoryDiscount {
     @Id
     @Column(name = "idofcategorydiscount")
@@ -35,7 +26,7 @@ public class CategoryDiscount {
             joinColumns = @JoinColumn(name = "idofcategorydiscount"),
             inverseJoinColumns = @JoinColumn(name = "idofrule")
     )
-    private List<DiscountRule> rules;
+    private Set<DiscountRule> rules;
 
     @ManyToMany
     @JoinTable(
@@ -43,13 +34,13 @@ public class CategoryDiscount {
             joinColumns = @JoinColumn(name = "idofcategorydiscount"),
             inverseJoinColumns = @JoinColumn(name = "idofrule")
     )
-    private List<WtDiscountRule> wtRules;
+    private Set<WtDiscountRule> wtRules;
 
-    @OneToOne(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "categoryDiscount")
     private CategoryDiscountDTSZN categoryDiscountDTSZN;
 
-    @OneToMany(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
-    private List<CodeMSP> codeMSPs;
+    @OneToMany(mappedBy = "categoryDiscount")
+    private Set<CodeMSP> codeMSPs;
 
     @Column(name = "categorytype")
     private Integer categoryType;
@@ -62,19 +53,19 @@ public class CategoryDiscount {
         this.categoryType = categoryType;
     }
 
-    public List<CodeMSP> getCodeMSPs() {
+    public Set<CodeMSP> getCodeMSPs() {
         return codeMSPs;
     }
 
-    public void setCodeMSPs(List<CodeMSP> codeMSPs) {
+    public void setCodeMSPs(Set<CodeMSP> codeMSPs) {
         this.codeMSPs = codeMSPs;
     }
 
-    public List<WtDiscountRule> getWtRules() {
+    public Set<WtDiscountRule> getWtRules() {
         return wtRules;
     }
 
-    public void setWtRules(List<WtDiscountRule> wtRules) {
+    public void setWtRules(Set<WtDiscountRule> wtRules) {
         this.wtRules = wtRules;
     }
 
@@ -94,11 +85,11 @@ public class CategoryDiscount {
         this.categoryName = categoryName;
     }
 
-    public List<DiscountRule> getRules() {
+    public Set<DiscountRule> getRules() {
         return rules;
     }
 
-    public void setRules(List<DiscountRule> rules) {
+    public void setRules(Set<DiscountRule> rules) {
         this.rules = rules;
     }
 

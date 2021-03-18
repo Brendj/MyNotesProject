@@ -12,4 +12,6 @@ import java.util.List;
 
 public interface CategoryDiscountRepo extends JpaRepository<CategoryDiscount, Long> {
     List<CategoryDiscount> findAllByIdOfCategoryDiscountIn(List<Long> ids);
+
+
 }

@@ -23,4 +23,6 @@ public interface DiscountChangeHistoryRepo extends JpaRepository<DiscountChangeH
             + " and dh.categoriesdiscounts not like ''\n",
             nativeQuery = true)
     List<DiscountChangeHistory> getHistoryByDistinctClient(Pageable pageable);
+
+
 }
