@@ -3572,7 +3572,7 @@ public class PreorderDAOService {
                 // проверка по календарю учебных дней
                 Boolean isLearningDay = DAOReadonlyService.getInstance()
                         .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-                if (isLearningDay != null && !isLearningDay) {
+                if (isLearningDay != null && isLearningDay) {
                     return false;
                 }
                 if (isLearningDay == null) {
@@ -3592,7 +3592,7 @@ public class PreorderDAOService {
         } else {
             Boolean isLearningDay = DAOReadonlyService.getInstance()
                     .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-            if (isLearningDay != null && !isLearningDay) {
+            if (isLearningDay != null && isLearningDay) {
                 return false;
             }
         }
