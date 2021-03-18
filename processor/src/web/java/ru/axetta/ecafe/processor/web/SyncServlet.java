@@ -70,7 +70,7 @@ public class SyncServlet extends HttpServlet {
     private static final AtomicLong threadCounter = new AtomicLong();
     public static int MAX_SYNCS;
     public static int permitsTimeout;
-    public static final int permitsAccIncTimeout;
+    public static int permitsAccIncTimeout;
     private static Boolean initComplete = false;
     private static Semaphore permitsForSync;
     private final static ThreadLocal<Boolean> currentSyncWasGranted = new ThreadLocal<Boolean>(){
