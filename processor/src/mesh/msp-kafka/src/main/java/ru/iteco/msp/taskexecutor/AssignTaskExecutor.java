@@ -13,6 +13,7 @@ import ru.iteco.msp.models.Client;
 import ru.iteco.msp.models.ClientDTSZNDiscountInfo;
 import ru.iteco.msp.models.ClientDiscountHistory;
 import ru.iteco.msp.service.DiscountsService;
+import ru.iteco.msp.service.FileSupportService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.SimpleTriggerContext;
@@ -41,6 +43,7 @@ public class AssignTaskExecutor {
     private final ThreadPoolTaskScheduler threadPoolAssignTaskScheduler;
     private final KafkaService kafkaService;
     private final DiscountsService discountsService;
+    private final FileSupportService fileSupportService;
 
     @Value(value = "${kafka.task.execution.assign.samplesize}")
     private Integer sampleSize;
@@ -56,11 +59,13 @@ public class AssignTaskExecutor {
             CronTrigger assignCronTrigger,
             ThreadPoolTaskScheduler threadPoolAssignTaskScheduler,
             KafkaService kafkaService,
-            DiscountsService discountsService){
+            DiscountsService discountsService,
+            FileSupportService fileSupportService){
         this.assignCronTrigger = assignCronTrigger;
         this.threadPoolAssignTaskScheduler = threadPoolAssignTaskScheduler;
         this.kafkaService = kafkaService;
         this.discountsService = discountsService;
+        this.fileSupportService = fileSupportService;
     }
 
     @PostConstruct
@@ -128,13 +133,19 @@ public class AssignTaskExecutor {
         @Transactional(propagation = Propagation.SUPPORTS)
         public void beginPrimalLoad() {
             try {
-                Pageable pageable = PageRequest.of(0, sampleSize);
-                List<Client> clientsList = discountsService.getClientsWithMeshGuid(pageable);
+                Long lastProcessIdOfClient = fileSupportService.getLastProcessIdOfClient();
+                Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("idOfClient"));
+                List<Client> clientsList;
+                if(lastProcessIdOfClient == null) {
+                    clientsList = discountsService.getClientsWithMeshGuid(pageable);
+                } else {
+                    clientsList = discountsService
+                            .getClientsWithMeshGuidAndGreaterThenIdOfClient(lastProcessIdOfClient, pageable);
+                }
                 while (CollectionUtils.isNotEmpty(clientsList)) {
                     for (Client c : clientsList) {
                         List<CategoryDiscount> clientCategoryDiscount = c.getDiscounts();
                         for (CategoryDiscount discount : clientCategoryDiscount) {
-
                             if (discount.getCategoryType() != 0) {
                                 continue;
                             }
@@ -148,6 +159,7 @@ public class AssignTaskExecutor {
                             AssignEvent event = AssignEvent.build(discount, c, AssignOperationType.ADD, info);
                             kafkaService.sendAssign(mapper.writeValueAsString(event));
                         }
+                        fileSupportService.writeLastProcessIdOfClient(c.getIdOfClient());
                     }
 
                     pageable = pageable.next();

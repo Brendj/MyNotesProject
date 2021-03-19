@@ -43,6 +43,10 @@ public class DiscountsService {
         return clientRepo.getAllByMeshGuidIsNotNullAndDiscountsNotNull(pageable);
     }
 
+    public List<Client> getClientsWithMeshGuidAndGreaterThenIdOfClient(Long idOfClient, Pageable pageable){
+        return clientRepo.getAllByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(idOfClient, pageable);
+    }
+
     public ClientDTSZNDiscountInfo getChangedDiscounts(Integer code, Client client, Date begin, Date end) {
         return clientDTSZNDiscountInfoRepo
                 .findFirstByDTISZNCodeAndClientAndLastUpdateBetweenOrderByLastUpdateDesc(code.longValue(), client,

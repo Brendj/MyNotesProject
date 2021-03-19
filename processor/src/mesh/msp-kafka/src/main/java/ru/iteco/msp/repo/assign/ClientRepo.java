@@ -16,4 +16,7 @@ public interface ClientRepo extends JpaRepository<Client, Long> {
 
     @EntityGraph(value = "client.discount", type = EntityGraph.EntityGraphType.LOAD)
     List<Client> getAllByMeshGuidIsNotNullAndDiscountsNotNull(Pageable pageable);
+
+    @EntityGraph(value = "client.discount", type = EntityGraph.EntityGraphType.LOAD)
+    List<Client> getAllByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(Long idOfClient, Pageable pageable);
 }
