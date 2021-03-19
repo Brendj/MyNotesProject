@@ -38,6 +38,7 @@ public class ResMenuSupplier implements AbstractToElement {
     private final String dateWithoutTimePattern = "dd.MM.yyyy";
 
     private Set<WtOrgGroup> orgGroups;
+    private Set<WtOrgGroup> offlineOrgGroups;
     private Set<WtCategoryItem> categoryItems;
     private Set<WtTypeOfProductionItem> typeProductions;
     private Set<WtAgeGroupItem> ageGroupItems;
@@ -61,6 +62,7 @@ public class ResMenuSupplier implements AbstractToElement {
 
     public ResMenuSupplier() {
         orgGroups = new HashSet<>();
+        offlineOrgGroups = new HashSet<>();
         categoryItems = new HashSet<>();
         typeProductions = new HashSet<>();
         ageGroupItems = new HashSet<>();
@@ -79,6 +81,7 @@ public class ResMenuSupplier implements AbstractToElement {
 
     public ResMenuSupplier(MenuSupplier menuSupplier) {
         orgGroups = menuSupplier.getOrgGroups();
+        offlineOrgGroups = menuSupplier.getOfflineOrgGroups();
         categoryItems = menuSupplier.getCategoryItems();
         typeProductions = menuSupplier.getTypeProductions();
         ageGroupItems = menuSupplier.getAgeGroupItems();
@@ -103,6 +106,12 @@ public class ResMenuSupplier implements AbstractToElement {
         Element orgGroupsElem = document.createElement("OrgGroups");
         for (WtOrgGroup orgGroup : orgGroups) {
             orgGroupsElem.appendChild(orgGroupToElement(document, orgGroup));
+        }
+        for (WtOrgGroup orgGroup : offlineOrgGroups) {
+            if (!orgGroups.contains(orgGroup)) {
+                orgGroup.setDeleteState(1);
+                orgGroupsElem.appendChild(orgGroupToElement(document, orgGroup));
+            }
         }
 
         Element categoryItemsElem = document.createElement("CategoryItems");

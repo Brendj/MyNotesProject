@@ -804,6 +804,26 @@ public class DAOReadonlyService {
         }
     }
 
+    public Set<WtOrgGroup> getOfflineOrgGroupsSetFromVersion(Long version, Org org) {
+        Set<WtOrgGroup> offlineOrgGroups = new HashSet<>();
+        Query queryDeletedOrgGroups = entityManager.createNativeQuery("select idoforggroup from cf_wt_org_relation_aud a "
+                + "where a.versionoforggroup > :version and a.deletestate = 1 and a.idoforggroup is not null "
+                + "and a.idofcomplex is null and a.idofmenu is null "
+                + "and a.idoforg = :idoforg");
+        queryDeletedOrgGroups.setParameter("version", version);
+        queryDeletedOrgGroups.setParameter("idoforg", org.getIdOfOrg());
+        List list = queryDeletedOrgGroups.getResultList();
+        for (Object obj : list) {
+            Long idOfOrgGroup = HibernateUtils.getDbLong(obj);
+            Query query = entityManager.createQuery(
+                    "SELECT orgGroup from WtOrgGroup orgGroup left join fetch orgGroup.orgs items "
+                            + "where orgGroup.idOfOrgGroup = :idOfOrgGroup");
+            query.setParameter("idOfOrgGroup", idOfOrgGroup);
+            offlineOrgGroups.add((WtOrgGroup) query.getSingleResult());
+        }
+        return offlineOrgGroups;
+    }
+
     public Set<WtCategoryItem> getCategoryItemsSetFromVersion(Long version) {
         try {
             Query query = entityManager

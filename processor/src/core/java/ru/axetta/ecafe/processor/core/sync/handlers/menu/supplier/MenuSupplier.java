@@ -42,6 +42,7 @@ public class MenuSupplier implements SectionRequest {
     private Long idOfOrg;
 
     private Set<WtOrgGroup> orgGroups = new HashSet<>();
+    private Set<WtOrgGroup> offlineOrgGroups = new HashSet<>();
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
     private Set<WtTypeOfProductionItem> typeProductions = new HashSet<>();
     private Set<WtAgeGroupItem> ageGroupItems = new HashSet<>();
@@ -119,6 +120,8 @@ public class MenuSupplier implements SectionRequest {
                                 .getOrgGroupsSetFromVersion(entry.getValue(), itemContragent, item);
                         orgGroups.addAll(friendlyItems);
                     }
+                    offlineOrgGroups = DAOReadonlyService.getInstance()
+                            .getOfflineOrgGroupsSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "CategoryItemsRequest": {
@@ -338,5 +341,13 @@ public class MenuSupplier implements SectionRequest {
 
     public void setOfflineMenus(Set<WtMenu> offlineMenus) {
         this.offlineMenus = offlineMenus;
+    }
+
+    public Set<WtOrgGroup> getOfflineOrgGroups() {
+        return offlineOrgGroups;
+    }
+
+    public void setOfflineOrgGroups(Set<WtOrgGroup> offlineOrgGroups) {
+        this.offlineOrgGroups = offlineOrgGroups;
     }
 }
