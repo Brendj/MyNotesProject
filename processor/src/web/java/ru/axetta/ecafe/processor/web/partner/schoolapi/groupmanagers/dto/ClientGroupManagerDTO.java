@@ -16,6 +16,7 @@ public class ClientGroupManagerDTO {
     public static ClientGroupManagerDTO from(ClientGroupManager clientGroupManager) {
         if (clientGroupManager == null) return null;
         ClientGroupManagerDTO result = new ClientGroupManagerDTO();
+        result.setIdOfGroupManager(clientGroupManager.getIdOfClientGroupManager());
         result.setGroupName(clientGroupManager.getClientGroupName());
         result.setIdOfClient(clientGroupManager.getIdOfClient());
         result.setIdOfOrg(clientGroupManager.getOrgOwner());

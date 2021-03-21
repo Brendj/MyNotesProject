@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
@@ -21,11 +21,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 class AttachedGroupCommand {
+
     private final Logger logger = LoggerFactory.getLogger(AttachedGroupCommand.class);
     private final RuntimeContext runtimeContext;
+    private final static int CLIENT_NOT_FOUND = 101;
+    private final static int CLIENT_GROUP_NOT_FOUND = 102;
+    private final static int ORG_GROUP_IS_NOT_FRIENDLY = 103;
+    private final static int GROUP_MANAGER_NOT_FOUND = 104;
 
     @Autowired
     public AttachedGroupCommand(RuntimeContext runtimeContext) {
@@ -39,9 +45,9 @@ class AttachedGroupCommand {
         try {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-
+            checkClientOrRaiseError(session, groupManager);
+            checkGroupOrRaiseError(session, groupManager);
             Long version = DAOUtils.nextVersionByClientgroupManager(session);
-
             ClientGroupManager newClientGroupManager = new ClientGroupManager(groupManager.getIdOfClient(),
                     groupManager.getGroupName(), groupManager.getIdOfOrg());
             ClientGroupManager foundSimilarClientGroupManager = findSimilarClientGroupManager(session,
@@ -79,15 +85,17 @@ class AttachedGroupCommand {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Long version = DAOUtils.nextVersionByClientgroupManager(session);
-            ClientGroupManager foundClientGroupManager = (ClientGroupManager) session.load(ClientGroupManager.class, idOfClientGroupManager);
+            ClientGroupManager foundClientGroupManager = (ClientGroupManager) session
+                    .load(ClientGroupManager.class, idOfClientGroupManager);
             if (foundClientGroupManager != null) {
+                Long version = DAOUtils.nextVersionByClientgroupManager(session);
                 foundClientGroupManager.setVersion(version);
                 foundClientGroupManager.setDeleted(true);
                 session.save(foundClientGroupManager);
             } else {
-                throw new WebApplicationException(404,
-                        String.format("Руководитель группы idOfClientGroupManager='%d' не найден",idOfClientGroupManager));
+                throw new WebApplicationException(GROUP_MANAGER_NOT_FOUND,
+                        String.format("Group manager with idOfClientGroupManager='%d' not found",
+                                idOfClientGroupManager));
             }
             session.flush();
             transaction.commit();
@@ -96,10 +104,46 @@ class AttachedGroupCommand {
         } catch (Exception e) {
             logger.error("Error in dettach group, ", e);
             throw new WebApplicationException(
-                    String.format("Ошибка при удалении руководителя группы id='%d'",idOfClientGroupManager), e);
+                    String.format("Ошибка при удалении руководителя группы id='%d'", idOfClientGroupManager), e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+    }
+
+    private void checkClientOrRaiseError(Session session, ClientGroupManagerDTO clientGroupManager) {
+        Client client = (Client) session.load(Client.class, clientGroupManager.getIdOfClient());
+        if (client == null) {
+            throw new WebApplicationException(CLIENT_NOT_FOUND,
+                    String.format("Client with id='%d' not found", clientGroupManager.getIdOfClient()));
+        }
+        Org clientOrg = client.getOrg();
+        checkOrgOrRaiseError(clientOrg.getFriendlyOrg(), clientOrg.getIdOfOrg(), clientGroupManager.getIdOfOrg());
+    }
+
+    private void checkGroupOrRaiseError(Session session, ClientGroupManagerDTO clientGroupManager) {
+        CompositeIdOfClientGroup idOfClientGroup = new CompositeIdOfClientGroup(clientGroupManager.getIdOfOrg(),
+                clientGroupManager.getIdOfClientGroup());
+        ClientGroup clientGroup = (ClientGroup) session.get(ClientGroup.class, idOfClientGroup);
+        if (clientGroup == null) {
+            throw new WebApplicationException(CLIENT_GROUP_NOT_FOUND,
+                    String.format("Client group with idOfClientGroup='%d' not found",
+                            clientGroupManager.getIdOfClientGroup()));
+        }
+    }
+
+    private void checkOrgOrRaiseError(Set<Org> friendlyOrgs, Long clientOrgId, Long checkedOrgId) {
+        boolean found = false;
+        for (Org friendOrg : friendlyOrgs) {
+            if (friendOrg.getIdOfOrg().equals(checkedOrgId)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new WebApplicationException(ORG_GROUP_IS_NOT_FRIENDLY, String.format(
+                    "Organization of group with idOfOrg='%d' is not friendly for client organization with idOfOrg='%d',",
+                    checkedOrgId, clientOrgId));
         }
     }
 
@@ -111,13 +155,13 @@ class AttachedGroupCommand {
         criteria.add(Restrictions.eq("managerType", clientGroupManager.getManagerType()));
         List items = criteria.list();
         if (items != null && items.size() != 0) {
-            return getClientGroupManagerWithMaxVersion(items);
+            return filterClientGroupManagerWithMaxVersion(items);
         } else {
             return null;
         }
     }
 
-    private ClientGroupManager getClientGroupManagerWithMaxVersion(List<? extends ClientGroupManager> items) {
+    private ClientGroupManager filterClientGroupManagerWithMaxVersion(List<? extends ClientGroupManager> items) {
         ClientGroupManager itemWithMaxVersion = items.get(0);
         for (int i = 1, itemsSize = items.size(); i < itemsSize; i++) {
             ClientGroupManager manager = items.get(i);
@@ -127,7 +171,6 @@ class AttachedGroupCommand {
         }
         return itemWithMaxVersion;
     }
-
 
 
 }
