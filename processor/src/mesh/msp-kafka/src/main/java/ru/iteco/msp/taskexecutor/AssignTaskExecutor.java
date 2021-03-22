@@ -165,6 +165,7 @@ public class AssignTaskExecutor {
                     pageable = pageable.next();
                     clientsList = discountsService.getClientsWithMeshGuid(pageable);
                 }
+                log.info("--Primal load of assign MSP completed--");
             } catch (Exception e) {
                 log.error("Critical error in process sending primary discount change history records, task interrupt", e);
             }
