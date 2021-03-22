@@ -11,5 +11,6 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface ClientDiscountHistoryRepo extends CrudRepository<ClientDiscountHistory, Long> {
+
     List<ClientDiscountHistory> getAllByRegistryDateGreaterThanEqual(Long time);
 }

@@ -39,7 +39,7 @@ public class CategoryDiscount {
     @OneToOne(mappedBy = "categoryDiscount")
     private CategoryDiscountDTSZN categoryDiscountDTSZN;
 
-    @OneToMany(mappedBy = "categoryDiscount")
+    @OneToMany(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
     private Set<CodeMSP> codeMSPs;
 
     @Column(name = "categorytype")
