@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPreordersReport_subreport1" pageWidth="1224" pageHeight="1008" orientation="Landscape" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="670d200b-9ebd-4dfd-82ce-373f3af1f459">
-	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="394"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
@@ -42,79 +42,198 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="33" splitType="Stretch">
+		<band height="46" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="1184" height="30" uuid="7d15d951-5de4-453b-a3e1-96142f826d31"/>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="570" height="24" uuid="7d15d951-5de4-453b-a3e1-96142f826d31"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Итоговые показатели по оплаченным позициям]]></text>
 			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="0" y="24" width="42" height="22" forecolor="#000000" uuid="9a9fda60-5460-497d-86e9-204a791ca840">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="42" y="24" width="142" height="22" forecolor="#000000" uuid="e1e68ce4-c10d-4702-851d-b0b1d030402d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Наименование]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="184" y="24" width="40" height="22" forecolor="#000000" uuid="7128c1f7-9b5e-4975-b196-cd33f1d588c7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ID ОO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="224" y="24" width="96" height="22" forecolor="#000000" uuid="b82c5cf5-3599-49d2-8b67-f33f4868294b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="local_mesure_unity" value="pixel"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="1" bottomPadding="0" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Наименование OO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="320" y="24" width="53" height="22" forecolor="#000000" uuid="afce3443-b776-4c72-87ad-1ed2f96561d9">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Адрес здания]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="373" y="24" width="54" height="22" forecolor="#000000" uuid="86df4bae-e859-4368-a611-7fdbbbd03ce1">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Название]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="427" y="24" width="35" height="22" forecolor="#000000" uuid="696d89a0-2a8b-4787-b713-e7adca591b07">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="462" y="24" width="54" height="22" forecolor="#000000" uuid="36070461-7b77-40da-9992-f5a0b43c801a">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Цена]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToBandHeight" x="516" y="24" width="54" height="22" forecolor="#000000" uuid="f7c89260-20b4-4544-91ef-6a2e77692d68">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Оплачено]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>
-		<band height="36" splitType="Stretch">
+		<band height="21" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="1077" y="0" width="107" height="36" uuid="e68495f0-1667-495d-bca5-fb5e78645756">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-				</reportElement>
-				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
-				</textElement>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="373" y="0" width="109" height="36" uuid="dc31484a-0182-4d5e-98c4-8085c239fe51">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
-				</reportElement>
-				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Left" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
-				</textElement>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="566" y="0" width="150" height="36" uuid="e1fc7968-9681-454c-abe1-76a99fa934c4">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
-				</reportElement>
-				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Left" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
-				</textElement>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="770" y="0" width="253" height="36" uuid="c3c2d875-0ab6-456d-8126-baddd2d47e33">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
-				</reportElement>
-				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
-				</textElement>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="42" height="36" backcolor="#FF6666" uuid="fe5e4d8b-f13c-4526-a0b2-5dfc93a42abd">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="42" height="21" backcolor="#FF6666" uuid="fe5e4d8b-f13c-4526-a0b2-5dfc93a42abd">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -129,7 +248,7 @@
 				<textFieldExpression><![CDATA[$F{idOfContragent}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="42" y="0" width="142" height="36" uuid="acb0b581-660a-4a85-bdf2-54f14bdfde93">
+				<reportElement stretchType="RelativeToBandHeight" x="42" y="0" width="142" height="21" uuid="acb0b581-660a-4a85-bdf2-54f14bdfde93">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -144,7 +263,7 @@
 				<textFieldExpression><![CDATA[$F{contragentName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="184" y="0" width="40" height="36" backcolor="#FFFFFF" uuid="4ecc6e95-844c-46b2-968f-8a404913eb8d">
+				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="184" y="0" width="40" height="21" backcolor="#FFFFFF" uuid="4ecc6e95-844c-46b2-968f-8a404913eb8d">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
 				</reportElement>
@@ -160,7 +279,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="224" y="0" width="96" height="36" uuid="5eef7e0d-0e16-4805-b676-08e4757ee25f">
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="224" y="0" width="96" height="21" uuid="5eef7e0d-0e16-4805-b676-08e4757ee25f">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
 				</reportElement>
@@ -176,7 +295,7 @@
 				<textFieldExpression><![CDATA[$F{orgShortName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="320" y="0" width="53" height="36" uuid="a245a2e2-ef9c-421c-8460-84d13f50810d">
+				<reportElement stretchType="RelativeToBandHeight" x="320" y="0" width="53" height="21" uuid="a245a2e2-ef9c-421c-8460-84d13f50810d">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
 				</reportElement>
@@ -192,7 +311,7 @@
 				<textFieldExpression><![CDATA[$F{orgShortAddress}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="482" y="0" width="54" height="36" uuid="988a136a-bdf7-48ef-92fb-37bc0081644a">
+				<reportElement stretchType="RelativeToBandHeight" x="373" y="0" width="54" height="21" uuid="988a136a-bdf7-48ef-92fb-37bc0081644a">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -206,8 +325,37 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{complexName}]]></textFieldExpression>
 			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="462" y="0" width="54" height="21" uuid="a745c932-c7e4-47da-806d-845dac7a63b2">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{complexPrice})) / 100.00]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement stretchType="RelativeToBandHeight" x="516" y="0" width="54" height="21" uuid="99e25bbd-0e71-4665-8831-1bca3df0a38e"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="8" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{usedSum})) / 100.00]]></textFieldExpression>
+			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="536" y="0" width="30" height="36" uuid="33491629-06d3-4d03-9a72-189ea7f12567">
+				<reportElement stretchType="RelativeToBandHeight" x="427" y="0" width="35" height="21" uuid="33491629-06d3-4d03-9a72-189ea7f12567">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -221,53 +369,16 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="716" y="0" width="54" height="36" uuid="a745c932-c7e4-47da-806d-845dac7a63b2">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-					<printWhenExpression><![CDATA[!$F{complexPriceVision}.equals("0")]]></printWhenExpression>
-				</reportElement>
-				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[String.format(Locale.US, "%.2f", new BigDecimal($F{complexPrice} / 100.0))]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToTallestObject" x="1023" y="0" width="54" height="36" uuid="99e25bbd-0e71-4665-8831-1bca3df0a38e"/>
-				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8" isItalic="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[String.format(Locale.US, "%.2f", new BigDecimal($F{usedSum} / 100.0))]]></textFieldExpression>
-			</textField>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="50">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="1184" height="10" uuid="993b8c7d-aced-4bd1-8cc6-57b71b34d999">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-				</reportElement>
-				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
-				</textElement>
-			</textField>
+		<band height="1">
+			<line>
+				<reportElement x="0" y="0" width="570" height="1" uuid="a4597bff-3fdd-4cf0-a76c-657c1b2c1083"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
 		</band>
 	</pageFooter>
 </jasperReport>

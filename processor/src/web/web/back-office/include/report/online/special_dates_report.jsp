@@ -32,9 +32,37 @@
                 <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
                 <f:setPropertyActionListener value="#{mainPage.specialDatesReportPage.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+
+                <a4j:support event="onclick" action="#{mainPage.specialDatesReportPage.clean}"
+                             reRender="clear" />
+                <a4j:support event="onclick" action="#{mainPage.specialDatesReportPage.clean}"
+                             reRender="clear" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true"
                           value=" {#{mainPage.specialDatesReportPage.filter}}" />
+        </h:panelGroup>
+
+        <h:outputText id="group" escape="true" value="Группа" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{mainPage.specialDatesReportPage.clientGroupName}" styleClass="input-text"
+                         style="margin-right: 2px;" disabled="#{mainPage.specialDatesReportPage.idOfOrgs == null}"/>
+            <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" disabled="#{mainPage.specialDatesReportPage.idOfOrgs == null}">
+                <f:param name="idOfOrg" value="#{mainPage.specialDatesReportPage.idOfOrgs}" />
+                <f:setPropertyActionListener value="#{mainPage.specialDatesReportPage.idOfOrgs}" target="#{mainPage.clientGroupSelectPage.idOfOrg}" />
+                <f:setPropertyActionListener value="#{null}" target="#{mainPage.clientGroupSelectPage.filter}" />
+            </a4j:commandButton>
+            <a4j:commandButton id="clear" value="Очистить" action="#{mainPage.specialDatesReportPage.clean}"
+                               reRender="#{mainPage.topMostPage.pageComponent.id}"
+                               styleClass="command-button" style="width: 80px; margin-left: 4px;"
+                               disabled="#{mainPage.specialDatesReportPage.idOfOrgs == null}">
+                <f:param name="idOfOrg" value="#{mainPage.clientGroupSelectPage.idOfOrg}" />
+                <f:setPropertyActionListener value="" target="#{mainPage.clientGroupSelectPage.filter}" />
+                <f:setPropertyActionListener value="#{mainPage.specialDatesReportPage.clientGroupName}" target="" />
+                <a4j:support event="onclick" action="#{mainPage.clientGroupSelectPage.cancelFilter}"
+                             reRender="modalClientGroupSelectorForm" />
+            </a4j:commandButton>
         </h:panelGroup>
 
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
@@ -63,7 +91,7 @@
         </rich:calendar>
 
         <h:outputText escape="false" value="Показать комментарий" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.specialDatesReportPage.showComments}" styleClass="output-text">
+        <h:selectBooleanCheckbox id="comment" value="#{mainPage.specialDatesReportPage.showComments}" styleClass="output-text" disabled="#{mainPage.specialDatesReportPage.idOfClientGroup == null}">
         </h:selectBooleanCheckbox>
 
     </h:panelGrid>
