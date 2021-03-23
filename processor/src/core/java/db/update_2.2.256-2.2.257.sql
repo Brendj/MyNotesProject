@@ -1,11 +1,14 @@
 -- Миграции БД при обновлении веб АРМа ПП до v 1.26
 
 create sequence cf_wt_complexes_dishes_repeatable_seq
-    maxvalue 2147483648;
+    INCREMENT BY 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    START 1;
 
 create table cf_wt_complexes_dishes_repeatable
 (
-    idofrelation bigint    not null default nextval('cf_wt_complexes_dishes_repeatable_seq'::regclass),
+    idofrelation bigint    not null default nextval('cf_wt_complexes_dishes_repeatable_seq'),
     idofcomplex  bigint    not null,
     idofdish     bigint    not null,
     deletestate  integer   not null,
