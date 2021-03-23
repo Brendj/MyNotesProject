@@ -25,6 +25,7 @@ public class PreOrdersFeedingItem {
     private final Long idOfOrg;
     private final Date createdDate;
     private final Date lastUpdate;
+    private final Boolean isComposite;
     private List<PreOrderFeedingDetail> preOrderFeedingDetailList = new LinkedList<PreOrderFeedingDetail>();
 
     public PreOrdersFeedingItem(Session session, PreorderComplex preorderComplex) {
@@ -35,6 +36,11 @@ public class PreOrdersFeedingItem {
         this.idOfOrg = preorderComplex.getIdOfOrgOnCreate() == null ? preorderComplex.getClient().getOrg().getIdOfOrg() : preorderComplex.getIdOfOrgOnCreate();
         this.createdDate = preorderComplex.getCreatedDate();
         this.lastUpdate = preorderComplex.getLastUpdate();
+        if (preorderComplex.getModeOfAdd() == null) {
+            this.isComposite = false;
+        } else {
+            this.isComposite = preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) ? true : false;
+        }
 
         PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(preorderComplex);
         this.preOrderFeedingDetailList.add(feedingDetail);
@@ -99,10 +105,17 @@ public class PreOrdersFeedingItem {
         if (null != lastUpdate) {
             element.setAttribute("LastUpdate", timeFormat.format(lastUpdate));
         }
+        if (null != isComposite) {
+            element.setAttribute("IsCompositeComplex", isComposite ? "1" : "0");
+        }
 
         for (PreOrderFeedingDetail detail : this.preOrderFeedingDetailList) {
             element.appendChild(detail.toElement(document));
         }
         return element;
+    }
+
+    public Boolean getComposite() {
+        return isComposite;
     }
 }
