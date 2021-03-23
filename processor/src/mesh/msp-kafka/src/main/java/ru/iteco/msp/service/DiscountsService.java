@@ -47,17 +47,11 @@ public class DiscountsService {
         return clientRepo.getAllByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(idOfClient, pageable);
     }
 
-    public ClientDTSZNDiscountInfo getChangedDiscounts(Integer code, Client client, Date begin, Date end) {
-        return clientDTSZNDiscountInfoRepo
-                .findFirstByDTISZNCodeAndClientAndLastUpdateBetweenOrderByLastUpdateDesc(code.longValue(), client,
-                        begin.getTime(), end.getTime());
-    }
-
     public ClientDTSZNDiscountInfo getLastInfoByClientAndCode(Client client, Integer code) {
         return clientDTSZNDiscountInfoRepo.findFirstByDTISZNCodeAndClientOrderByLastUpdateDesc(code.longValue(), client);
     }
 
     public List<ClientDiscountHistory> getNewHistoryByTime(Date date) {
-        return clientDiscountHistoryRepo.getAllByRegistryDateGreaterThanEqual(date.getTime());
+        return clientDiscountHistoryRepo.getAllByRegistryDateGreaterThanEqualAndClientMeshGuidIsNotNull(date.getTime());
     }
 }

@@ -36,7 +36,7 @@ public class CategoryDiscount {
     )
     private Set<WtDiscountRule> wtRules;
 
-    @OneToOne(mappedBy = "categoryDiscount")
+    @OneToOne(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
     private CategoryDiscountDTSZN categoryDiscountDTSZN;
 
     @OneToMany(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)

@@ -12,5 +12,5 @@ import java.util.List;
 
 public interface ClientDiscountHistoryRepo extends CrudRepository<ClientDiscountHistory, Long> {
 
-    List<ClientDiscountHistory> getAllByRegistryDateGreaterThanEqual(Long time);
+    List<ClientDiscountHistory> getAllByRegistryDateGreaterThanEqualAndClientMeshGuidIsNotNull(Long time);
 }

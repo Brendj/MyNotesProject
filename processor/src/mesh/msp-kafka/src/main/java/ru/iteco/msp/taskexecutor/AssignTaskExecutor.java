@@ -16,7 +16,6 @@ import ru.iteco.msp.service.DiscountsService;
 import ru.iteco.msp.service.FileSupportService;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -96,15 +94,12 @@ public class AssignTaskExecutor {
                     List<ClientDiscountHistory> discountChangeHistoryList = discountsService.getNewHistoryByTime(begin);
 
                     for (ClientDiscountHistory h : discountChangeHistoryList) {
-                        if (StringUtils.isEmpty(h.getClient().getMeshGuid())) {
-                            continue;
-                        }
                         type = AssignOperationType.getAssignTypeByOperationType(h.getOperationType());
                         if (AssignOperationType.CHANGE.equals(type)
                                 || h.getCategoryDiscount().getCategoryDiscountDTSZN() != null) {
                             info = discountsService
-                                    .getChangedDiscounts(h.getCategoryDiscount().getCategoryDiscountDTSZN().getCode(), h.getClient(),
-                                            takeThreeMinute(h.getRegistryDate()), addThreeMinute(h.getRegistryDate()));
+                                    .getLastInfoByClientAndCode(h.getClient(), h.getCategoryDiscount()
+                                            .getCategoryDiscountDTSZN().getCode());
                         }
 
                         AssignEvent event = AssignEvent.build(h.getCategoryDiscount(), h.getClient(), type, info);
@@ -114,20 +109,6 @@ public class AssignTaskExecutor {
             } catch (Exception e) {
                 log.error("Critical error in process sending assign MSP-discounts info, task interrupt", e);
             }
-        }
-
-        private Date takeThreeMinute(Long time) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(time);
-            calendar.add(Calendar.MINUTE, -3);
-            return calendar.getTime();
-        }
-
-        private Date addThreeMinute(Long time) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(time);
-            calendar.add(Calendar.MINUTE, 3);
-            return calendar.getTime();
         }
 
         @Transactional(propagation = Propagation.SUPPORTS)
