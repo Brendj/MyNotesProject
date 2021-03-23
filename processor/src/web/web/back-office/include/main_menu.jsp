@@ -1576,6 +1576,10 @@
                             label="Отчет по блюдам" action="#{mainPage.showDishMenuWebARMPPReportPage}"
                             reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="complexMenuReport" binding="#{mainPage.complexMenuReportPage.mainMenuComponent}"
+                            label="Отчет по комплексам" action="#{mainPage.showComplexMenuReportPage}"
+                            reRender="workspaceForm" />
+
         <rich:panelMenuItem id="clientsBenefitsReportMenuItem"
                             binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                             label="Расчет комплексов по льготным правилам"

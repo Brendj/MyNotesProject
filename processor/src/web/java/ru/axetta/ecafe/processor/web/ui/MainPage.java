@@ -339,6 +339,7 @@ public class MainPage implements Serializable {
     private final TotalSalesPage totalSalesPage = new TotalSalesPage();
     private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
     private final DishMenuWebARMPPReportPage dishMenuReportWebArmPP = new DishMenuWebARMPPReportPage();
+    private final ComplexMenuReportPage complexMenuReportPage = new ComplexMenuReportPage();
 
     //Charts
     private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
@@ -7807,6 +7808,9 @@ public class MainPage implements Serializable {
     public DishMenuWebARMPPReportPage getDishMenuReportWebArmPP() {
         return dishMenuReportWebArmPP;
     }
+    public ComplexMenuReportPage getComplexMenuReportPage() {
+        return complexMenuReportPage;
+    }
 
     public Object showDishMenuWebARMPPReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -7816,6 +7820,19 @@ public class MainPage implements Serializable {
             logger.error("Failed to set DishMenuWebARMPPReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчета по блюдам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showComplexMenuReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexMenuReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;

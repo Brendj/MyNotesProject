@@ -22,8 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -3166,6 +3166,11 @@ public class DAOService {
 
     public List<WtGroupItem> getMapTypeFoods() {
         Query q = entityManager.createQuery("SELECT wtGroup from WtGroupItem wtGroup");
+        return q.getResultList();
+    }
+
+    public List<WtDietType> getMapDiet() {
+        Query q = entityManager.createQuery("SELECT wtDiet from WtDietType wtDiet");
         return q.getResultList();
     }
 
