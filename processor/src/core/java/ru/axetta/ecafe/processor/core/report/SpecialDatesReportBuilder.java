@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -90,6 +91,11 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
         List<SpecialDatesReportItem> list = new ArrayList<SpecialDatesReportItem>();
 
         Boolean showComments = Boolean.valueOf(getReportProperties().getProperty("showComments"));
+        String clientGroupName = getReportProperties().getProperty("clientGroupName");
+        Long idOfClientGroup = null;
+        try {
+            idOfClientGroup = Long.parseLong(getReportProperties().getProperty("idOfClientGroup"));
+        }catch (NumberFormatException ignore){}
 
         String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
         List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
@@ -106,6 +112,7 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
 
         List<Long> idOfOrgsList = new ArrayList<Long>(orgMap.keySet());
         Collections.sort(idOfOrgsList);
+        List<Object[]> groupName = getGroupName(idOfOrgsList, session);
 
         for(Long orgId : idOfOrgsList){
             Org org = (Org) session.load(Org.class, orgId);
@@ -129,51 +136,87 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
                 criteria.add(Restrictions.between("date", bDate, eDate));
                 criteria.add(Restrictions.eq("idOfOrg", orgId));
                 criteria.add(Restrictions.eq("deleted", false));
+                criteria.add(Restrictions.isNull("idOfClientGroup"));
                 List<SpecialDate> specialDates = criteria.list();
-                String comment = "";
+                StringBuilder comment = new StringBuilder();
+
+                criteria = session.createCriteria(SpecialDate.class);
+                criteria.add(Restrictions.between("date", bDate, eDate));
+                criteria.add(Restrictions.eq("idOfOrg", orgId));
+                criteria.add(Restrictions.eq("deleted", false));
+                criteria.add(Restrictions.eq("isWeekend", true));
+                criteria.add(Restrictions.isNotNull("idOfClientGroup"));
+                if (idOfClientGroup != null)
+                    criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+                List<SpecialDate> groupId = criteria.list();
 
                 Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
-                if(specialDates.size() > 0) {
-                    for (SpecialDate specialDate : specialDates) {
-                        isWeekend = specialDate.getIsWeekend();
-                        if (showComments) {
-                            comment = specialDate.getComment();
+                for (SpecialDate specialDate : specialDates)
+                    isWeekend = specialDate.getIsWeekend();
+
+                for(SpecialDate sd: groupId) {
+                    isWeekend = true;
+                    for (Object[] name : groupName)
+                        if (name[1].toString().equals(sd.getIdOfClientGroup().toString()) && name[0].toString().equals(sd.getIdOfOrg().toString())) {
+                            comment.append(name[2].toString());
+                            if (idOfClientGroup != null && showComments && !sd.getComment().equals(""))
+                                comment.append(" - ").append(sd.getComment());
+                            comment.append(", ");
                         }
-                    }
                 }
+                if (comment.length() > 2) comment = new StringBuilder(comment.substring(0, comment.length() - 2));
+
                 int day = CalendarUtils.getDayOfWeek(currentDate);
                 if (day == Calendar.SATURDAY && !isSixWorkWeek  && isWeekend) {
                     //проверяем нет ли привязки отдельных групп к 6-ти дневной неделе
-                    Object[] weekendByGroup = isWeekendByGroups(session, orgId);
+                    Object[] weekendByGroup = isWeekendByGroups(session, orgId, clientGroupName, idOfClientGroup);
                     isWeekend = (Boolean) weekendByGroup[0];
-                    comment = (String) weekendByGroup[1];
+                    comment = new StringBuilder((String) weekendByGroup[1]);
                 }
                 String dateStr = getDayOfWeekString(CalendarUtils.getDayOfWeek(currentDate) - 1) + " " + CalendarUtils.dateShortToString(currentDate);
 
-                list.add(new SpecialDatesReportItem(orgId, dateStr, org.getShortName(), isWeekend, comment));
+                list.add(new SpecialDatesReportItem(orgId, dateStr, org.getShortName(), isWeekend, comment.toString()));
 
                 c.add(Calendar.DATE, 1);
             }
         }
-
         return new JRBeanCollectionDataSource(list);
     }
 
-    private Object[] isWeekendByGroups(Session session, Long idOfOrg) {
+    private List<Object[]> getGroupName(List<Long> idOfOrgList, Session session) {
+        String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
+        String getGroup = "select cg.idoforg, cg.idofclientgroup, cg.groupname "
+                + "from cf_clientgroups cg "
+                + "join cf_orgs o on cg.idoforg = o.idOfOrg  "
+                + "where cg.idofclientgroup > 0"
+                + idOfOrgsCondition;
+        Query query = session.createSQLQuery(getGroup);
+        if(!CollectionUtils.isEmpty(idOfOrgList)){
+            query.setParameterList("idOfOrgList", idOfOrgList);
+        }
+        List<Object[]> dataFromDB = query.list();
+        return  dataFromDB;
+    }
+
+    private Object[] isWeekendByGroups(Session session, Long idOfOrg, String clientGroupName, Long idOfClientGroup) {
         Boolean isWeekend = true;
-        String desc = "";
+        StringBuilder desc = new StringBuilder();
         Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("isSixDaysWorkWeek", true));
         List<GroupNamesToOrgs> list = criteria.list();
-        if (list != null && list.size() > 0) {
+        for (GroupNamesToOrgs group : list) {
             isWeekend = false;
-            for (GroupNamesToOrgs group : list) {
-                desc += group.getGroupName() + ", ";
+            if (idOfClientGroup != null) {
+                if (group.getGroupName().equals(clientGroupName))
+                    desc.append(group.getGroupName()).append(", ");
             }
-            if (desc.length() > 2) desc = desc.substring(0, desc.length()-2);
+            else
+                desc.append(group.getGroupName()).append(", ");
         }
-        return new Object[] {isWeekend, desc};
+        if (desc.length() > 2) desc = new StringBuilder(desc.substring(0, desc.length() - 2));
+
+        return new Object[] {isWeekend, desc.toString()};
     }
 
     private HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(Session session, List<Long> idOfOrgList,
