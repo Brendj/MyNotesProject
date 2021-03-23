@@ -4772,14 +4772,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
         }
-        if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit)) {
-            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-        } else {
-            Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
-            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                    idOfClient, handler.getData().getOperationType());
+        try {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit, version)) {
+                r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            } else {
+                Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+                handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                        idOfClient, handler.getData().getOperationType());
+            }
+            return r;
+        } catch (Exception e) {
+            logger.error("Error in changeExpenditureLimit: ", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         }
-        return r;
     }
 
     @Override
@@ -6365,7 +6371,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
                 return r;
             }
-            if (!daoService.setClientExpenditureLimit(contractId, limit)) {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!daoService.setClientExpenditureLimit(contractId, limit, version)) {
                 r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
