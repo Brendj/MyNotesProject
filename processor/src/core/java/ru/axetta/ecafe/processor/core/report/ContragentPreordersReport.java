@@ -8,6 +8,14 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -17,12 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 
 import java.util.*;
 
@@ -258,6 +260,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             if (CollectionUtils.isEmpty(dataFromDB)) {
                 throw new Exception("Нет данных для построения отчета");
             }
+
             List<ContragentPreordersSubreportItem> subReportItem = new ArrayList<ContragentPreordersSubreportItem>();
             query = session.createSQLQuery(getComplex);
             List<Object[]> dataComplex = setParam(query, startTime, endTime, idOfOrgList);
@@ -270,7 +273,11 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             query = session.createSQLQuery(getDish);
             List<Object[]> dataDish = setParam(query, startTime, endTime, idOfOrgList);
             getSubReportItem(subReportItem, dataDish, dataDishAmount);
-            subReportItem = getFinal(getSort(subReportItem));
+            subReportItem = showOnlyUnpaidItems ? null : getTotalPrice(getSort(subReportItem));
+            Set<Long> idOfOrgSet = new HashSet<>();
+            for (Object[] row: dataFromDB)
+                idOfOrgSet.add(DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[2]));
+            List<SpecialDate> specialDates = getSpecialDate(session, idOfOrgSet, startTime, endTime);
 
             for (Object[] row : dataFromDB) {
                 Long idOfContragent = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
@@ -293,7 +300,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                 String psStatus = (String) row[18];
                 String isSixDaysWorkWeek = (String) row[20];
                 Long idOfClientGroup = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[22]);
-                String isWeekend = checkWeekend(session, idOfOrg, preorderDate, idOfClientGroup, isSixDaysWorkWeek);
+                String isWeekend = checkWeekend(specialDates, idOfOrg, preorderDate, idOfClientGroup, isSixDaysWorkWeek);
                 List<String> usedAmounts = new ArrayList<String>(Arrays.asList(row[19].toString().split("&&")));
                 List<String> dish = new ArrayList<String>(Arrays.asList(row[9].toString().split("&&")));
                 List<String> dishAmounts = new ArrayList<String>(Arrays.asList(row[21].toString().split("&&")));
@@ -307,52 +314,51 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return new JRBeanCollectionDataSource(result);
         }
 
-        private List<ContragentPreordersSubreportItem> getFinal(List<ContragentPreordersSubreportItem> subReportItem){
+        private List<ContragentPreordersSubreportItem> getTotalPrice(List<ContragentPreordersSubreportItem> subReportItem){
             List<ContragentPreordersSubreportItem> subReportItemNew = new ArrayList<>();
             int totalIndex = 0;
             for (int s = 0; s < subReportItem.size() ; s++){
-                int finalCount = 0, finalPrice = 0;
+                int totalCount = 0, totalPrice = 0;
                 if(s + 1 == subReportItem.size() || !subReportItem.get(s).getIdOfContragent().equals(subReportItem.get(s + 1).getIdOfContragent())){
                     subReportItemNew.add(subReportItem.get(s));
                     for(int g = totalIndex; g <= s; g++){
-                        finalCount += subReportItem.get(g).getAmount();
-                        finalPrice += subReportItem.get(g).getAmount() * subReportItem.get(g).getComplexPrice();
+                        totalCount += subReportItem.get(g).getAmount();
+                        totalPrice += subReportItem.get(g).getAmount() * subReportItem.get(g).getComplexPrice();
                     }
                     totalIndex = s + 1;
                     ContragentPreordersSubreportItem item = new ContragentPreordersSubreportItem(subReportItem.get(s).getIdOfContragent(),
                             subReportItem.get(s).getContragentName(), null, null,
-                            null, "Итого", finalCount, null,
-                            (long)finalPrice, "0");
+                            null, "Итого", totalCount, null,
+                            (long)totalPrice, "0");
                     subReportItemNew.add(item);
                 }
                 else subReportItemNew.add(subReportItem.get(s));
             }
             return subReportItemNew;
         }
-        private String checkWeekend(Session session, Long idOfOrg, Date preorderDate, Long idOfClientGroup, String isSixDaysWorkWeek ){
-            String isWeekend = "Да";
-            Criteria criteria = session.createCriteria(SpecialDate.class);
-            criteria.add(Restrictions.eq("date", preorderDate));
-            criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
-            criteria.add(Restrictions.eq("deleted", false));
-            criteria.add(Restrictions.isNull("idOfClientGroup"));
-            List<SpecialDate> specialDates = criteria.list();
-            if(specialDates.size() > 0)
-                for (SpecialDate sp : specialDates)
-                    isWeekend = sp.getIsWeekend() ? "Нет" : "Да";
 
-            criteria = session.createCriteria(SpecialDate.class);
-            criteria.add(Restrictions.eq("date", preorderDate));
-            criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
-            criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
-            criteria.add(Restrictions.eq("deleted", false));
-            specialDates = criteria.list();
-            if(specialDates.size() > 0)
-                for (SpecialDate sp : specialDates)
+        private List<SpecialDate> getSpecialDate(Session session, Set<Long> idOfOrgSet, Date startTime, Date endTime){
+            List<SpecialDate> specialDates = new ArrayList<>();
+            for (Long idOfOrg: idOfOrgSet) {
+                Criteria criteria = session.createCriteria(SpecialDate.class);
+                criteria.add(Restrictions.between("date", startTime, endTime));
+                criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+                criteria.add(Restrictions.eq("deleted", false));
+                specialDates.addAll(criteria.list());
+            }
+            return specialDates;
+        }
+
+        private String checkWeekend(List<SpecialDate> specialDates, Long idOfOrg, Date preorderDate, Long idOfClientGroup, String isSixDaysWorkWeek ){
+            String isWeekend = "Да";
+            for (SpecialDate sp : specialDates)
+                if (sp.getIdOfClientGroup() == null && sp.getDate().compareTo(preorderDate) == 0 && sp.getIdOfOrg().equals(idOfOrg))
+                    isWeekend = sp.getIsWeekend() ? "Нет" : "Да";
+            for (SpecialDate sp : specialDates)
+                if (sp.getIdOfClientGroup() != null && sp.getIdOfClientGroup().equals(idOfClientGroup) && sp.getDate().compareTo(preorderDate) == 0 && sp.getIdOfOrg().equals(idOfOrg))
                     isWeekend = sp.getIsWeekend() ? "Нет" : "Да";
             Calendar c = Calendar.getInstance();
             c.setTime(preorderDate);
-
             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY)
                 if (isSixDaysWorkWeek.equals("Нет"))
                     isWeekend = "Нет";
@@ -372,7 +378,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                 Long complexPrice = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[6]);
                 int dishCount = 0;
                 for (Object[] amount : dataComplexAmount) {
-                    if (complexName.equals(amount[5].toString()) && DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(amount[7]).intValue() > 0)
+                    if (idOfContragent.toString().equals(amount[0].toString()) && idOfOrg.toString().equals(amount[2].toString()) &&
+                            complexName.equals(amount[5].toString()) && DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(amount[7]).intValue() > 0)
                         dishCount += DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(amount[7]).intValue();
                 }
                 if(dishCount > 0){
@@ -393,8 +400,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return subReportItem;
         }
 
-        private List<Object[]> setParam(Query query, Date startTime, Date endTime, List<Long> idOfOrgList)
-                throws Exception {
+        private List<Object[]> setParam(Query query, Date startTime, Date endTime, List<Long> idOfOrgList){
             query.setParameter("startDate", startTime.getTime())
                     .setParameter("endDate", endTime.getTime());
             if(contragent != null) {
@@ -427,7 +433,6 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             } catch (NumberFormatException ignore){};
             return result.toString();
         }
-
     }
 
     @Override

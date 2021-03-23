@@ -410,6 +410,7 @@ public class SyncResponse {
             private final Boolean multiCardMode;
             private final String parallel;
             private final String ssoId;
+            private final Long expenditureLimit;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -457,6 +458,7 @@ public class SyncResponse {
                 this.multiCardMode = client.activeMultiCardMode();
                 this.parallel = client.getParallel();
                 this.ssoId = client.getSsoid();
+                this.expenditureLimit = client.getExpenditureLimit();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -666,6 +668,9 @@ public class SyncResponse {
                 if(this.ssoId != null){
                     element.setAttribute("SsoId", this.ssoId);
                 }
+                if (this.expenditureLimit != null) {
+                    element.setAttribute("MaxDailyLimit", String.valueOf(expenditureLimit));
+                }
                 return element;
             }
 
@@ -690,6 +695,10 @@ public class SyncResponse {
 
             public Boolean getMultiCardMode() {
                 return multiCardMode;
+            }
+
+            public Long getExpenditureLimit() {
+                return expenditureLimit;
             }
         }
 
