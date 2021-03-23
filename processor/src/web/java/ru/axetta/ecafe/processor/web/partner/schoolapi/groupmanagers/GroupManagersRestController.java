@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/groupmanagers")
@@ -26,12 +27,12 @@ public class GroupManagersRestController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response attachedGroup(ClientGroupManagerDTO groupManager) {
+    public Response attachedGroups(List<ClientGroupManagerDTO> groupClientManagers) {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        ClientGroupManager clientGroupManager = getService().attachedGroup(groupManager);
-        ClientGroupManagerDTO response = ClientGroupManagerDTO.from(clientGroupManager);
+        List<ClientGroupManager> clientGroupManagers = getService().attachedGroups(groupClientManagers);
+        List<ClientGroupManagerDTO> response = ClientGroupManagerDTO.fromCollection(clientGroupManagers);
         return Response.ok().entity(response).build();
     }
 

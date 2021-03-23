@@ -6,6 +6,9 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.dto;
 
 import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClientGroupManagerDTO {
     private long idOfGroupManager;
     private long idOfClient;
@@ -20,6 +23,14 @@ public class ClientGroupManagerDTO {
         result.setGroupName(clientGroupManager.getClientGroupName());
         result.setIdOfClient(clientGroupManager.getIdOfClient());
         result.setIdOfOrg(clientGroupManager.getOrgOwner());
+        return result;
+    }
+
+    public static List<ClientGroupManagerDTO> fromCollection(List<ClientGroupManager> clientGroupManagers) {
+        List<ClientGroupManagerDTO> result = new ArrayList<>();
+        for (ClientGroupManager clientGroupManager : clientGroupManagers) {
+            result.add(ClientGroupManagerDTO.from(clientGroupManager));
+        }
         return result;
     }
 

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -38,29 +39,17 @@ class AttachedGroupCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public ClientGroupManager attachedGroup(ClientGroupManagerDTO groupManager) {
+    public List<ClientGroupManager> attachedGroups(List<ClientGroupManagerDTO> groupManagers) {
+        List<ClientGroupManager> result = new ArrayList<>();
+        if (groupManagers == null || groupManagers.isEmpty()) return result;
         Session session = null;
         Transaction transaction = null;
-        ClientGroupManager result;
         try {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            checkClientOrRaiseError(session, groupManager);
-            checkGroupOrRaiseError(session, groupManager);
-            Long version = DAOUtils.nextVersionByClientgroupManager(session);
-            ClientGroupManager newClientGroupManager = new ClientGroupManager(groupManager.getIdOfClient(),
-                    groupManager.getGroupName(), groupManager.getIdOfOrg());
-            ClientGroupManager foundSimilarClientGroupManager = findSimilarClientGroupManager(session,
-                    newClientGroupManager);
-            if (foundSimilarClientGroupManager == null) {
-                newClientGroupManager.setVersion(version);
-                newClientGroupManager.setDeleted(false);
-                session.save(newClientGroupManager);
-                result = newClientGroupManager;
-            } else {
-                foundSimilarClientGroupManager.setVersion(version);
-                session.save(foundSimilarClientGroupManager);
-                result = foundSimilarClientGroupManager;
+            for (ClientGroupManagerDTO groupManager : groupManagers) {
+                ClientGroupManager savedManager = saveNewClientGroupManager(groupManager, session);
+                result.add(savedManager);
             }
             session.flush();
             transaction.commit();
@@ -70,12 +59,59 @@ class AttachedGroupCommand {
         } catch (Exception e) {
             logger.error("Error in attach group to manager groups, ", e);
             throw new WebApplicationException(
-                    String.format("Ошибка при добавлении руководителя группы id='%d' к группе name='%s'",
-                            groupManager.getIdOfClient()), e);
+                    String.format("Ошибка при добавлении руководителя группы id='%d'",
+                            groupManagers.get(0).getIdOfClient()), e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public ClientGroupManager attachedGroup(ClientGroupManagerDTO groupManager) {
+        Session session = null;
+        Transaction transaction = null;
+        ClientGroupManager result;
+        try {
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            result = saveNewClientGroupManager(groupManager, session);
+            session.flush();
+            transaction.commit();
+            return result;
+        } catch (WebApplicationException wex) {
+            throw wex;
+        } catch (Exception e) {
+            logger.error("Error in attach group to manager groups, ", e);
+            throw new WebApplicationException(
+                    String.format("Ошибка при добавлении руководителя группы id='%d' к группе name='%s'",
+                            groupManager.getIdOfClient(), groupManager.getGroupName()), e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private ClientGroupManager saveNewClientGroupManager(ClientGroupManagerDTO groupManager, Session session) {
+        ClientGroupManager result;
+        checkClientOrRaiseError(session, groupManager);
+        checkGroupOrRaiseError(session, groupManager);
+        Long version = DAOUtils.nextVersionByClientgroupManager(session);
+        ClientGroupManager newClientGroupManager = new ClientGroupManager(groupManager.getIdOfClient(),
+                groupManager.getGroupName(), groupManager.getIdOfOrg());
+        ClientGroupManager foundSimilarClientGroupManager = findSimilarClientGroupManager(session,
+                newClientGroupManager);
+        if (foundSimilarClientGroupManager == null) {
+            newClientGroupManager.setVersion(version);
+            newClientGroupManager.setDeleted(false);
+            session.save(newClientGroupManager);
+            result = newClientGroupManager;
+        } else {
+            foundSimilarClientGroupManager.setVersion(version);
+            foundSimilarClientGroupManager.setDeleted(false);
+            session.save(foundSimilarClientGroupManager);
+            result = foundSimilarClientGroupManager;
+        }
+        return result;
     }
 
     public void dettachedGroup(Long idOfClientGroupManager) {
@@ -171,6 +207,7 @@ class AttachedGroupCommand {
         }
         return itemWithMaxVersion;
     }
+
 
 
 }

@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.dto.ClientG
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 class ClientGroupManagersServiceImpl implements ClientGroupManagersService {
 
@@ -19,6 +21,11 @@ class ClientGroupManagersServiceImpl implements ClientGroupManagersService {
     @Override
     public ClientGroupManager attachedGroup(ClientGroupManagerDTO groupManager) {
         return attachedGroupCommand.attachedGroup(groupManager);
+    }
+
+    @Override
+    public List<ClientGroupManager> attachedGroups(List<ClientGroupManagerDTO> groupManagers) {
+        return attachedGroupCommand.attachedGroups(groupManagers);
     }
 
     @Override
