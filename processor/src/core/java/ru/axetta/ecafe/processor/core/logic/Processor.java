@@ -1266,8 +1266,7 @@ public class Processor implements SyncProcessor {
         fullProcessingTempCardsOperationsAndData(request, syncHistory, responseSections);
 
         // Process ResCategoriesDiscountsAndRules
-        //Временно убираем
-        //fullProcessingCategoriesDiscountaAndRules(request, syncHistory, responseSections);
+        fullProcessingCategoriesDiscountaAndRules(request, syncHistory, responseSections);
 
         // Process CorrectingNumbersOrdersRegistry
         fullProcessingCorrectingNumbersSection(request, syncHistory, responseSections);
