@@ -1,6 +1,7 @@
 package ru.iteco.nsisync.config;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
+
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -38,6 +39,15 @@ class KafkaConsumerConfig {
     @Value(value = "${kafka.consumer.auto-offset-reset}")
     private String consumerAutoOffset;
 
+    @Value(value = "${kafka.consumer.max-poll-records}")
+    private String maxPollRecords;
+
+    @Value(value = "${kafka.session.timeout.ms}")
+    private String sessionTimeout;
+
+    @Value(value = "${kafka.heartbeat.interval.ms}")
+    private String heartbeatInterval;
+
     @Autowired
     public KafkaConsumerConfig(JsonDeserializer jsonDeserializer) {
         this.jsonDeserializer = jsonDeserializer;
@@ -52,6 +62,9 @@ class KafkaConsumerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerAutoOffset);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, Integer.parseInt(sessionTimeout));
+        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, heartbeatInterval);
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
         props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
         props.put(SaslConfigs.SASL_JAAS_CONFIG,

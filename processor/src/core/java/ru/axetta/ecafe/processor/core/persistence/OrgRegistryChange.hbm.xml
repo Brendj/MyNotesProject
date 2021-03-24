@@ -31,8 +31,8 @@
         <property name="officialName" column="officialname" type="string" length="255" not-null="true"/>
         <property name="officialNameFrom" column="officialnamefrom" type="string" length="255"/>
 
-        <property name="address" column="address" type="string" length="255" not-null="true"/>
-        <property name="addressFrom" column="addressfrom" type="string" length="255"/>
+        <property name="address" column="address" type="string" length="512" not-null="true"/>
+        <property name="addressFrom" column="addressfrom" type="string" length="512"/>
         <property name="city" column="city" type="string" length="255" not-null="true"/>
         <property name="cityFrom" column="cityfrom" type="string" length="255"/>
         <property name="region" column="region" type="string" length="255" not-null="true"/>
@@ -56,12 +56,14 @@
         <property name="egissoIdFrom" column="egissoIdFrom" type="string" length="128"/>
         <property name="municipalDistrict" column="municipal_district" type="string" length="256"/>
         <property name="municipalDistrictFrom" column="municipal_districtFrom" type="string" length="256"/>
-        <property name="shortAddress" column="short_address" type="string" length="128"/>
-        <property name="shortAddressFrom" column="short_addressFrom" type="string" length="128"/>
+        <property name="shortAddress" column="short_address" type="string" length="512"/>
+        <property name="shortAddressFrom" column="short_addressFrom" type="string" length="512"/>
         <property name="founder" column="founder" type="string" length="512"/>
         <property name="founderFrom" column="founderFrom" type="string" length="512"/>
         <property name="subordination" column="subordination" type="string" length="512"/>
         <property name="subordinationFrom" column="subordinationFrom" type="string" length="512"/>
+        <property name="globalId" column="globalId" type="long"/>
+        <property name="globalIdFrom" column="globalIdFrom" type="long"/>
 
         <set name="orgs" lazy="false" cascade="all" order-by="operationType, address">
             <key column="mainRegistry"/>

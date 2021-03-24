@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
-import ru.axetta.ecafe.processor.core.sms.emp.type.EMPAbstractEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPLeaveWithGuardianEventType;
@@ -28,7 +27,6 @@ import javax.annotation.Resource;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -944,6 +942,12 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
                 }
 
+                if (!findValueInParams(new String[]{PARAM_FRATION}, values).isEmpty())
+                {
+                    String ration = findValueInParams(new String[]{PARAM_FRATION}, values);
+                    empType.getParameters().put(PARAM_FRATION, ration);
+                }
+
                 //  дата только для платного комплекса + льготного комплекса
                 if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
                    findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
@@ -952,7 +956,6 @@ public class EventNotificationService {
                     String complexName = findValueInParams(new String[]{PARAM_COMPLEX_NAME}, values);
                     empType.getParameters().put(PARAM_COMPLEX_NAME, complexName);
                 }
-
 
                 //  сумма только для буфет + платное
                 String amountPrice = findValueInParams(new String[]{PARAM_AMOUNT_PRICE}, values);

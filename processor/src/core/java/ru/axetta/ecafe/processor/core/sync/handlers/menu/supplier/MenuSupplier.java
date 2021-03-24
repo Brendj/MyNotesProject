@@ -42,6 +42,7 @@ public class MenuSupplier implements SectionRequest {
     private Long idOfOrg;
 
     private Set<WtOrgGroup> orgGroups = new HashSet<>();
+    private Set<WtOrgGroup> offlineOrgGroups = new HashSet<>();
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
     private Set<WtTypeOfProductionItem> typeProductions = new HashSet<>();
     private Set<WtAgeGroupItem> ageGroupItems = new HashSet<>();
@@ -51,7 +52,9 @@ public class MenuSupplier implements SectionRequest {
     private Set<WtDish> dishes = new HashSet<>();
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
     private Set<WtMenu> menus = new HashSet<>();
+    private Set<WtMenu> offlineMenus = new HashSet<>();
     private Set<WtComplex> complexes = new HashSet<>();
+    private Set<WtComplex> offlineComplexes = new HashSet<>();
     private Set<WtComplexExcludeDays> excludeDays = new HashSet<>();
 
     private Integer resCode;
@@ -117,6 +120,8 @@ public class MenuSupplier implements SectionRequest {
                                 .getOrgGroupsSetFromVersion(entry.getValue(), itemContragent, item);
                         orgGroups.addAll(friendlyItems);
                     }
+                    offlineOrgGroups = DAOReadonlyService.getInstance()
+                            .getOfflineOrgGroupsSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "CategoryItemsRequest": {
@@ -146,25 +151,28 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "DishesRequest": {
+                    Set<Long> contragents = new HashSet<>();
+                    contragents.add(contragent.getIdOfContragent());
                     dishes = DAOReadonlyService.getInstance().getDishesListFromVersion(entry.getValue(), contragent);
                     for (Org item : friendlyOrgs) {
                         Contragent itemContragent = DAOReadonlyService.getInstance()
                                 .findDefaultSupplier(item.getIdOfOrg());
+                        if (contragents.contains(itemContragent.getIdOfContragent())) continue;
                         Set<WtDish> friendlyItems = DAOReadonlyService.getInstance()
                                 .getDishesListFromVersion(entry.getValue(), itemContragent);
                         dishes.addAll(friendlyItems);
+                        contragents.add(itemContragent.getIdOfContragent());
                     }
                     break;
                 }
                 case "MenuGroupsRequest": {
-                    //menuGroups = DAOReadonlyService.getInstance()
-                    //        .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
                     menuGroups = DAOReadonlyService.getInstance()
                             .getMenuGroupsSetFromVersion(entry.getValue(), contragent);
                     break;
                 }
                 case "MenusRequest": {
                     menus = DAOReadonlyService.getInstance().getMenusSetFromVersion(entry.getValue(), contragent, org);
+                    offlineMenus = DAOReadonlyService.getInstance().getOfflineMenusSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "ComplexesRequest": {
@@ -177,6 +185,8 @@ public class MenuSupplier implements SectionRequest {
                                 .getComplexesSetFromVersion(entry.getValue(), itemContragent, item);
                         complexes.addAll(friendlyItems);
                     }
+                    offlineComplexes = DAOReadonlyService.getInstance()
+                            .getOfflineComplexesSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "ExcludeDaysRequest": {
@@ -321,4 +331,27 @@ public class MenuSupplier implements SectionRequest {
         this.resCode = resCode;
     }
 
+    public Set<WtComplex> getOfflineComplexes() {
+        return offlineComplexes;
+    }
+
+    public void setOfflineComplexes(Set<WtComplex> offlineComplexes) {
+        this.offlineComplexes = offlineComplexes;
+    }
+
+    public Set<WtMenu> getOfflineMenus() {
+        return offlineMenus;
+    }
+
+    public void setOfflineMenus(Set<WtMenu> offlineMenus) {
+        this.offlineMenus = offlineMenus;
+    }
+
+    public Set<WtOrgGroup> getOfflineOrgGroups() {
+        return offlineOrgGroups;
+    }
+
+    public void setOfflineOrgGroups(Set<WtOrgGroup> offlineOrgGroups) {
+        this.offlineOrgGroups = offlineOrgGroups;
+    }
 }

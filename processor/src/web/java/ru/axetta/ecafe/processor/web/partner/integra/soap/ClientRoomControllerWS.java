@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -116,8 +116,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -4772,14 +4772,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
         }
-        if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit)) {
-            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-        } else {
-            Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
-            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                    idOfClient, handler.getData().getOperationType());
+        try {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit, version)) {
+                r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            } else {
+                Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+                handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                        idOfClient, handler.getData().getOperationType());
+            }
+            return r;
+        } catch (Exception e) {
+            logger.error("Error in changeExpenditureLimit: ", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         }
-        return r;
     }
 
     @Override
@@ -6365,7 +6371,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
                 return r;
             }
-            if (!daoService.setClientExpenditureLimit(contractId, limit)) {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!daoService.setClientExpenditureLimit(contractId, limit, version)) {
                 r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
@@ -9439,6 +9446,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<ClientSummaryBase> list = new ArrayList<>();
         list.add(summaryBase);
         result.setClientSummary(list);
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
         return result;
     }
 

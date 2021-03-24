@@ -738,7 +738,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
             smsUserCodeSender = createUserCodeSender(properties);
 
-            processor = createProcessor(sessionFactory, reportsSessionFactory, eventNotificator);
+            processor = createProcessor(sessionFactory, eventNotificator);
             this.syncProcessor = processor;
             this.cardManager = createCardManagerProcessor(properties, sessionFactory, eventNotificator);
             paymentProcessor = createPaymentProcessor(properties, sessionFactory, eventNotificator);
@@ -796,6 +796,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(CardBlockUnblockService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(MeshCardNotifyTaskExecutor.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();
@@ -1135,12 +1136,11 @@ public class RuntimeContext implements ApplicationContextAware {
 
 
     private static Processor createProcessor(SessionFactory sessionFactory,
-            SessionFactory sessionFactorySlave,
             EventNotificator eventNotificator) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating processor.");
         }
-        Processor processor = new Processor(sessionFactory, sessionFactorySlave, eventNotificator);
+        Processor processor = new Processor(sessionFactory, eventNotificator);
         if (logger.isDebugEnabled()) {
             logger.debug("Processor created.");
         }
