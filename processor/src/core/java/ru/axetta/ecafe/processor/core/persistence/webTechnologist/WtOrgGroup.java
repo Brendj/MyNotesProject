@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -167,13 +166,11 @@ public class WtOrgGroup {
             return false;
         }
         WtOrgGroup that = (WtOrgGroup) o;
-        return Objects.equals(idOfOrgGroup, that.idOfOrgGroup) && Objects.equals(nameOfOrgGroup, that.nameOfOrgGroup)
-                && Objects.equals(createDate, that.createDate) && Objects.equals(lastUpdate, that.lastUpdate) && Objects
-                .equals(deleteState, that.deleteState) && Objects.equals(version, that.version);
+        return idOfOrgGroup.equals(that.getIdOfOrgGroup());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfOrgGroup, nameOfOrgGroup, createDate, lastUpdate, deleteState, version);
+        return idOfOrgGroup.hashCode();
     }
 }

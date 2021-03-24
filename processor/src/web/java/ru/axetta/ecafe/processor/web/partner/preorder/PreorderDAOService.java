@@ -840,6 +840,7 @@ public class PreorderDAOService {
         boolean isWtMenu = org.getUseWebArm();  // меню веб-технолога
 
         Session session = (Session)emReport.getDelegate();
+        if (guardianMobile != null && guardianMobile.equals("")) guardianMobile = null;
         List<Client> clientsByMobile = PreorderUtils.getClientsByMobile(session, client.getIdOfClient(), guardianMobile);
         Integer value = PreorderUtils.getClientGroupResult(session, clientsByMobile);
         PreorderMobileGroupOnCreateType mobileGroupOnCreate;
@@ -1689,9 +1690,11 @@ public class PreorderDAOService {
             deleteGeneratedPreordersByRegular((Session) em.getDelegate(), regularPreorder, PreorderState.OK);
         }
 
-        //получаем список всех предзаказов (в т.ч. удаленные)
+        //получаем список всех предзаказов по регуляру (в т.ч. удаленные)
         List<PreorderComplex> preorderComplexes = getPreorderComplexesByRegular(regularPreorder, currentDate, dateTo);
 
+        //все предзаказы клиента за период,
+        List<PreorderComplex> preordersForClient = getPreorderComplexesByClient(regularPreorder, currentDate, dateTo);
 
         currentDate = CalendarUtils.startOfDayInUTC(CalendarUtils.addHours(currentDate, 12));
 
@@ -1721,6 +1724,16 @@ public class PreorderDAOService {
                 logger.info("Weekend or not generated day");
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
+            }
+
+            //проверяем, нет ли на дату удаленного пользователем предзаказа
+            PreorderComplex pc2 = findPreorderComplexOnDate(preordersForClient, currentDate, null);
+            if (pc2 != null) {
+                if (pc2.getDeletedState() && pc2.getState() == PreorderState.OK && pc2.getLastUpdate().after(regularPreorder.getCreatedDate())) {
+                    logger.info("Client deleted preorder on this date earlier");
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
+                }
             }
 
             boolean isWtMenu = regularPreorder.getClient().getOrg().getUseWebArm();
@@ -1973,6 +1986,17 @@ public class PreorderDAOService {
                 .getResultList();
     }
 
+    private List<PreorderComplex> getPreorderComplexesByClient(RegularPreorder regularPreorder, Date dateFrom, Date dateTo) {
+        return em.createQuery("select pc from PreorderComplex pc "
+                + "where pc.client = :client and pc.preorderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
+                + "order by pc.createdDate desc, pc.lastUpdate desc")
+                .setParameter("client", regularPreorder.getClient())
+                .setParameter("dateFrom", dateFrom)
+                .setParameter("dateTo", dateTo)
+                .setParameter("idOfComplex", regularPreorder.getIdOfComplex())
+                .getResultList();
+    }
+
     private void testAndDeleteRegularPreorder(RegularPreorder regularPreorder) {
         if (!CalendarUtils.betweenDate(new Date(), regularPreorder.getStartDate(), regularPreorder.getEndDate())) return;
         Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc join pc.preorderMenuDetails pmd "
@@ -2112,7 +2136,8 @@ public class PreorderDAOService {
 
     private PreorderMenuDetail findPreorderMenuDetail(Date date, Client client, Long armIdOfMenu) {
         Query query = em.createQuery("select pmd from PreorderMenuDetail pmd "
-                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu ");
+                + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and pmd.armIdOfMenu = :armIdOfMenu "
+                + "order by pmd.idOfPreorderMenuDetail desc");
         query.setParameter("client", client);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
@@ -3370,10 +3395,12 @@ public class PreorderDAOService {
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("select complex from WtComplex complex "
+                        + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "and complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
                         + "and complex.contragent = :contragent "
                         + "and :rule in elements(complex.discountRules) "
+                        + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs))"
                         + "and (complex.wtComplexGroupItem.idOfComplexGroupItem = :freeComplex "
                         + "or complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
                 query.setParameter("rule", rule);
@@ -3383,6 +3410,7 @@ public class PreorderDAOService {
                 query.setParameter("freeComplex", FREE_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("contragent", org.getDefaultSupplier());
+                query.setParameter("org", org);
                 List<WtComplex> res = query.getResultList();
                 if (res != null && res.size() > 0) {
                     wtComplexes.addAll(res);
@@ -3547,7 +3575,7 @@ public class PreorderDAOService {
                 // проверка по календарю учебных дней
                 Boolean isLearningDay = DAOReadonlyService.getInstance()
                         .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-                if (isLearningDay != null && !isLearningDay) {
+                if (isLearningDay != null && isLearningDay) {
                     return false;
                 }
                 if (isLearningDay == null) {
@@ -3567,7 +3595,7 @@ public class PreorderDAOService {
         } else {
             Boolean isLearningDay = DAOReadonlyService.getInstance()
                     .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-            if (isLearningDay != null && !isLearningDay) {
+            if (isLearningDay != null && isLearningDay) {
                 return false;
             }
         }
