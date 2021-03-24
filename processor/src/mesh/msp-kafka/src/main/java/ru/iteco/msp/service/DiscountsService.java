@@ -24,6 +24,8 @@ public class DiscountsService {
     private final ClientDiscountHistoryRepo clientDiscountHistoryRepo;
     private final ClientRepo clientRepo;
 
+    private final static Integer DISCOUNT_TYPE = 0;
+
     public DiscountsService(
             DiscountChangeHistoryRepo discountChangeHistoryRepo,
             ClientDTSZNDiscountInfoRepo clientDTSZNDiscountInfoRepo,
@@ -52,6 +54,7 @@ public class DiscountsService {
     }
 
     public List<ClientDiscountHistory> getNewHistoryByTime(Date date) {
-        return clientDiscountHistoryRepo.getAllByRegistryDateGreaterThanEqualAndClientMeshGuidIsNotNull(date.getTime());
+        return clientDiscountHistoryRepo
+                .getAllByRegistryDateGreaterThanEqualAndClientMeshGuidIsNotNullAndCategoryDiscountCategoryType(date.getTime(), DISCOUNT_TYPE);
     }
 }

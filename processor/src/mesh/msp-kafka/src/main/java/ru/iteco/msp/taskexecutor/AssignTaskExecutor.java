@@ -92,7 +92,6 @@ public class AssignTaskExecutor {
                     begin = new Date(end.getTime() - delta);
 
                     List<ClientDiscountHistory> discountChangeHistoryList = discountsService.getNewHistoryByTime(begin);
-
                     for (ClientDiscountHistory h : discountChangeHistoryList) {
                         type = AssignOperationType.getAssignTypeByOperationType(h.getOperationType());
                         if (AssignOperationType.CHANGE.equals(type)
