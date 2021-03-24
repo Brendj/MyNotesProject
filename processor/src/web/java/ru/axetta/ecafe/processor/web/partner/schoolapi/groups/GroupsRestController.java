@@ -50,6 +50,17 @@ public class GroupsRestController {
         return Response.ok().entity(response).build();
     }
 
+    @DELETE
+    @Path("/subgroups/{id}")
+    public Response deleteMiddleGroup(@PathParam("id") Long id){
+        if (!hasAnyRole(User.DefaultRole.ADMIN.name(), User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.name())) {
+            throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        }
+        MiddleGroupResponse response = getService().deleteMiddleGroup(id);
+        return Response.ok().entity(response).build();
+    }
+
+
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path(value = "/{id}/org/{orgId}")

@@ -13,5 +13,6 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.MiddleGroupRes
 public interface SchoolApiClientGroupsService {
     MiddleGroupResponse createMiddleGroup(Long id, Long orgId, MiddleGroupRequest request);
     MiddleGroupResponse updateMiddleGroup(Long id, Long orgId, MiddleGroupRequest request);
+    MiddleGroupResponse deleteMiddleGroup(Long idOfMiddleGroup);
     GroupClientsUpdateResponse updateGroup(Long id, Long orgId, GroupClientsUpdateRequest request);
 }

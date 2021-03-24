@@ -16,9 +16,12 @@ import org.springframework.stereotype.Component;
 public class SchoolApiClientGroupsServiceImpl implements SchoolApiClientGroupsService {
 
     @Autowired
-    CreateMiddleGroupCommand middleGroupCommand;
+    private CreateMiddleGroupCommand middleGroupCommand;
     @Autowired
-    UpdateGroupCommand updateGroupCommand;
+    private UpdateGroupCommand updateGroupCommand;
+    @Autowired
+    private DeleteMiddleGroupCommand deleteMiddleGroupCommand;
+
 
     @Override
     public MiddleGroupResponse createMiddleGroup(Long id, Long orgId, MiddleGroupRequest request) {
@@ -28,6 +31,11 @@ public class SchoolApiClientGroupsServiceImpl implements SchoolApiClientGroupsSe
     @Override
     public MiddleGroupResponse updateMiddleGroup(Long id, Long orgId, MiddleGroupRequest request) {
         return middleGroupCommand.updateGroup(id, orgId, request);
+    }
+
+    @Override
+    public MiddleGroupResponse deleteMiddleGroup(Long idOfMiddleGroup) {
+        return deleteMiddleGroupCommand.deleteGroup(idOfMiddleGroup);
     }
 
     @Override
