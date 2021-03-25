@@ -4,10 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.summary;
 
+import org.apache.commons.codec.binary.Base64;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.tomcat.util.buf.Base64;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletException;

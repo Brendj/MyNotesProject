@@ -21,8 +21,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jboss.vfs.VFS;
-import org.jboss.vfs.VirtualFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -315,7 +313,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
             String surl = url.toString();
             res += surl + "\n";
             if (surl.startsWith("vfs:/") && surl.endsWith("/WEB-INF/classes/")) {
-                VirtualFile zzz = VFS.getChild(surl.substring(5));
+                /*VirtualFile zzz = VFS.getChild(surl.substring(5));
                 if (zzz.isFile()) {
                     res += "!" + zzz.getPhysicalFile().getAbsolutePath() + "\n";
                 }
@@ -324,7 +322,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
                     if (vf.isFile()) {
                         res += vf.getPhysicalFile().getAbsolutePath() + "\n";
                     }
-                }
+                }*/
             }
         }
         result = res;

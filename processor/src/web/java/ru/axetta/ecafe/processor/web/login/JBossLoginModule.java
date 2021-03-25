@@ -16,9 +16,9 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -174,7 +174,7 @@ public class JBossLoginModule implements LoginModule {
         // <security-domain name="ecafe" cache-type="default"> удалить [cache-type="default"]
         loginSucceeded = false;
         Callback[] callbacks = new Callback[]{new NameCallback("Username"), new PasswordCallback("Password", false)};
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         try {
             callbackHandler.handle(callbacks);
         } catch (Exception e) {
@@ -220,7 +220,7 @@ public class JBossLoginModule implements LoginModule {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();

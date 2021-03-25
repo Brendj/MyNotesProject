@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
@@ -20,7 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
@@ -238,7 +238,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     }
 
     public void createUser(Session session) throws Exception {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
         try {

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.newispp;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
@@ -11,8 +13,6 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

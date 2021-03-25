@@ -10,10 +10,10 @@ import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.UserNotificationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -105,7 +105,7 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         boolean success=false;
         SecurityJournalAuthenticate.EventType eventType =
                 changePassword ? SecurityJournalAuthenticate.EventType.CHANGE_GRANTS : SecurityJournalAuthenticate.EventType.MODIFY_USER;
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         try {
             if(checkCurrentPassword(currPlainPassword)){
                 if(changePassword){

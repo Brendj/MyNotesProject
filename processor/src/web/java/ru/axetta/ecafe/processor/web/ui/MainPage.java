@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
 import ru.axetta.ecafe.processor.web.ui.card.*;
@@ -74,7 +75,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.richfaces.component.html.HtmlPanelMenu;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -10035,7 +10035,7 @@ public class MainPage implements Serializable {
         String userName = context.getRemoteUser();
         User user = DAOService.getInstance().findUserByUserName(userName);
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         try {
             if (!newPassword.equals(newPasswordConfirm)) {
                 newPassword = "";

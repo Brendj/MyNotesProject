@@ -15,9 +15,9 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -42,7 +42,7 @@ public class UserGroupCreatePage extends UserCreatePage {
     public void createGroup() throws Exception {
         Session session = null;
         Transaction transaction = null;
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
         try {

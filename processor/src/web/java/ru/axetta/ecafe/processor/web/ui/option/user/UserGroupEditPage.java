@@ -14,9 +14,9 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -35,7 +35,7 @@ public class UserGroupEditPage extends UserEditPage {
     private final static Logger logger = LoggerFactory.getLogger(UserGroupEditPage.class);
 
     public void updateUser(Session session, Long idOfUser) throws Exception {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
 

@@ -25,13 +25,13 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -179,7 +179,7 @@ public class DAOReadonlyService {
 
     public User getUserFromSession() {
         try {
-            HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+            HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
             HttpSession httpSession = request.getSession(true);
             Long idOfUser = (Long) httpSession.getAttribute(User.USER_ID_ATTRIBUTE_NAME);
             User user = findUserById(idOfUser);

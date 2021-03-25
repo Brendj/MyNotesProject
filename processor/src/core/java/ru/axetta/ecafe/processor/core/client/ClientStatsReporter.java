@@ -4,14 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.client;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientMigration;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
