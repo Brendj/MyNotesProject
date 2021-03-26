@@ -16,14 +16,29 @@ public class HardwareSettingsRequestHSItem {
     private Long idOfHardwareSetting;
     private List<HardwareSettingsRequestItem> items = new LinkedList<>();
     private HardwareSettingsRequestIPItem ipItem;
+    private String errorMessage;
+    private Integer resCode;
 
     public HardwareSettingsRequestHSItem(Long idOfHardwareSetting) {
         this.idOfHardwareSetting = idOfHardwareSetting;
     }
 
     public static HardwareSettingsRequestHSItem build(Node hsNode) {
-        Long idOfHardwareSetting = XMLUtils.getLongAttributeValue(hsNode, "HostId");
+        Long idOfHardwareSetting = null;
+        String errorMessage = null;
+        Integer resCode = HardwareSettingsRequestItem.ERROR_CODE_ALL_OK;
+        try {
+            idOfHardwareSetting = XMLUtils.getLongAttributeValue(hsNode, "HostId");
+            if(idOfHardwareSetting == null){
+                throw new Exception("HostId is Null");
+            }
+        } catch (Exception e){
+            errorMessage = e.getMessage();
+            resCode = HardwareSettingsRequestItem.ERROR_CODE_NOT_VALID_ATTRIBUTE;
+        }
         HardwareSettingsRequestHSItem hsItem = new HardwareSettingsRequestHSItem(idOfHardwareSetting);
+        hsItem.setErrorMessage(errorMessage);
+        hsItem.setResCode(resCode);
 
         Node itemNode = hsNode.getFirstChild();
         while (null != itemNode) {
@@ -98,5 +113,21 @@ public class HardwareSettingsRequestHSItem {
 
     public void setIpItem(HardwareSettingsRequestIPItem ipItem) {
         this.ipItem = ipItem;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public Integer getResCode() {
+        return resCode;
+    }
+
+    public void setResCode(Integer resCode) {
+        this.resCode = resCode;
     }
 }

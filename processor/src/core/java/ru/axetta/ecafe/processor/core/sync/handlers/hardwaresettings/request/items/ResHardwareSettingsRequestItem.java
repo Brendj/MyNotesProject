@@ -25,7 +25,7 @@ public class ResHardwareSettingsRequestItem {
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "Status", status);
-        if (status != null && status != 0) {
+        if (status != null && status.equals(0)) {
             XMLUtils.setAttributeIfNotNull(element, "ErrorMessage", errorMessage);
         }
         return element;

@@ -32,18 +32,21 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
     public ResHardwareSettingsRequest process() {
         ResHardwareSettingsRequest result = new ResHardwareSettingsRequest();
+        boolean errorFound;
+        Long orgOwner = hardwareSettingsRequest.getOrgOwner();
+        Long nextVersion = DAOUtils.nextVersionByHardwareSettingsRequest(session);
+        StringBuilder errorMessage = new StringBuilder();
 
         try {
-            boolean errorFound;
-            Long orgOwner = hardwareSettingsRequest.getOrgOwner();
-            Long nextVersion = DAOUtils.nextVersionByHardwareSettingsRequest(session);
-            StringBuilder errorMessage = new StringBuilder();
-
             for (HardwareSettingsRequestHSItem hsItem : hardwareSettingsRequest.getSectionItem()) {
-                HardwareSettings hardwareSettings = null;
                 int status = 1;
+                if(hsItem.getIdOfHardwareSetting() == null){
+                    status = 0;
+                    result.getItems().add(new ResHardwareSettingsRequestItem(status, hsItem.getErrorMessage()));
+                    continue;
+                }
 
-                hardwareSettings = DAOUtils
+                HardwareSettings hardwareSettings = DAOUtils
                         .getHardwareSettingsByOrgAndHostIP(session, hsItem.getIpItem().getValue(), orgOwner);
                 if (null == hardwareSettings) {
                     Org org = (Org) session.get(Org.class, orgOwner);
