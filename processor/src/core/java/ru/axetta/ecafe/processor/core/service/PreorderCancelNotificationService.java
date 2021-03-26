@@ -165,7 +165,7 @@ public class PreorderCancelNotificationService {
                 while (datemessages.hasNext()) {
                     Map.Entry<Date, String> datemessage = datemessages.next();
                     value = "<br>";
-                    value += new SimpleDateFormat("yyyy-MM-dd").format(datemessage.getKey());
+                    value += new SimpleDateFormat("dd-MM-yyyy").format(datemessage.getKey());
                     value += datemessage.getValue();
                     values = EventNotificationService.attachToValues
                             (type.getKey() + "_den_" + counttype, value, values);
@@ -410,9 +410,7 @@ public class PreorderCancelNotificationService {
         if (mode == 1 || mode == 2) {
             mess += preorderComplex.getComplexName().trim() + ":";
             for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                if (preorderMenuDetail.getRegularPreorder() != null) {
-                    mess += "«" + preorderMenuDetail.getMenuDetailName().trim() + "»,";
-                }
+                mess += "«" + preorderMenuDetail.getMenuDetailName().trim() + "»,";
             }
             if (mess.length() > 4)
                 mess = mess.substring(0, mess.length() - 1);
@@ -437,7 +435,7 @@ public class PreorderCancelNotificationService {
             }
             mess += ": «" + regularPreorder.getItemName().trim() + "» ";
         }
-        mess += "(стоимость " + regularPreorder.getPrice() / 100 + " руб., ";
+        mess += " (стоимость " + regularPreorder.getPrice() / 100 + " руб., ";
         mess += regularPreorder.getAmount() + " шт)";
         mess += "<br>";
         dateMessage.put(regularPreorder.getEndDate(), mess);

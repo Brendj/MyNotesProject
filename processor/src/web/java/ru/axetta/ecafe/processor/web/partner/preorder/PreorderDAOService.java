@@ -3395,10 +3395,12 @@ public class PreorderDAOService {
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("select complex from WtComplex complex "
+                        + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "and complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
                         + "and complex.contragent = :contragent "
                         + "and :rule in elements(complex.discountRules) "
+                        + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs))"
                         + "and (complex.wtComplexGroupItem.idOfComplexGroupItem = :freeComplex "
                         + "or complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
                 query.setParameter("rule", rule);
@@ -3408,6 +3410,7 @@ public class PreorderDAOService {
                 query.setParameter("freeComplex", FREE_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("contragent", org.getDefaultSupplier());
+                query.setParameter("org", org);
                 List<WtComplex> res = query.getResultList();
                 if (res != null && res.size() > 0) {
                     wtComplexes.addAll(res);
@@ -3572,7 +3575,7 @@ public class PreorderDAOService {
                 // проверка по календарю учебных дней
                 Boolean isLearningDay = DAOReadonlyService.getInstance()
                         .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-                if (isLearningDay != null && !isLearningDay) {
+                if (isLearningDay != null && isLearningDay) {
                     return false;
                 }
                 if (isLearningDay == null) {
@@ -3592,7 +3595,7 @@ public class PreorderDAOService {
         } else {
             Boolean isLearningDay = DAOReadonlyService.getInstance()
                     .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-            if (isLearningDay != null && !isLearningDay) {
+            if (isLearningDay != null && isLearningDay) {
                 return false;
             }
         }
