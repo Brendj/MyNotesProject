@@ -5237,7 +5237,7 @@ public class Processor implements SyncProcessor {
                 return;
             }
 
-            if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
+            if (!orgMap.containsKey(client.getOrg().getIdOfOrg())) {
                 if (!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient())
                         .size() > 0)) {
                     if (!allocatedClients.contains(clientParamItem.getIdOfClient())) {
