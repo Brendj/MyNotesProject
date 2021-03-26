@@ -685,38 +685,38 @@ public class EzdController {
                 erroringage = !erroringage;
             }
         }
-        //
-        //if (erroringroup || erroringage)
-        //{
-        //    logger.error("Для клиентов вашей категории пользование данным сервисом не предусмотрено");
-        //    result.setErrorCode(ResponseCodes.RC_BAD_CATEGORY.getCode().toString());
-        //    result.setErrorMessage(ResponseCodes.RC_BAD_CATEGORY.toString());
-        //    return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        //}
-        //if (client.getCards().isEmpty())
-        //{
-        //    logger.error("На текущий момент доступ в здание невозможен по причине отсутствия активного электронного идентификатора");
-        //    result.setErrorCode(ResponseCodes.RC_NO_CARD.getCode().toString());
-        //    result.setErrorMessage(ResponseCodes.RC_NO_CARD.toString());
-        //    return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        //}
-        //
-        //boolean activecard = false;
-        //for (Card card: client.getCards())
-        //{
-        //    if (card.isActive())
-        //    {
-        //        activecard = true;
-        //        break;
-        //    }
-        //}
-        //if (!activecard)
-        //{
-        //    logger.error("На текущий момент доступ в здание невозможен по причине заблокированного электронного идентификатора");
-        //    result.setErrorCode(ResponseCodes.RC_NO_ACTIVE_CARD.getCode().toString());
-        //    result.setErrorMessage(ResponseCodes.RC_NO_ACTIVE_CARD.toString());
-        //    return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        //}
+
+        if (erroringroup || erroringage)
+        {
+            logger.error("Для клиентов вашей категории пользование данным сервисом не предусмотрено");
+            result.setErrorCode(ResponseCodes.RC_BAD_CATEGORY.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_BAD_CATEGORY.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
+        if (client.getCards().isEmpty())
+        {
+            logger.error("На текущий момент доступ в здание невозможен по причине отсутствия активного электронного идентификатора");
+            result.setErrorCode(ResponseCodes.RC_NO_CARD.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_NO_CARD.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
+
+        boolean activecard = false;
+        for (Card card: client.getCards())
+        {
+            if (card.isActive())
+            {
+                activecard = true;
+                break;
+            }
+        }
+        if (!activecard)
+        {
+            logger.error("На текущий момент доступ в здание невозможен по причине заблокированного электронного идентификатора");
+            result.setErrorCode(ResponseCodes.RC_NO_ACTIVE_CARD.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_NO_ACTIVE_CARD.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
         ////////////////////
         //Получаем ключи или генерируем их
         CardSign cardSign = DAOReadonlyService.getInstance().getSignInform(SERT_NUM_QR);
