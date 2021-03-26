@@ -3173,5 +3173,10 @@ public class DAOService {
         query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
         query.executeUpdate();
     }
+
+    public void saveQRinfo(ClientEnterQR clientEnterQR) {
+        entityManager.persist(clientEnterQR);
+        entityManager.flush();
+    }
 }
 
