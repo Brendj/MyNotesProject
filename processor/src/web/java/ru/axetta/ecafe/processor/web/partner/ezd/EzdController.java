@@ -754,18 +754,24 @@ public class EzdController {
             PrivateKey pk = CryptoSign.loadPrivKey(cardSign.getPrivatekeycard());
             //Подписывание
             byte[] sign = CryptoSign.sign(qr_data, pk);
-            //Размер ответа фиксированный
-            byte[] allData = new byte[SIZE_DATE + sign.length];
-            //Сохраняем сами подписи
-            System.arraycopy(qr_data, 0, allData, 0, SIZE_DATE);
-            System.arraycopy(sign, 0, allData, SIZE_DATE, sign.length);
-            ClientEnterQR clientEnterQR = new ClientEnterQR(client, allData, startDate, endDate, new Date());
+
+            //Сохраняем сгенерированный код
+            ClientEnterQR clientEnterQR = new ClientEnterQR(client, qr_data, startDate, endDate, new Date());
             DAOService.getInstance().saveQRinfo(clientEnterQR);
+
+            //Переводим в DER кодировку
+            StringBuffer res = new StringBuffer(2*(qr_data.length + sign.length));
+            for(int i=0; i < qr_data.length; i++)
+                res.append(String.format("%02X", qr_data[i]));
+            for(int i=0; i< sign.length; i++)
+                res.append(String.format("%02X", sign[i]));
+
+            //Формируем ответ
             ResponseToEZDQR responseToEZDQR = new ResponseToEZDQR();
             responseToEZDQR.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             responseToEZDQR.setErrorMessage(ResponseCodes.RC_OK.toString());
             responseToEZDQR.setMeshguid(meshGuid);
-            responseToEZDQR.setQr(CryptoSign.bytesToHex(allData));
+            responseToEZDQR.setQr(res.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseToEZDQR).build();
         } catch (Exception e)
         {
