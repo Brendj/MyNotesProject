@@ -685,11 +685,34 @@ public class EzdController {
                 try {
                     //Проверка диапазона групп
                     String[] idClientsGroupBetween = betweenGroups.split(",");
-                    if (client.getIdOfClientGroup() > Long.parseLong(idClientsGroupBetween[0])
-                            && client.getIdOfClientGroup() < Long.parseLong(idClientsGroupBetween[1])) {
-                        errorinbetweengroup = false;
+                    if (idClientsGroupBetween[0].equals("infinity"))
+                    {
+                        if (idClientsGroupBetween[1].equals("infinity"))
+                        {
+                            errorinbetweengroup = false;
+                        }
+                        else
+                        {
+                            if (client.getIdOfClientGroup() < Long.parseLong(idClientsGroupBetween[1])) {
+                                errorinbetweengroup = false;
+                            }
+                        }
+                    } else
+                    {
+                        if (idClientsGroupBetween[1].equals("infinity"))
+                        {
+                            if (client.getIdOfClientGroup() > Long.parseLong(idClientsGroupBetween[0])) {
+                                errorinbetweengroup = false;
+                            }
+                        }
+                        else
+                        {
+                            if (client.getIdOfClientGroup() > Long.parseLong(idClientsGroupBetween[0])
+                                    && client.getIdOfClientGroup() < Long.parseLong(idClientsGroupBetween[1])) {
+                                errorinbetweengroup = false;
+                            }
+                        }
                     }
-
                 } catch (Exception e) {
                     logger.error("Внутренняя ошибка сервиса");
                     result.setErrorCode(ResponseCodes.RC_SERVER_ERROR.getCode().toString());
