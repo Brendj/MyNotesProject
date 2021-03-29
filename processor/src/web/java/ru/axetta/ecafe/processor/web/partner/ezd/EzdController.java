@@ -651,8 +651,8 @@ public class EzdController {
             if (client==null)
             {
                 logger.error("Клиент не найден");
-                result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
-                result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
+                result.setErrorCode(ResponseCodes.RC_CLIENT_NOT_FOUND.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_CLIENT_NOT_FOUND.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
             String groups = RuntimeContext.getInstance().getConfigProperties().getProperty(GROUPS_FOR_QR, "");
