@@ -709,7 +709,7 @@ public class EzdController {
             boolean erroringage = true;
             //Проверка маски группы
             if (client.getAgeTypeGroup() != null) {
-                if (client.getAgeTypeGroup().contains(ageGroupMask)) {
+                if (client.getAgeTypeGroup().toLowerCase().contains(ageGroupMask.toLowerCase())) {
                     erroringage = false;
                 }
             }
