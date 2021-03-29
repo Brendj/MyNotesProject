@@ -708,8 +708,8 @@ public class EzdController {
 
             boolean erroringage = true;
             //Проверка маски группы
-            if (client.getClientGroup() != null && client.getClientGroup().getGroupName() != null) {
-                if (client.getClientGroup().getGroupName().contains(ageGroupMask)) {
+            if (client.getAgeTypeGroup() != null) {
+                if (client.getAgeTypeGroup().contains(ageGroupMask)) {
                     erroringage = false;
                 }
             }
