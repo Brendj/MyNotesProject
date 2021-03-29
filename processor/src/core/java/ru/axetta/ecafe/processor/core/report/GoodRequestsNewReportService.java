@@ -775,14 +775,19 @@ public class GoodRequestsNewReportService {
             ComplexInfoItem complexInfoItem = complexOrgDictionary.get(position.getOrgOwner());
             if (complexInfoItem.preorderInfo.containsKey(position.getGlobalId())) {
                 GoodInfo info = complexInfoItem.preorderInfo.get(position.getGlobalId());
+                feedingPlanType = info.feedingPlanType;
                 price = info.price;
                 goodsCode = dishCode;
             } else if (complexId != null && complexInfoItem.goodInfos.containsKey(complexId.longValue())) {
                 GoodInfo info = complexInfoItem.goodInfos.get(complexId.longValue());
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
                 price = info.price;
+            } else {
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
             }
+        } else {
+            feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
         }
-        feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
 
         if (wtComplex != null && !requestGoodsInfo.containsKey(wtComplex.getIdOfComplex())) {
             requestGoodsInfo.put(wtComplex.getIdOfComplex(),
