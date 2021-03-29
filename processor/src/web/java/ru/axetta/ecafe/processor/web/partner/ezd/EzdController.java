@@ -50,6 +50,8 @@ public class EzdController {
     public static final String KEY_FOR_QR = "ecafe.processor.ezd.qr.key";
     public static final String GROUPS_FOR_QR = "ecafe.processor.ezd.qr.groups";
     public static final String GROUPS_FOR_QR_INVERSE = "ecafe.processor.ezd.qr.groups.inverse";
+    public static final String BETWEEN_GROUPS_FOR_QR = "ecafe.processor.ezd.qr.betweengroups";
+    public static final String BETWEEN_GROUPS_FOR_QR_INVERSE = "ecafe.processor.ezd.qr.betweengroups.inverse";
     public static final String EGEGROUP_QR_MASK = "ecafe.processor.ezd.qr.agetypegroups.mask";
     public static final String EGEGROUP_QR_MASK_INVERSE = "ecafe.processor.ezd.qr.agetypegroups.mask.inverse";
 
@@ -639,146 +641,184 @@ public class EzdController {
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
-        Client client = DAOService.getInstance().getClientByMeshGuid(meshGuid);
-        if (client==null)
-        {
-            logger.error("Клиент не найден");
-            result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }
-        String groups = RuntimeContext.getInstance().getConfigProperties().getProperty(GROUPS_FOR_QR, "");
-        String groupsInverse = RuntimeContext.getInstance().getConfigProperties().getProperty(GROUPS_FOR_QR_INVERSE, "");
-        String ageGroupMask = RuntimeContext.getInstance().getConfigProperties().getProperty(EGEGROUP_QR_MASK, "");
-        String ageGroupMaskInverse = RuntimeContext.getInstance().getConfigProperties().getProperty(EGEGROUP_QR_MASK_INVERSE, "");
 
-        if (groups.isEmpty() || groupsInverse.isEmpty() || ageGroupMask.isEmpty() || ageGroupMaskInverse.isEmpty())
-        {
-            logger.error("Конфигурация не задана");
-            result.setErrorCode(ResponseCodes.RC_NO_CONFIG.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_NO_CONFIG.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = DAOUtils.findClientByMeshGuid(session, meshGuid);
+            if (client==null)
+            {
+                logger.error("Клиент не найден");
+                result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+            String groups = RuntimeContext.getInstance().getConfigProperties().getProperty(GROUPS_FOR_QR, "");
+            String groupsInverse = RuntimeContext.getInstance().getConfigProperties().getProperty(GROUPS_FOR_QR_INVERSE, "");
+            String betweenGroups = RuntimeContext.getInstance().getConfigProperties().getProperty(BETWEEN_GROUPS_FOR_QR, "");
+            String betweenGroupsInverse = RuntimeContext.getInstance().getConfigProperties().getProperty(BETWEEN_GROUPS_FOR_QR_INVERSE, "");
+            String ageGroupMask = RuntimeContext.getInstance().getConfigProperties().getProperty(EGEGROUP_QR_MASK, "");
+            String ageGroupMaskInverse = RuntimeContext.getInstance().getConfigProperties().getProperty(EGEGROUP_QR_MASK_INVERSE, "");
 
-        boolean erroringroup = true;
-        if (client.getIdOfClientGroup() != null) {
-            String[] idClientsGroup = groups.split(",");
-            for (String idClientGroup : idClientsGroup) {
-                if (client.getIdOfClientGroup().equals(Long.valueOf(idClientGroup)))
-                {
-                    erroringroup=false;
-                    break;
+            if (groups.isEmpty() || groupsInverse.isEmpty() || ageGroupMask.isEmpty() || ageGroupMaskInverse.isEmpty())
+            {
+                logger.error("Конфигурация не задана");
+                result.setErrorCode(ResponseCodes.RC_NO_CONFIG.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_NO_CONFIG.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+
+            boolean erroringroup = true;
+            boolean errorinbetweengroup = true;
+            if (client.getIdOfClientGroup() != null) {
+                //Проверка списка групп
+                String[] idClientsGroup = groups.split(",");
+                for (String idClientGroup : idClientsGroup) {
+                    if (client.getIdOfClientGroup().equals(Long.valueOf(idClientGroup)))
+                    {
+                        erroringroup=false;
+                        break;
+                    }
+                }
+                try {
+                    //Проверка диапазона групп
+                    String[] idClientsGroupBetween = betweenGroups.split(",");
+                    if (client.getIdOfClientGroup() > Long.parseLong(idClientsGroupBetween[0])
+                            && client.getIdOfClientGroup() < Long.parseLong(idClientsGroupBetween[1])) {
+                        errorinbetweengroup = false;
+                    }
+
+                } catch (Exception e) {
+                    logger.error("Внутренняя ошибка сервиса");
+                    result.setErrorCode(ResponseCodes.RC_SERVER_ERROR.getCode().toString());
+                    result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
+                    return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
                 }
             }
-        }
-        if (Boolean.parseBoolean(groupsInverse))
-        {
-            erroringroup = !erroringroup;
-        }
-        boolean erroringage = true;
+            if (Boolean.parseBoolean(groupsInverse))
+            {
+                erroringroup = !erroringroup;
+            }
+            if (Boolean.parseBoolean(betweenGroupsInverse))
+            {
+                errorinbetweengroup = !errorinbetweengroup;
+            }
 
-        if (!erroringroup) {
-            if (client.getClientGroup().getGroupName().contains(ageGroupMask)) {
-                erroringage = false;
+            boolean erroringage = true;
+            //Проверка маски группы
+            if (client.getClientGroup() != null && client.getClientGroup().getGroupName() != null) {
+                if (client.getClientGroup().getGroupName().contains(ageGroupMask)) {
+                    erroringage = false;
+                }
             }
             if (Boolean.parseBoolean(ageGroupMaskInverse)) {
                 erroringage = !erroringage;
             }
-        }
 
-        if (erroringroup || erroringage)
-        {
-            logger.error("Для клиентов вашей категории пользование данным сервисом не предусмотрено");
-            result.setErrorCode(ResponseCodes.RC_BAD_CATEGORY.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_BAD_CATEGORY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }
-        if (client.getCards().isEmpty())
-        {
-            logger.error("На текущий момент доступ в здание невозможен по причине отсутствия активного электронного идентификатора");
-            result.setErrorCode(ResponseCodes.RC_NO_CARD.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_NO_CARD.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }
-
-        boolean activecard = false;
-        for (Card card: client.getCards())
-        {
-            if (card.isActive())
+            if ((erroringroup && errorinbetweengroup) || erroringage)
             {
-                activecard = true;
-                break;
+                logger.error("Для клиентов вашей категории пользование данным сервисом не предусмотрено");
+                result.setErrorCode(ResponseCodes.RC_BAD_CATEGORY.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_BAD_CATEGORY.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
-        }
-        if (!activecard)
-        {
-            logger.error("На текущий момент доступ в здание невозможен по причине заблокированного электронного идентификатора");
-            result.setErrorCode(ResponseCodes.RC_NO_ACTIVE_CARD.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_NO_ACTIVE_CARD.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }
-        ////////////////////
-        //Получаем ключи или генерируем их
-        CardSign cardSign = DAOReadonlyService.getInstance().getSignInform(SERT_NUM_QR);
-        if (cardSign == null)
-            cardSign = generatorKey();
-        if (cardSign == null)
-        {
-            logger.error("Внутренняя ошибка сервиса");
+            if (client.getCards().isEmpty())
+            {
+                logger.error("На текущий момент доступ в здание невозможен по причине отсутствия активного электронного идентификатора");
+                result.setErrorCode(ResponseCodes.RC_NO_CARD.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_NO_CARD.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+
+            boolean activecard = false;
+            for (Card card: client.getCards())
+            {
+                if (card.isActive())
+                {
+                    activecard = true;
+                    break;
+                }
+            }
+            if (!activecard)
+            {
+                logger.error("На текущий момент доступ в здание невозможен по причине заблокированного электронного идентификатора");
+                result.setErrorCode(ResponseCodes.RC_NO_ACTIVE_CARD.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_NO_ACTIVE_CARD.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+            ////////////////////
+            //Получаем ключи или генерируем их
+            CardSign cardSign = DAOReadonlyService.getInstance().getSignInform(SERT_NUM_QR);
+            if (cardSign == null)
+                cardSign = generatorKey();
+            if (cardSign == null)
+            {
+                logger.error("Внутренняя ошибка при генерации ключей для QR-кодов");
+                result.setErrorCode(ResponseCodes.RC_SERVER_ERROR.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+            Date startDate = new Date();
+            Date endDate = new Date(startDate.getTime()+TIME_ACTIVE_QR);
+            //Собираем, что подписываем
+            byte[] lenght = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(SIZE_DATE).array();//1 байт
+            byte[] clientId = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(client.getIdOfClient()).array();//4 байта
+            byte[] qrcode = asBytes (UUID.randomUUID());//16 байт
+            byte[] codeCreator = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(1).array();//4 байта
+            byte[] dateStart =  ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(startDate.getTime()).array();//4 байта
+            byte[] dateEnd =  ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(endDate.getTime()).array();//4 байта
+            byte[] sert = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getIdOfCardSign()).array();//4 байта
+            //Здесь сформируется конечный вариант для подписания
+            byte[] qr_data = new byte[37];
+            System.arraycopy(lenght, 3, qr_data, 0, 1);
+            System.arraycopy(clientId, 4, qr_data, 1, 4);
+            System.arraycopy(qrcode, 0, qr_data, 5, 16);
+            System.arraycopy(codeCreator, 0, qr_data, 21, 4);
+            System.arraycopy(dateStart, 0, qr_data, 25, 4);
+            System.arraycopy(dateEnd, 0, qr_data, 29, 4);
+            System.arraycopy(sert, 0, qr_data, 33, 4);
+
+            try {
+                //Достаем приватный ключ для подписи
+                PrivateKey pk = CryptoSign.loadPrivKey(cardSign.getPrivatekeycard());
+                //Подписывание
+                byte[] sign = CryptoSign.sign(qr_data, pk);
+
+                //Сохраняем сгенерированный код
+                ClientEnterQR clientEnterQR = new ClientEnterQR(client, qr_data, startDate, endDate, new Date());
+                DAOService.getInstance().saveQRinfo(clientEnterQR);
+
+                //Переводим в DER кодировку
+                StringBuffer res = new StringBuffer(2*(qr_data.length + sign.length));
+                for(int i=0; i < qr_data.length; i++)
+                    res.append(String.format("%02X", qr_data[i]));
+                for(int i=0; i< sign.length; i++)
+                    res.append(String.format("%02X", sign[i]));
+
+                //Формируем ответ
+                ResponseToEZDQR responseToEZDQR = new ResponseToEZDQR();
+                responseToEZDQR.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
+                responseToEZDQR.setErrorMessage(ResponseCodes.RC_OK.toString());
+                responseToEZDQR.setMeshguid(meshGuid);
+                responseToEZDQR.setQr(res.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(responseToEZDQR).build();
+            } catch (Exception e)
+            {
+                logger.error("Error in QR generate service: ", e);
+                result.setErrorCode(ResponseCodes.RC_SERVER_ERROR.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+        } catch (Exception e) {
+            logger.error("Ошибка при генерации ключей для QR кодов\": ", e);
             result.setErrorCode(ResponseCodes.RC_SERVER_ERROR.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }
-        Date startDate = new Date();
-        Date endDate = new Date(startDate.getTime()+TIME_ACTIVE_QR);
-        //Собираем, что подписываем
-        byte[] lenght = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(SIZE_DATE).array();//1 байт
-        byte[] clientId = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(client.getIdOfClient()).array();//4 байта
-        byte[] qrcode = asBytes (UUID.randomUUID());//16 байт
-        byte[] codeCreator = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(1).array();//4 байта
-        byte[] dateStart =  ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(startDate.getTime()).array();//4 байта
-        byte[] dateEnd =  ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(endDate.getTime()).array();//4 байта
-        byte[] sert = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getIdOfCardSign()).array();//4 байта
-        //Здесь сформируется конечный вариант для подписания
-        byte[] qr_data = new byte[37];
-        System.arraycopy(lenght, 3, qr_data, 0, 1);
-        System.arraycopy(clientId, 4, qr_data, 1, 4);
-        System.arraycopy(qrcode, 0, qr_data, 5, 16);
-        System.arraycopy(codeCreator, 0, qr_data, 21, 4);
-        System.arraycopy(dateStart, 0, qr_data, 25, 4);
-        System.arraycopy(dateEnd, 0, qr_data, 29, 4);
-        System.arraycopy(sert, 0, qr_data, 33, 4);
-
-        try {
-            //Достаем приватный ключ для подписи
-            PrivateKey pk = CryptoSign.loadPrivKey(cardSign.getPrivatekeycard());
-            //Подписывание
-            byte[] sign = CryptoSign.sign(qr_data, pk);
-
-            //Сохраняем сгенерированный код
-            ClientEnterQR clientEnterQR = new ClientEnterQR(client, qr_data, startDate, endDate, new Date());
-            DAOService.getInstance().saveQRinfo(clientEnterQR);
-
-            //Переводим в DER кодировку
-            StringBuffer res = new StringBuffer(2*(qr_data.length + sign.length));
-            for(int i=0; i < qr_data.length; i++)
-                res.append(String.format("%02X", qr_data[i]));
-            for(int i=0; i< sign.length; i++)
-                res.append(String.format("%02X", sign[i]));
-
-            //Формируем ответ
-            ResponseToEZDQR responseToEZDQR = new ResponseToEZDQR();
-            responseToEZDQR.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
-            responseToEZDQR.setErrorMessage(ResponseCodes.RC_OK.toString());
-            responseToEZDQR.setMeshguid(meshGuid);
-            responseToEZDQR.setQr(res.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(responseToEZDQR).build();
-        } catch (Exception e)
-        {
-            logger.error("Error in QR generate service: ", e);
-            result.setErrorCode(ResponseCodes.RC_SERVER_ERROR.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
