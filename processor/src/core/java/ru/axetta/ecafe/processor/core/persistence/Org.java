@@ -114,6 +114,11 @@ public class Org implements Serializable {
     private Boolean menusSyncParam;
     private Boolean orgSettingsSyncParam;
     private Boolean clientsSyncParam;
+    private Boolean cardSyncParam;
+    private Boolean photoSyncParam;
+    private Boolean zeroTransactionsSyncParam;
+    private Boolean discountPreordersSyncParam;
+    private Boolean foodApplicationSyncParam;
     private Boolean usePlanOrders;
     private Boolean commodityAccounting;
     private Boolean disableEditingClientsFromAISReestr;
@@ -1325,5 +1330,45 @@ public class Org implements Serializable {
 
     public void setGooddatecheck(Boolean gooddatecheck) {
         this.gooddatecheck = gooddatecheck;
+    }
+
+    public Boolean getCardSyncParam() {
+        return cardSyncParam;
+    }
+
+    public void setCardSyncParam(Boolean cardSyncParam) {
+        this.cardSyncParam = cardSyncParam;
+    }
+
+    public Boolean getPhotoSyncParam() {
+        return photoSyncParam;
+    }
+
+    public void setPhotoSyncParam(Boolean photoSyncParam) {
+        this.photoSyncParam = photoSyncParam;
+    }
+
+    public Boolean getZeroTransactionsSyncParam() {
+        return zeroTransactionsSyncParam;
+    }
+
+    public void setZeroTransactionsSyncParam(Boolean zeroTransactionsSyncParam) {
+        this.zeroTransactionsSyncParam = zeroTransactionsSyncParam;
+    }
+
+    public Boolean getDiscountPreordersSyncParam() {
+        return discountPreordersSyncParam;
+    }
+
+    public void setDiscountPreordersSyncParam(Boolean discountPreordersSyncParam) {
+        this.discountPreordersSyncParam = discountPreordersSyncParam;
+    }
+
+    public Boolean getFoodApplicationSyncParam() {
+        return foodApplicationSyncParam;
+    }
+
+    public void setFoodApplicationSyncParam(Boolean foodApplicationSyncParam) {
+        this.foodApplicationSyncParam = foodApplicationSyncParam;
     }
 }
