@@ -780,7 +780,7 @@ public class GoodRequestsNewReportService {
                 goodsCode = dishCode;
             } else if (complexId != null && complexInfoItem.goodInfos.containsKey(complexId.longValue())) {
                 GoodInfo info = complexInfoItem.goodInfos.get(complexId.longValue());
-                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
+                feedingPlanType = info.feedingPlanType;
                 price = info.price;
             } else {
                 feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
