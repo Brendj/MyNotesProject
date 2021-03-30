@@ -791,7 +791,7 @@ public class EzdController {
                 result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
-            Date startDate = new Date();
+            Date startDate = CalendarUtils.dateInUTC();
             Date endDate = new Date(startDate.getTime()+TIME_ACTIVE_QR);
             //Собираем, что подписываем
             byte[] lenght = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(SIZE_DATE).array();//1 байт
