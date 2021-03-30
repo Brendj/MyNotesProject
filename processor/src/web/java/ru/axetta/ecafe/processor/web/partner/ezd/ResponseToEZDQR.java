@@ -14,6 +14,10 @@ public class ResponseToEZDQR extends Result{
     private String meshguid;
     @JsonProperty("qr")
     private String qr;
+    @JsonProperty("dateFrom")
+    private String dateFrom;
+    @JsonProperty("dateTo")
+    private String dateTo;
 
     public String getMeshguid() {
         return meshguid;
@@ -29,5 +33,21 @@ public class ResponseToEZDQR extends Result{
 
     public void setQr(String qr) {
         this.qr = qr;
+    }
+
+    public String getDateFrom() {
+        return dateFrom;
+    }
+
+    public void setDateFrom(String dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+
+    public String getDateTo() {
+        return dateTo;
+    }
+
+    public void setDateTo(String dateTo) {
+        this.dateTo = dateTo;
     }
 }

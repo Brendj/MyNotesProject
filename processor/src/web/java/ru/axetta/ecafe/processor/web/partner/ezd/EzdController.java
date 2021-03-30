@@ -779,7 +779,7 @@ public class EzdController {
                 result.setErrorMessage(ResponseCodes.RC_NO_ACTIVE_CARD.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
-            ////////////////////
+            //////////////////
             //Получаем ключи или генерируем их
             CardSign cardSign = DAOReadonlyService.getInstance().getSignInform(SERT_NUM_QR);
             if (cardSign == null)
@@ -798,8 +798,8 @@ public class EzdController {
             byte[] clientId = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(client.getIdOfClient()).array();//4 байта
             byte[] qrcode = asBytes (UUID.randomUUID());//16 байт
             byte[] codeCreator = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(1).array();//4 байта
-            byte[] dateStart =  ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(startDate.getTime()).array();//4 байта
-            byte[] dateEnd =  ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(endDate.getTime()).array();//4 байта
+            byte[] dateStart =  ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt((int) (startDate.getTime()/1000)).array();//4 байта
+            byte[] dateEnd =  ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt((int) (endDate.getTime()/1000)).array();//4 байта
             byte[] sert = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getIdOfCardSign()).array();//4 байта
             //Здесь сформируется конечный вариант для подписания
             byte[] qr_data = new byte[37];
@@ -834,6 +834,8 @@ public class EzdController {
                 responseToEZDQR.setErrorMessage(ResponseCodes.RC_OK.toString());
                 responseToEZDQR.setMeshguid(meshGuid);
                 responseToEZDQR.setQr(res.toString());
+                responseToEZDQR.setDateFrom(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startDate));
+                responseToEZDQR.setDateTo(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate));
                 return Response.status(HttpURLConnection.HTTP_OK).entity(responseToEZDQR).build();
             } catch (Exception e)
             {
