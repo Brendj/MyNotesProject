@@ -672,7 +672,10 @@ public class EzdController {
 
             boolean erroringroup = true;
             boolean errorinbetweengroup = true;
+            ClientGroup.Predefined predefined = null;
             if (client.getIdOfClientGroup() != null) {
+                //Получаем предопределенную группу
+                predefined = ClientGroup.Predefined.parse(client.getIdOfClientGroup());
                 //Проверка списка групп
                 String[] idClientsGroup = groups.split(",");
                 for (String idClientGroup : idClientsGroup) {
@@ -729,16 +732,21 @@ public class EzdController {
                 errorinbetweengroup = !errorinbetweengroup;
             }
 
-            boolean erroringage = true;
-            //Проверка маски группы
-            if (client.getAgeTypeGroup() != null) {
-                if (client.getAgeTypeGroup().toLowerCase().contains(ageGroupMask.toLowerCase())) {
-                    erroringage = false;
+            boolean erroringage = false;
+
+            if (predefined == null) {
+                erroringage = true;
+                //Проверка маски группы только для НЕ предопределенных групп
+                if (client.getAgeTypeGroup() != null) {
+                    if (client.getAgeTypeGroup().toLowerCase().contains(ageGroupMask.toLowerCase())) {
+                        erroringage = false;
+                    }
+                }
+                if (Boolean.parseBoolean(ageGroupMaskInverse)) {
+                    erroringage = !erroringage;
                 }
             }
-            if (Boolean.parseBoolean(ageGroupMaskInverse)) {
-                erroringage = !erroringage;
-            }
+
 
             if ((erroringroup && errorinbetweengroup) || erroringage)
             {
