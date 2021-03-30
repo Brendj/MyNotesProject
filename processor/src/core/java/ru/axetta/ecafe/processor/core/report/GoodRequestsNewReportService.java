@@ -427,7 +427,7 @@ public class GoodRequestsNewReportService {
                 final Long price = (null != values[5]) ? ((BigInteger) values[5]).longValue() : null;
 
                 if (isComplex) {
-                    planType = FeedingPlanType.PREORDER;
+                    planType = FeedingPlanType.COMPLEX;
                 } else {
                     if (MENU_DETAIL_TYPE_BREAKFAST.equals(menuDetailType)) {
                         planType = FeedingPlanType.BREAKFAST;
