@@ -6,7 +6,7 @@ package ru.iteco.msp.service;
 
 import ru.iteco.msp.models.Order;
 import ru.iteco.msp.models.dto.SupplyMSPOrders;
-import ru.iteco.msp.repo.OrderRepo;
+import ru.iteco.msp.repo.supply.OrderRepo;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -30,10 +30,6 @@ public class SupplyMSPService {
 
     public SupplyMSPService(OrderRepo orderRepo){
         this.orderRepo = orderRepo;
-    }
-
-    public Integer countOrders(Date begin, Date end){
-        return orderRepo.countDistinctByCreatedDateBetweenAndOrderTypeIn(begin.getTime(), end.getTime(), DISCOUNT_TYPES);
     }
 
     public List<SupplyMSPOrders> getDiscountOrders(Date begin, Date end, Pageable pageable){
