@@ -46,7 +46,6 @@ public class EzdController {
     private static final long TIME_MAX = 39600000; //11:00
     private static final int SERT_NUM_QR =  65536;
     private static final int SIZE_DATE =  37;
-    private static final int TIME_ACTIVE_QR =  300000;
     public static final String KEY_FOR_QR = "ecafe.processor.ezd.qr.key";
     public static final String GROUPS_FOR_QR = "ecafe.processor.ezd.qr.groups";
     public static final String GROUPS_FOR_QR_INVERSE = "ecafe.processor.ezd.qr.groups.inverse";
@@ -54,6 +53,7 @@ public class EzdController {
     public static final String BETWEEN_GROUPS_FOR_QR_INVERSE = "ecafe.processor.ezd.qr.betweengroups.inverse";
     public static final String EGEGROUP_QR_MASK = "ecafe.processor.ezd.qr.agetypegroups.mask";
     public static final String EGEGROUP_QR_MASK_INVERSE = "ecafe.processor.ezd.qr.agetypegroups.mask.inverse";
+    public static final String TIME_ACTIVE_QR = "ecafe.processor.ezd.qr.timeframe";
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -661,6 +661,7 @@ public class EzdController {
             String betweenGroupsInverse = RuntimeContext.getInstance().getConfigProperties().getProperty(BETWEEN_GROUPS_FOR_QR_INVERSE, "");
             String ageGroupMask = RuntimeContext.getInstance().getConfigProperties().getProperty(EGEGROUP_QR_MASK, "");
             String ageGroupMaskInverse = RuntimeContext.getInstance().getConfigProperties().getProperty(EGEGROUP_QR_MASK_INVERSE, "");
+            String timeframe = RuntimeContext.getInstance().getConfigProperties().getProperty(TIME_ACTIVE_QR, "300");
 
             if (groups.isEmpty() || groupsInverse.isEmpty() || ageGroupMask.isEmpty() || ageGroupMaskInverse.isEmpty())
             {
@@ -794,10 +795,17 @@ public class EzdController {
                 result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
+            Integer timeFrameInt;
+            try {
+                timeFrameInt = Integer.parseInt(timeframe);
+            } catch (Exception e)
+            {
+                timeFrameInt = 300;
+            }
             Date startDate = new Date();
-            Date endDate = new Date(startDate.getTime()+TIME_ACTIVE_QR);
+            Date endDate = new Date(startDate.getTime()+timeFrameInt);
             Date startDateUTC = CalendarUtils.dateInUTC();
-            Date endDateUTC = new Date(startDateUTC.getTime()+TIME_ACTIVE_QR);
+            Date endDateUTC = new Date(startDateUTC.getTime()+timeFrameInt);
             //Собираем, что подписываем
             byte[] lenght = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(SIZE_DATE).array();//1 байт
             byte[] clientId = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(client.getIdOfClient()).array();//4 байта
