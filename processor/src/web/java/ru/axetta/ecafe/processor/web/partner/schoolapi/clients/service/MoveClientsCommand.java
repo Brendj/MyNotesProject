@@ -22,13 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Date;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateClientRegistryVersion;
 
 @Service
 class MoveClientsCommand {
-
-    private Logger logger = LoggerFactory.getLogger(MoveClientsCommand.class);
+    private final Logger logger = LoggerFactory.getLogger(MoveClientsCommand.class);
     private final RuntimeContext runtimeContext;
 
     @Autowired
@@ -93,6 +93,7 @@ class MoveClientsCommand {
             if (!StringUtils.isEmpty(error)) {
                 return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
             }
+            client.setUpdateTime(new Date());
             client.setClientRegistryVersion(version);
 
             session.update(client);

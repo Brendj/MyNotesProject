@@ -57,8 +57,8 @@ public class ClientsRestController {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path(value="/plan/exclude")
-    public Response planExclude(ClientsUpdateRequest request){
+    @Path(value = "/plan/exclude")
+    public Response planExclude(ClientsUpdateRequest request) {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
@@ -66,11 +66,22 @@ public class ClientsRestController {
         return Response.ok().entity(response).build();
     }
 
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path(value = "/discounts")
+    public Response updateDiscounts(ClientsUpdateRequest request) {
+        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+            throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        }
+        ClientsUpdateResponse response = getService().updateClientsDiscounts(request.getUpdateClients(), getUser());
+        return Response.ok().entity(response).build();
+    }
+
     private SchoolApiClientsService getService() {
         return RuntimeContext.getAppContext().getBean(SchoolApiClientsService.class);
     }
 
-    private boolean hasAnyRole(String... role){
+    private boolean hasAnyRole(String... role) {
         AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
         return authorityUtils.hasAnyRole(role);
     }

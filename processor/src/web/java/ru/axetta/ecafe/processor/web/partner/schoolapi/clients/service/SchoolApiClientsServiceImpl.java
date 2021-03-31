@@ -23,6 +23,9 @@ public class SchoolApiClientsServiceImpl implements SchoolApiClientsService {
     private ExcludeFromPlanCommand excludeFromPlanCommand;
     @Autowired
     private UpdateClientCommand updateClientCommand;
+    @Autowired
+    private UpdateClientCategoriesCommand updateClientCategoriesCommand;
+
 
     @Override
     public ClientsUpdateResponse moveClients(Collection<ClientUpdateItem> moveClientToGroups, User user) throws WebApplicationException {
@@ -37,6 +40,11 @@ public class SchoolApiClientsServiceImpl implements SchoolApiClientsService {
     @Override
     public ClientUpdateResult updateClient(Long idOfClient, ClientUpdateItem request, User user) {
         return updateClientCommand.updateClient(idOfClient, request, user);
+    }
+
+    @Override
+    public ClientsUpdateResponse updateClientsDiscounts(Collection<ClientUpdateItem> updateClients, User user) {
+        return updateClientCategoriesCommand.updateDiscounts(updateClients, user);
     }
 
 }

@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ClientUpdateItem {
     private Long idOfClient;
@@ -17,6 +19,7 @@ public class ClientUpdateItem {
     private Date birthDate;
     private Boolean confirmVisualRecognition;
     private String mobile;
+    private List<Long> categoriesDiscounts = new ArrayList<>();
 
     public Long getIdOfClient() {
         return idOfClient;
@@ -96,5 +99,13 @@ public class ClientUpdateItem {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public List<Long> getCategoriesDiscounts() {
+        return categoriesDiscounts;
+    }
+
+    public void setCategoriesDiscounts(List<Long> categoriesDiscounts) {
+        this.categoriesDiscounts = categoriesDiscounts;
     }
 }

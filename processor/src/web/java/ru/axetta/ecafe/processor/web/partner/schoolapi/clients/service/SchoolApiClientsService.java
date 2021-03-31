@@ -18,4 +18,6 @@ public interface SchoolApiClientsService {
     ClientsUpdateResponse excludeClientsFromPlan(Collection<ClientUpdateItem> updateClients);
 
     ClientUpdateResult updateClient(Long idOfClient, ClientUpdateItem request, User user);
+
+    ClientsUpdateResponse updateClientsDiscounts(Collection<ClientUpdateItem> updateClients, User user);
 }

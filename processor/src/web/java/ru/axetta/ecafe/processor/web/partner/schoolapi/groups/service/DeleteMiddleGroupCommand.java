@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -98,6 +99,7 @@ class DeleteMiddleGroupCommand {
     private void resetMiddleGroup(Session session, Client client, long version) {
         // сброс подгруппы для клиента
         client.setMiddleGroup(null);
+        client.setUpdateTime(new Date());
         client.setClientRegistryVersion(version);
         session.update(client);
     }

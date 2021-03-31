@@ -24,8 +24,7 @@ import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateCl
 
 @Service
 class UpdateClientCommand {
-
-    private Logger logger = LoggerFactory.getLogger(UpdateClientCommand.class);
+    private final Logger logger = LoggerFactory.getLogger(UpdateClientCommand.class);
     private final RuntimeContext runtimeContext;
     private final MoveClientsCommand moveClientsCommand;
     private static final int NOT_FOUND = 404, BAD_PARAMS = 400;
@@ -53,6 +52,7 @@ class UpdateClientCommand {
             setConfirmVideo(request.getConfirmVisualRecognition(), client);
             setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(), client);
             setGroupAndMiddleGroup(request, client, session, user);
+            client.setUpdateTime(new Date());
             client.setClientRegistryVersion(version);
             session.update(client);
             session.flush();

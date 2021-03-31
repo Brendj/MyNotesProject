@@ -5,7 +5,11 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.clients.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateItem;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateResult;
@@ -17,25 +21,24 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateClientRegistryVersion;
 
-@Service
-class ExcludeFromPlanCommand {
-    private final Logger logger = LoggerFactory.getLogger(ExcludeFromPlanCommand.class);
+@Component
+class UpdateClientCategoriesCommand {
+
+    private final Logger logger = LoggerFactory.getLogger(UpdateClientCategoriesCommand.class);
     private final RuntimeContext runtimeContext;
 
     @Autowired
-    public ExcludeFromPlanCommand(RuntimeContext runtimeContext) {
+    public UpdateClientCategoriesCommand(RuntimeContext runtimeContext) {
         this.runtimeContext = runtimeContext;
     }
 
-    public ClientsUpdateResponse excludeClients(Collection<ClientUpdateItem> updateClients) throws
-            WebApplicationException {
+    public ClientsUpdateResponse updateDiscounts(Collection<ClientUpdateItem> updateClients, User user) {
         ClientsUpdateResponse result = new ClientsUpdateResponse();
         if (updateClients.size() == 0) {
             return result;
@@ -43,7 +46,7 @@ class ExcludeFromPlanCommand {
         try {
             long version = updateClientRegistryVersion(null);
             for (ClientUpdateItem item : updateClients) {
-                ClientUpdateResult updateResult = excludeClientFromPlan(item, version);
+                ClientUpdateResult updateResult = updateDiscountsForClient(item, version, user);
                 result.getClients().add(updateResult);
             }
         } catch (Exception e) {
@@ -53,7 +56,7 @@ class ExcludeFromPlanCommand {
         return result;
     }
 
-    private ClientUpdateResult excludeClientFromPlan(ClientUpdateItem item, long version) {
+    private ClientUpdateResult updateDiscountsForClient(ClientUpdateItem item, long version, User user) {
         Session session = null;
         Transaction transaction = null;
 
@@ -67,10 +70,18 @@ class ExcludeFromPlanCommand {
                         String.format("Client with ID='%d' not found", item.getIdOfClient()));
             }
 
-            client.setDisablePlanCreationDate(item.getStartExcludeDate());
-            client.setDisablePlanEndDate(item.getEndExcludedDate());
-            client.setUpdateTime(new Date());
-            client.setClientRegistryVersion(version);
+            Set<CategoryDiscount> oldCategoriesDiscounts = client.getCategories();
+            Set<CategoryDiscount> newCategoriesDiscounts = getNewCategoryDiscounts(item, session);
+
+            if (!newCategoriesDiscounts.equals(oldCategoriesDiscounts)) {
+                client.setCategories(newCategoriesDiscounts);
+                DiscountManager.saveDiscountHistory(session, client, client.getOrg(), oldCategoriesDiscounts,
+                        newCategoriesDiscounts, client.getDiscountMode(), client.getDiscountMode(),
+                        DiscountChangeHistory.MODIFY_IN_WEB_ARM.concat(user != null ? user.getUserName() : ""));
+                client.setLastDiscountsUpdate(new Date());
+                client.setUpdateTime(new Date());
+                client.setClientRegistryVersion(version);
+            }
 
             session.update(client);
             session.flush();
@@ -83,6 +94,18 @@ class ExcludeFromPlanCommand {
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+    }
+
+    private Set<CategoryDiscount> getNewCategoryDiscounts(ClientUpdateItem item, Session session) {
+        List<Long> categoriesIds = item.getCategoriesDiscounts();
+        if (!categoriesIds.isEmpty()) {
+            return new HashSet<CategoryDiscount>(
+                    session.createQuery("select cd from CategoryDiscount cd where idOfCategoryDiscount in :categoryIds")
+                            .setParameterList("categoryIds", categoriesIds).list());
+
+        } else {
+            return new HashSet<CategoryDiscount>();
         }
     }
 
