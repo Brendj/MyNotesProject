@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2634,6 +2634,41 @@ public class DAOUtils {
 
     public static void savePreorderDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
         Query query = session.createQuery("update Org set preorderSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveCardDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set cardSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveFoodApplicationDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set foodApplicationSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void savePhotoDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set photoSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveZeroTransactionsDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set zeroTransactionsSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveDiscountPreordersDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set discountPreordersSyncParam = :value where id = :idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
