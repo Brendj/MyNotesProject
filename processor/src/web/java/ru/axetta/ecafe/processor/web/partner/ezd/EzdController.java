@@ -782,8 +782,11 @@ public class EzdController {
             //////////////////
             //Получаем ключи или генерируем их
             CardSign cardSign = DAOReadonlyService.getInstance().getSignInform(SERT_NUM_QR);
-            if (cardSign == null)
+            if (cardSign == null) {
                 cardSign = generatorKey();
+                DAOService.getInstance().setCardSignID(cardSign, SERT_NUM_QR);
+                cardSign = DAOReadonlyService.getInstance().getSignInform(SERT_NUM_QR);
+            }
             if (cardSign == null)
             {
                 logger.error("Внутренняя ошибка при генерации ключей для QR-кодов");
@@ -791,15 +794,17 @@ public class EzdController {
                 result.setErrorMessage(ResponseCodes.RC_SERVER_ERROR.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
-            Date startDate = CalendarUtils.dateInUTC();
+            Date startDate = new Date();
             Date endDate = new Date(startDate.getTime()+TIME_ACTIVE_QR);
+            Date startDateUTC = CalendarUtils.dateInUTC();
+            Date endDateUTC = new Date(startDateUTC.getTime()+TIME_ACTIVE_QR);
             //Собираем, что подписываем
             byte[] lenght = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(SIZE_DATE).array();//1 байт
             byte[] clientId = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(client.getIdOfClient()).array();//4 байта
             byte[] qrcode = asBytes (UUID.randomUUID());//16 байт
             byte[] codeCreator = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(1).array();//4 байта
-            byte[] dateStart =  ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt((int) (startDate.getTime()/1000)).array();//4 байта
-            byte[] dateEnd =  ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt((int) (endDate.getTime()/1000)).array();//4 байта
+            byte[] dateStart =  ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt((int) (startDateUTC.getTime()/1000)).array();//4 байта
+            byte[] dateEnd =  ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt((int) (endDateUTC.getTime()/1000)).array();//4 байта
             byte[] sert = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getIdOfCardSign()).array();//4 байта
             //Здесь сформируется конечный вариант для подписания
             byte[] qr_data = new byte[37];
@@ -882,6 +887,7 @@ public class EzdController {
             cardSign.setPrivatekeycard(privateKey.getEncoded());
             cardSign.setNewtypeprovider(true);
             session.save(cardSign);
+
             transaction.commit();
             transaction = null;
             logger.info("Созданы приватный и открытый ключи для QR кодов");
