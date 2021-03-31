@@ -4982,13 +4982,10 @@ public class Processor implements SyncProcessor {
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     long totalRSum = totalBuffetRSum + totalLunchRSum;
                     long totalAmountBuyAll = totalBuffetRSum + totalLunchRSum;
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_PRICE,
-                            Long.toString(totalBuffetRSum / 100) + ',' + Long.toString(totalBuffetRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_LUNCH,
-                            Long.toString(totalLunchRSum / 100) + ',' + Long.toString(totalLunchRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT,
-                            Long.toString(totalRSum / 100) + ',' + Long.toString(totalRSum % 100), values);
-                    values = EventNotificationService.attachAmountBuyAllToValues(totalAmountBuyAll, values);
+                    values = EventNotificationService.attachMoneyToValues(totalBuffetRSum, values, EventNotificationService.PARAM_AMOUNT_PRICE);
+                    values = EventNotificationService.attachMoneyToValues(totalLunchRSum, values, EventNotificationService.PARAM_AMOUNT_LUNCH);
+                    values = EventNotificationService.attachMoneyToValues(totalRSum, values, EventNotificationService.PARAM_AMOUNT);
+                    values = EventNotificationService.attachMoneyToValues(totalAmountBuyAll, values, EventNotificationService.PARAM_AMOUNT_BUY_ALL);
                     if (client.getBalance() != null) {
                         values = EventNotificationService.attachToValues("balance",
                                 Long.toString(client.getBalance() / 100) + ',' + Long
