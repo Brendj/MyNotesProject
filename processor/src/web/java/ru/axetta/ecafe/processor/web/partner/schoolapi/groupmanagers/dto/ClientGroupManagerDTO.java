@@ -15,6 +15,8 @@ public class ClientGroupManagerDTO {
     private String groupName;
     private Long idOfClientGroup;
     private Long idOfOrg;
+    private String clientName;
+    private String shortAddress;
 
     public static ClientGroupManagerDTO from(ClientGroupManager clientGroupManager) {
         if (clientGroupManager == null) return null;
@@ -72,5 +74,21 @@ public class ClientGroupManagerDTO {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 }
