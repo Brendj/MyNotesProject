@@ -5,17 +5,17 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.ContragentPreordersReport;
+import ru.axetta.ecafe.processor.core.report.ComplexMenuReport;
+import ru.axetta.ecafe.processor.core.report.ComplexMenuReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -29,7 +29,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,16 +45,18 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         ContragentSelectPage.CompleteHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(ComplexMenuReportPage.class);
-    public String getPageFilename() {
-        return "report/online/complex_menu_report";
-    }
     private Contragent contragent;
-    private Long selectidTypeFoodId;
+    private Long selectIdTypeFoodId;
     private Long selectDiet;
-    private Long selectidAgeGroup;
+    private Long selectIdAgeGroup;
     private Long selectArchived;
     private String orgFilter = "Не выбрано";
     private final String CLASS_TYPE_TSP = Integer.toString(Contragent.TSP);
+    List<ComplexMenuReportItem> result;
+
+    public String getPageFilename() {
+        return "report/online/complex_menu_report";
+    }
 
     public String getClassTypeTSP(){
         return CLASS_TYPE_TSP;
@@ -86,21 +91,83 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         return null;
     }
 
+    public void exportToXLS() {
+        if (!validateFormData()) {
+            return;
+        }
+        BasicReportJob report = buildReport();
+        if (report != null) {
+            try {
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                        .getResponse();
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                response.setHeader("Content-disposition", "inline;filename=complex_menu_report.xls");
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.flush();
+                servletOutputStream.close();
+            } catch (Exception e) {
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
+            }
+        }
+    }
+
+    public void buildForJsf(){
+        ComplexMenuReport.Builder builder = new ComplexMenuReport.Builder();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Transaction persistenceTransaction = null;
+        Session persistenceSession = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List<String> stringOrgList = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
+            List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
+
+            for (String idOfOrg : stringOrgList) {
+                idOfOrgList.add(Long.parseLong(idOfOrg));
+            }
+
+            result = builder.createDataSource(persistenceSession, getContragent(),  idOfOrgList, selectIdTypeFoodId, selectDiet, selectIdAgeGroup, selectArchived );
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
     private BasicReportJob buildReport(){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
-            ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
+            ComplexMenuReport.Builder builder = new ComplexMenuReport.Builder();
             builder.setContragent(this.contragent);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+            builder.getReportProperties().setProperty("selectIdTypeFoodId", selectIdTypeFoodId.toString());
+            builder.getReportProperties().setProperty("selectDiet", selectDiet.toString());
+            builder.getReportProperties().setProperty("selectIdAgeGroup", selectIdAgeGroup.toString());
+            builder.getReportProperties().setProperty("selectArchived", selectArchived.toString());
+
 
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -177,14 +244,13 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         return null;
     }
 
-
-    public SelectItem[] getTypesOfFood() {
-        List<WtGroupItem> wtGroupItems = DAOService.getInstance().getMapTypeFoods();
-        SelectItem[] items = new SelectItem[wtGroupItems.size() + 1];
+    public SelectItem[] getTypesOfComplexFood() {
+        List<WtComplexGroupItem> wtGroupComplex = DAOService.getInstance().getTypeComplexFood();
+        SelectItem[] items = new SelectItem[wtGroupComplex.size() + 1];
         items[0] = new SelectItem(-1, "Не выбрано");
         int n = 1;
-        for (WtGroupItem wtGroupItem : wtGroupItems) {
-            items[n] = new SelectItem(wtGroupItem.getIdOfGroupItem(), wtGroupItem.getDescription());
+        for (WtComplexGroupItem wtComplexItem : wtGroupComplex) {
+            items[n] = new SelectItem(wtComplexItem.getIdOfComplexGroupItem(), wtComplexItem.getDescription());
             ++n;
         }
         return items;
@@ -214,12 +280,30 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         return items;
     }
 
-    public SelectItem[] getArchiveds() {
+    public SelectItem[] getArchived() {
         SelectItem[] items = new SelectItem[3];
-        items[0] = new SelectItem(1, "Без архивных");
-        items[1] = new SelectItem(2, "Включая архивные");
-        items[2] = new SelectItem(3, "Только архивные");
+        items[0] = new SelectItem(0, "Без архивных");
+        items[1] = new SelectItem(-1, "Включая архивные");
+        items[2] = new SelectItem(1, "Только архивные");
         return items;
+    }
+
+    public List<ComplexMenuReportItem> getResult() {
+        return result;
+    }
+
+    public void setResult(List<ComplexMenuReportItem> result) {
+        this.result = result;
+    }
+
+    @Override
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    @Override
+    public void setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
     }
 
     public Long getSelectArchived() {
@@ -230,20 +314,20 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         this.selectArchived = selectArchived;
     }
 
-    public Long getSelectidAgeGroup() {
-        return selectidAgeGroup;
+    public Long getSelectIdAgeGroup() {
+        return selectIdAgeGroup;
     }
 
-    public void setSelectidAgeGroup(Long selectidAgeGroup) {
-        this.selectidAgeGroup = selectidAgeGroup;
+    public void setSelectIdAgeGroup(Long selectIdAgeGroup) {
+        this.selectIdAgeGroup = selectIdAgeGroup;
     }
 
-    public Long getSelectidTypeFoodId() {
-        return selectidTypeFoodId;
+    public Long getSelectIdTypeFoodId() {
+        return selectIdTypeFoodId;
     }
 
-    public void setSelectidTypeFoodId(Long selectidTypeFoodId) {
-        this.selectidTypeFoodId = selectidTypeFoodId;
+    public void setSelectIdTypeFoodId(Long selectidTypeFoodId) {
+        this.selectIdTypeFoodId = selectidTypeFoodId;
     }
 
     public Long getSelectDiet() {

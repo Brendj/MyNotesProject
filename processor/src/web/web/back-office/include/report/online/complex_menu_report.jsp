@@ -49,8 +49,8 @@
         </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Выбор типа питания" />
-        <h:selectOneMenu value="#{mainPage.complexMenuReportPage.selectidTypeFoodId}" >
-            <f:selectItems value="#{mainPage.complexMenuReportPage.getTypesOfFood()}"/>
+        <h:selectOneMenu value="#{mainPage.complexMenuReportPage.selectIdTypeFoodId}" >
+            <f:selectItems value="#{mainPage.complexMenuReportPage.getTypesOfComplexFood()}"/>
         </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Выбор рациона" />
@@ -59,47 +59,90 @@
         </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Выбор возрастной группы" />
-        <h:selectOneMenu value="#{mainPage.complexMenuReportPage.selectidAgeGroup}" >
+        <h:selectOneMenu value="#{mainPage.complexMenuReportPage.selectIdAgeGroup}" >
             <f:selectItems value="#{mainPage.complexMenuReportPage.getAgeGroup()}"/>
         </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Архивные" />
         <h:selectOneMenu value="#{mainPage.complexMenuReportPage.selectArchived}" >
-            <f:selectItems value="#{mainPage.complexMenuReportPage.getArchiveds()}"/>
+            <f:selectItems value="#{mainPage.complexMenuReportPage.getArchived()}"/>
         </h:selectOneMenu>
-
-        <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.complexMenuReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDateCalendar"
-                         actionListener="#{mainPage.contragentPreordersReportPage.onReportPeriodChanged}" />
-        </rich:calendar>
-
-        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
-        <h:selectOneMenu id="endDatePeriodSelect"
-                         value="#{mainPage.complexMenuReportPage.periodTypeMenu.periodType}"
-                         styleClass="input-text" style="width: 250px;">
-            <f:converter converterId="periodTypeConverter" />
-            <f:selectItems value="#{mainPage.complexMenuReportPage.periodTypeMenu.items}" />
-            <a4j:support event="onchange" reRender="endDateCalendar"
-                         actionListener="#{mainPage.complexMenuReportPage.onReportPeriodChanged}" />
-        </h:selectOneMenu>
-        <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-        <rich:calendar id="endDateCalendar" value="#{mainPage.complexMenuReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDatePeriodSelect"
-                         actionListener="#{mainPage.complexMenuReportPage.onEndDateSpecified}" />
-        </rich:calendar>
 
     </h:panelGrid>
 
     <h:panelGrid columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.complexMenuReportPage.buildHTMLReport}"
-                           reRender="contragentPreordersReportTablePanel" styleClass="command-button" status="reportGenerateStatus" />
+
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.complexMenuReportPage.buildForJsf}"
+                           reRender="complexMenuReportTablePanel" styleClass="command-button" status="reportGenerateStatus" />
+
         <h:commandButton value="Генерировать отчет в Excel"
                          action="#{mainPage.complexMenuReportPage.exportToXLS}"
                          styleClass="command-button" />
     </h:panelGrid>
 
+    <a4j:status id="reportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
+    <h:panelGrid styleClass="borderless-grid" id="complexMenuReportTablePanel">
+        <c:if test="${not empty mainPage.complexMenuReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по комплексам" styleClass="output-text" />
+            <f:verbatim>
+                <div class="htmlReportContent"> ${mainPage.complexMenuReportPage.htmlReport} </div>
+            </f:verbatim>
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+        </c:if>
+    </h:panelGrid>
+
+    <rich:dataTable id="complexMenuReportTable" value="#{mainPage.complexMenuReportPage.result}"
+                    var="item" rows="25"
+                    footerClass="data-table-footer" >
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ОО" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Количество" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Тип питания" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Возрастная категория" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Комплекс" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Цена" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Передавать внешним системам" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Даты действия" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Циклическое наполнение" />
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:subTable value="#{item.complexItem}" var="complex" rowKeyVar="rowComplexKey">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="item.idOfOrg" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
+                </rich:column>
+            </rich:subTable>
+    </rich:dataTable>
 
 </h:panelGrid>

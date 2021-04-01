@@ -3169,6 +3169,11 @@ public class DAOService {
         return q.getResultList();
     }
 
+    public List<WtComplexGroupItem> getTypeComplexFood() {
+        Query q = entityManager.createQuery("SELECT wtComplex from WtComplexGroupItem wtComplex");
+        return q.getResultList();
+    }
+
     public List<WtDietType> getMapDiet() {
         Query q = entityManager.createQuery("SELECT wtDiet from WtDietType wtDiet");
         return q.getResultList();
