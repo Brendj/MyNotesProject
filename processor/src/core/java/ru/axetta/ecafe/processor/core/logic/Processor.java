@@ -3692,19 +3692,21 @@ public class Processor implements SyncProcessor {
         //info messages
         processInfoMessageSections(request, responseSections);
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.96")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         try {
@@ -5237,7 +5239,7 @@ public class Processor implements SyncProcessor {
                 return;
             }
 
-            if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
+            if (!orgMap.containsKey(client.getOrg().getIdOfOrg())) {
                 if (!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient())
                         .size() > 0)) {
                     if (!allocatedClients.contains(clientParamItem.getIdOfClient())) {
