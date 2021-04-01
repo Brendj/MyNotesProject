@@ -752,7 +752,7 @@ public class DAOReadonlyService {
 
     public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
         try {
-            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and ce.kafka<>true");
+            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and (ce.kafka is null or ce.kafka is false)");
             query.setParameter("vers", maxVersion);
             List<EMIAS> emias = query.getResultList();
             //Фильтрация по орг
