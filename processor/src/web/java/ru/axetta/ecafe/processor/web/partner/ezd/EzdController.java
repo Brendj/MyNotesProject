@@ -802,6 +802,8 @@ public class EzdController {
             {
                 timeFrameInt = 300;
             }
+            //Перевод в мс
+            timeFrameInt = timeFrameInt * 1000;
             Date startDate = new Date();
             Date endDate = new Date(startDate.getTime()+timeFrameInt);
             Date startDateUTC = CalendarUtils.dateInUTC();
