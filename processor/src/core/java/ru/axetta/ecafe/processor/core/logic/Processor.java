@@ -2217,7 +2217,6 @@ public class Processor implements SyncProcessor {
         processMigrantsSections(request, syncHistory, responseSections, null);
         if (request.getClientRegistryRequest() == null)
             processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
-        processAccRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccountRegistrySectionsForMigrants(request, syncHistory, responseSections);
         if (request.getClientGuardianRequest() == null)
             processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
@@ -2252,22 +2251,6 @@ public class Processor implements SyncProcessor {
             String message = String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }
-    }
-
-    private void processAccRegistrySectionsForMigrants(SyncRequest request, SyncHistory syncHistory,
-            List<AbstractToElement> responseSections) {
-        SyncResponse.AccRegistry accRegistryForMigrants;
-        try {
-            accRegistryForMigrants = getAccRegistryForMigrants(request.getIdOfOrg());
-            addToResponseSections(accRegistryForMigrants, responseSections);
-        } catch (Exception e) {
-            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            if (syncHistory != null) {
-                processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory,
-                        message);
-            }
             logger.error(message, e);
         }
     }
