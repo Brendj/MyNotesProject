@@ -204,6 +204,12 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="Ид НСИ-3" />
+                        </f:facet>
+                        <h:outputText value="#{org.globalId}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="ЕКИС ид" />
                         </f:facet>
                         <h:outputText value="#{org.ekisId}" escape="false" />

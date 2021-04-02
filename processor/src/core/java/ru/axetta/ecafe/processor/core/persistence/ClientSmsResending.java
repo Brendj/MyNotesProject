@@ -27,6 +27,7 @@ public class ClientSmsResending {
     private Date lastResendingDate;
     private Date eventTime;
     private Long idOfOrg;
+    private String nodeName;
 
     public ClientSmsResending() {
         // For Hibernate only
@@ -234,5 +235,13 @@ public class ClientSmsResending {
                 ", createDate=" + createDate +
                 ", lastResendingDate=" + lastResendingDate +
                 '}';
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 }

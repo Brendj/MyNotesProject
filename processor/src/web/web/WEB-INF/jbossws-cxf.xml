@@ -128,6 +128,9 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             <bean class="ru.axetta.ecafe.processor.web.util.RemoveSecurityHeaderSoapInterceptor"/>
             <bean class="ru.axetta.ecafe.processor.web.util.ClientRoomControllerLoggingInterceptor"/>
         </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <bean class="ru.axetta.ecafe.processor.web.util.ClientRoomControllerLoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
     </jaxws:endpoint>
     <jaxws:endpoint
             id="DashboardServiceWS"

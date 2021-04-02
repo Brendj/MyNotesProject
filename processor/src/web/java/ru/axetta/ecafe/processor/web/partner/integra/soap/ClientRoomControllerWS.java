@@ -4772,14 +4772,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
         }
-        if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit)) {
-            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-        } else {
-            Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
-            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                    idOfClient, handler.getData().getOperationType());
+        try {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit, version)) {
+                r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            } else {
+                Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+                handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                        idOfClient, handler.getData().getOperationType());
+            }
+            return r;
+        } catch (Exception e) {
+            logger.error("Error in changeExpenditureLimit: ", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         }
-        return r;
     }
 
     @Override
@@ -6365,7 +6371,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
                 return r;
             }
-            if (!daoService.setClientExpenditureLimit(contractId, limit)) {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!daoService.setClientExpenditureLimit(contractId, limit, version)) {
                 r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
@@ -9836,6 +9843,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
         } catch (Exception e) {
             logger.error("Error in setPreorderAllowed", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result setInformedSpecialMenuForClient(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            ClientManager.setInformedSpecialMenu(session, client, client.isStudent());
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setInformedSpecialMenu", e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
