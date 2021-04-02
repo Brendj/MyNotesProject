@@ -524,10 +524,11 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
-    public boolean setClientExpenditureLimit(Long contractId, long limit) {
+    public boolean setClientExpenditureLimit(Long contractId, long limit, long version) {
         Query q = entityManager
-                .createQuery("update Client set expenditureLimit=:expenditureLimit where contractId=:contractId");
+                .createQuery("update Client set expenditureLimit=:expenditureLimit, clientRegistryVersion = :version where contractId=:contractId");
         q.setParameter("expenditureLimit", limit);
+        q.setParameter("version", version);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
@@ -1006,9 +1007,9 @@ public class DAOService {
         return findOrgByRegistryDataByMainField(uniqueAddressId, "guid", guid, inn, unom, unad, skipThirdPart);
     }
 
-    public List<Org> findOrgsByEkisId(Long ekisId) {
-        Query q = entityManager.createQuery("select org from Org org where org.ekisId = :ekisId");
-        q.setParameter("ekisId", ekisId);
+    public List<Org> findOrgsByNSIId(Long nsiId) {
+        Query q = entityManager.createQuery("select org from Org org where org.orgIdFromNsi = :nsiId");
+        q.setParameter("nsiId", nsiId);
         return q.getResultList();
     }
 
@@ -2868,8 +2869,8 @@ public class DAOService {
                 .setParameter("idOfOption", new Long(Option.OPTION_LAST_ORG_CHANGE_PROCESS)).executeUpdate();
     }
 
-    public void saveLogServiceMessage(String message, LogServiceType type) {
-        LogService logService = new LogService(type, message);
+    public void saveLogServiceMessage(String message, String response, LogServiceType type) {
+        LogService logService = new LogService(type, message, response);
         entityManager.merge(logService);
     }
 
@@ -2887,7 +2888,7 @@ public class DAOService {
 
     public List findEMIASbyClientandBeetwenDates(Client client, Date startDate, Date endDate) {
         Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
-                + "and em.dateLiberate between :begDate and :endDate ");
+                + "and em.dateLiberate between :begDate and :endDate and em.kafka<>true");
         query.setParameter("guid", client.getClientGUID());
         query.setParameter("begDate", startDate);
         query.setParameter("endDate", endDate);
@@ -3131,14 +3132,6 @@ public class DAOService {
         return DAOUtils.getComplexesByWtDiscountRule(entityManager, discountRule);
     }
 
-    public List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryDiscountsByWtDiscountRule(entityManager, discountRule);
-    }
-
-    public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
-    }
-
     public CodeMSP findCodeNSPByCode(Integer code) {
         if(code == null){
             return null;
@@ -3172,6 +3165,13 @@ public class DAOService {
     public List<WtAgeGroupItem> getAgeGroups() {
         Query q = entityManager.createQuery("SELECT wtAge FROM WtAgeGroupItem wtAge");
         return q.getResultList();
+    }
+    public void updateExemptionVisiting() {
+        Query query = entityManager.createQuery(
+                "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate");
+        query.setParameter("currentDate", CalendarUtils.startOfDay(new Date()));
+        query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
+        query.executeUpdate();
     }
 }
 

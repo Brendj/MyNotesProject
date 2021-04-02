@@ -99,16 +99,18 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     @Override
     public String buildText(boolean buildWithParams) {
-        if(text == null || text.trim().length() < 1) {
-            return "";
+        if(params == null || params.isEmpty()) {
+            return "empty";
         }
 
-        String result = new String(text);
+        StringBuilder result = new StringBuilder();
         for(String k : params.keySet()) {
             String v = params.get(k);
-            result = result.replaceAll("%" + k + "%", v);
+            if (v == null)
+                v = new String(" ");
+            result.append("param:").append(k).append(";value:").append(v).append(";");
         }
-        return result;
+        return result.toString();
     }
 
     protected void parseClientSimpleInfo(Client client, int type) {

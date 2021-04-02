@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,20 +54,6 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
                 .setParameter("idOfOrg", idOfOrg)
                 .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue())
                 .setParameter("idOfDisplacedGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
-
-        return query.getResultList();
-    }
-
-
-    public List<Client> findAllActiveByOrgAndUpdateDate(List<Long> idOfOrgs, Date lastAccRegistrySync) {
-        Query query = entityManager
-                .createQuery("select c from Client c where c.org.idOfOrg in (:idOfOrgs) "
-                        + " and (c.idOfClientGroup < :idOfClientGroup or c.idOfClientGroup = :idOfDisplacedGroup) "
-                        + " and c.updateTime >  :lastAccRegistrySync ")
-                .setParameter("idOfOrgs", idOfOrgs)
-                .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue())
-                .setParameter("idOfDisplacedGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue())
-                .setParameter("lastAccRegistrySync", lastAccRegistrySync);
 
         return query.getResultList();
     }

@@ -172,22 +172,6 @@ public class Staff extends DistributedObject {
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        Criteria criteria = session.createCriteria(Staff.class);
-        criteria.add(Restrictions.eq("hashCode", getHashCode()));
-        criteria.add(Restrictions.ne("guid", guid));
-        Staff staff = null;
-        List list = criteria.list();
-        session.clear();
-        if(list!=null && !list.isEmpty()){
-            staff = (Staff) list.get(0);
-        }
-        if(!(staff==null || staff.getDeletedState() || guid.equals(staff.getGuid()))){
-            DistributedObjectException distributedObjectException =  new DistributedObjectException("Staff DATA_EXIST_VALUE");
-            distributedObjectException.setData(staff.getGuid());
-            throw distributedObjectException;
-        }
-        //if(getTagName().equals("C")){
-      //  }
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class ClientDiscountHistoryService {
 
     public void saveClientDiscountHistoryByOldScheme(Session session, Client client,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment){
-        ClientDiscountHistory history = null;
+        List<ClientDiscountHistory> histories = new LinkedList<>();
         if(!oldDiscounts.equals(newDiscounts)) {
             List<CategoryDiscount> disjunctions = (List<CategoryDiscount>) CollectionUtils
                     .disjunction(newDiscounts, oldDiscounts);
@@ -32,7 +33,7 @@ public class ClientDiscountHistoryService {
                 ClientDiscountHistoryOperationTypeEnum type = ClientDiscountHistoryOperationTypeEnum
                         .getType(oldDiscounts, newDiscounts, uncommon);
 
-                history = ClientDiscountHistory.build(client, comment, uncommon, type);
+                histories.add(ClientDiscountHistory.build(client, comment, uncommon, type));
 
             }
         } else {
@@ -42,12 +43,14 @@ public class ClientDiscountHistoryService {
                 discount = (CategoryDiscount) session.merge(discount);
                 ClientDtisznDiscountInfo info = getInfoByDiscount(client.getCategoriesDSZN(), discount);
                 if(info != null && CalendarUtils.betweenDate(info.getLastUpdate(), begin, end)){
-                    history = ClientDiscountHistory.build(client, comment, discount,
-                            ClientDiscountHistoryOperationTypeEnum.CHANGE);
+                    histories.add(ClientDiscountHistory.build(client, comment, discount,
+                            ClientDiscountHistoryOperationTypeEnum.CHANGE));
                 }
             }
         }
-        session.save(history);
+        for(ClientDiscountHistory h :histories) {
+            session.save(h);
+        }
     }
 
     private ClientDtisznDiscountInfo getInfoByDiscount(Set<ClientDtisznDiscountInfo> categoriesDSZN,

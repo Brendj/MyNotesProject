@@ -119,6 +119,11 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Отправка уведомлений об отмене предзаказа выполнена");
     }
 
+    public void archvedExeption() throws Exception {
+        ArchivedExeptionService.archivedExeption.manualStart();
+        printMessage("Архивирование событий выполнено");
+    }
+
     public void runImportRegisterClients() throws Exception {
         RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                 .run(); //DEF
