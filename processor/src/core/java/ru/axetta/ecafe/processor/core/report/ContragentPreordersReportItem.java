@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import java.util.Date;
+import java.util.List;
 
 public class ContragentPreordersReportItem {
     private Long idOfContragent;
@@ -16,7 +17,8 @@ public class ContragentPreordersReportItem {
     private Date preorderDate;
     private String complexName;
     private Integer amount;
-    private String dish;
+    private String paidDish;
+    private String notPaidDish;
     private Long complexPrice;
     private Date cancelDate;
     private String reversed;
@@ -25,11 +27,18 @@ public class ContragentPreordersReportItem {
     private String idOfOrder;
     private String isPaid;
     private Long usedSum;
+    private String psStatus;
+    private String weekend;
+    private List<ContragentPreordersSubreportItem> subReportItem;
+
+    public ContragentPreordersReportItem(List<ContragentPreordersSubreportItem> subReportItem) {
+        this.subReportItem = subReportItem;
+    }
 
     public ContragentPreordersReportItem(Long idOfContragent, String contragentName, Long idOfOrg, String orgShortName,
             String orgShortAddress, Long clientContractId, Date preorderDate, String complexName, Integer amount,
-            String dish, Long complexPrice, Date cancelDate, String reversed, Date createdDate,
-            Long orderSum, Long idOfOrder, String isPaid, Long usedSum) {
+            String paidDish, String notPaidDish, Long complexPrice, Date cancelDate, String reversed, Date createdDate,
+            Long orderSum, Long idOfOrder, String isPaid, Long usedSum, String psStatus, String weekend, List<ContragentPreordersSubreportItem> subReportItem) {
         this.idOfContragent = idOfContragent;
         this.contragentName = contragentName;
         this.idOfOrg = idOfOrg;
@@ -39,7 +48,8 @@ public class ContragentPreordersReportItem {
         this.preorderDate = preorderDate;
         this.complexName = complexName;
         this.amount = amount;
-        this.dish = dish;
+        this.paidDish = paidDish;
+        this.notPaidDish = notPaidDish;
         this.complexPrice = complexPrice;
         this.cancelDate = cancelDate;
         this.reversed = reversed;
@@ -48,6 +58,9 @@ public class ContragentPreordersReportItem {
         this.idOfOrder = idOfOrder == null ? "" : idOfOrder.toString();
         this.isPaid = isPaid;
         this.usedSum = usedSum;
+        this.psStatus = psStatus;
+        this.weekend = weekend;
+        this.subReportItem = subReportItem;
     }
 
     public Long getIdOfContragent() {
@@ -122,12 +135,20 @@ public class ContragentPreordersReportItem {
         this.amount = amount;
     }
 
-    public String getDish() {
-        return dish;
+    public String getPaidDish() {
+        return paidDish;
     }
 
-    public void setDish(String dish) {
-        this.dish = dish;
+    public void setPaidDish(String paidDish) {
+        this.paidDish = paidDish;
+    }
+
+    public String getNotPaidDish() {
+        return notPaidDish;
+    }
+
+    public void setNotPaidDish(String notPaidDish) {
+        this.notPaidDish = notPaidDish;
     }
 
     public Long getComplexPrice() {
@@ -192,5 +213,29 @@ public class ContragentPreordersReportItem {
 
     public void setUsedSum(Long usedSum) {
         this.usedSum = usedSum;
+    }
+
+    public String getPsStatus() {
+        return psStatus;
+    }
+
+    public void setPsStatus(String psStatus) {
+        this.psStatus = psStatus;
+    }
+
+    public String getWeekend() {
+        return weekend;
+    }
+
+    public void setWeekend(String weekend) {
+        this.weekend = weekend;
+    }
+
+    public List<ContragentPreordersSubreportItem> getSubReportItem() {
+        return subReportItem;
+    }
+
+    public void setSubReportItem(List<ContragentPreordersSubreportItem> subReportItem) {
+        this.subReportItem = subReportItem;
     }
 }

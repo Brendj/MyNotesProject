@@ -26,10 +26,11 @@ import java.util.Set;
                                 @ColumnResult(name = "code", type = Integer.class),
                                 @ColumnResult(name = "dtsznCodes", type = String.class),
                                 @ColumnResult(name = "categoryName", type = String.class),
-                                @ColumnResult(name = "orderDate", type = Long.class),
+                                @ColumnResult(name = "createdDate", type = Long.class),
                                 @ColumnResult(name = "rSum", type = Long.class),
                                 @ColumnResult(name = "organizationId", type = Long.class),
                                 @ColumnResult(name = "details", type = String.class),
+                                @ColumnResult(name = "fration", type = Integer.class)
                         }
                 )
         }
@@ -43,10 +44,11 @@ import java.util.Set;
         "       ccm.code as \"code\",\n" +
         "       string_agg(cast(cd_dszn.code as text), ';')  as \"dtsznCodes\",\n" +
         "       string_agg(cd.categoryname, ';') as \"categoryName\",\n" +
-        "       o.orderdate as \"orderDate\",\n" +
+        "       o.createddate as \"createdDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
-        "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
+        "       string_agg(distinct od.menudetailname, ';')  as \"details\",\n" +
+        "       od.fration as \"fration\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
@@ -66,7 +68,7 @@ import java.util.Set;
         "  and od.menutype between 50 and 99\n" +
         "  and od.idofrule is not null\n" +
         "  and (cd.idofcategorydiscount >= 0 or cd.idofcategorydiscount = -90)\n" +
-        "  group by 1,2,3,4,7,8,9" +
+        "  group by 1,2,3,4,7,8,9,11 " +
         " union distinct " +
         "       select o.idoforg as \"idOfOrg\",\n" +
         "       o.idoforder as \"idOfOrder\",\n" +
@@ -74,10 +76,11 @@ import java.util.Set;
         "       cast(null as int) as \"code\",\n" +
         "       string_agg(cast(cd_dszn.code as text), ';')  as \"dtsznCodes\",\n" +
         "       string_agg(cd.categoryname, ';') as \"categoryName\",\n" +
-        "       o.orderdate as \"orderDate\",\n" +
+        "       o.createddate as \"createdDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
-        "       string_agg(distinct od.menudetailname, ';')  as \"details\"\n" +
+        "       string_agg(distinct od.menudetailname, ';')  as \"details\",\n" +
+        "       od.fration as \"fration\"\n" +
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
@@ -93,7 +96,7 @@ import java.util.Set;
         "  and od.menutype between 50 and 99\n" +
         "  and od.idofrule is not null\n" +
         "  and (cd.idofcategorydiscount >= 0 or cd.idofcategorydiscount = -90)\n" +
-        "  group by 1,2,3,4,7,8,9 "
+        "  group by 1,2,3,4,7,8,9,11 "
 )
 public class Order {
     public static final int DISCOUNT_TYPE = 4;

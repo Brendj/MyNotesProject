@@ -19,5 +19,6 @@
             </type>
         </property>
         <property name="packetBody" column="packetBody" type="string" />
+        <property name="responseBody" column="responseBody" type="string" />
     </class>
 </hibernate-mapping>

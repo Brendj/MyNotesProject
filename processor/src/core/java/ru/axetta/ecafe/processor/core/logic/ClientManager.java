@@ -1934,6 +1934,25 @@ public class ClientManager {
         }
     }
 
+    public static void setInformedSpecialMenu(Session session, Client client, Boolean isStudent) {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client", client));
+        List<PreorderFlag> preorderFlagList = criteria.list();
+        PreorderFlag preorderFlag;
+        if (preorderFlagList.size() == 0) {
+            preorderFlag = new PreorderFlag(client);
+        } else {
+            preorderFlag = preorderFlagList.get(0);
+        }
+        if (isStudent) {
+            preorderFlag.setAllowedPreorder(true);
+        } else {
+            preorderFlag.setInformedSpecialMenu(true);
+        }
+        preorderFlag.setLastUpdate(new Date());
+        session.saveOrUpdate(preorderFlag);
+    }
+
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
         if (guardian != null) {

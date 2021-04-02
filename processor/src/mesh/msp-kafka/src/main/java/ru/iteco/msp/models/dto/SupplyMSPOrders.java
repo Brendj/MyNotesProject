@@ -11,26 +11,37 @@ public class SupplyMSPOrders {
     private Integer code;
     private String dtsznCodes;
     private String categoryName;
-    private Long orderDate;
+    private Long createdDate;
     private Long rSum;
     private Long organizationId;
     private String details;
+    private Integer fration;
 
     public SupplyMSPOrders() {
     }
 
     public SupplyMSPOrders(Long idOfOrg, Long idOfOrder, String meshGUID, Integer code, String dtsznCodes,
-                           String categoryName, Long orderDate, Long rSum, Long organizationId, String details) {
+                           String categoryName, Long createdDate, Long rSum, Long organizationId, String details,
+                           Integer fration) {
         this.idOfOrg = idOfOrg;
         this.idOfOrder = idOfOrder;
         this.meshGUID = meshGUID;
         this.code = code;
         this.dtsznCodes = dtsznCodes;
         this.categoryName = categoryName;
-        this.orderDate = orderDate;
+        this.createdDate = createdDate;
         this.rSum = rSum;
         this.organizationId = organizationId;
         this.details = details;
+        this.fration = fration;
+    }
+
+    public Integer getFration() {
+        return fration;
+    }
+
+    public void setFration(Integer fration) {
+        this.fration = fration;
     }
 
     public Long getIdOfOrg() {
@@ -81,12 +92,12 @@ public class SupplyMSPOrders {
         this.categoryName = categoryName;
     }
 
-    public Long getOrderDate() {
-        return orderDate;
+    public Long getCreatedDate() {
+        return createdDate;
     }
 
-    public void setOrderDate(Long orderDate) {
-        this.orderDate = orderDate;
+    public void setCreatedDate(Long createdDate) {
+        this.createdDate = createdDate;
     }
 
     public Long getrSum() {

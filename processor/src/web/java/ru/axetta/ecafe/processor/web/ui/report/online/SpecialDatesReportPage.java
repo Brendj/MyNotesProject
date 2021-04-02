@@ -8,6 +8,8 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.SpecialDatesReport;
@@ -17,7 +19,9 @@ import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientGroupSelectPage;
 import ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -43,7 +47,7 @@ import java.util.Properties;
  * Date: 17.04.16
  * Time: 11:18
  */
-public class SpecialDatesReportPage extends OnlineReportPage {
+public class SpecialDatesReportPage extends OnlineReportPage implements OrgSelectPage.CompleteHandler, ClientGroupSelectPage.CompleteHandler{
 
     private final static Logger logger = LoggerFactory.getLogger(SpecialDatesReportPage.class);
     private final static String generateBeginDateKey = "specialDatesReport.generateBeginDate";
@@ -52,7 +56,10 @@ public class SpecialDatesReportPage extends OnlineReportPage {
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
     private Boolean applyUserSettings = false;
     private OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
-    private Boolean showComments = true;
+    private Boolean showComments = false;
+    private String clientGroupName;
+    private Long idOfClientGroup;
+    private Long idOfOrgs;
 
     public SpecialDatesReportPage() {
         super();
@@ -81,6 +88,21 @@ public class SpecialDatesReportPage extends OnlineReportPage {
             case ONE_MONTH: {
                 setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
             } break;
+        }
+    }
+    public Object clean(){
+        clientGroupName = null;
+        idOfClientGroup = null;
+        showComments = false;
+        return null;
+    }
+
+    public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
+        if (null != idOfClientGroup) {
+            this.idOfClientGroup = idOfClientGroup;
+            this.clientGroupName = DAOUtils
+                    .findClientGroup(session, new CompositeIdOfClientGroup(getIdOfOrgs(), idOfClientGroup))
+                    .getGroupName();
         }
     }
 
@@ -246,6 +268,11 @@ public class SpecialDatesReportPage extends OnlineReportPage {
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         properties.setProperty("showComments", Boolean.toString(showComments));
+        if (idOfClientGroup != null){
+            properties.setProperty("idOfClientGroup", idOfClientGroup.toString());
+            properties.setProperty("clientGroupName", clientGroupName);
+        }
+
         return properties;
     }
 
@@ -288,5 +315,36 @@ public class SpecialDatesReportPage extends OnlineReportPage {
 
     public void setShowComments(Boolean showComments) {
         this.showComments = showComments;
+    }
+
+    public String getClientGroupName() {
+        return clientGroupName;
+    }
+
+    public void setClientGroupName(String clientGroupName) {
+        this.clientGroupName = clientGroupName;
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getIdOfOrgs() {
+        if (idOfOrgList.size() == 1)
+            return idOfOrgList.get(0);
+        else {
+            clientGroupName = null;
+            idOfClientGroup = null;
+            showComments = false;
+            return null;
+        }
+    }
+
+    public void setIdOfOrgs(Long idOfOrgs) {
+        this.idOfOrgs = idOfOrgs;
     }
 }
