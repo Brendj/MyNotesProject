@@ -14,14 +14,16 @@ public class LogService {
     private LogServiceType idOfService;
     private Date createdDate;
     private String packetBody;
+    private String responseBody;
 
     public LogService() {
 
     }
 
-    public LogService(LogServiceType idOfService, String packetBody) {
+    public LogService(LogServiceType idOfService, String packetBody, String responseBody) {
         this.idOfService= idOfService;
         this.packetBody = packetBody;
+        this.responseBody = responseBody;
         this.createdDate = new Date();
     }
 
@@ -55,5 +57,13 @@ public class LogService {
 
     public void setPacketBody(String packetBody) {
         this.packetBody = packetBody;
+    }
+
+    public String getResponseBody() {
+        return responseBody;
+    }
+
+    public void setResponseBody(String responseBody) {
+        this.responseBody = responseBody;
     }
 }

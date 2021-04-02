@@ -14,7 +14,6 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -349,22 +348,11 @@ public class WtDish {
             return false;
         }
         WtDish wtDish = (WtDish) o;
-        return idOfDish.equals(wtDish.idOfDish) && Objects.equals(dishName, wtDish.dishName) && Objects
-                .equals(componentsOfDish, wtDish.componentsOfDish) && Objects.equals(code, wtDish.code) && Objects
-                .equals(price, wtDish.price) && Objects
-                .equals(dateOfBeginMenuIncluding, wtDish.dateOfBeginMenuIncluding) && Objects
-                .equals(dateOfEndMenuIncluding, wtDish.dateOfEndMenuIncluding) && Objects
-                .equals(createDate, wtDish.createDate) && Objects.equals(lastUpdate, wtDish.lastUpdate) && Objects
-                .equals(version, wtDish.version) && Objects.equals(deleteState, wtDish.deleteState) && Objects
-                .equals(guid, wtDish.guid) && Objects.equals(protein, wtDish.protein) && Objects.equals(fat, wtDish.fat)
-                && Objects.equals(carbohydrates, wtDish.carbohydrates) && Objects.equals(calories, wtDish.calories)
-                && Objects.equals(qty, wtDish.qty) && Objects.equals(barcode, wtDish.barcode);
+        return idOfDish.equals(wtDish.getIdOfDish());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfDish, dishName, componentsOfDish, code, price, dateOfBeginMenuIncluding,
-                dateOfEndMenuIncluding, createDate, lastUpdate, version, deleteState, guid, protein, fat, carbohydrates,
-                calories, qty, barcode);
+        return idOfDish.hashCode();
     }
 }
