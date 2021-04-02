@@ -9853,6 +9853,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result setInformedSpecialMenuForClient(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            ClientManager.setInformedSpecialMenu(session, client, client.isStudent());
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setInformedSpecialMenu", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
     public Result setInformedSpecialMenu(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardianMobile") String guardianMobile) {
         authenticateRequest(contractId);
