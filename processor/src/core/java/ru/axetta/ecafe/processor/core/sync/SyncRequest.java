@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldBuilder;
@@ -2802,6 +2804,7 @@ public class SyncRequest {
 			builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
 			builders.add(new EmiasBuilder());
+            builders.add(new ExemptionVisitingBuilder());
             builders.add(new MenuSupplierBuilder(idOfOrg));
             builders.add(new RequestsSupplierBuilder(idOfOrg));
             builders.add(new HardwareSettingsRequestBuilder(idOfOrg));
@@ -3112,6 +3115,10 @@ public class SyncRequest {
 
 	public EmiasRequest getEmiasRequest(){
         return this.<EmiasRequest>findSection(EmiasRequest.class);
+    }
+
+    public ExemptionVisitingRequest getExemptionVisitingRequest(){
+        return this.<ExemptionVisitingRequest>findSection(ExemptionVisitingRequest.class);
     }
 
     public MenuSupplier getMenuSupplier() {

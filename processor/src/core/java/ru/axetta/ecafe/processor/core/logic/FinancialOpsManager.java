@@ -53,7 +53,9 @@ public class FinancialOpsManager {
             String textContents, Date serviceSendTime) throws Exception {
 
         Session session = em.unwrap(Session.class);
-
+        ClientSmsNodeLogging clientSmsNodeLogging = new ClientSmsNodeLogging(idOfSms, textContents,
+                RuntimeContext.getInstance().getNodeName(), new Date());
+        session.save(clientSmsNodeLogging);
         if(textContents.length() >= 70) {
             textContents = textContents.substring(0, 69);
         }
@@ -99,7 +101,9 @@ public class FinancialOpsManager {
             getCurrentPositionsManager(session)
                     .changeCurrentPosition(-priceOfSms, operatorContragent, clientContragent);
         }
-
+        ClientSmsNodeLogging clientSmsNodeLogging = new ClientSmsNodeLogging(idOfSms, textContents,
+                RuntimeContext.getInstance().getNodeName(), new Date());
+        session.save(clientSmsNodeLogging);
         textContents = textContents.substring(0, Math.min(textContents.length(), 70));
         Long orgId = idOfSourceOrg == null ? client.getOrg().getIdOfOrg() : idOfSourceOrg;
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone == null ? "-" : phone, contentsId, contentsType, textContents,

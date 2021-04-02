@@ -175,6 +175,7 @@ public class SMSResendingService {
         ClientSmsResending clientSmsResending = new ClientSmsResending
                                                 (idOfSms, 1L, client, phone, serviceName, contentsId, contentsType,
                                                  textContents, paramsContents, currentDate, currentDate, eventTime, client.getOrg().getIdOfOrg());
+        clientSmsResending.setNodeName(RuntimeContext.getInstance().getNodeName());
         try {
             clientSmsResending = getInstance().saveResending(clientSmsResending);
         } catch (Exception e) {

@@ -295,6 +295,7 @@ public class OrgMskNSIService extends MskNSIService {
 
         info.setFounderFrom(existingOrg.getFounder());
         info.setSubordinationFrom(existingOrg.getSubordination());
+        info.setGlobalIdFrom(existingOrg.getOrgIdFromNsi());
 
         info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
     }

@@ -20,7 +20,6 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -59,55 +58,31 @@ public class SupplyTaskExecutor {
             Date begin;
             Date end;
             try {
-                end = getEndOfMonth();
-                begin = getBeginOfMonth();
+                ReportingDate reportingDate = new ReportingDate();
 
-                Integer allRows = supplyMSPService.countOrders(begin, end);
+                do {
+                    end = reportingDate.getEndPeriod();
+                    begin = reportingDate.getBeginPeriod();
 
-                if(allRows.equals(0)){
-                    log.warn("No Orders, skipped");
-                    return;
-                }
-                Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("createdDate"));
-                List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
+                    Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("createdDate"));
+                    List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
 
-                while (CollectionUtils.isNotEmpty(orderList)){
-                    for(SupplyMSPOrders o : orderList){
-                        kafkaService.sendSupplyMSP(o);
+                    while (CollectionUtils.isNotEmpty(orderList)) {
+                        for (SupplyMSPOrders o : orderList) {
+                            kafkaService.sendSupplyMSP(o);
+                        }
+                        orderList.clear();
+                        orderList = null;
+
+                        pageable = pageable.next();
+                        orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
                     }
-                    orderList.clear();
-                    orderList = null;
+                    reportingDate = reportingDate.getNext();
+                } while (reportingDate != null);
 
-                    pageable = pageable.next();
-                    orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
-                }
             } catch (Exception e) {
                 log.error("Critical error in process sending supply MSP info, task interrupt", e);
             }
-        }
-
-        Date getBeginOfMonth(){
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.MONTH, -1);
-            return calendar.getTime();
-        }
-
-        Date getEndOfMonth(){
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.MILLISECOND, -1);
-            return calendar.getTime();
         }
     }
 }
