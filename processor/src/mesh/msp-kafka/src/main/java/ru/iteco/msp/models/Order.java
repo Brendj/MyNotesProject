@@ -26,7 +26,7 @@ import java.util.Set;
                                 @ColumnResult(name = "code", type = Integer.class),
                                 @ColumnResult(name = "dtsznCodes", type = String.class),
                                 @ColumnResult(name = "categoryName", type = String.class),
-                                @ColumnResult(name = "orderDate", type = Long.class),
+                                @ColumnResult(name = "createdDate", type = Long.class),
                                 @ColumnResult(name = "rSum", type = Long.class),
                                 @ColumnResult(name = "organizationId", type = Long.class),
                                 @ColumnResult(name = "details", type = String.class),
@@ -44,7 +44,7 @@ import java.util.Set;
         "       ccm.code as \"code\",\n" +
         "       string_agg(cast(cd_dszn.code as text), ';')  as \"dtsznCodes\",\n" +
         "       string_agg(cd.categoryname, ';') as \"categoryName\",\n" +
-        "       o.orderdate as \"orderDate\",\n" +
+        "       o.createddate as \"createdDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
         "       string_agg(distinct od.menudetailname, ';')  as \"details\",\n" +
@@ -76,7 +76,7 @@ import java.util.Set;
         "       cast(null as int) as \"code\",\n" +
         "       string_agg(cast(cd_dszn.code as text), ';')  as \"dtsznCodes\",\n" +
         "       string_agg(cd.categoryname, ';') as \"categoryName\",\n" +
-        "       o.orderdate as \"orderDate\",\n" +
+        "       o.createddate as \"createdDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
         "       string_agg(distinct od.menudetailname, ';')  as \"details\",\n" +

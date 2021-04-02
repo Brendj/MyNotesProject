@@ -48,7 +48,7 @@ public class SupplyEvent {
             }
         }
         event.data = order.getDetails() + OrderDetailFRationType.getByCode(order.getFration());
-        event.date = order.getOrderDate().toString();
+        event.date = order.getCreatedDate().toString();
         event.amount = order.getrSum();
         event.organization_id = order.getOrganizationId();
 

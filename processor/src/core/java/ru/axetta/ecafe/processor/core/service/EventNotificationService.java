@@ -791,7 +791,7 @@ public class EventNotificationService {
         return attachToValues(CLIENT_GENDER_KEY, genderString, values);
     }
 
-    public static final String[] attachAmountBuyAllToValues(Long amountBuyAll, String[] values) {
+    public static final String[] attachMoneyToValues(Long amountBuyAll, String[] values, String nameParam) {
         if (null == amountBuyAll) {
             return values;
         }
@@ -804,7 +804,7 @@ public class EventNotificationService {
         }
         String amountBuyAllString = rub.toString() + "," + cop_str;
 
-        return attachToValues(PARAM_AMOUNT_BUY_ALL, amountBuyAllString, values);
+        return attachToValues(nameParam, amountBuyAllString, values);
     }
 
     public static Long getTargetIdFromValues(String[] values) {
@@ -944,6 +944,12 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
                 }
 
+                if (!findValueInParams(new String[]{PARAM_FRATION}, values).isEmpty())
+                {
+                    String ration = findValueInParams(new String[]{PARAM_FRATION}, values);
+                    empType.getParameters().put(PARAM_FRATION, ration);
+                }
+
                 //  дата только для платного комплекса + льготного комплекса
                 if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
                    findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
@@ -952,7 +958,6 @@ public class EventNotificationService {
                     String complexName = findValueInParams(new String[]{PARAM_COMPLEX_NAME}, values);
                     empType.getParameters().put(PARAM_COMPLEX_NAME, complexName);
                 }
-
 
                 //  сумма только для буфет + платное
                 String amountPrice = findValueInParams(new String[]{PARAM_AMOUNT_PRICE}, values);

@@ -783,7 +783,7 @@ public class GoodRequestsNewReportService {
                 feedingPlanType = info.feedingPlanType;
                 price = info.price;
             } else {
-                feedingPlanType = FeedingPlanType.PAY_PLAN;
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
             }
         } else {
             feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
