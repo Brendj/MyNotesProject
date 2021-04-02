@@ -115,7 +115,7 @@ public class EnterEventItem {
         }
         Long longCardId = null;
         if (enterEventNode.getAttributes().getNamedItem("LongCardId") != null) {
-            childPassCheckerId = Long.parseLong(
+            longCardId = Long.parseLong(
                     enterEventNode.getAttributes().getNamedItem("LongCardId").getTextContent());
         }
         return new EnterEventItem(idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode,
