@@ -5,8 +5,6 @@
 package ru.axetta.ecafe.processor.web.util;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.LogServiceType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -28,6 +26,12 @@ public class ClientRoomControllerLoggingInterceptor extends AbstractSoapIntercep
     @Override
     public void handleMessage(SoapMessage message) throws Fault {
         if (!RuntimeContext.getInstance().isLogInfoService()) return;
+        String request = getMessageString(message, ">");
+        if (request == null) return;
+        RuntimeContext.getAppContext().getBean(SoapLoggerInfo.class).setIncomingMessage(request);
+    }
+
+    public String getMessageString(SoapMessage message, String suffix) {
         try {
             InputStream is = message.getContent(InputStream.class);
             CachedOutputStream os = new CachedOutputStream();
@@ -37,13 +41,13 @@ public class ClientRoomControllerLoggingInterceptor extends AbstractSoapIntercep
             is.close();
             String request = new String(os.getBytes());
             for (String method : RuntimeContext.getInstance().getMethodsInfoService()) {
-                if (request.contains(method + ">")) {
-                    DAOService.getInstance().saveLogServiceMessage(request, LogServiceType.CLIENT_ROOM_CONTROLLER);
-                    break;
+                if (request.contains(method + suffix)) {
+                    return request;
                 }
             }
         } catch (Exception e) {
             logger.error("Error in handle ClientRoomController message: ", e);
         }
+        return null;
     }
 }

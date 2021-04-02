@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSectionForARMAnswer;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ResClientBalanceHoldData;
@@ -408,6 +410,7 @@ public class SyncResponse {
             private final Boolean multiCardMode;
             private final String parallel;
             private final String ssoId;
+            private final Long expenditureLimit;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -455,6 +458,7 @@ public class SyncResponse {
                 this.multiCardMode = client.activeMultiCardMode();
                 this.parallel = client.getParallel();
                 this.ssoId = client.getSsoid();
+                this.expenditureLimit = client.getExpenditureLimit();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -664,6 +668,9 @@ public class SyncResponse {
                 if(this.ssoId != null){
                     element.setAttribute("SsoId", this.ssoId);
                 }
+                if (this.expenditureLimit != null) {
+                    element.setAttribute("MaxDailyLimit", String.valueOf(expenditureLimit));
+                }
                 return element;
             }
 
@@ -688,6 +695,10 @@ public class SyncResponse {
 
             public Boolean getMultiCardMode() {
                 return multiCardMode;
+            }
+
+            public Long getExpenditureLimit() {
+                return expenditureLimit;
             }
         }
 
@@ -1246,6 +1257,8 @@ public class SyncResponse {
     private SyncSettingsSection syncSettingsSection;
     private EmiasSection emias;
     private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
+    private ExemptionVisitingSection exemptionVisitingSection;
+    private ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer;
     private ResMenuSupplier resMenuSupplier;
     private ResRequestsSupplier resRequestsSupplier;
     private RequestsSupplierData requestsSupplierData;
@@ -1253,7 +1266,6 @@ public class SyncResponse {
     private ResTurnstileSettingsRequest resTurnstileSettingsRequest;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
-
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
             String directorName, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
@@ -1274,7 +1286,7 @@ public class SyncResponse {
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer,
+            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer, ExemptionVisitingSection exemptionVisitingSection, ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer,
             ResMenuSupplier resMenuSupplier, ResRequestsSupplier resRequestsSupplier, RequestsSupplierData requestsSupplierData,
             ResHardwareSettingsRequest resHardwareSettingsRequest,
             ResTurnstileSettingsRequest resTurnstileSettingsRequest) {
@@ -1341,6 +1353,8 @@ public class SyncResponse {
         this.syncSettingsSection = syncSettingsSection;
 		this.emias = emias;
         this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
+        this.exemptionVisitingSection = exemptionVisitingSection;
+        this.exemptionVisitingSectionForARMAnswer = exemptionVisitingSectionForARMAnswer;
         this.resMenuSupplier = resMenuSupplier;
         this.resRequestsSupplier = resRequestsSupplier;
         this.requestsSupplierData = requestsSupplierData;
@@ -1665,7 +1679,13 @@ public class SyncResponse {
         if(emias != null){
             envelopeElement.appendChild(emias.toElement(document));
         }
+        if (exemptionVisitingSectionForARMAnswer != null) {
+            envelopeElement.appendChild(exemptionVisitingSectionForARMAnswer.toElement(document));
+        }
 
+        if(exemptionVisitingSection != null){
+            envelopeElement.appendChild(exemptionVisitingSection.toElement(document));
+        }
         if (resMenuSupplier != null) {
             envelopeElement.appendChild(resMenuSupplier.toElement(document));
         }

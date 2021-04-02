@@ -559,6 +559,7 @@
         <url-pattern>/smartwatch/*</url-pattern>
         <url-pattern>/school/api/v1/*</url-pattern>
         <url-pattern>/ispp/library/*</url-pattern>
+        <url-pattern>/ezd/*</url-pattern>
     </filter-mapping>
 
     <filter>

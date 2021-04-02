@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -1037,7 +1038,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setPayForSMS(this.payForSMS);
 
         /* категори скидок */
-        Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+        Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
@@ -1050,9 +1051,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 }
                 categoryDiscountSet.add(categoryDiscount);
             }
-        } else {
-            /* очистить список если он не пуст */
-            client.getCategories().clear();
         }
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
@@ -1062,6 +1060,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                         DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
                 client.setLastDiscountsUpdate(new Date());
             } catch (Exception ignore){}
+        }
+
+        if (CollectionUtils.isEmpty(this.idOfCategoryList)) {
+            /* очистить список если он не пуст */
+            client.getCategories().clear();
         }
 
         if (null != discountMode) {
