@@ -665,14 +665,14 @@ public class GoodRequestsNewReportService {
                 price = info.price;
             } else if (complexInfoItem.goodInfos.containsKey(good.getGlobalId())) {
                 GoodInfo info = complexInfoItem.goodInfos.get(good.getGlobalId());
-                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), position.getComplexId());
+                feedingPlanType = info.feedingPlanType;
                 price = info.price;
             } else {
-                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), position.getComplexId());
+                feedingPlanType = FeedingPlanType.PAY_PLAN;
                 price = 0L;
             }
         } else {
-            feedingPlanType = decodeFeedingPlan(position.getFeedingType(), position.getComplexId());
+            feedingPlanType = FeedingPlanType.PAY_PLAN;
             price = 0L;
         }
         if (needFullGoodNames) {
