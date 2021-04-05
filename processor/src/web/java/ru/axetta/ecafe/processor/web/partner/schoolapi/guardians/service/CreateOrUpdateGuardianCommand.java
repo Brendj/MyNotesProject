@@ -58,7 +58,7 @@ public class CreateOrUpdateGuardianCommand {
             ClientGuardian reloadedGuardian = FindExistingGuardianLink(request.getChildClientId(), request.getGuardianClientId(), session);
             session.flush();
             transaction.commit();
-
+            transaction = null;
             if (reloadedGuardian == null) return CreateOrUpdateGuardianResponse.error(request, "Internal server error");
             return CreateOrUpdateGuardianResponse.success(reloadedGuardian.getIdOfClientGuardian(), request);
         }

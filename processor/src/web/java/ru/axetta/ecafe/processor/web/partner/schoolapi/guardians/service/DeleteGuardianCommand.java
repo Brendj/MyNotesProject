@@ -48,6 +48,7 @@ public class DeleteGuardianCommand {
             session.update(guardian);
             session.flush();
             transaction.commit();
+            transaction = null;
             return DeleteGuardianResponse.success(guardian.getIdOfClientGuardian());
         }
         catch (WebApplicationException e)

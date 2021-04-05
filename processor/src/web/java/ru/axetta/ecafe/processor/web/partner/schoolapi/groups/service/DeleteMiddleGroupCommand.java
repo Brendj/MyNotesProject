@@ -60,6 +60,7 @@ class DeleteMiddleGroupCommand {
             response = MiddleGroupResponse.from(middleGroupItem);
             session.flush();
             transaction.commit();
+            transaction = null;
             return response;
         } catch (WebApplicationException wex) {
             throw wex;

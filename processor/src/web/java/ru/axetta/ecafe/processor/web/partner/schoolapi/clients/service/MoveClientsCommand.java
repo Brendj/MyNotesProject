@@ -99,7 +99,7 @@ class MoveClientsCommand {
             session.update(client);
             session.flush();
             transaction.commit();
-
+            transaction = null;
             return ClientUpdateResult.success(movedClient.getIdOfClient());
         } catch (Exception e) {
             logger.error("Error in moved client to other group, ", e);

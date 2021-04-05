@@ -46,6 +46,15 @@ public class GroupManagersRestController {
         return Response.ok().build();
     }
 
+    @DELETE
+    @Path("")
+    public Response dettachedGroups(@QueryParam("id") final List<Long> ids) {
+        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+            throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        }
+        getService().dettachedGroups(ids);
+        return Response.ok().build();
+    }
 
 
     private User getUser() {

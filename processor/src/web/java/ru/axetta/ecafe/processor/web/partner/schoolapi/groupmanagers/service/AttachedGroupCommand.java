@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -53,6 +54,7 @@ class AttachedGroupCommand {
             }
             session.flush();
             transaction.commit();
+            transaction = null;
             return result;
         } catch (WebApplicationException wex) {
             throw wex;
@@ -77,6 +79,7 @@ class AttachedGroupCommand {
             result = saveNewClientGroupManager(groupManager, session);
             session.flush();
             transaction.commit();
+            transaction = null;
             return result;
         } catch (WebApplicationException wex) {
             throw wex;
@@ -121,20 +124,10 @@ class AttachedGroupCommand {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
 
-            ClientGroupManager foundClientGroupManager = (ClientGroupManager) session
-                    .load(ClientGroupManager.class, idOfClientGroupManager);
-            if (foundClientGroupManager != null) {
-                Long version = DAOUtils.nextVersionByClientgroupManager(session);
-                foundClientGroupManager.setVersion(version);
-                foundClientGroupManager.setDeleted(true);
-                session.save(foundClientGroupManager);
-            } else {
-                throw new WebApplicationException(GROUP_MANAGER_NOT_FOUND,
-                        String.format("Group manager with idOfClientGroupManager='%d' not found",
-                                idOfClientGroupManager));
-            }
+            dettachedGroupInternal(idOfClientGroupManager, session);
             session.flush();
             transaction.commit();
+            transaction = null;
         } catch (WebApplicationException wex) {
             throw wex;
         } catch (Exception e) {
@@ -144,6 +137,43 @@ class AttachedGroupCommand {
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void dettachedGroups(Collection<Long> clientGroupManagersIds) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            for (Long idOfClientGroupManager : clientGroupManagersIds) {
+                dettachedGroupInternal(idOfClientGroupManager, session);
+            }
+            session.flush();
+            transaction.commit();
+            transaction = null;
+        } catch (WebApplicationException wex) {
+            throw wex;
+        } catch (Exception e) {
+            logger.error("Error in dettach groups, ", e);
+            throw new WebApplicationException(String.format("Ошибка при удалении руководителя группы "), e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private void dettachedGroupInternal(Long idOfClientGroupManager, Session session) {
+        ClientGroupManager foundClientGroupManager = (ClientGroupManager) session
+                .load(ClientGroupManager.class, idOfClientGroupManager);
+        if (foundClientGroupManager != null) {
+            Long version = DAOUtils.nextVersionByClientgroupManager(session);
+            foundClientGroupManager.setVersion(version);
+            foundClientGroupManager.setDeleted(true);
+            session.save(foundClientGroupManager);
+        } else {
+            throw new WebApplicationException(GROUP_MANAGER_NOT_FOUND,
+                    String.format("Group manager with idOfClientGroupManager='%d' not found", idOfClientGroupManager));
         }
     }
 

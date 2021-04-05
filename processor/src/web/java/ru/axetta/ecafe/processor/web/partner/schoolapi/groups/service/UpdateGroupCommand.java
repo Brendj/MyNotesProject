@@ -53,6 +53,7 @@ class UpdateGroupCommand {
             updateExcludeFromPlan(request, clientGroup, response, session);
             session.flush();
             transaction.commit();
+            transaction = null;
             return response;
         } catch (WebApplicationException wex) {
             throw wex;

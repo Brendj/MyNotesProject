@@ -59,6 +59,7 @@ class CreateMiddleGroupCommand {
             }
             session.flush();
             transaction.commit();
+            transaction = null;
             return response;
         } catch (WebApplicationException wex) {
             throw wex;
@@ -108,6 +109,7 @@ class CreateMiddleGroupCommand {
 
             session.flush();
             transaction.commit();
+            transaction = null;
             return response;
         } catch (WebApplicationException wex) {
             throw wex;

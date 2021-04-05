@@ -86,6 +86,7 @@ class UpdateClientCategoriesCommand {
             session.update(client);
             session.flush();
             transaction.commit();
+            transaction = null;
             return ClientUpdateResult.success(item.getIdOfClient());
 
         } catch (Exception e) {
