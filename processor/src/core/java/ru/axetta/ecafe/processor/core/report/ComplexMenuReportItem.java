@@ -12,6 +12,7 @@ public class ComplexMenuReportItem {
     private List<String> org;
     private List<String> complexList;
     private  List<ComplexItem> complexItem;
+    private List<ComplexOrgItem> complexOrgItem;
 
     public ComplexMenuReportItem(List<String> org, String orgCount, List<String> complexList) {
         this.org = org;
@@ -19,10 +20,19 @@ public class ComplexMenuReportItem {
         this.complexList = complexList;
     }
 
-    public ComplexMenuReportItem(String idOfOrg, String orgCount, List<ComplexItem> complexItem) {
+    public ComplexMenuReportItem(String idOfOrg, String orgCount, List<ComplexItem> complexItem, List<ComplexOrgItem> complexOrgItem) {
         this.idOfOrg = idOfOrg;
         this.orgCount = orgCount;
         this.complexItem = complexItem;
+        this.complexOrgItem = complexOrgItem;
+    }
+
+    public List<ComplexOrgItem> getComplexOrgItem() {
+        return complexOrgItem;
+    }
+
+    public void setComplexOrgItem(List<ComplexOrgItem> complexOrgItem) {
+        this.complexOrgItem = complexOrgItem;
     }
 
     public List<ComplexItem> getComplexItem() {

@@ -398,7 +398,8 @@ public class MainPage implements Serializable {
     private final ComplexListSelectPage complexWebListSelectPage = new ComplexListSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
-    private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
+    private final ClientGroupSelectPage  clientGroupSelectPage = new ClientGroupSelectPage();
+    private final ComplexDishSelectPage complexDishSelectPage = new ComplexDishSelectPage();
     private final UserSelectPage userSelectPage = new UserSelectPage();
     private final OrgMainBuildingListSelectPage orgMainBuildingListSelectPage = new OrgMainBuildingListSelectPage();
     private final CardRegistrationConfirm cardRegistrationConfirm = new CardRegistrationConfirm();
@@ -1745,6 +1746,10 @@ public class MainPage implements Serializable {
         return clientGroupSelectPage;
     }
 
+    public ComplexDishSelectPage getComplexDishSelectPage() {
+        return complexDishSelectPage;
+    }
+
     public Object showClientGroupSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ClientGroupSelectPage.CompleteHandler) {
@@ -1779,6 +1784,34 @@ public class MainPage implements Serializable {
         }
         return null;
     }
+
+    public Object showDishSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ClientGroupSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                complexDishSelectPage.pushCompleteHandler((ComplexDishSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(complexDishSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill client group selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
 
     public Object updateClientGroupSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -1838,6 +1871,36 @@ public class MainPage implements Serializable {
         }
         return null;
     }
+
+    public Object completeDishSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            complexDishSelectPage.completeDishSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == complexDishSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to fill dish selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора блюда: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
 
     public Object showOrgSelectPage() {
         return showOrgSelectPage(null, null);

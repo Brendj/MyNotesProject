@@ -8,26 +8,36 @@ import java.math.BigDecimal;
 
 public class ComplexItem {
     private String idOfComplex;
-    private String idOfComplexGroupItem;
-    private String idOfDietType;
-    private String idOfAgeGroupItem;
+    private String complexGroupItem;
+    private String dietType;
+    private String ageGroupItem;
     private BigDecimal price;
     private String isPortal;
-    private String date;
+    private String startDate;
+    private String endDate;
     private String complexName;
     private String cycle;
 
-    public ComplexItem(String idOfComplex, String idOfComplexGroupItem, String idOfDietType, String idOfAgeGroupItem,
-            BigDecimal price, String isPortal, String date, String complexName, String cycle) {
+    public ComplexItem(String idOfComplex, String complexGroupItem, String dietType, String ageGroupItem,
+            BigDecimal price, String isPortal, String startDate, String endDate, String complexName, String cycle) {
         this.idOfComplex = idOfComplex;
-        this.idOfComplexGroupItem = idOfComplexGroupItem;
-        this.idOfDietType = idOfDietType;
-        this.idOfAgeGroupItem = idOfAgeGroupItem;
+        this.complexGroupItem = complexGroupItem;
+        this.dietType = dietType;
+        this.ageGroupItem = ageGroupItem;
         this.price = price;
         this.isPortal = isPortal;
-        this.date = date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.complexName = complexName;
         this.cycle = cycle;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public String getCycle() {
@@ -38,12 +48,12 @@ public class ComplexItem {
         this.cycle = cycle;
     }
 
-    public String getDate() {
-        return date;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
     public String getIdOfComplex() {
@@ -54,28 +64,28 @@ public class ComplexItem {
         this.idOfComplex = idOfComplex;
     }
 
-    public String getIdOfComplexGroupItem() {
-        return idOfComplexGroupItem;
+    public String getComplexGroupItem() {
+        return complexGroupItem;
     }
 
-    public void setIdOfComplexGroupItem(String idOfComplexGroupItem) {
-        this.idOfComplexGroupItem = idOfComplexGroupItem;
+    public void setComplexGroupItem(String complexGroupItem) {
+        this.complexGroupItem = complexGroupItem;
     }
 
-    public String getIdOfDietType() {
-        return idOfDietType;
+    public String getDietType() {
+        return dietType;
     }
 
-    public void setIdOfDietType(String idOfDietType) {
-        this.idOfDietType = idOfDietType;
+    public void setDietType(String dietType) {
+        this.dietType = dietType;
     }
 
-    public String getIdOfAgeGroupItem() {
-        return idOfAgeGroupItem;
+    public String getAgeGroupItem() {
+        return ageGroupItem;
     }
 
-    public void setIdOfAgeGroupItem(String idOfAgeGroupItem) {
-        this.idOfAgeGroupItem = idOfAgeGroupItem;
+    public void setAgeGroupItem(String ageGroupItem) {
+        this.ageGroupItem = ageGroupItem;
     }
 
     public BigDecimal getPrice() {

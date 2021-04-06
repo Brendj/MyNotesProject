@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,10 +55,8 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            startTime = CalendarUtils.startOfDay(startTime);
-            endTime = CalendarUtils.endOfDay(endTime);
+            startTime = startTime == null ? null : CalendarUtils.startOfDay(startTime);
             parameterMap.put("startDate", startTime);
-            parameterMap.put("endDate", endTime);
 
             String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
@@ -70,21 +69,27 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
             Long diet = Long.valueOf(getReportProperties().getProperty("selectDiet"));
             Long ageGroup = Long.valueOf(getReportProperties().getProperty("selectIdAgeGroup"));
             Long archived = Long.valueOf(getReportProperties().getProperty("selectArchived"));
-            JRDataSource dataSource = new JRBeanCollectionDataSource(createDataSource(session, contragent, idOfOrgList, typeFood, diet, ageGroup, archived));
+            JRDataSource dataSource = new JRBeanCollectionDataSource(createDataSource(session, contragent, idOfOrgList, typeFood, diet, ageGroup, archived, startTime));
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             return new ContragentCompletionReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, idOfContragent);
         }
 
-        public List<ComplexMenuReportItem> createDataSource(Session session, Contragent contragent, List<Long> idOfOrgList, Long typeFood, Long diet, Long ageGroup, Long archived) throws Exception {
+        public List<ComplexMenuReportItem> createDataSource(Session session, Contragent contragent, List<Long> idOfOrgList, Long typeFood, Long diet, Long ageGroup, Long archived, Date date) throws Exception {
             List<ComplexMenuReportItem> result = new LinkedList<>();
+            List<WtComplexGroupItem> wtGroupComplex = DAOService.getInstance().getTypeComplexFood();
+            List<WtDietType> dietGroupItems = DAOService.getInstance().getMapDiet();
+            List<WtAgeGroupItem> ageGroups = DAOService.getInstance().getAgeGroups();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Timestamp ts = date == null ? null : Timestamp.valueOf(formatter.format(date));
             String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
             String idOfContragentCondition = contragent == null ? "" : " and wc.idofcontragent = :idOfContragent ";
             String typeFoodCondition = typeFood == -1 ? "" : " and wc.idofcomplexgroupitem = :typeFood ";
             String dietCondition = diet == -1 ? "" : " and wc.idofdiettype = :diet ";
             String ageGroupCondition = ageGroup == -1 ? "" : " and wc.idofagegroupitem = :ageGroup ";
             String archivedCondition = archived == -1 ? "" : " and wc.deletestate = :archived ";
+            String dateCondition = ts == null ? "" : " and wc.begindate <= :ts and wc.enddate >= :ts ";
 
             String getIdOfOrg = "with complex_menu AS ( "
                     + "select o.idoforg, o.organizationtype, wc.idofcomplex, wc.idofcomplexgroupitem, wc.idofdiettype, wc.idofagegroupitem, wc.price, wc.is_portal, wc.begindate, wc.enddate, wc.name "
@@ -98,6 +103,7 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                     + dietCondition
                     + ageGroupCondition
                     + archivedCondition
+                    + dateCondition
                     + " union "
                     + "select o.idoforg, o.organizationtype, wc.idofcomplex, wc.idofcomplexgroupitem, wc.idofdiettype, wc.idofagegroupitem, wc.price, wc.is_portal, wc.begindate, wc.enddate, wc.name "
                     + "from cf_wt_org_group_relations ogr "
@@ -110,6 +116,7 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                     + dietCondition
                     + ageGroupCondition
                     + archivedCondition
+                    + dateCondition
                     + " )"
                     + " select * from complex_menu "
                     + " order by 1, 4, 5, 6 ";
@@ -174,21 +181,34 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                 query.setParameter("archived", archived);
                 queryDish.setParameter("archived", archived);
             }
-            List<Object[]> idOfOrg = query.list();
+            if(ts != null) {
+                query.setParameter("ts", ts);
+            }
+            List<Object[]> complexList = query.list();
             List<Object[]> dishList = queryDish.list();
 
-            if (CollectionUtils.isEmpty(idOfOrg)) {
+            if (CollectionUtils.isEmpty(complexList)) {
                 throw new Exception("Нет данных для построения отчета");
             }
 
-            List<ComplexMenuReportItem> orgList = sortOrg(idOfOrg);
-            orgList = sortComplex(orgList, idOfOrg);
+            Set<Long> orgId = new TreeSet<>();
+            for (Object[] idOfOrg: complexList)
+                orgId.add(Long.valueOf(idOfOrg[0].toString()));
+            String idOfOrgs = CollectionUtils.isEmpty(orgId) ? "" : " and co.idoforg in (:orgId) " ;
+            String getOrg = " select co.idoforg, co.shortnameinfoservice, co.address, co.shortname, co.district "
+                    + " from cf_orgs co "
+                    + "where co.idoforg >= 0 "
+                    + idOfOrgs ;
+            Query queryOrg = session.createSQLQuery(getOrg);
+            if(!CollectionUtils.isEmpty(orgId))
+                queryOrg.setParameterList("orgId", orgId);
+            List<Object[]> orgData = queryOrg.list();
+            if (CollectionUtils.isEmpty(orgData))
+                throw new Exception("Нет данных для построения отчета");
 
-            List<WtComplexGroupItem> wtGroupComplex = DAOService.getInstance().getTypeComplexFood();
-            List<WtDietType> dietGroupItems = DAOService.getInstance().getMapDiet();
-            List<WtAgeGroupItem> ageGroups = DAOService.getInstance().getAgeGroups();
-            List<ComplexItem> complexItems = getComplexItem(idOfOrg, wtGroupComplex, dietGroupItems, ageGroups, dishList);
-
+            List<ComplexMenuReportItem> orgList = sortOrg(complexList);
+            orgList = sortComplex(orgList, complexList);
+            List<ComplexItem> complexItems = getComplexItem(complexList, wtGroupComplex, dietGroupItems, ageGroups, dishList, date);
             for (ComplexMenuReportItem complex: orgList) {
                 List<ComplexItem> complexItem = new ArrayList<>();
                 for (String co : complex.getComplexList())
@@ -198,11 +218,23 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                     org.append(orgs).append(", ");
                 if (org.length() > 1)
                     org.setLength(org.length() - 2);
-
-                result.add(new ComplexMenuReportItem(org.toString(), complex.getOrgCount(), complexItem));
+                result.add(new ComplexMenuReportItem(org.toString(), complex.getOrgCount(), complexItem, getOrgList(complex, orgData)));
             }
             return result;
         }
+
+        private List<ComplexOrgItem> getOrgList(ComplexMenuReportItem complex, List<Object[]> orgData) {
+            List<ComplexOrgItem> orgItem = new ArrayList<>();
+            for (String org: complex.getOrg()){
+                for (Object[] data: orgData){
+                    if(org.equals(data[0].toString()))
+                        orgItem.add(new ComplexOrgItem(data[0].toString(), data[1].toString(), data[2].toString(),
+                                data[3].toString(), data[4].toString()));
+                }
+            }
+            return orgItem;
+        }
+
 
         private ComplexItem getCurrentComplexItem(String complex, List<ComplexItem> complexList){
             for (ComplexItem compexList: complexList)
@@ -211,69 +243,71 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                 return null;
         }
 
-        private List<ComplexItem> getComplexItem(List<Object[]> idOfOrg, List<WtComplexGroupItem> wtGroupComplex,
-                List<WtDietType> dietGroupItems, List<WtAgeGroupItem> ageGroups, List<Object[]> dishList ){
-            List<ComplexItem> complexList = new ArrayList<>();
-            for (Object[] id : idOfOrg) {
+        private List<ComplexItem> getComplexItem(List<Object[]> complexList, List<WtComplexGroupItem> wtGroupComplex,
+                List<WtDietType> dietGroupItems, List<WtAgeGroupItem> ageGroups, List<Object[]> dishList, Date date ){
+            List<ComplexItem> complexes = new ArrayList<>();
+            for (Object[] complex : complexList) {
                 String groupComplex = "";
                 String dietType = "";
                 String agrGroup = "";
+                String startDate = "";
+                String endDate = "";
+                String complexName = complex[10].toString();
                 StringBuilder cycle = new StringBuilder();
                 BigDecimal price = BigDecimal.valueOf(0);
-                if (id[6] != null)
-                    price = new BigDecimal(id[6].toString());
-                String isPortal = Boolean.parseBoolean(id[7].toString()) ? "Да" : "Нет";
-
+                if (complex[6] != null)
+                    price = new BigDecimal(complex[6].toString());
+                String isPortal = Boolean.parseBoolean(complex[7].toString()) ? "Да" : "Нет";
                 String dates = "";
-
                 try {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
                 SimpleDateFormat myFormat = new SimpleDateFormat("dd-MM-yyyy");
-                String beginDate = myFormat.format(format.parse(id[8].toString()));
-                String endDate = myFormat.format(format.parse(id[9].toString()));
-                    dates = beginDate + " - " + endDate;
+                startDate = myFormat.format(format.parse(complex[8].toString()));
+                endDate = myFormat.format(format.parse(complex[9].toString()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
 
                 for (WtAgeGroupItem aGroup: ageGroups)
-                    if (id[5].toString().equals(aGroup.getIdOfAgeGroupItem().toString()))
+                    if (complex[5].toString().equals(aGroup.getIdOfAgeGroupItem().toString()))
                         agrGroup = aGroup.getDescription();
 
                 for (WtDietType dType: dietGroupItems)
-                    if (id[4].toString().equals(dType.getIdOfDietType().toString()))
+                    if (complex[4].toString().equals(dType.getIdOfDietType().toString()))
                         dietType = dType.getDescription();
 
                 for (WtComplexGroupItem gComplex: wtGroupComplex)
-                    if (id[3].toString().equals(gComplex.getIdOfComplexGroupItem().toString()))
+                    if (complex[3].toString().equals(gComplex.getIdOfComplexGroupItem().toString()))
                         groupComplex = gComplex.getDescription();
 
                 for (Object[] dl : dishList) {
-                    if(dl[1].toString().equals(id[2].toString()) && dl[0].toString().equals(id[0].toString()))
+                    if(dl[1].toString().equals(complex[2].toString()) && dl[0].toString().equals(complex[0].toString()))
                         cycle.append(dl[2].toString()).append("(").append(dl[3].toString()).append(")").append(", ");
                 }
                 if (cycle.length() > 1)
                     cycle.setLength(cycle.length() - 2);
 
-                ComplexItem complexItem = new ComplexItem(id[2].toString(), groupComplex,
-                        dietType, agrGroup, price, isPortal, dates, id[10].toString(), cycle.toString());
-                complexList.add(complexItem);
+                ComplexItem complexItem = new ComplexItem(complex[2].toString(), groupComplex,
+                        dietType, agrGroup, price, isPortal, startDate, endDate, complexName, cycle.toString());
+                complexes.add(complexItem);
             }
-            return complexList;
+            return complexes;
         }
 
-        private List<ComplexMenuReportItem> sortOrg(List<Object[]> idOfOrg){
+        private List<ComplexMenuReportItem> sortOrg(List<Object[]> complexList){
             List<ComplexMenuReportItem> complexMenuReportList = new ArrayList<>();
             String orgType = null;
-            Set<String> sortOrg = new HashSet<>();
-            for (Object[] orgs: idOfOrg)
-                sortOrg.add(orgs[0].toString());
+            Set<String> sortOrg = new TreeSet<>();
+
+            for (Object[] complex: complexList)
+                sortOrg.add(complex[0].toString());
+
             for (String sort: sortOrg){
                 ArrayList<String> idOfComplex = new ArrayList<>();
-                for (Object[] orgs: idOfOrg)
-                    if (sort.equals(orgs[0].toString())) {
-                        idOfComplex.add(orgs[2].toString());
-                        orgType = orgs[1].toString();
+                for (Object[] complex: complexList)
+                    if (sort.equals(complex[0].toString())) {
+                        idOfComplex.add(complex[2].toString());
+                        orgType = complex[1].toString();
                     }
                 Arrays.sort(new ArrayList[]{idOfComplex});
                 complexMenuReportList.add(new ComplexMenuReportItem(Arrays.asList(sort), orgType, idOfComplex));
@@ -282,22 +316,38 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
         }
 
         private String getOrgCount(List<String> sort, List<Object[]> idOfOrg){
-            int dou = 0, soh = 0;
+            int dou = 0, soh = 0, spo = 0;
+            StringBuilder result = new StringBuilder();
             for (String ss: sort){
                 for (Object[] id: idOfOrg){
                     if (ss.equals(id[0].toString())){
-                        if (id[1].toString().equals("1"))
-                            dou++;
-                        else
-                            soh++;
+                        switch (id[1].toString()) {
+                            case "0":
+                                soh++;
+                                break;
+                            case "1":
+                                dou++;
+                                break;
+                            case "3":
+                                spo++;
+                                break;
+                        }
                         break;
                     }
                 }
             }
-            return dou + " ДОУ, " + soh + " СОШ";
+            if (soh > 0)
+                result.append(soh).append(" СОШ, ");
+            if (dou > 0)
+                result.append(dou).append(" ДОУ, ");
+            if (spo > 0)
+                result.append(spo).append(" СПО, ");
+            if (result.length() > 1)
+                result.setLength(result.length() - 2);
+            return result.toString();
         }
 
-        private List<ComplexMenuReportItem> sortComplex(List<ComplexMenuReportItem> list, List<Object[]> idOfOrg){
+        private List<ComplexMenuReportItem> sortComplex(List<ComplexMenuReportItem> list, List<Object[]> complexList){
             List<ComplexMenuReportItem> item = new ArrayList<>();
             for(int s = 0; s < list.size(); s++){
                 if (list.get(s).getOrg() != null) {
@@ -310,7 +360,7 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                             complexMenuReportItem.setOrg(null);
                         }
                     }
-                        ComplexMenuReportItem complexMenuReportItem = new ComplexMenuReportItem(newOrg, getOrgCount(newOrg, idOfOrg), list.get(s).getComplexList());
+                        ComplexMenuReportItem complexMenuReportItem = new ComplexMenuReportItem(newOrg, getOrgCount(newOrg, complexList), list.get(s).getComplexList());
                         item.add(complexMenuReportItem);
                 }
             }

@@ -3074,7 +3074,12 @@ public class DAOService {
             return null;
         }
     }
-	
+
+    public List<WtDish> getWtDish() {
+        Query q = entityManager.createQuery("SELECT dish FROM WtDish dish");
+        return q.getResultList();
+    }
+
 	//Список союзов организаций, кужа входит данная организация
     public List<Long> getOrgGroupsbyOrgForWEBARM(Long idOforg) throws Exception {
         Session session = (Session) entityManager.getDelegate();

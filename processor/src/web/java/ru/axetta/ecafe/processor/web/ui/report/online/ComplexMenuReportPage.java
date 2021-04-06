@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.*;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
@@ -16,6 +18,7 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ComplexMenuReport;
 import ru.axetta.ecafe.processor.core.report.ComplexMenuReportItem;
+import ru.axetta.ecafe.processor.core.report.ComplexOrgItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -33,11 +36,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -51,8 +50,10 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     private Long selectIdAgeGroup;
     private Long selectArchived;
     private String orgFilter = "Не выбрано";
+    private Date selectDate;
     private final String CLASS_TYPE_TSP = Integer.toString(Contragent.TSP);
-    List<ComplexMenuReportItem> result;
+    private List<ComplexMenuReportItem> result = new ArrayList<>();
+    private List<ComplexOrgItem> complexOrgItem;
 
     public String getPageFilename() {
         return "report/online/complex_menu_report";
@@ -62,39 +63,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         return CLASS_TYPE_TSP;
     }
 
-    public Object buildHTMLReport() {
-        htmlReport="";
-        if (!validateFormData()) {
-            return null;
-        }
-        BasicReportJob report = buildReport();
-        if (report != null) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                JRHtmlExporter exporter = new JRHtmlExporter();
-                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
-                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
-                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                exporter.exportReport();
-                htmlReport = os.toString("UTF-8");
-                os.close();
-            } catch (Exception e) {
-                printError("Ошибка при построении отчета: " + e.getMessage());
-                logger.error("Failed build report ", e);
-            }
-        }
-        return null;
-    }
-
     public void exportToXLS() {
-        if (!validateFormData()) {
-            return;
-        }
         BasicReportJob report = buildReport();
         if (report != null) {
             try {
@@ -137,7 +106,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            result = builder.createDataSource(persistenceSession, getContragent(),  idOfOrgList, selectIdTypeFoodId, selectDiet, selectIdAgeGroup, selectArchived );
+            result = builder.createDataSource(persistenceSession, getContragent(),  idOfOrgList, selectIdTypeFoodId, selectDiet, selectIdAgeGroup, selectArchived, selectDate );
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
@@ -163,11 +132,9 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
             builder.getReportProperties().setProperty("selectDiet", selectDiet.toString());
             builder.getReportProperties().setProperty("selectIdAgeGroup", selectIdAgeGroup.toString());
             builder.getReportProperties().setProperty("selectArchived", selectArchived.toString());
-
-
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report = builder.build(persistenceSession, selectDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -180,28 +147,6 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         return report;
     }
 
-    private boolean validateFormData() {
-        if(startDate == null){
-            printError("Не указана дата начала выборки");
-            return false;
-        }
-        if(endDate == null){
-            printError("Не указана дата конца выборки");
-            return false;
-        }
-        if(startDate.after(endDate)){
-            printError("Дата конца выборки меньше даты начала выборки");
-            return false;
-        } else {
-            int diffInDays = (int)( (endDate.getTime() - startDate.getTime())
-                    / (1000 * 60 * 60 * 24));
-            if (diffInDays >= 365) {
-                printError("Выбран слишком большой период. Измените период и повторите построение отчета");
-                return false;
-            }
-        }
-        return true;
-    }
 
     @Override
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContragentFlag, String classTypes)
@@ -256,6 +201,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         return items;
     }
 
+
     public SelectItem[] getTypesOfDiet() {
         List<WtDietType> dietGroupItems = DAOService.getInstance().getMapDiet();
         SelectItem[] items = new SelectItem[dietGroupItems.size() + 1];
@@ -286,6 +232,22 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         items[1] = new SelectItem(-1, "Включая архивные");
         items[2] = new SelectItem(1, "Только архивные");
         return items;
+    }
+
+    public Date getSelectDate() {
+        return selectDate;
+    }
+
+    public void setSelectDate(Date selectDate) {
+        this.selectDate = selectDate;
+    }
+
+    public List<ComplexOrgItem> getComplexOrgItem() {
+        return complexOrgItem;
+    }
+
+    public void setComplexOrgItem(List<ComplexOrgItem> complexOrgItem) {
+        this.complexOrgItem = complexOrgItem;
     }
 
     public List<ComplexMenuReportItem> getResult() {

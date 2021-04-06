@@ -16,13 +16,77 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<rich:modalPanel id="orgList" autosized="true" minWidth="1100">
+    <f:facet name="header">
+        <h:outputText
+                value="Список организаций" />
+    </f:facet>
+    <rich:dataTable id="orgs"  value="#{mainPage.complexMenuReportPage.complexOrgItem}"
+                    var="item" rows="15" footerClass="data-table-footer">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ИД ОО" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Краткое официальное наименование ОО" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Адрес здания ОО" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Наименование ОО для ПП" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Округ" />
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{item.shortNameInfoService}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{item.address}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{item.shortName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{item.district}" styleClass="output-text" />
+        </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="orgs" renderIfSinglePage="false"
+                               maxPages="5" fastControls="hide" stepControls="auto"
+                               boundaryControls="hide">
+                <a4j:support event="onpagechange" />
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
+    </rich:dataTable>
+    <rich:spacer height="20px" />
+    <tr>
+        <td style="text-align: right;">
+            <a4j:commandButton value="Закрыть"  onclick="Richfaces.hideModalPanel('orgList')"
+                       style="width: 180px; margin-right: 8px; margin-bottom: 8px"  ajaxSingle="true" />
+         </td>
+    </tr>
+</rich:modalPanel>
+
 <h:panelGrid id="dishMenuReportPanel" binding="#{mainPage.complexMenuReportPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
     <h:panelGrid id="filterComplexMenuReportPanel" columns="2">
 
         <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
-        <h:panelGroup styleClass="borderless-div" id="contragentPreordersReportPageSelectContragentPanel">
+        <h:panelGroup styleClass="borderless-div" id="contragentComplexMenuPanel">
             <h:inputText value="#{mainPage.complexMenuReportPage.filter}" readonly="true"
                          styleClass="input-text" style="margin-right: 2px; width: 275px;" />
             <a4j:commandButton value="..."
@@ -36,7 +100,7 @@
         </h:panelGroup>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
-        <h:panelGroup styleClass="borderless-div" id="contragentPreordersReportPageSelectOrgsPanel">
+        <h:panelGroup styleClass="borderless-div" id="complexMenuOrgPanel">
             <a4j:commandButton value="..." action="#{mainPage.complexMenuReportPage.showOrgListSelectPage}"
                                reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null})
@@ -68,12 +132,29 @@
             <f:selectItems value="#{mainPage.complexMenuReportPage.getArchived()}"/>
         </h:selectOneMenu>
 
+        <h:outputText escape="true" value="Показать комплексы на дату" styleClass="output-text" />
+        <rich:calendar value="#{mainPage.complexMenuReportPage.selectDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDateCalendar"
+                         actionListener="#{mainPage.complexMenuReportPage.onReportPeriodChanged}" />
+        </rich:calendar>
+
+        <h:outputText escape="true" value="Блюдо" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{mainPage.complexDishSelectPage.selectedItem.dishName}" readonly="true" styleClass="input-text"
+                         style="margin-right: 2px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showDishSelectPage}" reRender="modalDishSelectorForm"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDishSelectorForm')}.show();"
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="#{null}" target="#{mainPage.complexDishSelectPage.filter}" />
+            </a4j:commandButton>
+        </h:panelGroup>
     </h:panelGrid>
 
     <h:panelGrid columns="2">
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.complexMenuReportPage.buildForJsf}"
-                           reRender="complexMenuReportTablePanel" styleClass="command-button" status="reportGenerateStatus" />
+                           reRender="complexMenuReportTable" styleClass="command-button" status="reportGenerateStatus" />
 
         <h:commandButton value="Генерировать отчет в Excel"
                          action="#{mainPage.complexMenuReportPage.exportToXLS}"
@@ -100,9 +181,8 @@
     </h:panelGrid>
 
     <rich:dataTable id="complexMenuReportTable" value="#{mainPage.complexMenuReportPage.result}"
-                    var="item" rows="25"
+                    var="item" rows="40"
                     footerClass="data-table-footer" >
-
         <f:facet name="header">
             <rich:columnGroup>
                 <rich:column headerClass="column-header">
@@ -113,6 +193,9 @@
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Тип питания" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Рацион" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Возрастная категория" />
@@ -127,7 +210,10 @@
                     <h:outputText escape="true" value="Передавать внешним системам" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Даты действия" />
+                    <h:outputText escape="true" value="Дата начала"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Дата окончания" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Циклическое наполнение" />
@@ -135,14 +221,64 @@
             </rich:columnGroup>
         </f:facet>
 
-        <rich:subTable value="#{item.complexItem}" var="complex" rowKeyVar="rowComplexKey">
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="item.idOfOrg" />
-                    </f:facet>
-                    <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
-                </rich:column>
-            </rich:subTable>
+        <rich:subTable value="#{item.complexItem}" var="complexItem" rowKeyVar="rowKey"
+                       columnClasses="center-aligned-column, center-aligned-column, center-aligned-column">
+
+            <rich:column headerClass="column-header" rowspan="#{item.complexItem.size()}" rendered="#{rowKey eq 0}">
+                <a4j:commandButton value="Список" reRender="orgList" ajaxSingle="true"
+                                   oncomplete="Richfaces.showModalPanel('orgList');">
+                    <f:setPropertyActionListener value="#{item.complexOrgItem}"
+                                                 target="#{mainPage.complexMenuReportPage.complexOrgItem}" />
+                </a4j:commandButton>
+            </rich:column>
+
+            <rich:column headerClass="column-header" rowspan="#{item.complexItem.size()}" rendered="#{rowKey eq 0}">
+                <h:outputText escape="true" value="#{item.orgCount}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" style="white-space: nowrap" value="#{complexItem.complexGroupItem}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complexItem.dietType}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complexItem.ageGroupItem}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" style="white-space: nowrap" value="#{complexItem.complexName}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complexItem.price}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complexItem.isPortal}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" style="white-space: nowrap" value="#{complexItem.startDate}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" style="white-space: nowrap" value="#{complexItem.endDate}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complexItem.cycle}" styleClass="output-text"/>
+            </rich:column>
+        </rich:subTable>
+
+        <f:facet name="footer">
+            <rich:datascroller for="complexMenuReportTable" renderIfSinglePage="false"
+                               maxPages="5" fastControls="hide" stepControls="auto"
+                               boundaryControls="hide">
+                <a4j:support event="onpagechange" />
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
+
     </rich:dataTable>
+
 
 </h:panelGrid>
