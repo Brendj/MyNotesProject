@@ -2217,7 +2217,6 @@ public class Processor implements SyncProcessor {
         processMigrantsSections(request, syncHistory, responseSections, null);
         if (request.getClientRegistryRequest() == null)
             processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
-        processAccRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccountRegistrySectionsForMigrants(request, syncHistory, responseSections);
         if (request.getClientGuardianRequest() == null)
             processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
@@ -2252,22 +2251,6 @@ public class Processor implements SyncProcessor {
             String message = String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }
-    }
-
-    private void processAccRegistrySectionsForMigrants(SyncRequest request, SyncHistory syncHistory,
-            List<AbstractToElement> responseSections) {
-        SyncResponse.AccRegistry accRegistryForMigrants;
-        try {
-            accRegistryForMigrants = getAccRegistryForMigrants(request.getIdOfOrg());
-            addToResponseSections(accRegistryForMigrants, responseSections);
-        } catch (Exception e) {
-            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            if (syncHistory != null) {
-                processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory,
-                        message);
-            }
             logger.error(message, e);
         }
     }
@@ -3692,20 +3675,22 @@ public class Processor implements SyncProcessor {
         //info messages
         processInfoMessageSections(request, responseSections);
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
-            }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
+        //if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.96")) {
+        //    try {
+        //        EmiasRequest emiasRequest = request.getEmiasRequest();
+        //        if (emiasRequest != null) {
+        //            FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+        //            emiasSection = new EmiasSection();
+        //            emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+        //            emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+        //            emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+        //            emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        //        }
+        //    } catch (Exception e) {
+        //        String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+        //        logger.error(message, e);
+        //    }
+        //}
 
         try {
             ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
@@ -4982,13 +4967,10 @@ public class Processor implements SyncProcessor {
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     long totalRSum = totalBuffetRSum + totalLunchRSum;
                     long totalAmountBuyAll = totalBuffetRSum + totalLunchRSum;
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_PRICE,
-                            Long.toString(totalBuffetRSum / 100) + ',' + Long.toString(totalBuffetRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_LUNCH,
-                            Long.toString(totalLunchRSum / 100) + ',' + Long.toString(totalLunchRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT,
-                            Long.toString(totalRSum / 100) + ',' + Long.toString(totalRSum % 100), values);
-                    values = EventNotificationService.attachAmountBuyAllToValues(totalAmountBuyAll, values);
+                    values = EventNotificationService.attachMoneyToValues(totalBuffetRSum, values, EventNotificationService.PARAM_AMOUNT_PRICE);
+                    values = EventNotificationService.attachMoneyToValues(totalLunchRSum, values, EventNotificationService.PARAM_AMOUNT_LUNCH);
+                    values = EventNotificationService.attachMoneyToValues(totalRSum, values, EventNotificationService.PARAM_AMOUNT);
+                    values = EventNotificationService.attachMoneyToValues(totalAmountBuyAll, values, EventNotificationService.PARAM_AMOUNT_BUY_ALL);
                     if (client.getBalance() != null) {
                         values = EventNotificationService.attachToValues("balance",
                                 Long.toString(client.getBalance() / 100) + ',' + Long
@@ -5237,7 +5219,7 @@ public class Processor implements SyncProcessor {
                 return;
             }
 
-            if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
+            if (!orgMap.containsKey(client.getOrg().getIdOfOrg())) {
                 if (!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient())
                         .size() > 0)) {
                     if (!allocatedClients.contains(clientParamItem.getIdOfClient())) {
