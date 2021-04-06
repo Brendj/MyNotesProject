@@ -93,6 +93,9 @@ public class AssignTaskExecutor {
 
                     List<ClientDiscountHistory> discountChangeHistoryList = discountsService.getNewHistoryByTime(begin);
                     for (ClientDiscountHistory h : discountChangeHistoryList) {
+                        if(h.getCategoryDiscount().getCategoryType() != 0){
+                            continue;
+                        }
                         type = AssignOperationType.getAssignTypeByOperationType(h.getOperationType());
                         if (AssignOperationType.CHANGE.equals(type)
                                 || h.getCategoryDiscount().getCategoryDiscountDTSZN() != null) {
@@ -101,7 +104,8 @@ public class AssignTaskExecutor {
                                             .getCategoryDiscountDTSZN().getCode());
                         }
 
-                        AssignEvent event = AssignEvent.build(h.getCategoryDiscount(), h.getClient(), type, info);
+                        AssignEvent event = AssignEvent.build(h.getCategoryDiscount(), h.getClient(), type, info,
+                                h.getRegistryDate().toString());
                         kafkaService.sendAssign(mapper.writeValueAsString(event));
                     }
                 }
@@ -126,7 +130,15 @@ public class AssignTaskExecutor {
                     for (Client c : clientsList) {
                         List<CategoryDiscount> clientCategoryDiscount = c.getDiscounts();
                         for (CategoryDiscount discount : clientCategoryDiscount) {
-                            if (discount.getCategoryType() != 0) {
+                            if(discount.getCategoryType() != 0){
+                                continue;
+                            }
+                            ClientDiscountHistory history = discountsService.getLastHistoryByClientAndCategory(c, discount);
+                            if(history == null){
+                                log.warn(String
+                                        .format("Primary load: No history by ClientId %d and DiscountId %d, skipped",
+                                                c.getIdOfClient(), discount.getIdOfCategoryDiscount())
+                                );
                                 continue;
                             }
 
@@ -136,7 +148,7 @@ public class AssignTaskExecutor {
                                         .getLastInfoByClientAndCode(c, discount.getCategoryDiscountDTSZN().getCode());
                             }
 
-                            AssignEvent event = AssignEvent.build(discount, c, AssignOperationType.ADD, info);
+                            AssignEvent event = AssignEvent.build(discount, c, AssignOperationType.ADD, info, history.getRegistryDate().toString());
                             kafkaService.sendAssign(mapper.writeValueAsString(event));
                         }
                         fileSupportService.writeLastProcessIdOfClient(c.getIdOfClient());

@@ -15,8 +15,8 @@ import java.util.List;
 public interface ClientRepo extends JpaRepository<Client, Long> {
 
     @EntityGraph(value = "client.discount", type = EntityGraph.EntityGraphType.LOAD)
-    List<Client> getAllByMeshGuidIsNotNullAndDiscountsNotNull(Pageable pageable);
+    List<Client> findByMeshGuidIsNotNullAndDiscountsNotNull(Pageable pageable);
 
     @EntityGraph(value = "client.discount", type = EntityGraph.EntityGraphType.LOAD)
-    List<Client> getAllByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(Long idOfClient, Pageable pageable);
+    List<Client> findByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(Long idOfClient, Pageable pageable);
 }

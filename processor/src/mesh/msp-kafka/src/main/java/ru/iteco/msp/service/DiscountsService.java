@@ -4,6 +4,7 @@
 
 package ru.iteco.msp.service;
 
+import ru.iteco.msp.models.CategoryDiscount;
 import ru.iteco.msp.models.Client;
 import ru.iteco.msp.models.ClientDTSZNDiscountInfo;
 import ru.iteco.msp.models.ClientDiscountHistory;
@@ -12,6 +13,7 @@ import ru.iteco.msp.repo.assign.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +25,16 @@ public class DiscountsService {
     private final CategoryDiscountDTSZNRepo categoryDiscountDTSZNRepo;
     private final ClientDiscountHistoryRepo clientDiscountHistoryRepo;
     private final ClientRepo clientRepo;
+
+    public final static List<Long> DISCOUNTS_CODES_WITH_END_DATE = Arrays.asList(
+            24L, // Инвалидность
+            41L, // Пенсионер
+            48L, // Малообеспеченные
+            52L, // Сироты
+            56L, // Родитель с инвалидностью
+            66L, // Многодетные
+            0L   // Иное
+    );
 
     private final static Integer DISCOUNT_TYPE = 0;
 
@@ -42,11 +54,11 @@ public class DiscountsService {
     }
 
     public List<Client> getClientsWithMeshGuid(Pageable pageable){
-        return clientRepo.getAllByMeshGuidIsNotNullAndDiscountsNotNull(pageable);
+        return clientRepo.findByMeshGuidIsNotNullAndDiscountsNotNull(pageable);
     }
 
     public List<Client> getClientsWithMeshGuidAndGreaterThenIdOfClient(Long idOfClient, Pageable pageable){
-        return clientRepo.getAllByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(idOfClient, pageable);
+        return clientRepo.findByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(idOfClient, pageable);
     }
 
     public ClientDTSZNDiscountInfo getLastInfoByClientAndCode(Client client, Integer code) {
@@ -56,5 +68,10 @@ public class DiscountsService {
     public List<ClientDiscountHistory> getNewHistoryByTime(Date date) {
         return clientDiscountHistoryRepo
                 .getAllByRegistryDateGreaterThanEqualAndClientMeshGuidIsNotNullAndCategoryDiscountCategoryType(date.getTime(), DISCOUNT_TYPE);
+    }
+
+    public ClientDiscountHistory getLastHistoryByClientAndCategory(Client c, CategoryDiscount discount) {
+        return clientDiscountHistoryRepo
+                .getFirstByCategoryDiscountAndClientOrderByRegistryDateDesc(discount, c);
     }
 }
