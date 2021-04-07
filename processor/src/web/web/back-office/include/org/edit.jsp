@@ -57,6 +57,8 @@
         </h:selectOneMenu>
         <h:inputTextarea rows="2" cols="64" value="#{mainPage.orgEditPage.statusTextArea}" styleClass="input-text" />
     </h:panelGrid>
+    <h:outputText escape="true" value="Наличие ГК" styleClass="output-text"/>
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.governmentContract}" styleClass="input-text" />
     <h:outputText escape="true" value="Очередь внедрения" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.introductionQueue}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
