@@ -54,11 +54,11 @@ public class DiscountsService {
     }
 
     public List<Client> getClientsWithMeshGuid(Pageable pageable){
-        return clientRepo.findByMeshGuidIsNotNullAndDiscountsNotNull(pageable);
+        return clientRepo.findDistinctByMeshGuidIsNotNullAndDiscountsNotNull(pageable);
     }
 
     public List<Client> getClientsWithMeshGuidAndGreaterThenIdOfClient(Long idOfClient, Pageable pageable){
-        return clientRepo.findByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(idOfClient, pageable);
+        return clientRepo.findDistinctByMeshGuidIsNotNullAndDiscountsNotNullAndIdOfClientGreaterThan(idOfClient, pageable);
     }
 
     public ClientDTSZNDiscountInfo getLastInfoByClientAndCode(Client client, Integer code) {
@@ -73,5 +73,9 @@ public class DiscountsService {
     public ClientDiscountHistory getLastHistoryByClientAndCategory(Client c, CategoryDiscount discount) {
         return clientDiscountHistoryRepo
                 .getFirstByCategoryDiscountAndClientOrderByRegistryDateDesc(discount, c);
+    }
+
+    public List<CategoryDiscount> getDiscountsByClient(Client c) {
+        return categoryDiscountRepo.findAllByClients(c);
     }
 }

@@ -128,17 +128,17 @@ public class AssignTaskExecutor {
                 }
                 while (CollectionUtils.isNotEmpty(clientsList)) {
                     for (Client c : clientsList) {
-                        List<CategoryDiscount> clientCategoryDiscount = c.getDiscounts();
+                        List<CategoryDiscount> clientCategoryDiscount = discountsService.getDiscountsByClient(c);
                         for (CategoryDiscount discount : clientCategoryDiscount) {
                             if(discount.getCategoryType() != 0){
                                 continue;
                             }
                             ClientDiscountHistory history = discountsService.getLastHistoryByClientAndCategory(c, discount);
                             if(history == null){
-                                log.warn(String
+                                /*log.warn(String
                                         .format("Primary load: No history by ClientId %d and DiscountId %d, skipped",
                                                 c.getIdOfClient(), discount.getIdOfCategoryDiscount())
-                                );
+                                );*/
                                 continue;
                             }
 
