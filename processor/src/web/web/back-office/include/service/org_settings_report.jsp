@@ -146,6 +146,15 @@
                     <h:outputText escape="true" value="Статус" />
                 </rich:column>
                 <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Детализация статуса" />
+                </rich:column>
+                <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Комментарий к статусу" />
+                </rich:column>
+                <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Наличие ГК" />
+                </rich:column>
+                <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
                     <h:outputText escape="true" value="GUID" />
                 </rich:column>
                 <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
@@ -305,6 +314,17 @@
             <h:outputText escape="true" value="#{item.status}" styleClass="output-text" />
         </rich:column>
         <!-- Requisites -->
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
+            <h:outputText escape="true" value="#{item.organizationStatus}" styleClass="output-text" />
+        </rich:column>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
+            <h:outputText escape="true" value="#{item.statusDetailing}" styleClass="output-text" />
+        </rich:column>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
+            <h:selectBooleanCheckbox value="#{item.governmentContract}" styleClass="checkboxes">
+                <a4j:support event="onchange" action="#{item.change()}" />
+            </h:selectBooleanCheckbox>
+        </rich:column>
         <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.GUID}" styleClass="output-text" />
         </rich:column>

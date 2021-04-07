@@ -368,6 +368,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
                     org.setOrgStructureVersion(nextOrgVersion);
                     org.setOrgSettingsSyncParam(Boolean.TRUE);
+                    org.setGovernmentContract(item.getGovernmentContract());
                     session.update(org);
 
                     logger.info("Success");
