@@ -1309,7 +1309,7 @@ public class ClientManager {
         try {
             return runtimeContext.getCardManager()
                     .createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state,
-                            validTime, lifeState, lockReason, issueTime, cardPrintedNo);
+                            validTime, lifeState, lockReason, issueTime, cardPrintedNo, null);
         } catch (Exception e) {
             throw new Exception("Ошибка при создании карты: " + e);
         }

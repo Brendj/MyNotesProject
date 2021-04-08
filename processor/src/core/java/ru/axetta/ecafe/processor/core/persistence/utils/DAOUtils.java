@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -625,6 +625,12 @@ public class DAOUtils {
     public static CardTemp findCardTempByCardNo(Session persistenceSession, long cardNo) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
+        return (CardTemp) criteria.uniqueResult();
+    }
+
+    public static CardTemp findCardTempByLongCardNo(Session persistenceSession, Long longCardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
+        criteria.add(Restrictions.eq("longCardNo", longCardNo));
         return (CardTemp) criteria.uniqueResult();
     }
 
@@ -2678,7 +2684,8 @@ public class DAOUtils {
     // TODO: воспользоваться диклоративными пособами генерации запроса и на выходи получать только TempCardOperationItem
     public static CardTempOperation getLastTempCardOperationByOrgAndCartNo(Session session, Long idOfOrg, Long cardNo) {
         Query query = session.createQuery(
-                "select operation from CardTempOperation operation left join operation.cardTemp card  where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
+                "select operation from CardTempOperation operation left join operation.cardTemp card "
+                   + " where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("cardNo", cardNo);
         List list = query.list();
@@ -5473,5 +5480,38 @@ public class DAOUtils {
                 + "  and agetypegroup not like ''\n "
                 + "order by agetypegroup");
         return q.list();
+    }
+
+    public static Card findCardByLongCardNoExtended(Session session, Long longCardNo,
+            Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
+        if (longCardNo == null) return null;
+        try {
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("longCardNo", longCardNo));
+
+            if (idOfClient != null || idOfGuardian != null || idOfVisitor != null) {
+                List<Long> ids = new LinkedList<>();
+                if (idOfClient != null) ids.add(idOfClient);
+                if (idOfGuardian != null) ids.add(idOfGuardian);
+                if (idOfVisitor != null) ids.add(idOfVisitor);
+                if (!ids.isEmpty())
+                    criteria.add(Restrictions.in("client.idOfClient", ids));
+            }
+
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Error in findCardByCardNoExtended", e);
+            return null;
+        }
+    }
+
+    public static Card findCardByLongCardNo(Session persistenceSession, Long longCardNo) {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("longCardNo", longCardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
     }
 }

@@ -166,6 +166,7 @@ public class Org implements Serializable {
     private Long orgIdFromNsi;
     private Boolean gooddatecheck;
     private Boolean governmentContract;
+    private Boolean useLongCardNo;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -233,6 +234,7 @@ public class Org implements Serializable {
         this.preordersEnabled = false;
         this.useWebArm = false;
         this.governmentContract = false;
+        this.useLongCardNo = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1335,5 +1337,13 @@ public class Org implements Serializable {
 
     public void setGovernmentContract(Boolean governmentContract) {
         this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseLongCardNo() {
+        return useLongCardNo;
+    }
+
+    public void setUseLongCardNo(Boolean useLongCardNo) {
+        this.useLongCardNo = useLongCardNo;
     }
 }

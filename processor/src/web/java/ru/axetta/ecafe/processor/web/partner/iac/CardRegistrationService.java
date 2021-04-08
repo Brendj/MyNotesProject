@@ -86,7 +86,7 @@ public class CardRegistrationService {
                 validDate = CalendarUtils.addDays(new Date(), 10);
             RuntimeContext.getInstance().getCardManager().createCard(session, session.getTransaction(), client.getIdOfClient(),
                     cardId, Arrays.asList(Card.TYPE_NAMES).indexOf("Mifare"), CardState.ISSUED.getValue(), validDate,
-                    Card.ISSUED_LIFE_STATE, null, new Date(), cardId);
+                    Card.ISSUED_LIFE_STATE, null, new Date(), cardId, null);
         } else {
             if (CardState.BLOCKED.getValue() != card.getState() && CardState.TEMPBLOCKED.getValue() != card.getState()) {
                 throw new CardAlreadyUsedException(String.format("Card already used: cardId = %d, orgId = %d, clientId = %d",

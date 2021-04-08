@@ -197,10 +197,6 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.publicKey}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Текущий номер пакета" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.idOfPacket}" styleClass="input-text" />
-    <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.oneActiveCard}"  styleClass="input-text" disabled="true"  />
-    <h:outputText escape="true" value="Цифровая подпись при регистрации карты" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.needVirifyCardSign}"  styleClass="input-text" disabled="true"  />
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.securityLevel}" styleClass="input-text long-field" />
     <h:outputText id="disableEditingClientsFromAISReestrLabel" escape="true" value="Разрешить проведение сверки контингента" styleClass="output-text"/>
@@ -225,12 +221,6 @@
                       rendered="#{mainPage.orgViewPage.isCurrentOrg(key.idOfOrg)}"/>
         <h:outputText escape="false" value="&nbsp;&nbsp;" styleClass="output-text" />
     </a4j:repeat>
-    <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.workInSummerTime}" styleClass="input-text" disabled="true" />
-    <h:outputText escape="true" value="Заявки на посещение других ОО" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.requestForVisitsToOtherOrg}" styleClass="input-text" disabled="true" />
-    <h:outputText escape="true" value="Использование обучающимися нескольких идентификаторов в ОО" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.multiCardModeEnabled}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useWebArm}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Функционал проверки даты в заявке на питание" styleClass="output-text" />
@@ -239,6 +229,24 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.autoCreateCards}" styleClass="input-text" disabled="true" rendered="#{mainPage.isSpb}" />
+</h:panelGrid>
+<br />
+<rich:separator />
+<br />
+<h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
+<h:panelGrid id="orgViewGrid_cards" styleClass="borderless-grid" columns="2">
+    <h:outputText escape="true" value="Разрешить один активный ЭИ" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.oneActiveCard}"  styleClass="input-text" disabled="true"  />
+    <h:outputText escape="true" value="Цифровая подпись при регистрации ЭИ" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.needVirifyCardSign}"  styleClass="input-text" disabled="true"  />
+    <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.workInSummerTime}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Заявки на посещение других ОО" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.requestForVisitsToOtherOrg}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Использование обучающимися нескольких ЭИ в ОО" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.multiCardModeEnabled}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useLongCardNo}" styleClass="input-text" disabled="true" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"
