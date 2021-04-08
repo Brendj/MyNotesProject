@@ -147,6 +147,14 @@ public class AssignTaskExecutor {
                                 info = discountsService
                                         .getLastInfoByClientAndCode(c, discount.getCategoryDiscountDTSZN().getCode());
                             }
+                            if(info != null && !info.getStatus().equals(0) && isNotArchived(info)){
+                                log.warn(String
+                                        .format("Primary load: DTSZN Info for ClientId %d and DiscountId %d"
+                                                        + " is invalid (status == 0 or is archived),"
+                                                        + " but discount is active for the target client, skipped",
+                                                c.getIdOfClient(), discount.getIdOfCategoryDiscount()));
+                                continue;
+                            }
 
                             AssignEvent event = AssignEvent.build(discount, c, AssignOperationType.ADD, info, history.getRegistryDate().toString());
                             kafkaService.sendAssign(mapper.writeValueAsString(event));
@@ -161,6 +169,10 @@ public class AssignTaskExecutor {
             } catch (Exception e) {
                 log.error("Critical error in process sending primary discount change history records, task interrupt", e);
             }
+        }
+
+        private boolean isNotArchived(ClientDTSZNDiscountInfo info) {
+            return info.getArchived() == null || info.getArchived().equals(0);
         }
     }
 }
