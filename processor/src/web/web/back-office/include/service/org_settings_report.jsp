@@ -117,7 +117,6 @@
                     headerClass="column-header gray">
         <f:facet name="header">
             <rich:columnGroup columnClasses="gray">
-                <%--<h:outputText escape="true" value="Отчет по образовательным комплексам" />--%>
                 <rich:column rowspan="2">
                     <h:outputText escape="true" value="Номер" />
                 </rich:column>
@@ -151,7 +150,7 @@
                 <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
                     <h:outputText escape="true" value="Комментарий к статусу" />
                 </rich:column>
-                <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                <rich:column rendered="#{orgSettingsReportPage.showRequisite}" colspan="1">
                     <h:outputText escape="true" value="Наличие ГК" />
                 </rich:column>
                 <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
@@ -223,7 +222,12 @@
                 <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}" colspan="1">
                     <h:outputText escape="true" value="Режим \"Летний период\"" />
                 </rich:column>
-                <rich:column breakBefore="true" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+                <rich:column breakBefore="true" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseGovernmentContract}" disabled="false">
+                        <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(12)}"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseWebArm}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(0)}"/>
                     </h:selectBooleanCheckbox>
