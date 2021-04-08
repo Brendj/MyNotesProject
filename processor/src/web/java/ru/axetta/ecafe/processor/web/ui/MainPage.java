@@ -1449,8 +1449,6 @@ public class MainPage implements Serializable {
             logger.error("Failed to load menu exchange from table", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при выводе данных по мастера меню: " + e.getMessage(), null));
-        } finally {
-
         }
         return null;
     }

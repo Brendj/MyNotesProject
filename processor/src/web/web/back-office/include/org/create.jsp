@@ -208,10 +208,6 @@
 <h:panelGrid id="orgCreateGrid_sync" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.publicKey}" maxlength="1024" styleClass="input-text" />
-    <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.oneActiveCard}"  styleClass="input-text"  />
-    <h:outputText escape="true" value="Цифровая подпись при регистрации карты" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.needVerifyCardSign}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.orgCreatePage.securityLevel}" styleClass="input-text" style="width: 250px;">
         <f:converter converterId="organizationSecurityLevelConverter"/>
@@ -226,6 +222,18 @@
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
+    <br />
+    <rich:separator />
+    <br />
+    <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
+    <h:panelGrid id="orgCreateGrid_cards" styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Разрешить один активный ЭИ" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.oneActiveCard}"  styleClass="input-text"  />
+        <h:outputText escape="true" value="Цифровая подпись при регистрации ЭИ" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.needVerifyCardSign}"  styleClass="input-text"  />
+        <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardId}" styleClass="input-text" />
+    </h:panelGrid>
 <br />
 <rich:separator />
 <br />
