@@ -1446,7 +1446,7 @@ public class PreorderDAOService {
 
     @Transactional
     public void relevancePreordersToWtMenu(PreorderComplex preorderComplex, long nextVersion) {
-        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        if (isGoodRequestExists(preorderComplex)) return;
         Date preorderDate = preorderComplex.getPreorderDate();
 
         WtComplex wtComplex = getWtComplex(preorderComplex, preorderComplex.getArmComplexId(), preorderDate);
