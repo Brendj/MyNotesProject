@@ -10,6 +10,7 @@ import ru.iteco.msp.models.CategoryDiscount;
 import ru.iteco.msp.models.Client;
 import ru.iteco.msp.models.ClientDTSZNDiscountInfo;
 import ru.iteco.msp.models.CodeMSP;
+import ru.iteco.msp.service.DiscountsService;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssignEvent {
@@ -22,7 +23,7 @@ public class AssignEvent {
     private String end_at;
 
     public static AssignEvent build(CategoryDiscount categoryDiscount, Client client,
-            AssignOperationType type, ClientDTSZNDiscountInfo info){
+            AssignOperationType type, ClientDTSZNDiscountInfo info, String beginDate){
         AssignEvent event = new AssignEvent();
         event.setPerson_id(client.getMeshGuid());
 
@@ -37,9 +38,9 @@ public class AssignEvent {
         } else {
             event.setBenefit_category_name(categoryDiscount.getCategoryName());
         }
+        event.setBegin_at(beginDate);
 
-        if(info != null){
-            event.setBegin_at(info.getDateStart().toString());
+        if(info != null && DiscountsService.DISCOUNTS_CODES_WITH_END_DATE.contains(info.getDTISZNCode())){
             event.setEnd_at(info.getDateEnd().toString());
         }
         event.setAction_code(type.getCode());

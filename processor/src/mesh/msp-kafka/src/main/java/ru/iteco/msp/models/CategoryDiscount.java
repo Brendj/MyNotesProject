@@ -36,6 +36,14 @@ public class CategoryDiscount {
     )
     private Set<WtDiscountRule> wtRules;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "cf_clients_categorydiscounts",
+            joinColumns = @JoinColumn(name = "idofcategorydiscount"),
+            inverseJoinColumns = @JoinColumn(name = "idofclient")
+    )
+    private Set<Client> clients;
+
     @OneToOne(mappedBy = "categoryDiscount", fetch = FetchType.EAGER)
     private CategoryDiscountDTSZN categoryDiscountDTSZN;
 
@@ -99,6 +107,14 @@ public class CategoryDiscount {
 
     public void setCategoryDiscountDTSZN(CategoryDiscountDTSZN categoryDiscountDTSZN) {
         this.categoryDiscountDTSZN = categoryDiscountDTSZN;
+    }
+
+    public Set<Client> getClients() {
+        return clients;
+    }
+
+    public void setClients(Set<Client> clients) {
+        this.clients = clients;
     }
 
     @Override
