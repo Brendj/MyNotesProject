@@ -4770,10 +4770,16 @@ public class Processor implements SyncProcessor {
                 // If cardNo specified - load card from data model
                 Card card = null;
                 Long cardNo = payment.getCardNo();
-                if (null != cardNo) {
-                    card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                Long longCardNo = payment.getLongCardNo();
+                if (null != cardNo || null != longCardNo) {
+                    if (longCardNo != null) {
+                        card = DAOUtils.findCardByLongCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                    } else {
+                        card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                    }
                     if (null == card) {
-                        logger.info(String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
+                        logger.info(
+                                String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
                                         payment.getIdOfOrder(), cardNo));
                     } else {
                         RuntimeContext.getAppContext().getBean(CardBlockService.class)
@@ -6689,6 +6695,7 @@ public class Processor implements SyncProcessor {
                     enterEvent.setPassDirection(e.getPassDirection());
                     enterEvent.setEventCode(e.getEventCode());
                     enterEvent.setIdOfCard(e.getIdOfCard());
+                    enterEvent.setLongCardId(e.getLongCardId());
                     enterEvent.setClient(clientFromEnterEvent);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
                     // Проверка корректности времени

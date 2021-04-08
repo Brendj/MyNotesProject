@@ -15,8 +15,8 @@ import ru.axetta.ecafe.util.ParseUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,7 +192,7 @@ public class CardFileLoadPage extends BasicWorkspacePage {
         try {
             Long idOfCard = cardManager
                     .createCard(idOfClient, cardNo, cardType, state, validTime, lifeState, lockReason, issueTime,
-                            cardPrintedNo);
+                            cardPrintedNo, null);
             return new LineResult(lineNo, 0, "Ok", idOfCard);
         } catch (Exception e) {
             logger.debug("Failed to create card", e);

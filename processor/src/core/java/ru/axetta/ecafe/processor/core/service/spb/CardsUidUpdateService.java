@@ -53,7 +53,7 @@ public class CardsUidUpdateService {
                                         card.getIssueTime(), card.getExternalId());
                                 cardManager.createCard(client.getIdOfClient(), newCardNo, card.getCardType(),
                                         CardState.ISSUED.getValue(), CalendarUtils.addYear(new Date(), 10),
-                                        Card.ISSUED_LIFE_STATE, null, new Date(), newCardPrintedNo);
+                                        Card.ISSUED_LIFE_STATE, null, new Date(), newCardPrintedNo, null);
                             }
                         }
                     } catch (NumberFormatException e) {

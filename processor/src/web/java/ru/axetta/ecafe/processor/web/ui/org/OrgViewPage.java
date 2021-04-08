@@ -104,6 +104,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean preordersEnabled;
     private Boolean participantOP;
     private Boolean preorderlp;
+    private Boolean useLongCardNo;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -305,6 +306,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.orgIdFromNsi = org.getOrgIdFromNsi();
         this.goodDateCheck = org.getGooddatecheck();
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
+        this.useLongCardNo = org.getUseLongCardNo();
     }
 
     public String getFilterOrgs() {
@@ -864,5 +866,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setGovernmentContract(Boolean governmentContract) {
         this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseLongCardNo() {
+        return useLongCardNo;
+    }
+
+    public void setUseLongCardNo(Boolean useLongCardNo) {
+        this.useLongCardNo = useLongCardNo;
     }
 }

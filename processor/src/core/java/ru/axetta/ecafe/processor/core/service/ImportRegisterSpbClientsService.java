@@ -241,8 +241,9 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                         Org org = DAOUtils.findOrg(session, change.getIdOfOrg());
                         if (org.getAutoCreateCards()) {
                             RuntimeContext.getInstance().getCardManager()
-                                    .createCardTransactionFree(session, afterSaveClient.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
-                                            CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                                    .createCardTransactionFree(session, afterSaveClient.getIdOfClient(), cardNo,
+                                            Card.parseCardType(Card.TYPE_NAMES[1]), CardState.ISSUED.getValue(),
+                                            validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo, null);
                         }
                     }
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
@@ -926,8 +927,9 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     try {
                         CardManagerProcessor.lockActiveCards(session, client.getCards());
                         RuntimeContext.getInstance().getCardManager()
-                                .createCardTransactionFree(session, client.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
-                                        CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                                .createCardTransactionFree(session, client.getIdOfClient(), cardNo,
+                                        Card.parseCardType(Card.TYPE_NAMES[1]), CardState.ISSUED.getValue(),
+                                        validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo, null);
                     } catch (Exception e) {
                         logger.error("Error SPb cards creation for client " + client.getContractId(), e);
                         continue;
