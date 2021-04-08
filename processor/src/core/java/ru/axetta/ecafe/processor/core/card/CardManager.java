@@ -33,7 +33,7 @@ public interface CardManager {
     Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo, Long longCardNo, User user) throws Exception;;
 
-    void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception;
+    void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo, Long longCardNo) throws Exception;
 
     void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId) throws Exception;
@@ -51,9 +51,9 @@ public interface CardManager {
     void updateCardInSession(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard, boolean ignoreValidTime) throws Exception;
 
-    void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception;
+    void changeCardOwner(Long idOfClient, Long cardNo, Long longCardNo, Date changeTime, Date validTime) throws Exception;
 
-    void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime, User cardOperatorUser) throws Exception;
+    void changeCardOwner(Long idOfClient, Long cardNo, Long longCardNo, Date changeTime, Date validTime, User cardOperatorUser) throws Exception;
 
     Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo, Long cardPrintedNo,
             Long longCardNo, Integer cardType) throws Exception;

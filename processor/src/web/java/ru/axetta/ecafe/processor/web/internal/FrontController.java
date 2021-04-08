@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -599,7 +600,8 @@ public class FrontController extends HttpServlet {
     /* Выполняет проверку наличия «не нашей customerType=1» карты с физическим идентификатором  cardNo в таблице временных карт. */
     @WebMethod(operationName = "checkVisitorByCard")
     public VisitorItem checkVisitorByCard(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "cardNo") Long cardNo) throws FrontControllerException {
+            @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
+            throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -612,13 +614,23 @@ public class FrontController extends HttpServlet {
              * В случае совпадения cardNo временной карты с cardNo в таблице постоянных карт,  *
              * выбрасывать исключение с сообщением «Карта уже зарегистрирована как постоянная» *
              * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-            Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            Card c = null;
+            if(longCardNo == null) {
+                c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            } else {
+                c = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
+            }
             if (c != null) {
                 throw new FrontControllerException(
                         "Карта уже зарегистрирована как постоянная на клиента: " + c.getClient().getIdOfClient());
             }
 
-            CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            CardTemp ct = null;
+            if(longCardNo == null) {
+                ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            } else {
+                ct = DAOUtils.findCardTempByLongCardNo(persistenceSession, longCardNo);
+            }
 
             /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
              * В случае не обнаружения cardNo временной карты в таблице временных    *
@@ -670,7 +682,8 @@ public class FrontController extends HttpServlet {
     /* возвращающий последнюю операцию по врем. карте */
     @WebMethod(operationName = "getLastTempCardOperation")
     public TempCardOperationItem getLastTempCardOperation(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "cardNo") Long cardNo) throws FrontControllerException {
+            @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
+            throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -698,11 +711,12 @@ public class FrontController extends HttpServlet {
     /* Выполняет регистрацию временной карты системы customerType=0 */
     @WebMethod(operationName = "registerTempCard")
     public void registerTempCard(@WebParam(name = "orgId") Long idOfOrg, @WebParam(name = "cardNo") Long cardNo,
-            @WebParam(name = "cardPrintedNo") String cardPrintedNo) throws FrontControllerException {
+            @WebParam(name = "cardPrintedNo") String cardPrintedNo,  @WebParam(name = "longCardNo") Long longCardNo)
+            throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         ///
         try {
-            RuntimeContext.getInstance().getCardManager().createTempCard(idOfOrg, cardNo, cardPrintedNo);
+            RuntimeContext.getInstance().getCardManager().createTempCard(idOfOrg, cardNo, cardPrintedNo, longCardNo);
         } catch (Exception e) {
             logger.error("Failed registerTempCard", e);
             throw new FrontControllerException(
@@ -1013,7 +1027,8 @@ public class FrontController extends HttpServlet {
     /* Выполняет регистрацию врем. карты посетителя customerType=1. */
     @WebMethod(operationName = "registerVisitorTempCard")
     public void registerVisitorTempCard(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "idOfVisitor") Long idOfVisitor, @WebParam(name = "cardNo") Long cardNo)
+            @WebParam(name = "idOfVisitor") Long idOfVisitor, @WebParam(name = "cardNo") Long cardNo,
+            @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
@@ -1026,29 +1041,38 @@ public class FrontController extends HttpServlet {
              * */
             Visitor visitor = DAOUtils.findVisitorById(persistenceSession, idOfVisitor);
             if (visitor == null) {
-                throw new FrontControllerException(String.format("Посетитель не зарегистрирован"));
+                throw new FrontControllerException("Посетитель не зарегистрирован");
             }
-
-            Card card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            Card card = null;
+            if(longCardNo == null) {
+                card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            } else {
+                card = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
+            }
 
             /**
              * Если id карты совпадает с идентификатором постоянной карты из таблицы постоянных карт —
              * возвращать ошибку с сообщением «карта уже зарегистрирована как постоянная»
              * */
             if (card != null) {
-                throw new FrontControllerException(String.format("Карта уже зарегистрирована как постоянная"));
+                throw new FrontControllerException("Карта уже зарегистрирована как постоянная");
             }
 
             Org org = OrgReadOnlyRepository.getInstance().find(idOfOrg);
             if (org == null) {
-                throw new FrontControllerException(String.format("Организация не найдена"));
+                throw new FrontControllerException("Организация не найдена");
             }
 
-            CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            CardTemp cardTemp = null;
+            if(longCardNo == null) {
+                cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            } else {
+                cardTemp = DAOUtils.findCardTempByLongCardNo(persistenceSession, cardNo);
+            }
 
             if (cardTemp == null) {
                 //cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), ClientTypeEnum.VISITOR);
-                cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), 1);
+                cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), 1, longCardNo);
                 cardTemp.setOrg(org);
                 cardTemp.setVisitor(visitor);
                 persistenceSession.save(cardTemp);
@@ -1059,7 +1083,7 @@ public class FrontController extends HttpServlet {
                  * */
                 //if(cardTemp.getClientTypeEnum() == ClientTypeEnum.CLIENT){
                 if (cardTemp.getVisitorType() == 0) {
-                    throw new FrontControllerException(String.format("карта уже зарегистрирована как временная"));
+                    throw new FrontControllerException("карта уже зарегистрирована как временная");
                 } else {
                     if (cardTemp.getVisitor() == null) {
                         /**
@@ -1077,8 +1101,7 @@ public class FrontController extends HttpServlet {
                          * «Карта зарегистрирована на другого посетителя».
                          * */
                         if (!cardTemp.getVisitor().equals(visitor)) {
-                            throw new FrontControllerException(
-                                    String.format("Карта зарегистрирована на другого посетителя"));
+                            throw new FrontControllerException("Карта зарегистрирована на другого посетителя");
                         }
                     }
                 }
@@ -1116,11 +1139,12 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "changeCardOwner")
     public void changeCardOwner(@WebParam(name = "orgId") Long orgId, @WebParam(name = "newOwnerId") Long newOwnerId,
             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "changeTime") Date changeTime,
-            @WebParam(name = "validTime") Date validTime) throws FrontControllerException {
+            @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo)
+            throws FrontControllerException {
         checkRequestValidity(orgId);
         ///
         try {
-            RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
+            RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, longCardNo, changeTime, validTime);
         } catch (Exception e) {
             logger.error("Failed changeCardOwner", e);
             throw new FrontControllerException(String.format("Ошибка при смене владельца карты: %s", e.getMessage()),
@@ -2160,11 +2184,12 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name = "cardNo") Long cardNo,
-            @WebParam(name = "idOfOrg") Long idOfOrg) throws FrontControllerException {
+            @WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "longCardNo") Long longCardNo)
+            throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
         ResponseItem responseItem = new ResponseItem();
         try {
-            Card card = CardService.getInstance().unblockOrReturnCard(cardNo, idOfOrg);
+            Card card = CardService.getInstance().unblockOrReturnCard(cardNo, longCardNo, idOfOrg);
             CardService.getInstance().updateSyncStatus(card, idOfOrg, 0L, true);
             responseItem.code = ResponseItem.OK;
             responseItem.message = ResponseItem.OK_MESSAGE;
@@ -2634,5 +2659,51 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    @WebMethod(operationName = "updateCardFieldsRequest")
+    public UpdateCardFieldsResponse updateCardFieldsRequest(@WebParam(name = "cardInfo") CardInfo info)
+            throws FrontControllerException {
+        UpdateCardFieldsResponse result = new UpdateCardFieldsResponse();
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            for(CardInfoItem item : info.getItems()){
+                Card c = (Card) persistenceSession.get(Card.class, item.getProcessingCardId());
+
+                if (c == null){
+                    logger.warn(
+                            String.format("Card CardNo: %d LongCardId: %d not found",
+                                    item.getCardNo(), item.getLongCardId())
+                    );
+
+                    result.setCode(ResponseItem.ERROR_INTERNAL);
+                    result.getProblemProcessingCardIds().add(item.getProcessingCardId());
+                    continue;
+                }
+                c.setLongCardNo(item.getLongCardId());
+                c.setIsLongUid(BooleanUtils.toBoolean(item.getIsLongId()));
+                c.setUpdateTime(new Date());
+
+                persistenceSession.update(c);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            persistenceSession.close();
+        } catch (Exception e){
+            logger.error("Error in updateCardFieldsRequest", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
     }
 }

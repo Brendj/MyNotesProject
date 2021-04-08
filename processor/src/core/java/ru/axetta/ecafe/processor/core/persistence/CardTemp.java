@@ -31,23 +31,25 @@ public class CardTemp {
     private int visitorType;
 
     /* Конструктор регистрации врекменой карты, но не выдавая его ни кому */
-    public CardTemp(Org org, Long cardNo,  String cardPrintedNo) {
+    public CardTemp(Org org, Long cardNo, String cardPrintedNo, Long longCardNo) {
         this.cardNo = cardNo;
         this.org = org;
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
         this.createDate = new Date();
+        this.longCardNo = longCardNo;
         //this.clientTypeEnum = ClientTypeEnum.CLIENT;
         this.visitorType = 0;
     }
 
-    public CardTemp(Long cardNo,  String cardPrintedNo, Integer clientType) {
+    public CardTemp(Long cardNo,  String cardPrintedNo, Integer clientType, Long longCardNo) {
         this.cardNo = cardNo;
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
         this.createDate = new Date();
         //this.clientTypeEnum = clientType;
         this.visitorType = clientType;
+        this.longCardNo = longCardNo;
     }
 
     public CardTemp(Long cardNo,  String cardPrintedNo,CardOperationStation cardOperationStation,  Integer clientType) {
