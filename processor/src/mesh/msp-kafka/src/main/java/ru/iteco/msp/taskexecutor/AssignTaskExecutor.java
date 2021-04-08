@@ -147,10 +147,10 @@ public class AssignTaskExecutor {
                                 info = discountsService
                                         .getLastInfoByClientAndCode(c, discount.getCategoryDiscountDTSZN().getCode());
                             }
-                            if(info != null && !info.getStatus().equals(0) && isNotArchived(info)){
+                            if(info != null && (info.getStatus().equals(0) || isArchived(info))){
                                 log.warn(String
                                         .format("Primary load: DTSZN Info for ClientId %d and DiscountId %d"
-                                                        + " is invalid (status == 0 or is archived),"
+                                                        + " is invalid (status == 1 or is archived),"
                                                         + " but discount is active for the target client, skipped",
                                                 c.getIdOfClient(), discount.getIdOfCategoryDiscount()));
                                 continue;
@@ -171,8 +171,8 @@ public class AssignTaskExecutor {
             }
         }
 
-        private boolean isNotArchived(ClientDTSZNDiscountInfo info) {
-            return info.getArchived() == null || info.getArchived().equals(0);
+        private boolean isArchived(ClientDTSZNDiscountInfo info) {
+            return info.getArchived() != null && info.getArchived().equals(1);
         }
     }
 }
