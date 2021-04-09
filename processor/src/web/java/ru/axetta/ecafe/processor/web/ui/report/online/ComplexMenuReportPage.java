@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ComplexMenuReport;
 import ru.axetta.ecafe.processor.core.report.ComplexMenuReportItem;
@@ -23,6 +24,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.webTechnolog.DishListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -41,7 +43,7 @@ import java.util.*;
 @Component
 @Scope("session")
 public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList,
-        ContragentSelectPage.CompleteHandler {
+        DishListSelectPage.CompleteHandler, ContragentSelectPage.CompleteHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(ComplexMenuReportPage.class);
     private Contragent contragent;
@@ -50,10 +52,15 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     private Long selectIdAgeGroup;
     private Long selectArchived;
     private String orgFilter = "Не выбрано";
+    private String dishFilter = "Не выбрано";
     private Date selectDate;
+    private Long dishIds;
+    private String contragentIds = "";
+    private List<DishItem> dishItems = new ArrayList<>();
     private final String CLASS_TYPE_TSP = Integer.toString(Contragent.TSP);
     private List<ComplexMenuReportItem> result = new ArrayList<>();
     private List<ComplexOrgItem> complexOrgItem;
+    private Boolean showCycle = true;
 
     public String getPageFilename() {
         return "report/online/complex_menu_report";
@@ -101,12 +108,9 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
             persistenceTransaction = persistenceSession.beginTransaction();
             List<String> stringOrgList = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
-
-            for (String idOfOrg : stringOrgList) {
+            for (String idOfOrg : stringOrgList)
                 idOfOrgList.add(Long.parseLong(idOfOrg));
-            }
-
-            result = builder.createDataSource(persistenceSession, getContragent(),  idOfOrgList, selectIdTypeFoodId, selectDiet, selectIdAgeGroup, selectArchived, selectDate );
+            result = builder.createDataSource(persistenceSession, getContragent(),  idOfOrgList, selectIdTypeFoodId, selectDiet, selectIdAgeGroup, selectArchived, selectDate, dishIds, showCycle);
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
@@ -132,6 +136,8 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
             builder.getReportProperties().setProperty("selectDiet", selectDiet.toString());
             builder.getReportProperties().setProperty("selectIdAgeGroup", selectIdAgeGroup.toString());
             builder.getReportProperties().setProperty("selectArchived", selectArchived.toString());
+            builder.getReportProperties().setProperty("dishIds", dishIds == null ? "" : dishIds.toString());
+            builder.getReportProperties().setProperty("showCycle", showCycle.toString());
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             report = builder.build(persistenceSession, selectDate, endDate, localCalendar);
@@ -147,7 +153,6 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         return report;
     }
 
-
     @Override
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContragentFlag, String classTypes)
             throws Exception {
@@ -160,6 +165,8 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         }
         idOfOrgList.clear();
         orgFilter = "Не выбрано";
+        if (contragent != null)
+            contragentIds = contragent.getIdOfContragent().toString();
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap){
@@ -232,6 +239,10 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         items[1] = new SelectItem(-1, "Включая архивные");
         items[2] = new SelectItem(1, "Только архивные");
         return items;
+    }
+
+    public boolean isShowDishList() {
+        return !contragentIds.equals("");
     }
 
     public Date getSelectDate() {
@@ -316,4 +327,107 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         this.orgFilter = orgFilter;
     }
 
+    public String getDishFilter() {
+        return dishFilter;
+    }
+
+    public void setDishFilter(String dishFilter) {
+        this.dishFilter = dishFilter;
+    }
+
+    @Override
+    public void dishListSelection(Session session, List<Long> idOfDishs) throws Exception {
+        dishItems.clear();
+        for (Long idOfDish : idOfDishs) {
+            WtDish wtDish = (WtDish) session.load(WtDish.class, idOfDish);
+            DishItem dishItem = new DishItem(wtDish);
+            dishItems.add(dishItem);
+        }
+        setComplexFilterInfo(dishItems);
+    }
+
+    private void setComplexFilterInfo(List<DishItem> dishItems) {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (dishItems.isEmpty()) {
+            dishFilter = "Не выбрано";
+        } else {
+            for (DishItem it : dishItems) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(it.getDishName());
+                ids.append(it.getIdOfDish());
+            }
+            dishFilter = str.toString();
+        }
+        dishIds = ids.length() < 0 || ids.toString().equals("") ? null : Long.parseLong(ids.toString());
+    }
+
+    public static class DishItem {
+        private final Long idOfDish;
+        private final String dishName;
+
+        public DishItem(WtDish wtDish) {
+            this.idOfDish = wtDish.getIdOfDish();
+            this.dishName = wtDish.getDishName();
+        }
+
+        public String getDishName() {
+            return dishName;
+        }
+
+        public Long getIdOfDish() {
+            return idOfDish;
+        }
+    }
+
+    public Long getDishIds() {
+        return dishIds;
+    }
+
+    public void setDishIds(Long dishIds) {
+        this.dishIds = dishIds;
+    }
+
+    public static class ContragentItem {
+
+        private final Long idOfContragent;
+        private final String contragentName;
+
+        public ContragentItem(Contragent contragent) {
+            this.idOfContragent = contragent.getIdOfContragent();
+            this.contragentName = contragent.getContragentName();
+        }
+
+        public ContragentItem() {
+            this.idOfContragent = null;
+            this.contragentName = null;
+        }
+
+        public Long getIdOfContragent() {
+            return idOfContragent;
+        }
+
+        public String getContragentName() {
+            return contragentName;
+        }
+    }
+
+    public String getContragentIds() {
+        return contragentIds;
+    }
+
+    public void setContragentIds(String contragentIds) {
+        this.contragentIds = contragentIds;
+    }
+
+    public Boolean getShowCycle() {
+        return showCycle;
+    }
+
+    public void setShowCycle(Boolean showCycle) {
+        this.showCycle = showCycle;
+    }
 }

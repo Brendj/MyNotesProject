@@ -75,7 +75,7 @@
     <tr>
         <td style="text-align: right;">
             <a4j:commandButton value="Закрыть"  onclick="Richfaces.hideModalPanel('orgList')"
-                       style="width: 180px; margin-right: 8px; margin-bottom: 8px"  ajaxSingle="true" />
+                       style="width: 80px; margin-right: 8px; margin-bottom: 8px"  ajaxSingle="true" />
          </td>
     </tr>
 </rich:modalPanel>
@@ -91,7 +91,7 @@
                          styleClass="input-text" style="margin-right: 2px; width: 275px;" />
             <a4j:commandButton value="..."
                                action="#{mainPage.showContragentSelectPage}"
-                               reRender="modalContragentSelectorPanel,registerStampReportPanelGrid"
+                               reRender="modalContragentSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
@@ -139,16 +139,24 @@
                          actionListener="#{mainPage.complexMenuReportPage.onReportPeriodChanged}" />
         </rich:calendar>
 
-        <h:outputText escape="true" value="Блюдо" styleClass="output-text" />
+        <h:outputText escape="true" value="Выбор блюда" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{mainPage.complexDishSelectPage.selectedItem.dishName}" readonly="true" styleClass="input-text"
-                         style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.showDishSelectPage}" reRender="modalDishSelectorForm"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDishSelectorForm')}.show();"
-                               styleClass="command-link" style="width: 25px;" >
-                <f:setPropertyActionListener value="#{null}" target="#{mainPage.complexDishSelectPage.filter}" />
+            <a4j:commandButton value="..." action="#{mainPage.showDishListSelectPage}"
+                               disabled="#{!mainPage.complexMenuReportPage.showDishList}"
+                               reRender="modalDishListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDishListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="#{mainPage.complexMenuReportPage.contragentIds}" target="#{mainPage.dishWebListSelectPage.filterContagents}" />
+                <f:setPropertyActionListener value="#{mainPage.complexMenuReportPage.dishIds}" target="#{mainPage.dishWebListSelectPage.selectedIds}" />
             </a4j:commandButton>
+            <h:outputText value=" #{mainPage.complexMenuReportPage.dishFilter}" escape="true"
+                          styleClass="output-text" />
         </h:panelGroup>
+
+        <h:outputText styleClass="output-text" escape="true" value="Циклическое наполнение" />
+        <h:selectBooleanCheckbox value="#{mainPage.complexMenuReportPage.showCycle}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">
@@ -181,7 +189,7 @@
     </h:panelGrid>
 
     <rich:dataTable id="complexMenuReportTable" value="#{mainPage.complexMenuReportPage.result}"
-                    var="item" rows="40"
+                    var="item" rows="25"
                     footerClass="data-table-footer" >
         <f:facet name="header">
             <rich:columnGroup>
@@ -195,13 +203,13 @@
                     <h:outputText escape="true" value="Тип питания" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Рацион" />
+                    <h:outputText escape="true" value="Вид рациона" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Возрастная категория" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Комплекс" />
+                    <h:outputText escape="true" value="Название комплекс" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Цена" />
@@ -215,7 +223,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Дата окончания" />
                 </rich:column>
-                <rich:column headerClass="column-header">
+                <rich:column headerClass="column-header" rendered = "#{mainPage.complexMenuReportPage.showCycle}" >
                     <h:outputText escape="true" value="Циклическое наполнение" />
                 </rich:column>
             </rich:columnGroup>
@@ -259,7 +267,7 @@
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" style="white-space: nowrap" value="#{complexItem.endDate}" styleClass="output-text" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rendered = "#{mainPage.complexMenuReportPage.showCycle}" >
                 <h:outputText escape="true" value="#{complexItem.cycle}" styleClass="output-text"/>
             </rich:column>
         </rich:subTable>

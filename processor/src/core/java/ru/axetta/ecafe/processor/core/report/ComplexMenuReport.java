@@ -69,14 +69,21 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
             Long diet = Long.valueOf(getReportProperties().getProperty("selectDiet"));
             Long ageGroup = Long.valueOf(getReportProperties().getProperty("selectIdAgeGroup"));
             Long archived = Long.valueOf(getReportProperties().getProperty("selectArchived"));
-            JRDataSource dataSource = new JRBeanCollectionDataSource(createDataSource(session, contragent, idOfOrgList, typeFood, diet, ageGroup, archived, startTime));
+            Boolean showCycle = Boolean.valueOf(getReportProperties().getProperty("showCycle"));
+            Long dishIds = null;
+            try {
+                dishIds = Long.valueOf(getReportProperties().getProperty("dishIds"));
+            }catch (NumberFormatException ignore){}
+
+            JRDataSource dataSource = new JRBeanCollectionDataSource(createDataSource(session, contragent, idOfOrgList, typeFood, diet, ageGroup, archived, startTime, dishIds, showCycle));
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             return new ContragentCompletionReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, idOfContragent);
         }
 
-        public List<ComplexMenuReportItem> createDataSource(Session session, Contragent contragent, List<Long> idOfOrgList, Long typeFood, Long diet, Long ageGroup, Long archived, Date date) throws Exception {
+        public List<ComplexMenuReportItem> createDataSource(Session session, Contragent contragent, List<Long> idOfOrgList, Long typeFood, Long diet,
+                Long ageGroup, Long archived, Date date, Long dishIds, Boolean showCycle) throws Exception {
             List<ComplexMenuReportItem> result = new LinkedList<>();
             List<WtComplexGroupItem> wtGroupComplex = DAOService.getInstance().getTypeComplexFood();
             List<WtDietType> dietGroupItems = DAOService.getInstance().getMapDiet();
@@ -90,6 +97,7 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
             String ageGroupCondition = ageGroup == -1 ? "" : " and wc.idofagegroupitem = :ageGroup ";
             String archivedCondition = archived == -1 ? "" : " and wc.deletestate = :archived ";
             String dateCondition = ts == null ? "" : " and wc.begindate <= :ts and wc.enddate >= :ts ";
+            String dishCondition = dishIds == null ? "" : " and cid.idofdish = :dishIds ";
 
             String getIdOfOrg = "with complex_menu AS ( "
                     + "select o.idoforg, o.organizationtype, wc.idofcomplex, wc.idofcomplexgroupitem, wc.idofdiettype, wc.idofagegroupitem, wc.price, wc.is_portal, wc.begindate, wc.enddate, wc.name "
@@ -136,6 +144,7 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                     + dietCondition
                     + ageGroupCondition
                     + archivedCondition
+                    + dishCondition
                     + " group by 1, 2, 3 "
                     + " union "
                     + "select o.idoforg, wc.idofcomplex, ci.cycle_day, COUNT(cid.idofdish) , array_to_string(array_agg(cid.idofdish), '&&') as dishes "
@@ -151,6 +160,7 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                     + dietCondition
                     + ageGroupCondition
                     + archivedCondition
+                    + dishCondition
                     + " group by 1, 2, 3 "
                     + " )"
                     + " select * from dish_menu "
@@ -181,11 +191,14 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                 query.setParameter("archived", archived);
                 queryDish.setParameter("archived", archived);
             }
-            if(ts != null) {
+            if(ts != null)
                 query.setParameter("ts", ts);
-            }
+            if(dishIds != null)
+                queryDish.setParameter("dishIds", dishIds);
             List<Object[]> complexList = query.list();
-            List<Object[]> dishList = queryDish.list();
+            List<Object[]> dishList = null;
+            if(showCycle)
+                dishList = queryDish.list();
 
             if (CollectionUtils.isEmpty(complexList)) {
                 throw new Exception("Нет данных для построения отчета");
@@ -208,18 +221,37 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
 
             List<ComplexMenuReportItem> orgList = sortOrg(complexList);
             orgList = sortComplex(orgList, complexList);
-            List<ComplexItem> complexItems = getComplexItem(complexList, wtGroupComplex, dietGroupItems, ageGroups, dishList, date);
+            List<ComplexItem> complexItems = getComplexItem(complexList, wtGroupComplex, dietGroupItems, ageGroups, dishList, getAllComplex(complexList));
             for (ComplexMenuReportItem complex: orgList) {
-                List<ComplexItem> complexItem = new ArrayList<>();
+                List<ComplexItem> finalComplex = new ArrayList<>();
                 for (String co : complex.getComplexList())
-                    complexItem.add(getCurrentComplexItem(co, complexItems));
+                    finalComplex.add(getCurrentComplexItem(co, complexItems));
                 StringBuilder org = new StringBuilder();
                 for (String orgs: complex.getOrg())
                     org.append(orgs).append(", ");
                 if (org.length() > 1)
                     org.setLength(org.length() - 2);
-                result.add(new ComplexMenuReportItem(org.toString(), complex.getOrgCount(), complexItem, getOrgList(complex, orgData)));
+                finalComplex = checkDish(finalComplex, dishCondition);
+                if (finalComplex.size() > 0)
+                    result.add(new ComplexMenuReportItem(org.toString(), complex.getOrgCount(), finalComplex, getOrgList(complex, orgData)));
             }
+            return result;
+        }
+
+        private List<String> getAllComplex(List<Object[]> allComplex){
+            Set<String> complexList = new TreeSet<>();
+            for(Object[] complex: allComplex)
+                complexList.add(complex[2].toString());
+            return new ArrayList<>(complexList);
+        }
+
+        private List<ComplexItem> checkDish(List<ComplexItem> finalComplex, String dishCondition){
+            if (dishCondition.equals(""))
+                return finalComplex;
+            List<ComplexItem> result = new ArrayList<>();
+            for (ComplexItem complexItem: finalComplex)
+                if (!complexItem.getCycle().equals("") && complexItem.getCycle() != null)
+                    result.add(complexItem);
             return result;
         }
 
@@ -237,16 +269,19 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
 
 
         private ComplexItem getCurrentComplexItem(String complex, List<ComplexItem> complexList){
-            for (ComplexItem compexList: complexList)
-                if (compexList.getIdOfComplex().equals(complex))
-                    return compexList;
+            for (ComplexItem list: complexList)
+                if (list.getIdOfComplex().equals(complex))
+                    return list;
                 return null;
         }
 
         private List<ComplexItem> getComplexItem(List<Object[]> complexList, List<WtComplexGroupItem> wtGroupComplex,
-                List<WtDietType> dietGroupItems, List<WtAgeGroupItem> ageGroups, List<Object[]> dishList, Date date ){
+                List<WtDietType> dietGroupItems, List<WtAgeGroupItem> ageGroups, List<Object[]> dishList, List<String> allComplex){
             List<ComplexItem> complexes = new ArrayList<>();
             for (Object[] complex : complexList) {
+                if (allComplex.contains(complex[2].toString()))
+                    allComplex.remove(complex[2].toString());
+                else continue;
                 String groupComplex = "";
                 String dietType = "";
                 String agrGroup = "";
@@ -258,7 +293,6 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                 if (complex[6] != null)
                     price = new BigDecimal(complex[6].toString());
                 String isPortal = Boolean.parseBoolean(complex[7].toString()) ? "Да" : "Нет";
-                String dates = "";
                 try {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
                 SimpleDateFormat myFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -279,9 +313,9 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                 for (WtComplexGroupItem gComplex: wtGroupComplex)
                     if (complex[3].toString().equals(gComplex.getIdOfComplexGroupItem().toString()))
                         groupComplex = gComplex.getDescription();
-
-                for (Object[] dl : dishList) {
-                    if(dl[1].toString().equals(complex[2].toString()) && dl[0].toString().equals(complex[0].toString()))
+                    if(dishList != null)
+                        for (Object[] dl : dishList) {
+                            if(dl[1].toString().equals(complex[2].toString()) && dl[0].toString().equals(complex[0].toString()))
                         cycle.append(dl[2].toString()).append("(").append(dl[3].toString()).append(")").append(", ");
                 }
                 if (cycle.length() > 1)
