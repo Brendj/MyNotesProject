@@ -64,7 +64,7 @@ public class POSPaymentControllerWS extends HttpServlet implements POSPaymentCon
                 Payment payment = new Payment(posPayment.getCardNo(), posPayment.getTime(), posPayment.getOrderDate(), posPayment.getSocDiscount(),
                   posPayment.getTrdDiscount(), posPayment.getGrant(), posPayment.getIdOfClient(), null, posPayment.getIdOfPayForClient(), posPayment.getIdOfOrder(), posPayment.getIdOfCashier(),
                         posPayment.getSumByCard(), posPayment.getSumByCash(), posPayment.getrSum(), posPayment.getIdOfPOS(), posPayment.getConfirmerId(),
-                        0, posPayment.getComments(), OrderTypeEnumType.fromInteger(posPayment.getOrderType()), purchases, null, null);
+                        0, posPayment.getComments(), OrderTypeEnumType.fromInteger(posPayment.getOrderType()), purchases, null, null, null);
 
                 ResPaymentRegistryItem resAcc;
                 final PosResPaymentRegistryItem e = new PosResPaymentRegistryItem();

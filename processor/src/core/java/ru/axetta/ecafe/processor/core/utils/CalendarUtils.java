@@ -192,6 +192,12 @@ public class CalendarUtils {
         return c.getTime();
     }
 
+    public static Date dateInUTC() {
+        GregorianCalendar c = new GregorianCalendar();
+        int offset = c.get(Calendar.ZONE_OFFSET);
+        return new Date(new Date().getTime()+offset);
+    }
+
     public static Date truncateToDayOfMonthAndAddDay(Date date) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);

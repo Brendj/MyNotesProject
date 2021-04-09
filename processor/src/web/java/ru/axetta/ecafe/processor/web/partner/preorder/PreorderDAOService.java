@@ -334,7 +334,7 @@ public class PreorderDAOService {
                 // 15 Льготные комплексы по правилам соц. скидок
                 if (complexSign.get("Free") && !complexSign.get("Elem") && !complexSign.get("Middle")) {
                     Set<WtDiscountRule> discRules = getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
-                    resComplexes = getFreeWtComplexesByDiscountRules(startDate, startDate, discRules);
+                    resComplexes = getFreeWtComplexesByDiscountRules(startDate, startDate, discRules, org);
                     if (resComplexes.size() > 0) {
                         wtDiscComplexes.addAll(resComplexes);
                     }
@@ -1446,7 +1446,7 @@ public class PreorderDAOService {
 
     @Transactional
     public void relevancePreordersToWtMenu(PreorderComplex preorderComplex, long nextVersion) {
-        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        if (isGoodRequestExists(preorderComplex)) return;
         Date preorderDate = preorderComplex.getPreorderDate();
 
         WtComplex wtComplex = getWtComplex(preorderComplex, preorderComplex.getArmComplexId(), preorderDate);
@@ -3381,15 +3381,16 @@ public class PreorderDAOService {
     }
 
     public Set<WtComplex> getFreeWtComplexesByDiscountRules(Date startDate, Date endDate,
-            Set<WtDiscountRule> wtDiscountRuleSet) {
+            Set<WtDiscountRule> wtDiscountRuleSet, Org org) {
         Set<WtComplex> wtComplexes = new HashSet<>();
         for (WtDiscountRule rule : wtDiscountRuleSet) {
-            Query query = emReport.createQuery("select complex from WtComplex complex "
+            Query query = emReport.createQuery("select complex from WtComplex complex LEFT JOIN complex.wtOrgGroup orgGroup "
                     + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
-                    + "and :rule in elements(complex.discountRules)");
+                    + "and :rule in elements(complex.discountRules) and (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs))");
             query.setParameter("rule", rule);
             query.setParameter("startDate", startDate, TemporalType.DATE);
             query.setParameter("endDate", endDate, TemporalType.DATE);
+            query.setParameter("org", org);
             List<WtComplex> res = query.getResultList();
             if (res != null && res.size() > 0) {
                 wtComplexes.addAll(res);
