@@ -19,7 +19,6 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ComplexMenuReport;
 import ru.axetta.ecafe.processor.core.report.ComplexMenuReportItem;
-import ru.axetta.ecafe.processor.core.report.ComplexOrgItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -59,7 +58,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     private List<DishItem> dishItems = new ArrayList<>();
     private final String CLASS_TYPE_TSP = Integer.toString(Contragent.TSP);
     private List<ComplexMenuReportItem> result = new ArrayList<>();
-    private List<ComplexOrgItem> complexOrgItem;
+
     private Boolean showCycle = true;
 
     public String getPageFilename() {
@@ -71,6 +70,9 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     }
 
     public void exportToXLS() {
+        if (!validateFormData()) {
+            return;
+        }
         BasicReportJob report = buildReport();
         if (report != null) {
             try {
@@ -78,7 +80,6 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
                 HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
                         .getResponse();
                 ServletOutputStream servletOutputStream = response.getOutputStream();
-
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
                 response.setHeader("Content-disposition", "inline;filename=complex_menu_report.xls");
@@ -99,6 +100,9 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     }
 
     public void buildForJsf(){
+        if (!validateFormData()) {
+            return;
+        }
         ComplexMenuReport.Builder builder = new ComplexMenuReport.Builder();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Transaction persistenceTransaction = null;
@@ -110,10 +114,9 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
             for (String idOfOrg : stringOrgList)
                 idOfOrgList.add(Long.parseLong(idOfOrg));
-            result = builder.createDataSource(persistenceSession, getContragent(),  idOfOrgList, selectIdTypeFoodId, selectDiet, selectIdAgeGroup, selectArchived, selectDate, dishIds, showCycle);
+            result = builder.createDataSource(persistenceSession, getContragent(), idOfOrgList, selectIdTypeFoodId, selectDiet, selectIdAgeGroup, selectArchived, selectDate, dishIds, showCycle);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
@@ -151,6 +154,14 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
             HibernateUtils.close(persistenceSession, logger);
         }
         return report;
+    }
+
+    private boolean validateFormData() {
+        if(contragent == null && idOfOrgList.isEmpty()){
+            printError("Выберите контрагента или организацию");
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -253,13 +264,6 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         this.selectDate = selectDate;
     }
 
-    public List<ComplexOrgItem> getComplexOrgItem() {
-        return complexOrgItem;
-    }
-
-    public void setComplexOrgItem(List<ComplexOrgItem> complexOrgItem) {
-        this.complexOrgItem = complexOrgItem;
-    }
 
     public List<ComplexMenuReportItem> getResult() {
         return result;

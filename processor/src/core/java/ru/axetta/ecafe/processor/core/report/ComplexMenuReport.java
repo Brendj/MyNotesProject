@@ -74,7 +74,6 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
             try {
                 dishIds = Long.valueOf(getReportProperties().getProperty("dishIds"));
             }catch (NumberFormatException ignore){}
-
             JRDataSource dataSource = new JRBeanCollectionDataSource(createDataSource(session, contragent, idOfOrgList, typeFood, diet, ageGroup, archived, startTime, dishIds, showCycle));
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
@@ -199,7 +198,6 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
             List<Object[]> dishList = null;
             if(showCycle)
                 dishList = queryDish.list();
-
             if (CollectionUtils.isEmpty(complexList)) {
                 throw new Exception("Нет данных для построения отчета");
             }
@@ -301,7 +299,6 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-
                 for (WtAgeGroupItem aGroup: ageGroups)
                     if (complex[5].toString().equals(aGroup.getIdOfAgeGroupItem().toString()))
                         agrGroup = aGroup.getDescription();
@@ -332,10 +329,8 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
             List<ComplexMenuReportItem> complexMenuReportList = new ArrayList<>();
             String orgType = null;
             Set<String> sortOrg = new TreeSet<>();
-
             for (Object[] complex: complexList)
                 sortOrg.add(complex[0].toString());
-
             for (String sort: sortOrg){
                 ArrayList<String> idOfComplex = new ArrayList<>();
                 for (Object[] complex: complexList)

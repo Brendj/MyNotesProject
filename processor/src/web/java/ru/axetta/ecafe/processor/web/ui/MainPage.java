@@ -341,6 +341,7 @@ public class MainPage implements Serializable {
     private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
     private final DishMenuWebARMPPReportPage dishMenuReportWebArmPP = new DishMenuWebARMPPReportPage();
     private final ComplexMenuReportPage complexMenuReportPage = new ComplexMenuReportPage();
+    private final ComplexOrgReportPage complexOrgReportPage = new ComplexOrgReportPage();
 
     //Charts
     private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
@@ -7896,6 +7897,10 @@ public class MainPage implements Serializable {
     }
     public ComplexMenuReportPage getComplexMenuReportPage() {
         return complexMenuReportPage;
+    }
+
+    public ComplexOrgReportPage getComplexOrgReportPage() {
+        return complexOrgReportPage;
     }
 
     public Object showDishMenuWebARMPPReportPage() {
