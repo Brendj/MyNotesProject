@@ -222,20 +222,22 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
             List<ComplexItem> complexItems = getComplexItem(complexList, wtGroupComplex, dietGroupItems, ageGroups, dishList, getAllComplex(complexList));
             for (ComplexMenuReportItem complex: orgList) {
                 List<ComplexItem> finalComplex = new ArrayList<>();
+
                 for (String co : complex.getComplexList())
                     finalComplex.add(getCurrentComplexItem(co, complexItems));
+
                 StringBuilder org = new StringBuilder();
                 for (String orgs: complex.getOrg())
                     org.append(orgs).append(", ");
                 if (org.length() > 1)
                     org.setLength(org.length() - 2);
+
                 finalComplex = checkDish(finalComplex, dishCondition);
                 if (finalComplex.size() > 0)
                     result.add(new ComplexMenuReportItem(org.toString(), complex.getOrgCount(), finalComplex, getOrgList(complex, orgData), showCycle));
-                else{
-                    throw new Exception("Нет данных для построения отчета");
-                }
             }
+            if(result.size() == 0)
+                throw new Exception("Нет данных для построения отчета");
             return result;
         }
 
