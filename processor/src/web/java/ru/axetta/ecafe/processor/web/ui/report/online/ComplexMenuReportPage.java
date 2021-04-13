@@ -54,11 +54,9 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     private String dishFilter = "Не выбрано";
     private Date selectDate;
     private Long dishIds;
-    private String contragentIds = "";
     private List<DishItem> dishItems = new ArrayList<>();
     private final String CLASS_TYPE_TSP = Integer.toString(Contragent.TSP);
     private List<ComplexMenuReportItem> result = new ArrayList<>();
-
     private Boolean showCycle = true;
 
     public String getPageFilename() {
@@ -120,6 +118,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
+            result = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -176,8 +175,6 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         }
         idOfOrgList.clear();
         orgFilter = "Не выбрано";
-        if (contragent != null)
-            contragentIds = contragent.getIdOfContragent().toString();
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap){
@@ -253,7 +250,13 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     }
 
     public boolean isShowDishList() {
-        return !contragentIds.equals("");
+        if (contragent == null || contragent.getContragentName().equals("")){
+            dishFilter = "Не выбрано";
+            dishIds = null;
+            return false;
+        }
+        else
+            return true;
     }
 
     public Date getSelectDate() {
@@ -419,13 +422,6 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
         }
     }
 
-    public String getContragentIds() {
-        return contragentIds;
-    }
-
-    public void setContragentIds(String contragentIds) {
-        this.contragentIds = contragentIds;
-    }
 
     public Boolean getShowCycle() {
         return showCycle;
@@ -434,4 +430,9 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     public void setShowCycle(Boolean showCycle) {
         this.showCycle = showCycle;
     }
+
+    public String getConragentName(){
+        return contragent.getIdOfContragent().toString();
+    }
+
 }

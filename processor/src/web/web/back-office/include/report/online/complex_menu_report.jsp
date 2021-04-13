@@ -152,7 +152,7 @@
                                reRender="modalDishListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDishListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{mainPage.complexMenuReportPage.contragentIds}" target="#{mainPage.dishWebListSelectPage.filterContagents}" />
+                <f:setPropertyActionListener value="#{mainPage.complexMenuReportPage.conragentName}" target="#{mainPage.dishWebListSelectPage.filterContagents}" />
                 <f:setPropertyActionListener value="#{mainPage.complexMenuReportPage.dishIds}" target="#{mainPage.dishWebListSelectPage.selectedIds}" />
             </a4j:commandButton>
             <h:outputText value=" #{mainPage.complexMenuReportPage.dishFilter}" escape="true"

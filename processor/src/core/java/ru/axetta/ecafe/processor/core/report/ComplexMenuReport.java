@@ -231,7 +231,10 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
                     org.setLength(org.length() - 2);
                 finalComplex = checkDish(finalComplex, dishCondition);
                 if (finalComplex.size() > 0)
-                    result.add(new ComplexMenuReportItem(org.toString(), complex.getOrgCount(), finalComplex, getOrgList(complex, orgData)));
+                    result.add(new ComplexMenuReportItem(org.toString(), complex.getOrgCount(), finalComplex, getOrgList(complex, orgData), showCycle));
+                else{
+                    throw new Exception("Нет данных для построения отчета");
+                }
             }
             return result;
         }
