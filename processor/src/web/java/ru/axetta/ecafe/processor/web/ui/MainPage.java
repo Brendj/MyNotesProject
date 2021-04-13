@@ -68,6 +68,7 @@ import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.user.UserListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmLoadPage;
 import ru.axetta.ecafe.processor.web.ui.webTechnolog.ComplexListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.webTechnolog.DishListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -339,6 +340,8 @@ public class MainPage implements Serializable {
     private final TotalSalesPage totalSalesPage = new TotalSalesPage();
     private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
     private final DishMenuWebARMPPReportPage dishMenuReportWebArmPP = new DishMenuWebARMPPReportPage();
+    private final ComplexMenuReportPage complexMenuReportPage = new ComplexMenuReportPage();
+    private final ComplexOrgReportPage complexOrgReportPage = new ComplexOrgReportPage();
 
     //Charts
     private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
@@ -395,9 +398,10 @@ public class MainPage implements Serializable {
     private final ContractSelectPage contractSelectPage = new ContractSelectPage();
     private final ContragentListSelectPage contragentListSelectPage = new ContragentListSelectPage();
     private final ComplexListSelectPage complexWebListSelectPage = new ComplexListSelectPage();
+    private final DishListSelectPage dishWebListSelectPage = new DishListSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
-    private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
+    private final ClientGroupSelectPage  clientGroupSelectPage = new ClientGroupSelectPage();
     private final UserSelectPage userSelectPage = new UserSelectPage();
     private final OrgMainBuildingListSelectPage orgMainBuildingListSelectPage = new OrgMainBuildingListSelectPage();
     private final CardRegistrationConfirm cardRegistrationConfirm = new CardRegistrationConfirm();
@@ -2154,6 +2158,11 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object clearDishListSelectedItemsList() {
+        dishWebListSelectPage.deselectAllItems();
+        return null;
+    }
+
     public Object selectAllOrgListSelectedItemsList() {
         orgListSelectPage.selectAllItems();
         updateOrgListSelectPage();
@@ -2653,6 +2662,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
+
     public Object showContragentListSelectPage() {
         return showContragentListSelectPage(null) ;
     }
@@ -2721,6 +2731,38 @@ public class MainPage implements Serializable {
                 HibernateUtils.close(persistenceSession, logger);
 
 
+            }
+        }
+        return null;
+    }
+
+    public Object showDishListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof DishListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof DishListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                dishWebListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof DishListSelectPage.CompleteHandler) {
+                    dishWebListSelectPage
+                            .pushCompleteHandler((DishListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(dishWebListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill dish list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка блюд: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
             }
         }
         return null;
@@ -2862,8 +2904,36 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
 
+    }
 
+    public Object completeDishListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            dishWebListSelectPage.completeDishSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dishWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            dishWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("Failed to complete dish list selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка блюд: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return null;
 
@@ -2901,6 +2971,24 @@ public class MainPage implements Serializable {
             logger.error("{}", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при обработке выбора списка комплексов: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+    public Object cancelDishListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            dishWebListSelectPage.cancelContragentListSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dishWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            dishWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("{}", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка блюд: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7805,6 +7893,13 @@ public class MainPage implements Serializable {
     public DishMenuWebARMPPReportPage getDishMenuReportWebArmPP() {
         return dishMenuReportWebArmPP;
     }
+    public ComplexMenuReportPage getComplexMenuReportPage() {
+        return complexMenuReportPage;
+    }
+
+    public ComplexOrgReportPage getComplexOrgReportPage() {
+        return complexOrgReportPage;
+    }
 
     public Object showDishMenuWebARMPPReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -7814,6 +7909,19 @@ public class MainPage implements Serializable {
             logger.error("Failed to set DishMenuWebARMPPReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчета по блюдам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showComplexMenuReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexMenuReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -10821,5 +10929,9 @@ public class MainPage implements Serializable {
 
     public ComplexListSelectPage getComplexWebListSelectPage() {
         return complexWebListSelectPage;
+    }
+
+    public DishListSelectPage getDishWebListSelectPage() {
+        return dishWebListSelectPage;
     }
 }
