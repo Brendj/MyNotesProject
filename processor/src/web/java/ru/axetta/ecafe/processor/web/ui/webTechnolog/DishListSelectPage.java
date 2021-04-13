@@ -165,19 +165,6 @@ public class DishListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    public String getSelectedItems() {
-        StringBuilder str = new StringBuilder();
-        for (Item it : items) {
-            if (!it.isSelected()) {
-                continue;
-            }
-            if (str.length() > 0) {
-                str.append("; ");
-            }
-            str.append(it.getDishName());
-        }
-        return str.toString();
-    }
 
     public String getSelectedName() {
         return selectedName;
