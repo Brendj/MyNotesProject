@@ -87,6 +87,9 @@ public class CardManagerProcessor implements CardManager {
             c = findCardByCardNo(persistenceSession, cardNo);
         } else {
             c = findCardByLongCardNo(persistenceSession, longCardNo);
+            if(c == null){
+                c = findCardByCardNo(persistenceSession, cardNo);
+            }
         }
         if (c != null ) {
             String errorMessage = String.format("Карта %s уже зарегистрирована", cardNo);
@@ -221,6 +224,9 @@ public class CardManagerProcessor implements CardManager {
             c = findCardByCardNo(persistenceSession, cardNo);
         } else {
             c = findCardByLongCardNo(persistenceSession, longCardNo);
+            if(c == null){
+                c = findCardByCardNo(persistenceSession, cardNo);
+            }
         }
 
         if (c != null) {

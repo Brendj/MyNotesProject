@@ -5508,10 +5508,14 @@ public class DAOUtils {
     }
 
     public static Card findCardByLongCardNo(Session persistenceSession, Long longCardNo) {
-        Criteria criteria = persistenceSession.createCriteria(Card.class);
-        criteria.add(Restrictions.eq("longCardNo", longCardNo));
-        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
-        criteria.setMaxResults(1);
-        return (Card) criteria.uniqueResult();
+        try {
+            Criteria criteria = persistenceSession.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("longCardNo", longCardNo));
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (NoResultException e){
+            return null;
+        }
     }
 }
