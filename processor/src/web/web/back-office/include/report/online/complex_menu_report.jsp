@@ -86,6 +86,52 @@
     <rich:spacer height="20px" />
 </rich:modalPanel>
 
+
+
+
+
+
+
+<rich:modalPanel id="complexExtended" autosized="true" minWidth="1100">
+    <f:facet name="header">
+        <h:outputText
+                value="Детальный отчет по комплексам" />
+    </f:facet>
+
+    <h:panelGrid columns="2">
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.complexExtendedReportPage.buildHTMLReport}"
+                           reRender="ComplexExtendedReportTablePanel" styleClass="command-button" />
+        <h:commandButton value="Генерировать отчет в Excel"
+                         action="#{mainPage.complexExtendedReportPage.exportToXLS}"
+                         styleClass="command-button" />
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" id="ComplexExtendedReportTablePanel" style="margin-top: 18px">
+        <c:if test="${not empty mainPage.complexExtendedReportPage.htmlReport}">
+            <f:verbatim>
+                <div class="htmlReportContent"> ${mainPage.complexExtendedReportPage.htmlReport} </div>
+            </f:verbatim>
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+        </c:if>
+    </h:panelGrid>
+
+    <tr>
+        <td style="text-align: right;">
+
+            <a4j:commandButton value="Закрыть"  onclick="Richfaces.hideModalPanel('complexExtended')"
+                               style="width: 80px; margin-right: 8px; margin-bottom: 8px"  ajaxSingle="true" />
+        </td>
+    </tr>
+
+</rich:modalPanel>
+
+
+
+
+
+
+
+
 <h:panelGrid id="dishMenuReportPanel" binding="#{mainPage.complexMenuReportPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
@@ -263,9 +309,15 @@
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{complexItem.ageGroupItem}" styleClass="output-text"/>
             </rich:column>
+
             <rich:column headerClass="column-header">
-                <h:outputText escape="true" style="white-space: nowrap" value="#{complexItem.complexName}" styleClass="output-text" />
+                <a4j:commandLink value="#{complexItem.complexName}" reRender="complexExtended" ajaxSingle="true"
+                                   oncomplete="Richfaces.showModalPanel('complexExtended');">
+                    <f:setPropertyActionListener value="#{complexItem.idOfComplex}"
+                                                 target="#{mainPage.complexExtendedReportPage.idOfComplex}" />
+                </a4j:commandLink>
             </rich:column>
+
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{complexItem.price}" styleClass="output-text"/>
             </rich:column>
