@@ -58,6 +58,23 @@ public class PreorderFeedingStatusItem {
         return element;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PreorderFeedingStatusItem)) {
+            return false;
+        }
+        final PreorderFeedingStatusItem that = (PreorderFeedingStatusItem) o;
+        return guid.equals(that.getGuid());
+    }
+
+    @Override
+    public int hashCode() {
+        return guid.hashCode();
+    }
+
     public Date getDate() {
         return date;
     }
