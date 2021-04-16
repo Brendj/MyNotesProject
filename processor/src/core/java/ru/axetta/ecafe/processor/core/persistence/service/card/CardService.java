@@ -227,6 +227,9 @@ public class CardService {
             card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
         } else {
             card = cardWritableRepository.findByLongCardNo(longCardNo, idOfOrg);
+            if(card == null){
+                card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
+            }
         }
         if (null == card) {
             throw new CardNotFoundException(
