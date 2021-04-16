@@ -1335,8 +1335,6 @@
 
         <rich:panelMenuItem id="zeroTransactionsReportMenuItem" binding="#{mainPage.zeroTransactionsReportPage.mainMenuComponent}"
                             label="Учет причин снижения объемов оказания услуг" action="#{mainPage.showZeroTransactionsReportPage}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
-                            label="Отчет по учебным дням" action="#{mainPage.showSpecialDatesReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="migrantsReportMenuItem" binding="#{mainPage.migrantsReportPage.mainMenuComponent}"
                             label="#{mainPage.migrantsReportPage.reportNameForMenu}" action="#{mainPage.showMigrantsReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="monitoringOfMenuItem" binding="#{mainPage.monitoringOfReportPage.mainMenuComponent}"
@@ -1369,6 +1367,13 @@
         <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
         <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
                             label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="calendarReportsGroupMenu" binding="#{mainPage.calendarReportsGroupMenu.mainMenuComponent}"
+                         label="Календарь дней питания" rendered="#{mainPage.eligibleToViewCalendarReports}">
+        <a4j:support event="onclick" action="#{mainPage.showCalendarReportsGroupMenu}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
+                            label="Отчет по учебным дням" action="#{mainPage.showSpecialDatesReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>

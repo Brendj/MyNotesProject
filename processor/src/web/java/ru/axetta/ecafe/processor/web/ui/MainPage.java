@@ -416,6 +416,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage acceptanceActGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage calendarReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage clientReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
 
@@ -6587,6 +6588,10 @@ public class MainPage implements Serializable {
         return activityReportsGroupMenu;
     }
 
+    public BasicWorkspacePage getCalendarReportsGroupMenu() {
+        return calendarReportsGroupMenu;
+    }
+
     public BasicWorkspacePage getClientReportsGroupMenu() {
         return clientReportsGroupMenu;
     }
@@ -6639,6 +6644,12 @@ public class MainPage implements Serializable {
 
     public Object showActivityReportsGroupMenu() {
         currentWorkspacePage = activityReportsGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showCalendarReportsGroupMenu() {
+        currentWorkspacePage = calendarReportsGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
@@ -9548,6 +9559,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToViewActivityReports() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY);
+    }
+
+    public boolean isEligibleToViewCalendarReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     }
 
     public boolean isEligibleToViewClientsReports() throws Exception {
