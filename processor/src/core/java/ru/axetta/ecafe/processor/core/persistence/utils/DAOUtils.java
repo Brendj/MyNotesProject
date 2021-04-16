@@ -5291,10 +5291,10 @@ public class DAOUtils {
         return version;
     }
 
-    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
-            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+    public static HardwareSettings getHardwareSettingsByOrgAndHostIP(Session session,
+            String ip, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
-        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.ipHost", ip));
         criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
         return (HardwareSettings) criteria.uniqueResult();
     }

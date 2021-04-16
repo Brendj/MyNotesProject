@@ -47,13 +47,13 @@ CREATE TABLE cf_client_qr_code (
 );
 
 --975
-drop table cf_wt_revision_info;
 drop table cf_wt_org_groups_aud;
 drop table cf_wt_org_group_relations_aud;
 drop table cf_wt_menu_org_aud;
 drop table cf_wt_menu_aud;
 drop table cf_wt_complexes_org_aud;
 drop table cf_wt_complexes_aud;
+drop table cf_wt_revision_info;
 
 update cf_wt_menu_group_relationships g set deletestate = 1
 where deletestate = 0 and (select m.deletestate from cf_wt_menu m where m.idofmenu = g.idofmenu) = 1;
