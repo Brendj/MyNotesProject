@@ -16,13 +16,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/client")
-@Tag(name="Client-controller", description="Операции по клиентам")
+@Tag(name = "Client-controller", description = "Операции по клиентам")
 public class ClientController {
+
     private final ClientService clientService;
     private final ClientConverter clientConverter;
 
     public ClientController(ClientService clientService,
-            ClientConverter clientConverter){
+            ClientConverter clientConverter) {
         this.clientService = clientService;
         this.clientConverter = clientConverter;
     }
