@@ -4,10 +4,9 @@
 
 package ru.iteco.restservice.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import ru.iteco.restservice.model.enums.OrganizationType;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -17,12 +16,57 @@ public class Org {
     @Column(name = "idoforg")
     private Long idOfOrg;
 
+    @Column(name = "officialname")
+    private String officialName;
+
+    @Column(name = "organizationtype")
+    @Enumerated(EnumType.ORDINAL)
+    private OrganizationType type;
+
+    @Column(name = "shortname")
+    private String shortName;
+
+    @Column(name = "shortaddress")
+    private String shortAddress;
+
     public Long getIdOfOrg() {
         return idOfOrg;
     }
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getOfficialName() {
+        return officialName;
+    }
+
+    public void setOfficialName(String officialName) {
+        this.officialName = officialName;
+    }
+
+    public OrganizationType getType() {
+        return type;
+    }
+
+    public void setType(OrganizationType type) {
+        this.type = type;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 
     @Override

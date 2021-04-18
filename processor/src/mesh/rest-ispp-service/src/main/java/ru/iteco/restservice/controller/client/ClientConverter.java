@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class ClientConverter extends BaseConverter<ClientResponseDTO, Client> {
     @Override
     public ClientResponseDTO toDTO(Client c){
-
         return null;
     }
 }

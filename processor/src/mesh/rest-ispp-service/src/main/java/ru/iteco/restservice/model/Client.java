@@ -4,6 +4,8 @@
 
 package ru.iteco.restservice.model;
 
+import ru.iteco.restservice.model.enums.Gender;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +29,13 @@ public class Client {
 
     @Column(name = "mobile")
     private String mobile;
+
+    @Column(name = "balance")
+    private Long balance;
+
+    @Column(name = "gender")
+    @Enumerated(EnumType.ORDINAL)
+    private Gender gender;
 
     @ManyToOne
     @JoinColumn(name = "idoforg", insertable = false, updatable = false)
@@ -148,6 +157,14 @@ public class Client {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    public Long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Long balance) {
+        this.balance = balance;
     }
 
     @Override
