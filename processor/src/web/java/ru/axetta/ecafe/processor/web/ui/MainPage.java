@@ -322,6 +322,7 @@ public class MainPage implements Serializable {
     private final BalanceLeavingReportPage balanceLeavingReportPage = new BalanceLeavingReportPage();
     private final ZeroTransactionsReportPage zeroTransactionsReportPage = new ZeroTransactionsReportPage();
     private final SpecialDatesReportPage specialDatesReportPage = new SpecialDatesReportPage();
+    private final FoodDaysCalendarReportPage foodDaysCalendarReportPage = new FoodDaysCalendarReportPage();
     private final MigrantsReportPage migrantsReportPage = new MigrantsReportPage();
     private final MonitoringOfReportPage monitoringOfReportPage = new MonitoringOfReportPage();
     private final ClientTransactionsReportPage clientTransactionsReportPage = new ClientTransactionsReportPage();
@@ -2694,6 +2695,40 @@ public class MainPage implements Serializable {
     }
 
     public Object showComplexListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ComplexListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                complexWebListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler) {
+                    complexWebListSelectPage
+                            .pushCompleteHandler((ComplexListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(complexWebListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill complex list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка комплексов меню для Web-технолога: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
+    }
+
+    public Object showGroupListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler
                 || currentTopMostPage instanceof ComplexListSelectPage) {
@@ -7647,6 +7682,23 @@ public class MainPage implements Serializable {
             currentWorkspacePage = specialDatesReportPage;
         } catch (Exception e) {
             logger.error("Failed to set SpecialDatesReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public FoodDaysCalendarReportPage getFoodDaysCalendarReportPage() {
+        return foodDaysCalendarReportPage;
+    }
+
+    public Object showFoodDaysCalendarReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = foodDaysCalendarReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set FoodDaysCalendarReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
         }

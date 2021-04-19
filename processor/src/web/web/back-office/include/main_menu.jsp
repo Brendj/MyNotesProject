@@ -1374,6 +1374,9 @@
         <a4j:support event="onclick" action="#{mainPage.showCalendarReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
                             label="Отчет по учебным дням" action="#{mainPage.showSpecialDatesReportPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
+                            label="Журнал ведения календаря дней питания" action="#{mainPage.showFoodDaysCalendarReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
