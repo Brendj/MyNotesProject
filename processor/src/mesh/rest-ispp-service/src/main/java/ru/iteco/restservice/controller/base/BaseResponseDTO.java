@@ -12,22 +12,21 @@ public abstract class BaseResponseDTO implements Serializable {
     private String middleName;
     private String lastname;
     private String grade;
-    private String officialName;
     private String orgType;
-    private String mobile;
     private String orgName;
 
-    public BaseResponseDTO(Long contractId, String firstName, String middleName, String lastname, String grade,
-            String officialName, String orgType, String mobile, String orgName) {
+    public BaseResponseDTO(Long contractId, String firstName, String middleName, String lastname, String grade
+            , String orgType, String orgName) {
         this.contractId = contractId;
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastname = lastname;
         this.grade = grade;
-        this.officialName = officialName;
         this.orgType = orgType;
-        this.mobile = mobile;
         this.orgName = orgName;
+    }
+
+    public BaseResponseDTO() {
     }
 
     public Long getContractId() {
@@ -70,28 +69,12 @@ public abstract class BaseResponseDTO implements Serializable {
         this.grade = grade;
     }
 
-    public String getOfficialName() {
-        return officialName;
-    }
-
-    public void setOfficialName(String officialName) {
-        this.officialName = officialName;
-    }
-
     public String getOrgType() {
         return orgType;
     }
 
     public void setOrgType(String orgType) {
         this.orgType = orgType;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
     }
 
     public String getOrgName() {

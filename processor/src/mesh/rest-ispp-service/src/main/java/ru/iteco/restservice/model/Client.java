@@ -13,6 +13,78 @@ import java.util.Set;
 
 @Entity
 @Table(name = "cf_clients")
+@SqlResultSetMappings({
+        @SqlResultSetMapping(
+                name = "clientResponse",
+                classes = {
+                        @ConstructorResult(
+                                targetClass = ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO.class,
+                                columns = {
+                                    @ColumnResult(name = "contractId", type = Long.class),
+                                    @ColumnResult(name = "balance", type = Long.class),
+                                    @ColumnResult(name = "firstName", type = String.class),
+                                    @ColumnResult(name = "lastName", type = String.class),
+                                    @ColumnResult(name = "middleName", type = String.class),
+                                    @ColumnResult(name = "grade", type = String.class),
+                                    @ColumnResult(name = "orgName", type = String.class),
+                                    @ColumnResult(name = "orgType", type = String.class),
+                                    @ColumnResult(name = "address", type = String.class),
+                                    @ColumnResult(name = "isInside", type = Boolean.class),
+                                    @ColumnResult(name = "meshGuid", type = String.class),
+                                    @ColumnResult(name = "specialMenu", type = Boolean.class),
+                                    @ColumnResult(name = "gender", type = String.class),
+                                    @ColumnResult(name = "categoryDiscount", type = String.class),
+                                    @ColumnResult(name = "preorderAllowed", type = Boolean.class),
+                                    @ColumnResult(name = "limit", type = Long.class)
+                                }
+                        )
+                }
+        )
+    }
+)
+@NamedNativeQueries({
+        @NamedNativeQuery(
+            name="getClientByGuardPhone",
+            resultSetMapping = "clientResponse",
+            query = "SELECT child.contractId AS \"contractId\",\n"
+                    + "       child.balance AS \"balance\",\n"
+                    + "       cp.firstname AS \"firstName\",\n"
+                    + "       cp.secondname AS \"lastName\",\n"
+                    + "       cp.surname AS \"middleName\",\n"
+                    + "       cc.groupname AS \"grade\",\n"
+                    + "       co.shortname AS \"orgName\",\n"
+                    + "       CASE\n"
+                    + "           WHEN co.organizationtype = 0 THEN 'Общеобразовательное ОУ'\n"
+                    + "           WHEN co.organizationtype = 1 THEN 'Дошкольное ОУ'\n"
+                    + "           WHEN co.organizationtype = 2 THEN 'Поставщик питания'\n"
+                    + "           WHEN co.organizationtype = 3 THEN 'Профессиональное ОУ'\n"
+                    + "           WHEN co.organizationtype = 4 THEN 'Доп.образование'\n"
+                    + "           ELSE 'Неизвестно' END AS \"orgType\",\n"
+                    + "       co.shortaddress AS \"address\",\n"
+                    + "       COALESCE((SELECT CASE WHEN ee.eventcode IN (0, 6, 100, 101, 102, 112) THEN TRUE ELSE FALSE END\n"
+                    + "        FROM cf_enterevents ee\n"
+                    + "        WHERE ee.idofclient = child.idofclient\n"
+                    + "        ORDER BY evtdatetime DESC\n"
+                    + "        LIMIT 1), FALSE) AS \"isInside\",\n"
+                    + "       child.meshguid AS \"meshGuid\",\n"
+                    + "       COALESCE(CASE WHEN child.specialmenu = 1 THEN TRUE ELSE FALSE END, FALSE) AS \"specialMenu\",\n"
+                    + "       CASE WHEN child.gender = 0 THEN 'Ж' ELSE 'М' END AS \"gender\",\n"
+                    + "       string_agg(c.categoryname, ',') AS \"categoryDiscount\",\n"
+                    + "       COALESCE(CASE WHEN cpf.allowedpreorder = 1 THEN TRUE ELSE FALSE END, FALSE) AS \"preorderAllowed\",\n"
+                    + "       child.limits AS \"limit\" \n"
+                    + "FROM cf_clients AS child\n"
+                    + "         JOIN cf_orgs AS co ON child.idoforg = co.idoforg\n"
+                    + "         JOIN cf_persons AS cp ON child.idofperson = cp.idofperson\n"
+                    + "         JOIN cf_clientgroups cc ON child.idoforg = cc.idoforg AND child.idofclientgroup = cc.idofclientgroup\n"
+                    + "         LEFT JOIN cf_clients_categorydiscounts ccc ON child.idofclient = ccc.idofclient\n"
+                    + "         LEFT JOIN cf_categorydiscounts c ON ccc.idofcategorydiscount = c.idofcategorydiscount\n"
+                    + "         JOIN cf_client_guardian AS guardians ON child.idofclient = guardians.idofchildren\n"
+                    + "         JOIN cf_clients AS guardian ON guardians.idofguardian = guardian.idofclient\n"
+                    + "         LEFT JOIN cf_preorder_flags cpf ON child.idofclient = cpf.idofclient\n"
+                    + "WHERE guardian.mobile LIKE :guardPhone \n"
+                    + "GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16;"
+        )
+})
 public class Client {
     @Id
     @Column(name = "idofclient")

@@ -6,7 +6,6 @@ package ru.iteco.restservice.controller.client;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
-import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.servise.ClientService;
 
 import org.springframework.web.bind.annotation.*;
@@ -31,9 +30,6 @@ public class ClientController {
     @GetMapping
     @ResponseBody
     public List<ClientResponseDTO> getClientByGuardian(@NotNull @RequestParam String guardPhone) {
-        List<Client> clients = clientService.getClientsByGuardianPhone(guardPhone);
-        return clientConverter.toDTOs(clients);
+        return clientService.getClientsByGuardianPhone(guardPhone);
     }
-
-
 }

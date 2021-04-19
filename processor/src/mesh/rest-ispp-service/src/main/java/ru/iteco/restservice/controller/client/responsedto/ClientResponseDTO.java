@@ -6,8 +6,6 @@ package ru.iteco.restservice.controller.client.responsedto;
 
 import ru.iteco.restservice.controller.base.BaseResponseDTO;
 
-import java.util.List;
-
 public class ClientResponseDTO extends BaseResponseDTO {
     private Long balance;
     private String address;
@@ -15,14 +13,14 @@ public class ClientResponseDTO extends BaseResponseDTO {
     private String meshGUID;
     private Boolean specialMenu;
     private String gender;
-    private List<String> categoryDiscount;
+    private String categoryDiscount;
     private Boolean preorderAllowed;
+    private Long limit;
 
-    public ClientResponseDTO(Long contractId, String firstName, String middleName, String lastname, String grade,
-            String officialName, String orgType, String mobile, String orgName, Long balance, String address,
-            Boolean isInside, String meshGUID, Boolean specialMenu, String gender, List<String> categoryDiscount,
-            Boolean preorderAllowed) {
-        super(contractId, firstName, middleName, lastname, grade, officialName, orgType, mobile, orgName);
+    public ClientResponseDTO(Long contractId, Long balance, String firstName, String lastname, String middleName,
+            String grade, String orgName, String orgType,  String address, Boolean isInside, String meshGUID,
+            Boolean specialMenu, String gender, String categoryDiscount, Boolean preorderAllowed, Long limit) {
+        super(contractId, firstName, middleName, lastname, grade, orgType, orgName);
         this.balance = balance;
         this.address = address;
         this.isInside = isInside;
@@ -31,6 +29,11 @@ public class ClientResponseDTO extends BaseResponseDTO {
         this.gender = gender;
         this.categoryDiscount = categoryDiscount;
         this.preorderAllowed = preorderAllowed;
+        this.limit = limit;
+    }
+
+    ClientResponseDTO(){
+
     }
 
     public Long getBalance() {
@@ -49,11 +52,11 @@ public class ClientResponseDTO extends BaseResponseDTO {
         this.address = address;
     }
 
-    public Boolean getInside() {
+    public Boolean getIsInside() {
         return isInside;
     }
 
-    public void setInside(Boolean inside) {
+    public void setIsInside(Boolean inside) {
         isInside = inside;
     }
 
@@ -81,11 +84,11 @@ public class ClientResponseDTO extends BaseResponseDTO {
         this.gender = gender;
     }
 
-    public List<String> getCategoryDiscount() {
+    public String getCategoryDiscount() {
         return categoryDiscount;
     }
 
-    public void setCategoryDiscount(List<String> categoryDiscount) {
+    public void setCategoryDiscount(String categoryDiscount) {
         this.categoryDiscount = categoryDiscount;
     }
 
@@ -95,5 +98,13 @@ public class ClientResponseDTO extends BaseResponseDTO {
 
     public void setPreorderAllowed(Boolean preorderAllowed) {
         this.preorderAllowed = preorderAllowed;
+    }
+
+    public Long getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Long limit) {
+        this.limit = limit;
     }
 }
