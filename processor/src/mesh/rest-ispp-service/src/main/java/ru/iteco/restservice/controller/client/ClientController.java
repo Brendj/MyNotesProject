@@ -5,6 +5,7 @@
 package ru.iteco.restservice.controller.client;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ru.iteco.restservice.controller.client.exceptionhandler.ClientControllerExceptionHandler;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
 import ru.iteco.restservice.servise.ClientService;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/client")
+@ClientControllerExceptionHandler
 @Tag(name = "Client-controller", description = "Операции по клиентам")
 public class ClientController {
 
