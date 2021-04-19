@@ -3041,14 +3041,14 @@ public class DAOUtils {
     private static long getDistributedObjectVersionFromSequence(Session session, String name) {
         long version = 0L;
         String sequenceName = DAOService.getInstance().getDistributedObjectSequenceName(name);
-        Query query = session.createSQLQuery(String.format("select nextval('%s')", sequenceName));
+        Query query = session.createSQLQuery(String.format("savepoint before_get_version; select nextval('%s')", sequenceName));
         try {
             Object o = query.uniqueResult();
             if (o != null) {
                 version = HibernateUtils.getDbLong(o);
             }
         } catch (SQLGrammarException e) {
-            Query q = session.createSQLQuery(String.format("create sequence %s", sequenceName));
+            Query q = session.createSQLQuery(String.format("rollback to savepoint before_get_version; create sequence %s", sequenceName));
             q.executeUpdate();
         }
         return version;
