@@ -85,6 +85,18 @@ import java.util.Set;
                     + "GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16;"
         )
 })
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+            name = "forClientResponseDTO",
+            attributeNodes = {
+                    @NamedAttributeNode("discounts"),
+                    @NamedAttributeNode("org"),
+                    @NamedAttributeNode("clientGroup"),
+                    @NamedAttributeNode("person"),
+                    @NamedAttributeNode("preorderFlag")
+            }
+    )
+})
 public class Client {
     @Id
     @Column(name = "idofclient")
@@ -108,6 +120,12 @@ public class Client {
     @Column(name = "gender")
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
+
+    @Column(name = "specialmenu")
+    private Integer specialMenu;
+
+    @Column(name = "limits")
+    private Long limits;
 
     @ManyToOne
     @JoinColumn(name = "idoforg", insertable = false, updatable = false)
@@ -139,6 +157,9 @@ public class Client {
     @OneToOne
     @JoinColumn(name = "idofperson")
     private Person person;
+
+    @OneToOne(mappedBy = "client")
+    private PreorderFlag preorderFlag;
 
     public Client() {
     }
@@ -237,6 +258,38 @@ public class Client {
 
     public void setBalance(Long balance) {
         this.balance = balance;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public Integer getSpecialMenu() {
+        return specialMenu;
+    }
+
+    public void setSpecialMenu(Integer specialMenu) {
+        this.specialMenu = specialMenu;
+    }
+
+    public Long getLimits() {
+        return limits;
+    }
+
+    public void setLimits(Long limits) {
+        this.limits = limits;
+    }
+
+    public PreorderFlag getPreorderFlag() {
+        return preorderFlag;
+    }
+
+    public void setPreorderFlag(PreorderFlag preorderFlag) {
+        this.preorderFlag = preorderFlag;
     }
 
     @Override

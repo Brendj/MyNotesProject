@@ -26,9 +26,6 @@ public abstract class BaseResponseDTO implements Serializable {
         this.orgName = orgName;
     }
 
-    public BaseResponseDTO() {
-    }
-
     public Long getContractId() {
         return contractId;
     }

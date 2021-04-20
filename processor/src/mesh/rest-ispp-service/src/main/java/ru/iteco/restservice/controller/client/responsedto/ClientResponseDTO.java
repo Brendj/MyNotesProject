@@ -32,10 +32,6 @@ public class ClientResponseDTO extends BaseResponseDTO {
         this.limit = limit;
     }
 
-    ClientResponseDTO(){
-
-    }
-
     public Long getBalance() {
         return balance;
     }
