@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.iteco.msp.repo;
+package ru.iteco.msp.repo.assign;
 
 import ru.iteco.msp.models.DiscountChangeHistory;
 
@@ -23,4 +23,6 @@ public interface DiscountChangeHistoryRepo extends JpaRepository<DiscountChangeH
             + " and dh.categoriesdiscounts not like ''\n",
             nativeQuery = true)
     List<DiscountChangeHistory> getHistoryByDistinctClient(Pageable pageable);
+
+
 }

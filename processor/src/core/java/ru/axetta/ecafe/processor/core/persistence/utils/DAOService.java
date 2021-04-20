@@ -3173,5 +3173,20 @@ public class DAOService {
         query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
         query.executeUpdate();
     }
+
+    public void saveQRinfo(ClientEnterQR clientEnterQR) {
+        entityManager.persist(clientEnterQR);
+        entityManager.flush();
+    }
+
+    @Transactional
+    public void setCardSignID(CardSign cardSign, int newID) {
+        String str_query = "update cf_card_signs set idofcardsign=:newID where idofcardsign=:oldID";
+        Query q = entityManager.createNativeQuery(str_query);
+        q = entityManager.createNativeQuery(str_query);
+        q.setParameter("newID", newID);
+        q.setParameter("oldID", cardSign.getIdOfCardSign());
+        q.executeUpdate();
+    }
 }
 

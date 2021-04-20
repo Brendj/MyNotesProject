@@ -19,6 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.math.BigInteger;
@@ -43,15 +44,19 @@ public class CardWritableRepository extends WritableJpaDao {
     }
 
     public Card findByCardNo( Long cardno, Long idOfOrg ){
-        TypedQuery<Card> query = entityManager.createQuery(
-                "from Card c left join fetch c.client inner join fetch c.org "
-                 + "where c.cardNo=:cardno and c.org.idOfOrg=:idOfOrg", Card.class);
-        query.setParameter("cardno",cardno);
-        query.setParameter("idOfOrg", idOfOrg);
-        List<Card> resultList = query.getResultList();
-        if(resultList.size()> 0){
-            return query.getResultList().get(0);
-        }else return null;
+        try {
+            TypedQuery<Card> query = entityManager.createQuery(
+                    "from Card c left join fetch c.client inner join fetch c.org " + "where c.cardNo=:cardno and c.org.idOfOrg=:idOfOrg", Card.class);
+            query.setParameter("cardno", cardno);
+            query.setParameter("idOfOrg", idOfOrg);
+            List<Card> resultList = query.getResultList();
+            if (resultList.size() > 0) {
+                return query.getResultList().get(0);
+            } else
+                return null;
+        } catch (PersistenceException e){
+            return null;
+        }
     }
 
     public Card findByCardNo( Long cardno, Long idOfOrg, Long idOfClient, Boolean isOldArm ) {
@@ -119,28 +124,28 @@ public class CardWritableRepository extends WritableJpaDao {
         return (result > 0);
     }
 
-    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,
+    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignVerifyRes, Integer cardSignCertNum, Boolean isLongUid) throws Exception {
         checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type, cardNo);
-        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid);
+        return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, isLongUid);
     }
 
-    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
+    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,  Long longCardNo, Integer cardSignVerifyRes,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
         checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type, cardNo);
-        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid, cardTransitionState);
+        return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, isLongUid, cardTransitionState);
     }
 
-    public Card createCardSpecial(Org org, long cardNo, long cardPrintedNo, int type,
+    public Card createCardSpecial(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignCertNum) throws Exception {
         if (cardExistsInSpecial(cardNo)) {
-            return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, null);
+            return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, null);
         } else {
             throw new Exception("cardNo not found");
         }
     }
 
-    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
+    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
@@ -149,6 +154,9 @@ public class CardWritableRepository extends WritableJpaDao {
         card.setTransitionState(cardTransitionState);
         if (null != isLongUid)
             card.setIsLongUid(isLongUid);
+        if(null != longCardNo){
+            card.setLongCardNo(longCardNo);
+        }
         if (org.getNeedVerifyCardSign() && !(cardSignCertNum == null || cardSignCertNum == 0) && !Card.isSocial(type))
             card.setCardSignCertNum(cardSignCertNum);
 
@@ -156,9 +164,9 @@ public class CardWritableRepository extends WritableJpaDao {
         return card;
     }
 
-    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
+    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignCertNum, Boolean isLongUid) throws Exception {
-        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid,
+        return createCardInternal(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum, isLongUid,
                 CardTransitionState.OWN.getCode());
     }
 
@@ -460,7 +468,7 @@ public class CardWritableRepository extends WritableJpaDao {
         q = entityManager.createNativeQuery(String.format("insert into clients_for_cards(idOfClient) values(unnest(cast(string_to_array('%s', ',') as bigint[])))", str.substring(0, str.length()-1)));
         q.executeUpdate();
         q = entityManager.createNativeQuery("select c.IdOfCard, c.Version, c.IdOfClient, c.IdOfVisitor, c.idoforg, c.CardNo, c.CardType, c.CreatedDate, c.LastUpdate, c.State, c.LockReason, "
-                + "c.ValidDate, c.IssueDate, c.LifeState, c.CardPrintedNo, c.ExternalId, c.CardSignCertNum, c.IsLongUid, c.transitionstate "
+                + "c.ValidDate, c.IssueDate, c.LifeState, c.CardPrintedNo, c.ExternalId, c.CardSignCertNum, c.IsLongUid, c.transitionstate, c.longCardNo "
                 + "from cf_cards c inner join clients_for_cards cfc on c.idOfClient = cfc.idOfClient", Card.class);
         return q.getResultList();
     }
@@ -478,5 +486,19 @@ public class CardWritableRepository extends WritableJpaDao {
             return true;
         }else
             return false;
+    }
+
+    public Card findByLongCardNo(Long longCardNo, Long idOfOrg) {
+        try {
+            TypedQuery<Card> query = entityManager.createQuery(
+                    "from Card c left join fetch c.client inner join fetch c.org "
+                            + "where c.longCardNo=:longCardNo and c.org.idOfOrg=:idOfOrg", Card.class);
+            query.setParameter("longCardNo", longCardNo);
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setMaxResults(1);
+            return query.getSingleResult();
+        } catch (PersistenceException e){
+            return null;
+        }
     }
 }

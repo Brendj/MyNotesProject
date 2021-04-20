@@ -36,6 +36,9 @@ public class ClientDTSZNDiscountInfo {
     @Column(name = "archived")
     private Integer archived;
 
+    @Column(name = "status")
+    private Integer status;
+
     public ClientDTSZNDiscountInfo() {
     }
 
@@ -101,6 +104,14 @@ public class ClientDTSZNDiscountInfo {
 
     public void setArchived(Integer archived) {
         this.archived = archived;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @Override

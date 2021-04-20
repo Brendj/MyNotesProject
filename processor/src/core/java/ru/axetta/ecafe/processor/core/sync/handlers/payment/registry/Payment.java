@@ -23,6 +23,7 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.*;
 public class Payment {
 
     private final Long cardNo;
+    private final Long longCardNo;
     private final Date time;
     private final Date orderDate;
     private final Long socDiscount;
@@ -48,6 +49,7 @@ public class Payment {
     public static Payment build(Node paymentNode, LoadContext loadContext) throws Exception {
         NamedNodeMap namedNodeMap = paymentNode.getAttributes();
         Long cardNo = getLongValueNullSafe(namedNodeMap, "CardNo");
+        Long longCardNo = getLongValueNullSafe(namedNodeMap, "LongCardId");
         Date date = loadContext.getTimeFormat().parse(namedNodeMap.getNamedItem("Date").getTextContent());
         /* поддержка версий которые не высылают OrderDate в эту колонку записываются дата из колоки Date */
         String orderDateStr = getStringValueNullSafe(namedNodeMap,"OrderDate");
@@ -131,13 +133,15 @@ public class Payment {
 
         return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfOrg, idOfClient, idOfPayForClient, idOfOrder,
                 idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, state, comments, OrderTypeEnumType.fromInteger(orderType),
-                purchases, guidOfCBHR, summOfCBHR);
+                purchases, guidOfCBHR, summOfCBHR, longCardNo);
     }
 
     public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long IdOfOrg, Long idOfClient,
             Long idOfPayForClient, long idOfOrder, Long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS,
-            Long confirmerId, int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases, String guidOfCBHR, Long summOfCBHR) {
+            Long confirmerId, int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases,
+            String guidOfCBHR, Long summOfCBHR, Long longCardNo) {
         this.cardNo = cardNo;
+        this.longCardNo = longCardNo;
         this.time = time;
         this.orderDate = orderDate;
         this.socDiscount = socDiscount;
@@ -163,6 +167,10 @@ public class Payment {
 
     public Long getCardNo() {
         return cardNo;
+    }
+
+    public Long getLongCardNo() {
+        return longCardNo;
     }
 
     public Date getTime() {

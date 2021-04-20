@@ -87,6 +87,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean disableEditingClientsFromAISReestr;
     private Boolean usePaydableSubscriptionFeeding;
     private Boolean workInSummerTime;
+    private Boolean governmentContract;
+    private Boolean useLongCardNo;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -436,6 +438,8 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setUseWebArm(useWebArm);
         org.setGooddatecheck(goodDateCheck);
         org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
+        org.setGovernmentContract(governmentContract);
+        org.setUseLongCardNo(useLongCardNo);
 
         session.update(org);
         fill(org);
@@ -491,6 +495,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.workInSummerTime = org.getIsWorkInSummerTime();
+        this.useLongCardNo = org.getUseLongCardNo() == null ? false : org.getUseLongCardNo();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -594,6 +599,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.useWebArm = org.getUseWebArm();
         this.goodDateCheck = org.getGooddatecheck();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
+        this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1467,4 +1473,20 @@ public class OrgEditPage extends BasicWorkspacePage
     public Long getOrgIdFromNsi() { return orgIdFromNsi; }
 
     public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
+
+    public Boolean getGovernmentContract() {
+        return governmentContract;
+    }
+
+    public void setGovernmentContract(Boolean governmentContract) {
+        this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseLongCardNo() {
+        return useLongCardNo;
+    }
+
+    public void setUseLongCardNo(Boolean useLongCardNo) {
+        this.useLongCardNo = useLongCardNo;
+    }
 }

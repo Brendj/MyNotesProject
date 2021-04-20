@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
+
 import org.w3c.dom.Node;
 
 import java.util.Date;
@@ -12,14 +14,14 @@ public class HardwareSettingsRequestDotNetVerItem extends HardwareSettingsReques
 
     private String value;
 
-    public HardwareSettingsRequestDotNetVerItem(String value, Date lastUpdate, String type, String errorMessage) {
+    public HardwareSettingsRequestDotNetVerItem(String value, Date lastUpdate, HardwareSettingsRequest.ModuleType type,
+            String errorMessage) {
         super(lastUpdate, type, errorMessage);
         this.value = value;
     }
 
     public static HardwareSettingsRequestDotNetVerItem build(Node itemNode) {
-
-        String type = "DotNetVer";
+        HardwareSettingsRequest.ModuleType type = HardwareSettingsRequest.ModuleType.DOTNETVER;
 
         StringBuilder errorMessage = new StringBuilder();
 

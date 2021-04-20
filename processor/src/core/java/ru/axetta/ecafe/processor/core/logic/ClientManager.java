@@ -1309,7 +1309,7 @@ public class ClientManager {
         try {
             return runtimeContext.getCardManager()
                     .createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state,
-                            validTime, lifeState, lockReason, issueTime, cardPrintedNo);
+                            validTime, lifeState, lockReason, issueTime, cardPrintedNo, null);
         } catch (Exception e) {
             throw new Exception("Ошибка при создании карты: " + e);
         }
@@ -1932,6 +1932,25 @@ public class ClientManager {
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
         }
+    }
+
+    public static void setInformedSpecialMenu(Session session, Client client, Boolean isStudent) {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client", client));
+        List<PreorderFlag> preorderFlagList = criteria.list();
+        PreorderFlag preorderFlag;
+        if (preorderFlagList.size() == 0) {
+            preorderFlag = new PreorderFlag(client);
+        } else {
+            preorderFlag = preorderFlagList.get(0);
+        }
+        if (isStudent) {
+            preorderFlag.setAllowedPreorder(true);
+        } else {
+            preorderFlag.setInformedSpecialMenu(true);
+        }
+        preorderFlag.setLastUpdate(new Date());
+        session.saveOrUpdate(preorderFlag);
     }
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */

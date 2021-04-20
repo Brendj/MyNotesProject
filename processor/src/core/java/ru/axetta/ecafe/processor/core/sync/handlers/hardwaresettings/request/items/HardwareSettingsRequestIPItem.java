@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
+
 import org.w3c.dom.Node;
 
 import java.util.Date;
@@ -12,13 +14,13 @@ public class HardwareSettingsRequestIPItem extends HardwareSettingsRequestItem {
 
     private String value;
 
-    public HardwareSettingsRequestIPItem(String value, Date lastUpdate, String type, String errorMessage) {
+    public HardwareSettingsRequestIPItem(String value, Date lastUpdate, HardwareSettingsRequest.ModuleType type, String errorMessage) {
         super(lastUpdate, type, errorMessage);
         this.value = value;
     }
 
     public static HardwareSettingsRequestIPItem build(Node itemNode) {
-        String type = "IP";
+        HardwareSettingsRequest.ModuleType type = HardwareSettingsRequest.ModuleType.IP;
         StringBuilder errorMessage = new StringBuilder();
 
         return new HardwareSettingsRequestIPItem(getValue(itemNode, errorMessage),

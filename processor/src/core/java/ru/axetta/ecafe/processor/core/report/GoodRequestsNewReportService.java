@@ -427,7 +427,7 @@ public class GoodRequestsNewReportService {
                 final Long price = (null != values[5]) ? ((BigInteger) values[5]).longValue() : null;
 
                 if (isComplex) {
-                    planType = FeedingPlanType.PREORDER;
+                    planType = FeedingPlanType.COMPLEX;
                 } else {
                     if (MENU_DETAIL_TYPE_BREAKFAST.equals(menuDetailType)) {
                         planType = FeedingPlanType.BREAKFAST;
@@ -775,14 +775,19 @@ public class GoodRequestsNewReportService {
             ComplexInfoItem complexInfoItem = complexOrgDictionary.get(position.getOrgOwner());
             if (complexInfoItem.preorderInfo.containsKey(position.getGlobalId())) {
                 GoodInfo info = complexInfoItem.preorderInfo.get(position.getGlobalId());
+                feedingPlanType = info.feedingPlanType;
                 price = info.price;
                 goodsCode = dishCode;
             } else if (complexId != null && complexInfoItem.goodInfos.containsKey(complexId.longValue())) {
                 GoodInfo info = complexInfoItem.goodInfos.get(complexId.longValue());
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
                 price = info.price;
+            } else {
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
             }
+        } else {
+            feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
         }
-        feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
 
         if (wtComplex != null && !requestGoodsInfo.containsKey(wtComplex.getIdOfComplex())) {
             requestGoodsInfo.put(wtComplex.getIdOfComplex(),
@@ -806,6 +811,36 @@ public class GoodRequestsNewReportService {
             position.setNotified(true);
             session.persist(position);
         }
+    }
+
+    private FeedingPlanType decodeFeedingPlan(Integer feedingType, Integer complexId) {
+        FeedingPlanType result = null;
+        switch (feedingType){
+            case 0: {
+                result = FeedingPlanType.GENERAL; break;
+            }
+            case 1: {
+                result = FeedingPlanType.REDUCED_PRICE_PLAN; break;
+            }
+            case 2: {
+                result = FeedingPlanType.PAY_PLAN; break;
+            }
+            case 3: {
+                result = FeedingPlanType.SUBSCRIPTION_FEEDING; break;
+            }
+            case 4: {
+                if (complexId != null)
+                    result = FeedingPlanType.COMPLEX;
+                else
+                    result = FeedingPlanType.DISH;
+                break;
+            }
+            case 5: {
+                result = FeedingPlanType.PREORDER; break;
+            }
+            default: result = FeedingPlanType.PAY_PLAN;
+        }
+        return result;
     }
 
     private FeedingPlanType decodeFeedingPlan(Integer feedingType, Integer complexId, Long dishId) {

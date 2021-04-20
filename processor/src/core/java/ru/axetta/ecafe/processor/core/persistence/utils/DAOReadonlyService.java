@@ -750,53 +750,49 @@ public class DAOReadonlyService {
         return resultMap;
     }
 
-    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
+    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
         try {
-            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and ce.kafka<>true");
-            query.setParameter("vers", maxVersion);
-            List<EMIAS> emias = query.getResultList();
-            //Фильтрация по орг
-            Iterator<EMIAS> emiasIterator = emias.iterator();
-            while (emiasIterator.hasNext()) {
-                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
-                Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
-                if (cl == null) {
-                    //Удаляем "удаленных" клиентов
-                    emiasIterator.remove();
-                    continue;
-                }
-                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
-                    //Удаляем "чужих" клиентов
-                    emiasIterator.remove();
-                }
+            Session session = entityManager.unwrap(Session.class);
+            org.hibernate.Query q = session.createSQLQuery("select ce.id from cf_emias ce "
+                    + " left join cf_clients cc on cc.meshguid = ce.guid "
+                    + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and (ce.kafka is null or ce.kafka = false)");
+            q.setParameterList("orgs", idOfOrgs);
+            q.setParameter("vers", maxVersion);
+            List list = q.list();
+            List<Long> ids = new ArrayList<>();
+            for (Object obj : list) {
+                Long id = HibernateUtils.getDbLong(obj);
+                ids.add(id);
             }
-            return emias;
+            if (ids.size() == 0) return new ArrayList<>();
+            Query query = entityManager
+                    .createQuery("SELECT ce FROM EMIAS ce where ce.id in :list");
+            query.setParameter("list", ids);
+            return query.getResultList();
         } catch (Exception e) {
             return new ArrayList<>();
         }
     }
 
-    public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
+    public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
         try {
-            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and ce.kafka=true and ce.processed = true");
-            query.setParameter("vers", maxVersion);
-            List<EMIAS> emias = query.getResultList();
-            //Фильтрация по орг
-            Iterator<EMIAS> emiasIterator = emias.iterator();
-            while (emiasIterator.hasNext()) {
-                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
-                Client cl = DAOUtils.findClientByMeshGuid(entityManager.unwrap(Session.class), emias1.getGuid());
-                if (cl == null) {
-                    //Удаляем "удаленных" клиентов
-                    emiasIterator.remove();
-                    continue;
-                }
-                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
-                    //Удаляем "чужих" клиентов
-                    emiasIterator.remove();
-                }
+            Session session = entityManager.unwrap(Session.class);
+            org.hibernate.Query q = session.createSQLQuery("select ce.id from cf_emias ce "
+                    + " left join cf_clients cc on cc.meshguid = ce.guid "
+                    + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and ce.kafka=true and ce.processed = true");
+            q.setParameterList("orgs", idOfOrgs);
+            q.setParameter("vers", maxVersion);
+            List list = q.list();
+            List<Long> ids = new ArrayList<>();
+            for (Object obj : list) {
+                Long id = HibernateUtils.getDbLong(obj);
+                ids.add(id);
             }
-            return emias;
+            if (ids.size() == 0) return new ArrayList<>();
+            Query query = entityManager
+                    .createQuery("SELECT ce FROM EMIAS ce where ce.id in :list");
+            query.setParameter("list", ids);
+            return query.getResultList();
         } catch (Exception e) {
             return new ArrayList<>();
         }
