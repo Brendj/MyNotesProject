@@ -17,4 +17,12 @@ public class GroupClientsUpdateRequest implements Serializable {
     public void setBindingOrgId(Long bindingOrgId) {
         this.bindingOrgId = bindingOrgId;
     }
+
+    public Boolean getDisableFromPlanLP() {
+        return disableFromPlanLP;
+    }
+
+    public void setDisableFromPlanLP(Boolean disableFromPlanLP) {
+        this.disableFromPlanLP = disableFromPlanLP;
+    }
 }

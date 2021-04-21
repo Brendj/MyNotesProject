@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateI
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateResult;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -24,10 +25,12 @@ import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateCl
 
 @Service
 class UpdateClientCommand {
+
     private final Logger logger = LoggerFactory.getLogger(UpdateClientCommand.class);
     private final RuntimeContext runtimeContext;
     private final MoveClientsCommand moveClientsCommand;
     private static final int NOT_FOUND = 404, BAD_PARAMS = 400;
+
     @Autowired
     public UpdateClientCommand(RuntimeContext runtimeContext, MoveClientsCommand moveClientsCommand) {
         this.runtimeContext = runtimeContext;
@@ -44,7 +47,8 @@ class UpdateClientCommand {
             transaction = session.beginTransaction();
             Client client = (Client) session.get(Client.class, idOfClient);
             if (client == null) {
-                throw new WebApplicationException(NOT_FOUND, String.format("Client with ID='%d' not found", idOfClient));
+                throw new WebApplicationException(NOT_FOUND,
+                        String.format("Client with ID='%d' not found", idOfClient));
             }
             setMobilePhone(client, request.getMobile(), user);
             setBirthDate(request.getBirthDate(), client);
@@ -59,11 +63,9 @@ class UpdateClientCommand {
             transaction.commit();
             transaction = null;
             return ClientUpdateResult.success(client.getIdOfClient());
-        }
-        catch (WebApplicationException e){
+        } catch (WebApplicationException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in update client info, ", e);
             throw new WebApplicationException("Error in update client info, ", e);
         } finally {
@@ -78,20 +80,23 @@ class UpdateClientCommand {
         }
         if (!client.getIdOfClientGroup().equals(request.getIdOfClientGroup())) {
 
+            long idOfOrg = request.getIdOfOrg() != null ? request.getIdOfOrg() : client.getClientGroup().getCompositeIdOfClientGroup().getIdOfOrg();
             ClientGroup moveToGroup = (ClientGroup) session.get(ClientGroup.class,
-                    new CompositeIdOfClientGroup(request.getIdOfOrg(), request.getIdOfClientGroup()));
+                    new CompositeIdOfClientGroup(idOfOrg, request.getIdOfClientGroup()));
             if (moveToGroup == null) {
-                throw new WebApplicationException(NOT_FOUND, String.format("Group of client with ID='%d' not found", request.getIdOfClientGroup()));
+                throw new WebApplicationException(NOT_FOUND,
+                        String.format("Group of client with ID='%d' not found", request.getIdOfClientGroup()));
             }
             // обновляем группу
             String result = moveClientsCommand.updateClientGroupOrGetError(session, moveToGroup, client, user, false);
-            if (result != null) {
+            if (StringUtils.isNotEmpty(result)) {
                 throw new WebApplicationException(result);
             }
             // обновляем подгруппу если нужно
-            result = moveClientsCommand.updateMiddleGroupOrGetError(session, request.getIdOfClientGroup(), request.getIdOfMiddleGroup(),
-                    client);
-            if (result != null) {
+            result = moveClientsCommand
+                    .updateMiddleGroupOrGetError(session, request.getIdOfClientGroup(), request.getIdOfMiddleGroup(),
+                            client);
+            if (StringUtils.isNotEmpty(result)) {
                 throw new WebApplicationException(result);
             }
         }
