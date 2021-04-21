@@ -4,8 +4,8 @@
 
 package ru.iteco.restservice.controller.client;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import ru.iteco.restservice.controller.client.exceptionhandler.ClientControllerExceptionHandler;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.servise.ClientService;
@@ -19,8 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/client")
-@ClientControllerExceptionHandler
-@Tag(name = "Client-controller", description = "Операции по клиентам")
+@Api(value = "Операции по клиентам")
 public class ClientController {
     private final Logger log = LoggerFactory.getLogger(ClientController.class);
 
@@ -35,6 +34,10 @@ public class ClientController {
 
     @GetMapping("/getByGuardMobile")
     @ResponseBody
+    @ApiOperation(
+            value = "Получение списка детей по номеру опекуна",
+            notes = "Позволяет получить список детей по номеру телефона опекуна, если такой опекун присуствует в системе"
+    )
     public List<ClientResponseDTO> getClientByGuardian(@NotNull @RequestParam String guardPhone) {
         try {
             List<Client> childs = clientService.getClientsByGuardianPhone(guardPhone);
@@ -47,6 +50,10 @@ public class ClientController {
 
     @GetMapping("/getByMeshGuid")
     @ResponseBody
+    @ApiOperation(
+            value = "Получение клиента по MESH-GUID",
+            notes = "Позволяет получить клиента с указанным MESH-GUID"
+    )
     public ClientResponseDTO getClientByMeshGuid(@NotNull @RequestParam String meshGuid) {
         try {
             Client client = clientService.getClientByMeshGuid(meshGuid);

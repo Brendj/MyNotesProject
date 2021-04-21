@@ -4,6 +4,7 @@
 
 package ru.iteco.restservice.db.repo.readonly;
 
+import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.model.Client;
 
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -29,4 +30,18 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
 
     @EntityGraph("forClientResponseDTO")
     Client getClientByMeshGuid(String meshGuid);
+
+    @Query(value = "FROM Client employee "
+            + "JOIN FETCH employee.org AS org "
+            + "JOIN FETCH employee.person AS person "
+            + "JOIN FETCH employee.clientGroup AS cg "
+            + "LEFT JOIN FETCH employee.discounts AS discounts "
+            + "LEFT JOIN FETCH employee.preorderFlag AS pf "
+            + "WHERE employee.mobile = :mobile "
+            + "AND ((cg.clientGroupId.idOfClientGroup BETWEEN 1100000000L AND 1100000029L) "
+            + " OR (cg.clientGroupId.idOfClientGroup BETWEEN 1100000110L AND 1100000119L))")
+    Client getEmployeeByMobile(@Param("mobile") String mobile);
+
+    @Query(name = "getGuardiansByClient", nativeQuery = true)
+    List<GuardianResponseDTO> getGuardiansByClient(@Param("contractId") Long contractId);
 }

@@ -4,6 +4,7 @@
 
 package ru.iteco.restservice.servise;
 
+import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
@@ -52,7 +53,7 @@ public class ClientService {
         return childs;
     }
 
-    public Client getClientByMeshGuid(String meshGuid) {
+    public Client getClientByMeshGuid(@NotNull String meshGuid) {
         if(!guidPattern.matcher(meshGuid).matches()){
             throw new IllegalArgumentException("Полученный GUID имеет неверный формат");
         }
@@ -61,5 +62,25 @@ public class ClientService {
             throw new NotFoundException(String.format("Клиент с MESH-GUID %s не найден", meshGuid));
         }
         return client;
+    }
+
+    public Client getEmployeeByMobile(@NotNull String mobile) {
+        if (!phonePattern.matcher(mobile).matches()) {
+            throw new IllegalArgumentException("Номер телефона не соотвествует паттерну");
+        }
+        Client client = clientReadOnlyRepo.getEmployeeByMobile(mobile);
+        if (client == null) {
+            throw new NotFoundException(String.format("Не найден клиент по номеру %s", mobile));
+        }
+        return client;
+    }
+
+    public List<GuardianResponseDTO> getGuardiansByClient(@NotNull Long contractId){
+        List<GuardianResponseDTO> results = clientReadOnlyRepo.getGuardiansByClient(contractId);
+        if(CollectionUtils.isEmpty(results)){
+            throw new NotFoundException(String.format("Не удалось найти представителей по л/с %d", contractId));
+        }
+
+        return results;
     }
 }

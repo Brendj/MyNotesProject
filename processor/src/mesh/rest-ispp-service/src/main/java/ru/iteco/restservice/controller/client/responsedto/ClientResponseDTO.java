@@ -4,17 +4,38 @@
 
 package ru.iteco.restservice.controller.client.responsedto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import ru.iteco.restservice.controller.base.BaseResponseDTO;
 
+@ApiModel(value = "ClientResponseDTO", description = "Данные по клиенту")
 public class ClientResponseDTO extends BaseResponseDTO {
+
+    @ApiModelProperty(notes = "Баланс клиента в копейках", example = "10000")
     private Long balance;
+
+    @ApiModelProperty(notes = "Адрес организации, к которой привязан клиент", example = "Москва, Волжский бульвар, дом 16, корпус 2")
     private String address;
+
+    @ApiModelProperty(notes = "Признак, что клиент сейчас находится на территории организации (прошел через турникет)", example = "true")
     private Boolean isInside;
+
+    @ApiModelProperty(notes = "Идентификатор в системе МЭШ", example = "00xx00x0-0000-0x00-x0xx-x00x000x0xx0")
     private String meshGUID;
+
+    @ApiModelProperty(notes = "Признак наличия у клиента особенностей в питании", example = "true")
     private Boolean specialMenu;
+
+    @ApiModelProperty(notes = "Пол клиента", example = "Ж")
     private String gender;
+
+    @ApiModelProperty(notes = "Список льгот в ИС ПП через запятую", example = "Многодетные")
     private String categoryDiscount;
+
+    @ApiModelProperty(notes = "Признак согласия представителя клиента на получение услуги вариативного горячего питания", example = "true")
     private Boolean preorderAllowed;
+
+    @ApiModelProperty(notes = "Размер дневного ограничения на покупку в буфете школьной столовой", example = "10000")
     private Long limit;
 
     public ClientResponseDTO(Long contractId, Long balance, String firstName, String lastname, String middleName,

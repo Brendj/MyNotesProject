@@ -5,6 +5,7 @@
 package ru.iteco.restservice.model;
 
 import ru.iteco.restservice.model.enums.ClientGuardianRelationType;
+import ru.iteco.restservice.model.enums.ClientGuardianRepresentType;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -27,6 +28,9 @@ public class ClientGuardian {
     @Column(name = "relation")
     @Enumerated(EnumType.ORDINAL)
     private ClientGuardianRelationType relationType;
+
+    @Column(name = "islegalrepresent")
+    private ClientGuardianRepresentType representType;
 
     public ClientGuardian(){
 

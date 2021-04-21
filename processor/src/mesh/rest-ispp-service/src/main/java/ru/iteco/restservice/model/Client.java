@@ -39,6 +39,26 @@ import java.util.Set;
                                 }
                         )
                 }
+        ),
+        @SqlResultSetMapping(
+                name = "guardResponse",
+                classes = {
+                        @ConstructorResult(
+                                targetClass = ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO.class,
+                                columns = {
+                                        @ColumnResult(name = "contractId", type = Long.class),
+                                        @ColumnResult(name = "firstName", type = String.class),
+                                        @ColumnResult(name = "lastName", type = String.class),
+                                        @ColumnResult(name = "middleName", type = String.class),
+                                        @ColumnResult(name = "grade", type = String.class),
+                                        @ColumnResult(name = "orgName", type = String.class),
+                                        @ColumnResult(name = "orgType", type = String.class),
+                                        @ColumnResult(name = "address", type = String.class),
+                                        @ColumnResult(name = "relation", type = Integer.class),
+                                        @ColumnResult(name = "isLegalRepresent", type = Integer.class)
+                                }
+                        )
+                }
         )
     }
 )
@@ -83,6 +103,33 @@ import java.util.Set;
                     + "         LEFT JOIN cf_preorder_flags cpf ON child.idofclient = cpf.idofclient\n"
                     + "WHERE guardian.mobile LIKE :guardPhone \n"
                     + "GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16;"
+        ),
+        @NamedNativeQuery(
+                name="getGuardiansByClient",
+                resultSetMapping = "guardResponse",
+                query = "SELECT guardian.contractId AS \"contractId\",\n"
+                        + "       cp.firstname AS \"firstName\",\n"
+                        + "       cp.secondname AS \"lastName\",\n"
+                        + "       cp.surname AS \"middleName\",\n"
+                        + "       cc.groupname AS \"grade\",\n"
+                        + "       co.shortname AS \"orgName\",\n"
+                        + "       CASE\n"
+                        + "           WHEN co.organizationtype = 0 THEN 'Общеобразовательное ОУ'\n"
+                        + "           WHEN co.organizationtype = 1 THEN 'Дошкольное ОУ'\n"
+                        + "           WHEN co.organizationtype = 2 THEN 'Поставщик питания'\n"
+                        + "           WHEN co.organizationtype = 3 THEN 'Профессиональное ОУ'\n"
+                        + "           WHEN co.organizationtype = 4 THEN 'Доп.образование'\n"
+                        + "           ELSE 'Неизвестно' END AS \"orgType\",\n"
+                        + "       co.shortaddress AS \"address\", \n"
+                        + "       childs.relation AS \"relation\", \n"
+                        + "       childs.islegalrepresent AS \"isLegalRepresent\" \n"
+                        + "FROM cf_clients AS guardian\n"
+                        + "         JOIN cf_orgs AS co ON guardian.idoforg = co.idoforg\n"
+                        + "         JOIN cf_persons AS cp ON guardian.idofperson = cp.idofperson\n"
+                        + "         JOIN cf_clientgroups cc ON guardian.idoforg = cc.idoforg AND guardian.idofclientgroup = cc.idofclientgroup\n"
+                        + "         JOIN cf_client_guardian AS childs ON guardian.idofclient = childs.idofguardian\n"
+                        + "         JOIN cf_clients AS child ON child.idofclient = childs.idofchildren\n"
+                        + "WHERE child.contractid = :contractId"
         )
 })
 @NamedEntityGraphs({

@@ -5,14 +5,20 @@
 package ru.iteco.restservice.model.enums;
 
 public enum ClientGuardianRelationType {
-    Mother("Мать"),
-    Father("Отец"),
-    Representative("Представитель"),
-    Guardian("Опекун/попечитель"),
-    Foster_Parent("Приемный родитель"),
-    Adoptive_Parent("Усыновитель"),
-    Foster_Carer("Патронатный воспитатель"),
-    Other("Иное");
+    MOTHER("Мать"),
+    FATHER("Отец"),
+    REPRESENTATIVE("Доверенный представитель"),
+    GUARDIAN("Опекун"),
+    FOSTER_PARENT("Приемный родитель"),
+    ADOPTIVE_PARENT("Усыновитель"),
+    FOSTER_CARER("Патронатный воспитатель"),
+    OTHER("Иное"),
+    UNCLE("Дядя"),
+    AUNT("Тётя"),
+    BROTHER("Брат"),
+    SISTER("Сестра"),
+    GRANDMOTHER("Бабушка"),
+    GRANDFATHER("Дедушка");
 
     final String description;
 
@@ -23,5 +29,14 @@ public enum ClientGuardianRelationType {
     @Override
     public String toString() {
         return description;
+    }
+
+    public static ClientGuardianRelationType of(Integer i){
+        for(ClientGuardianRelationType type : ClientGuardianRelationType.values()){
+            if(i.equals(type.ordinal())){
+                return type;
+            }
+        }
+        return OTHER;
     }
 }
