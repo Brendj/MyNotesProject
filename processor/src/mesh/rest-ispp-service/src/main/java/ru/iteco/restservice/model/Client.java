@@ -53,7 +53,6 @@ import java.util.Set;
                                         @ColumnResult(name = "grade", type = String.class),
                                         @ColumnResult(name = "orgName", type = String.class),
                                         @ColumnResult(name = "orgType", type = String.class),
-                                        @ColumnResult(name = "address", type = String.class),
                                         @ColumnResult(name = "relation", type = Integer.class),
                                         @ColumnResult(name = "isLegalRepresent", type = Integer.class)
                                 }
@@ -120,7 +119,6 @@ import java.util.Set;
                         + "           WHEN co.organizationtype = 3 THEN 'Профессиональное ОУ'\n"
                         + "           WHEN co.organizationtype = 4 THEN 'Доп.образование'\n"
                         + "           ELSE 'Неизвестно' END AS \"orgType\",\n"
-                        + "       co.shortaddress AS \"address\", \n"
                         + "       childs.relation AS \"relation\", \n"
                         + "       childs.islegalrepresent AS \"isLegalRepresent\" \n"
                         + "FROM cf_clients AS guardian\n"
