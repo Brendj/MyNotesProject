@@ -4,12 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.service;
 
+import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.dto.PlanOrderRestrictionDTO;
 
 import java.util.List;
 
 public interface SchoolApiPlanOrderRestrictionsService {
-    List<PlanOrderRestrictionDTO> updatePlanOrderRestrictions(Long idOfClient, List<PlanOrderRestrictionDTO> restrictions);
-
-    List<PlanOrderRestrictionDTO> deletePlanOrderRestrictions(Long idOfClient, List<PlanOrderRestrictionDTO> restrictions);
+    List<PlanOrdersRestriction> updatePlanOrderRestrictions(Long idOfClient, List<PlanOrderRestrictionDTO> restrictions, boolean notified);
 }

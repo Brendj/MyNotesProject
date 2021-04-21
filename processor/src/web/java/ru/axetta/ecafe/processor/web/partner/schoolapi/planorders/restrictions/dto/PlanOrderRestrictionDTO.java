@@ -4,16 +4,38 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.dto;
 
+import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlanOrderRestrictionDTO implements Serializable {
     private Long id;
     private Long idOfClient;
     private Long idOfOrg;
+    private Long idOfConfigurationProvider;
     private Integer planType;
     private String complexName;
     private Long complexId;
     private Integer resolution;
+
+    public static List<PlanOrderRestrictionDTO> fromList(List<PlanOrdersRestriction> updatedItems) {
+        List<PlanOrderRestrictionDTO> result = new ArrayList<>();
+        for (PlanOrdersRestriction item : updatedItems) {
+            PlanOrderRestrictionDTO dto = new PlanOrderRestrictionDTO();
+            dto.setId(item.getIdOfPlanOrdersRestriction());
+            dto.setComplexId(Long.valueOf(item.getArmComplexId()));
+            dto.setComplexName(item.getComplexName());
+            dto.setPlanType(item.getPlanOrdersRestrictionType().ordinal());
+            dto.setIdOfClient(item.getIdOfClient());
+            dto.setResolution(item.getResol());
+            dto.setIdOfConfigarationProvider(item.getIdOfConfigurationProoviderOnCreate());
+            dto.setIdOfOrg(item.getIdOfOrgOnCreate());
+            result.add(dto);
+        }
+        return result;
+    }
 
     public Long getId() {
         return id;
@@ -69,5 +91,13 @@ public class PlanOrderRestrictionDTO implements Serializable {
 
     public void setResolution(Integer resolution) {
         this.resolution = resolution;
+    }
+
+    public Long getIdOfConfigarationProvider() {
+        return idOfConfigurationProvider;
+    }
+
+    public void setIdOfConfigarationProvider(Long idOfConfigarationProvider) {
+        this.idOfConfigurationProvider = idOfConfigarationProvider;
     }
 }
