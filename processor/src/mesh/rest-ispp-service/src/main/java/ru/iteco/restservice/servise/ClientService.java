@@ -8,6 +8,7 @@ import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,12 @@ public class ClientService {
         if(!clientReadOnlyRepo.existsByMobile(guardPhone)){
             throw new NotFoundException(String.format("Не найден клиент по номеру %s", guardPhone));
         }
-        return clientReadOnlyRepo.getClientsByGuardMobile(guardPhone);
+
+        List<Client> childs = clientReadOnlyRepo.getClientsByGuardMobile(guardPhone);
+        if(CollectionUtils.isEmpty(childs)){
+            throw new NotFoundException(String.format("Не найдены клиенты по номеру опекуна %s", guardPhone));
+        }
+        return childs;
     }
 
     public Client getClientByMeshGuid(String meshGuid) {
