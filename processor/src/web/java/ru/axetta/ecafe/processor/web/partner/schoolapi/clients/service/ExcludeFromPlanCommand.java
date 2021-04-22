@@ -66,7 +66,7 @@ class ExcludeFromPlanCommand {
                 return ClientUpdateResult.error(item.getIdOfClient(),
                         String.format("Client with ID='%d' not found", item.getIdOfClient()));
             }
-
+            client.setUseLastEEModeForPlan(item.getUseLastEEModeForPlan());
             client.setDisablePlanCreationDate(item.getStartExcludeDate());
             client.setDisablePlanEndDate(item.getEndExcludedDate());
             client.setUpdateTime(new Date());

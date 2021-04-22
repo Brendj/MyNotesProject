@@ -13,6 +13,7 @@ public class ClientUpdateItem {
     private Long idOfClientGroup;
     private Long idOfOrg;
     private Long idOfMiddleGroup;
+    private Boolean useLastEEModeForPlan;
     private Date startExcludeDate;
     private Date endExcludedDate;
     private Integer gender;
@@ -107,5 +108,13 @@ public class ClientUpdateItem {
 
     public void setCategoriesDiscounts(List<Long> categoriesDiscounts) {
         this.categoriesDiscounts = categoriesDiscounts;
+    }
+
+    public Boolean getUseLastEEModeForPlan() {
+        return useLastEEModeForPlan;
+    }
+
+    public void setUseLastEEModeForPlan(Boolean useLastEEModeForPlan) {
+        this.useLastEEModeForPlan = useLastEEModeForPlan;
     }
 }

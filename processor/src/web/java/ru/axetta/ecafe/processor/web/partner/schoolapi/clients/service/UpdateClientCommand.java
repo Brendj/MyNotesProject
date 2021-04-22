@@ -54,7 +54,7 @@ class UpdateClientCommand {
             setBirthDate(request.getBirthDate(), client);
             setGender(request.getGender(), client);
             setConfirmVideo(request.getConfirmVisualRecognition(), client);
-            setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(), client);
+            setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(), request.getUseLastEEModeForPlan(), client);
             setGroupAndMiddleGroup(request, client, session, user);
             client.setUpdateTime(new Date());
             client.setClientRegistryVersion(version);
@@ -102,7 +102,10 @@ class UpdateClientCommand {
         }
     }
 
-    private void setDisableFromPlan(Date startExcludeDate, Date endExcludedDate, Client client) {
+    private void setDisableFromPlan(Date startExcludeDate, Date endExcludedDate,Boolean useLastEEModeForPlan, Client client) {
+        if (useLastEEModeForPlan != null) {
+            client.setUseLastEEModeForPlan(useLastEEModeForPlan);
+        }
         if (startExcludeDate != null) {
             client.setDisablePlanCreationDate(startExcludeDate);
         }
