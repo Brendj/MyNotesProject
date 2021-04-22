@@ -8,19 +8,18 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.FoodDaysCalendarReport;
+import ru.axetta.ecafe.processor.core.report.FoodDaysCalendarReportBuilder;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.client.ClientGroupSelectPage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientGroupListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter;
-import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -36,76 +35,24 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
-public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgSelectPage.CompleteHandler, ClientGroupSelectPage.CompleteHandler {
-    private final static Logger logger = LoggerFactory.getLogger(FoodDaysCalendarReportPage.class);
+public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList, ClientGroupListSelectPage.CompleteHandler {
 
-    private String htmlReport = null;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
-    private Boolean applyUserSettings = false;
-    private OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
-    private String clientGroupName;
+    private final Logger logger = LoggerFactory.getLogger(FoodDaysCalendarReportPage.class);
+    private String htmlReport;
     private Long idOfClientGroup;
+    private OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
+    private Boolean applyUserSettings = false;
     private Boolean allOrg = false;
-    private Long idOfOrgs;
+    private List<ClientGroupListSelectPage.Item> clientGroup = Collections.emptyList();
 
-    public void showOrgListSelectPage () {
-        MainPage.getSessionInstance().showOrgListSelectPage();
-    }
-
-    public void onReportPeriodChanged(ActionEvent event) {
-        htmlReport = null;
-        switch (periodTypeMenu.getPeriodType()){
-            case ONE_DAY: {
-                setEndDate(startDate);
-            } break;
-            case ONE_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 6));
-            } break;
-            case TWO_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 13));
-            } break;
-            case ONE_MONTH: {
-                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
-            } break;
-        }
-    }
-
-    public Object clean(){
-        clientGroupName = null;
-        idOfClientGroup = null;
-        return null;
-    }
-
-    public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
-        if (null != idOfClientGroup) {
-            this.idOfClientGroup = idOfClientGroup;
-            this.clientGroupName = DAOUtils
-                    .findClientGroup(session, new CompositeIdOfClientGroup(getIdOfOrgs(), idOfClientGroup))
-                    .getGroupName();
-        }
-    }
-
-    public void onEndDateSpecified(ActionEvent event) {
-        htmlReport = null;
-        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
-        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
-            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
-        } else {
-            long diff=end.getTime()-startDate.getTime();
-            int noOfDays=(int)(diff/(24*60*60*1000));
-            switch (noOfDays){
-                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
-                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
-                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
-                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
-            }
-        }
-        if(startDate.after(endDate)){
-            printError("Дата выборки от меньше дата выборки до");
-        }
+    public FoodDaysCalendarReportPage(){
+        super();
+        localCalendar.setTime(this.startDate);
+        localCalendar.add(Calendar.DATE, 7);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
     }
 
     public Object buildReportHTML() {
@@ -116,7 +63,7 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgS
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
-        FoodDaysCalendarReport builder = new FoodDaysCalendarReport(templateFilename);
+        FoodDaysCalendarReportBuilder builder = new FoodDaysCalendarReportBuilder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -157,44 +104,13 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgS
         return null;
     }
 
-    private String checkIsExistFile(String suffix) {
-        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFileName = FoodDaysCalendarReport.class.getSimpleName() + suffix;
-        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if(!(new File(templateFilename)).exists()){
-            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
-            return null;
-        }
-        return templateFilename;
-    }
-
-    private boolean validateFormData() {
-        if(CollectionUtils.isEmpty(idOfOrgList)){
-            printError("Выберите список организаций");
-            return true;
-        }
-        if(startDate==null){
-            printError("Не указано дата выборки от");
-            return true;
-        }
-        if(endDate==null){
-            printError("Не указано дата выборки до");
-            return true;
-        }
-        if(startDate.after(endDate)){
-            printError("Дата выборки от меньше дата выборки до");
-            return true;
-        }
-        return false;
-    }
-
     public void exportToXLS(ActionEvent actionEvent){
         if (validateFormData()) return;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return ;
         Date generateTime = new Date();
-        FoodDaysCalendarReport builder = new FoodDaysCalendarReport(templateFilename);
+        FoodDaysCalendarReportBuilder builder = new FoodDaysCalendarReportBuilder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -224,7 +140,6 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgS
                 response.setContentType("application/xls");
                 String filename = buildFileName(generateTime, report);
                 response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
-
                 JRXlsExporter xlsExport = new JRXlsExporter();
                 xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
                 xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
@@ -245,15 +160,27 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgS
     private Properties buildProperties() {
         Properties properties = new Properties();
         String idOfOrgString = "";
+        ArrayList<Long> groupId = new ArrayList<>();
+        ArrayList<String> groupName = new ArrayList<>();
+        String selectGroupName = "";
+        String selectGroupId = "";
+        for(ClientGroupListSelectPage.Item group: clientGroup){
+            if(group.getSelected()){
+                groupId.add(group.getIdOfClientGroup());
+                groupName.add(group.getGroupName());
+            }
+        }
+        if(groupId.size() > 0){
+            selectGroupName = StringUtils.join(groupName.iterator(), ",");
+            selectGroupId = StringUtils.join(groupId.iterator(), ",");
+        }
         if(idOfOrgList != null) {
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
-        if (idOfClientGroup != null){
-            properties.setProperty("idOfClientGroup", idOfClientGroup.toString());
-            properties.setProperty("clientGroupName", clientGroupName);
-        }
-
+        properties.setProperty("allOrg", Boolean.toString(allOrg));
+        properties.setProperty("selectGroupName", selectGroupName);
+        properties.setProperty("selectGroupId", selectGroupId);
         return properties;
     }
 
@@ -264,37 +191,83 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgS
         return String.format("%s-%s-%s", "FoodDaysCalendarReport", reportDistinctText, format);
     }
 
-    @Override
-    public String getPageFilename() {
-        return "report/online/food_days_calendar_report";
+    private String checkIsExistFile(String suffix) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateShortFileName = FoodDaysCalendarReport.class.getSimpleName() + suffix;
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        if(!(new File(templateFilename)).exists()){
+            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            return null;
+        }
+        return templateFilename;
+    }
+
+    private boolean validateFormData() {
+        if(!allOrg)
+            if(CollectionUtils.isEmpty(idOfOrgList)){
+                printError("Выберите список организаций");
+                return true;
+            }
+        if(startDate==null){
+            printError("Не указано дата выборки от");
+            return true;
+        }
+        if(endDate==null){
+            printError("Не указано дата выборки до");
+            return true;
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+            return true;
+        }
+        return false;
+    }
+
+    public void onReportPeriodChanged(ActionEvent event) {
+        htmlReport = null;
+        switch (periodTypeMenu.getPeriodType()){
+            case ONE_DAY: {
+                setEndDate(startDate);
+            } break;
+            case ONE_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 6));
+            } break;
+            case TWO_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 13));
+            } break;
+            case ONE_MONTH: {
+                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
+            } break;
+        }
+    }
+
+    public void onEndDateSpecified(ActionEvent event) {
+        htmlReport = null;
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noOfDays=(int)(diff/(24*60*60*1000));
+            switch (noOfDays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от больше даты выборки до");
+        }
+    }
+
+
+    public void showOrgListSelectPage(){
+        MainPage.getSessionInstance().showOrgListSelectPage();
     }
 
     public OrgRequestFilterConverter getOrgRequest() {
         return orgRequest;
-    }
-
-    public String getHtmlReport() {
-        return htmlReport;
-    }
-
-    public PeriodTypeMenu getPeriodTypeMenu() {
-        return periodTypeMenu;
-    }
-
-    public Boolean getApplyUserSettings() {
-        return applyUserSettings;
-    }
-
-    public void setApplyUserSettings(Boolean applyUserSettings) {
-        this.applyUserSettings = applyUserSettings;
-    }
-
-    public String getClientGroupName() {
-        return clientGroupName;
-    }
-
-    public void setClientGroupName(String clientGroupName) {
-        this.clientGroupName = clientGroupName;
     }
 
     public Long getIdOfClientGroup() {
@@ -305,6 +278,10 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgS
         this.idOfClientGroup = idOfClientGroup;
     }
 
+    public String getPageFilename() {
+        return "report/online/food_days_calendar_report";
+    }
+
     public Boolean getAllOrg() {
         return allOrg;
     }
@@ -313,18 +290,41 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgS
         this.allOrg = allOrg;
     }
 
-    public Long getIdOfOrgs() {
-        if (idOfOrgList.size() == 1)
-            return idOfOrgList.get(0);
-        else {
-            clientGroupName = null;
-            idOfClientGroup = null;
-            return null;
-        }
+    public Long getIdOfOrg() {
+        return idOfOrg;
     }
 
-    public void setIdOfOrgs(Long idOfOrgs) {
-        this.idOfOrgs = idOfOrgs;
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 
+    public List<ClientGroupListSelectPage.Item> getClientGroup() {
+        return clientGroup;
+    }
+
+    public void setClientGroup(List<ClientGroupListSelectPage.Item> clientGroup) {
+        this.clientGroup = clientGroup;
+    }
+
+    public Boolean getApplyUserSettings() {
+        return applyUserSettings;
+    }
+
+    public void setApplyUserSettings(Boolean applyUserSettings) {
+        this.applyUserSettings = applyUserSettings;
+    }
+
+    @Override
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    @Override
+    public void setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+    }
+
+    @Override
+    public void completeClientGroupListSelection(Session session, Long idOfClientGroup) throws Exception {
+    }
 }

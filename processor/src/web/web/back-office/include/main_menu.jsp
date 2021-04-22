@@ -1371,12 +1371,12 @@
 
     <rich:panelMenuGroup id="calendarReportsGroupMenu" binding="#{mainPage.calendarReportsGroupMenu.mainMenuComponent}"
                          label="Календарь дней питания" rendered="#{mainPage.eligibleToViewCalendarReports}">
-        <a4j:support event="onclick" action="#{mainPage.showCalendarReportsGroupMenu}" reRender="workspaceForm" />
+        <a4j:support event="onclick" action="#{mainPage.calendarReportsGroupMenu.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
-                            label="Отчет по учебным дням" action="#{mainPage.showSpecialDatesReportPage}" reRender="workspaceForm" />
+                            label="Отчет по учебным дням" action="#{mainPage.specialDatesReportPage.show}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
-                            label="Журнал ведения календаря дней питания" action="#{mainPage.showFoodDaysCalendarReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="foodDaysReportPanelGrid" binding="#{mainPage.foodDaysCalendarReportPage.mainMenuComponent}"
+                            label="Журнал ведения календаря дней питания" action="#{mainPage.foodDaysCalendarReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
