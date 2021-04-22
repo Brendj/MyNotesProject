@@ -14,9 +14,8 @@ import java.util.List;
 public class RequestFeedingData implements AbstractToElement {
     private List<RequestFeedingItem> items;
 
-    public RequestFeedingData() {
-
-    }
+    public RequestFeedingData() {}
+    public RequestFeedingData(List<RequestFeedingItem> items) { this.items = items; }
 
     @Override
     public Element toElement(Document document) throws Exception {

@@ -542,7 +542,8 @@
                 ru.axetta.ecafe.processor.web.partner.schoolapi.groups.GroupsRestController,
                 ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.GuardiansRestController,
                 ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.GroupManagersRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.PlanOrdersRestController
+                ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.PlanOrdersRestController,
+                ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.ApplicationForFoodRestController
             </param-value>
         </init-param>
         <init-param>

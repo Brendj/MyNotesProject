@@ -23,9 +23,7 @@ public class ResRequestFeedingItem {
     private Integer code;
     private String error;
 
-    public ResRequestFeedingItem() {
-
-    }
+    public ResRequestFeedingItem() {}
 
     public ResRequestFeedingItem(ApplicationForFood applicationForFood, Integer resultCode) {
         this.applicationForFeedingNumber = applicationForFood.getIdOfApplicationForFood();
@@ -35,6 +33,14 @@ public class ResRequestFeedingItem {
         this.applicantPhone = applicationForFood.getMobile();
         this.serviceNumber = applicationForFood.getServiceNumber();
         this.code = resultCode;
+    }
+
+    public static ResRequestFeedingItem error(Integer errorCode, String errorText)
+    {
+        ResRequestFeedingItem result = new ResRequestFeedingItem();
+        result.code = errorCode;
+        result.error = errorText;
+        return result;
     }
 
     public Element toElement(Document document, String elementName) throws Exception {

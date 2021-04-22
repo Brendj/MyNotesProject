@@ -5,9 +5,6 @@
       <artifact name="web:web exploded" />
     </artifacts-to-build>
   </component>
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -24,7 +21,13 @@
         <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </expand>
-    <select />
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:issue_830" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
   </component>
   <component name="CCaseConfig">
     <option name="checkoutReserved" value="false" />
@@ -41,25 +44,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#561&#10;work on issue 561">
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/error/GenericExceptionMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/error/WebApplicationErrorResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/error/WebApplicationException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/error/WebApplicationExceptionMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/processor.ipr" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/ApplicationForFoodRestController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/dto/AplicationForFoodConfirmDocumentsResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/dto/ApplicationForFoodConfirmResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/dto/ApplicationForFoodDeclineResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/service/ApplicationForFoodConfirmCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/service/ApplicationForFoodConfirmDocumentsCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/service/ApplicationForFoodDeclineCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/service/SchoolApiApplicationForFoodService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/service/SchoolApiApplicationForFoodServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/web.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/RequestDTO/CreateClientRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/RequestDTO/CreateClientRequestDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/SchoolRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/SchoolRestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/ClientsRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/ClientsRestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/service/MoveClientsCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/service/MoveClientsCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/service/SchoolApiClientsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/service/SchoolApiClientsService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/service/SchoolApiClientsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/clients/service/SchoolApiClientsServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/service/ISchoolApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/service/ISchoolApiService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/service/SchoolApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/service/SchoolApiService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/util/RequestProcessingException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JWTAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JWTAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/JwtAuthenticationException.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/JwtAuthenticationException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/RequestFeedingData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/RequestFeedingData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/RequestFeedingProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/RequestFeedingProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/ResRequestFeeding.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/ResRequestFeeding.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/ResRequestFeedingItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/request/feeding/ResRequestFeedingItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
@@ -361,6 +361,7 @@
         <option value="spring-beans.schema" />
         <option value="FxmlFile" />
         <option value="Enum" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -503,7 +504,7 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="C:/java/apache-maven-3.6.3" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../../../../../../../java/apache-maven-3.6.3" />
       </MavenGeneralSettings>
     </option>
   </component>
@@ -787,20 +788,6 @@
         <option name="fileUrl" />
       </JSRemoteDebuggerConfigurationSettings>
       <method />
-    </configuration>
-    <configuration default="true" type="TestNG">
-      <extension name="coverage" runner="emma" />
-      <option name="TEST_OBJECT" value="CLASS" />
-      <option name="VM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
     </configuration>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -1516,6 +1503,20 @@
       <ConfigurationWrapper RunnerId="Debug" />
       <method v="2" />
     </configuration>
+    <configuration default="true" type="TestNG">
+      <extension name="coverage" runner="emma" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" ALTERNATIVE_JRE_ENABLED="false">
       <deployment />
       <server-settings />
@@ -1548,10 +1549,10 @@
       <item itemvalue="JUnit.HMACSHA1Test.testMD5" />
       <item itemvalue="JUnit.md5DigestAsHexTest.testMd5Digest" />
       <item itemvalue="JUnit.md5DigestAsHexTest" />
-      <item itemvalue="Remote JVM Debug.Kazan VM" />
-      <item itemvalue="Remote JVM Debug.Kirill_remote" />
-      <item itemvalue="Remote JVM Debug.Remote" />
-      <item itemvalue="Remote JVM Debug.test_server_remote" />
+      <item itemvalue="Remote.Kazan VM" />
+      <item itemvalue="Remote.Kirill_remote" />
+      <item itemvalue="Remote.Remote" />
+      <item itemvalue="Remote.test_server_remote" />
     </list>
     <recent_temporary>
       <list>
@@ -1571,7 +1572,6 @@
       <AnalysisUIOptions />
     </option>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
   <component name="StarteamConfiguration">
     <option name="SERVER" value="" />
     <option name="PORT" value="49201" />
@@ -2130,7 +2130,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="issue_830" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -2205,6 +2217,52 @@
       <option name="RECURSIVE" value="false" />
       <option name="VERSION" />
     </GetOptions>
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="2057" height="376" key="GridCell.Tab.0.bottom" timestamp="1619080984528">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.0.bottom/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984528" />
+    <state width="2057" height="376" key="GridCell.Tab.0.center" timestamp="1619080984527">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.0.center/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984527" />
+    <state width="2057" height="376" key="GridCell.Tab.0.left" timestamp="1619080984527">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.0.left/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984527" />
+    <state width="2057" height="376" key="GridCell.Tab.0.right" timestamp="1619080984527">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.0.right/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984527" />
+    <state width="2057" height="376" key="GridCell.Tab.1.bottom" timestamp="1619080984416">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.1.bottom/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984416" />
+    <state width="2057" height="376" key="GridCell.Tab.1.center" timestamp="1619080984416">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.1.center/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984416" />
+    <state width="2057" height="376" key="GridCell.Tab.1.left" timestamp="1619080984415">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.1.left/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984415" />
+    <state width="2057" height="376" key="GridCell.Tab.1.right" timestamp="1619080984416">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state width="2057" height="376" key="GridCell.Tab.1.right/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080984416" />
+    <state x="1080" y="461" width="540" height="524" key="StructurePopup" timestamp="1619080516069">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state x="1080" y="461" width="540" height="524" key="StructurePopup/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080516069" />
+    <state x="1168" y="633" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1619080266066">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state x="1168" y="633" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080266066" />
+    <state x="1022" y="325" width="672" height="678" key="search.everywhere.popup" timestamp="1619080832603">
+      <screen x="158" y="0" width="2402" height="1440" />
+    </state>
+    <state x="1022" y="325" width="672" height="678" key="search.everywhere.popup/158.0.2402.1440/-2560.0.2498.1440@158.0.2402.1440" timestamp="1619080832603" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2309,6 +2367,11 @@
           <line>51</line>
           <option name="timeStamp" value="315" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/schoolapi/applicationforfood/service/ApplicationForFoodConfirmDocumentsCommand.java</url>
+          <line>53</line>
+          <option name="timeStamp" value="316" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="java-exception">
@@ -2318,7 +2381,7 @@
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
-        <PinnedItemInfo parentTag="ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException" memberName="cause" />
+        <PinnedItemInfo />
       </pinned-members>
     </pin-to-top-manager>
   </component>
