@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.DeleteGuardianResponse;
 
 import org.hibernate.Session;
@@ -24,7 +23,6 @@ public class DeleteGuardianCommand {
 
     private Logger logger = LoggerFactory.getLogger(DeleteGuardianCommand.class);
     private final RuntimeContext runtimeContext;
-    private static final int NOT_FOUND = 404, BAD_PARAMS = 400;
 
     @Autowired
     public DeleteGuardianCommand(RuntimeContext runtimeContext)
@@ -32,7 +30,7 @@ public class DeleteGuardianCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public DeleteGuardianResponse deleteGuardian(long idOfRecord, User user)
+    public DeleteGuardianResponse deleteGuardian(long recordId, User user)
     {
         Session session = null;
         Transaction transaction = null;
@@ -41,8 +39,8 @@ public class DeleteGuardianCommand {
         {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            ClientGuardian guardian = (ClientGuardian) session.get(ClientGuardian.class, idOfRecord);
-            if (guardian == null) throw new WebApplicationException(NOT_FOUND, "Guardian with record ID = '" + idOfRecord + "' was not found");
+            ClientGuardian guardian = (ClientGuardian) session.get(ClientGuardian.class, recordId);
+            if (guardian == null) return DeleteGuardianResponse.error(recordId, 404, "guardian with recordId = " + recordId + " was not found");
             Long newGuardianVersion = ClientManager.generateNewClientGuardianVersion(session);
             guardian.delete(newGuardianVersion);
             session.update(guardian);
@@ -51,14 +49,10 @@ public class DeleteGuardianCommand {
             transaction = null;
             return DeleteGuardianResponse.success(guardian.getIdOfClientGuardian());
         }
-        catch (WebApplicationException e)
-        {
-            throw e;
-        }
         catch (Exception e)
         {
-            logger.error("Error in update guardian, ", e);
-            throw new WebApplicationException("Error in update guardian, ", e);
+            logger.error("Error update guardian with record id " + recordId + ": ", e);
+            return DeleteGuardianResponse.error(recordId, 500, "Error update guardian with record id " + recordId + ": " + e.getMessage());
         }
         finally
         {

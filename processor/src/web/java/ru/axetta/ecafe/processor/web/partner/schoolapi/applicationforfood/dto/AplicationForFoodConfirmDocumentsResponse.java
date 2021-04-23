@@ -7,25 +7,27 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.BaseResponse;
 
 public class AplicationForFoodConfirmDocumentsResponse extends BaseResponse {
-    private long id;
+    private long recordId;
+    private AplicationForFoodConfirmDocumentsResponse() { }
 
-    private AplicationForFoodConfirmDocumentsResponse(long id)
+    public static AplicationForFoodConfirmDocumentsResponse success(long recordId)
     {
-        this.id = id;
-        super.result = 0;
-        super.errorText = null;
+        AplicationForFoodConfirmDocumentsResponse result = new AplicationForFoodConfirmDocumentsResponse();
+        result.recordId = recordId;
+        result.result = 0;
+        result.errorText = null;
+        return result;
     }
 
-    private AplicationForFoodConfirmDocumentsResponse(long id, int result, String errorText)
+    public static AplicationForFoodConfirmDocumentsResponse error(long recordId, int errorCode, String errorText)
     {
-        this.id = id;
-        super.result = result;
-        super.errorText = errorText;
+        AplicationForFoodConfirmDocumentsResponse result = new AplicationForFoodConfirmDocumentsResponse();
+        result.recordId = recordId;
+        result.result = errorCode;
+        result.errorText = errorText;
+        return result;
     }
 
-    public static AplicationForFoodConfirmDocumentsResponse success(long id) { return new AplicationForFoodConfirmDocumentsResponse(id); }
-    public static AplicationForFoodConfirmDocumentsResponse error(long id, String errorText) { return new AplicationForFoodConfirmDocumentsResponse(id, 1, errorText); }
-
-    public long getId() { return this.id; }
-    public void setId(long id) { this.id = id; }
+    public long getRecordId() { return this.recordId; }
+    public void setRecordId(long recordId) { this.recordId = recordId; }
 }

@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFe
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeedingItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto.ApplicationForFoodDeclineResponse;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.service.DeleteGuardianCommand;
 
 import org.hibernate.Session;
@@ -39,7 +38,7 @@ public class ApplicationForFoodDeclineCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public ApplicationForFoodDeclineResponse decline(long idOfRecord, Date docOrderDate, String docOrderId, User user)
+    public ApplicationForFoodDeclineResponse decline(long recordId, Date docOrderDate, String docOrderId, User user)
     {
         Session session = null;
         Transaction transaction = null;
@@ -48,15 +47,15 @@ public class ApplicationForFoodDeclineCommand {
         {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            ApplicationForFood applicationForFood = DAOUtils.getApplicationForFoodByRecordId(session, idOfRecord);
-            if (applicationForFood == null) throw new WebApplicationException(NOT_FOUND, "ApplicationForFood with record ID = '" + idOfRecord + "' was not found");
-            if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.RESUME || applicationForFood.getDtisznCode() != null) throw new WebApplicationException(NOT_FOUND, "ApplicationForFood with record ID = '" + idOfRecord + "' decline not available due its state");
+            ApplicationForFood applicationForFood = DAOUtils.getApplicationForFoodByRecordId(session, recordId);
+            if (applicationForFood == null) return ApplicationForFoodDeclineResponse.error(recordId, 404, "ApplicationForFood with record ID = '" + recordId + "' was not found");
+            if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.RESUME || applicationForFood.getDtisznCode() != null) return ApplicationForFoodDeclineResponse.error(recordId, 400, "ApplicationForFood with record ID = '" + recordId + "' decline not available due its state");
 
             long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
             long nextHistoryVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
 
             Client client = (Client) session.load(Client.class, applicationForFood.getClient().getIdOfClient());
-            if (client == null) throw new WebApplicationException("Error in decline documents ApplicationForFood, client is NULL");
+            if (client == null) return ApplicationForFoodDeclineResponse.error(recordId, 500, "Error in decline ApplicationForFood, client is NULL");
 
             RequestFeedingItem requestFeedingItem = new RequestFeedingItem(applicationForFood, new Date(System.currentTimeMillis()));
             requestFeedingItem.setDocOrderDate(docOrderDate);
@@ -72,12 +71,12 @@ public class ApplicationForFoodDeclineCommand {
             transaction = null;
 
             requestFeedingProcessor.processETPStatuses(proceedResult.getValue());
-            return ApplicationForFoodDeclineResponse.success(idOfRecord);
+            return ApplicationForFoodDeclineResponse.success(recordId);
         }
         catch (Exception e)
         {
             logger.error("Error in confirm documents ApplicationForFood, ", e);
-            return ApplicationForFoodDeclineResponse.error(idOfRecord, e.getMessage());
+            return ApplicationForFoodDeclineResponse.error(recordId, 500, "Error in decline ApplicationForFood: " + e.getMessage());
         }
         finally
         {

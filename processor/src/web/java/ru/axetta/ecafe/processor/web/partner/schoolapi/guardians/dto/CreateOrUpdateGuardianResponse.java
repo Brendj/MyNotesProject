@@ -55,7 +55,7 @@ public class CreateOrUpdateGuardianResponse extends BaseResponse
 
     private CreateOrUpdateGuardianResponse() { }
 
-    public static CreateOrUpdateGuardianResponse success(long recordId, CreateOrUpdateGuardianRequest createGuardianRequest)
+    public static CreateOrUpdateGuardianResponse success(CreateOrUpdateGuardianRequest createGuardianRequest, long recordId)
     {
         CreateOrUpdateGuardianResponse result = new CreateOrUpdateGuardianResponse();
         result.result = 0;
@@ -69,10 +69,10 @@ public class CreateOrUpdateGuardianResponse extends BaseResponse
         return result;
     }
 
-    public static CreateOrUpdateGuardianResponse error(CreateOrUpdateGuardianRequest createGuardianRequest, String errorText)
+    public static CreateOrUpdateGuardianResponse error(CreateOrUpdateGuardianRequest createGuardianRequest, int errorCode, String errorText)
     {
         CreateOrUpdateGuardianResponse result = new CreateOrUpdateGuardianResponse();
-        result.result = 1;
+        result.result = errorCode;
         result.errorText = errorText;
         result.recordId = null;
         result.childClientId = createGuardianRequest.getChildClientId();

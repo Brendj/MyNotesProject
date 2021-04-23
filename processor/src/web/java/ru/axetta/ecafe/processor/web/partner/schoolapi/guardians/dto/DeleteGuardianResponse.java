@@ -9,24 +9,25 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.BaseResponse;
 public class DeleteGuardianResponse extends BaseResponse
 {
     private long recordId;
+    private DeleteGuardianResponse() { }
 
-    private DeleteGuardianResponse(long idOfRecord)
+    public static DeleteGuardianResponse success(long recordId)
     {
-        this.recordId = idOfRecord;
-        super.result = 0;
-        super.errorText = null;
+        DeleteGuardianResponse deleteGuardianResponse = new DeleteGuardianResponse();
+        deleteGuardianResponse.result = 0;
+        deleteGuardianResponse.recordId = recordId;
+        deleteGuardianResponse.errorText = null;
+        return deleteGuardianResponse;
+    }
+    public static DeleteGuardianResponse error(long recordId, int errorCode, String errorText)
+    {
+        DeleteGuardianResponse deleteGuardianResponse = new DeleteGuardianResponse();
+        deleteGuardianResponse.result = errorCode;
+        deleteGuardianResponse.recordId = recordId;
+        deleteGuardianResponse.errorText = errorText;
+        return deleteGuardianResponse;
     }
 
-    private DeleteGuardianResponse(long idOfRecord, int result, String errorText)
-    {
-        this.recordId = idOfRecord;
-        super.result = result;
-        super.errorText = errorText;
-    }
-
-    public static DeleteGuardianResponse success(long idOfRecord) { return new DeleteGuardianResponse(idOfRecord); }
-    public static DeleteGuardianResponse error(long idOfRecord, String errorText) { return new DeleteGuardianResponse(idOfRecord, 1, errorText); }
-
-    public long getRecordId() { return recordId; }
-    public void setRecordId(long value) { recordId = value; }
+    public long getRecordId() { return this.recordId; }
+    public void setRecordId(long value) { this.recordId = value; }
 }

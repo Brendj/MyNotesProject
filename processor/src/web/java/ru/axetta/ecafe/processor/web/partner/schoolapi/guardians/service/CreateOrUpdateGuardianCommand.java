@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianResponse;
 
@@ -59,17 +58,13 @@ public class CreateOrUpdateGuardianCommand {
             session.flush();
             transaction.commit();
             transaction = null;
-            if (reloadedGuardian == null) return CreateOrUpdateGuardianResponse.error(request, "Internal server error");
-            return CreateOrUpdateGuardianResponse.success(reloadedGuardian.getIdOfClientGuardian(), request);
-        }
-        catch (WebApplicationException e)
-        {
-            throw e;
+            if (reloadedGuardian == null) return CreateOrUpdateGuardianResponse.error(request, 500, "reloaded guardian is null");
+            return CreateOrUpdateGuardianResponse.success(request, reloadedGuardian.getIdOfClientGuardian());
         }
         catch (Exception e)
         {
-            logger.error("Error in create or update guardian, ", e);
-            throw new WebApplicationException("Error in create or update guardian, ", e);
+            logger.error("Error create or update guardian, ", e);
+            return CreateOrUpdateGuardianResponse.error(request, 500, "Error create or update guardian: " + e.getMessage());
         }
         finally
         {

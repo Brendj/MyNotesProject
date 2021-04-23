@@ -7,26 +7,28 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.BaseResponse;
 
 public class ApplicationForFoodDeclineResponse extends BaseResponse {
+    private long recordId;
 
-    private long id;
+    private ApplicationForFoodDeclineResponse() { }
 
-    private ApplicationForFoodDeclineResponse(long id)
+    public static ApplicationForFoodDeclineResponse success(long recordId)
     {
-        this.id = id;
-        super.result = 0;
-        super.errorText = null;
+        ApplicationForFoodDeclineResponse result = new ApplicationForFoodDeclineResponse();
+        result.recordId = recordId;
+        result.result = 0;
+        result.errorText = null;
+        return result;
     }
 
-    private ApplicationForFoodDeclineResponse(long id, int result, String errorText)
+    public static ApplicationForFoodDeclineResponse error(long recordId, int errorCode, String errorText)
     {
-        this.id = id;
-        super.result = result;
-        super.errorText = errorText;
+        ApplicationForFoodDeclineResponse result = new ApplicationForFoodDeclineResponse();
+        result.recordId = recordId;
+        result.result = errorCode;
+        result.errorText = errorText;
+        return result;
     }
 
-    public static ApplicationForFoodDeclineResponse success(long id) { return new ApplicationForFoodDeclineResponse(id); }
-    public static ApplicationForFoodDeclineResponse error(long id, String errorText) { return new ApplicationForFoodDeclineResponse(id, 1, errorText); }
-
-    public long getId() { return this.id; }
-    public void setId(long id) { this.id = id; }
+    public long getRecordId() { return this.recordId; }
+    public void setRecordId(long recordId) { this.recordId = recordId; }
 }
