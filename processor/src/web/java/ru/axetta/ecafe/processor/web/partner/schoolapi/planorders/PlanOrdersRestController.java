@@ -14,12 +14,8 @@ import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -32,7 +28,7 @@ public class PlanOrdersRestController {
     @POST
     @Path("/restrictions/client/{id}")
     public Response setClientPlanOrderRestrictions(@PathParam("id") Long idOfClient,
-            @RequestParam(value = "notified", defaultValue = "false", required = false) boolean notified,
+            @QueryParam(value = "notified") @DefaultValue("false") boolean notified,
             List<PlanOrderRestrictionDTO> restrictions) {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
