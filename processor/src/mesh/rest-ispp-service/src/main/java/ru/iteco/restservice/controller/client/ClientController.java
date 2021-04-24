@@ -4,22 +4,25 @@
 
 package ru.iteco.restservice.controller.client;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.servise.ClientService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/client")
-@Api(value = "Операции по клиентам")
+@Tag(name = "Операции по клиентам")
 public class ClientController {
     private final Logger log = LoggerFactory.getLogger(ClientController.class);
 
@@ -34,11 +37,14 @@ public class ClientController {
 
     @GetMapping("/getByGuardMobile")
     @ResponseBody
-    @ApiOperation(
-            value = "Получение списка детей по номеру опекуна",
-            notes = "Позволяет получить список детей по номеру телефона опекуна, если такой опекун присуствует в системе"
+    @Operation(
+            summary = "Получение списка детей по номеру опекуна",
+            description = "Позволяет получить список детей по номеру телефона опекуна, если такой опекун присуствует в системе"
     )
-    public List<ClientResponseDTO> getClientByGuardian(@NotNull @RequestParam String guardPhone) {
+    public List<ClientResponseDTO> getClientByGuardian(
+           @Parameter(description = "Номер телефона опекуна чере \"7\"", example = "79000000000")
+           @NotNull
+           @RequestParam String guardPhone) {
         try {
             List<Client> childs = clientService.getClientsByGuardianPhone(guardPhone);
             return clientConverter.toDTOs(childs);
@@ -50,11 +56,14 @@ public class ClientController {
 
     @GetMapping("/getByMeshGuid")
     @ResponseBody
-    @ApiOperation(
-            value = "Получение клиента по MESH-GUID",
-            notes = "Позволяет получить клиента с указанным MESH-GUID"
+    @Operation(
+            summary = "Получение клиента по MESH-GUID",
+            description = "Позволяет получить клиента с указанным MESH-GUID"
     )
-    public ClientResponseDTO getClientByMeshGuid(@NotNull @RequestParam String meshGuid) {
+    public ClientResponseDTO getClientByMeshGuid(
+            @Parameter(description = "Идентификатор MESH-GUID")
+            @NotNull
+            @RequestParam String meshGuid) {
         try {
             Client client = clientService.getClientByMeshGuid(meshGuid);
             return clientConverter.toDTO(client);

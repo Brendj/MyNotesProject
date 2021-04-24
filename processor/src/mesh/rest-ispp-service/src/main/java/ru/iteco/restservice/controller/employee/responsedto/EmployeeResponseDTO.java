@@ -4,14 +4,28 @@
 
 package ru.iteco.restservice.controller.employee.responsedto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.controller.base.BaseResponseDTO;
 
+@Schema(name = "EmployeeResponseDTO", description = "Данные по сотруднику")
 public class EmployeeResponseDTO  extends BaseResponseDTO {
+    @Schema(description = "Баланс сотрудника в копейках", example = "10000")
     private Long balance;
+
+    @Schema(description = "Адрес организации, к которой привязан сотрудник", example = "Москва, Волжский бульвар, дом 16, корпус 2")
     private String address;
+
+    @Schema(description = "Признак, что сотрудник сейчас находится на территории организации (прошел через турникет)", example = "true")
     private Boolean isInside;
+
+    @Schema(description = "Признак наличия у сотрудника особенностей в питании", example = "true")
     private Boolean specialMenu;
+
+    @Schema(description = "Пол сотрудника", example = "Ж")
     private String gender;
+
+    @Schema(description = "Признак согласия сотрудника на получение услуги вариативного горячего питания",
+            example = "true")
     private Boolean preorderAllowed;
 
     public EmployeeResponseDTO(Long contractId, Long balance, String firstName, String middleName, String lastname, String grade,

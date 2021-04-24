@@ -4,30 +4,30 @@
 
 package ru.iteco.restservice.controller.base;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
 public abstract class BaseResponseDTO implements Serializable {
-    @ApiModelProperty(name = "Номер лицевого счета клиента", example = "1868344")
+    @Schema(description = "Номер лицевого счета клиента", example = "1868344")
     private Long contractId;
 
-    @ApiModelProperty(name = "Имя", example = "Пётр")
+    @Schema(description = "Имя", example = "Пётр")
     private String firstName;
 
-    @ApiModelProperty(name = "Отчество", example = "Петрович")
+    @Schema(description = "Отчество", example = "Петрович")
     private String middleName;
 
-    @ApiModelProperty(name = "Фамилия", example = "Петров")
+    @Schema(description = "Фамилия", example = "Петров")
     private String lastName;
 
-    @ApiModelProperty(name = "Группа", example = "5-А")
+    @Schema(description = "Группа", example = "5-А")
     private String grade;
 
-    @ApiModelProperty(name = "Тип организации, к которой привязан клиент", example = "Общеобразовательное ОУ")
+    @Schema(description = "Тип организации, к которой привязан клиент", example = "Общеобразовательное ОУ")
     private String orgType;
 
-    @ApiModelProperty(name = "Название организации, к которой привязан клиент", example = "ГБОУ СОШ № 1367 (13)")
+    @Schema(description = "Название организации, к которой привязан клиент", example = "ГБОУ СОШ № 1367 (13)")
     private String orgName;
 
     public BaseResponseDTO(Long contractId, String firstName, String middleName, String lastname, String grade

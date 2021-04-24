@@ -23,7 +23,7 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
             + "LEFT JOIN FETCH childs.preorderFlag AS pf "
             + "JOIN childs.guardians AS guardians "
             + "JOIN guardians.guardian AS guardian "
-            + "WHERE guardian.mobile = :guardPhone ")
+            + "WHERE guardian.mobile = :guardPhone AND guardians.deletedState = FALSE AND guardians.disabled = 0")
     List<Client> getClientsByGuardMobile(@Param("guardPhone") String guardMobile);
 
     Boolean existsByMobile(String mobile);

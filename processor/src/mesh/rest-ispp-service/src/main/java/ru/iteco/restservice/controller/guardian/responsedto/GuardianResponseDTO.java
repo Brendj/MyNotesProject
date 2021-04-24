@@ -4,12 +4,18 @@
 
 package ru.iteco.restservice.controller.guardian.responsedto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.controller.base.BaseResponseDTO;
 import ru.iteco.restservice.model.enums.ClientGuardianRelationType;
 import ru.iteco.restservice.model.enums.ClientGuardianRepresentType;
 
+@Schema(name = "GuardianResponseDTO", description = "Данные по представителю")
 public class GuardianResponseDTO extends BaseResponseDTO {
+
+    @Schema(description = "Степень родства представителя обучающегося по отношению к обучающемуся", example = "Отец")
     private String relation;
+
+    @Schema(description = "Роль представителя обучающегося по отношению к обучающемуся", example = "Законный представитель")
     private String isLegalRepresent;
 
     public GuardianResponseDTO(Long contractId, String firstName, String lastName, String middleName, String grade,

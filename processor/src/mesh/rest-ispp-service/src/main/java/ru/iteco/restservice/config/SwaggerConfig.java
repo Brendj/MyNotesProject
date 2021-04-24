@@ -4,24 +4,19 @@
 
 package ru.iteco.restservice.config;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import ru.iteco.restservice.property.SwaggerProperty;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfig {
 
     public static final String[] AUTH_WHITELIST = {
-            "/v2/api-docs",
+            "/v3/api-docs",
             "/swagger-resources",
             "/swagger-resources/**",
             "/configuration/ui",
@@ -37,26 +32,23 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .host(swaggerProperty.getHostUrl())
-                //.securitySchemes(newArrayList(apiKey()))
-                //.securityContexts(newArrayList(securityContext()))
+    public OpenAPI api() {
+        return new OpenAPI()
+                /*.host(swaggerProperty.getHostUrl())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("ru.iteco.restservice"))
-                .paths(PathSelectors.any())
-                .build()
-                .apiInfo(metaData());
+                .apis(RequestHandlerSelectors.basePackage("ru.iteco.restservice"))*/
+                .info(metaData());
     }
 
-    private ApiInfo metaData() {
-        return new ApiInfoBuilder()
+    private Info metaData() {
+        return new Info()
                 .title("ISPP REST API")
                 .description("Описание REST API ИС \"Проход и Питание\"")
                 .version("1.0.0")
-                .license("Apache License Version 2.0")
-                .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0\"")
-                .build();
+                .license(new License()
+                        .name("Apache License Version 2.0")
+                        .url("https://www.apache.org/licenses/LICENSE-2.0\"")
+                );
     }
 
     /*private ApiKey apiKey() {

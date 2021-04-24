@@ -32,6 +32,12 @@ public class ClientGuardian {
     @Column(name = "islegalrepresent")
     private ClientGuardianRepresentType representType;
 
+    @Column(name = "disabled")
+    private Integer disabled;
+
+    @Column(name = "deletedstate")
+    private Boolean deletedState;
+
     public ClientGuardian(){
 
     }
@@ -66,6 +72,30 @@ public class ClientGuardian {
 
     public void setRelationType(ClientGuardianRelationType relationType) {
         this.relationType = relationType;
+    }
+
+    public ClientGuardianRepresentType getRepresentType() {
+        return representType;
+    }
+
+    public void setRepresentType(ClientGuardianRepresentType representType) {
+        this.representType = representType;
+    }
+
+    public Integer getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Integer disabled) {
+        this.disabled = disabled;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 
     @Override
