@@ -203,11 +203,10 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgL
     }
 
     private boolean validateFormData() {
-        if(!allOrg)
-            if(CollectionUtils.isEmpty(idOfOrgList)){
-                printError("Выберите список организаций");
-                return true;
-            }
+        if(CollectionUtils.isEmpty(idOfOrgList)){
+            printError("Выберите список организаций");
+            return true;
+        }
         if(startDate==null){
             printError("Не указано дата выборки от");
             return true;
@@ -260,7 +259,6 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgL
             printError("Дата выборки от больше даты выборки до");
         }
     }
-
 
     public void showOrgListSelectPage(){
         MainPage.getSessionInstance().showOrgListSelectPage();

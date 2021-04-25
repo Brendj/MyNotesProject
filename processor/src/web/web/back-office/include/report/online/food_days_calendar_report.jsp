@@ -50,7 +50,7 @@
                          style="margin-left: 4px;" />
         </h:panelGroup>
 
-        <h:outputText escape="false" value="Построить по всем ОО" styleClass="output-text" />
+        <h:outputText escape="false" value="Построить по всем зданиям ОО" styleClass="output-text" />
         <h:selectBooleanCheckbox id="comment" value="#{mainPage.foodDaysCalendarReportPage.allOrg}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 

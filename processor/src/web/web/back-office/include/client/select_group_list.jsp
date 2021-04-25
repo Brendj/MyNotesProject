@@ -62,17 +62,28 @@
                 <td style="text-align: center;">
                     <rich:dataTable width="100%" align="center" id="modalClientGroupSelectorListClientGroupTable"
                                     value="#{mainPage.clientGroupListSelectPage.items}" var="item" rows="15"
-                                    footerClass="data-table-footer" columnClasses="left-aligned-column" rowKeyVar="row"
+                                    footerClass="data-table-footer" columnClasses="center-aligned-column, center-aligned-column, left-aligned-column" rowKeyVar="row"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                    onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
-                        <rich:column headerClass="column-header">
+                                    onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'" >
+                        <rich:column headerClass="column-header" style="width: auto" >
+                            <f:facet name="header">
+                                <h:outputText value="Выбор" />
+                            </f:facet>
                             <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text">
                                 <a4j:support event="onchange" action="#{mainPage.clientGroupListSelectPage.updateSelectedIds(item.groupName, item.selected)}"
                                              reRender="groupSelected" />
                             </h:selectBooleanCheckbox>
                         </rich:column>
-
-                        <rich:column headerClass="column-header">
+                        <rich:column headerClass="column-header"  style="width: auto" >
+                            <f:facet name="header">
+                                <h:outputText value="ИД ОО" />
+                            </f:facet>
+                            <h:outputText escape="true" value="#{item.idoforg}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header"  style="width: auto">
+                            <f:facet name="header">
+                                <h:outputText value="Группа" />
+                            </f:facet>
                             <h:outputText escape="true" value="#{item.groupName}" styleClass="output-text" />
                         </rich:column>
                         <f:facet name="footer">

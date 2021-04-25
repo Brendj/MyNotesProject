@@ -25,17 +25,20 @@ public class ClientGroupListSelectPage extends BasicPage {
 
         private Long idOfClientGroup;
         private final String groupName;
+        private Long idoforg;
         private Boolean selected;
 
         public Item() {
             this.idOfClientGroup = null;
             this.groupName = null;
+            this.idoforg = null;
             this.selected = null;
         }
 
         public Item(ClientGroup clientGroup) {
             this.idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
             this.groupName = clientGroup.getGroupName();
+            this.idoforg = clientGroup.getOrg().getIdOfOrg();
             this.selected = false;
         }
 
@@ -49,6 +52,14 @@ public class ClientGroupListSelectPage extends BasicPage {
 
         public String getGroupName() {
             return groupName;
+        }
+
+        public Long getIdoforg() {
+            return idoforg;
+        }
+
+        public void setIdoforg(Long idoforg) {
+            this.idoforg = idoforg;
         }
 
         public Long getIdOfClientGroup() {
@@ -69,9 +80,7 @@ public class ClientGroupListSelectPage extends BasicPage {
     }
 
     public void clear(){
-        for (Item item : getItems()) {
-            item.setSelected(false);
-        }
+        items = Collections.emptyList();
         selectedGroupName = "Не выбрано";
         selectedGroupId = new ArrayList<>();
     }
@@ -213,7 +222,8 @@ public class ClientGroupListSelectPage extends BasicPage {
     }
     private Integer containsItem(List<Item> currentItems, Item newItem){
         for(int s = 0; s < currentItems.size(); s++){
-            if(currentItems.get(s).getIdOfClientGroup().toString().equals(newItem.getIdOfClientGroup().toString()))
+            if(currentItems.get(s).getIdOfClientGroup().toString().equals(newItem.getIdOfClientGroup().toString())
+                    && currentItems.get(s).idoforg.toString().equals(newItem.getIdoforg().toString()))
                 return s;
         }
         return -1;

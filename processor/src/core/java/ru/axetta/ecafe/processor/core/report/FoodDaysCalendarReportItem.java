@@ -22,10 +22,12 @@ public class FoodDaysCalendarReportItem {
     private String idOfOrgOwner;
     private String name;
     private String address;
+    private Integer deletedHistory;
 
     public FoodDaysCalendarReportItem(String orgName, String groupName, String periodDate, String date,
             String idOfClientGroup, String idOfOrg, String shortAddress, String isWeekend, String comment,
-            String deleted, Date armLastUpdate, String idOfOrgOwner, String name, String address) {
+            String deleted, Date armLastUpdate, String idOfOrgOwner, String name, String address,
+            Integer deletedHistory) {
         this.orgName = orgName;
         this.groupName = groupName;
         this.periodDate = periodDate;
@@ -40,6 +42,7 @@ public class FoodDaysCalendarReportItem {
         this.idOfOrgOwner = idOfOrgOwner;
         this.name = name;
         this.address = address;
+        this.deletedHistory = deletedHistory;
     }
 
     public String getOrgName() {
@@ -152,5 +155,13 @@ public class FoodDaysCalendarReportItem {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Integer getDeletedHistory() {
+        return deletedHistory;
+    }
+
+    public void setDeletedHistory(Integer deletedHistory) {
+        this.deletedHistory = deletedHistory;
     }
 }
