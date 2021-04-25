@@ -6,11 +6,13 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.
 
 import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction;
 
-import java.io.Serializable;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlanOrderRestrictionDTO implements Serializable {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class PlanOrderRestrictionDTO {
     private Long id;
     private Long idOfClient;
     private Long idOfOrg;
@@ -30,7 +32,7 @@ public class PlanOrderRestrictionDTO implements Serializable {
             dto.setPlanType(item.getPlanOrdersRestrictionType().ordinal());
             dto.setIdOfClient(item.getIdOfClient());
             dto.setResolution(item.getResol());
-            dto.setIdOfConfigarationProvider(item.getIdOfConfigurationProoviderOnCreate());
+            dto.setIdOfConfigurationProvider(item.getIdOfConfigurationProoviderOnCreate());
             dto.setIdOfOrg(item.getIdOfOrgOnCreate());
             result.add(dto);
         }
@@ -93,11 +95,11 @@ public class PlanOrderRestrictionDTO implements Serializable {
         this.resolution = resolution;
     }
 
-    public Long getIdOfConfigarationProvider() {
+    public Long getIdOfConfigurationProvider() {
         return idOfConfigurationProvider;
     }
 
-    public void setIdOfConfigarationProvider(Long idOfConfigarationProvider) {
-        this.idOfConfigurationProvider = idOfConfigarationProvider;
+    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
+        this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 }

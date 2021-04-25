@@ -21,26 +21,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class DeleteGuardianCommand {
 
-    private Logger logger = LoggerFactory.getLogger(DeleteGuardianCommand.class);
+    private final Logger logger = LoggerFactory.getLogger(DeleteGuardianCommand.class);
     private final RuntimeContext runtimeContext;
 
     @Autowired
-    public DeleteGuardianCommand(RuntimeContext runtimeContext)
-    {
+    public DeleteGuardianCommand(RuntimeContext runtimeContext) {
         this.runtimeContext = runtimeContext;
     }
 
-    public DeleteGuardianResponse deleteGuardian(long recordId, User user)
-    {
+    public DeleteGuardianResponse deleteGuardian(long recordId, User user) {
         Session session = null;
         Transaction transaction = null;
 
-        try
-        {
+        try {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             ClientGuardian guardian = (ClientGuardian) session.get(ClientGuardian.class, recordId);
-            if (guardian == null) return DeleteGuardianResponse.error(recordId, 404, "guardian with recordId = " + recordId + " was not found");
+            if (guardian == null) {
+                return DeleteGuardianResponse
+                        .error(recordId, 404, "guardian with recordId = " + recordId + " was not found");
+            }
             Long newGuardianVersion = ClientManager.generateNewClientGuardianVersion(session);
             guardian.delete(newGuardianVersion);
             session.update(guardian);
@@ -48,14 +48,11 @@ public class DeleteGuardianCommand {
             transaction.commit();
             transaction = null;
             return DeleteGuardianResponse.success(guardian.getIdOfClientGuardian());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error update guardian with record id " + recordId + ": ", e);
-            return DeleteGuardianResponse.error(recordId, 500, "Error update guardian with record id " + recordId + ": " + e.getMessage());
-        }
-        finally
-        {
+            return DeleteGuardianResponse
+                    .error(recordId, 500, "Error update guardian with record id " + recordId + ": " + e.getMessage());
+        } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }

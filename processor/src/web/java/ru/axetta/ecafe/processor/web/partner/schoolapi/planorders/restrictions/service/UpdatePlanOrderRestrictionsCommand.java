@@ -61,13 +61,14 @@ class UpdatePlanOrderRestrictionsCommand {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = checkClientOrRaiseError(idOfClient, session);
-            long nextVersion = DAOUtils.nextVersionByTableWithoutLock(session, "cf_plan_orders_restrictions");
             List<PlanOrdersRestriction> currentRestrictions = DAOUtils
                     .getPlanOrdersRestrictionByClient(session, idOfClient);
-            List<PlanOrderRestrictionDTO> currentConfProviderRestrictions = filterCurrentConfProviderRestrictions(client,
-                    updateItems);
-            List<PlanOrdersRestriction> updatedRestrictions = updateRestrictions(currentConfProviderRestrictions, session, client,
-                    nextVersion, currentRestrictions);
+            List<PlanOrderRestrictionDTO> currentConfProviderRestrictions = filterCurrentConfProviderRestrictions(
+                    client, updateItems);
+
+            long nextVersion = getNextVersion(session);
+            List<PlanOrdersRestriction> updatedRestrictions = updateRestrictions(currentConfProviderRestrictions,
+                    session, client, nextVersion, currentRestrictions);
             deleteOldRestrictions(session, nextVersion, currentRestrictions, updatedRestrictions);
             session.flush();
             transaction.commit();
@@ -82,6 +83,10 @@ class UpdatePlanOrderRestrictionsCommand {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private long getNextVersion(Session session) {
+        return DAOUtils.nextVersionByTableWithoutLock(session, "cf_plan_orders_restrictions");
     }
 
     private List<PlanOrderRestrictionDTO> filterCurrentConfProviderRestrictions(Client client,
@@ -108,13 +113,13 @@ class UpdatePlanOrderRestrictionsCommand {
             List<PlanOrderRestrictionDTO> olderRestrictions = filterOlderRestrictions(client, updateItems);
             List<PlanOrdersRestriction> result = new ArrayList<>();
             if (olderRestrictions.size() > 0) {
-                long nextVersion = DAOUtils.nextVersionByTableWithoutLock(session, "cf_plan_orders_restrictions");
+                long nextVersion = getNextVersion(session);
                 List<PlanOrdersRestriction> currentRestrictions = DAOUtils
                         .getPlanOrdersRestrictionByClient(session, idOfClient);
 
                 for (PlanOrderRestrictionDTO item : olderRestrictions) {
                     PlanOrdersRestriction foundItem = findRestrictionsByIdIn(currentRestrictions, item.getId());
-                    if (foundItem != null) {
+                    if (foundItem != null && !foundItem.getDeletedState()) {
                         result.add(deleteRestriction(session, nextVersion, foundItem));
                     }
                 }
@@ -139,8 +144,8 @@ class UpdatePlanOrderRestrictionsCommand {
         Long clientOrgConfProvider = client.getOrg().getConfigurationProvider().getIdOfConfigurationProvider();
         List<PlanOrderRestrictionDTO> result = new ArrayList<>();
         for (PlanOrderRestrictionDTO item : updateItems) {
-            if (item.getIdOfConfigarationProvider() != null && !Objects
-                    .equals(item.getIdOfConfigarationProvider(), clientOrgConfProvider)) {
+            if (item.getIdOfConfigurationProvider() != null && !Objects
+                    .equals(item.getIdOfConfigurationProvider(), clientOrgConfProvider)) {
                 result.add(item);
             }
         }
@@ -160,16 +165,13 @@ class UpdatePlanOrderRestrictionsCommand {
                 if (foundSimilar == null) {
                     result.add(createNewRestriction(session, nextVersion, item, client));
                 } else {
-                    PlanOrdersRestriction restriction = updateRestriction(session, nextVersion, foundSimilar, item);
-                    result.add(restriction);
+                    result.add(updateRestriction(session, nextVersion, foundSimilar, item));
                 }
             } else {
                 // обновить существующие
                 PlanOrdersRestriction foundRestriction = findRestrictionsByIdIn(currentRestrictions, item.getId());
                 if (foundRestriction != null) {
-                    PlanOrdersRestriction updatedRestriction = updateRestriction(session, nextVersion, foundRestriction,
-                            item);
-                    result.add(updatedRestriction);
+                    result.add(updateRestriction(session, nextVersion, foundRestriction, item));
                 }
             }
         }
@@ -179,9 +181,8 @@ class UpdatePlanOrderRestrictionsCommand {
     private void deleteOldRestrictions(Session session, long nextVersion,
             List<PlanOrdersRestriction> currentRestrictions, List<PlanOrdersRestriction> updatedRestrictions) {
         for (PlanOrdersRestriction restriction : currentRestrictions) {
-            PlanOrdersRestriction foundUpdatedRestriction = findRestrictionsByIdIn(updatedRestrictions,
-                    restriction.getIdOfPlanOrdersRestriction());
-            if (foundUpdatedRestriction == null) {
+            PlanOrdersRestriction foundUpdatedRestriction = findRestrictionsByIdIn(updatedRestrictions, restriction.getIdOfPlanOrdersRestriction());
+            if (foundUpdatedRestriction == null && !restriction.getDeletedState() && restriction.getResol() == 0 /*Exclude*/) {
                 // если не прислали ограничение, значит оно устарело
                 deleteRestriction(session, nextVersion, restriction);
             }
@@ -192,7 +193,8 @@ class UpdatePlanOrderRestrictionsCommand {
     private Client checkClientOrRaiseError(long idOfClient, Session session) {
         Client client = (Client) session.load(Client.class, idOfClient);
         if (client == null) {
-            throw new WebApplicationException(ResponseCodes.CLIENT_NOT_FOUND.getCode(), String.format("Client with id='%d' not found", idOfClient));
+            throw new WebApplicationException(ResponseCodes.CLIENT_NOT_FOUND.getCode(),
+                    String.format("Client with id='%d' not found", idOfClient));
         }
         return client;
     }
@@ -243,7 +245,7 @@ class UpdatePlanOrderRestrictionsCommand {
             if (planOrdersRestrictionType == null) {
                 planOrdersRestrictionType = PlanOrdersRestrictionType.LP;
             }
-            Long idOfConfigarationProvider = updateItem.getIdOfConfigarationProvider();
+            Long idOfConfigarationProvider = updateItem.getIdOfConfigurationProvider();
             if (idOfConfigarationProvider == null) {
                 idOfConfigarationProvider = client.getOrg().getConfigurationProvider().getIdOfConfigurationProvider();
             }

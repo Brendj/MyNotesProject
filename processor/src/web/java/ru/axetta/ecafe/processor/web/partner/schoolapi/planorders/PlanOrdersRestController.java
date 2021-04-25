@@ -24,11 +24,11 @@ import java.util.List;
 @Path(value = "/planorders")
 @Controller
 public class PlanOrdersRestController {
-
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/restrictions/client/{id}")
     public Response setClientPlanOrderRestrictions(@PathParam("id") Long idOfClient,
-            @QueryParam(value = "notified") @DefaultValue("false") boolean notified,
+            @QueryParam(value = "notified") @DefaultValue("false") Boolean notified,
             List<PlanOrderRestrictionDTO> restrictions) {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);

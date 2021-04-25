@@ -24,8 +24,7 @@ import java.util.Date;
 
 @Component
 public class CreateOrUpdateGuardianCommand {
-
-    private Logger logger = LoggerFactory.getLogger(CreateOrUpdateGuardianCommand.class);
+    private final Logger logger = LoggerFactory.getLogger(CreateOrUpdateGuardianCommand.class);
     private final RuntimeContext runtimeContext;
 
     @Autowired
@@ -33,19 +32,21 @@ public class CreateOrUpdateGuardianCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public CreateOrUpdateGuardianResponse createGuardian(CreateOrUpdateGuardianRequest request, User user)
-    {
+    public CreateOrUpdateGuardianResponse createGuardian(CreateOrUpdateGuardianRequest request, User user) {
         Session session = null;
         Transaction transaction = null;
 
-        try
-        {
+        try {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Long newGuardianVersion = ClientManager.generateNewClientGuardianVersion(session);
 
-            ClientGuardian guardian = FindExistingGuardianLink(request.getChildClientId(), request.getGuardianClientId(), session);
-            if (guardian == null) guardian = new ClientGuardian(request.getChildClientId(), request.getGuardianClientId(), ClientCreatedFromType.ARM);
+            ClientGuardian guardian = FindExistingGuardianLink(request.getChildClientId(),
+                    request.getGuardianClientId(), session);
+            if (guardian == null) {
+                guardian = new ClientGuardian(request.getChildClientId(), request.getGuardianClientId(),
+                        ClientCreatedFromType.ARM);
+            }
             guardian.setVersion(newGuardianVersion);
             guardian.setLastUpdate(new Date());
             guardian.setDeletedState(false);
@@ -54,28 +55,27 @@ public class CreateOrUpdateGuardianCommand {
             guardian.setRepresentType(ClientGuardianRepresentType.fromInteger(request.getRights()));
             guardian.setRelation(ClientGuardianRelationType.fromInteger(request.getRelationType()));
             session.saveOrUpdate(guardian);
-            ClientGuardian reloadedGuardian = FindExistingGuardianLink(request.getChildClientId(), request.getGuardianClientId(), session);
+            ClientGuardian reloadedGuardian = FindExistingGuardianLink(request.getChildClientId(),
+                    request.getGuardianClientId(), session);
             session.flush();
             transaction.commit();
             transaction = null;
-            if (reloadedGuardian == null) return CreateOrUpdateGuardianResponse.error(request, 500, "reloaded guardian is null");
+            if (reloadedGuardian == null) {
+                return CreateOrUpdateGuardianResponse.error(request, 500, "reloaded guardian is null");
+            }
             return CreateOrUpdateGuardianResponse.success(request, reloadedGuardian.getIdOfClientGuardian());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error create or update guardian, ", e);
-            return CreateOrUpdateGuardianResponse.error(request, 500, "Error create or update guardian: " + e.getMessage());
-        }
-        finally
-        {
+            return CreateOrUpdateGuardianResponse
+                    .error(request, 500, "Error create or update guardian: " + e.getMessage());
+        } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
 
 
-    private ClientGuardian FindExistingGuardianLink(long childId, long guardianId, Session session)
-    {
+    private ClientGuardian FindExistingGuardianLink(long childId, long guardianId, Session session) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", childId));
         criteria.add(Restrictions.eq("idOfGuardian", guardianId));
