@@ -36,7 +36,7 @@ public class ApiKeyInterceptor extends HandlerInterceptorAdapter {
 
     private String getParameters(HttpServletRequest request) {
         StringBuilder posted = new StringBuilder();
-        Enumeration<?> e = request.getParameterNames();
+        Enumeration<String> e = request.getParameterNames();
         if (e != null) {
             posted.append("?");
         }
