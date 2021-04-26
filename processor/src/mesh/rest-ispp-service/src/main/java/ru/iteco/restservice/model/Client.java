@@ -140,6 +140,12 @@ import java.util.Set;
                     @NamedAttributeNode("person"),
                     @NamedAttributeNode("preorderFlag")
             }
+    ),
+    @NamedEntityGraph(
+            name = "getClientAndOrgByContractId",
+            attributeNodes = {
+                    @NamedAttributeNode("org")
+            }
     )
 })
 public class Client {
