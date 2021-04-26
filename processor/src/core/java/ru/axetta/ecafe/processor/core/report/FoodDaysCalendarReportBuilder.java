@@ -167,7 +167,6 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         for (Object[] data: dataSpecialDates){
             String isWeekend = Integer.parseInt(data[4].toString()) == 0 ? "Да" : "Нет";
             String deleted = Integer.parseInt(data[6].toString()) == 1 ? "Да" : "Нет";
-            String deleted = Integer.parseInt(data[6].toString()) == 1 ? "Да" : "Нет";
             Date lastEditDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(data[7]);
             String name = "";
             if(dataGuid != null)
