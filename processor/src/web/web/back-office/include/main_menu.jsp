@@ -854,6 +854,9 @@
         <%--@elvariable id="cardServicesPage" type="ru.axetta.ecafe.processor.web.ui.service.CardServicesPage"--%>
         <rich:panelMenuItem id="cardServicesMenuItem" binding="#{cardServicesPage.mainMenuComponent}"
                             label="Электронные идентификаторы" action="#{cardServicesPage.show}" reRender="workspaceForm"/>
+        <%--@elvariable id="serviceControlPage" type="ru.axetta.ecafe.processor.web.ui.service.ServiceControlPage"--%>
+        <rich:panelMenuItem id="serviceControllMenuItem" binding="#{serviceControlPage.mainMenuComponent}"
+                            label="Управление микросервисами" action="#{serviceControlPage.show}" reRender="workspaceForm"/>
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Сверка"

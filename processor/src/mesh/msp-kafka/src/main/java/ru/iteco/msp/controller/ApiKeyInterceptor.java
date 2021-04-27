@@ -44,7 +44,7 @@ public class ApiKeyInterceptor extends HandlerInterceptorAdapter {
             if (posted.length() > 1) {
                 posted.append("&");
             }
-            String curr = (String) e.nextElement();
+            String curr = e.nextElement();
             posted.append(curr).append("=");
             posted.append(request.getParameter(curr));
         }

@@ -26,6 +26,8 @@ public class SupplyService {
     private final KafkaService kafkaService;
     private final SupplyMSPService supplyMSPService;
 
+    private static final Long DELTA_MONTH = 2595600000L;
+
     public SupplyService(KafkaService kafkaService,
             SupplyMSPService supplyMSPService) {
         this.kafkaService = kafkaService;
@@ -67,6 +69,10 @@ public class SupplyService {
             if(begin.after(end)){
                 throw new IllegalArgumentException("Begin date after end date");
             }
+            if((end.getTime() - begin.getTime()) > DELTA_MONTH){
+                throw new IllegalArgumentException("Too long period");
+            }
+
             ReportingDate reportingDate = new ReportingDate(begin, end);
             do {
                 sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
