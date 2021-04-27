@@ -114,7 +114,8 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
 
         String getName = " select s.guid, s.firstname, p.surname, p.firstname as name, p.secondname "
                 + "from cf_staffs s "
-                + "join cf_persons p on s.idofclient = p.idofperson "
+                + "join cf_clients c on s.idofclient = c.idofclient "
+                + "join cf_persons p on c.idofperson = p.idofperson "
                 + "where s.guid in (:guid)";
 
         String getSpecialDates =  "select sdh.date, cg.groupname, sdh.idOfOrg, o.shortaddress, sdh.isweekend, sdh.comment, sdh.deleted, "
