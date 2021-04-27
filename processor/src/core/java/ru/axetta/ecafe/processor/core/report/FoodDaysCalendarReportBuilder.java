@@ -89,8 +89,8 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         Set<Long> idOfOrgList = new TreeSet<>();
         for (String idOfOrg : stringOrgList)
             idOfOrgList.add(Long.parseLong(idOfOrg));
-        String idOfOrgs = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and sd.idoforg in (:idOfOrgList) " ;
-        String idOfGroup = CollectionUtils.isEmpty(groupId) ? "" : " and sd.idofclientgroup in (:groupId) " ;
+        String idOfOrgs = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and sdh.idoforg in (:idOfOrgList) " ;
+        String idOfGroup = CollectionUtils.isEmpty(groupId) ? "" : " and sdh.idofclientgroup in (:groupId) " ;
         String idOfOrg = CollectionUtils.isEmpty(idOfOrgList) ? "" : " where sd.idoforg in (:idOfOrgList) " ;
 
         String getFriendlyOrg = "select fo.friendlyOrg "
@@ -117,17 +117,17 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
                 + "join cf_persons p on s.idofclient = p.idofperson "
                 + "where s.guid in (:guid)";
 
-        String getSpecialDates =  "select sd.date, cg.groupname, sd.idOfOrg, o.shortaddress, sd.isweekend, sd.comment, sd.deleted, "
-                + "sdh.armlastupdate, sdh.idoforgowner, sdh.staffguid, oe.shortaddress as address, sdh.deleted as del "
-                + "from cf_specialdates sd "
-                + "join cf_orgs o on sd.idoforg = o.idoforg "
-                + "join cf_specialdates_history sdh on sd.idoforg = sdh.idoforg and sd.idofclientgroup = sdh.idofclientgroup and sd.date = sdh.date "
+        String getSpecialDates =  "select sdh.date, cg.groupname, sdh.idOfOrg, o.shortaddress, sdh.isweekend, sdh.comment, sdh.deleted, "
+                + "sdh.armlastupdate, sdh.idoforgowner, sdh.staffguid, oe.shortaddress as address, sd.deleted as del "
+                + "from cf_specialdates_history sdh "
+                + "join cf_orgs o on sdh.idoforg = o.idoforg "
+                + "join cf_specialdates sd on sd.idoforg = sdh.idoforg and sd.idofclientgroup = sdh.idofclientgroup and sd.date = sdh.date "
                 + "join cf_orgs oe on sdh.idoforgowner = oe.idoforg "
-                + "join cf_clientgroups cg on cg.idoforg = sd.idoforg and cg.idofclientgroup = sd.idofclientgroup "
-                + "where sd.date BETWEEN :startDate and :endDate "
+                + "join cf_clientgroups cg on cg.idoforg = sdh.idoforg and cg.idofclientgroup = sdh.idofclientgroup "
+                + "where sdh.date BETWEEN :startDate and :endDate "
                 + idOfOrgs
                 + idOfGroup
-                + " order by 1";
+                + " order by 1, 2";
 
         query = session.createSQLQuery(getSpecialDates);
         query.setParameter("startDate", startDate.getTime())
@@ -165,8 +165,8 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         }
 
         for (Object[] data: dataSpecialDates){
-            String isWeekend = Integer.parseInt(data[4].toString()) == 0 ? "Да" : "Нет";
-            String deleted = Integer.parseInt(data[6].toString()) == 1 ? "Да" : "Нет";
+            String isWeekend = data[4].toString().equals("1") ? "Да" : "Нет";
+            String deleted = data[6].toString().equals("1") ? "Да" : "Нет";
             Date lastEditDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(data[7]);
             String name = "";
             if(dataGuid != null)
@@ -178,7 +178,7 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
             DateFormat df = new SimpleDateFormat(pattern);
             String periodDate = df.format(startDate) + " - " + df.format(endDate);
             String date = df.format(DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(data[0]));
-            Integer deleteHistory = data[11].toString() == null ? 0 : Integer.parseInt(data[11].toString());
+            Integer deleteHistory = Integer.parseInt(data[11].toString());
             list.add(new FoodDaysCalendarReportItem(org.toString(), selectGroupName, periodDate, date, data[1].toString(), data[2].toString(), data[3].toString(),
                     isWeekend, data[5].toString(), deleted, lastEditDate, data[8].toString(), name, data[10].toString(), deleteHistory));
         }
