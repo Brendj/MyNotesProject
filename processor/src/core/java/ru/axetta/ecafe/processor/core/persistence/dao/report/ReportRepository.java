@@ -459,7 +459,6 @@ public class ReportRepository extends BaseJpaDao {
             Long idOrg;
             Properties properties = new Properties();
             String selectGroupName = "";
-            String selectGroupId = "";
             if (reportParameters.getIdOfOrg() == null) {
                 idOrg = reportParameters.getSourceOrg();
                 List<Long> idOfOrgList = new ArrayList<>();
@@ -470,13 +469,11 @@ public class ReportRepository extends BaseJpaDao {
                 idOrg = reportParameters.getIdOfOrg();
                 properties.setProperty("IdOfOrg", idOrg.toString());
             }
-            if (reportParameters.getGroupNameList() != null && reportParameters.getGroupIdList() != null){
-                selectGroupName = reportParameters.getGroupNameList();
-                selectGroupId = reportParameters.getGroupIdList();
+            if (reportParameters.getGroupName()!= null){
+                selectGroupName = reportParameters.getGroupName();
             }
             properties.setProperty("selectGroupName", selectGroupName);
-            properties.setProperty("selectGroupId", selectGroupId);
-
+            properties.setProperty("allOrg", reportParameters.getIsAllFriendlyOrgs());
             builder.setReportProperties(properties);
 
             BasicJasperReport jasperReport = builder
@@ -992,8 +989,6 @@ public class ReportRepository extends BaseJpaDao {
         private String enterEventType;
         private Integer category;
         private String groupName;
-        private String groupNameList;
-        private String groupIdList;
         private String isAllFriendlyOrgs;
         private String outputMigrants;   // receive from ARM 1 or 0
         private String sortedBySections; // receive from ARM 1 or 0
@@ -1046,14 +1041,6 @@ public class ReportRepository extends BaseJpaDao {
             return isAllFriendlyOrgs;
         }
 
-        public String getGroupNameList() {
-            return groupNameList;
-        }
-
-        public String getGroupIdList() {
-            return groupIdList;
-        }
-
         public ReportParameters parse() throws ParseException {
             startDate = null;
             endDate = null;
@@ -1068,7 +1055,6 @@ public class ReportRepository extends BaseJpaDao {
             isAllFriendlyOrgs = null;
             outputMigrants = null;
             sortedBySections = null;
-            groupIdList = null;
 
             DateFormat safeDateFormat = dateFormat.get();
             for (ReportParameter parameter : parameters) {
@@ -1115,12 +1101,6 @@ public class ReportRepository extends BaseJpaDao {
                 }
                 else if(parameter.getParameterName().equals("sortedBySections")){
                     sortedBySections = Boolean.toString(parameter.getParameterValue().equals("1"));
-                }
-                else if(parameter.getParameterName().equals("groupNameList")){
-                    groupNameList = parameter.getParameterValue();
-                }
-                else if(parameter.getParameterName().equals("groupIdList")){
-                    groupIdList = parameter.getParameterValue();
                 }
             }
             return this;
