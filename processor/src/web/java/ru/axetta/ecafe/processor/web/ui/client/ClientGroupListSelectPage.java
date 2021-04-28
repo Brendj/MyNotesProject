@@ -217,6 +217,8 @@ public class ClientGroupListSelectPage extends BasicPage {
             }
         }
         saveItems = this.items;
+        if(saveItems.size() == 0)
+           saveItems = updateItems(this.items, items);
         this.items = updateItems(this.items, items);
     }
 
