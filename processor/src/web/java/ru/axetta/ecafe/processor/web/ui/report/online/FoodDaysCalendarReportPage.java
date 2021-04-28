@@ -160,19 +160,19 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgL
     private Properties buildProperties() {
         Properties properties = new Properties();
         String idOfOrgString = "";
-        ArrayList<Long> groupId = new ArrayList<>();
         ArrayList<String> groupName = new ArrayList<>();
+        ArrayList<String> groupIdOfOrg = new ArrayList<>();
         String selectGroupName = "";
-        String selectGroupId = "";
+        String selectGroupIdOfOrg = "";
         for(ClientGroupListSelectPage.Item group: clientGroup){
             if(group.getSelected()){
-                groupId.add(group.getIdOfClientGroup());
                 groupName.add(group.getGroupName());
+                groupIdOfOrg.add(group.getIdoforg().toString());
             }
         }
-        if(groupId.size() > 0){
+        if(groupName.size() > 0){
             selectGroupName = StringUtils.join(groupName.iterator(), ",");
-            selectGroupId = StringUtils.join(groupId.iterator(), ",");
+            selectGroupIdOfOrg = StringUtils.join(groupIdOfOrg.iterator(), ",");
         }
         if(idOfOrgList != null) {
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
@@ -180,7 +180,7 @@ public class FoodDaysCalendarReportPage extends OnlineReportPage implements OrgL
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         properties.setProperty("allOrg", Boolean.toString(allOrg));
         properties.setProperty("selectGroupName", selectGroupName);
-        properties.setProperty("selectGroupId", selectGroupId);
+        properties.setProperty("selectGroupIdOfOrg", selectGroupIdOfOrg);
         return properties;
     }
 

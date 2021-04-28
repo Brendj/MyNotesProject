@@ -53,9 +53,7 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         Map<String, Object> parameterMap = new HashMap<String, Object>();
         parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
         parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
-
         JRDataSource dataSource = buildDataSource(session, startTime, endTime);
-
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         Date generateEndTime = new Date();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -79,19 +77,24 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
 
         Boolean friendlyOrg = Boolean.valueOf(getReportProperties().getProperty("allOrg"));
         String selectGroupName = getReportProperties().getProperty("selectGroupName");
-        String selectGroupId = getReportProperties().getProperty("selectGroupId");
-        List<String> stringGroupId = Arrays.asList(StringUtils.split(selectGroupId, ','));
-        List<Integer> groupId = new ArrayList<>();
-        for(String group: stringGroupId)
-            groupId.add(Integer.parseInt(group));
+        List<String> groupName = Arrays.asList(StringUtils.split(selectGroupName, ','));
         String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
         List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgString, ','));
         Set<Long> idOfOrgList = new TreeSet<>();
         for (String idOfOrg : stringOrgList)
             idOfOrgList.add(Long.parseLong(idOfOrg));
         String idOfOrgs = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and sdh.idoforg in (:idOfOrgList) " ;
-        String idOfGroup = CollectionUtils.isEmpty(groupId) ? "" : " and sdh.idofclientgroup in (:groupId) " ;
+        String idOfGroup = CollectionUtils.isEmpty(groupName) ? "" : " and cg.groupname in (:groupName) " ;
         String idOfOrg = CollectionUtils.isEmpty(idOfOrgList) ? "" : " where sd.idoforg in (:idOfOrgList) " ;
+
+        String groupIdOfOrg = "";
+         List<Integer> groupIdOfOrgList = new ArrayList<>();
+        if (getReportProperties().getProperty("selectGroupIdOfOrg") != null && !getReportProperties().getProperty("selectGroupIdOfOrg").equals("")) {
+            List<String> stringGroupIdOfOrgList = Arrays.asList(StringUtils.split(getReportProperties().getProperty("selectGroupIdOfOrg"), ','));
+            for(String item: stringGroupIdOfOrgList)
+                groupIdOfOrgList.add(Integer.parseInt(item));
+            groupIdOfOrg = " and cg.idoforg in (:groupIdOfOrgList) ";
+        }
 
         String getFriendlyOrg = "select fo.friendlyOrg "
                 + "from cf_friendly_organization fo "
@@ -128,6 +131,7 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
                 + "where sdh.date BETWEEN :startDate and :endDate "
                 + idOfOrgs
                 + idOfGroup
+                + groupIdOfOrg
                 + " order by 1, 2";
 
         query = session.createSQLQuery(getSpecialDates);
@@ -136,9 +140,12 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         if(!CollectionUtils.isEmpty(idOfOrgList)){
             query.setParameterList("idOfOrgList", idOfOrgList);
         }
-        if(!CollectionUtils.isEmpty(groupId)){
-            query.setParameterList("groupId", groupId);
+        if(!CollectionUtils.isEmpty(groupName)){
+            query.setParameterList("groupName", groupName);
         }
+        if(!groupIdOfOrg.equals(""))
+            query.setParameterList("groupIdOfOrgList", groupIdOfOrgList);
+
         List<Object[]> dataSpecialDates = query.list();
         if (CollectionUtils.isEmpty(dataSpecialDates)) {
             throw new Exception("Нет данных для построения отчета");

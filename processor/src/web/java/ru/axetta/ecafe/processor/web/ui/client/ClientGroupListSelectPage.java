@@ -71,6 +71,7 @@ public class ClientGroupListSelectPage extends BasicPage {
     private List<Long> selectedGroupId = new ArrayList<>();
     private final Stack<CompleteHandler> completeHandlers = new Stack<CompleteHandler>();
     private List<Item> items = Collections.emptyList();
+    private List<Item> saveItems = new ArrayList<>();
     private Item selectedItem = new Item();
     private String filter;
     private String idOfOrg;
@@ -81,6 +82,16 @@ public class ClientGroupListSelectPage extends BasicPage {
 
     public void clear(){
         items = Collections.emptyList();
+        saveItems = new ArrayList<>();
+        selectedGroupName = "Не выбрано";
+        selectedGroupId = new ArrayList<>();
+    }
+
+    public void clearSelect(){
+        for (Item item: items)
+            item.setSelected(false);
+        for (Item item: saveItems)
+            item.setSelected(false);
         selectedGroupName = "Не выбрано";
         selectedGroupId = new ArrayList<>();
     }
@@ -103,7 +114,7 @@ public class ClientGroupListSelectPage extends BasicPage {
 
     public String getSelectedItems() {
         StringBuilder str = new StringBuilder();
-        for (Item it : items) {
+        for (Item it : saveItems) {
             if (!it.selected) {
                 continue;
             }
@@ -191,6 +202,9 @@ public class ClientGroupListSelectPage extends BasicPage {
         if (filter == null) {
             filter = "";
         }
+        if (filter.equals("") && saveItems.size() > 0){
+            this.items = updateItems(this.items, saveItems);
+        }
         List<ClientGroup> clientGroups = retrieveClientGroups(session, orgList);
         for (ClientGroup clientGroup : clientGroups) {
             Item item = new Item(clientGroup);
@@ -202,7 +216,14 @@ public class ClientGroupListSelectPage extends BasicPage {
                 items.add(item);
             }
         }
+        saveItems = this.items;
         this.items = updateItems(this.items, items);
+    }
+
+    public void update(){
+        if (saveItems.size() > 0){
+            this.items = updateItems(this.items, saveItems);
+        }
     }
 
     private List<Item> updateItems(List<Item> currentItems, List<Item> newItems){

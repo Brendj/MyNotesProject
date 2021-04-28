@@ -1914,6 +1914,7 @@ public class MainPage implements Serializable {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
+            clientGroupListSelectPage.update();
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -2255,8 +2256,13 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object clearGroupListSelectedItemsList() {
+    public Object clearGroupListItemsList() {
         clientGroupListSelectPage.clear();
+        return null;
+    }
+
+    public Object clearGroupListSelectedItemsList() {
+        clientGroupListSelectPage.clearSelect();
         return null;
     }
 
