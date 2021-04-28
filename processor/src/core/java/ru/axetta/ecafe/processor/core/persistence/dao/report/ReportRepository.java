@@ -81,6 +81,8 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_ENTER_EVENT_JOURNAL_SUBJECT="Журнал посещений";
     private final String REPORT_PREORDER_JOURNAL_REPORT = "VariableFeedingJournalReport";
     private final String REPORT_PREORDER_JOURNAL_REPORT_SUBJECT = "Журнал операций ВП";
+    private final String REPORT_ENTER_EVENT_JOURNAL_CALENDAR_FOOD = "FoodDaysCalendarReport";
+    private final String REPORT_ENTER_EVENT_JOURNAL_CALENDAR_FOOD_SUBJECT = "Журнал ведения календаря дней питания";
 
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
@@ -126,6 +128,8 @@ public class ReportRepository extends BaseJpaDao {
             return getEnterEventJournal(parameters, REPORT_ENTER_EVENT_JOURNAL_SUBJECT);
         } else if (reportType.equals(REPORT_PREORDER_JOURNAL_REPORT)) {
             return getPreorderJournal(parameters, REPORT_PREORDER_JOURNAL_REPORT_SUBJECT);
+        } else if (reportType.equals(REPORT_ENTER_EVENT_JOURNAL_CALENDAR_FOOD)) {
+            return getFoodDayJournal(parameters, REPORT_ENTER_EVENT_JOURNAL_CALENDAR_FOOD_SUBJECT);
         }
         return null;
     }
@@ -354,6 +358,22 @@ public class ReportRepository extends BaseJpaDao {
         return rawDataReport;
     }
 
+    private byte[] getFoodDayJournal(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildFoodDayJournalReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPagesOrZero(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
     private boolean isEmptyReportPrintPages(BasicJasperReport deliveredServicesReport) {
         return deliveredServicesReport.getPrint().getPages() != null
                 && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0;
@@ -415,6 +435,48 @@ public class ReportRepository extends BaseJpaDao {
                 properties.setProperty(PreorderJournalReport.P_ID_OF_CLIENTS, client.getIdOfClient().toString());
             }
             properties.setProperty(PreorderJournalReport.P_LINE_SEPARATOR, "\n");
+            builder.setReportProperties(properties);
+
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        } catch (Exception e){
+            logger.error("Failure to build a report", e);
+            return null;
+        }
+    }
+
+    private BasicJasperReport buildFoodDayJournalReport(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + FoodDaysCalendarReport.class.getSimpleName() + ".jasper";
+        FoodDaysCalendarReportBuilder builder = new FoodDaysCalendarReportBuilder(templateFilename);
+        try {
+            Long idOrg;
+            Properties properties = new Properties();
+            String selectGroupName = "";
+            String selectGroupId = "";
+            if (reportParameters.getIdOfOrg() == null) {
+                idOrg = reportParameters.getSourceOrg();
+                List<Long> idOfOrgList = new ArrayList<>();
+                idOfOrgList.add(idOrg);
+                properties.setProperty("IdOfOrg", StringUtils.join(idOfOrgList.iterator(), ","));
+            }
+            else {
+                idOrg = reportParameters.getIdOfOrg();
+                properties.setProperty("IdOfOrg", idOrg.toString());
+            }
+            if (reportParameters.getGroupNameList() != null && reportParameters.getGroupIdList() != null){
+                selectGroupName = reportParameters.getGroupNameList();
+                selectGroupId = reportParameters.getGroupIdList();
+            }
+            properties.setProperty("selectGroupName", selectGroupName);
+            properties.setProperty("selectGroupId", selectGroupId);
+
             builder.setReportProperties(properties);
 
             BasicJasperReport jasperReport = builder
@@ -930,6 +992,8 @@ public class ReportRepository extends BaseJpaDao {
         private String enterEventType;
         private Integer category;
         private String groupName;
+        private String groupNameList;
+        private String groupIdList;
         private String isAllFriendlyOrgs;
         private String outputMigrants;   // receive from ARM 1 or 0
         private String sortedBySections; // receive from ARM 1 or 0
@@ -982,6 +1046,14 @@ public class ReportRepository extends BaseJpaDao {
             return isAllFriendlyOrgs;
         }
 
+        public String getGroupNameList() {
+            return groupNameList;
+        }
+
+        public String getGroupIdList() {
+            return groupIdList;
+        }
+
         public ReportParameters parse() throws ParseException {
             startDate = null;
             endDate = null;
@@ -996,6 +1068,7 @@ public class ReportRepository extends BaseJpaDao {
             isAllFriendlyOrgs = null;
             outputMigrants = null;
             sortedBySections = null;
+            groupIdList = null;
 
             DateFormat safeDateFormat = dateFormat.get();
             for (ReportParameter parameter : parameters) {
@@ -1043,15 +1116,22 @@ public class ReportRepository extends BaseJpaDao {
                 else if(parameter.getParameterName().equals("sortedBySections")){
                     sortedBySections = Boolean.toString(parameter.getParameterValue().equals("1"));
                 }
+                else if(parameter.getParameterName().equals("groupNameList")){
+                    groupNameList = parameter.getParameterValue();
+                }
+                else if(parameter.getParameterName().equals("groupIdList")){
+                    groupIdList = parameter.getParameterValue();
+                }
             }
             return this;
         }
 
         public boolean checkRequiredParameters() {
             //Либо указана целеваю организация, либо источник запроса
-          return   (idOfOrg != null || sourceOrg != null) && startDate != null
+            return   (idOfOrg != null || sourceOrg != null) && startDate != null
                     && endDate != null;
         }
+
 
         public String getOutputMigrants() {
             return outputMigrants;
