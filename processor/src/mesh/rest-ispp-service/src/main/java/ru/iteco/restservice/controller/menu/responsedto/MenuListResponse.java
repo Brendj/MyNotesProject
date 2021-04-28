@@ -1,17 +1,20 @@
 package ru.iteco.restservice.controller.menu.responsedto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MenuListResponse {
-    private final List<MenuItem> menuItems;
+    @Schema(description = "Список категория блюд")
+    private final List<CategoryItem> categoryItems;
 
     public MenuListResponse() {
-        this.menuItems = new ArrayList<>();
+        this.categoryItems = new ArrayList<>();
     }
 
-    public List<MenuItem> getMenuItems() {
-        return menuItems;
+    public List<CategoryItem> getCategoryItems() {
+        return categoryItems;
     }
 
     //public void setMenuDetailList(List<MenuDetail> menuDetailList) {

@@ -9,7 +9,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "cf_wt_categories")
-public class WtCategory {
+public class WtCategory implements Comparable {
     public static final int ACTIVE = 0;
     public static final int DELETE = 1;
 
@@ -55,6 +55,15 @@ public class WtCategory {
         item.setDeleteState(WtCategoryItem.ACTIVE);
 
         return item;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof WtCategory)) {
+            return 1;
+        }
+        WtCategory ext = (WtCategory) o;
+        return this.description.compareTo(ext.getDescription());
     }
 
     public Set<WtCategoryItem> getCategoryItems() {
@@ -138,14 +147,11 @@ public class WtCategory {
             return false;
         }
         WtCategory that = (WtCategory) o;
-        return Objects.equals(getIdOfCategory(), that.getIdOfCategory()) && Objects.equals(getGuid(), that.getGuid())
-                && Objects.equals(getDescription(), that.getDescription()) && Objects
-                .equals(getCategoryItems(), that.getCategoryItems())
-                && Objects.equals(getDeleteState(), that.getDeleteState());
+        return Objects.equals(getIdOfCategory(), that.getIdOfCategory());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIdOfCategory(), getGuid(), getDescription(), getCategoryItems(), getDeleteState());
+        return Objects.hash(getIdOfCategory());
     }
 }

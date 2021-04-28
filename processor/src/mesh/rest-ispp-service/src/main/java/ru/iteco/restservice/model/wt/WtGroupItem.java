@@ -13,6 +13,10 @@ import java.util.Set;
 @Table(name = "cf_wt_group_items")
 public class WtGroupItem {
 
+    public static final Long GROUP_BUFFET = 3L;
+    public static final Long GROUP_COMMERCIAL = 4L;
+    public static final Long GROUP_ALL = 5L;
+
     @Id
     @Column(name = "idOfGroupItem")
     private Long idOfGroupItem;

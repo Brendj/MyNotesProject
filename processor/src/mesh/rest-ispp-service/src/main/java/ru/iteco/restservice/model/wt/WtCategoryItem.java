@@ -42,7 +42,7 @@ public class WtCategoryItem {
     private Set<WtDish> dishes = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn(name = "idofwtcategory")
+    @JoinColumn(name = "idofcategory")
     private WtCategory wtCategory;
 
     public static WtCategoryItem build(String description, WtCategory selectedItem) {

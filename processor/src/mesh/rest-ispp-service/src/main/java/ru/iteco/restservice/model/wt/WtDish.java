@@ -99,6 +99,10 @@ public class WtDish {
             inverseJoinColumns = @JoinColumn(name = "idOfCategoryItem"))
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idofcategory")
+    private WtCategory category;
+
     @ManyToMany
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
@@ -327,5 +331,13 @@ public class WtDish {
     @Override
     public int hashCode() {
         return idOfDish.hashCode();
+    }
+
+    public WtCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(WtCategory category) {
+        this.category = category;
     }
 }
