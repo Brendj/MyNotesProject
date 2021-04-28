@@ -9,10 +9,10 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.Accessory" table="cf_org_accessories">
         <cache usage="transactional"/>
         <id name="idOfAccessory" column="IdOfAccessory" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfAccessory</param>
-                <param name="max_lo">3</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">cf_org_accessories_Id_Gen_seq</param>
             </generator>
         </id>
         <property name="idOfSourceOrg" column="IdOfSourceOrg" type="long" not-null="true" update="false"/>
