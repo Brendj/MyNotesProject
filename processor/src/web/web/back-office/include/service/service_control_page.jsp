@@ -22,7 +22,7 @@
                 <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
                 <rich:calendar value="#{serviceControlPage.endDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-                <a4j:commandButton value="Отправить ЭИ в МЭШ" id="CardServicesSentToMeshButton"
+                <a4j:commandButton value="Отправить запрос" id="CardServicesSentToMeshButton"
                                    action="#{serviceControlPage.sendTask()}" styleClass="command-button"
                                    status="cardServicesPanelreportGenerateStatus"
                 />
