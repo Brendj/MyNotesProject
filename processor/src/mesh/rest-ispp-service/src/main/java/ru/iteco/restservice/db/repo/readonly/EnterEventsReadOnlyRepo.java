@@ -21,10 +21,11 @@ public interface EnterEventsReadOnlyRepo extends CrudRepository<EnterEvent, Ente
 
     @Query(value = "SELECT CASE WHEN ee.eventcode IN (0, 6, 100, 101, 102, 112) THEN TRUE ELSE FALSE END "
             + "FROM cf_enterevents ee "
-            + "WHERE ee.idofclient = :idOfClient "
+            + "WHERE ee.idofclient = :idOfClient AND evtdatetime >= :today "
             + "ORDER BY evtdatetime DESC "
             + "LIMIT 1", nativeQuery = true)
-    Optional<Boolean> clientIsInside(@NotNull @Param("idOfClient") Long idOfClient);
+    Optional<Boolean> clientIsInside(@NotNull @Param("idOfClient") Long idOfClient,
+                                     @NotNull @Param("today") Long today);
 
     @Query(name = "getEnterEvents", nativeQuery = true)
     Page<EnterEventResponseDTO> getEnterEventsByClient(

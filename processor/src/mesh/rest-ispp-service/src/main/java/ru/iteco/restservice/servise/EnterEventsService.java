@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class EnterEventsService {
@@ -22,12 +24,26 @@ public class EnterEventsService {
     }
 
     public Boolean clientIsInside(@NotNull Long idOfClient){
-        return readOnlyRepo.clientIsInside(idOfClient).orElse(false);
+        Date today = getStartOfDay();
+
+        return readOnlyRepo.clientIsInside(idOfClient, today.getTime()).orElse(false);
     }
 
     public Page<EnterEventResponseDTO> getEnterEventsWitchExternalEventsByContractId(
             @NotNull Long contractId, @NotNull Long startDate,
             @NotNull Long endDate, @NotNull Pageable pageable) {
         return readOnlyRepo.getEnterEventsByClient(contractId, startDate, endDate, pageable);
+    }
+
+    private Date getStartOfDay(){
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
     }
 }

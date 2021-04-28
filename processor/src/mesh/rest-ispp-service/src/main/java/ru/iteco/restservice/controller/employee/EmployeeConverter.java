@@ -29,7 +29,7 @@ public class EmployeeConverter extends BaseConverter<EmployeeResponseDTO, Client
         String lastname = c.getPerson().getLastName();
         String grade = c.getClientGroup().getGroupName();
         String orgType = c.getOrg().getType().toString();
-        String orgName = c.getOrg().getShortName();
+        String orgName = c.getOrg().getShortNameInfoService();
         Long balance = c.getBalance();
         String address = c.getOrg().getShortAddress();
         Boolean isInside = enterEventsService.clientIsInside(c.getIdOfClient());

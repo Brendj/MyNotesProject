@@ -71,7 +71,7 @@ import java.util.Set;
                     + "       cp.secondname AS \"lastName\",\n"
                     + "       cp.surname AS \"middleName\",\n"
                     + "       cc.groupname AS \"grade\",\n"
-                    + "       co.shortname AS \"orgName\",\n"
+                    + "       co.shortnameinfoservice AS \"orgName\",\n"
                     + "       CASE\n"
                     + "           WHEN co.organizationtype = 0 THEN 'Общеобразовательное ОУ'\n"
                     + "           WHEN co.organizationtype = 1 THEN 'Дошкольное ОУ'\n"
@@ -111,7 +111,7 @@ import java.util.Set;
                         + "       cp.secondname AS \"lastName\",\n"
                         + "       cp.surname AS \"middleName\",\n"
                         + "       cc.groupname AS \"grade\",\n"
-                        + "       co.shortname AS \"orgName\",\n"
+                        + "       co.shortnameinfoservice AS \"orgName\",\n"
                         + "       CASE\n"
                         + "           WHEN co.organizationtype = 0 THEN 'Общеобразовательное ОУ'\n"
                         + "           WHEN co.organizationtype = 1 THEN 'Дошкольное ОУ'\n"
@@ -127,7 +127,7 @@ import java.util.Set;
                         + "         JOIN cf_clientgroups cc ON guardian.idoforg = cc.idoforg AND guardian.idofclientgroup = cc.idofclientgroup\n"
                         + "         JOIN cf_client_guardian AS childs ON guardian.idofclient = childs.idofguardian\n"
                         + "         JOIN cf_clients AS child ON child.idofclient = childs.idofchildren\n"
-                        + "WHERE child.contractid = :contractId"
+                        + "WHERE child.contractid = :contractId AND childs.deletedstate IS FALSE AND childs.disabled = 0 "
         )
 })
 @NamedEntityGraphs({

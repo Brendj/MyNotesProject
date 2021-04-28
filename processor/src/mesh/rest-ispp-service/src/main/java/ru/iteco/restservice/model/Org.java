@@ -29,6 +29,9 @@ public class Org {
     @Column(name = "shortaddress")
     private String shortAddress;
 
+    @Column(name = "shortnameinfoservice")
+    private String shortNameInfoService;
+
     public Long getIdOfOrg() {
         return idOfOrg;
     }
@@ -67,6 +70,14 @@ public class Org {
 
     public void setShortAddress(String shortAddress) {
         this.shortAddress = shortAddress;
+    }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
     }
 
     @Override

@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
-    @Query(value = "FROM Client childs "
+    @Query(value = "SELECT DISTINCT childs FROM Client childs "
             + "JOIN FETCH childs.org AS org "
             + "JOIN FETCH childs.person AS person "
             + "JOIN FETCH childs.clientGroup AS cg "
@@ -31,7 +31,7 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
     @EntityGraph("forClientResponseDTO")
     Client getClientByMeshGuid(String meshGuid);
 
-    @Query(value = "FROM Client employee "
+    @Query(value = "SELECT DISTINCT employee FROM Client employee "
             + "JOIN FETCH employee.org AS org "
             + "JOIN FETCH employee.person AS person "
             + "JOIN FETCH employee.clientGroup AS cg "
