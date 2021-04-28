@@ -13,7 +13,7 @@
     <h:panelGrid id="cardServicesPanel">
         <rich:panel>
             <f:facet name="header">
-                <h:outputText styleClass="column-header" value="Запуск задачи отправки факта предаставления МСП" />
+                <h:outputText styleClass="column-header" value="Запуск задачи отправки факта предоставления МСП" />
             </f:facet>
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
