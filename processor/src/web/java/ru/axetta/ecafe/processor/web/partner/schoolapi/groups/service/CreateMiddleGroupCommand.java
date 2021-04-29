@@ -5,15 +5,18 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groups.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.ResponseCodes;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.MiddleGroupRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.MiddleGroupResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -24,9 +27,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-class CreateMiddleGroupCommand {
-
-    private Logger logger = LoggerFactory.getLogger(CreateMiddleGroupCommand.class);
+class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
+    private final Logger logger = LoggerFactory.getLogger(CreateMiddleGroupCommand.class);
     private final RuntimeContext runtimeContext;
     private static final int DUPLICATE_GROUP_NAME = 409, GROUP_NOT_FOUND = 404, GROUP_NOT_PREDEFINED = 410;
 
@@ -85,7 +87,10 @@ class CreateMiddleGroupCommand {
         try {
             boolean isPredefined = isPredefined(idOfGroupClients);
             if (!isPredefined) {
-                throw new WebApplicationException(GROUP_NOT_PREDEFINED, String.format("Group with ID='%d' not predefined", idOfGroupClients));
+                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(), String.format("Group with ID='%d' not predefined", idOfGroupClients));
+            }
+            if (StringUtils.isEmpty(request.getName())){
+                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(), "Is empty middle group name");
             }
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
@@ -125,7 +130,8 @@ class CreateMiddleGroupCommand {
 
     private GroupNamesToOrgs updateMiddleGroup(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs,
             Session session) {
-        long version = getVersion(session);
+        long version = getNextVersion(session);
+        updateMiddleGroupForClients(request, groupNamesToOrgs, session, version);
         groupNamesToOrgs.setVersion(version);
         groupNamesToOrgs.setGroupName(request.getName());
         groupNamesToOrgs.setIdOfOrg(request.getBindingOrgId());
@@ -134,8 +140,12 @@ class CreateMiddleGroupCommand {
         return groupNamesToOrgs;
     }
 
-    private GroupNamesToOrgs foundMiddleGroupById(Session session, Long id) {
-        return (GroupNamesToOrgs) session.get(GroupNamesToOrgs.class, id);
+    private void updateMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, Session session,
+            long version) {
+        List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
+        for (Client client : clientListWithMiddleGroup) {
+            setMiddleGroupForClient(session, client, request.getName(), version);
+        }
     }
 
     private GroupNamesToOrgs foundMiddleGroupByName(Session session, Long mainBuildingOrgId,
@@ -143,12 +153,10 @@ class CreateMiddleGroupCommand {
         List<GroupNamesToOrgs> allGroupsAndSubGroupsBindingToCurrentOrg = DAOUtils
                 .getAllGroupnamesToOrgsByIdOfMainOrg(session, mainBuildingOrgId);
         for (GroupNamesToOrgs item : allGroupsAndSubGroupsBindingToCurrentOrg) {
-            if (item.getIdOfOrg() == request.getBindingOrgId()) {
-                if (item.getIsMiddleGroup() != null && item.getIsMiddleGroup() && item.getGroupName()
-                        .equalsIgnoreCase(request.getName()) && item.getParentGroupName() != null && item
-                        .getParentGroupName().equalsIgnoreCase(request.getParentGroupName())) {
-                    return item;
-                }
+            if (item.getIsMiddleGroup() != null && item.getIsMiddleGroup() && item.getGroupName()
+                    .equalsIgnoreCase(request.getName()) && item.getParentGroupName() != null && item
+                    .getParentGroupName().equalsIgnoreCase(request.getParentGroupName())) {
+                return item;
             }
         }
         return null;
@@ -166,16 +174,13 @@ class CreateMiddleGroupCommand {
 
     private GroupNamesToOrgs createSubGroup(MiddleGroupRequest request, Long mainBuildingOrgId,
             Session persistenceSession) {
-        long version = getVersion(persistenceSession);
+        long version = getNextVersion(persistenceSession);
         GroupNamesToOrgs subgroup = new GroupNamesToOrgs(mainBuildingOrgId, request.getBindingOrgId(), 1,
                 request.getName(), version, request.getParentGroupName(), true);
         persistenceSession.save(subgroup);
         return subgroup;
     }
 
-    private long getVersion(Session session) {
-        return DAOUtils.nextVersionByGroupNameToOrg(session);
-    }
 
 
 }
