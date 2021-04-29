@@ -39,8 +39,8 @@ select setval('cf_regular_preorders_Id_Gen_seq', (select coalesce(max(IdOfRegula
 CREATE SEQUENCE CF_Users_Id_Gen_seq INCREMENT BY 3;
 select setval('CF_Users_Id_Gen_seq', (select coalesce(max(IdOfUser), 0) + 1 from CF_Users));
 
-CREATE SEQUENCE IdOfMenuDetail_Id_Gen_seq INCREMENT BY 512;
-select setval('IdOfMenuDetail_Id_Gen_seq', (select coalesce(max(IdOfMenuDetail), 0) + 1 from cf_menudetails));
+CREATE SEQUENCE cf_menudetails_id_gen_seq INCREMENT BY 512;
+select setval('cf_menudetails_id_gen_seq', (select coalesce(max(IdOfMenuDetail), 0) + 1 from cf_menudetails));
 
 CREATE SEQUENCE CF_Settlements_Id_Gen_seq INCREMENT BY 3;
 select setval('CF_Settlements_Id_Gen_seq', (select coalesce(max(IdOfSettlement), 0) + 1 from CF_Settlements));
