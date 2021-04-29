@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.ResponseCodes;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateResponse;
@@ -24,9 +25,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 class UpdateGroupCommand {
-    private Logger logger = LoggerFactory.getLogger(UpdateGroupCommand.class);
+
+    private final Logger logger = LoggerFactory.getLogger(UpdateGroupCommand.class);
     private final RuntimeContext runtimeContext;
-    private static final int DUPLICATE_GROUP_NAME = 409, GROUP_NOT_FOUND = 404;
 
     @Autowired
     public UpdateGroupCommand(RuntimeContext runtimeContext) {
@@ -45,12 +46,11 @@ class UpdateGroupCommand {
             ClientGroup clientGroup = (ClientGroup) session.get(ClientGroup.class, idOfClientGroup);
 
             if (clientGroup == null) {
-                throw new WebApplicationException(GROUP_NOT_FOUND,
+                throw new WebApplicationException(ResponseCodes.CLIENT_GROUP_NOT_FOUND.getCode(),
                         String.format("Группа с ID: '%d' и OrgID: '%d' не найдена", id, orgId));
             }
             response = GroupClientsUpdateResponse.from(clientGroup);
             updateBindingOrg(request, clientGroup, response, session);
-            updateExcludeFromPlan(request, clientGroup, response, session);
             session.flush();
             transaction.commit();
             transaction = null;
@@ -68,28 +68,21 @@ class UpdateGroupCommand {
 
     }
 
-    private void updateExcludeFromPlan(GroupClientsUpdateRequest request, ClientGroup clientGroup,
-            GroupClientsUpdateResponse response,
-            Session session) {
-
-    }
-
     private void updateBindingOrg(GroupClientsUpdateRequest request, ClientGroup clientGroup,
             GroupClientsUpdateResponse response, Session session) {
         long version = DAOUtils.nextVersionByGroupNameToOrg(session);
         Org org = clientGroup.getOrg();
         Long idOfMainOrg = getMainBuildingOrgId(org);
-        GroupNamesToOrgs groupNamesToOrgs = DAOUtils.getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session,
-                org.getIdOfOrg(), clientGroup.getGroupName());
+        GroupNamesToOrgs groupNamesToOrgs = DAOUtils
+                .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), clientGroup.getGroupName());
         if (groupNamesToOrgs == null) {
-            DAOUtils.createGroupNamesToOrg(session, org, version, clientGroup.getGroupName());
+            groupNamesToOrgs = new GroupNamesToOrgs(idOfMainOrg, request.getBindingOrgId(), 1,
+                    clientGroup.getGroupName(), version, null, false);
         }
-        else {
-            groupNamesToOrgs.setIdOfOrg(request.getBindingOrgId());
-            groupNamesToOrgs.setIdOfMainOrg(idOfMainOrg);
-            groupNamesToOrgs.setVersion(version);
-            session.update(groupNamesToOrgs);
-        }
+        groupNamesToOrgs.setIdOfOrg(request.getBindingOrgId());
+        groupNamesToOrgs.setIdOfMainOrg(idOfMainOrg);
+        groupNamesToOrgs.setVersion(version);
+        session.saveOrUpdate(groupNamesToOrgs);
         response.setBindingOrgId(request.getBindingOrgId());
     }
 
