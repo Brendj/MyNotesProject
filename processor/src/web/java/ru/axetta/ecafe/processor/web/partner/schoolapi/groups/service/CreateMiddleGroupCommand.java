@@ -98,7 +98,7 @@ class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
             if (foundCurrentGroup != null) {
                 Long mainBuildingOrgId = getMainBuilding(session, idOfOrg);
                 GroupNamesToOrgs foundGroupWithNewName = foundMiddleGroupByName(session, mainBuildingOrgId, request);
-                if (foundGroupWithNewName == null) {
+                if (foundGroupWithNewName == null || foundGroupWithNewName.getIdOfGroupNameToOrg().equals(foundCurrentGroup.getIdOfGroupNameToOrg())) {
                     GroupNamesToOrgs middleGroup = updateMiddleGroup(request, foundCurrentGroup, session);
                     response = MiddleGroupResponse.from(middleGroup);
                 } else {
