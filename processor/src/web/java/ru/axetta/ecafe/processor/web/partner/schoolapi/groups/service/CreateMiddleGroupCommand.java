@@ -129,9 +129,9 @@ class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
     }
 
     private GroupNamesToOrgs updateMiddleGroup(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs,
-            Session session) {
+            Session session) throws Exception {
+        updateMiddleGroupForClients(request, groupNamesToOrgs, session);
         long version = getNextVersion(session);
-        updateMiddleGroupForClients(request, groupNamesToOrgs, session, version);
         groupNamesToOrgs.setVersion(version);
         groupNamesToOrgs.setGroupName(request.getName());
         groupNamesToOrgs.setIdOfOrg(request.getBindingOrgId());
@@ -140,11 +140,14 @@ class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
         return groupNamesToOrgs;
     }
 
-    private void updateMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, Session session,
-            long version) {
+    private void updateMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, Session session)
+            throws Exception {
         List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
-        for (Client client : clientListWithMiddleGroup) {
-            setMiddleGroupForClient(session, client, request.getName(), version);
+        if (!clientListWithMiddleGroup.isEmpty()) {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            for (Client client : clientListWithMiddleGroup) {
+                setMiddleGroupForClient(session, client, request.getName(), version);
+            }
         }
     }
 
