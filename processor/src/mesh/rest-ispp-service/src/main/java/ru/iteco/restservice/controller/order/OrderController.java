@@ -11,9 +11,11 @@ import ru.iteco.restservice.controller.order.responseDTO.OrderResponseDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -29,11 +31,13 @@ public class OrderController {
     @Operation(
             summary = "Получение списка обытий предоставления питания",
             description = "Позволяет получить события предоставления питания обучающемуся в ОО")
-    public OrderResponseDTO getList(
+    public Page<OrderResponseDTO> getList(
             @Parameter(description = "Номер лицевого счета клиента") @NotNull @PositiveOrZero @RequestParam Long contractId,
             @NotNull @RequestParam @Parameter(description = "Дата начала выборки в Timestamp (ms)") @PositiveOrZero Long startDate,
-            @NotNull @RequestParam @Parameter(description = "Дата конца выборки в Timestamp (ms)") @PositiveOrZero Long endDate){
+            @NotNull @RequestParam @Parameter(description = "Дата конца выборки в Timestamp (ms)") @PositiveOrZero Long endDate,
+            @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") @PositiveOrZero Integer page,
+            @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "10")
+            @Max(value = 100L, message = "Размер выборки не должен привышать 100 записей") @PositiveOrZero Integer size){
         return null;
     }
-
 }
