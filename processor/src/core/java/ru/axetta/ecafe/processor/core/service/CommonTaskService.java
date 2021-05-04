@@ -74,7 +74,7 @@ public class CommonTaskService {
         String port = RuntimeContext.getInstance().getPropertiesValue(PORT_PROPERTY, "8080");
         for (String ipAddress : cacheMulticastList) {
             String url = String.format("http://%s:%s/processor/commontask", ipAddress, port);
-            logger.info(String.format("Doing http request to %s", url));
+            //logger.info(String.format("Doing http request to %s", url));
             PostMethod httpMethod = new PostMethod(url);
             httpMethod.addParameter(OPERATION_PARAM, OPERATION_INVALIDATE_CACHE);
             httpMethod.addParameter(OPERATION_IDOFORG, idOfOrg.toString());
