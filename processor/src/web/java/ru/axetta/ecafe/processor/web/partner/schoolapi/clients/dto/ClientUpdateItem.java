@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +24,14 @@ public class ClientUpdateItem {
     private Boolean confirmVisualRecognition;
     private String mobile;
     private List<Long> categoriesDiscounts = new ArrayList<>();
+
+    public static ClientUpdateItem from(Client client, ClientGroup clientGroup){
+        ClientUpdateItem clientUpdateItem = new ClientUpdateItem();
+        clientUpdateItem.setIdOfClient(client.getIdOfClient());
+        clientUpdateItem.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        clientUpdateItem.setIdOfOrg(clientGroup.getCompositeIdOfClientGroup().getIdOfOrg());
+        return clientUpdateItem;
+    }
 
     public Long getIdOfClient() {
         return idOfClient;

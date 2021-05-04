@@ -34,7 +34,7 @@ public class GroupsRestController {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name(), User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        MiddleGroupResponse response = getService().createMiddleGroup(id, orgId, request);
+        MiddleGroupResponse response = getService().createMiddleGroup(id, orgId, request, getUser());
         return Response.ok().entity(response).build();
     }
 
@@ -46,7 +46,7 @@ public class GroupsRestController {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name(), User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        MiddleGroupResponse response = getService().updateMiddleGroup(id, orgId, request);
+        MiddleGroupResponse response = getService().updateMiddleGroup(id, orgId, request, getUser());
         return Response.ok().entity(response).build();
     }
 
@@ -68,10 +68,14 @@ public class GroupsRestController {
         if (!hasAnyRole(User.DefaultRole.ADMIN.name(), User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        GroupClientsUpdateResponse response = getService().updateGroup(id, orgId, request);
+        GroupClientsUpdateResponse response = getService().updateGroup(id, orgId, request, getUser());
         return Response.ok().entity(response).build();
     }
 
+    private User getUser() {
+        AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
+        return authorityUtils.findCurrentUser();
+    }
 
     private SchoolApiClientGroupsService getService() {
         return RuntimeContext.getAppContext().getBean(SchoolApiClientGroupsService.class);

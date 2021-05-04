@@ -5,12 +5,11 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groups.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateItem;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.service.MoveClientsCommand;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.ResponseCodes;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.MiddleGroupRequest;
@@ -25,26 +24,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 @Component
-class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
-    private final Logger logger = LoggerFactory.getLogger(CreateMiddleGroupCommand.class);
+class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
+
+    private final Logger logger = LoggerFactory.getLogger(CreateOrUpdateMiddleGroupCommand.class);
     private final RuntimeContext runtimeContext;
+    private final MoveClientsCommand moveClientsCommand;
     private static final int DUPLICATE_GROUP_NAME = 409, GROUP_NOT_FOUND = 404, GROUP_NOT_PREDEFINED = 410;
 
     @Autowired
-    public CreateMiddleGroupCommand(RuntimeContext runtimeContext) {
+    public CreateOrUpdateMiddleGroupCommand(RuntimeContext runtimeContext, MoveClientsCommand moveClientsCommand) {
         this.runtimeContext = runtimeContext;
+        this.moveClientsCommand = moveClientsCommand;
     }
 
-    public MiddleGroupResponse createGroup(Long idOfGroupClients, Long idOfOrg, MiddleGroupRequest request) {
+    public MiddleGroupResponse createGroup(Long idOfGroupClients, Long idOfOrg, MiddleGroupRequest request, User user) {
         MiddleGroupResponse response;
         Session session = null;
         Transaction transaction = null;
         try {
             boolean isPredefined = isPredefined(idOfGroupClients);
             if (!isPredefined) {
-                throw new WebApplicationException(GROUP_NOT_PREDEFINED, String.format("Group with ID='%d' not predefined", idOfGroupClients));
+                throw new WebApplicationException(GROUP_NOT_PREDEFINED,
+                        String.format("Group with ID='%d' not predefined", idOfGroupClients));
             }
 
             session = runtimeContext.createPersistenceSession();
@@ -80,17 +84,19 @@ class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
         return predefinedGroup != null;
     }
 
-    public MiddleGroupResponse updateGroup(Long idOfGroupClients, Long idOfOrg, MiddleGroupRequest request) {
+    public MiddleGroupResponse updateGroup(Long idOfGroupClients, Long idOfOrg, MiddleGroupRequest request, User user) {
         MiddleGroupResponse response;
         Session session = null;
         Transaction transaction = null;
         try {
             boolean isPredefined = isPredefined(idOfGroupClients);
             if (!isPredefined) {
-                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(), String.format("Group with ID='%d' not predefined", idOfGroupClients));
+                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(),
+                        String.format("Group with ID='%d' not predefined", idOfGroupClients));
             }
-            if (StringUtils.isEmpty(request.getName())){
-                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(), "Is empty middle group name");
+            if (StringUtils.isEmpty(request.getName())) {
+                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(),
+                        "Is empty middle group name");
             }
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
@@ -98,8 +104,9 @@ class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
             if (foundCurrentGroup != null) {
                 Long mainBuildingOrgId = getMainBuilding(session, idOfOrg);
                 GroupNamesToOrgs foundGroupWithNewName = foundMiddleGroupByName(session, mainBuildingOrgId, request);
-                if (foundGroupWithNewName == null || foundGroupWithNewName.getIdOfGroupNameToOrg().equals(foundCurrentGroup.getIdOfGroupNameToOrg())) {
-                    GroupNamesToOrgs middleGroup = updateMiddleGroup(request, foundCurrentGroup, session);
+                if (foundGroupWithNewName == null || foundGroupWithNewName.getIdOfGroupNameToOrg()
+                        .equals(foundCurrentGroup.getIdOfGroupNameToOrg())) {
+                    GroupNamesToOrgs middleGroup = updateMiddleGroup(request, foundCurrentGroup, user, session);
                     response = MiddleGroupResponse.from(middleGroup);
                 } else {
                     throw new WebApplicationException(DUPLICATE_GROUP_NAME,
@@ -128,20 +135,51 @@ class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
         }
     }
 
-    private GroupNamesToOrgs updateMiddleGroup(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs,
+    private GroupNamesToOrgs updateMiddleGroup(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, User user,
             Session session) throws Exception {
-        updateMiddleGroupForClients(request, groupNamesToOrgs, session);
-        long version = getNextVersion(session);
-        groupNamesToOrgs.setVersion(version);
+        //обновление клиентов
+        if (Objects.equals(groupNamesToOrgs.getIdOfOrg(), request.getBindingOrgId())) {
+            // если привзяка такая же, то простое изменение имени подгруппы для клиента
+            updateMiddleGroupForClients(request, groupNamesToOrgs, user, session);
+        }
+        else {
+            // смена группы, подгруппы для клиента
+            updateGroupAndMiddleGroupForClients(request, groupNamesToOrgs, user, session);
+        }
+
+        // обновить саму подгруппу
+        groupNamesToOrgs.setVersion(getNextVersion(session));
         groupNamesToOrgs.setGroupName(request.getName());
         groupNamesToOrgs.setIdOfOrg(request.getBindingOrgId());
         groupNamesToOrgs.setParentGroupName(request.getParentGroupName());
         session.update(groupNamesToOrgs);
-        return groupNamesToOrgs;
+       return groupNamesToOrgs;
     }
 
-    private void updateMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, Session session)
-            throws Exception {
+    private void updateGroupAndMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, User user,
+            Session session) throws Exception {
+        List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
+        if (!clientListWithMiddleGroup.isEmpty()) {
+            ClientGroup foundNewGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, request.getBindingOrgId(),request.getParentGroupName());
+            if (foundNewGroup == null) {
+                // создаем группу для успешного перемещения туда клиентов
+                foundNewGroup = DAOUtils.createClientGroup(session, request.getBindingOrgId(), request.getParentGroupName());
+            }
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            for (Client client : clientListWithMiddleGroup) {
+                ClientUpdateItem clientUpdateItem = ClientUpdateItem.from(client, foundNewGroup);
+                clientUpdateItem.setIdOfMiddleGroup(groupNamesToOrgs.getIdOfGroupNameToOrg());
+
+                String error = moveClientsCommand.executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, true);
+                if (StringUtils.isNotEmpty(error)) {
+                    throw new WebApplicationException(String.format("Ошибка при обновлении клиентов для подгруппы с ID='%d'", groupNamesToOrgs.getIdOfGroupNameToOrg()));
+                }
+            }
+        }
+    }
+
+    private void updateMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, User user,
+            Session session) throws Exception {
         List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
         if (!clientListWithMiddleGroup.isEmpty()) {
             long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -183,7 +221,6 @@ class CreateMiddleGroupCommand extends BaseMiddleGroupCommand {
         persistenceSession.save(subgroup);
         return subgroup;
     }
-
 
 
 }

@@ -27,7 +27,8 @@ import java.util.Date;
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateClientRegistryVersion;
 
 @Service
-class MoveClientsCommand {
+public class MoveClientsCommand {
+
     private final Logger logger = LoggerFactory.getLogger(MoveClientsCommand.class);
     private final RuntimeContext runtimeContext;
 
@@ -75,28 +76,10 @@ class MoveClientsCommand {
                         String.format("Group of client with ID='%d' not found", movedClient.getIdOfClientGroup()));
             }
 
-            boolean isChangeOrg = isChangeOrg(client, movedClient.getIdOfOrg());
-            if (isChangeOrg) {
-                String error = updateOrgOrGetError(session, movedClient.getIdOfOrg(), client, moveToGroup, user);
-                if (!StringUtils.isEmpty(error)) {
-                    return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
-                }
-            }
-
-            String error = updateClientGroupOrGetError(session, moveToGroup, client, user, isChangeOrg);
+            String error = executeMoveOrError(session, movedClient, client, moveToGroup, version, user, true);
             if (!StringUtils.isEmpty(error)) {
                 return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
             }
-
-            error = updateMiddleGroupOrGetError(session, movedClient.getIdOfMiddleGroup(), movedClient.getIdOfMiddleGroup(),
-                    client);
-            if (!StringUtils.isEmpty(error)) {
-                return ClientUpdateResult.error(movedClient.getIdOfClient(), error);
-            }
-            client.setUpdateTime(new Date());
-            client.setClientRegistryVersion(version);
-
-            session.update(client);
             session.flush();
             transaction.commit();
             transaction = null;
@@ -110,12 +93,40 @@ class MoveClientsCommand {
         }
     }
 
+    public String executeMoveOrError(Session session, ClientUpdateItem movedClient, Client client,
+            ClientGroup moveToGroup, long version, User user, boolean needUpdateMiddleGroup) {
+        boolean isChangeOrg = isChangeOrg(client, movedClient.getIdOfOrg());
+        if (isChangeOrg) {
+            String error = updateOrgOrGetError(session, movedClient.getIdOfOrg(), client, moveToGroup, user);
+            if (!StringUtils.isEmpty(error)) {
+                return error;
+            }
+        }
+
+        String error = updateClientGroupOrGetError(session, moveToGroup, client, user, isChangeOrg);
+        if (!StringUtils.isEmpty(error)) {
+            return error;
+        }
+
+        if (needUpdateMiddleGroup) {
+            error = updateMiddleGroupOrGetError(session, movedClient.getIdOfMiddleGroup(),
+                    movedClient.getIdOfMiddleGroup(), client);
+            if (!StringUtils.isEmpty(error)) {
+                return error;
+            }
+        }
+        client.setUpdateTime(new Date());
+        client.setClientRegistryVersion(version);
+        session.update(client);
+        return null;
+    }
+
     private boolean isChangeOrg(Client client, Long idOfOrg) {
         return idOfOrg != null && !client.getOrg().getIdOfOrg().equals(idOfOrg);
     }
 
     private String updateOrgOrGetError(Session session, Long idOfOrg, Client client, ClientGroup moveToGroup,
-                                       User user) {
+            User user) {
         Object newOrg = session.load(Org.class, idOfOrg);
         if (newOrg == null) {
             return String.format("Organization with ID='%d' not found", idOfOrg);
@@ -125,8 +136,7 @@ class MoveClientsCommand {
             ClientManager
                     .addClientMigrationEntry(session, client.getOrg(), client.getClientGroup(), (Org) newOrg, client,
                             ClientGroupMigrationHistory.MODIFY_IN_WEB_ARM
-                                    .concat(user != null ? user.getUserName() : ""),
-                            moveToGroup.getGroupName());
+                                    .concat(user != null ? user.getUserName() : ""), moveToGroup.getGroupName());
             client.setOrg((Org) newOrg);
             return StringUtils.EMPTY;
         } catch (Exception ex) {
@@ -135,7 +145,8 @@ class MoveClientsCommand {
         }
     }
 
-    String updateClientGroupOrGetError(Session session, ClientGroup moveToGroup, Client client, User user, boolean isChangeOrg) {
+    String updateClientGroupOrGetError(Session session, ClientGroup moveToGroup, Client client, User user,
+            boolean isChangeOrg) {
         if (!isChangeGroupClient(client, moveToGroup.getCompositeIdOfClientGroup())) {
             return StringUtils.EMPTY;
         }

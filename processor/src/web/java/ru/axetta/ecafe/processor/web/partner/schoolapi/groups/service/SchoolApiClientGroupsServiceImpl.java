@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groups.service;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.MiddleGroupRequest;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class SchoolApiClientGroupsServiceImpl implements SchoolApiClientGroupsService {
 
     @Autowired
-    private CreateMiddleGroupCommand middleGroupCommand;
+    private CreateOrUpdateMiddleGroupCommand middleGroupCommand;
     @Autowired
     private UpdateGroupCommand updateGroupCommand;
     @Autowired
@@ -24,13 +25,13 @@ public class SchoolApiClientGroupsServiceImpl implements SchoolApiClientGroupsSe
 
 
     @Override
-    public MiddleGroupResponse createMiddleGroup(Long id, Long orgId, MiddleGroupRequest request) {
-        return middleGroupCommand.createGroup(id, orgId, request);
+    public MiddleGroupResponse createMiddleGroup(Long id, Long orgId, MiddleGroupRequest request, User user) {
+        return middleGroupCommand.createGroup(id, orgId, request, user);
     }
 
     @Override
-    public MiddleGroupResponse updateMiddleGroup(Long id, Long orgId, MiddleGroupRequest request) {
-        return middleGroupCommand.updateGroup(id, orgId, request);
+    public MiddleGroupResponse updateMiddleGroup(Long id, Long orgId, MiddleGroupRequest request, User user) {
+        return middleGroupCommand.updateGroup(id, orgId, request, user);
     }
 
     @Override
@@ -39,8 +40,8 @@ public class SchoolApiClientGroupsServiceImpl implements SchoolApiClientGroupsSe
     }
 
     @Override
-    public GroupClientsUpdateResponse updateGroup(Long id, Long orgId, GroupClientsUpdateRequest request) {
-        return updateGroupCommand.updateGroup(id, orgId, request);
+    public GroupClientsUpdateResponse updateGroup(Long id, Long orgId, GroupClientsUpdateRequest request, User user) {
+        return updateGroupCommand.updateGroup(id, orgId, request, user);
     }
 
 

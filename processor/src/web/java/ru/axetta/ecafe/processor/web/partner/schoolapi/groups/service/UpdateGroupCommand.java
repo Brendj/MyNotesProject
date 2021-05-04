@@ -5,17 +5,17 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groups.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateItem;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.service.MoveClientsCommand;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.ResponseCodes;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -23,18 +23,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+
+import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateClientRegistryVersion;
+
 @Component
 class UpdateGroupCommand {
 
     private final Logger logger = LoggerFactory.getLogger(UpdateGroupCommand.class);
     private final RuntimeContext runtimeContext;
+    private final MoveClientsCommand moveClientsCommand;
 
     @Autowired
-    public UpdateGroupCommand(RuntimeContext runtimeContext) {
+    public UpdateGroupCommand(RuntimeContext runtimeContext, MoveClientsCommand moveClientsCommand) {
         this.runtimeContext = runtimeContext;
+        this.moveClientsCommand = moveClientsCommand;
     }
 
-    public GroupClientsUpdateResponse updateGroup(Long id, Long orgId, GroupClientsUpdateRequest request) {
+    public GroupClientsUpdateResponse updateGroup(Long id, Long orgId, GroupClientsUpdateRequest request, User user) {
         GroupClientsUpdateResponse response;
         Session session = null;
         Transaction transaction = null;
@@ -51,6 +57,7 @@ class UpdateGroupCommand {
             }
             response = GroupClientsUpdateResponse.from(clientGroup);
             updateBindingOrg(request, clientGroup, response, session);
+            updateBindingClients(request.getBindingOrgId(), clientGroup, session, user);
             session.flush();
             transaction.commit();
             transaction = null;
@@ -66,6 +73,42 @@ class UpdateGroupCommand {
             HibernateUtils.close(session, logger);
         }
 
+    }
+
+    private void updateBindingClients(Long bindingOrg, ClientGroup clientGroup, Session session, User user)
+            throws Exception {
+        if (bindingOrg == null) {
+            return;
+        }
+        ClientGroup.Predefined predefinedGroup = ClientGroup.Predefined.parse(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        if (predefinedGroup != null) {
+            /* для клиентов предопределенных групп никого не перемещаем */
+            return;
+        }
+        Set<Client> clients = clientGroup.getClients();
+        if (clients.isEmpty()) {
+            return;
+        }
+
+        ClientGroup foundNewGroup;
+        try {
+            foundNewGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, bindingOrg, clientGroup.getGroupName());
+        } catch (Exception e) {
+            throw new WebApplicationException(e.getMessage());
+        }
+        if (foundNewGroup == null) {
+            // если группу не нашли, нужно создать для успешного перемещения туда клиентов
+            foundNewGroup = DAOUtils.createClientGroup(session, bindingOrg, clientGroup.getGroupName());
+        }
+        long version = updateClientRegistryVersion(null);
+        for (Client client : clients) {
+            ClientUpdateItem clientUpdateItem = ClientUpdateItem.from(client, foundNewGroup);
+            String error = moveClientsCommand.executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, false);
+            if (StringUtils.isNotEmpty(error)) {
+                throw new WebApplicationException(
+                        String.format("Ошибка при смене привязки у клинета c ID='%d', ", client.getIdOfClient()));
+            }
+        }
     }
 
     private void updateBindingOrg(GroupClientsUpdateRequest request, ClientGroup clientGroup,
