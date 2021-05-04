@@ -103,6 +103,14 @@ public class RuntimeContext implements ApplicationContextAware {
         return getAppContext().containsBean("orgRoomCommonBean");
     }
 
+    public static SessionFactory getReportsSessionFactory() {
+        return reportsSessionFactory;
+    }
+
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
     public boolean isTestMode() {
         return Boolean.parseBoolean((String)configProperties.get("ecafe.processor.testMode"));
     }
@@ -298,8 +306,8 @@ public class RuntimeContext implements ApplicationContextAware {
     private StdPayConfig partnerStdPayConfig;
     private IntegraPartnerConfig integraPartnerConfig;
     private AcquiropaySystemConfig acquiropaySystemConfig;
-    static SessionFactory sessionFactory;
-    static SessionFactory reportsSessionFactory;
+    private static SessionFactory sessionFactory;
+    private static SessionFactory reportsSessionFactory;
     static SessionFactory externalServicesSessionFactory;
     private RegularPaymentSubscriptionService regularPaymentSubscriptionService;
     boolean criticalErrors;

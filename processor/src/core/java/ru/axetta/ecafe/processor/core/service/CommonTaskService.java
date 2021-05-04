@@ -16,6 +16,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by nuc on 08.11.2018.
  */
@@ -27,7 +30,12 @@ public class CommonTaskService {
     public static final String NODE_PARAM = "node";
     public static final String OPERATION_PARAM = "operation";
     public static final String OPERATION_LOGGING = "logging";
+    public static final String OPERATION_INVALIDATE_CACHE = "invcache";
+    public static final String OPERATION_IDOFORG = "idoforg";
     private static final Logger logger = LoggerFactory.getLogger(CommonTaskService.class);
+    private List<String> cacheMulticastList;
+    private static final String CACHE_MULTICAST_ADDRESSES_PROPERTY = "ecafe.processor.cache.multicast.addresses";
+    private static final String PORT_PROPERTY = "ecafe.processor.commonTaskService.port";
 
     @Async
     public void writeToCommonLog(String node, String level, String payload) {
@@ -38,18 +46,50 @@ public class CommonTaskService {
         httpMethod.addParameter(NODE_PARAM, node);
         httpMethod.addParameter(level, payload);
 
+        int statusCode = getStatus(httpMethod);
+        if (HttpStatus.SC_OK != statusCode) {
+            logger.error("CommonTaskService bad response code");
+        }
+    }
+
+    private int getStatus(PostMethod httpMethod) {
         try {
             HttpClient httpClient = new HttpClient();
             httpClient.getParams().setContentCharset("UTF-8");
             httpClient.getParams().setSoTimeout(5000);
-            int statusCode = httpClient.executeMethod(httpMethod);
-            if (HttpStatus.SC_OK != statusCode) {
-                logger.error("CommonTaskService bad response code");
-            }
+            return httpClient.executeMethod(httpMethod);
         } catch(Exception e) {
-            logger.error("Error in sending log message to CommonTaskService: ", e);
+            logger.error("Error in getStatus CommonTaskService: ", e);
+            return -1;
         } finally {
             httpMethod.releaseConnection();
         }
+    }
+
+    @Async
+    public void invalidateOrgMulticast(Long idOfOrg) {
+        if (cacheMulticastList == null) {
+            cacheMulticastList = getCacheMulticastAddresses();
+        }
+        String port = RuntimeContext.getInstance().getPropertiesValue(PORT_PROPERTY, "8080");
+        for (String ipAddress : cacheMulticastList) {
+            String url = String.format("http://%s:%s/processor/commontask", ipAddress, port);
+            logger.info(String.format("Doing http request to %s", url));
+            PostMethod httpMethod = new PostMethod(url);
+            httpMethod.addParameter(OPERATION_PARAM, OPERATION_INVALIDATE_CACHE);
+            httpMethod.addParameter(OPERATION_IDOFORG, idOfOrg.toString());
+
+            int statusCode = getStatus(httpMethod);
+        }
+    }
+
+    private List<String> getCacheMulticastAddresses() {
+        List<String> result = new ArrayList<>();
+        String str = RuntimeContext.getInstance().getConfigProperties().getProperty(CACHE_MULTICAST_ADDRESSES_PROPERTY);
+        String[] arr = str.split(",");
+        for (String s : arr) {
+            result.add(s);
+        }
+        return result;
     }
 }

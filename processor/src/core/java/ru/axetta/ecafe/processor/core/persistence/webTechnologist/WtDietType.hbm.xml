@@ -8,7 +8,6 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType" table="cf_wt_diet_type">
-        <cache usage="transactional"/>
         <id name="idOfDietType">
             <column name="idOfDietType" sql-type="long"/>
         </id>

@@ -4,15 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+import ru.axetta.ecafe.processor.core.service.CommonTaskService;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.persistence.PostUpdate;
 import javax.persistence.Version;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +41,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class Org implements Serializable {
-
+    private static final Logger logger = LoggerFactory.getLogger(Org.class);
     public static final String[] STATE_NAMES = {"Не обслуживается", "Обслуживается"};
     public static final int INACTIVE_STATE = 0;
     public static final int ACTIVE_STATE = 1;
@@ -167,6 +172,12 @@ public class Org implements Serializable {
     private Boolean gooddatecheck;
     private Boolean governmentContract;
     private Boolean useLongCardNo;
+
+    @PostUpdate
+    public void sendInvalidateCache() {
+        logger.info("Send invalidate org id = " + idOfOrg);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
+    }
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
