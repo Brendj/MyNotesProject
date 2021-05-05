@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.emias;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,11 +19,13 @@ public class ExemptionVisitingResult extends ResponseItem {
     }
 
     public ExemptionVisitingResult(int code, String message) {
-        this.code = code;
-        this.message = message;
+        this.resultCode = code;
+        this.description = message;
     }
 
     public List<ExemptionVisitingDay> getExemptionVisitingResultDays() {
+        if (exemptionVisitingResultDays == null)
+            exemptionVisitingResultDays = new ArrayList<>();
         return exemptionVisitingResultDays;
     }
 

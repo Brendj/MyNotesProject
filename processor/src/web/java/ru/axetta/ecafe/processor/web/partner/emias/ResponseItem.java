@@ -65,16 +65,16 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_INCORRECT_FORMAT = "Некорректный формат";
     public static final String USED_IN_ANOTHER_ORG = "Используется в другой ОО";
     public static final String ERROR_GUARDIAN_MESSAGE = "Связка опекуна с опекаемым не найдена";
-    public int code;
-    public String message;
+    public int resultCode;
+    public String description;
 
     public ResponseItem() {
-        code = OK;
-        message = OK_MESSAGE;
+        resultCode = OK;
+        description = OK_MESSAGE;
     }
 
     public ResponseItem(int code, String message) {
-        this.code = code;
-        this.message = message;
+        this.resultCode = code;
+        this.description = message;
     }
 }

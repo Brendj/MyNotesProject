@@ -110,8 +110,8 @@ public class EMIASController extends HttpServlet {
                 exemptionVisitingResult.getExemptionVisitingResultDays().add(exemptionVisitingResultDays);
             }
             persistenceTransaction = null;
-            exemptionVisitingResult.code = ResponseItem.OK;
-            exemptionVisitingResult.message = ResponseItem.OK_MESSAGE;
+            exemptionVisitingResult.resultCode = ResponseItem.OK;
+            exemptionVisitingResult.description = ResponseItem.OK_MESSAGE;
             return exemptionVisitingResult;
         } catch (Exception e) {
             new ExemptionVisitingResult (ResponseItem.ERROR_INTERNAL_EMIAS, ResponseItem.ERROR_INTERNAL_MESSAGE_EMIAS);
@@ -199,8 +199,8 @@ public class EMIASController extends HttpServlet {
             session.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            exemptionVisitingResult.code = ResponseItem.OK;
-            exemptionVisitingResult.message = ResponseItem.OK_MESSAGE;
+            exemptionVisitingResult.resultCode = ResponseItem.OK;
+            exemptionVisitingResult.description = ResponseItem.OK_MESSAGE;
             return exemptionVisitingResult;
         } catch (Exception e) {
             new ExemptionVisitingResult (ResponseItem.ERROR_INTERNAL_EMIAS, ResponseItem.ERROR_INTERNAL_MESSAGE_EMIAS);
