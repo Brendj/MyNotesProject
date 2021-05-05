@@ -269,7 +269,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             long l = System.currentTimeMillis();
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
-            List<String> datesStringList = CalendarUtils.datesBetween(startTime, endTime);
+            List<String> datesStringList = CalendarUtils.datesBetween(startTime, endTime, 1);
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
             List<Date> dates = new ArrayList<Date>();
             for (String date : datesStringList) {

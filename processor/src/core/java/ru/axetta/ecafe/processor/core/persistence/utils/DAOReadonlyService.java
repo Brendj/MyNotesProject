@@ -781,6 +781,19 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<EMIAS> getEmiasbyClient(Session session, Client client) {
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("guid", client.getMeshGUID()));
+            criteria.add(Restrictions.eq("kafka", true));
+            criteria.add(Restrictions.eq("processed", true));
+            criteria.add(Restrictions.ne("archive", true));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIAS>();
+        }
+    }
+
     public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
         try {
             String groupName = getClientGroupName(orgId, idOfClientGroup);

@@ -5,13 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
- * User: timur
- * Date: 07.08.12
- * Time: 11:15
- * To change this template use File | Settings | File Templates.
+ * User: a.voinov
  */
 public class EMIAS {
 
@@ -31,6 +29,7 @@ public class EMIAS {
     private Boolean archive;
     private Integer hazard_level_id;
     private Boolean processed;
+    private Set<EMIASbyDay> daySet;
 
    public EMIAS(){}
 
@@ -161,5 +160,13 @@ public class EMIAS {
 
     public void setProcessed(Boolean processed) {
         this.processed = processed;
+    }
+
+    public Set<EMIASbyDay> getDaySet() {
+        return daySet;
+    }
+
+    public void setDaySet(Set<EMIASbyDay> daySet) {
+        this.daySet = daySet;
     }
 }

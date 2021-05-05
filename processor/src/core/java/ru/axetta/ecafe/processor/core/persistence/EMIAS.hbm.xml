@@ -27,6 +27,10 @@
         <property name="archive" column="archive" type="boolean"/>
         <property name="hazard_level_id" column="hazard_level_id" type="integer"/>
         <property name="processed" column="processed" type="boolean"/>
+        <set name="daySet" inverse="true" cascade="all">
+            <key column="IdEMIAS"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.EMIASbyDay"/>
+        </set>
     </class>
 </hibernate-mapping>
 
