@@ -6,7 +6,6 @@ package ru.iteco.restservice.controller.order.responseDTO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,11 +17,11 @@ public class OrderDetailResponseDTO {
     private Boolean isDiscountComplex;
     private String goodType;
     private String name;
-    private BigDecimal calories;
+    private Integer calories;
     private String output;
-    private BigDecimal protein;
-    private BigDecimal fat;
-    private BigDecimal carbohydrates;
+    private Integer protein;
+    private Integer fat;
+    private Integer carbohydrates;
     private Integer amount;
 
     public String getComplexName() {
@@ -89,11 +88,11 @@ public class OrderDetailResponseDTO {
         this.price = price;
     }
 
-    public BigDecimal getCalories() {
+    public Integer getCalories() {
         return calories;
     }
 
-    public void setCalories(BigDecimal calories) {
+    public void setCalories(Integer calories) {
         this.calories = calories;
     }
 
@@ -105,27 +104,27 @@ public class OrderDetailResponseDTO {
         this.output = output;
     }
 
-    public BigDecimal getProtein() {
+    public Integer getProtein() {
         return protein;
     }
 
-    public void setProtein(BigDecimal protein) {
+    public void setProtein(Integer protein) {
         this.protein = protein;
     }
 
-    public BigDecimal getFat() {
+    public Integer getFat() {
         return fat;
     }
 
-    public void setFat(BigDecimal fat) {
+    public void setFat(Integer fat) {
         this.fat = fat;
     }
 
-    public BigDecimal getCarbohydrates() {
+    public Integer getCarbohydrates() {
         return carbohydrates;
     }
 
-    public void setCarbohydrates(BigDecimal carbohydrates) {
+    public void setCarbohydrates(Integer carbohydrates) {
         this.carbohydrates = carbohydrates;
     }
 

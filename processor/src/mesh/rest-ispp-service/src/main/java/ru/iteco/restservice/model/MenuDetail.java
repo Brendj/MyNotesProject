@@ -8,7 +8,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -25,16 +24,16 @@ public class MenuDetail {
     private String menuDetailOutput;
 
     @Column(name = "calories")
-    private BigDecimal calories;
+    private Integer calories;
 
     @Column(name = "protein")
-    private BigDecimal protein;
+    private Integer protein;
 
     @Column(name = "fat")
-    private BigDecimal fat;
+    private Integer fat;
 
     @Column(name = "carbohydrates")
-    private BigDecimal carbohydrates;
+    private Integer carbohydrates;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
@@ -65,35 +64,35 @@ public class MenuDetail {
         this.menuDetailOutput = menuDetailOutput;
     }
 
-    public BigDecimal getCalories() {
+    public Integer getCalories() {
         return calories;
     }
 
-    public void setCalories(BigDecimal calories) {
+    public void setCalories(Integer calories) {
         this.calories = calories;
     }
 
-    public BigDecimal getProtein() {
+    public Integer getProtein() {
         return protein;
     }
 
-    public void setProtein(BigDecimal protein) {
+    public void setProtein(Integer protein) {
         this.protein = protein;
     }
 
-    public BigDecimal getFat() {
+    public Integer getFat() {
         return fat;
     }
 
-    public void setFat(BigDecimal fat) {
+    public void setFat(Integer fat) {
         this.fat = fat;
     }
 
-    public BigDecimal getCarbohydrates() {
+    public Integer getCarbohydrates() {
         return carbohydrates;
     }
 
-    public void setCarbohydrates(BigDecimal carbohydrates) {
+    public void setCarbohydrates(Integer carbohydrates) {
         this.carbohydrates = carbohydrates;
     }
 

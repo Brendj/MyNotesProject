@@ -6,6 +6,7 @@ package ru.iteco.restservice.model;
 
 import ru.iteco.restservice.model.compositid.OrderDetailCompositeId;
 import ru.iteco.restservice.model.enums.OrderDetailFRationType;
+import ru.iteco.restservice.model.wt.WtDish;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;

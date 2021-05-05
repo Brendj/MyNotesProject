@@ -10,7 +10,7 @@ import ru.iteco.restservice.controller.order.responseDTO.OrderResponseDTO;
 import ru.iteco.restservice.model.MenuDetail;
 import ru.iteco.restservice.model.Order;
 import ru.iteco.restservice.model.OrderDetail;
-import ru.iteco.restservice.model.WtDish;
+import ru.iteco.restservice.model.wt.WtDish;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
