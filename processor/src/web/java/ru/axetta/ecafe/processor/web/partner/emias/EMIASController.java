@@ -178,6 +178,8 @@ public class EMIASController extends HttpServlet {
                                 {
                                     emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
                                     session.save(emiaSbyDay);
+                                    emias.setVersion(DAOUtils.getMaxVersionOfEmias(session) + 1);
+                                    session.save(emias);
                                     datefind = true;
                                     break;
                                 }
@@ -190,6 +192,8 @@ public class EMIASController extends HttpServlet {
                                 emiaSbyDay.setDate(sdf.parse(dateStr));
                                 emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
                                 session.save(emiaSbyDay);
+                                emias.setVersion(DAOUtils.getMaxVersionOfEmias(session) + 1);
+                                session.save(emias);
                             }
                             break;
                         }
