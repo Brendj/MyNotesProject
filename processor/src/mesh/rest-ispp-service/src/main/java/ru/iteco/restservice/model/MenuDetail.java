@@ -4,10 +4,10 @@
 
 package ru.iteco.restservice.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -35,6 +35,11 @@ public class MenuDetail {
 
     @Column(name = "carbohydrates")
     private BigDecimal carbohydrates;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.JOIN)
+    @JoinColumn(name = "idofmenu", updatable = false, insertable = false)
+    private Menu menu;
 
     public Long getIdOfMenuDetail() {
         return idOfMenuDetail;
@@ -90,6 +95,14 @@ public class MenuDetail {
 
     public void setCarbohydrates(BigDecimal carbohydrates) {
         this.carbohydrates = carbohydrates;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
     }
 
     @Override

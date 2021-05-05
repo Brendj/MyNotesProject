@@ -19,11 +19,11 @@ public class Order {
     @EmbeddedId
     private OrderCompositeId compositeId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idofclient")
     private Client client;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idoforg", insertable = false, updatable = false)
     private Org org;
 

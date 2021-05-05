@@ -4,17 +4,25 @@
 
 package ru.iteco.restservice.controller.order.responseDTO;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderDetailResponseDTO {
+    private Long idOfOrderDetail;
     private String complexName;
     private Long currentPrice;
+    private Long price;
     private Boolean isDiscountComplex;
-    private Integer goodType;
+    private String goodType;
     private String name;
-    private Integer calories;
-    private Integer output;
-    private Integer protein;
-    private Integer fat;
-    private Integer carbohydrates;
+    private BigDecimal calories;
+    private String output;
+    private BigDecimal protein;
+    private BigDecimal fat;
+    private BigDecimal carbohydrates;
     private Integer amount;
 
     public String getComplexName() {
@@ -41,11 +49,11 @@ public class OrderDetailResponseDTO {
         isDiscountComplex = discountComplex;
     }
 
-    public Integer getGoodType() {
+    public String getGoodType() {
         return goodType;
     }
 
-    public void setGoodType(Integer goodType) {
+    public void setGoodType(String goodType) {
         this.goodType = goodType;
     }
 
@@ -57,51 +65,84 @@ public class OrderDetailResponseDTO {
         this.name = name;
     }
 
-    public Integer getCalories() {
-        return calories;
-    }
-
-    public void setCalories(Integer calories) {
-        this.calories = calories;
-    }
-
-    public Integer getOutput() {
-        return output;
-    }
-
-    public void setOutput(Integer output) {
-        this.output = output;
-    }
-
-    public Integer getProtein() {
-        return protein;
-    }
-
-    public void setProtein(Integer protein) {
-        this.protein = protein;
-    }
-
-    public Integer getFat() {
-        return fat;
-    }
-
-    public void setFat(Integer fat) {
-        this.fat = fat;
-    }
-
-    public Integer getCarbohydrates() {
-        return carbohydrates;
-    }
-
-    public void setCarbohydrates(Integer carbohydrates) {
-        this.carbohydrates = carbohydrates;
-    }
-
     public Integer getAmount() {
         return amount;
     }
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public Long getIdOfOrderDetail() {
+        return idOfOrderDetail;
+    }
+
+    public void setIdOfOrderDetail(Long idOfOrderDetail) {
+        this.idOfOrderDetail = idOfOrderDetail;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
+    public BigDecimal getCalories() {
+        return calories;
+    }
+
+    public void setCalories(BigDecimal calories) {
+        this.calories = calories;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
+    public BigDecimal getProtein() {
+        return protein;
+    }
+
+    public void setProtein(BigDecimal protein) {
+        this.protein = protein;
+    }
+
+    public BigDecimal getFat() {
+        return fat;
+    }
+
+    public void setFat(BigDecimal fat) {
+        this.fat = fat;
+    }
+
+    public BigDecimal getCarbohydrates() {
+        return carbohydrates;
+    }
+
+    public void setCarbohydrates(BigDecimal carbohydrates) {
+        this.carbohydrates = carbohydrates;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        OrderDetailResponseDTO that = (OrderDetailResponseDTO) o;
+        return Objects.equals(idOfOrderDetail, that.idOfOrderDetail);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idOfOrderDetail);
     }
 }

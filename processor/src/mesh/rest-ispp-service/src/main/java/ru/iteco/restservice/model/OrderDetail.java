@@ -5,6 +5,10 @@
 package ru.iteco.restservice.model;
 
 import ru.iteco.restservice.model.compositid.OrderDetailCompositeId;
+import ru.iteco.restservice.model.enums.OrderDetailFRationType;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -30,15 +34,47 @@ public class OrderDetail {
     @Column(name = "menutype")
     private Integer menuType;
 
+    @Column(name = "idofmenufromsync")
+    private Long idOfMenuFromSync;
+
+    @Column(name = "fration")
+    @Enumerated
+    private OrderDetailFRationType rationType;
+
+    @Column(name = "menuoutput")
+    private String menuOutput;
+
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name="idoforder", insertable = false, updatable = false),
-            @JoinColumn(name="idoforderdetail", insertable = false, updatable = false)
+            @JoinColumn(name="idoforg", insertable = false, updatable = false)
     })
     private Order order;
 
     @ManyToOne
-    @JoinColumn()
+    @JoinColumn(name = "idofdish", insertable = false, updatable = false)
+    private WtDish dish;
+
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "idofmenufromsync", insertable = false, updatable = false)
+    private Menu menu;
+
+    public Long getIdOfMenuFromSync() {
+        return idOfMenuFromSync;
+    }
+
+    public void setIdOfMenuFromSync(Long idOfMenuFromSync) {
+        this.idOfMenuFromSync = idOfMenuFromSync;
+    }
+
+    public WtDish getDish() {
+        return dish;
+    }
+
+    public void setDish(WtDish dish) {
+        this.dish = dish;
+    }
 
     public Order getOrder() {
         return order;
@@ -86,6 +122,30 @@ public class OrderDetail {
 
     public void setMenuType(Integer menuType) {
         this.menuType = menuType;
+    }
+
+    public OrderDetailFRationType getRationType() {
+        return rationType;
+    }
+
+    public void setRationType(OrderDetailFRationType rationType) {
+        this.rationType = rationType;
+    }
+
+    public String getMenuOutput() {
+        return menuOutput;
+    }
+
+    public void setMenuOutput(String menuOutput) {
+        this.menuOutput = menuOutput;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
     }
 
     @Override
