@@ -137,55 +137,64 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
 
     private GroupNamesToOrgs updateMiddleGroup(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, User user,
             Session session) throws Exception {
-        //обновление клиентов
-        if (Objects.equals(groupNamesToOrgs.getIdOfOrg(), request.getBindingOrgId())) {
-            // если привзяка такая же, то простое изменение имени подгруппы для клиента
-            updateMiddleGroupForClients(request, groupNamesToOrgs, user, session);
-        }
-        else {
-            // смена группы, подгруппы для клиента
-            updateGroupAndMiddleGroupForClients(request, groupNamesToOrgs, user, session);
-        }
-
+        Long oldBindingOrg = groupNamesToOrgs.getIdOfOrg();
+        List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
         // обновить саму подгруппу
         groupNamesToOrgs.setVersion(getNextVersion(session));
         groupNamesToOrgs.setGroupName(request.getName());
         groupNamesToOrgs.setIdOfOrg(request.getBindingOrgId());
         groupNamesToOrgs.setParentGroupName(request.getParentGroupName());
         session.update(groupNamesToOrgs);
-       return groupNamesToOrgs;
+
+        //обновление клиентов
+        if (!clientListWithMiddleGroup.isEmpty()) {
+            if (Objects.equals(oldBindingOrg, request.getBindingOrgId())) {
+                // если привзяка такая же, то простое изменение имени подгруппы для клиента
+                updateMiddleGroupForClients(request, clientListWithMiddleGroup, session);
+            } else {
+                // смена группы, подгруппы для клиента
+                updateGroupAndMiddleGroupForClients(request, clientListWithMiddleGroup,
+                        groupNamesToOrgs.getIdOfGroupNameToOrg(), user, session);
+            }
+        }
+        return groupNamesToOrgs;
     }
 
-    private void updateGroupAndMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, User user,
-            Session session) throws Exception {
-        List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
+    private void updateGroupAndMiddleGroupForClients(MiddleGroupRequest request, List<Client> clientListWithMiddleGroup,
+            Long idOfGroupNamesToOrg, User user, Session session) throws Exception {
         if (!clientListWithMiddleGroup.isEmpty()) {
-            ClientGroup foundNewGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, request.getBindingOrgId(),request.getParentGroupName());
+            ClientGroup foundNewGroup = DAOUtils
+                    .findClientGroupByGroupNameAndIdOfOrg(session, request.getBindingOrgId(),
+                            request.getParentGroupName());
             if (foundNewGroup == null) {
                 // создаем группу для успешного перемещения туда клиентов
-                foundNewGroup = DAOUtils.createClientGroup(session, request.getBindingOrgId(), request.getParentGroupName());
+                foundNewGroup = DAOUtils
+                        .createClientGroup(session, request.getBindingOrgId(), request.getParentGroupName());
             }
             long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             for (Client client : clientListWithMiddleGroup) {
                 ClientUpdateItem clientUpdateItem = ClientUpdateItem.from(client, foundNewGroup);
-                clientUpdateItem.setIdOfMiddleGroup(groupNamesToOrgs.getIdOfGroupNameToOrg());
+                clientUpdateItem.setIdOfMiddleGroup(idOfGroupNamesToOrg);
 
-                String error = moveClientsCommand.executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, true);
+                String error = moveClientsCommand
+                        .executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, true);
                 if (StringUtils.isNotEmpty(error)) {
-                    throw new WebApplicationException(String.format("Ошибка при обновлении клиентов для подгруппы с ID='%d'", groupNamesToOrgs.getIdOfGroupNameToOrg()));
+                    throw new WebApplicationException(
+                            String.format("Ошибка при обновлении клиентов для подгруппы с ID='%d'",
+                                    idOfGroupNamesToOrg));
                 }
             }
         }
     }
 
-    private void updateMiddleGroupForClients(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, User user,
+    private void updateMiddleGroupForClients(MiddleGroupRequest request, List<Client> clientListWithMiddleGroup,
             Session session) throws Exception {
-        List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
-        if (!clientListWithMiddleGroup.isEmpty()) {
-            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-            for (Client client : clientListWithMiddleGroup) {
-                setMiddleGroupForClient(session, client, request.getName(), version);
-            }
+        if (clientListWithMiddleGroup.isEmpty()) {
+            return;
+        }
+        long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        for (Client client : clientListWithMiddleGroup) {
+            setMiddleGroupForClient(session, client, request.getName(), version);
         }
     }
 

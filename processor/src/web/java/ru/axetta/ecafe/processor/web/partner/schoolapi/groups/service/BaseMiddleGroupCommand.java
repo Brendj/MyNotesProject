@@ -18,7 +18,7 @@ import java.util.Set;
 
 class BaseMiddleGroupCommand {
 
-     void resetMiddleGroupForClient(Session session, Client client, long version) {
+    void resetMiddleGroupForClient(Session session, Client client, long version) {
         setMiddleGroupForClient(session, client, null, version);
     }
 
@@ -33,10 +33,16 @@ class BaseMiddleGroupCommand {
         return (GroupNamesToOrgs) session.get(GroupNamesToOrgs.class, id);
     }
 
+
+    List<Client> getClientListWithMiddleGroup(Session session, GroupNamesToOrgs groupNamesToOrgs) {
+        return getClientListWithMiddleGroup(session, groupNamesToOrgs.getIdOfMainOrg(), groupNamesToOrgs.getGroupName(),
+                groupNamesToOrgs.getParentGroupName());
+    }
+
     @SuppressWarnings("unchecked")
-    List<Client> getClientListWithMiddleGroup(Session session, GroupNamesToOrgs middleGroup) {
-        Long mainBuilding = middleGroup.getIdOfMainOrg();
-        Org mainOrg = (Org) session.load(Org.class, mainBuilding);
+    List<Client> getClientListWithMiddleGroup(Session session, Long idOfMainOrg, String middleGroupName,
+            String parentGroupName) {
+        Org mainOrg = (Org) session.load(Org.class, idOfMainOrg);
         Set<Org> friendlyOrg = mainOrg.getFriendlyOrg();
         List<Long> friendlyOrgIds = new ArrayList<>();
         for (Org org : friendlyOrg) {
@@ -44,9 +50,8 @@ class BaseMiddleGroupCommand {
         }
         return (List<Client>) session.createQuery(
                 "select cl from Client cl  join cl.clientGroup where cl.org.idOfOrg in :orgs and cl.clientGroup.groupName = :groupName and  cl.middleGroup = :middleGroupName ")
-                .setParameter("groupName", middleGroup.getParentGroupName())
-                .setParameter("middleGroupName", middleGroup.getGroupName()).setParameterList("orgs", friendlyOrgIds)
-                .list();
+                .setParameter("groupName", parentGroupName).setParameter("middleGroupName", middleGroupName)
+                .setParameterList("orgs", friendlyOrgIds).list();
     }
 
     long getNextVersion(Session session) {
