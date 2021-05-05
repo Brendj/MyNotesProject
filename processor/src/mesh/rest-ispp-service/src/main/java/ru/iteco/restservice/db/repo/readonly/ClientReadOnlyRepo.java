@@ -13,6 +13,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
     @Query(value = "SELECT DISTINCT childs FROM Client childs "
@@ -44,4 +45,7 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
 
     @Query(name = "getGuardiansByClient", nativeQuery = true)
     List<GuardianResponseDTO> getGuardiansByClient(@Param("contractId") Long contractId);
+
+    @EntityGraph("getClientAndOrgByContractId")
+    Optional<Client> getClientByContractId(@Param("contractId") Long contractId);
 }

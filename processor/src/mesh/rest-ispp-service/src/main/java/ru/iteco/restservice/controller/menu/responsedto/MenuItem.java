@@ -1,0 +1,132 @@
+package ru.iteco.restservice.controller.menu.responsedto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import ru.iteco.restservice.model.wt.WtCategoryItem;
+import ru.iteco.restservice.model.wt.WtDish;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MenuItem {
+
+    @Schema(description = "Идентификатор блюда")
+    private Long dishId;
+
+    @Schema(description = "Название блюда")
+    private String dishName;
+
+    @Schema(description = "Список подкатегорий блюда")
+    private final List<SubCategoryItem> subcategories;
+
+    @Schema(description = "Цена блюда")
+    private Long price;
+
+    @Schema(description = "Калорийность блюда")
+    private Integer calories;
+
+    @Schema(description = "Масса блюда в граммах")
+    private String output;
+
+    @Schema(description = "Признак-идентификатора запрета покупки блюда")
+    private Long idOfProhibition;
+
+    @Schema(description = "Белки")
+    private Integer protein;
+
+    @Schema(description = "Жиры")
+    private Integer fat;
+
+    @Schema(description = "Углеводы")
+    private Integer carbohydrates;
+
+    public MenuItem(WtDish wtDish) {
+        this.dishId = wtDish.getIdOfDish();
+        this.dishName = wtDish.getDishName();
+        this.price = wtDish.getPrice().longValue();
+        this.calories = wtDish.getCalories();
+        this.output = wtDish.getQty() == null ? "" : wtDish.getQty();
+        this.protein = wtDish.getProtein();
+        this.fat = wtDish.getFat();
+        this.carbohydrates = wtDish.getCarbohydrates();
+        this.subcategories = new ArrayList<>();
+        for (WtCategoryItem wtCategoryItem : wtDish.getCategoryItems()) {
+            this.subcategories.add(new SubCategoryItem(wtCategoryItem));
+        }
+    }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
+    public Integer getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
+    public Long getIdOfProhibition() {
+        return idOfProhibition;
+    }
+
+    public void setIdOfProhibition(Long idOfProhibition) {
+        this.idOfProhibition = idOfProhibition;
+    }
+
+    public Integer getProtein() {
+        return protein;
+    }
+
+    public void setProtein(Integer protein) {
+        this.protein = protein;
+    }
+
+    public Integer getFat() {
+        return fat;
+    }
+
+    public void setFat(Integer fat) {
+        this.fat = fat;
+    }
+
+    public Integer getCarbohydrates() {
+        return carbohydrates;
+    }
+
+    public void setCarbohydrates(Integer carbohydrates) {
+        this.carbohydrates = carbohydrates;
+    }
+
+    public Long getDishId() {
+        return dishId;
+    }
+
+    public void setDishId(Long dishId) {
+        this.dishId = dishId;
+    }
+
+    public String getDishName() {
+        return dishName;
+    }
+
+    public void setDishName(String dishName) {
+        this.dishName = dishName;
+    }
+
+    public List<SubCategoryItem> getSubcategories() {
+        return subcategories;
+    }
+}
