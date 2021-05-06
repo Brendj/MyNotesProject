@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateClientRegistryVersion;
 
@@ -80,12 +81,14 @@ class UpdateGroupCommand {
         if (bindingOrg == null) {
             return;
         }
-        ClientGroup.Predefined predefinedGroup = ClientGroup.Predefined.parse(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        ClientGroup.Predefined predefinedGroup = ClientGroup.Predefined
+                .parse(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         if (predefinedGroup != null) {
             /* для клиентов предопределенных групп никого не перемещаем */
             return;
         }
-        Set<Client> clients = clientGroup.getClients();
+
+        List<Client> clients = loadClientsFromGroupsWithName(session, getFriendlyOrgIds(clientGroup), clientGroup.getGroupName());
         if (clients.isEmpty()) {
             return;
         }
@@ -100,15 +103,23 @@ class UpdateGroupCommand {
             // если группу не нашли, нужно создать для успешного перемещения туда клиентов
             foundNewGroup = DAOUtils.createClientGroup(session, bindingOrg, clientGroup.getGroupName());
         }
+
         long version = updateClientRegistryVersion(null);
         for (Client client : clients) {
             ClientUpdateItem clientUpdateItem = ClientUpdateItem.from(client, foundNewGroup);
-            String error = moveClientsCommand.executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, false);
+            String error = moveClientsCommand
+                    .executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, false);
             if (StringUtils.isNotEmpty(error)) {
                 throw new WebApplicationException(
                         String.format("Ошибка при смене привязки у клинета c ID='%d', ", client.getIdOfClient()));
             }
         }
+    }
+
+    private List<Client> loadClientsFromGroupsWithName(Session session, List<Long> orgIds, String groupName) {
+        return (List<Client>) session.createQuery(
+                "select cl from Client cl where cl.clientGroup.groupName=:groupName and cl.org.idOfOrg in (:orgs) ")
+                .setParameterList("orgs", orgIds).setParameter("groupName", groupName).list();
     }
 
     private void updateBindingOrg(GroupClientsUpdateRequest request, ClientGroup clientGroup,
@@ -130,13 +141,20 @@ class UpdateGroupCommand {
     }
 
     private Long getMainBuildingOrgId(Org org) {
-        //Org org = (Org) session.get(Org.class, parentGroupOrgId);
         for (Org friendlyOrg : org.getFriendlyOrg()) {
             if (friendlyOrg.isMainBuilding()) {
                 return friendlyOrg.getIdOfOrg();
             }
         }
         return org.getIdOfOrg();
+    }
+
+    private List<Long> getFriendlyOrgIds(ClientGroup group) {
+        List<Long> result = new ArrayList<>();
+        for (Org org : group.getOrg().getFriendlyOrg()) {
+            result.add(org.getIdOfOrg());
+        }
+        return result;
     }
 
 }
