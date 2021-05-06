@@ -294,11 +294,6 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
         }
 
-        boolean isGroupsFieldEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GROUP);
-        if (isGroupsFieldEmpty) {
-            fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
-        }
-
         boolean isGenderEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GENDER);
         if (isGenderEmpty) {
             fieldConfig.setValue(ClientManager.FieldId.GENDER, 0);
@@ -323,7 +318,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
     private String[] modifyData(String line, int lineNo) {
         String[] data = line.split(";", -1);
         String[] tokens = new String[34];
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length && i < 11; i++) {
             data[i] = data[i].trim();
             if (i < 11) {
                 if (i == 0 && data[i].equals("")) {     // CONTRACT_ID
@@ -336,14 +331,25 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                     data[i] = "0";
                 }
                 tokens[i] = data[i].trim();
-            } else if (i > 11) {
+            } /*else if (i > 11) {
                 if ((i == 16 || i == 17 || i == 18) && data[i]
                         .equals("")) {        // PAY_FOR_SMS, NOTIFY_BY_PUSH, NOTIFY_BY_EMAIL
                     data[i] = "0";
                 }
                 tokens[i - 1] = data[i];
-            }
+            }*/
         }
+        tokens[11] = data[12]; //документ
+        tokens[12] = data[13]; //адрес
+        tokens[13] = data[14]; //телефон
+        tokens[14] = data[15]; //мобильный
+        tokens[15] = data[16]; //емейл
+        tokens[16] = data[17].equals("") ? "0" : data[17]; //платный смс
+        tokens[17] = data[19].equals("") ? "0" : data[19]; //уведомления по смс
+        //tokens[18] = data[21].equals("") ? "0" : data[21]; //уведомления пуш
+        tokens[18] = data[18].equals("") ? "0" : data[18]; //уведомления емейл
+        tokens[19] = data[20]; //овердрафт
+        tokens[22] = StringUtils.isEmpty(data[22]) ? ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup() : data[22];
         tokens[33] = data[11].equals("0") ? "f" : "m";      // GENDER
         return tokens;
     }
