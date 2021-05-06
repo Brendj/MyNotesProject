@@ -28,6 +28,7 @@ public class Order {
     private Org org;
 
     @OneToMany(mappedBy = "order")
+    @OrderBy("menuType")
     private Set<OrderDetail> orderDetailSet;
 
     @Column(name = "orderdate")
