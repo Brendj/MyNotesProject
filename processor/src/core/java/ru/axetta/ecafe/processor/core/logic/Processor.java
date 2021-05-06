@@ -7170,13 +7170,13 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Org organization = getOrgReference(persistenceSession, idOfOrg);
+            //Org organization = getOrgReference(persistenceSession, idOfOrg);
             OrgSync orgSync = (OrgSync) persistenceSession.load(OrgSync.class, idOfOrg);
             Long result = orgSync.getIdOfPacket();
             orgSync.setIdOfPacket(++result);
             //organization.setIdOfPacket(result + 1);
-            organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
-            persistenceSession.update(organization);
+            //organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
+            //persistenceSession.update(organization);
             persistenceSession.update(orgSync);
             persistenceSession.flush();
             persistenceTransaction.commit();

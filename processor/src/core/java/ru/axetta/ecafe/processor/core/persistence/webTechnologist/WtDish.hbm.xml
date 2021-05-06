@@ -9,7 +9,6 @@
 <hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" table="cf_wt_dishes">
-        <cache usage="transactional"/>
         <id name="idOfDish">
             <column name="idofdish" sql-type="long"/>
         </id>

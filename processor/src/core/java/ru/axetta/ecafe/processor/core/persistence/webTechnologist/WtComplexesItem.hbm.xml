@@ -8,7 +8,6 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem" table="cf_wt_complexes_items">
-        <cache usage="transactional"/>
         <id name="idOfComplexItem">
             <column name="idofcomplexitem" sql-type="long"/>
         </id>

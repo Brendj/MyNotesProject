@@ -9,7 +9,6 @@
 <hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" table="cf_wt_menu_groups">
-        <cache usage="transactional"/>
         <id name="id">
             <column name="id" sql-type="long"/>
         </id>
