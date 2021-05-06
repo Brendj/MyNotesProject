@@ -81,7 +81,7 @@ public class HardwareSettingsReportItem {
         }
         setClientVersion(orgSync.getClientVersion());
 
-        setRemoteAddress(settings.getIpHost());
+        setRemoteAddress(settings.getCompositeIdOfHardwareSettings().getIpHost());
         setDotNetVersion(settings.getDotNetVer());
         setOsVersion(settings.getoSVer());
         setRamSize(settings.getRamSize());
