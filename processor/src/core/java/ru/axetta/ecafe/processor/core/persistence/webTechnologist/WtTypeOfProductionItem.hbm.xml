@@ -9,7 +9,6 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtTypeOfProductionItem" 
            table="cf_wt_typeofproduction_items">
-        <cache usage="transactional"/>
         <id name="idOfTypeProductionItem">
             <column name="idoftypeproductionitem" sql-type="long"/>
         </id>

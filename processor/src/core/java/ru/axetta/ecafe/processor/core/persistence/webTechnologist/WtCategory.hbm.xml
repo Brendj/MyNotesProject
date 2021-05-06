@@ -8,7 +8,6 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory" table="cf_wt_categories">
-        <cache usage="transactional"/>
         <id name="idOfCategory">
             <column name="idofcategory" sql-type="long"/>
             <generator class="sequence">

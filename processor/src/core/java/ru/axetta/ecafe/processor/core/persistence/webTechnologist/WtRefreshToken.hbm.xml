@@ -9,7 +9,6 @@
 <hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtRefreshToken" table="cf_wt_refresh_token">
-        <cache usage="transactional"/>
         <id name="hash">
             <column name="hash" sql-type="string" length="128"/>
         </id>
