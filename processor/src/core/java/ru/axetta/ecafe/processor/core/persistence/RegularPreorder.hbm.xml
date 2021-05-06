@@ -8,10 +8,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.RegularPreorder" table="cf_regular_preorders">
         <id name="idOfRegularPreorder" column="IdOfRegularPreorder" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfRegularPreorder</param>
-                <param name="max_lo">32</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">32</param>
+                <param name="sequence_name">cf_regular_preorders_Id_Gen_seq</param>
             </generator>
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
