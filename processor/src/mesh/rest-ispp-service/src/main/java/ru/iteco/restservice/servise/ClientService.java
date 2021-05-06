@@ -8,11 +8,13 @@ import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.ClientsNotificationSettings;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
+@Validated
 public class ClientService {
     private final Logger log = LoggerFactory.getLogger(ClientService.class);
     private static final Pattern phonePattern = Pattern.compile("^7\\d{10}$");
@@ -82,5 +85,11 @@ public class ClientService {
         }
 
         return results;
+    }
+
+    public List<ClientsNotificationSettings> getNotificationSettingsByClients(@NotNull Long contractId) {
+        if(!clientReadOnlyRepo.existsByContractId(contractId)){
+            throw new  NotFoundException(String.format("Не найден клиент по л/с %d",contractId));
+        }
     }
 }
