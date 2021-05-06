@@ -16,7 +16,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<rich:modalPanel id="orgList" autosized="true" minWidth="1100">
+<rich:modalPanel id="orgList" autosized="true" minWidth="1400">
     <f:facet name="header">
         <h:outputText
                 value="Список организаций" />
@@ -85,51 +85,6 @@
 
     <rich:spacer height="20px" />
 </rich:modalPanel>
-
-
-
-
-
-
-
-<rich:modalPanel id="complexExtended" autosized="true" minWidth="1100">
-    <f:facet name="header">
-        <h:outputText
-                value="Детальный отчет по комплексам" />
-    </f:facet>
-
-    <h:panelGrid columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.complexExtendedReportPage.buildHTMLReport}"
-                           reRender="ComplexExtendedReportTablePanel" styleClass="command-button" />
-        <h:commandButton value="Генерировать отчет в Excel"
-                         action="#{mainPage.complexExtendedReportPage.exportToXLS}"
-                         styleClass="command-button" />
-    </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid" id="ComplexExtendedReportTablePanel" style="margin-top: 18px">
-        <c:if test="${not empty mainPage.complexExtendedReportPage.htmlReport}">
-            <f:verbatim>
-                <div class="htmlReportContent"> ${mainPage.complexExtendedReportPage.htmlReport} </div>
-            </f:verbatim>
-            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
-        </c:if>
-    </h:panelGrid>
-
-    <tr>
-        <td style="text-align: right;">
-
-            <a4j:commandButton value="Закрыть"  onclick="Richfaces.hideModalPanel('complexExtended')"
-                               style="width: 80px; margin-right: 8px; margin-bottom: 8px"  ajaxSingle="true" />
-        </td>
-    </tr>
-
-</rich:modalPanel>
-
-
-
-
-
-
 
 
 <h:panelGrid id="dishMenuReportPanel" binding="#{mainPage.complexMenuReportPage.pageComponent}"
@@ -260,7 +215,7 @@
                     <h:outputText escape="true" value="Возрастная категория" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Название комплекс" />
+                    <h:outputText escape="true" value="Название комплекса" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Цена" />
@@ -311,8 +266,8 @@
             </rich:column>
 
             <rich:column headerClass="column-header">
-                <a4j:commandLink value="#{complexItem.complexName}" reRender="complexExtended" ajaxSingle="true"
-                                   oncomplete="Richfaces.showModalPanel('complexExtended');">
+                <a4j:commandLink value="#{complexItem.complexName}" binding="#{mainPage.complexExtendedReportPage.mainMenuComponent}" reRender="workspaceForm" ajaxSingle="true"
+                                 action="#{mainPage.showComplexExtendedMenuReportPage}">
                     <f:setPropertyActionListener value="#{complexItem.idOfComplex}"
                                                  target="#{mainPage.complexExtendedReportPage.idOfComplex}" />
                 </a4j:commandLink>

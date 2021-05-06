@@ -7932,6 +7932,19 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showComplexExtendedMenuReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexExtendedReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showComplexExtendedReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {

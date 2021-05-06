@@ -12,7 +12,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexExcludeDays;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -22,6 +24,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ComplexExtendedReport extends BasicReportForContragentJob {
@@ -49,42 +52,87 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
             startTime = CalendarUtils.startOfDay(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             String idOfComplex = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfComplex"));
-            JRDataSource dataSource = createDataSource(session, Long.valueOf(idOfComplex));
+            JRDataSource dataSource = new JRBeanCollectionDataSource(createDataSource(session, Long.valueOf(idOfComplex)));
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             return new ContragentCompletionReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, null);
         }
 
-        private JRDataSource createDataSource(Session session, Long idOfComplex) throws Exception {
+        public List<ComplexExtendedItem> createDataSource(Session session, Long idOfComplex) throws Exception {
             List<ComplexExtendedItem> result = new LinkedList<ComplexExtendedItem>();
-            List<Long> idOfcomplexItem = new ArrayList<>();
+            Set<Integer> days = new TreeSet<>();
             Criteria criteria = session.createCriteria(WtComplex.class);
             criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
             criteria.add(Restrictions.eq("deleteState", 0));
             List<WtComplex> complexList = criteria.list();
             WtComplex complex = complexList.get(0);
-            String getComplexItems = "select c.cycle_day, c.idofcomplexitem from cf_wt_complexes_items c where c.idofcomplex = :idOfComplex ";
-            Query queryDish = session.createSQLQuery(getComplexItems);
-            queryDish.setParameter("idOfComplex", idOfComplex);
-            List<Object[]> dishList = queryDish.list();
-            for(Object[] id: dishList)
-                idOfcomplexItem.add(Long.valueOf(id[1].toString()));
-            String getDish;
-            if(idOfcomplexItem.size() > 0)
-                getDish = "select cid.idofcomplexitem, cid.idOfDish from cf_wt_complex_items_dish cid where cid.idofcomplexitem in (:idOfcomplexItem) ";
 
-            List<String> ll = new ArrayList<>();
-            for(Object[] day: dishList) {
-                result.add(new ComplexExtendedItem("jyy", complex.getName(), complex.getWtDietType().getDescription(),
-                        complex.getWtAgeGroupItem().getDescription(), complex.getWtComplexGroupItem().getDescription(),
-                        complex.getIsPortal().toString(), complex.getBarcode(),
-                        complex.getBeginDate().toString() + " - " + complex.getEndDate(), complex.getDayInCycle().toString(), complex.getCycleMotion().toString(), "trt", "erge",
-                        "erhe", day[0].toString(), ll));
+            Criteria wtComplexExcludeDays = session.createCriteria(WtComplexExcludeDays.class);
+            wtComplexExcludeDays.add(Restrictions.eq("deleteState", 0));
+            wtComplexExcludeDays.add(Restrictions.eq("complex", complex));
+            List<WtComplexExcludeDays> complexExcludeDays = wtComplexExcludeDays.list();
+
+            String getDish = " select wci.cycle_day, wd.dishname, wd.price, wd.componentsofdish, c.description, ci.description as subcategory, "
+                    + "wd.calories, wd.protein, wd.fat, wd.carbohydrates, wd.code, wd.qty, wd.dateofbeginmenuincluding, wd.dateofendmenuincluding, wd.idofdish "
+                    + "from cf_wt_complexes_items wci "
+                    + "join cf_wt_complex_items_dish cid on wci.idofcomplexitem = cid.idofcomplexitem "
+                    + "join cf_wt_dishes wd on cid.idofdish = wd.idofdish "
+                    + "join cf_wt_categories c on wd.idofcategory = c.idofcategory "
+                    + "join cf_wt_dish_categoryitem_relationships r on cid.idofdish = r.idofdish "
+                    + "join cf_wt_category_items ci on r.idofcategoryitem = ci.idofcategoryitem "
+                    + "where wd.deletestate = 0 and c.deletestate = 0 and ci.deletestate = 0 "
+                    + "and wci.idofcomplex = :idofcomplex "
+                    + "order by 1";
+
+            Query query = session.createSQLQuery(getDish);
+            if(complex.getIdOfComplex() != null)
+                query.setParameter("idofcomplex", complex.getIdOfComplex());
+            List<Object[]> dishData = query.list();
+            if (CollectionUtils.isEmpty(dishData))
+                throw new Exception("Нет данных для построения отчета");
+            for(Object[] day: dishData)
+                days.add(Integer.parseInt(day[0].toString()));
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+            String complexDate = formatter.format(complex.getBeginDate()) + " - " + formatter.format(complex.getEndDate());
+            StringBuilder passDay = new StringBuilder("Нет");
+            if (complexExcludeDays.size() > 0) {
+                passDay = new StringBuilder("");
+                for (WtComplexExcludeDays excludeDays : complexExcludeDays) {
+                    passDay.append(formatter.format(excludeDays.getDate())).append(", ");
+                }
+                if (passDay.length() > 2)
+                    passDay = new StringBuilder(passDay.substring(0, passDay.length() - 2));
             }
 
-            return new JRBeanCollectionDataSource(result);
+            for(Integer day: days) {
+                result.add(new ComplexExtendedItem(complex.getContragent().getContragentName(), complex.getName(), complex.getWtDietType().getDescription(),
+                        complex.getWtAgeGroupItem().getDescription(), complex.getWtComplexGroupItem().getDescription(),
+                        complex.getIsPortal() ? "Да" : "Нет", complex.getBarcode(), complexDate, complex.getDayInCycle().toString(),
+                        complex.getCycleMotion().toString(), complex.getStartCycleDay().toString(), passDay.toString(),
+                        complex.getComment() == null ? "" : complex.getComment(), day.toString(), getDishList(dishData, day.toString())));
+            }
+
+            return result;
         }
+
+        private List<ComplexExtendedDishItem> getDishList(List<Object[]> dishData, String day){
+            List<ComplexExtendedDishItem> list = new ArrayList<>();
+            for (Object[] dish: dishData){
+                    if (day.equals(dish[0].toString())) {
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+                        String beginDate = dish[12] == null ? "" : formatter.format(dish[12]);
+                        String endDate = dish[13] == null ? "" : formatter.format(dish[13]);
+                        String kbju = dish[6].toString() + "/" + dish[7].toString()+ "/" +dish[8].toString() + "/" +dish[9].toString();
+                        list.add(new ComplexExtendedDishItem(dish[1].toString(), dish[2].toString(), dish[3].toString(),
+                                dish[4].toString(), dish[5].toString(), kbju, dish[10].toString(), dish[11].toString(),
+                                beginDate, endDate, dish[14].toString()));
+                    }
+            }
+            return list;
+        }
+
     }
 
     @Override
@@ -106,6 +154,5 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
     public ContragentPreordersReport.Builder createBuilder(String templateFilename) {
         return new ContragentPreordersReport.Builder(templateFilename);
     }
-
 
 }

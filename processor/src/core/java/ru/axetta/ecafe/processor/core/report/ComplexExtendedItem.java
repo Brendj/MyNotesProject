@@ -21,11 +21,11 @@ public class ComplexExtendedItem {
     String passDay;
     String note;
     String day;
-    List<String> dish;
+    List<ComplexExtendedDishItem> dish;
 
     public ComplexExtendedItem(String contragent, String complexName, String dietType, String ageGroupItem,
             String complexType, String isPortal, String barCode, String complexDate, String dayInCycle,
-            String cycleMotion, String startDay, String passDay, String note, String day, List<String> dish) {
+            String cycleMotion, String startDay, String passDay, String note, String day, List<ComplexExtendedDishItem> dish) {
         this.contragent = contragent;
         this.complexName = complexName;
         this.dietType = dietType;
@@ -40,6 +40,7 @@ public class ComplexExtendedItem {
         this.passDay = passDay;
         this.note = note;
         this.day = day;
+        this.dish = dish;
     }
 
     public String getContragent() {
@@ -154,11 +155,11 @@ public class ComplexExtendedItem {
         this.day = day;
     }
 
-    public List<String> getDish() {
+    public List<ComplexExtendedDishItem> getDish() {
         return dish;
     }
 
-    public void setDish(List<String> dish) {
+    public void setDish(List<ComplexExtendedDishItem> dish) {
         this.dish = dish;
     }
 }

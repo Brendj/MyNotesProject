@@ -5,10 +5,13 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.*;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.ComplexExtendedItem;
 import ru.axetta.ecafe.processor.core.report.ComplexExtendedReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -16,39 +19,46 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+@Component
+@Scope("session")
 public class ComplexExtendedReportPage extends OnlineReportPage {
+
+    public String getPageFilename() {
+        return "report/online/complex_extended_report";
+    }
 
     private final Logger logger = LoggerFactory.getLogger(ComplexExtendedReportPage.class);
     private String idOfComplex;
+    private List<ComplexExtendedItem> report = new ArrayList<>();
 
-    public Object buildHTMLReport() {
-        htmlReport="";
-        BasicReportJob report = buildReport();
-        if (report != null) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                JRHtmlExporter exporter = new JRHtmlExporter();
-                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
-                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
-                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                exporter.exportReport();
-                htmlReport = os.toString("UTF-8");
-                os.close();
-            } catch (Exception e) {
-                printError("Ошибка при построении отчета: " + e.getMessage());
-                logger.error("Failed build report ", e);
-            }
+    public Object getBuildHTMLReport() {
+        if(idOfComplex == null)
+            report = new ArrayList<>();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            ComplexExtendedReport.Builder builder = new ComplexExtendedReport.Builder();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report = builder.createDataSource(persistenceSession, Long.valueOf(idOfComplex));
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return null;
     }
@@ -120,5 +130,13 @@ public class ComplexExtendedReportPage extends OnlineReportPage {
 
     public void setIdOfComplex(String idOfComplex) {
         this.idOfComplex = idOfComplex;
+    }
+
+    public List<ComplexExtendedItem> getReport() {
+        return report;
+    }
+
+    public void setReport(List<ComplexExtendedItem> report) {
+        this.report = report;
     }
 }
