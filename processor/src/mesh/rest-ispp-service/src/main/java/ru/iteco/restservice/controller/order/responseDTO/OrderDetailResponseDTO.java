@@ -5,23 +5,53 @@
 package ru.iteco.restservice.controller.order.responseDTO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Детали заказа."
+        + " Наполнение полей зависит от того, что было продано: комплекс или отдельно блюда."
+        + " Для комплекса заполняются поля \"complexName\", \"currentPrice\", \"isDiscountComplex\", \"goodType\"."
+        + " Оставшийся поля, помеченные как nullable, заполняются для блюд.")
 public class OrderDetailResponseDTO {
+    @Schema(description = "ID записи", example = "704602893601087488")
     private Long idOfOrderDetail;
+
+    @Schema(description = "Название комплекса", example = "Составной_Платный", nullable = true)
     private String complexName;
+
+    @Schema(description = "Цена комплекса в копейках", example = "11075", nullable = true)
     private Long currentPrice;
-    private Long price;
+
+    @Schema(description = "Признак льготного комплекса", example = "false", nullable = true)
     private Boolean isDiscountComplex;
+
+    @Schema(description = "Вид рациона", example = "Завтрак", nullable = true)
     private String goodType;
+
+    @Schema(description = "Цена блюда в копейках", example = "0", nullable = true)
+    private Long price;
+
+    @Schema(description = "Название продукта", example = "Фруктовый салат", nullable = true)
     private String name;
+
+    @Schema(description = "Калорийность", example = "83", nullable = true)
     private Integer calories;
+
+    @Schema(description = "Вес", example = "100", nullable = true)
     private String output;
+
+    @Schema(description = "Белки", example = "14", nullable = true)
     private Integer protein;
+
+    @Schema(description = "Жиры", example = "1", nullable = true)
     private Integer fat;
+
+    @Schema(description = "Углеводы", example = "54", nullable = true)
     private Integer carbohydrates;
+
+    @Schema(description = "Количество", example = "1")
     private Integer amount;
 
     public String getComplexName() {

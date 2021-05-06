@@ -4,14 +4,26 @@
 
 package ru.iteco.restservice.controller.order.responseDTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.LinkedList;
 import java.util.List;
 
+@Schema(name = "GuardianResponseDTO", description = "Данные по покупкам")
 public class OrderResponseDTO {
+    @Schema(description = "Время пробития заказа в timestamp", example = "1617224400000")
     private Long time;
+
+    @Schema(description = "Свмма покупки в копейках", example = "11075")
     private Long sum;
+
+    @Schema(description = "Признак сторнирования", example = "false")
     private Boolean cancel;
+
+    @Schema(description = "ID записи", example = "704602893596893184")
     private Long idOfOrder;
+
+    @Schema(description = "Детали заказа")
     private List<OrderDetailResponseDTO> details = new LinkedList<>();
 
     public Long getTime() {
