@@ -33,6 +33,8 @@ public class SpecialDatesItem {
     private String groupName;
     private String errorMessage;
     private Integer resCode;
+    private String staffGuid;
+    private Date armLastUpdate;
 
     public static SpecialDatesItem build(Node itemNode, Long orgOwner, List<Long> friendlyOrgs) {
         Long idOfOrg = null;
@@ -41,6 +43,8 @@ public class SpecialDatesItem {
         String comment = null;
         String groupName = null;
         Boolean delete = false;
+        Date armLastUpdate = null;
+        String staffGuid = null;
 
         EMSetter emSetter = new EMSetter("");
 
@@ -65,6 +69,17 @@ public class SpecialDatesItem {
             emSetter.setCompositeErrorMessage("Attribute Date not found");
         }
 
+        String strArmLastUpdate = XMLUtils.getAttributeValue(itemNode, "LastUpdate");
+        if(StringUtils.isNotEmpty(strArmLastUpdate)){
+            try {
+                armLastUpdate = CalendarUtils.parseDateWithDayTime(strArmLastUpdate);
+            } catch (Exception e){
+                emSetter.setCompositeErrorMessage("Attribute LastUpdate not found or incorrect");
+            }
+        }
+
+        staffGuid = XMLUtils.getAttributeValue(itemNode, "GuidOfStaff");
+
         Integer intIsWeekend = getIntValue(itemNode, "IsWeekend", emSetter, true);
         if(intIsWeekend == 1){
             isWeekend = true;
@@ -86,7 +101,7 @@ public class SpecialDatesItem {
             }
         }
 
-        return new SpecialDatesItem(idOfOrg, date, isWeekend, comment, groupName, delete, orgOwner, emSetter.getStr());
+        return new SpecialDatesItem(idOfOrg, date, isWeekend, comment, groupName, delete, orgOwner, emSetter.getStr(), staffGuid, armLastUpdate);
     }
 
     private static Integer getIntValue(Node itemNode, String nodeName, ISetErrorMessage www, boolean checkExists) {
@@ -112,6 +127,22 @@ public class SpecialDatesItem {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getStaffGuid() {
+        return staffGuid;
+    }
+
+    public void setStaffGuid(String staffGuid) {
+        this.staffGuid = staffGuid;
+    }
+
+    public Date getArmLastUpdate() {
+        return armLastUpdate;
+    }
+
+    public void setArmLastUpdate(Date armLastUpdate) {
+        this.armLastUpdate = armLastUpdate;
     }
 
     private static class EMSetter implements ISetErrorMessage {
@@ -141,7 +172,7 @@ public class SpecialDatesItem {
     }
 
     public SpecialDatesItem(Long idOfOrg, Date date, Boolean isWeekend, String comment, String groupName, Boolean delete,
-            Long idOfOrgOwner, String errorMessage) {
+            Long idOfOrgOwner, String errorMessage, String staffGuid, Date armLastUpdate) {
         this.idOfOrg = idOfOrg;
         this.date = date;
         this.isWeekend = isWeekend;
@@ -155,6 +186,8 @@ public class SpecialDatesItem {
         } else {
             this.resCode = ERROR_CODE_NOT_VALID_ATTRIBUTE;
         }
+        this.staffGuid = staffGuid;
+        this.armLastUpdate = armLastUpdate;
     }
 
     public Long getIdOfOrg() {

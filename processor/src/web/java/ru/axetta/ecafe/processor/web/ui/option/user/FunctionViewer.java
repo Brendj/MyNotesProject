@@ -169,7 +169,7 @@ public class FunctionViewer {
                     .equals("onlineRprtRequest") || item.getFunctionName().equals("electronicReconciliationRprt")
                     || item.getFunctionName().equals("onlineRprtMeals") || item.getFunctionName().equals("paidFood")
                     || item.getFunctionName().equals("subscriptionFeeding") || item.getFunctionName()
-                    .equals("onlineRprtRefill") || item.getFunctionName().equals("onlineRprtActivity") || item
+                    .equals("onlineRprtRefill") || item.getFunctionName().equals("onlineRprtActivity") || item.getFunctionName().equals("onlineRprtCalendar") || item
                     .getFunctionName().equals("clientRprts") || item.getFunctionName().equals("statisticDifferences")
                     || item.getFunctionName().equals("financialControl") || item.getFunctionName().equals("informRprts")
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
