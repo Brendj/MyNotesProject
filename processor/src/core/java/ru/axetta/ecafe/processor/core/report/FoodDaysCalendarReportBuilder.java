@@ -77,24 +77,21 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
 
         Boolean friendlyOrg = Boolean.valueOf(getReportProperties().getProperty("allOrg"));
         String selectGroupName = getReportProperties().getProperty("selectGroupName");
-        List<String> groupName = Arrays.asList(StringUtils.split(selectGroupName, ','));
+        String selectGroupIdOfOrg = getReportProperties().getProperty("selectGroupIdOfOrg");
+        List<String> groupNameList = Arrays.asList(StringUtils.split(selectGroupName, ','));
+        List<Integer> groupIdOfOrgList = new ArrayList<>();
+        String[] stringGroupIdOfOrgList = StringUtils.split(selectGroupIdOfOrg, ',');
+        for (String idOfOrg: stringGroupIdOfOrgList)
+            groupIdOfOrgList.add(Integer.parseInt(idOfOrg));
         String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
-        List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgString, ','));
+        String[] stringOrgList = StringUtils.split(idOfOrgString, ',');
         Set<Long> idOfOrgList = new TreeSet<>();
         for (String idOfOrg : stringOrgList)
             idOfOrgList.add(Long.parseLong(idOfOrg));
         String idOfOrgs = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and sdh.idoforg in (:idOfOrgList) " ;
-        String idOfGroup = CollectionUtils.isEmpty(groupName) ? "" : " and cg.groupname in (:groupName) " ;
         String idOfOrg = CollectionUtils.isEmpty(idOfOrgList) ? "" : " where sd.idoforg in (:idOfOrgList) " ;
-
-        String groupIdOfOrg = "";
-         List<Integer> groupIdOfOrgList = new ArrayList<>();
-        if (getReportProperties().getProperty("selectGroupIdOfOrg") != null && !getReportProperties().getProperty("selectGroupIdOfOrg").equals("")) {
-            List<String> stringGroupIdOfOrgList = Arrays.asList(StringUtils.split(getReportProperties().getProperty("selectGroupIdOfOrg"), ','));
-            for(String item: stringGroupIdOfOrgList)
-                groupIdOfOrgList.add(Integer.parseInt(item));
-            groupIdOfOrg = " and cg.idoforg in (:groupIdOfOrgList) ";
-        }
+        String groupName = CollectionUtils.isEmpty(groupNameList) ? "" : " and cg.groupname in (:groupNameList) ";
+        String groupIdOfOrg = CollectionUtils.isEmpty(groupIdOfOrgList) ? "" : " and cg.idoforg in (:groupIdOfOrgList) ";
 
         String getFriendlyOrg = "select fo.friendlyOrg "
                 + "from cf_friendly_organization fo "
@@ -130,7 +127,7 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
                 + "join cf_clientgroups cg on cg.idoforg = sdh.idoforg and cg.idofclientgroup = sdh.idofclientgroup "
                 + "where sdh.date BETWEEN :startDate and :endDate "
                 + idOfOrgs
-                + idOfGroup
+                + groupName
                 + groupIdOfOrg
                 + " order by 1, 2";
 
@@ -140,8 +137,11 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         if(!CollectionUtils.isEmpty(idOfOrgList)){
             query.setParameterList("idOfOrgList", idOfOrgList);
         }
-        if(!CollectionUtils.isEmpty(groupName)){
-            query.setParameterList("groupName", groupName);
+        if(!CollectionUtils.isEmpty(groupNameList)){
+            query.setParameterList("groupNameList", groupNameList);
+        }
+        if(!CollectionUtils.isEmpty(groupIdOfOrgList)){
+            query.setParameterList("groupIdOfOrgList", groupIdOfOrgList);
         }
         if(!groupIdOfOrg.equals(""))
             query.setParameterList("groupIdOfOrgList", groupIdOfOrgList);
