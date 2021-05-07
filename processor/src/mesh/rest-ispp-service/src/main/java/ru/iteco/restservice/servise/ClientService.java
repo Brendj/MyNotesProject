@@ -63,9 +63,11 @@ public class ClientService {
         if(!guidPattern.matcher(meshGuid).matches()){
             throw new IllegalArgumentException("Полученный GUID имеет неверный формат");
         }
-        Client client = clientReadOnlyRepo.getClientByMeshGuid(meshGuid);
-        if(client == null){
-            throw new NotFoundException(String.format("Клиент с MESH-GUID %s не найден", meshGuid));
+        Client client = clientReadOnlyRepo.getClientByMeshGuid(meshGuid)
+                .orElseThrow(() -> new NotFoundException(String.format("Клиент с MESH-GUID %s не найден", meshGuid)));
+
+        if(client.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
         }
         return client;
     }
@@ -82,6 +84,12 @@ public class ClientService {
     }
 
     public List<GuardianResponseDTO> getGuardiansByClient(@NotNull Long contractId){
+        Client c = clientReadOnlyRepo.getClientByContractId(contractId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));
+
+        if(c.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
+        }
         List<GuardianResponseDTO> results = clientReadOnlyRepo.getGuardiansByClient(contractId);
         if(CollectionUtils.isEmpty(results)){
             throw new NotFoundException(String.format("Не удалось найти представителей по л/с %d", contractId));

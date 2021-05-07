@@ -32,7 +32,7 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
     Boolean existsByContractId(Long contractId);
 
     @EntityGraph("forClientResponseDTO")
-    Client getClientByMeshGuid(String meshGuid);
+    Optional<Client> getClientByMeshGuid(String meshGuid);
 
     @Query(value = "SELECT DISTINCT employee FROM Client employee "
             + "JOIN FETCH employee.org AS org "
