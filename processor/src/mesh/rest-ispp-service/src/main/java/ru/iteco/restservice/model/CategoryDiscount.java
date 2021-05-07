@@ -11,6 +11,11 @@ import java.util.Set;
 @Entity
 @Table(name = "cf_categorydiscounts")
 public class CategoryDiscount {
+    public static final Long RESERVE_DISCOUNT_ID = 50L;
+    public static final Long ELEM_DISCOUNT_ID = -90L;
+    public static final Long MIDDLE_DISCOUNT_ID = -91L;
+    public static final Long HIGH_DISCOUNT_ID = -92L;
+
     @Id
     @Column(name = "idofcategorydiscount")
     private Long idOfCategoryDiscount;

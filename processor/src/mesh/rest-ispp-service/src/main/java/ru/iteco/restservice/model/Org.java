@@ -32,6 +32,10 @@ public class Org {
     @Column(name = "shortnameinfoservice")
     private String shortNameInfoService;
 
+    @ManyToOne
+    @JoinColumn(name = "defaultSupplier")
+    private Contragent defaultSupplier;
+
     public Long getIdOfOrg() {
         return idOfOrg;
     }
@@ -95,5 +99,13 @@ public class Org {
     @Override
     public int hashCode() {
         return Objects.hash(idOfOrg);
+    }
+
+    public Contragent getDefaultSupplier() {
+        return defaultSupplier;
+    }
+
+    public void setDefaultSupplier(Contragent defaultSupplier) {
+        this.defaultSupplier = defaultSupplier;
     }
 }

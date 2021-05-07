@@ -3,6 +3,8 @@ package ru.iteco.restservice.db.repo.readonly;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ru.iteco.restservice.model.enums.EntityStateType;
+import ru.iteco.restservice.model.wt.WtComplexesItem;
 import ru.iteco.restservice.model.wt.WtDish;
 
 import java.math.BigInteger;
@@ -46,4 +48,17 @@ public interface WtDishReadOnlyRepo extends JpaRepository<WtDish, Long> {
     List<BigInteger> getWtDishesForMenuList(@Param("idOfMenus") List<Long> menus, @Param("date") Date date,
                                             @Param("groupTypes") List<Long> groupTypes);
 
+    @Query(value = "SELECT DISTINCT dish FROM WtDish dish join dish.complexItems complex "
+            + "left join fetch dish.repeatableComplex repeat "
+            + "WHERE complex = :complexItem "
+            + "AND dish.deleteState = 0 "
+            + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+            + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+            + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+            + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL)) "
+            + "AND (repeat is null or (repeat.state = :state and repeat.complexId = complex.wtComplex.idOfComplex))")
+    List<WtDish> getWtDishesByComplexItemAndDates(@Param("complexItem") WtComplexesItem complexItem,
+                                                  @Param("startDate") Date startDate,
+                                                  @Param("endDate") Date endDate,
+                                                  @Param("state") EntityStateType state);
 }

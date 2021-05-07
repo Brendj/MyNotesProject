@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.iteco.restservice.controller.menu.responsedto.CategoryItem;
+import ru.iteco.restservice.controller.menu.responsedto.ComplexesResponse;
 import ru.iteco.restservice.controller.menu.responsedto.MenuListResponse;
+import ru.iteco.restservice.servise.ComplexService;
 import ru.iteco.restservice.servise.MenuService;
 
 import javax.validation.constraints.PositiveOrZero;
@@ -23,6 +25,9 @@ public class MenuController {
 
     @Autowired
     MenuService menuService;
+
+    @Autowired
+    ComplexService complexService;
 
     @GetMapping("/getMenuList")
     @ResponseBody
@@ -43,4 +48,22 @@ public class MenuController {
             throw e;
         }
     }
+
+    @GetMapping("/getComplexes")
+    @ResponseBody
+    @Operation(summary = "Получение меню комплексного питания",
+    description = "Получение меню питания за счет средств бюджета города Москвы и меню платного горячего питания")
+    public ComplexesResponse getComplexes(@Parameter(description = "Номер лицевого счета клиента", example = "13177")
+                                          @RequestParam @PositiveOrZero Long contractId,
+                                          @Parameter(description = "Дата запроса меню", example = "2021-04-23")
+                                          @RequestParam Date date) throws Exception {
+        try {
+            ComplexesResponse response = complexService.getComplexes(date, contractId);
+            return response;
+        } catch (Exception e){
+            logger.error("Exception in getComplexes: ", e);
+            throw e;
+        }
+    }
+
 }

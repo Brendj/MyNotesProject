@@ -50,4 +50,7 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
 
     @EntityGraph("getClientAndOrgByContractId")
     Optional<Client> getClientByContractId(@Param("contractId") Long contractId);
+
+    @EntityGraph("getClientAndDiscountsByContractId")
+    Optional<Client> getClientAndDiscountsByContractId(@Param("contractId") Long contractId);
 }
