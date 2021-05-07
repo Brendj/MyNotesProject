@@ -16,6 +16,9 @@ import java.util.Set;
 @Entity
 @Table(name = "cf_wt_complexes")
 public class WtComplex {
+    public static final Long FREE_COMPLEX_GROUP_ITEM_ID = 1L;
+    public static final Long PAID_COMPLEX_GROUP_ITEM_ID = 2L;
+    public static final Long ALL_COMPLEX_GROUP_ITEM_ID = 3L;
 
     @Id
     @Column(name = "idOfComplex")
@@ -94,14 +97,17 @@ public class WtComplex {
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
     private Set<Org> orgs = new HashSet<>();
 
-    /*@ManyToMany
+    @ManyToMany
     @JoinTable(name = "cf_wt_discountrules_complexes",
             joinColumns = @JoinColumn(name = "idOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "idOfRule"))
-    private Set<WtDiscountRule> discountRules = new HashSet<>();*/
+    private Set<WtDiscountRule> discountRules = new HashSet<>();
 
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "complex")
+    private Set<ComplexDishRepeatable> repeatableDishes = new HashSet<>();
 
     public WtComplex(WtComplex complex) {
         this.idOfComplex = complex.idOfComplex;
@@ -356,5 +362,21 @@ public class WtComplex {
 
     public void setIdOfParentComplex(Long idOfParentComplex) {
         this.idOfParentComplex = idOfParentComplex;
+    }
+
+    public Set<WtDiscountRule> getDiscountRules() {
+        return discountRules;
+    }
+
+    public void setDiscountRules(Set<WtDiscountRule> discountRules) {
+        this.discountRules = discountRules;
+    }
+
+    public Set<ComplexDishRepeatable> getRepeatableDishes() {
+        return repeatableDishes;
+    }
+
+    public void setRepeatableDishes(Set<ComplexDishRepeatable> repeatableDishes) {
+        this.repeatableDishes = repeatableDishes;
     }
 }

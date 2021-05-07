@@ -146,6 +146,12 @@ import java.util.Set;
             attributeNodes = {
                     @NamedAttributeNode("org")
             }
+    ),
+    @NamedEntityGraph(
+            name = "getClientAndDiscountsByContractId",
+            attributeNodes = {
+                    @NamedAttributeNode("discounts")
+            }
     )
 })
 public class Client {
@@ -177,6 +183,9 @@ public class Client {
 
     @Column(name = "limits")
     private Long limits;
+
+    @Column(name = "parallel")
+    private String parallel;
 
     @ManyToOne
     @JoinColumn(name = "idoforg", insertable = false, updatable = false)
@@ -358,5 +367,13 @@ public class Client {
     @Override
     public int hashCode() {
         return Objects.hash(idOfClient);
+    }
+
+    public String getParallel() {
+        return parallel;
+    }
+
+    public void setParallel(String parallel) {
+        this.parallel = parallel;
     }
 }

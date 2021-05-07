@@ -115,6 +115,9 @@ public class WtDish {
             inverseJoinColumns = @JoinColumn(name = "idOfMenuMenuGroupRelation"))
     private Set<WtMenuGroupMenu> menuGroupMenus = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dish")
+    private Set<ComplexDishRepeatable> repeatableComplex = new HashSet<>();
+
 
     public Long getIdOfDish() {
         return idOfDish;
@@ -339,5 +342,13 @@ public class WtDish {
 
     public void setCategory(WtCategory category) {
         this.category = category;
+    }
+
+    public Set<ComplexDishRepeatable> getRepeatableComplex() {
+        return repeatableComplex;
+    }
+
+    public void setRepeatableComplex(Set<ComplexDishRepeatable> repeatableComplex) {
+        this.repeatableComplex = repeatableComplex;
     }
 }
