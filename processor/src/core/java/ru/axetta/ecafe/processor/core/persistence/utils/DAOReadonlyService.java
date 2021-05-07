@@ -794,6 +794,16 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<EMIASbyDay> getEmiasbyDayForClient(Session session, Client client) {
+        try {
+            Criteria criteria = session.createCriteria(EMIASbyDay.class);
+            criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIASbyDay>();
+        }
+    }
+
     public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
         try {
             String groupName = getClientGroupName(orgId, idOfClientGroup);

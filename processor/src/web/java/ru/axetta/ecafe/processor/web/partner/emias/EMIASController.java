@@ -86,19 +86,16 @@ public class EMIASController extends HttpServlet {
                 Date startdate = CalendarUtils.startOfDay(emias.getStartDateLiberate());
                 Date enddate = CalendarUtils.startOfDay(emias.getEndDateLiberate());
                 List<Long> dates2 = CalendarUtils.daysBetweenInMillis(startdate, enddate);
-
                 for (Long dateStr: dates2)
                 {
                     dates.put(dateStr, false);
                 }
             }
             //Переопределяем записанные даты
-            for (EMIAS emias: emiasList)
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client);
+            for (EMIASbyDay emiaSbyDay: emiaSbyDays)
             {
-                for (EMIASbyDay emiaSbyDay: emias.getDaySet())
-                {
-                    dates.put(emiaSbyDay.getDate().getTime(), emiaSbyDay.getEat());
-                }
+                dates.put(emiaSbyDay.getDate().getTime(), emiaSbyDay.getEat());
             }
             //Сортируем список дат
             SortedSet<Long> keys = new TreeSet<>(dates.keySet());
@@ -154,49 +151,58 @@ public class EMIASController extends HttpServlet {
             }
             if (!guardianWithMobileFound)
                 return new ExemptionVisitingResult (ResponseItem.ERROR_GUARDIAN, ResponseItem.ERROR_GUARDIAN_MESSAGE);
-            List<EMIAS> emiasList = DAOReadonlyService.getInstance().getEmiasbyClient(session, client);
-            Map<Long, Boolean> dates = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            for (ExemptionVisitingDay exemptionVisitingDay: exemptionVisitingDays)
+            {
+                if (sdf.parse(exemptionVisitingDay.getDate()).before(new Date()))
+                    return new ExemptionVisitingResult (ResponseItem.ERROR_INCORRECT_DATE, ResponseItem.ERROR_INCORRECT_DATE_MESSAGE);
+            }
+            List<EMIAS> emiasList = DAOReadonlyService.getInstance().getEmiasbyClient(session, client);
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client);
+            //Находим все даты из промежутка
+            Map<String, Boolean> dates = new HashMap<>();
             //Находим все даты из промежутка
             for (EMIAS emias: emiasList)
             {
                 Date startdate = CalendarUtils.startOfDay(emias.getStartDateLiberate());
                 Date enddate = CalendarUtils.startOfDay(emias.getEndDateLiberate());
-                List<String> dates1 = CalendarUtils.datesBetween(startdate, enddate, 2);
-                for (ExemptionVisitingDay exemptionVisitingDay: exemptionVisitingDays)
+                List<String> dates2 = CalendarUtils.datesBetween(startdate, enddate, 2);
+
+                for (String dateStr: dates2)
                 {
-                    for (String dateStr: dates1)
-                    {
-                        //Всегда полный диапазон дат должен включать конкретную дату,
-                        //если нет - то это не для текущего диапазона
-                        if (exemptionVisitingDay.getDate().equals(dateStr))
+                    dates.put(dateStr, false);
+                }
+            }
+            for (ExemptionVisitingDay exemptionVisitingDay: exemptionVisitingDays)
+            {
+                if (dates.containsKey(exemptionVisitingDay.getDate()))
+                {
+                    boolean datefind = false;
+                    for (EMIASbyDay emiaSbyDay: emiaSbyDays) {
+                        //Есть ли эта дата уже в списке в отдельной таблице
+                        if (sdf.format(emiaSbyDay.getDate()).equals(exemptionVisitingDay.getDate()))
                         {
-                            boolean datefind = false;
-                            for (EMIASbyDay emiaSbyDay: emias.getDaySet()) {
-                                //Есть ли эта дата уже в списке в отдельной таблице
-                                if (sdf.format(emiaSbyDay.getDate()).equals(dateStr))
-                                {
-                                    emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
-                                    session.save(emiaSbyDay);
-                                    emias.setVersion(DAOUtils.getMaxVersionOfEmias(session) + 1);
-                                    session.save(emias);
-                                    datefind = true;
-                                    break;
-                                }
-                            }
-                            //Дату не нашли
-                            if (!datefind)
-                            {
-                                EMIASbyDay emiaSbyDay = new EMIASbyDay();
-                                emiaSbyDay.setIdEMIAS(emias.getIdOfEMIAS());
-                                emiaSbyDay.setDate(sdf.parse(dateStr));
-                                emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
-                                session.save(emiaSbyDay);
-                                emias.setVersion(DAOUtils.getMaxVersionOfEmias(session) + 1);
-                                session.save(emias);
-                            }
+                            emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
+                            emiaSbyDay.setVersion(DAOUtils.getMaxVersionOfEmiasbyDay(session) + 1);
+                            emiaSbyDay.setIdOfOrg(client.getOrg().getIdOfOrg());
+                            emiaSbyDay.setUpdateDate(new Date());
+                            session.save(emiaSbyDay);
+                            datefind = true;
                             break;
                         }
+                    }
+                    //Дату не нашли
+                    if (!datefind)
+                    {
+                        EMIASbyDay emiaSbyDay = new EMIASbyDay();
+                        emiaSbyDay.setIdOfClient(client.getIdOfClient());
+                        emiaSbyDay.setDate(sdf.parse(exemptionVisitingDay.getDate()));
+                        emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
+                        emiaSbyDay.setCreateDate(new Date());
+                        emiaSbyDay.setUpdateDate(new Date());
+                        emiaSbyDay.setVersion(DAOUtils.getMaxVersionOfEmiasbyDay(session) + 1);
+                        emiaSbyDay.setIdOfOrg(client.getOrg().getIdOfOrg());
+                        session.save(emiaSbyDay);
                     }
                 }
             }

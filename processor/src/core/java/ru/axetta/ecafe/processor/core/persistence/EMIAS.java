@@ -29,7 +29,6 @@ public class EMIAS {
     private Boolean archive;
     private Integer hazard_level_id;
     private Boolean processed;
-    private Set<EMIASbyDay> daySet;
 
    public EMIAS(){}
 
@@ -160,13 +159,5 @@ public class EMIAS {
 
     public void setProcessed(Boolean processed) {
         this.processed = processed;
-    }
-
-    public Set<EMIASbyDay> getDaySet() {
-        return daySet;
-    }
-
-    public void setDaySet(Set<EMIASbyDay> daySet) {
-        this.daySet = daySet;
     }
 }

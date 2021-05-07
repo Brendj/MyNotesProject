@@ -15,9 +15,13 @@ import java.util.Date;
 public class EMIASbyDay {
 
     private Long idOfEmiasDay;
-    private Long idEMIAS;
+    private Long idOfClient;
     private Date date;
     private Boolean eat;
+    private Long version;
+    private Date createDate;
+    private Date updateDate;
+    private Long idOfOrg;
 
    public EMIASbyDay(){}
 
@@ -27,14 +31,6 @@ public class EMIASbyDay {
 
     public void setIdOfEmiasDay(Long idOfEmiasDay) {
         this.idOfEmiasDay = idOfEmiasDay;
-    }
-
-    public Long getIdEMIAS() {
-        return idEMIAS;
-    }
-
-    public void setIdEMIAS(Long idEMIAS) {
-        this.idEMIAS = idEMIAS;
     }
 
     public Date getDate() {
@@ -51,5 +47,45 @@ public class EMIASbyDay {
 
     public void setEat(Boolean eat) {
         this.eat = eat;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }
