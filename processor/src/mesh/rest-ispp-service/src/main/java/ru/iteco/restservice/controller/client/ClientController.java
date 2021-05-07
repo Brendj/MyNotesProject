@@ -31,11 +31,14 @@ public class ClientController {
 
     private final ClientService clientService;
     private final ClientConverter clientConverter;
+    private final NotificationSettingsConverter notificationSettingsConverter;
 
     public ClientController(ClientService clientService,
-            ClientConverter clientConverter) {
+            ClientConverter clientConverter,
+            NotificationSettingsConverter notificationSettingsConverter) {
         this.clientService = clientService;
         this.clientConverter = clientConverter;
+        this.notificationSettingsConverter = notificationSettingsConverter;
     }
 
     @GetMapping("/getByGuardMobile")
@@ -87,5 +90,6 @@ public class ClientController {
             @Parameter(description = "Номер лицевого счета клиента")
             @PositiveOrZero Long contractId) {
         List<ClientsNotificationSettings> settings = clientService.getNotificationSettingsByClients(contractId);
+        return notificationSettingsConverter.toDTOs(settings);
     }
 }

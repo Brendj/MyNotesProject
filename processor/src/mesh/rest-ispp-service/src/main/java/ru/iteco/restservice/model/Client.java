@@ -212,7 +212,7 @@ public class Client {
     @OneToOne(mappedBy = "client")
     private PreorderFlag preorderFlag;
 
-    @OneToMany
+    @OneToMany(mappedBy = "client")
     private Set<ClientsNotificationSettings> notificationSettings;
 
     public Client() {

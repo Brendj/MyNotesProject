@@ -12,16 +12,16 @@ import java.util.Objects;
 public class NotificationResponseDTO {
 
     @Schema(title = "Код настройки", example = "1000000000")
-    private Integer settingsCode;
+    private Long settingsCode;
 
     @Schema(title = "Расшифровка кода", example = "Оповещение о пополнениях")
     private String settingsName;
 
-    public Integer getSettingsCode() {
+    public Long getSettingsCode() {
         return settingsCode;
     }
 
-    public void setSettingsCode(Integer settingsCode) {
+    public void setSettingsCode(Long settingsCode) {
         this.settingsCode = settingsCode;
     }
 
