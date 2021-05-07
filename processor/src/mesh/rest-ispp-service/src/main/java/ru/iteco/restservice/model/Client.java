@@ -212,6 +212,9 @@ public class Client {
     @OneToOne(mappedBy = "client")
     private PreorderFlag preorderFlag;
 
+    @OneToMany(mappedBy = "client")
+    private Set<ClientsNotificationSettings> notificationSettings;
+
     public Client() {
     }
 
@@ -341,6 +344,14 @@ public class Client {
 
     public void setPreorderFlag(PreorderFlag preorderFlag) {
         this.preorderFlag = preorderFlag;
+    }
+
+    public Set<ClientsNotificationSettings> getNotificationSettings() {
+        return notificationSettings;
+    }
+
+    public void setNotificationSettings(Set<ClientsNotificationSettings> notificationSettings) {
+        this.notificationSettings = notificationSettings;
     }
 
     @Override

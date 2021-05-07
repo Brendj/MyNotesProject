@@ -29,6 +29,8 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
 
     Boolean existsByMobile(String mobile);
 
+    Boolean existsByContractId(Long contractId);
+
     @EntityGraph("forClientResponseDTO")
     Client getClientByMeshGuid(String meshGuid);
 

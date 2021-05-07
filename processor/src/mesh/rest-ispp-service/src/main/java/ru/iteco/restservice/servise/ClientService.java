@@ -8,19 +8,25 @@ import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.ClientsNotificationSettings;
+import ru.iteco.restservice.model.enums.ClientGroupAssignment;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
+@Validated
 public class ClientService {
     private final Logger log = LoggerFactory.getLogger(ClientService.class);
     private static final Pattern phonePattern = Pattern.compile("^7\\d{10}$");
@@ -82,5 +88,17 @@ public class ClientService {
         }
 
         return results;
+    }
+
+    @Transactional
+    public List<ClientsNotificationSettings> getNotificationSettingsByClients(@NotNull Long contractId) {
+        Client c = clientReadOnlyRepo.getClientByContractId(contractId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));
+
+        if(c.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
+        }
+
+        return new LinkedList<>(c.getNotificationSettings());
     }
 }
