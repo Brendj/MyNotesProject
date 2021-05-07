@@ -78,9 +78,9 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         Boolean friendlyOrg = Boolean.valueOf(getReportProperties().getProperty("allOrg"));
         String selectGroupName = getReportProperties().getProperty("selectGroupName");
         String selectGroupIdOfOrg = getReportProperties().getProperty("selectGroupIdOfOrg");
-        List<String> groupNameList = Arrays.asList(StringUtils.split(selectGroupName, ','));
+        List<String> groupNameList = selectGroupName == null ? new ArrayList<String>() : Arrays.asList(StringUtils.split(selectGroupName, ','));
         List<Integer> groupIdOfOrgList = new ArrayList<>();
-        String[] stringGroupIdOfOrgList = StringUtils.split(selectGroupIdOfOrg, ',');
+        String[] stringGroupIdOfOrgList = selectGroupIdOfOrg == null ? new String[]{} : StringUtils.split(selectGroupIdOfOrg, ',');
         for (String idOfOrg: stringGroupIdOfOrgList)
             groupIdOfOrgList.add(Integer.parseInt(idOfOrg));
         String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
@@ -187,7 +187,7 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
             String periodDate = df.format(startDate) + " - " + df.format(endDate);
             String date = df.format(DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(data[0]));
             Integer deleteHistory = Integer.parseInt(data[11].toString());
-            list.add(new FoodDaysCalendarReportItem(org.toString(), selectGroupName, periodDate, date, data[1].toString(), data[2].toString(), data[3].toString(),
+            list.add(new FoodDaysCalendarReportItem(org.toString(), selectGroupName == null ? "" : selectGroupName, periodDate, date, data[1].toString(), data[2].toString(), data[3].toString(),
                     isWeekend, data[5].toString(), deleted, lastEditDate, data[8].toString(), name, data[10].toString(), deleteHistory));
         }
         return new JRBeanCollectionDataSource(list);

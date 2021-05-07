@@ -458,8 +458,6 @@ public class ReportRepository extends BaseJpaDao {
         try {
             Properties properties = new Properties();
             Long idOrg = reportParameters.getIdOfOrg();
-            if(idOrg == null)
-                throw new EntityNotFoundException();
             List<Long> idOfOrgList = new ArrayList<>();
             idOfOrgList.add(idOrg);
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, StringUtils.join(idOfOrgList.iterator(), ","));
