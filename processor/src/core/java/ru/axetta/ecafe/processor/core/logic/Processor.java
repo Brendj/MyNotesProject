@@ -28,6 +28,9 @@ import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ResExemptionVisitingClient;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestProcessor;
@@ -437,6 +440,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         StringBuilder performanceLogger = new StringBuilder();
@@ -1185,7 +1189,8 @@ public class Processor implements SyncProcessor {
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
                 cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -2432,6 +2437,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2516,7 +2522,8 @@ public class Processor implements SyncProcessor {
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
 				resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -2583,6 +2590,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2649,7 +2657,8 @@ public class Processor implements SyncProcessor {
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private SyncResponse buildReestrTaloonsPreorderSyncResponse(SyncRequest request) throws Exception {
@@ -2715,6 +2724,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2780,7 +2790,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private SyncResponse buildRequestsSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -2846,7 +2857,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
-
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<>();
 
@@ -2912,7 +2923,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -2979,6 +2991,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3045,7 +3058,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -3112,6 +3126,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3214,7 +3229,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -3305,6 +3321,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3433,7 +3450,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -3504,6 +3522,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3624,7 +3643,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -3691,6 +3711,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3737,6 +3758,16 @@ public class Processor implements SyncProcessor {
                     logger.error(message, e);
                 }
             }
+        }
+
+        try {
+            if (request.getExemptionVisitingClientRequest() != null) {
+                resExemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                        request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+            logger.error(message, e);
         }
 
         try {
@@ -3859,7 +3890,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private SyncResponse buildMenuSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -3925,6 +3957,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3988,7 +4021,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -4148,6 +4182,26 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private ResExemptionVisitingClient processExemptionVisitingClient(ExemptionVisitingClientRequest exemptionVisitingClientRequest, Long idOfOrg)
+            throws Exception
+    {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ExemptionVisitingClientProcessor(persistenceSession, exemptionVisitingClientRequest,
+                    idOfOrg);
+            resExemptionVisitingClient = (ResExemptionVisitingClient) processor.process();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resExemptionVisitingClient;
     }
 
     private PlanOrdersRestrictions processPlanOrdersRestrictions(PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest) {
@@ -7675,6 +7729,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -7740,7 +7795,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory,
@@ -8227,6 +8283,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ResExemptionVisitingClient resExemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -8325,7 +8382,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSetting, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                resExemptionVisitingClient);
     }
 
     private OrgSettingSection processOrgSettings(OrgSettingsRequest orgSettingsRequest) throws Exception {

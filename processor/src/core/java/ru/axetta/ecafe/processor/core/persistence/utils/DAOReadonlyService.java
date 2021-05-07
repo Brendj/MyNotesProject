@@ -804,6 +804,13 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<EMIASbyDay> getEmiasbyDayForOrgs(Long maxVersion, List<Long> idforgs) {
+        return entityManager.createQuery("select distinct embd from EMIASbyDay embd where embd.version>:maxVersion and"
+                + " embd.idOfOrg in :idforgs")
+                .setParameter("idforgs", idforgs).setParameter("version", maxVersion)
+                .getResultList();
+    }
+
     public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
         try {
             String groupName = getClientGroupName(orgId, idOfClientGroup);

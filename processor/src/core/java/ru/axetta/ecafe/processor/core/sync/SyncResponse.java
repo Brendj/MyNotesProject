@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ResExemptionVisitingClient;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSectionForARMAnswer;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
@@ -1264,6 +1265,7 @@ public class SyncResponse {
     private RequestsSupplierData requestsSupplierData;
     private ResHardwareSettingsRequest resHardwareSettingsRequest;
     private ResTurnstileSettingsRequest resTurnstileSettingsRequest;
+    private ResExemptionVisitingClient resExemptionVisitingClient;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1289,7 +1291,8 @@ public class SyncResponse {
             ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer, ExemptionVisitingSection exemptionVisitingSection, ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer,
             ResMenuSupplier resMenuSupplier, ResRequestsSupplier resRequestsSupplier, RequestsSupplierData requestsSupplierData,
             ResHardwareSettingsRequest resHardwareSettingsRequest,
-            ResTurnstileSettingsRequest resTurnstileSettingsRequest) {
+            ResTurnstileSettingsRequest resTurnstileSettingsRequest,
+            ResExemptionVisitingClient resExemptionVisitingClient) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1360,6 +1363,7 @@ public class SyncResponse {
         this.requestsSupplierData = requestsSupplierData;
         this.resHardwareSettingsRequest = resHardwareSettingsRequest;
         this.resTurnstileSettingsRequest = resTurnstileSettingsRequest;
+        this.resExemptionVisitingClient = resExemptionVisitingClient;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1704,6 +1708,11 @@ public class SyncResponse {
         }
         if (resTurnstileSettingsRequest != null) {
             envelopeElement.appendChild(resTurnstileSettingsRequest.toElement(document));
+        }
+
+        // Список клиентов с измененными датами (по ЕМИАС)
+        if (null != resExemptionVisitingClient) {
+            envelopeElement.appendChild(resExemptionVisitingClient.toElement(document));
         }
     }
 
