@@ -162,20 +162,25 @@ public class ComplexService {
 
             Date startDate = CalendarUtils.startOfDay(date);
             Date endDate = CalendarUtils.endOfDay(date);
-            Set<WtComplex> wtComplexes = new HashSet<>();
+            Set<WtComplex> wtPaidComplexes = new HashSet<>();
             Set<WtComplex> wtDiscComplexes = new HashSet<>();
+            Set<WtComplex> wtAllComplexes = new HashSet<>();
 
             // 7-9, 11-12 Платные комплексы по возрастным группам и группам
             if (complexSign.get("Paid")) {
                 ageGroupIds.add(7L); // Все
                 List<WtComplex> wtComComplexes = complexRepo.getPaidWtComplexesByAgeGroupsAndPortal(startDate, endDate, ageGroupIds,
                         org, WtComplex.PAID_COMPLEX_GROUP_ITEM_ID, WtComplex.ALL_COMPLEX_GROUP_ITEM_ID);
-                if (wtComComplexes.size() > 0) {
-                    wtComplexes.addAll(wtComComplexes);
+                for (WtComplex wtComplex : wtComComplexes) {
+                    if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem().equals(WtComplex.PAID_COMPLEX_GROUP_ITEM_ID)) {
+                        wtPaidComplexes.add(wtComplex);
+                    } else {
+                        wtAllComplexes.add(wtComplex);
+                    }
                 }
             }
 
-            Set<WtComplex> resComplexes = new HashSet<>();
+            Set<WtComplex> resComplexes;
 
             // Правила по льготам
             if (categoriesDiscount.size() > 0) {
@@ -233,8 +238,11 @@ public class ComplexService {
                 }
             }
 
-            Map<WtComplex, List<WtDish>> map = getDishesMap(wtComplexes, startDate, endDate);
-            response.getPaidComplexes().fillComplexInfo(wtComplexes, map);
+            Map<WtComplex, List<WtDish>> map = getDishesMap(wtPaidComplexes, startDate, endDate);
+            response.getPaidComplexes().fillComplexInfo(wtPaidComplexes, map);
+
+            map = getDishesMap(wtAllComplexes, startDate, endDate);
+            response.getPaidAndFreeComplexes().fillComplexInfo(wtAllComplexes, map);
 
             map = getDishesMap(wtDiscComplexes, startDate, endDate);
             response.getFreeComplexes().fillComplexInfo(wtDiscComplexes, map);

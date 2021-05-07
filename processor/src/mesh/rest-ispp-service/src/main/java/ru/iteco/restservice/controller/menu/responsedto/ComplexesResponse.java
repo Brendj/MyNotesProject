@@ -13,9 +13,13 @@ public class ComplexesResponse {
     @Schema(description = "Платные комплексы")
     private ComplexGroupItem paidComplexes;
 
+    @Schema(description = "Платные и льготные комплексы")
+    private ComplexGroupItem paidAndFreeComplexes;
+
     public ComplexesResponse() {
         this.freeComplexes = new ComplexGroupItem();
         this.paidComplexes = new ComplexGroupItem();
+        this.paidAndFreeComplexes = new ComplexGroupItem();
     }
 
     public ComplexGroupItem getFreeComplexes() {
@@ -32,5 +36,13 @@ public class ComplexesResponse {
 
     public void setPaidComplexes(ComplexGroupItem paidComplexes) {
         this.paidComplexes = paidComplexes;
+    }
+
+    public ComplexGroupItem getPaidAndFreeComplexes() {
+        return paidAndFreeComplexes;
+    }
+
+    public void setPaidAndFreeComplexes(ComplexGroupItem paidAndFreeComplexes) {
+        this.paidAndFreeComplexes = paidAndFreeComplexes;
     }
 }
