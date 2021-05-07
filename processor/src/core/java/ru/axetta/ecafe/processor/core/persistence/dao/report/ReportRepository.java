@@ -456,26 +456,17 @@ public class ReportRepository extends BaseJpaDao {
                 autoReportGenerator.getReportsTemplateFilePath() + FoodDaysCalendarReport.class.getSimpleName() + ".jasper";
         FoodDaysCalendarReportBuilder builder = new FoodDaysCalendarReportBuilder(templateFilename);
         try {
-            Long idOrg;
             Properties properties = new Properties();
-            String selectGroupName = "";
-            if (reportParameters.getIdOfOrg() == null) {
-                idOrg = reportParameters.getSourceOrg();
-                List<Long> idOfOrgList = new ArrayList<>();
-                idOfOrgList.add(idOrg);
-                properties.setProperty("IdOfOrg", StringUtils.join(idOfOrgList.iterator(), ","));
-            }
-            else {
-                idOrg = reportParameters.getIdOfOrg();
-                properties.setProperty("IdOfOrg", idOrg.toString());
-            }
-            if (reportParameters.getGroupName()!= null){
-                selectGroupName = reportParameters.getGroupName();
-            }
-            properties.setProperty("selectGroupName", selectGroupName);
+            Long idOrg = reportParameters.getIdOfOrg();
+            if(idOrg == null)
+                throw new EntityNotFoundException();
+            List<Long> idOfOrgList = new ArrayList<>();
+            idOfOrgList.add(idOrg);
+            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, StringUtils.join(idOfOrgList.iterator(), ","));
+            if (reportParameters.getGroupName() != null )
+                properties.setProperty("selectGroupName", reportParameters.getGroupName());
             properties.setProperty("allOrg", reportParameters.getIsAllFriendlyOrgs());
             builder.setReportProperties(properties);
-
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
             return jasperReport;
