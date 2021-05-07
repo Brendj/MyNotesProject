@@ -87,6 +87,15 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         String idOfGroup = CollectionUtils.isEmpty(groupName) ? "" : " and cg.groupname in (:groupName) " ;
         String idOfOrg = CollectionUtils.isEmpty(idOfOrgList) ? "" : " where sd.idoforg in (:idOfOrgList) " ;
 
+        String groupIdOfOrg = "";
+         List<Integer> groupIdOfOrgList = new ArrayList<>();
+        if (getReportProperties().getProperty("selectGroupIdOfOrg") != null && !getReportProperties().getProperty("selectGroupIdOfOrg").equals("")) {
+            List<String> stringGroupIdOfOrgList = Arrays.asList(StringUtils.split(getReportProperties().getProperty("selectGroupIdOfOrg"), ','));
+            for(String item: stringGroupIdOfOrgList)
+                groupIdOfOrgList.add(Integer.parseInt(item));
+            groupIdOfOrg = " and cg.idoforg in (:groupIdOfOrgList) ";
+        }
+
         String getFriendlyOrg = "select fo.friendlyOrg "
                 + "from cf_friendly_organization fo "
                 + "where fo.currentorg in (:idOfOrgList)";
@@ -122,6 +131,7 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
                 + "where sdh.date BETWEEN :startDate and :endDate "
                 + idOfOrgs
                 + idOfGroup
+                + groupIdOfOrg
                 + " order by 1, 2";
 
         query = session.createSQLQuery(getSpecialDates);
@@ -133,6 +143,9 @@ public class FoodDaysCalendarReportBuilder extends BasicReportForAllOrgJob.Build
         if(!CollectionUtils.isEmpty(groupName)){
             query.setParameterList("groupName", groupName);
         }
+        if(!groupIdOfOrg.equals(""))
+            query.setParameterList("groupIdOfOrgList", groupIdOfOrgList);
+
         List<Object[]> dataSpecialDates = query.list();
         if (CollectionUtils.isEmpty(dataSpecialDates)) {
             throw new Exception("Нет данных для построения отчета");

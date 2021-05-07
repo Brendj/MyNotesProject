@@ -31,7 +31,7 @@
                 <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
                 <f:setPropertyActionListener value="#{mainPage.foodDaysCalendarReportPage.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
-                <a4j:support event="onclick" action="#{mainPage.clearGroupListSelectedItemsList}"
+                <a4j:support event="onclick" action="#{mainPage.clearGroupListItemsList}"
                              reRender="groupSelectpanel" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true"

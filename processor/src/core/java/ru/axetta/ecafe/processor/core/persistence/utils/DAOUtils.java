@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -3039,10 +3040,19 @@ public class DAOUtils {
 
     private static long getDistributedObjectVersionFromSequence(Session session, String name) {
         long version = 0L;
-        Query query = session.createSQLQuery(String.format("select nextval('%s')", DAOService.getInstance().getDistributedObjectSequenceName(name)));
-        Object o = query.uniqueResult();
-        if (o != null) {
-            version = HibernateUtils.getDbLong(o);
+        String sequenceName = DAOService.getInstance().getDistributedObjectSequenceName(name);
+        session.createSQLQuery("savepoint before_get_version").executeUpdate();
+        Query query = session.createSQLQuery(String.format("select nextval('%s')", sequenceName));
+        try {
+            Object o = query.uniqueResult();
+            if (o != null) {
+                version = HibernateUtils.getDbLong(o);
+            }
+            session.createSQLQuery("release savepoint before_get_version").executeUpdate();
+        } catch (SQLGrammarException e) {
+            session.createSQLQuery("rollback to savepoint before_get_version").executeUpdate();
+            Query q = session.createSQLQuery(String.format("create sequence %s", sequenceName));
+            q.executeUpdate();
         }
         return version;
     }
@@ -5291,10 +5301,10 @@ public class DAOUtils {
         return version;
     }
 
-    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
-            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+    public static HardwareSettings getHardwareSettingsByOrgAndHostIP(Session session,
+            String ip, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
-        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.ipHost", ip));
         criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
         return (HardwareSettings) criteria.uniqueResult();
     }
@@ -5508,10 +5518,14 @@ public class DAOUtils {
     }
 
     public static Card findCardByLongCardNo(Session persistenceSession, Long longCardNo) {
-        Criteria criteria = persistenceSession.createCriteria(Card.class);
-        criteria.add(Restrictions.eq("longCardNo", longCardNo));
-        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
-        criteria.setMaxResults(1);
-        return (Card) criteria.uniqueResult();
+        try {
+            Criteria criteria = persistenceSession.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("longCardNo", longCardNo));
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (NoResultException e){
+            return null;
+        }
     }
 }

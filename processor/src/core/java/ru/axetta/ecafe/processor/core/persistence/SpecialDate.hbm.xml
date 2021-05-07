@@ -8,10 +8,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.SpecialDate" table="cf_specialdates">
         <id name="idOfSpecialDate" column="IdOfSpecialDate" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfSpecialDate</param>
-                <param name="max_lo">32</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">32</param>
+                <param name="sequence_name">cf_specialdates_Id_Gen_seq</param>
             </generator>
         </id>
         <property name="idOfOrg" type="long" column="IdOfOrg" not-null="true"/>

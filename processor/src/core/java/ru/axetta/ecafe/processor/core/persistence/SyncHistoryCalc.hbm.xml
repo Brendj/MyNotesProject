@@ -8,10 +8,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.SyncHistoryCalc" table="cf_synchistory_calc2">
         <id name="idOfSyncHistoryCalc" column="idOfSyncHistoryCalc" type="java.lang.Long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">idOfSyncHistoryCalc</param>
-                <param name="max_lo">256</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">256</param>
+                <param name="sequence_name">cf_synchistory_calc2_Id_Gen_seq</param>
             </generator>
         </id>
         <property name="idOfOrg" column="idoforg" type="java.lang.Long"/>

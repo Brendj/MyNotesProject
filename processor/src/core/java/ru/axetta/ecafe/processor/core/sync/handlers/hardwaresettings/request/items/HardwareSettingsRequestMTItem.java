@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
@@ -15,8 +16,8 @@ public class HardwareSettingsRequestMTItem extends HardwareSettingsRequestItem {
     private Integer installStatus;
     private Integer value;
 
-    public HardwareSettingsRequestMTItem(Integer value, Integer installStatus, Date lastUpdate, String type,
-            String errorMessage) {
+    public HardwareSettingsRequestMTItem(Integer value, Integer installStatus, Date lastUpdate,
+            HardwareSettingsRequest.ModuleType type, String errorMessage) {
         super(lastUpdate, type, errorMessage);
         this.installStatus = installStatus;
         this.value = value;
@@ -25,7 +26,7 @@ public class HardwareSettingsRequestMTItem extends HardwareSettingsRequestItem {
     public static HardwareSettingsRequestMTItem build(Node itemNode) {
         Integer value;
         Integer installStatus;
-        String type = "MT";
+        HardwareSettingsRequest.ModuleType type = HardwareSettingsRequest.ModuleType.MT;
 
         StringBuilder errorMessage = new StringBuilder();
 
@@ -39,7 +40,8 @@ public class HardwareSettingsRequestMTItem extends HardwareSettingsRequestItem {
             errorMessage.append("Attribute InstallStatus not found");
         }
 
-        return new HardwareSettingsRequestMTItem(value, installStatus, getLastUpdate(itemNode, errorMessage), type, errorMessage.toString());
+        return new HardwareSettingsRequestMTItem(value, installStatus, getLastUpdate(itemNode, errorMessage),
+                type, errorMessage.toString());
     }
 
     public Integer getInstallStatus() {

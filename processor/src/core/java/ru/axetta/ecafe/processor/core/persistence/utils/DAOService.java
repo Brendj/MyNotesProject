@@ -22,8 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -3075,7 +3075,12 @@ public class DAOService {
             return null;
         }
     }
-	
+
+    public List<WtDish> getWtDish() {
+        Query q = entityManager.createQuery("SELECT dish FROM WtDish dish");
+        return q.getResultList();
+    }
+
 	//Список союзов организаций, кужа входит данная организация
     public List<Long> getOrgGroupsbyOrgForWEBARM(Long idOforg) throws Exception {
         Session session = (Session) entityManager.getDelegate();
@@ -3159,6 +3164,16 @@ public class DAOService {
 
     public List<WtGroupItem> getMapTypeFoods() {
         Query q = entityManager.createQuery("SELECT wtGroup from WtGroupItem wtGroup");
+        return q.getResultList();
+    }
+
+    public List<WtComplexGroupItem> getTypeComplexFood() {
+        Query q = entityManager.createQuery("SELECT wtComplex from WtComplexGroupItem wtComplex");
+        return q.getResultList();
+    }
+
+    public List<WtDietType> getMapDiet() {
+        Query q = entityManager.createQuery("SELECT wtDiet from WtDietType wtDiet");
         return q.getResultList();
     }
 
