@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +34,7 @@ public class SupplyService {
     }
 
     private void sendSupplyEvents(Date begin, Date end, Integer sampleSize) {
-        Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("createdDate"));
+        Pageable pageable = PageRequest.of(0, sampleSize);
         List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
 
         while (CollectionUtils.isNotEmpty(orderList)) {

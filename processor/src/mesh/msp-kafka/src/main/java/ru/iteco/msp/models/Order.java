@@ -96,7 +96,8 @@ import java.util.Set;
         "  and od.menutype between 50 and 99\n" +
         "  and od.idofrule is not null\n" +
         "  and (cd.idofcategorydiscount >= 0 or cd.idofcategorydiscount = -90)\n" +
-        "  group by 1,2,3,4,7,8,9,11 "
+        "  group by 1,2,3,4,7,8,9,11 " +
+        "  order by 7 "
 )
 public class Order {
     public static final int DISCOUNT_TYPE = 4;

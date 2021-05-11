@@ -13,6 +13,8 @@ public class ReportingDate {
     private final Date finalDate;
     private final Calendar calendar;
 
+    private static final int HOUR_PERIOD = 2;
+
     public ReportingDate(){
         calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -25,7 +27,7 @@ public class ReportingDate {
         beginPeriod = calendar.getTime();
 
         calendar.set(Calendar.MILLISECOND, 0);
-        calendar.add(Calendar.HOUR, 12);
+        calendar.add(Calendar.HOUR, HOUR_PERIOD);
         endPeriod = calendar.getTime();
 
         Calendar controlCalendar = Calendar.getInstance();
@@ -49,7 +51,7 @@ public class ReportingDate {
         beginPeriod = calendar.getTime();
 
         calendar.set(Calendar.MILLISECOND, 0);
-        calendar.add(Calendar.HOUR, 12);
+        calendar.add(Calendar.HOUR, HOUR_PERIOD);
         endPeriod = calendar.getTime();
 
         Calendar controlCalendar = Calendar.getInstance();
@@ -80,7 +82,7 @@ public class ReportingDate {
 
     private Date getEnd(){
         calendar.set(Calendar.MILLISECOND, 0);
-        calendar.add(Calendar.HOUR, 12);
+        calendar.add(Calendar.HOUR, HOUR_PERIOD);
 
         return calendar.getTime();
     }
