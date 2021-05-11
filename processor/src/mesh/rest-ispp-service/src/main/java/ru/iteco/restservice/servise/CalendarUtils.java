@@ -37,4 +37,8 @@ public class CalendarUtils {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
     }
+
+    public static Date getDateFromLong(Long value) {
+        return new Date(value);
+    }
 }

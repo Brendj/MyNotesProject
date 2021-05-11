@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.iteco.restservice.controller.menu.responsedto.CategoryItem;
 import ru.iteco.restservice.controller.menu.responsedto.ComplexesResponse;
 import ru.iteco.restservice.controller.menu.responsedto.MenuListResponse;
+import ru.iteco.restservice.servise.CalendarUtils;
 import ru.iteco.restservice.servise.ComplexService;
 import ru.iteco.restservice.servise.MenuService;
 
@@ -36,7 +37,7 @@ public class MenuController {
             description = "Получение меню буфета школьной столовой по номеру лицевого счета клиента")
     public MenuListResponse getMenuList(@Parameter(description = "Номер лицевого счета клиента", example = "13177")
                                         @RequestParam @PositiveOrZero Long contractId,
-                                        @Parameter(description = "Дата запроса меню", example = "2021-04-23")
+                                        @Parameter(description = "Дата запроса меню в Timestamp (ms)", example = "1620714787123")
                                         @RequestParam Date date) {
         try {
             MenuListResponse response = new MenuListResponse();
@@ -56,9 +57,10 @@ public class MenuController {
     public ComplexesResponse getComplexes(@Parameter(description = "Номер лицевого счета клиента", example = "13177")
                                           @RequestParam @PositiveOrZero Long contractId,
                                           @Parameter(description = "Дата запроса меню", example = "2021-04-23")
-                                          @RequestParam Date date) throws Exception {
+                                          @RequestParam @PositiveOrZero Long date) throws Exception {
         try {
-            ComplexesResponse response = complexService.getComplexes(date, contractId);
+            Date d = CalendarUtils.getDateFromLong(date);
+            ComplexesResponse response = complexService.getComplexes(d, contractId);
             return response;
         } catch (Exception e){
             logger.error("Exception in getComplexes: ", e);
