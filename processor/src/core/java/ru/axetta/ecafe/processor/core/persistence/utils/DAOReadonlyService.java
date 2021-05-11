@@ -807,7 +807,7 @@ public class DAOReadonlyService {
     public List<EMIASbyDay> getEmiasbyDayForOrgs(Long maxVersion, List<Long> idforgs) {
         return entityManager.createQuery("select distinct embd from EMIASbyDay embd where embd.version>:maxVersion and"
                 + " embd.idOfOrg in :idforgs")
-                .setParameter("idforgs", idforgs).setParameter("version", maxVersion)
+                .setParameter("idforgs", idforgs).setParameter("maxVersion", maxVersion)
                 .getResultList();
     }
 
