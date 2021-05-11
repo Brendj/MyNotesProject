@@ -15,12 +15,10 @@ import java.util.List;
 public class ExemptionVisitingClient implements AbstractToElement {
 
     private List<ExemptionVisitingClientPOjO> items;
-    private Long version;
 
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("ExemptionVisitingClient");
-        element.setAttribute("V", version.toString());
         for (ExemptionVisitingClientPOjO item : getItems()) {
             element.appendChild(item.toElement(document));
         }
@@ -36,13 +34,5 @@ public class ExemptionVisitingClient implements AbstractToElement {
 
     public void setItems(List<ExemptionVisitingClientPOjO> items) {
         this.items = items;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
     }
 }

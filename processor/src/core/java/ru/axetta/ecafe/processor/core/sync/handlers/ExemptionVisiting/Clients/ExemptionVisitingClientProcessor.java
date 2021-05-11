@@ -43,15 +43,12 @@ public class ExemptionVisitingClientProcessor extends AbstractProcessor<OrgSetti
 
         List<EMIASbyDay> emiasByDays = DAOReadonlyService.getInstance().getEmiasbyDayForOrgs(maxVersionFromARM, friendlyOrg);
 
-        exemptionVisitingClient.setVersion(0L);
         for (EMIASbyDay emiaSbyDay : emiasByDays) {
-            //Устанавливаем версию
-            if (emiaSbyDay.getVersion() > exemptionVisitingClient.getVersion())
-                exemptionVisitingClient.setVersion(emiaSbyDay.getVersion());
             //Новые данные
             ExemptionVisitingClientDates exemptionVisitingClientDates1 = new ExemptionVisitingClientDates();
             exemptionVisitingClientDates1.setDate(emiaSbyDay.getDate());
             exemptionVisitingClientDates1.setEat(emiaSbyDay.getEat());
+            exemptionVisitingClientDates1.setVersion(emiaSbyDay.getVersion());
             boolean findclient = false;
             for (ExemptionVisitingClientPOjO emiasSyncPOJO: exemptionVisitingClient.getItems())
             {

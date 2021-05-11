@@ -16,12 +16,14 @@ import java.util.Date;
 public class ExemptionVisitingClientDates implements AbstractToElement {
     private Date date;
     private Boolean eat;
+    private Long version;
 
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("D");
-        element.setAttribute("Date", CalendarUtils.dateShortToStringFullYear(date));
-        element.setAttribute("Visiting", eat.toString());
+        element.setAttribute("date", CalendarUtils.dateShortToStringFullYear(date));
+        element.setAttribute("visiting", eat.toString());
+        element.setAttribute("version", version.toString());
         return element;
     }
 
@@ -39,5 +41,13 @@ public class ExemptionVisitingClientDates implements AbstractToElement {
 
     public void setEat(Boolean eat) {
         this.eat = eat;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }
