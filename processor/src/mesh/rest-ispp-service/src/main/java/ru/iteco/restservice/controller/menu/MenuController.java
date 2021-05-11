@@ -37,7 +37,7 @@ public class MenuController {
             description = "Получение меню буфета школьной столовой по номеру лицевого счета клиента")
     public MenuListResponse getMenuList(@Parameter(description = "Номер лицевого счета клиента", example = "13177")
                                         @RequestParam @PositiveOrZero Long contractId,
-                                        @Parameter(description = "Дата запроса меню", example = "2021-04-23")
+                                        @Parameter(description = "Дата запроса меню в Timestamp (ms)", example = "1620714787123")
                                         @RequestParam Date date) {
         try {
             MenuListResponse response = new MenuListResponse();
