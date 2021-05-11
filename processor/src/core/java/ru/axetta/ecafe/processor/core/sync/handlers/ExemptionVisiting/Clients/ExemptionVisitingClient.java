@@ -12,14 +12,14 @@ import org.w3c.dom.Element;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ResExemptionVisitingClient implements AbstractToElement {
+public class ExemptionVisitingClient implements AbstractToElement {
 
     private List<ExemptionVisitingClientPOjO> items;
     private Long version;
 
     @Override
     public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("ResExemptionVisitingClient");
+        Element element = document.createElement("ExemptionVisitingClient");
         element.setAttribute("V", version.toString());
         for (ExemptionVisitingClientPOjO item : getItems()) {
             element.appendChild(item.toElement(document));

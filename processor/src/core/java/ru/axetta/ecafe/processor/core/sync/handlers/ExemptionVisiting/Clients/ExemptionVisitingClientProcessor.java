@@ -4,13 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients;
 
-import ru.axetta.ecafe.processor.core.persistence.EMIAS;
 import ru.axetta.ecafe.processor.core.persistence.EMIASbyDay;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.emias.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 
 import org.hibernate.Session;
@@ -18,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ExemptionVisitingClientProcessor extends AbstractProcessor<OrgSettingSection> {
@@ -34,9 +30,9 @@ public class ExemptionVisitingClientProcessor extends AbstractProcessor<OrgSetti
     }
 
     @Override
-    public ResExemptionVisitingClient process() throws Exception {
+    public ExemptionVisitingClient process() throws Exception {
         Long maxVersionFromARM = exemptionVisitingClientRequest.getMaxVersion();
-        ResExemptionVisitingClient resExemptionVisitingClient = new ResExemptionVisitingClient();
+        ExemptionVisitingClient exemptionVisitingClient = new ExemptionVisitingClient();
         //Собираем данные по всем дружественным корпусам
         List<Long> friendlyOrg = new ArrayList<>();
         friendlyOrg.add(idOfOrg);
@@ -47,17 +43,17 @@ public class ExemptionVisitingClientProcessor extends AbstractProcessor<OrgSetti
 
         List<EMIASbyDay> emiasByDays = DAOReadonlyService.getInstance().getEmiasbyDayForOrgs(maxVersionFromARM, friendlyOrg);
 
-        resExemptionVisitingClient.setVersion(0L);
+        exemptionVisitingClient.setVersion(0L);
         for (EMIASbyDay emiaSbyDay : emiasByDays) {
             //Устанавливаем версию
-            if (emiaSbyDay.getVersion() > resExemptionVisitingClient.getVersion())
-                resExemptionVisitingClient.setVersion(emiaSbyDay.getVersion());
+            if (emiaSbyDay.getVersion() > exemptionVisitingClient.getVersion())
+                exemptionVisitingClient.setVersion(emiaSbyDay.getVersion());
             //Новые данные
             ExemptionVisitingClientDates exemptionVisitingClientDates1 = new ExemptionVisitingClientDates();
             exemptionVisitingClientDates1.setDate(emiaSbyDay.getDate());
             exemptionVisitingClientDates1.setEat(emiaSbyDay.getEat());
             boolean findclient = false;
-            for (ExemptionVisitingClientPOjO emiasSyncPOJO: resExemptionVisitingClient.getItems())
+            for (ExemptionVisitingClientPOjO emiasSyncPOJO: exemptionVisitingClient.getItems())
             {
                 //Если такой клиент уже найден
                 if (emiasSyncPOJO.getIdOfClient().equals(emiaSbyDay.getIdOfClient()))
@@ -76,10 +72,10 @@ public class ExemptionVisitingClientProcessor extends AbstractProcessor<OrgSetti
                 List<ExemptionVisitingClientDates> itemList = new ArrayList<>();
                 itemList.add(exemptionVisitingClientDates1);
                 exemptionVisitingClientPOjO.setItemList(itemList);
-                resExemptionVisitingClient.getItems().add(exemptionVisitingClientPOjO);
+                exemptionVisitingClient.getItems().add(exemptionVisitingClientPOjO);
             }
         }
-        return resExemptionVisitingClient;
+        return exemptionVisitingClient;
     }
 
     public Long getIdOfOrg() {

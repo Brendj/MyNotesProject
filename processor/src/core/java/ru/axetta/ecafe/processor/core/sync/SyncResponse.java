@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ResExemptionVisitingClient;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClient;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSectionForARMAnswer;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
@@ -1265,7 +1265,7 @@ public class SyncResponse {
     private RequestsSupplierData requestsSupplierData;
     private ResHardwareSettingsRequest resHardwareSettingsRequest;
     private ResTurnstileSettingsRequest resTurnstileSettingsRequest;
-    private ResExemptionVisitingClient resExemptionVisitingClient;
+    private ExemptionVisitingClient resExemptionVisitingClient;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1292,7 +1292,7 @@ public class SyncResponse {
             ResMenuSupplier resMenuSupplier, ResRequestsSupplier resRequestsSupplier, RequestsSupplierData requestsSupplierData,
             ResHardwareSettingsRequest resHardwareSettingsRequest,
             ResTurnstileSettingsRequest resTurnstileSettingsRequest,
-            ResExemptionVisitingClient resExemptionVisitingClient) {
+            ExemptionVisitingClient resExemptionVisitingClient) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
