@@ -57,6 +57,7 @@ public class SupplyService {
                 sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
                 reportingDate = reportingDate.getNext();
             } while (reportingDate != null);
+            log.info("--Data sending completed--");
         } catch (Exception e) {
             log.error("Critical error in process sending supply MSP info, task interrupt", e);
         }
@@ -77,6 +78,7 @@ public class SupplyService {
                 sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
                 reportingDate = reportingDate.getNext();
             } while (reportingDate != null);
+            log.info("--Data sending completed--");
         } catch (Exception e) {
             log.error("Critical error in process sending supply MSP info, task interrupt", e);
         }
