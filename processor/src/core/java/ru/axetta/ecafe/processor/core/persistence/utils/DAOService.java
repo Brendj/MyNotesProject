@@ -554,7 +554,7 @@ public class DAOService {
     }
 
     public Org getOrg(Session session, Long idOfOrg) {
-        Org org = (Org)session.load(Org.class, idOfOrg);
+        Org org = (Org)session.get(Org.class, idOfOrg);
         return org;
     }
 
