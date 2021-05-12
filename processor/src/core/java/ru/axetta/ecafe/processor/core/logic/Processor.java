@@ -3873,14 +3873,16 @@ public class Processor implements SyncProcessor {
         }
 
         if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
-            try {
-                if (request.getExemptionVisitingClientRequest() != null) {
-                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
-                            request.getIdOfOrg());
+            if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.exemptionvisitingclient.accinc", "1").equals("1")) {
+                try {
+                    if (request.getExemptionVisitingClientRequest() != null) {
+                        exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                                request.getIdOfOrg());
+                    }
+                } catch (Exception e) {
+                    String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                    logger.error(message, e);
                 }
-            } catch (Exception e) {
-                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
-                logger.error(message, e);
             }
         }
 
