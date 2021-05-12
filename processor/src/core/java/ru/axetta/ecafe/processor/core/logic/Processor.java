@@ -171,6 +171,8 @@ public class Processor implements SyncProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private static final int RESPONSE_MENU_PERIOD_IN_DAYS = 7;
+    private static final String SYNC_CONFIG_EMIAS = "ecafe.processor.sync.emias";
+    private static final String SYNC_CONFIG_EXEMPTION_CLIENT = "ecafe.processor.sync.exemptionvisitingclient";
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS =
@@ -1134,7 +1136,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -1163,6 +1165,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -1367,12 +1381,15 @@ public class Processor implements SyncProcessor {
 
         fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             //Секция обработки заявок от ЕМИАС
             fullProcessingEMIAS(request, responseSections);
 
             //Секция обработки заявок от ЕМИАС (от Кафки)
             fullProcessingExemptionVisiting(request, responseSections);
+        }
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            fullProcessingExemptionVisitingClient(request, responseSections);
         }
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -2471,7 +2488,7 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2500,6 +2517,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -2608,7 +2637,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2637,6 +2666,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -2741,7 +2782,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2770,6 +2811,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -2875,7 +2928,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2904,6 +2957,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -3009,7 +3074,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3038,6 +3103,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -3182,7 +3259,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3211,6 +3288,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -3401,7 +3490,7 @@ public class Processor implements SyncProcessor {
                     e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3430,6 +3519,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -3594,7 +3695,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3623,6 +3724,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -3723,7 +3836,7 @@ public class Processor implements SyncProcessor {
 
         //info messages
         processInfoMessageSections(request, responseSections);
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias.accinc", "1").equals("1")) {
                 //if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.96")) {
                 //    try {
@@ -3741,7 +3854,6 @@ public class Processor implements SyncProcessor {
                 //        logger.error(message, e);
                 //    }
                 //}
-
                 try {
                     ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
                     if (exemptionVisitingRequest != null) {
@@ -3760,14 +3872,16 @@ public class Processor implements SyncProcessor {
             }
         }
 
-        try {
-            if (request.getExemptionVisitingClientRequest() != null) {
-                exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
-                        request.getIdOfOrg());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         try {
@@ -3973,7 +4087,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -4002,6 +4116,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -7746,7 +7872,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -7775,6 +7901,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
@@ -7998,6 +8136,20 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingExemptionVisitingClient(SyncRequest request, List<AbstractToElement> responseSections) {
+        ExemptionVisitingClient exemptionVisitingClient = null;
+        try {
+            if (request.getExemptionVisitingClientRequest() != null) {
+                exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                        request.getIdOfOrg());
+                addToResponseSections(exemptionVisitingClient,responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
             logger.error(message, e);
         }
     }
@@ -8333,7 +8485,7 @@ public class Processor implements SyncProcessor {
         discardOrgSettingsSyncParam(request.getIdOfOrg());
 
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -8362,6 +8514,18 @@ public class Processor implements SyncProcessor {
                 }
             } catch (Exception e) {
                 String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                 logger.error(message, e);
             }
         }
