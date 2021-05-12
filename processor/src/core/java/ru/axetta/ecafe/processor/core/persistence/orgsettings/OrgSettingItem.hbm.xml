@@ -6,7 +6,6 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem" table="CF_OrgSettings_Items">
-        <cache usage="transactional"/>
         <id name="idOfOrgSettingItem" column="idOfOrgSettingItem" type="long">
             <generator class="identity"/>
         </id>

@@ -8,10 +8,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.SpecialDate" table="cf_specialdates">
         <id name="idOfSpecialDate" column="IdOfSpecialDate" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfSpecialDate</param>
-                <param name="max_lo">32</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">32</param>
+                <param name="sequence_name">cf_specialdates_Id_Gen_seq</param>
             </generator>
         </id>
         <property name="idOfOrg" type="long" column="IdOfOrg" not-null="true"/>
@@ -25,6 +25,10 @@
         <property name="version" column="version" type="long" not-null="true"/>
         <property name="comment" column="comment" type="string" not-null="true"/>
         <property name="idOfClientGroup" column="idofclientgroup" type="long"/>
+        <property name="staffGuid" column="staffGuid" type="string"/>
+        <property name="armLastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="armLastUpdate"/>
+        <property name="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="createdDate"/>
+        <property name="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="lastUpdate"/>
         <many-to-one name="orgOwner" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgOwner" not-null="true"/>
     </class>
 </hibernate-mapping>

@@ -7,7 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.OrgContractId" table="CF_Orgs_contract_ids" optimistic-lock="version">
-
+        <cache usage="transactional"/>
         <id name="idOfOrg" column="IdOfOrg" type="long">
             <generator class="foreign">
                 <param name="property">org</param>

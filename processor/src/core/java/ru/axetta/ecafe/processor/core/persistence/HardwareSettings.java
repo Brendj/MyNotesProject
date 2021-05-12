@@ -13,7 +13,6 @@ public class HardwareSettings implements Serializable {
 
     private Set<HardwareSettingsMT> moduleTypes = new HashSet<HardwareSettingsMT>();
     private Org org;
-    private String ipHost;
     private Date lastUpdateForIPHost;
     private String dotNetVer;
     private Date lastUpdateForDotNetVer;
@@ -25,6 +24,7 @@ public class HardwareSettings implements Serializable {
     private Date lastUpdateForCPUHost;
     private Long version;
     private CompositeIdOfHardwareSettings compositeIdOfHardwareSettings;
+    private Long idOfHardwareSetting;
 
     public HardwareSettings() {
     }
@@ -35,14 +35,6 @@ public class HardwareSettings implements Serializable {
 
     public void setOrg(Org org) {
         this.org = org;
-    }
-
-    public String getIpHost() {
-        return ipHost;
-    }
-
-    public void setIpHost(String ipHost) {
-        this.ipHost = ipHost;
     }
 
     public Date getLastUpdateForIPHost() {
@@ -139,5 +131,13 @@ public class HardwareSettings implements Serializable {
 
     public void setCompositeIdOfHardwareSettings(CompositeIdOfHardwareSettings compositeIdOfHardwareSettings) {
         this.compositeIdOfHardwareSettings = compositeIdOfHardwareSettings;
+    }
+
+    public Long getIdOfHardwareSetting() {
+        return idOfHardwareSetting;
+    }
+
+    public void setIdOfHardwareSetting(Long idOfHardwareSetting) {
+        this.idOfHardwareSetting = idOfHardwareSetting;
     }
 }

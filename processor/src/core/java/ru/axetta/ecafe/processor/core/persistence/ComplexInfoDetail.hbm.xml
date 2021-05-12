@@ -8,10 +8,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDetail" table="CF_ComplexInfoDetail">
         <id name="idOfComplexInfoDetail" column="IdOfComplexInfoDetail" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfComplexInfoDetail</param>
-                <param name="max_lo">256</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">256</param>
+                <param name="sequence_name">CF_ComplexInfoDetail_Id_Gen_seq</param>
             </generator>
         </id>
         <many-to-one name="complexInfo" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" column="IdOfComplexInfo"

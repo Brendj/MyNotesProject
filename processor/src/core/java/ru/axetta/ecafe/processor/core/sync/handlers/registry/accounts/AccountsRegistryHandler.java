@@ -153,12 +153,12 @@ public class AccountsRegistryHandler {
 
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
-        List<Client> clientList = new ArrayList<>();
+        /*List<Client> clientList = new ArrayList<>();
         clientList.addAll(Processor.getMigrants(idOfOrg));
 
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
-        }
+        }*/
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
         /*List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrgAndDate(idOfOrgs,lastAccRegistrySyncDate);

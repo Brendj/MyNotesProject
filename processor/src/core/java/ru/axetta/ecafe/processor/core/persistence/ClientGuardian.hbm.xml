@@ -9,10 +9,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientGuardian" table="cf_client_guardian">
         <id name="idOfClientGuardian" column="IdOfClientGuardian" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfClientGuardian</param>
-                <param name="max_lo">3</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">cf_client_guardian_Id_Gen_seq</param>
             </generator>
         </id>
         <property name="version" column="Version" type="long"/>

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.CommonTaskService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
@@ -443,6 +444,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         session.update(org);
         fill(org);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
 
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
 

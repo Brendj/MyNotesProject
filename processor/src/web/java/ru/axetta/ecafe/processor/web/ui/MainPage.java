@@ -402,7 +402,8 @@ public class MainPage implements Serializable {
     private final DishListSelectPage dishWebListSelectPage = new DishListSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
-    private final ClientGroupSelectPage  clientGroupSelectPage = new ClientGroupSelectPage();
+    private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
+    private final ClientGroupListSelectPage clientGroupListSelectPage = new ClientGroupListSelectPage();
     private final UserSelectPage userSelectPage = new UserSelectPage();
     private final OrgMainBuildingListSelectPage orgMainBuildingListSelectPage = new OrgMainBuildingListSelectPage();
     private final CardRegistrationConfirm cardRegistrationConfirm = new CardRegistrationConfirm();
@@ -421,6 +422,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage acceptanceActGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage calendarReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage clientReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
 
@@ -457,6 +459,7 @@ public class MainPage implements Serializable {
     private final ContragentCompletionReportPage contragentCompletionReportPage = new ContragentCompletionReportPage();
     private final ContragentPaymentReportPage contragentPaymentReportPage = new ContragentPaymentReportPage();
     private final ContragentPreordersReportPage contragentPreordersReportPage = new ContragentPreordersReportPage();
+    private final FoodDaysCalendarReportPage foodDaysCalendarReportPage = new FoodDaysCalendarReportPage();
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage();
@@ -1782,6 +1785,45 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public ClientGroupListSelectPage getClientGroupListSelectPage() {
+        return clientGroupListSelectPage;
+    }
+
+    public Object showClientGroupListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ClientGroupListSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                if (params.get("idOfOrg") != null) {
+                    String idOfOrg = params.get("idOfOrg");
+                    clientGroupListSelectPage.fill(persistenceSession, idOfOrg);
+                } else {
+                    clientGroupListSelectPage.fill(persistenceSession, "");
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                clientGroupListSelectPage.pushCompleteHandler((ClientGroupListSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(clientGroupListSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill client group selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+            }
+        }
+        return null;
+    }
+
     public Object updateClientGroupSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
@@ -1812,6 +1854,36 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object updateClientGroupListSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if (params.get("idOfOrg") != null) {
+                String idOfOrg = params.get("idOfOrg");
+                clientGroupListSelectPage.fill(persistenceSession, idOfOrg);
+            } else {
+                clientGroupListSelectPage.fill(persistenceSession, "");
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill client group selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
     public Object completeClientGroupSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -1826,6 +1898,36 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
             if (!modalPages.empty()) {
                 if (modalPages.peek() == clientGroupSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to fill client group selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
+    public Object completeClientGroupListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            clientGroupListSelectPage.update();
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientGroupListSelectPage.completeClientGroupListSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == clientGroupListSelectPage) {
                     modalPages.pop();
                 }
             }
@@ -2161,6 +2263,16 @@ public class MainPage implements Serializable {
 
     public Object clearDishListSelectedItemsList() {
         dishWebListSelectPage.deselectAllItems();
+        return null;
+    }
+
+    public Object clearGroupListItemsList() {
+        clientGroupListSelectPage.clear();
+        return null;
+    }
+
+    public Object clearGroupListSelectedItemsList() {
+        clientGroupListSelectPage.clearSelect();
         return null;
     }
 
@@ -2663,6 +2775,11 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object selectAllGroupListSelectedItemsList() {
+        clientGroupListSelectPage.selectAllItems();
+        return null;
+    }
+
 
     public Object showContragentListSelectPage() {
         return showContragentListSelectPage(null) ;
@@ -2764,6 +2881,40 @@ public class MainPage implements Serializable {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    public Object showGroupListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ComplexListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                complexWebListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler) {
+                    complexWebListSelectPage
+                            .pushCompleteHandler((ComplexListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(complexWebListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill complex list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка комплексов меню для Web-технолога: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
             }
         }
         return null;
@@ -6676,6 +6827,10 @@ public class MainPage implements Serializable {
         return activityReportsGroupMenu;
     }
 
+    public BasicWorkspacePage getCalendarReportsGroupMenu() {
+        return calendarReportsGroupMenu;
+    }
+
     public BasicWorkspacePage getClientReportsGroupMenu() {
         return clientReportsGroupMenu;
     }
@@ -6728,6 +6883,12 @@ public class MainPage implements Serializable {
 
     public Object showActivityReportsGroupMenu() {
         currentWorkspacePage = activityReportsGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showCalendarReportsGroupMenu() {
+        currentWorkspacePage = calendarReportsGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
@@ -6868,6 +7029,10 @@ public class MainPage implements Serializable {
 
     public ContragentPreordersReportPage getContragentPreordersReportPage() {
         return contragentPreordersReportPage;
+    }
+
+    public FoodDaysCalendarReportPage getFoodDaysCalendarReportPage() {
+        return foodDaysCalendarReportPage;
     }
 
     public ClientPaymentsPage getClientPaymentsReportPage() {
@@ -7731,6 +7896,7 @@ public class MainPage implements Serializable {
         updateSelectedMainMenu();
         return null;
     }
+
 
     public MigrantsReportPage getMigrantsReportPage() {
         return migrantsReportPage;
@@ -9687,6 +9853,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToViewActivityReports() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY);
+    }
+
+    public boolean isEligibleToViewCalendarReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     }
 
     public boolean isEligibleToViewClientsReports() throws Exception {

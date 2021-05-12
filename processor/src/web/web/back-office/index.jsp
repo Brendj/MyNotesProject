@@ -180,6 +180,10 @@
         <c:import url="include/client/select_list.jsp" />
     </f:subview>
 
+    <f:subview id="clientGroupListSelectSubView">
+        <c:import url="include/client/select_group_list.jsp" />
+    </f:subview>
+
     <f:subview id="clientGroupSelectSubView">
         <c:import url="include/client/select_group.jsp" />
     </f:subview>

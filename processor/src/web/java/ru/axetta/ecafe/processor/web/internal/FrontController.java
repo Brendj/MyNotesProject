@@ -622,6 +622,9 @@ public class FrontController extends HttpServlet {
                 c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             } else {
                 c = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
+                if(c == null){
+                    c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+                }
             }
             if (c != null) {
                 throw new FrontControllerException(
@@ -1060,6 +1063,9 @@ public class FrontController extends HttpServlet {
                 card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             } else {
                 card = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
+                if(card == null){
+                    card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+                }
             }
 
             /**
