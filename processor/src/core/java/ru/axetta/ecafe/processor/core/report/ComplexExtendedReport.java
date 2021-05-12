@@ -74,14 +74,14 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
             List<WtComplexExcludeDays> complexExcludeDays = wtComplexExcludeDays.list();
 
             String getDish = " select wci.cycle_day, wd.dishname, wd.price, wd.componentsofdish, c.description, ci.description as subcategory, "
-                    + "wd.calories, wd.protein, wd.fat, wd.carbohydrates, wd.code, wd.qty, wd.dateofbeginmenuincluding, wd.dateofendmenuincluding, wd.idofdish "
+                    + "wd.calories, wd.protein, wd.fat, wd.carbohydrates, wd.code, wd.qty, wd.dateofbeginmenuincluding, wd.dateofendmenuincluding, wd.idofdish, ci.deletestate "
                     + "from cf_wt_complexes_items wci "
                     + "join cf_wt_complex_items_dish cid on wci.idofcomplexitem = cid.idofcomplexitem "
                     + "join cf_wt_dishes wd on cid.idofdish = wd.idofdish "
                     + "join cf_wt_categories c on wd.idofcategory = c.idofcategory "
-                    + "join cf_wt_dish_categoryitem_relationships r on cid.idofdish = r.idofdish "
-                    + "join cf_wt_category_items ci on r.idofcategoryitem = ci.idofcategoryitem "
-                    + "where wd.deletestate = 0 and c.deletestate = 0 and ci.deletestate = 0 "
+                    + "left join cf_wt_dish_categoryitem_relationships r on cid.idofdish = r.idofdish "
+                    + "left join cf_wt_category_items ci on r.idofcategoryitem = ci.idofcategoryitem "
+                    + "where wd.deletestate = 0 and c.deletestate = 0 "
                     + "and wci.idofcomplex = :idofcomplex "
                     + "order by 1";
 
@@ -121,13 +121,24 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
             List<ComplexExtendedDishItem> list = new ArrayList<>();
             for (Object[] dish: dishData){
                     if (day.equals(dish[0].toString())) {
+                        String dishName = dish[1].toString();
+                        String price = dish[2].toString();
+                        String structure = dish[3].toString();
+                        String category = dish[4] == null ? "" : dish[4].toString();
+                        String subCategory = "";
+                        if (dish[15] != null && dish[15].toString().equals("0"))
+                            subCategory = dish[5] == null ? "" : dish[5].toString();
+                        String kbju = dish[6].toString() + "/" + dish[7].toString()+ "/" +dish[8].toString() + "/" +dish[9].toString();
                         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+                        String code = dish[10].toString();
+                        String weight = dish[11].toString();
                         String beginDate = dish[12] == null ? "" : formatter.format(dish[12]);
                         String endDate = dish[13] == null ? "" : formatter.format(dish[13]);
-                        String kbju = dish[6].toString() + "/" + dish[7].toString()+ "/" +dish[8].toString() + "/" +dish[9].toString();
-                        list.add(new ComplexExtendedDishItem(dish[1].toString(), dish[2].toString(), dish[3].toString(),
-                                dish[4].toString(), dish[5].toString(), kbju, dish[10].toString(), dish[11].toString(),
-                                beginDate, endDate, dish[14].toString()));
+                        String idOfDish = dish[14].toString();
+
+                        list.add(new ComplexExtendedDishItem(dishName, price, structure,
+                                category, subCategory, kbju, code, weight,
+                                beginDate, endDate, idOfDish));
                     }
             }
             return list;
