@@ -110,7 +110,7 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
                 result.add(new ComplexExtendedItem(complex.getContragent().getContragentName(), complex.getName(), complex.getWtDietType().getDescription(),
                         complex.getWtAgeGroupItem().getDescription(), complex.getWtComplexGroupItem().getDescription(),
                         complex.getIsPortal() ? "Да" : "Нет", complex.getBarcode(), complexDate, complex.getDayInCycle().toString(),
-                        complex.getCycleMotion().toString(), complex.getStartCycleDay().toString(), passDay.toString(),
+                        complex.getCycleMotion().toString().equals("0") ? "5-ти дневная рабочая неделя" : "6-ти дневная рабочая неделя", complex.getStartCycleDay().toString(), passDay.toString(),
                         complex.getComment() == null ? "" : complex.getComment(), day.toString(), getDishList(dishData, day.toString())));
             }
 
