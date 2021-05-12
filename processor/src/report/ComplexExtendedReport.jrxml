@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ComplexExtendedReport" pageWidth="1180" pageHeight="10000" orientation="Landscape" columnWidth="1140" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5d430cbf-dd87-4c9a-8eb2-95d9ca1e454d">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ComplexExtendedReport" pageWidth="1375" pageHeight="10000" orientation="Landscape" columnWidth="1335" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="20" uuid="5d430cbf-dd87-4c9a-8eb2-95d9ca1e454d">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -32,9 +32,6 @@
 	<field name="note" class="java.lang.String"/>
 	<field name="day" class="java.lang.String"/>
 	<field name="dish" class="java.util.List"/>
-	<title>
-		<band height="31" splitType="Stretch"/>
-	</title>
 	<pageHeader>
 		<band height="119" splitType="Stretch">
 			<textField>
@@ -273,10 +270,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[КБЖУ]]></text>
+				<text><![CDATA[Калории]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="651" y="0" width="90" height="26" forecolor="#000000" uuid="3d6c8906-520a-46ce-bef2-5dd03468be1f"/>
+				<reportElement x="846" y="0" width="90" height="26" forecolor="#000000" uuid="3d6c8906-520a-46ce-bef2-5dd03468be1f"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -289,7 +286,7 @@
 				<text><![CDATA[Код поставщика]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="741" y="0" width="58" height="26" forecolor="#000000" uuid="ea0ca4d1-5f90-4503-8c88-1d6d27ef1698"/>
+				<reportElement x="936" y="0" width="58" height="26" forecolor="#000000" uuid="ea0ca4d1-5f90-4503-8c88-1d6d27ef1698"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -302,7 +299,7 @@
 				<text><![CDATA[Масса]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="799" y="0" width="124" height="26" forecolor="#000000" uuid="4683f04d-96e9-45f5-bb57-d59d61138cd6"/>
+				<reportElement x="994" y="0" width="124" height="26" forecolor="#000000" uuid="4683f04d-96e9-45f5-bb57-d59d61138cd6"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -315,7 +312,7 @@
 				<text><![CDATA[Дата начала действия]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="923" y="0" width="137" height="26" forecolor="#000000" uuid="6fc8c475-d28c-45c7-97a8-18c066cfa4e6"/>
+				<reportElement x="1118" y="0" width="137" height="26" forecolor="#000000" uuid="6fc8c475-d28c-45c7-97a8-18c066cfa4e6"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -328,7 +325,7 @@
 				<text><![CDATA[Дата окончания действия]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="1060" y="0" width="80" height="26" forecolor="#000000" uuid="1de2679a-e225-4444-91cf-3eafcd6beee4"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="1255" y="0" width="80" height="26" forecolor="#000000" uuid="1de2679a-e225-4444-91cf-3eafcd6beee4"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -339,6 +336,45 @@
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Код ИСПП]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="651" y="0" width="65" height="26" forecolor="#000000" uuid="66eae9a4-cbb4-436b-a218-18118932e74e"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Белки]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="716" y="0" width="65" height="26" forecolor="#000000" uuid="5164cacf-1ca4-47cb-ab25-9f47eaba2cf0"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Жиры]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="781" y="0" width="65" height="26" forecolor="#000000" uuid="5e408274-3e6e-452f-b89e-dd603882a812"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Углеводы]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

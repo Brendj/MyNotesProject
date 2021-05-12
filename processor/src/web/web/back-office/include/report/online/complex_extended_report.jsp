@@ -117,7 +117,16 @@
                     <h:outputText escape="true" value="Подкатегория" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="КБЖУ" />
+                    <h:outputText escape="true" value="Калории" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Белки" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Жиры" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Углеводы" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Код поставщика" />
@@ -159,10 +168,19 @@
                 <h:outputText escape="true" value="#{complex.category}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
-                <h:outputText escape="true" value="#{complex.subCateory}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{complex.subCategory}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
-                <h:outputText escape="true" value="#{complex.kbju}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{complex.calories}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complex.proteins}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complex.fats}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{complex.carbohydrates}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{complex.code}" styleClass="output-text" />

@@ -10,22 +10,29 @@ public class ComplexExtendedDishItem {
     private String price;
     private String structure;
     private String category;
-    private String subCateory;
-    private String kbju;
+    private String subCategory;
+    private String calories;
+    private String proteins;
+    private String fats;
+    private String carbohydrates;
     private String code;
     private String weight;
     private String beginDate;
     private String endDate;
     private String idOfDish;
 
-    public ComplexExtendedDishItem(String dish, String price, String structure, String category, String subCateory,
-            String kbju, String code, String weight, String beginDate, String endDate, String idOfDish) {
+    public ComplexExtendedDishItem(String dish, String price, String structure, String category, String subCategory,
+            String calories, String proteins, String fats, String carbohydrates, String code, String weight,
+            String beginDate, String endDate, String idOfDish) {
         this.dish = dish;
         this.price = price;
         this.structure = structure;
         this.category = category;
-        this.subCateory = subCateory;
-        this.kbju = kbju;
+        this.subCategory = subCategory;
+        this.calories = calories;
+        this.proteins = proteins;
+        this.fats = fats;
+        this.carbohydrates = carbohydrates;
         this.code = code;
         this.weight = weight;
         this.beginDate = beginDate;
@@ -65,20 +72,44 @@ public class ComplexExtendedDishItem {
         this.category = category;
     }
 
-    public String getSubCateory() {
-        return subCateory;
+    public String getSubCategory() {
+        return subCategory;
     }
 
-    public void setSubCateory(String subCateory) {
-        this.subCateory = subCateory;
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
     }
 
-    public String getKbju() {
-        return kbju;
+    public String getCalories() {
+        return calories;
     }
 
-    public void setKbju(String kbju) {
-        this.kbju = kbju;
+    public void setCalories(String calories) {
+        this.calories = calories;
+    }
+
+    public String getProteins() {
+        return proteins;
+    }
+
+    public void setProteins(String proteins) {
+        this.proteins = proteins;
+    }
+
+    public String getFats() {
+        return fats;
+    }
+
+    public void setFats(String fats) {
+        this.fats = fats;
+    }
+
+    public String getCarbohydrates() {
+        return carbohydrates;
+    }
+
+    public void setCarbohydrates(String carbohydrates) {
+        this.carbohydrates = carbohydrates;
     }
 
     public String getCode() {
