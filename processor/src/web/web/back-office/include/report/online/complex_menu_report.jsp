@@ -16,7 +16,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<rich:modalPanel id="orgList" autosized="true" minWidth="1100">
+<rich:modalPanel id="orgList" autosized="true" minWidth="1400">
     <f:facet name="header">
         <h:outputText
                 value="Список организаций" />
@@ -85,6 +85,7 @@
 
     <rich:spacer height="20px" />
 </rich:modalPanel>
+
 
 <h:panelGrid id="dishMenuReportPanel" binding="#{mainPage.complexMenuReportPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
@@ -214,7 +215,7 @@
                     <h:outputText escape="true" value="Возрастная категория" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Название комплекс" />
+                    <h:outputText escape="true" value="Название комплекса" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Цена" />
@@ -263,9 +264,15 @@
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{complexItem.ageGroupItem}" styleClass="output-text"/>
             </rich:column>
+
             <rich:column headerClass="column-header">
-                <h:outputText escape="true" style="white-space: nowrap" value="#{complexItem.complexName}" styleClass="output-text" />
+                <a4j:commandLink value="#{complexItem.complexName}" binding="#{mainPage.complexExtendedReportPage.mainMenuComponent}" reRender="workspaceForm" ajaxSingle="true"
+                                 action="#{mainPage.showComplexExtendedMenuReportPage}">
+                    <f:setPropertyActionListener value="#{complexItem.idOfComplex}"
+                                                 target="#{mainPage.complexExtendedReportPage.idOfComplex}" />
+                </a4j:commandLink>
             </rich:column>
+
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{complexItem.price}" styleClass="output-text"/>
             </rich:column>
