@@ -179,6 +179,11 @@ public class Org implements Serializable {
         RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
     }
 
+    public static void sendInvalidateCache(long idOfOrg) {
+        logger.info("Send invalidate org id = " + idOfOrg);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
+    }
+
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
