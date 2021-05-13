@@ -144,7 +144,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Примечаие:]]></text>
+				<text><![CDATA[Примечание:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="345" y="51" width="241" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="a7f96756-e286-4014-bb1e-fe9420a3264e"/>
