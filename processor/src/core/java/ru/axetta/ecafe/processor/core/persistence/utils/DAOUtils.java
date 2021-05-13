@@ -475,6 +475,7 @@ public class DAOUtils {
      * Обновляет орг. Ставит признак mainbuilding = 0
      * */
     public static int orgMainBuildingUnset(Session session, long idOfOrg) {
+        Org.sendInvalidateCache(idOfOrg);
         Query q = session.createSQLQuery("update cf_orgs set MainBuilding = 0 where idOfOrg = :idOfOrg")
                 .setParameter("idOfOrg", idOfOrg);
         return q.executeUpdate();
@@ -2402,6 +2403,7 @@ public class DAOUtils {
         q.setParameter("idOfOrg", idOfOrg);
         q.setParameter("contract", contract);
         q.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void removeContractLinkFromOrgs(EntityManager entityManager, Contract entity) {
@@ -2588,7 +2590,7 @@ public class DAOUtils {
         return query.getResultList();
     }
 
-    public static boolean isNextGradeTransfer(Session session, Long idOfOrg) {
+    /*public static boolean isNextGradeTransfer(Session session, Long idOfOrg) {
         Query query = session.createQuery("select org.nextGradeParam from Org org where org.idOfOrg = :idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         Boolean f = (Boolean) query.uniqueResult();
@@ -2610,12 +2612,13 @@ public class DAOUtils {
         } else {
             return f;
         }
-    }
+    }*/
 
     public static void falseFullSyncByOrg(Session session, Long idOfOrg) {
         Query query = session.createQuery("update Org set fullSyncParam=0 where id=:idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForMenusSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2623,6 +2626,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForClientsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2630,6 +2634,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForOrgSettingsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2637,6 +2642,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void savePreorderDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
@@ -2644,6 +2650,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static List<Client> fetchErrorClientsWithOutFriendlyOrg(final Session persistenceSession,

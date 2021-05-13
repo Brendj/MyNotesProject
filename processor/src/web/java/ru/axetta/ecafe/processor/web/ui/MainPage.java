@@ -342,6 +342,7 @@ public class MainPage implements Serializable {
     private final DishMenuWebARMPPReportPage dishMenuReportWebArmPP = new DishMenuWebARMPPReportPage();
     private final ComplexMenuReportPage complexMenuReportPage = new ComplexMenuReportPage();
     private final ComplexOrgReportPage complexOrgReportPage = new ComplexOrgReportPage();
+    private final ComplexExtendedReportPage complexExtendedReportPage = new ComplexExtendedReportPage();
 
     //Charts
     private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
@@ -3435,12 +3436,12 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         updateSelectedMainMenu();
         return null;
     }
+
+
 
     public ClientEditPage getClientEditPage() {
         return clientEditPage;
@@ -8067,6 +8068,10 @@ public class MainPage implements Serializable {
         return complexOrgReportPage;
     }
 
+    public ComplexExtendedReportPage getComplexExtendedReportPage() {
+        return complexExtendedReportPage;
+    }
+
     public Object showDishMenuWebARMPPReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -8084,6 +8089,32 @@ public class MainPage implements Serializable {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = complexMenuReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showComplexExtendedMenuReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexExtendedReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showComplexExtendedReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexExtendedReportPage;
         } catch (Exception e) {
             logger.error("Failed to set ComplexMenuReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
