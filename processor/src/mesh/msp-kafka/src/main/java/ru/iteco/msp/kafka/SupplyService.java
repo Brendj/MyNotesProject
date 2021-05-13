@@ -15,8 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class SupplyService {
@@ -26,6 +30,9 @@ public class SupplyService {
     private final SupplyMSPService supplyMSPService;
 
     private static final Long DELTA_MONTH = 2595600000L;
+    private static final int THREAD_POOL_SIZE = 3;
+
+    private volatile ReportingDate reportingDate = null;
 
     public SupplyService(KafkaService kafkaService,
             SupplyMSPService supplyMSPService) {
@@ -50,37 +57,77 @@ public class SupplyService {
     }
 
     public void runFromTaskExecutor(Integer sampleSize){
+        runTask(null, null, sampleSize);
+    }
+
+    @Async
+    public void runFromController(Date begin, Date end, Integer sampleSize) {
+        if (begin.after(end)) {
+            throw new IllegalArgumentException("Begin date after end date");
+        }
+        if ((end.getTime() - begin.getTime()) > DELTA_MONTH) {
+            throw new IllegalArgumentException("Too long period");
+        }
+
+        runTask(begin, end, sampleSize);
+    }
+
+    private void runTask(Date begin, Date end, Integer sampleSize){
         try {
-            ReportingDate reportingDate = new ReportingDate();
-            reportingDate = reportingDate.getNext();
-            do {
-                sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
-                reportingDate = reportingDate.getNext();
-            } while (reportingDate != null);
+            ExecutorService executorService = Executors.newFixedThreadPool(3);
+            if(begin == null || end == null) {
+                reportingDate = new ReportingDate();
+            } else {
+                reportingDate = new ReportingDate(begin, end);
+            }
+
+            List<Callable<Boolean>> tasks = Arrays.asList(
+                    new RunnableTask(sampleSize),
+                    new RunnableTask(sampleSize),
+                    new RunnableTask(sampleSize)
+            );
+
+            executorService.invokeAll(tasks);
+            executorService.shutdown();
+
             log.info("--Data sending completed--");
         } catch (Exception e) {
             log.error("Critical error in process sending supply MSP info, task interrupt", e);
         }
+        finally {
+            reportingDate = null;
+        }
     }
 
-    @Async
-    public void runFromController(Date begin, Date end, Integer sampleSize){
-        try{
-            if(begin.after(end)){
-                throw new IllegalArgumentException("Begin date after end date");
-            }
-            if((end.getTime() - begin.getTime()) > DELTA_MONTH){
-                throw new IllegalArgumentException("Too long period");
-            }
+    synchronized void setNext(){
+        reportingDate = reportingDate.getNext();
+    }
 
-            ReportingDate reportingDate = new ReportingDate(begin, end);
-            do {
-                sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
-                reportingDate = reportingDate.getNext();
-            } while (reportingDate != null);
-            log.info("--Data sending completed--");
-        } catch (Exception e) {
-            log.error("Critical error in process sending supply MSP info, task interrupt", e);
+    class RunnableTask implements Callable<Boolean> {
+        private final Integer sampleSize;
+
+        public RunnableTask(Integer sampleSize) {
+            this.sampleSize = sampleSize;
+        }
+
+        @Override
+        public Boolean call() {
+            try {
+                Date begin = null;
+                Date end = null;
+                do {
+                    synchronized (reportingDate) {
+                        begin = reportingDate.getBeginPeriod();
+                        end = reportingDate.getEndPeriod();
+                    }
+                    sendSupplyEvents(begin, end, sampleSize);
+                    setNext();
+                } while (reportingDate != null);
+                return true;
+            } catch (Exception e){
+                log.error("Exception in task ", e);
+                return false;
+            }
         }
     }
 }
