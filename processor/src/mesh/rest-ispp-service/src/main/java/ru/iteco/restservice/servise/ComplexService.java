@@ -8,7 +8,11 @@ import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.*;
 import ru.iteco.restservice.model.enums.EntityStateType;
 import ru.iteco.restservice.model.enums.Predefined;
+import ru.iteco.restservice.model.preorder.PreorderComplex;
+import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 import ru.iteco.restservice.model.wt.*;
+import ru.iteco.restservice.servise.data.PreorderAmountData;
+import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -36,6 +40,9 @@ public class ComplexService {
     WtComplexExcludeDaysReadOnlyRepo wtComplexExcludeDaysReadOnlyRepo;
     @Autowired
     WtComplexesItemReadOnlyRepo wtComplexesItemReadOnlyRepo;
+
+    @Autowired
+    PreorderComplexReadOnlyRepo preorderComplexReadOnlyRepo;
 
     public static final Set<String> ELEMENTARY_SCHOOL = new HashSet<>(Arrays.asList("1", "2", "3", "4"));
     public static final Set<String> MIDDLE_SCHOOL =  new HashSet<>(Arrays.asList("5", "6", "7", "8", "9", "10", "11", "12"));
@@ -238,19 +245,35 @@ public class ComplexService {
                 }
             }
 
+            PreorderAmountData preorderComplexAmounts = getPreorderComplexAmounts(client, startDate, endDate);
+
             Map<WtComplex, List<WtDish>> map = getDishesMap(wtPaidComplexes, startDate, endDate);
-            response.getPaidComplexes().fillComplexInfo(wtPaidComplexes, map);
+            response.getPaidComplexes().fillComplexInfo(wtPaidComplexes, map, preorderComplexAmounts);
 
             map = getDishesMap(wtAllComplexes, startDate, endDate);
-            response.getPaidAndFreeComplexes().fillComplexInfo(wtAllComplexes, map);
+            response.getPaidAndFreeComplexes().fillComplexInfo(wtAllComplexes, map, preorderComplexAmounts);
 
             map = getDishesMap(wtDiscComplexes, startDate, endDate);
-            response.getFreeComplexes().fillComplexInfo(wtDiscComplexes, map);
+            response.getFreeComplexes().fillComplexInfo(wtDiscComplexes, map, preorderComplexAmounts);
 
             return response;
 
         }
         return response;
+    }
+
+    private PreorderAmountData getPreorderComplexAmounts(Client client, Date startDate, Date endDate) {
+        PreorderAmountData result = new PreorderAmountData();
+
+        List<PreorderComplex> list = preorderComplexReadOnlyRepo.getPreorderComplexesByClientAndDate(client, startDate, endDate);
+        for (PreorderComplex pc : list) {
+            PreorderComplexAmountData data = new PreorderComplexAmountData(pc.getIdOfPreorderComplex(), pc.getAmount());
+            for (PreorderMenuDetail pmd : pc.getPreorderMenuDetails()) {
+                data.getDishAmounts().put(pmd.getIdOfDish(), pmd.getAmount());
+            }
+            result.getPreorderComplexAmountData().add(data);
+        }
+        return result;
     }
 
     private Map<WtComplex, List<WtDish>> getDishesMap(Set<WtComplex> wtComplexes, Date startDate, Date endDate) {

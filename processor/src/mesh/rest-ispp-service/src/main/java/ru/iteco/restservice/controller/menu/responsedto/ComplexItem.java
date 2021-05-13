@@ -3,6 +3,8 @@ package ru.iteco.restservice.controller.menu.responsedto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtDish;
+import ru.iteco.restservice.servise.data.PreorderAmountData;
+import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,19 +24,22 @@ public class ComplexItem {
     //private Integer complexType;
     @Schema(description = "Вид рациона комплекса")
     private Integer fRation;
+    @Schema(description = "Заказанное количество")
+    private Integer amount;
     @Schema(description = "Список блюд комплекса")
     private List<DishItem> menuItems;
 
-    public ComplexItem(WtComplex wtComplex, List<WtDish> dishes) {
+    public ComplexItem(WtComplex wtComplex, List<WtDish> dishes, PreorderAmountData preorderComplexAmounts) {
         this.complexId = wtComplex.getIdOfComplex();
         this.complexName = wtComplex.getName();
         this.composite = wtComplex.getComposite();
         this.price = wtComplex.getPrice() == null ? 0 : wtComplex.getPrice().longValue();
-        //this.complexType = wtComplex.fr
+        PreorderComplexAmountData data = PreorderAmountData.getByComplexId(preorderComplexAmounts, wtComplex.getIdOfComplex());
+        this.amount = data == null ? 0 : data.getAmount();
         this.fRation = wtComplex.getWtDietType().getIdOfDietType().intValue();
         this.menuItems = new ArrayList<>();
         for (WtDish wtDish : dishes) {
-            DishItem item = new DishItem(wtDish);
+            DishItem item = new DishItem(wtDish, data);
             menuItems.add(item);
         }
     }
@@ -93,5 +98,13 @@ public class ComplexItem {
 
     public void setComposite(Boolean composite) {
         this.composite = composite;
+    }
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 }

@@ -3,6 +3,8 @@ package ru.iteco.restservice.controller.menu.responsedto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtDish;
+import ru.iteco.restservice.servise.data.PreorderAmountData;
+import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +22,10 @@ public class ComplexGroupItem {
         this.complexes = new ArrayList<>();
     }
 
-    public void fillComplexInfo(Set<WtComplex> wtComplexSet, Map<WtComplex, List<WtDish>> map) {
+    public void fillComplexInfo(Set<WtComplex> wtComplexSet, Map<WtComplex, List<WtDish>> map,
+                                PreorderAmountData preorderComplexAmounts) {
         for (WtComplex wtComplex : wtComplexSet) {
-            ComplexItem item = new ComplexItem(wtComplex, map.get(wtComplex));
+            ComplexItem item = new ComplexItem(wtComplex, map.get(wtComplex), preorderComplexAmounts);
             complexes.add(item);
         }
     }
