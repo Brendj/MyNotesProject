@@ -266,7 +266,7 @@
             </rich:column>
 
             <rich:column headerClass="column-header">
-                <a4j:commandLink value="#{complexItem.complexName}" binding="#{mainPage.complexExtendedReportPage.mainMenuComponent}" reRender="workspaceForm" ajaxSingle="true"
+                <a4j:commandLink value="#{complexItem.complexName}" title="Онлайн отчеты / Отчет по меню / Отчет по комплексам / Детальный отчет по комплексам" binding="#{mainPage.complexExtendedReportPage.mainMenuComponent}" reRender="workspaceForm" ajaxSingle="true"
                                  action="#{mainPage.showComplexExtendedMenuReportPage}">
                     <f:setPropertyActionListener value="#{complexItem.idOfComplex}"
                                                  target="#{mainPage.complexExtendedReportPage.idOfComplex}" />

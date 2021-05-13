@@ -55,7 +55,7 @@
         <h:outputText escape="true" value="Передать внешним системам:" styleClass="output-text" />
         <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).isPortal}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Примечаие:" styleClass="output-text" style="margin-left: 50px"  />
+        <h:outputText escape="true" value="Примечание:" styleClass="output-text" style="margin-left: 50px"  />
         <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).note}" styleClass="output-text" />
 
         <h:outputText escape="true" value="Штрихкод:" styleClass="output-text" />
