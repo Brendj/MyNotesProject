@@ -15,12 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Service
 public class SupplyService {
@@ -30,9 +26,6 @@ public class SupplyService {
     private final SupplyMSPService supplyMSPService;
 
     private static final Long DELTA_MONTH = 2595600000L;
-    private static final int THREAD_POOL_SIZE = 3;
-
-    private volatile ReportingDate reportingDate = null;
 
     public SupplyService(KafkaService kafkaService,
             SupplyMSPService supplyMSPService) {
@@ -73,61 +66,22 @@ public class SupplyService {
     }
 
     private void runTask(Date begin, Date end, Integer sampleSize){
+        ReportingDate reportingDate = null;
         try {
-            ExecutorService executorService = Executors.newFixedThreadPool(3);
             if(begin == null || end == null) {
                 reportingDate = new ReportingDate();
             } else {
                 reportingDate = new ReportingDate(begin, end);
             }
 
-            List<Callable<Boolean>> tasks = Arrays.asList(
-                    new RunnableTask(sampleSize),
-                    new RunnableTask(sampleSize),
-                    new RunnableTask(sampleSize)
-            );
-
-            executorService.invokeAll(tasks);
-            executorService.shutdown();
+            do {
+                sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
+                reportingDate = reportingDate.getNext();
+            } while (reportingDate != null);
 
             log.info("--Data sending completed--");
         } catch (Exception e) {
             log.error("Critical error in process sending supply MSP info, task interrupt", e);
-        }
-        finally {
-            reportingDate = null;
-        }
-    }
-
-    synchronized void setNext(){
-        reportingDate = reportingDate.getNext();
-    }
-
-    class RunnableTask implements Callable<Boolean> {
-        private final Integer sampleSize;
-
-        public RunnableTask(Integer sampleSize) {
-            this.sampleSize = sampleSize;
-        }
-
-        @Override
-        public Boolean call() {
-            try {
-                Date begin = null;
-                Date end = null;
-                do {
-                    synchronized (reportingDate) {
-                        begin = reportingDate.getBeginPeriod();
-                        end = reportingDate.getEndPeriod();
-                    }
-                    sendSupplyEvents(begin, end, sampleSize);
-                    setNext();
-                } while (reportingDate != null);
-                return true;
-            } catch (Exception e){
-                log.error("Exception in task ", e);
-                return false;
-            }
         }
     }
 }
