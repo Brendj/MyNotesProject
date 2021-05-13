@@ -19,6 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.math.BigInteger;
@@ -43,15 +44,19 @@ public class CardWritableRepository extends WritableJpaDao {
     }
 
     public Card findByCardNo( Long cardno, Long idOfOrg ){
-        TypedQuery<Card> query = entityManager.createQuery(
-                "from Card c left join fetch c.client inner join fetch c.org "
-                 + "where c.cardNo=:cardno and c.org.idOfOrg=:idOfOrg", Card.class);
-        query.setParameter("cardno",cardno);
-        query.setParameter("idOfOrg", idOfOrg);
-        List<Card> resultList = query.getResultList();
-        if(resultList.size()> 0){
-            return query.getResultList().get(0);
-        }else return null;
+        try {
+            TypedQuery<Card> query = entityManager.createQuery(
+                    "from Card c left join fetch c.client inner join fetch c.org " + "where c.cardNo=:cardno and c.org.idOfOrg=:idOfOrg", Card.class);
+            query.setParameter("cardno", cardno);
+            query.setParameter("idOfOrg", idOfOrg);
+            List<Card> resultList = query.getResultList();
+            if (resultList.size() > 0) {
+                return query.getResultList().get(0);
+            } else
+                return null;
+        } catch (PersistenceException e){
+            return null;
+        }
     }
 
     public Card findByCardNo( Long cardno, Long idOfOrg, Long idOfClient, Boolean isOldArm ) {
@@ -484,12 +489,16 @@ public class CardWritableRepository extends WritableJpaDao {
     }
 
     public Card findByLongCardNo(Long longCardNo, Long idOfOrg) {
-        TypedQuery<Card> query = entityManager.createQuery(
-                "from Card c left join fetch c.client inner join fetch c.org "
-                        + "where c.longCardNo=:longCardNo and c.org.idOfOrg=:idOfOrg", Card.class);
-        query.setParameter("longCardNo",longCardNo);
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setMaxResults(1);
-        return query.getSingleResult();
+        try {
+            TypedQuery<Card> query = entityManager.createQuery(
+                    "from Card c left join fetch c.client inner join fetch c.org "
+                            + "where c.longCardNo=:longCardNo and c.org.idOfOrg=:idOfOrg", Card.class);
+            query.setParameter("longCardNo", longCardNo);
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setMaxResults(1);
+            return query.getSingleResult();
+        } catch (PersistenceException e){
+            return null;
+        }
     }
 }

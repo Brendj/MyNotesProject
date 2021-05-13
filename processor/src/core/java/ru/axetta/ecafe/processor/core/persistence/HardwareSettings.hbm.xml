@@ -10,18 +10,18 @@
         <composite-id name="compositeIdOfHardwareSettings"
                       class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings">
             <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
-            <key-property name="idOfHardwareSetting" type="long" column="IdOfHardwareSetting"/>
+            <key-property name="ipHost" type="string" column="ipHost"/>
         </composite-id>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
                      update="false" insert="false"/>
         <set name="moduleTypes" cascade="none" mutable="false">
             <key>
                 <column name="IdOfOrg"/>
-                <column name="IdOfHardwareSetting"/>
+                <column name="ipHost"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT"/>
         </set>
-        <property name="ipHost" column="ipHost" type="string" length="64" not-null="true"/>
+        <property name="idOfHardwareSetting" column="idofhardwaresetting" type="long" not-null="true"/>
         <property name="lastUpdateForIPHost" column="LastUpdateForIPHost"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>

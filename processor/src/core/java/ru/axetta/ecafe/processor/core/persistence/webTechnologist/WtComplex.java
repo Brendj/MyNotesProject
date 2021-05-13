@@ -67,6 +67,9 @@ public class WtComplex {
     @Column(name = "barcode")
     private String barcode;
 
+    @Column(name = "comment")
+    private String comment;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idOfComplexGroupItem")
     private WtComplexGroupItem wtComplexGroupItem;
@@ -139,6 +142,7 @@ public class WtComplex {
         this.orgs = complex.orgs;
         this.discountRules = complex.discountRules;
         this.wtComplexesItems = complex.wtComplexesItems;
+        this.comment = complex.comment;
     }
 
     public WtComplex() {
@@ -355,6 +359,14 @@ public class WtComplex {
 
     public Set<WtDiscountRule> getDiscountRules() {
         return discountRules;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public void setDiscountRules(Set<WtDiscountRule> discountRules) {

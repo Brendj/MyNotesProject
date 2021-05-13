@@ -8,13 +8,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" table="cf_wt_complexes">
-        <id name="idOfComplex" column="idOfComplex" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfRule</param>
-                <param name="max_lo">3</param>
-            </generator>
-        </id>
+        <id name="idOfComplex" column="idOfComplex" type="long"/>
         <property name="name">
             <column name="name" sql-type="varchar(256)" length="256"/>
         </property>

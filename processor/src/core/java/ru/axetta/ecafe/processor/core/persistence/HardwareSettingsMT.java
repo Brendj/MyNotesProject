@@ -21,6 +21,7 @@ public class HardwareSettingsMT implements Serializable {
     private Set<HardwareSettingsMT> orgsInternal = new HashSet<HardwareSettingsMT>();
     private Long idOfHardwareSetting;
     private Long idOfOrg;
+    private String hostIp;
 
     public HardwareSettingsMT() {
     }
@@ -103,5 +104,13 @@ public class HardwareSettingsMT implements Serializable {
 
     public void setFirmwareVer(String firmwareVer) {
         this.firmwareVer = firmwareVer;
+    }
+
+    public String getHostIp() {
+        return hostIp;
+    }
+
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
     }
 }

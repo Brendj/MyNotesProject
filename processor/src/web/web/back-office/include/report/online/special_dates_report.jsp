@@ -34,16 +34,14 @@
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
 
                 <a4j:support event="onclick" action="#{mainPage.specialDatesReportPage.clean}"
-                             reRender="clear" />
-                <a4j:support event="onclick" action="#{mainPage.specialDatesReportPage.clean}"
-                             reRender="clear" />
+                             reRender="groupPanel" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true"
                           value=" {#{mainPage.specialDatesReportPage.filter}}" />
         </h:panelGroup>
 
         <h:outputText id="group" escape="true" value="Группа" styleClass="output-text" />
-        <h:panelGroup styleClass="borderless-div">
+        <h:panelGroup id = "groupPanel" styleClass="borderless-div">
             <h:inputText value="#{mainPage.specialDatesReportPage.clientGroupName}" styleClass="input-text"
                          style="margin-right: 2px;" disabled="#{mainPage.specialDatesReportPage.idOfOrgs == null}"/>
             <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
