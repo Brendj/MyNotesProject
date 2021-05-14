@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "cf_regular_preorder")
+@Table(name = "cf_regular_preorders")
 public class RegularPreorder {
     @Id
     @GeneratedValue(generator = "cf_regular_preorder-seq")
