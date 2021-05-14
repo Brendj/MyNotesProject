@@ -2,6 +2,9 @@ package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.model.wt.WtDish;
+import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
+
+import java.util.Map;
 
 /**
  * Created by nuc on 29.04.2021.
@@ -18,6 +21,9 @@ public class DishItem {
 
     @Schema(description = "Цена блюда")
     private Long price;
+
+    @Schema(description = "Заказанное количество")
+    private Integer amount;
 
     @Schema(description = "Калорийность блюда")
     private Integer calories;
@@ -40,7 +46,7 @@ public class DishItem {
     @Schema(description = "Код блюда")
     private String itemCode;
 
-    public DishItem(WtDish wtDish) {
+    public DishItem(WtDish wtDish, PreorderComplexAmountData data) {
         this.dishId = wtDish.getIdOfDish();
         this.dishName = wtDish.getDishName();
         this.dishContent = wtDish.getComponentsOfDish();
@@ -52,6 +58,12 @@ public class DishItem {
         this.carbohydrates = wtDish.getCarbohydrates();
         this.isRegular = (wtDish.getRepeatableComplex() != null && wtDish.getRepeatableComplex().size() > 0);
         this.itemCode = wtDish.getCode();
+        if (data == null) {
+            this.amount = 0;
+        } else {
+            Map<Long, Integer> map = data.getDishAmounts();
+            this.amount = map.get(wtDish.getIdOfDish()) == null ? 0 : map.get(wtDish.getIdOfDish());
+        }
     }
 
     public Long getDishId() {
@@ -140,5 +152,13 @@ public class DishItem {
 
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
+    }
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 }
