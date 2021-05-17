@@ -95,7 +95,9 @@ public class EMIASController extends HttpServlet {
             List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client);
             for (EMIASbyDay emiaSbyDay: emiaSbyDays)
             {
-                dates.put(emiaSbyDay.getDate().getTime(), emiaSbyDay.getEat());
+                //Добавление только если есть такой дествительный промежуток
+                if (dates.containsKey(emiaSbyDay.getDate().getTime()))
+                    dates.put(emiaSbyDay.getDate().getTime(), emiaSbyDay.getEat());
             }
             //Сортируем список дат
             SortedSet<Long> keys = new TreeSet<>(dates.keySet());
