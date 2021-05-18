@@ -1,9 +1,15 @@
 package ru.iteco.restservice.model;
 
 import ru.iteco.restservice.model.enums.ProhibitionFilterType;
+import ru.iteco.restservice.model.wt.WtCategory;
+import ru.iteco.restservice.model.wt.WtCategoryItem;
+import ru.iteco.restservice.model.wt.WtDish;
+
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by nuc on 22.04.2021.
@@ -12,11 +18,12 @@ import java.util.Date;
 @Table(name = "cf_prohibitions")
 public class ProhibitionMenu {
     @Id
-    @Column(name = "idOfProhibitions")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idofprohibitions")
     private Long idOfProhibitions;
 
     @ManyToOne
-    @JoinColumn(name = "idofclient", insertable = false, updatable = false)
+    @JoinColumn(name = "idofclient")
     private Client client;
 
     @Column(name = "filterText")
@@ -27,9 +34,11 @@ public class ProhibitionMenu {
     private ProhibitionFilterType prohibitionFilterType;
 
     @Column(name = "createDate")
+    @Type(type = "ru.iteco.restservice.model.type.DateType")
     private Date createDate;
 
     @Column(name = "updateDate")
+    @Type(type = "ru.iteco.restservice.model.type.DateType")
     private Date updateDate;
 
     @Column(name = "version")
@@ -37,6 +46,18 @@ public class ProhibitionMenu {
 
     @Column(name = "deletedState")
     private Boolean deletedState;
+
+    @ManyToOne
+    @JoinColumn(name = "idofdish")
+    private WtDish dish;
+
+    @ManyToOne
+    @JoinColumn(name = "idofcategory")
+    private WtCategory category;
+
+    @ManyToOne
+    @JoinColumn(name = "idofcategoryitem")
+    private WtCategoryItem categoryItem;
 
     public ProhibitionMenu(Long idOfProhibitions, Client client, String filterText,
                            ProhibitionFilterType prohibitionFilterType, Date createDate, Date updateDate, Boolean deletedState) {
@@ -47,6 +68,16 @@ public class ProhibitionMenu {
         this.createDate = createDate;
         this.updateDate = updateDate;
         this.deletedState = deletedState;
+    }
+
+    public ProhibitionMenu(Client client, WtDish dish, WtCategory category, WtCategoryItem categoryItem) {
+        this.client = client;
+        this.dish = dish;
+        this.category = category;
+        this.categoryItem = categoryItem;
+        this.createDate = new Date();
+        this.updateDate = new Date();
+        this.deletedState = false;
     }
 
     public ProhibitionMenu() {
@@ -114,5 +145,46 @@ public class ProhibitionMenu {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public WtDish getDish() {
+        return dish;
+    }
+
+    public void setDish(WtDish dish) {
+        this.dish = dish;
+    }
+
+    public WtCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(WtCategory category) {
+        this.category = category;
+    }
+
+    public WtCategoryItem getCategoryItem() {
+        return categoryItem;
+    }
+
+    public void setCategoryItem(WtCategoryItem categoryItem) {
+        this.categoryItem = categoryItem;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ProhibitionMenu that = (ProhibitionMenu) o;
+        return Objects.equals(idOfProhibitions, that.idOfProhibitions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idOfProhibitions);
     }
 }

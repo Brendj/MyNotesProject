@@ -1,35 +1,50 @@
 package ru.iteco.restservice.servise;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import ru.iteco.restservice.controller.menu.responsedto.CategoryItem;
-import ru.iteco.restservice.controller.menu.responsedto.ComplexesResponse;
 import ru.iteco.restservice.controller.menu.responsedto.MenuItem;
 import ru.iteco.restservice.db.repo.readonly.*;
 import ru.iteco.restservice.errors.NotFoundException;
-import ru.iteco.restservice.model.*;
-import ru.iteco.restservice.model.enums.EntityStateType;
-import ru.iteco.restservice.model.enums.Predefined;
-import ru.iteco.restservice.model.wt.*;
+import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.ProhibitionMenu;
+import ru.iteco.restservice.model.wt.WtCategory;
+import ru.iteco.restservice.model.wt.WtCategoryItem;
+import ru.iteco.restservice.model.wt.WtDish;
+import ru.iteco.restservice.model.wt.WtGroupItem;
 import ru.iteco.restservice.servise.data.ProhibitionData;
 
-import javax.persistence.Query;
-import java.math.BigDecimal;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.*;
 
 @Service
 public class MenuService {
+    private final ClientReadOnlyRepo clientRepo;
+    private final WtMenuReadOnlyRepo menuRepo;
+    private final WtDishReadOnlyRepo dishRepo;
+    private final ProhibitionMenuReadOnlyRepo prohibitionMenuReadOnlyRepo;
+    private final WtCategoryItemRadOnlyRepo wtCategoryItemRadOnlyRepo;
+    private final WtCategoryReadOnlyRepo wtCategoryRadOnlyRepo;
 
+    @PersistenceContext(name = "writableEntityManager", unitName = "writablePU")
+    private EntityManager writableEntityManager;
 
-    @Autowired
-    ClientReadOnlyRepo clientRepo;
-    @Autowired
-    WtMenuReadOnlyRepo menuRepo;
-    @Autowired
-    WtDishReadOnlyRepo dishRepo;
-    @Autowired
-    ProhibitionMenuReadOnlyRepo prohibitionMenuReadOnlyRepo;
+    public MenuService(ClientReadOnlyRepo clientRepo,
+                       WtMenuReadOnlyRepo menuRepo,
+                       WtDishReadOnlyRepo dishRepo,
+                       ProhibitionMenuReadOnlyRepo prohibitionMenuReadOnlyRepo,
+                       WtCategoryItemRadOnlyRepo wtCategoryItemRadOnlyRepo,
+                       WtCategoryReadOnlyRepo  wtCategoryRadOnlyRepo){
+        this.clientRepo = clientRepo;
+        this.menuRepo = menuRepo;
+        this.dishRepo = dishRepo;
+        this.prohibitionMenuReadOnlyRepo = prohibitionMenuReadOnlyRepo;
+        this.wtCategoryItemRadOnlyRepo = wtCategoryItemRadOnlyRepo;
+        this.wtCategoryRadOnlyRepo = wtCategoryRadOnlyRepo;
+    }
 
     public List<CategoryItem> getMenuList(Date date, Long contractId) {
         Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
@@ -100,4 +115,82 @@ public class MenuService {
         return prohibitionData;
     }
 
+    @Transactional
+    public Long createProhibitionData(Long contractId, Long idOfDish, Long idOfCategory, Long idOfCategoryItem){
+        if(idOfDish == null && idOfCategory == null && idOfCategoryItem == null){
+            throw new IllegalArgumentException("Для установки ограничения требуется указать идентификатор сущности."
+                    + " Все ID пришли == null");
+        }
+
+        if(moreThenOneIsNotNull(idOfDish, idOfCategory, idOfCategoryItem)){
+            throw new IllegalArgumentException("Для установки ограничения требуется указать только один идентификатор сущности.");
+        }
+
+        Client client = clientRepo
+                .getClientByContractId(contractId)
+                .orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
+
+        WtDish dish = null;
+        WtCategory category = null;
+        WtCategoryItem categoryItem = null;
+
+        if(idOfDish != null){
+            dish = dishRepo.findById(idOfDish)
+                    .orElseThrow(() -> new NotFoundException("Не удалось найти блюдо по ID " + idOfDish));
+        } else if(idOfCategory != null){
+            category = wtCategoryRadOnlyRepo.findById(idOfCategory)
+                    .orElseThrow(() -> new NotFoundException("Не удалось найти категорию по ID " + idOfCategory));
+        } else if(idOfCategoryItem != null){
+            categoryItem = wtCategoryItemRadOnlyRepo
+                    .findById(idOfCategoryItem)
+                    .orElseThrow(() -> new NotFoundException("Не удалось найти подкатегорию по ID " + idOfCategoryItem));
+        } else {
+            throw new RuntimeException();
+        }
+
+        ProhibitionMenu prohibitionMenu = new ProhibitionMenu(client, dish, category, categoryItem);
+
+        prohibitionMenu = writableEntityManager.merge(prohibitionMenu);
+        return prohibitionMenu.getIdOfProhibitions();
+    }
+
+    private boolean moreThenOneIsNotNull(Object ... args) {
+        int count = 0;
+
+        for(Object o : args){
+            if(o != null) count++;
+            if(count > 1) return true;
+        }
+        return false;
+    }
+
+    public List<Long> deleteProhibitionById(Long id) {
+        ProhibitionMenu prohibition = prohibitionMenuReadOnlyRepo
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Не удалось найти ограничение по ID: " + id));
+
+        List<ProhibitionMenu> deletedRows = null;
+        List<Long> deletedIds = new LinkedList<>();
+
+        if(prohibition.getCategory() != null){
+            deletedRows = prohibitionMenuReadOnlyRepo
+                    .findRowsForDeleteByClientAndCategory(prohibition.getClient(), prohibition.getCategory());
+        } else if(prohibition.getCategoryItem() != null){
+            deletedRows = prohibitionMenuReadOnlyRepo
+                    .findRowsForDeleteByClientAndCategoryItems(prohibition.getClient(), prohibition.getCategoryItem());
+        } else {
+            deletedRows = Collections.singletonList(prohibition);
+        }
+
+        for(ProhibitionMenu p : deletedRows){
+            p.setUpdateDate(new Date());
+            p.setDeletedState(true);
+
+            writableEntityManager.merge(p);
+
+            deletedIds.add(p.getIdOfProhibitions());
+        }
+
+        return deletedIds;
+    }
 }
