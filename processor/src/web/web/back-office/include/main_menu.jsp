@@ -1372,6 +1372,10 @@
         <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
         <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
                             label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="emiasReport" type="ru.axetta.ecafe.processor.web.ui.report.online.EmiasReportPage"--%>
+        <rich:panelMenuItem id="emiasReport" binding="#{mainPage.emiasReportPage.mainMenuComponent}"
+                            label="Отчет по данным от ЕМИАС" action="#{mainPage.showEmiasReportPage()}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
