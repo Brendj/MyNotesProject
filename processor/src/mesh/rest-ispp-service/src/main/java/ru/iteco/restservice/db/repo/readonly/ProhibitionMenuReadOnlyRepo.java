@@ -25,8 +25,8 @@ public interface ProhibitionMenuReadOnlyRepo extends JpaRepository<ProhibitionMe
 
     @Query("select pm from ProhibitionMenu pm "
             + "inner join pm.categoryItem i "
-            + "left join WtDish d on i.wtCategory = d.category and pm.dish = d "
-            + "where pm.client = :client and pm.categoryItem = :categoryItem  ")
+            + "left join WtDish d on i.wtCategory = d.category "
+            + "where pm.client = :client and pm.categoryItem = :categoryItem and pm.dish = d ")
     List<ProhibitionMenu> findRowsForDeleteByClientAndCategoryItems(@Param("client") Client client,
             @Param("categoryItem") WtCategoryItem categoryItem);
 }

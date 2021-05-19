@@ -154,16 +154,7 @@ public class MenuService {
         return prohibitionMenu.getIdOfProhibitions();
     }
 
-    private boolean moreThenOneIsNotNull(Object ... args) {
-        int count = 0;
-
-        for(Object o : args){
-            if(o != null) count++;
-            if(count > 1) return true;
-        }
-        return false;
-    }
-
+    @Transactional
     public List<Long> deleteProhibitionById(Long id) {
         ProhibitionMenu prohibition = prohibitionMenuReadOnlyRepo
                 .findById(id)
@@ -192,5 +183,15 @@ public class MenuService {
         }
 
         return deletedIds;
+    }
+
+    private boolean moreThenOneIsNotNull(Object ... args) {
+        int count = 0;
+
+        for(Object o : args){
+            if(o != null) count++;
+            if(count > 1) return true;
+        }
+        return false;
     }
 }
