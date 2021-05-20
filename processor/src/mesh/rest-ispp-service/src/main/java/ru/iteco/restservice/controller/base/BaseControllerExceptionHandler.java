@@ -9,6 +9,7 @@ import ru.iteco.restservice.errors.NotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,7 +28,8 @@ public class BaseControllerExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, ValidationException.class})
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class,
+                       ValidationException.class, TypeMismatchException.class})
     public ResponseEntity<ErrorResponse> handleIllegalArgumentEx(Exception e){
         ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

@@ -46,7 +46,7 @@ public class ClientService {
 
     public List<Client> getClientsByGuardianPhone(@NotNull String guardPhone) {
         if(!phonePattern.matcher(guardPhone).matches()){
-            throw new IllegalArgumentException("Номер телефона не соотвествует паттерну");
+            throw new IllegalArgumentException("Номер телефона не соответствует паттерну");
         }
         if(!clientReadOnlyRepo.existsByMobile(guardPhone)){
             throw new NotFoundException(String.format("Не найден клиент по номеру %s", guardPhone));
@@ -74,7 +74,7 @@ public class ClientService {
 
     public Client getEmployeeByMobile(@NotNull String mobile) {
         if (!phonePattern.matcher(mobile).matches()) {
-            throw new IllegalArgumentException("Номер телефона не соотвествует паттерну");
+            throw new IllegalArgumentException("Номер телефона не соответствует паттерну");
         }
         Client client = clientReadOnlyRepo.getEmployeeByMobile(mobile);
         if (client == null) {

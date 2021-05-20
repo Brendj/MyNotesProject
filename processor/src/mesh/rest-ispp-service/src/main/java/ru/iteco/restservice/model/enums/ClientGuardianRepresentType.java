@@ -40,6 +40,9 @@ public enum ClientGuardianRepresentType {
     }
 
     public static ClientGuardianRepresentType of(Integer i){
+        if(i == null){
+            return null;
+        }
         for(ClientGuardianRepresentType type : ClientGuardianRepresentType.values()){
             if(i.equals(type.val)){
                 return type;

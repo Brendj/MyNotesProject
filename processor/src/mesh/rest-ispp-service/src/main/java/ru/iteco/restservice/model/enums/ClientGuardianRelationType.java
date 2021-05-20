@@ -32,6 +32,9 @@ public enum ClientGuardianRelationType {
     }
 
     public static ClientGuardianRelationType of(Integer i){
+        if(i == null){
+            return null;
+        }
         for(ClientGuardianRelationType type : ClientGuardianRelationType.values()){
             if(i.equals(type.ordinal())){
                 return type;
