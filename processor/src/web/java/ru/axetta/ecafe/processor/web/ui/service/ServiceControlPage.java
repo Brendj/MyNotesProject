@@ -33,7 +33,7 @@ public class ServiceControlPage extends BasicWorkspacePage {
 
     private static final String URL_ENDPOINT_PROP = "ecafe.processing.service.mspkafka.rest.url";
     private static final String API_KEY_PROP = "ecafe.processing.service.mspkafka.rest.apikey";
-    private static final String DEFAULT_SAMPLE_SIZE = "500";
+    private static final String DEFAULT_SAMPLE_SIZE = "50000";
     private static final Long DELTA_MONTH = 2595600000L;
 
     private String endpointUrl;

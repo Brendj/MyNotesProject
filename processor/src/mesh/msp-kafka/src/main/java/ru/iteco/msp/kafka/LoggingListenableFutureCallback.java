@@ -12,7 +12,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 public class LoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, String>> {
     private static final Logger log = LoggerFactory.getLogger(LoggingListenableFutureCallback.class);
-    private String message;
+    private final String message;
 
     public LoggingListenableFutureCallback(String message){
         this.message = message;
