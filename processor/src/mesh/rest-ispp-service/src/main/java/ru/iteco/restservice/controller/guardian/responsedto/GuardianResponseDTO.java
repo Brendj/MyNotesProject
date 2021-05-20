@@ -21,9 +21,11 @@ public class GuardianResponseDTO extends BaseResponseDTO {
     public GuardianResponseDTO(Long contractId, String firstName, String lastName, String middleName, String grade,
             String orgName, String orgType, Integer relation, Integer isLegalRepresent) {
         super(contractId, firstName, middleName, lastName, grade, orgType, orgName);
+        ClientGuardianRelationType relationType = ClientGuardianRelationType.of(relation);
+        ClientGuardianRepresentType representType = ClientGuardianRepresentType.of(isLegalRepresent);
 
-        this.relation = ClientGuardianRelationType.of(relation).toString();
-        this.isLegalRepresent = ClientGuardianRepresentType.of(isLegalRepresent).toString();
+        this.relation = relationType == null ? null : relationType.toString();
+        this.isLegalRepresent = representType == null ? null : representType.getDescription();
     }
 
     public String getRelation() {
