@@ -29,6 +29,7 @@ public class EMIAS {
     private Boolean archive;
     private Integer hazard_level_id;
     private Boolean processed;
+    private Date acceptedDateTime;
 
    public EMIAS(){}
 
@@ -159,5 +160,13 @@ public class EMIAS {
 
     public void setProcessed(Boolean processed) {
         this.processed = processed;
+    }
+
+    public Date getAcceptedDateTime() {
+        return acceptedDateTime;
+    }
+
+    public void setAcceptedDateTime(Date acceptedDateTime) {
+        this.acceptedDateTime = acceptedDateTime;
     }
 }

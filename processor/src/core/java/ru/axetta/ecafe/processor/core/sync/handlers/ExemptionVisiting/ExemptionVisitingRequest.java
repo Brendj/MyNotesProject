@@ -27,6 +27,13 @@ public class ExemptionVisitingRequest implements SectionRequest {
                 exemptionVisitingSyncFromARMPOJO.setIdExemption(XMLUtils.getLongAttributeValue(nodeElement, "idExemption"));
                 exemptionVisitingSyncFromARMPOJO
                         .setAccepted(Boolean.valueOf(XMLUtils.getAttributeValue(nodeElement, "accepted")));
+                String dateAccept = XMLUtils.getAttributeValue(nodeElement, "acceptedDateTime");
+                if (dateAccept.equals("null"))
+                {
+                    exemptionVisitingSyncFromARMPOJO.setAcceptedDateTime(null);
+                }
+                else
+                    exemptionVisitingSyncFromARMPOJO.setAcceptedDateTime(XMLUtils.getDateAttributeValue(nodeElement, "acceptedDateTime"));
                 items.add(exemptionVisitingSyncFromARMPOJO);
             }
             nodeElement = nodeElement.getNextSibling();

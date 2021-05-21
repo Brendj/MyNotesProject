@@ -91,6 +91,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
             exemptionVisitingSyncPOJO.setVersion(emias.getVersion());
             exemptionVisitingSyncPOJO.setCreateDate(emias.getCreateDate());
             exemptionVisitingSyncPOJO.setUpdateDate(emias.getUpdateDate());
+            exemptionVisitingSyncPOJO.setAcceptedDateTime(emias.getAcceptedDateTime());
             fullExemptionVisitingAnswerForARM.getItems().add(exemptionVisitingSyncPOJO);
         }
         return fullExemptionVisitingAnswerForARM;

@@ -60,57 +60,150 @@
     <h:panelGrid columns="1" columnClasses="valign, valign">
         <rich:dataTable id="emiasTable" value="#{mainPage.emiasReportPage.items}" var="item" rows="50"
                         footerClass="data-table-footer" columnClasses="center-aligned-column" reRender="lastOrgUpdateTime">
+
+            <f:facet name="header">
+                <rich:columnGroup columnClasses="gray">
+                    <rich:column headerClass="column-header" rowspan="2" width="30px">
+                        <h:outputText value="П/п" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header" colspan="3">
+                        <h:outputText value="Данные ОО" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header" colspan="4">
+                        <h:outputText value="Данные обучающегося" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header" colspan="6">
+                        <h:outputText value="Данные события" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header" rowspan="2">
+                        <h:outputText value="Отметка о несогласии представителя" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header" rowspan="2">
+                        <h:outputText value="Принято к сведению ОО" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header" breakBefore="true">
+                        <h:outputText value="ИД" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Название" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Адрес" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Группа" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="ФИО" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Лицевой счет" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Список льгот" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Дата получения" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Ид" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Начало отсутствия" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Окончание отсутствия" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Дата отмены" />
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <h:outputText value="Статус" />
+                    </rich:column>
+
+                </rich:columnGroup>
+            </f:facet>
+
             <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText escape="false" value="Идентификатор"/><br/>
-                        <h:outputText escape="false" value="события в «ИС ПП»"/>
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText escape="true" value="#{item.emiasID}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.recordID}" styleClass="output-text" />
             </rich:column>
+
             <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText escape="false" value="ФИО обучающегося"/>
-                    </h:panelGroup>
-                </f:facet>
+                <h:outputText escape="true" value="#{item.orgID}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.orgName}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.orgAdress}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.clientGroup}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{item.lastname} #{item.firstname} #{item.middlename}" styleClass="output-text" />
             </rich:column>
+
             <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText escape="false" value="Дата события"/>
-                    </h:panelGroup>
-                </f:facet>
-                <h:outputText escape="true" value="#{item.dateLiberation}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.contractID}" styleClass="output-text" />
             </rich:column>
+
             <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText escape="false" value="Дата начала"/><br/>
-                        <h:outputText escape="false" value="освобождения"/>
-                    </h:panelGroup>
-                </f:facet>
+                <h:outputText escape="true" value="#{item.benefits}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.emiasDate}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.emiasID}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{item.dateStartLiberation}" styleClass="output-text" />
             </rich:column>
+
             <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText escape="false" value="Дата окончания"/><br/>
-                        <h:outputText escape="false" value="освобождения"/>
-                    </h:panelGroup>
-                </f:facet>
                 <h:outputText escape="true" value="#{item.dateEndLiberation}" styleClass="output-text" />
             </rich:column>
+
             <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:panelGroup>
-                        <h:outputText escape="false" value="Отметка о принятии"/><br/>
-                        <h:outputText escape="false" value="к сведения информации"/>
-                    </h:panelGroup>
-                </f:facet>
+                <h:outputText escape="true" value="#{item.emiasDatearchived}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.status}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{item.accepted}" styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.acceptedinOO}" styleClass="output-text" />
             </rich:column>
 
             <f:facet name="footer">

@@ -14,28 +14,55 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class EmiasItem {
-    private Long emiasID;
+    private Long recordID;
+    private Long orgID;
+    private String orgName;
+    private String orgAdress;
+    private String clientGroup;
     private String firstname;
     private String lastname;
     private String middlename;
-    private String dateLiberation;
+    private Long contractID;
+    private String benefits;
+    private Long emiasID;
+    private String emiasDate;
     private String dateStartLiberation;
     private String dateEndLiberation;
+    private String emiasDatearchived;
+    private String status;
     private String accepted;
+    private String acceptedinOO;
 
     private Format formatter = new SimpleDateFormat("dd.MM.yyyy");
 
-    public EmiasItem(Long emiasID, String firstname, String lastname, String middlename,
-            Date dateLiberation, Date dateStartLiberation, Date dateEndLiberation, Boolean accepted)
+    public EmiasItem(Long recordID, Long orgID, String orgName, String orgAdress, String clientGroup,String firstname,
+            String lastname, String middlename, Long contractID, String benefits, Long emiasID, Date emiasDate,
+            Date dateStartLiberation, Date dateEndLiberation, Date emiasDatearchived, String status,
+            Boolean accepted, Date acceptedinOO)
     {
-        this.emiasID = emiasID;
+        this.recordID = recordID;
+        this.orgID = orgID;
+        this.orgName = orgName;
+        this.orgAdress = orgAdress;
+        this.clientGroup = clientGroup;
         this.firstname = firstname;
         this.lastname = lastname;
         this.middlename = middlename;
-        this.dateLiberation = formatter.format(dateLiberation);
-        this.dateStartLiberation = formatter.format(dateStartLiberation);
-        this.dateEndLiberation = formatter.format(dateEndLiberation);
+        this.contractID = contractID;
+        this.benefits = benefits;
+        this.emiasID = emiasID;
+        if (emiasDate != null)
+            this.emiasDate = formatter.format(emiasDate);
+        if (dateStartLiberation != null)
+            this.dateStartLiberation = formatter.format(dateStartLiberation);
+        if (dateEndLiberation != null)
+            this.dateEndLiberation = formatter.format(dateEndLiberation);
+        if (emiasDatearchived != null)
+            this.emiasDatearchived = formatter.format(emiasDatearchived);
+        this.status = status;
         this.accepted = accepted.toString();
+        if (acceptedinOO != null)
+            this.acceptedinOO = formatter.format(acceptedinOO);
     }
 
 
@@ -71,14 +98,6 @@ public class EmiasItem {
         this.middlename = middlename;
     }
 
-    public String getDateLiberation() {
-        return dateLiberation;
-    }
-
-    public void setDateLiberation(String dateLiberation) {
-        this.dateLiberation = dateLiberation;
-    }
-
     public String getDateStartLiberation() {
         return dateStartLiberation;
     }
@@ -101,5 +120,93 @@ public class EmiasItem {
 
     public void setAccepted(String accepted) {
         this.accepted = accepted;
+    }
+
+    public Long getRecordID() {
+        return recordID;
+    }
+
+    public void setRecordID(Long recordID) {
+        this.recordID = recordID;
+    }
+
+    public Long getOrgID() {
+        return orgID;
+    }
+
+    public void setOrgID(Long orgID) {
+        this.orgID = orgID;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getOrgAdress() {
+        return orgAdress;
+    }
+
+    public void setOrgAdress(String orgAdress) {
+        this.orgAdress = orgAdress;
+    }
+
+    public String getClientGroup() {
+        return clientGroup;
+    }
+
+    public void setClientGroup(String clientGroup) {
+        this.clientGroup = clientGroup;
+    }
+
+    public Long getContractID() {
+        return contractID;
+    }
+
+    public void setContractID(Long contractID) {
+        this.contractID = contractID;
+    }
+
+    public String getBenefits() {
+        return benefits;
+    }
+
+    public void setBenefits(String benefits) {
+        this.benefits = benefits;
+    }
+
+    public String getEmiasDate() {
+        return emiasDate;
+    }
+
+    public void setEmiasDate(String emiasDate) {
+        this.emiasDate = emiasDate;
+    }
+
+    public String getEmiasDatearchived() {
+        return emiasDatearchived;
+    }
+
+    public void setEmiasDatearchived(String emiasDatearchived) {
+        this.emiasDatearchived = emiasDatearchived;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAcceptedinOO() {
+        return acceptedinOO;
+    }
+
+    public void setAcceptedinOO(String acceptedinOO) {
+        this.acceptedinOO = acceptedinOO;
     }
 }
