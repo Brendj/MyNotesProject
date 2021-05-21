@@ -1780,7 +1780,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private static X509Certificate getRootCertSecondary() throws Exception {
         if (rtCertSecondary == null) {
-            byte bytes[] = Base64.decode(base64crt_secondary);
+            byte bytes[] = ru.axetta.ecafe.processor.core.utils.Base64.decode(base64crt_secondary);
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             rtCertSecondary = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(bytes));
         }

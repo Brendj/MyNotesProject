@@ -40,7 +40,7 @@ import java.util.*;
 
 @Path(value = "")
 @Controller
-@ApplicationPath("/ezd")
+@ApplicationPath("/ispp/ezd")
 public class EzdController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(EzdController.class);
