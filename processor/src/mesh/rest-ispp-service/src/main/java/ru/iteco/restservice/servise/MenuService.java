@@ -134,6 +134,8 @@ public class MenuService {
         WtCategory category = null;
         WtCategoryItem categoryItem = null;
 
+        Long nextVersion = prohibitionMenuReadOnlyRepo.getMaxVersion() + 1;
+
         if(idOfDish != null){
             dish = dishRepo.findById(idOfDish)
                     .orElseThrow(() -> new NotFoundException("Не удалось найти блюдо по ID " + idOfDish));
@@ -148,7 +150,7 @@ public class MenuService {
             throw new RuntimeException();
         }
 
-        ProhibitionMenu prohibitionMenu = new ProhibitionMenu(client, dish, category, categoryItem);
+        ProhibitionMenu prohibitionMenu = new ProhibitionMenu(client, dish, category, categoryItem, nextVersion);
 
         prohibitionMenu = writableEntityManager.merge(prohibitionMenu);
         return prohibitionMenu.getIdOfProhibitions();
@@ -160,22 +162,32 @@ public class MenuService {
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Не удалось найти ограничение по ID: " + id));
 
-        List<ProhibitionMenu> deletedRows = null;
+        Set<ProhibitionMenu> deletedRows = new HashSet<>();
+        List<ProhibitionMenu> categoryItemProhibitions;
+        List<ProhibitionMenu> dishProhibitions;
         List<Long> deletedIds = new LinkedList<>();
 
         if(prohibition.getCategory() != null){
-            deletedRows = prohibitionMenuReadOnlyRepo
-                    .findRowsForDeleteByClientAndCategory(prohibition.getClient(), prohibition.getCategory());
-        } else if(prohibition.getCategoryItem() != null){
-            deletedRows = prohibitionMenuReadOnlyRepo
-                    .findRowsForDeleteByClientAndCategoryItems(prohibition.getClient(), prohibition.getCategoryItem());
-        } else {
-            deletedRows = Collections.singletonList(prohibition);
-        }
+            categoryItemProhibitions = prohibitionMenuReadOnlyRepo
+                    .findProhibitionWithCategoryItemsByClientAndCategory(prohibition.getClient(), prohibition.getCategory());
+            deletedRows.addAll(categoryItemProhibitions);
 
+            for(WtCategoryItem i : prohibition.getCategory().getCategoryItems()){
+                deletedRows.addAll(prohibitionMenuReadOnlyRepo
+                        .findProhibitionWithDishByClientAndCategoryItem(prohibition.getClient(), i));
+            }
+        } else if(prohibition.getCategoryItem() != null){
+            dishProhibitions = prohibitionMenuReadOnlyRepo
+                    .findProhibitionWithDishByClientAndCategoryItem(prohibition.getClient(), prohibition.getCategoryItem());
+            deletedRows.addAll(dishProhibitions);
+        }
+        deletedRows.add(prohibition);
+
+        Long nextVersion = prohibitionMenuReadOnlyRepo.getMaxVersion() + 1;
         for(ProhibitionMenu p : deletedRows){
             p.setUpdateDate(new Date());
             p.setDeletedState(true);
+            p.setVersion(nextVersion);
 
             writableEntityManager.merge(p);
 

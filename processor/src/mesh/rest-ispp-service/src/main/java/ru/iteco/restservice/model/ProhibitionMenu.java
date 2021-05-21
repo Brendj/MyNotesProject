@@ -70,7 +70,7 @@ public class ProhibitionMenu {
         this.deletedState = deletedState;
     }
 
-    public ProhibitionMenu(Client client, WtDish dish, WtCategory category, WtCategoryItem categoryItem) {
+    public ProhibitionMenu(Client client, WtDish dish, WtCategory category, WtCategoryItem categoryItem, Long version) {
         this.client = client;
         this.dish = dish;
         this.category = category;
@@ -78,6 +78,7 @@ public class ProhibitionMenu {
         this.createDate = new Date();
         this.updateDate = new Date();
         this.deletedState = false;
+        this.version = version;
     }
 
     public ProhibitionMenu() {
