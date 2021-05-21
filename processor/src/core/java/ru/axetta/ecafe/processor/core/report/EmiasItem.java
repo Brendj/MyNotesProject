@@ -30,7 +30,7 @@ public class EmiasItem {
     private String dateEndLiberation;
     private String emiasDatearchived;
     private String status;
-    private String accepted;
+    private Boolean accepted;
     private String acceptedinOO;
 
     private Format formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -60,7 +60,7 @@ public class EmiasItem {
         if (emiasDatearchived != null)
             this.emiasDatearchived = formatter.format(emiasDatearchived);
         this.status = status;
-        this.accepted = accepted.toString();
+        this.accepted = accepted;
         if (acceptedinOO != null)
             this.acceptedinOO = formatter.format(acceptedinOO);
     }
@@ -114,11 +114,11 @@ public class EmiasItem {
         this.dateEndLiberation = dateEndLiberation;
     }
 
-    public String getAccepted() {
+    public Boolean getAccepted() {
         return accepted;
     }
 
-    public void setAccepted(String accepted) {
+    public void setAccepted(Boolean accepted) {
         this.accepted = accepted;
     }
 

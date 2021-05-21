@@ -39,6 +39,31 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Дата получения от" styleClass="output-text" />
+        <rich:calendar value="#{mainPage.emiasReportPage.startDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDateCalendar"
+                         actionListener="#{mainPage.emiasReportPage.onReportPeriodChanged}" />
+        </rich:calendar>
+
+        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+        <h:selectOneMenu id="endDatePeriodSelect"
+                         value="#{mainPage.emiasReportPage.periodTypeMenu.periodType}"
+                         styleClass="input-text" style="width: 250px;">
+            <f:converter converterId="periodTypeConverter" />
+            <f:selectItems value="#{mainPage.emiasReportPage.periodTypeMenu.items}" />
+            <a4j:support event="onchange" reRender="endDateCalendar"
+                         actionListener="#{mainPage.emiasReportPage.onReportPeriodChanged}" />
+        </h:selectOneMenu>
+        <h:outputText escape="true" value="Дата получения до" styleClass="output-text" />
+        <rich:calendar id="endDateCalendar" value="#{mainPage.emiasReportPage.endDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect"
+                         actionListener="#{mainPage.emiasReportPage.onEndDateSpecified}" />
+        </rich:calendar>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="false" value="Построить по всем дружественным организациям" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.emiasReportPage.allFriendlyOrgs}" styleClass="output-text">
         </h:selectBooleanCheckbox>
@@ -199,7 +224,7 @@
             </rich:column>
 
             <rich:column headerClass="column-header">
-                <h:outputText escape="true" value="#{item.accepted}" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{item.accepted}" styleClass="output-text" disabled="true"/>
             </rich:column>
 
             <rich:column headerClass="column-header">

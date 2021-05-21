@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
@@ -26,10 +27,8 @@ import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by voinov on 13.05.21.
@@ -39,6 +38,8 @@ public class EmiasReportPage extends OnlineReportPage {
     private final static Logger logger = LoggerFactory.getLogger(EmiasReportPage.class);
 
     private String htmlReport = null;
+
+
 
     public EmiasReportPage() throws RuntimeContext.NotInitializedException {
         super();
@@ -70,7 +71,7 @@ public class EmiasReportPage extends OnlineReportPage {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 builder.setReportProperties(buildProperties());
-                items = builder.createDataSource(persistenceSession);
+                items = builder.createDataSource(persistenceSession, startDate, endDate);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {
@@ -158,7 +159,6 @@ public class EmiasReportPage extends OnlineReportPage {
         }
         properties.setProperty(BlockUnblockCardReport.P_ID_OF_CLIENTS, StringUtils.join(idClients, ','));
         properties.setProperty(BlockUnblockCardReport.P_ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
-       // properties.setProperty(BlockUnblockCardReport.P_CARD_STATUS, cardStatusFilter);
         return properties;
     }
 

@@ -41,10 +41,6 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
      *
      * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
      */
-    public static final String REPORT_NAME = "Детализированный отчет по посещению";
-    public static final String[] TEMPLATE_FILE_NAMES = {"BlockUnblockCard.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = true;
-    public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
     final public static String P_ID_OF_CLIENTS = "idOfClients";
     final public static String P_ALL_FRIENDLY_ORGS = "friendsOrg";
 
@@ -97,13 +93,13 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
             endTime = CalendarUtils.endOfDay(endTime);
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    new JRBeanCollectionDataSource(createDataSource(session)));
+                    new JRBeanCollectionDataSource(createDataSource(session, startTime, endTime)));
             Date generateEndTime = new Date();
             return new EmiasReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, null);
         }
 
-        public List<EmiasItem> createDataSource(Session session) {
+        public List<EmiasItem> createDataSource(Session session, Date startTime, Date endTime) {
 
             List<EmiasItem> emiasItems = new ArrayList<>();
             Org orgLoad;
@@ -120,6 +116,8 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
 
             String filterOrgs = "";
             String filterClients = "";
+            String filterPeriod = "";
+
             if (orgLoad != null) {
                 if (allFriendlyOrgs) {
                     for (Org org : orgLoad.getFriendlyOrg()) {
@@ -139,6 +137,15 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 filterClients = " and cc.idofclient in (" + filterClients + ") ";
             }
 
+            if (startTime != null)
+            {
+                filterPeriod += " and ce.dateliberate > " + startTime.getTime() + " ";
+            }
+            if (endTime != null)
+            {
+                filterPeriod += " and ce.dateliberate < " + endTime.getTime() + " ";
+            }
+
             Query queryEMIAS = session.createSQLQuery(
                     "select distinct co.idoforg, co.shortnameinfoservice, co.shortaddress, ccg.groupname, cp.firstname, cp.surname, cp.secondname,\n"
                             + "cc.contractid, benefit.benef, ce.dateliberate, ce.ideventemias, ce.startdateliberate, ce.enddateliberate, \n"
@@ -152,7 +159,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
                             + "left join (select cc.idofclient, string_agg(ccdd.dtiszndescription, ', ') as benef from cf_clients cc \n"
                             + "left join cf_client_dtiszn_discount_info ccdd on cc.idofclient=ccdd.idofclient group by cc.idofclient) as benefit on benefit.idofclient=cc.idofclient\n"
-                            + "where ce.processed = true " + filterOrgs + filterClients);
+                            + "where ce.processed = true " + filterOrgs + filterClients + filterPeriod);
 
             List rListEmias = queryEMIAS.list();
             long counter = 1;

@@ -54,10 +54,10 @@ public class BlockUnblockCardReport extends BasicReportForMainBuildingOrgJob {
      *
      * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
      */
-    public static final String REPORT_NAME = "Детализированный отчет по посещению";
-    public static final String[] TEMPLATE_FILE_NAMES = {"BlockUnblockCard.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = true;
-    public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
+    //public static final String REPORT_NAME = "Детализированный отчет по посещению";
+    //public static final String[] TEMPLATE_FILE_NAMES = {"BlockUnblockCard.jasper"};
+    //public static final boolean IS_TEMPLATE_REPORT = true;
+    //public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
     final public static String P_ID_OF_CLIENTS = "idOfClients";
     final public static String P_ALL_FRIENDLY_ORGS = "friendsOrg";
     final public static String P_CARD_STATUS = "cardStatus";
