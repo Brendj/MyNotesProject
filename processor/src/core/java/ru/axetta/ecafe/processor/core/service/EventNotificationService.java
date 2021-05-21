@@ -792,7 +792,7 @@ public class EventNotificationService {
         return attachToValues(CLIENT_GENDER_KEY, genderString, values);
     }
 
-    public static final String[] attachAmountBuyAllToValues(Long amountBuyAll, String[] values) {
+    public static final String[] attachMoneyToValues(Long amountBuyAll, String[] values, String nameParam) {
         if (null == amountBuyAll) {
             return values;
         }
@@ -805,7 +805,7 @@ public class EventNotificationService {
         }
         String amountBuyAllString = rub.toString() + "," + cop_str;
 
-        return attachToValues(PARAM_AMOUNT_BUY_ALL, amountBuyAllString, values);
+        return attachToValues(nameParam, amountBuyAllString, values);
     }
 
     public static Long getTargetIdFromValues(String[] values) {

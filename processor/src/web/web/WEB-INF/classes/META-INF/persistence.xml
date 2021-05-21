@@ -70,7 +70,7 @@
                       value="org.hibernate.transaction.JBossTransactionManagerLookup"/>
             <!--<property name="hibernate.transaction.factory_class"-->
                       <!--value="org.hibernate.transaction.CMTTransactionFactory"/>-->
-            <property name="hibernate.cache.use_second_level_cache" value="false"/>
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
             <property name="hibernate.cache.use_query_cache" value="false"/>
             <property name="hibernate.cache.use_minimal_puts" value="true"/>
             <property name="hibernate.cache.use_structured_entries" value="true"/>

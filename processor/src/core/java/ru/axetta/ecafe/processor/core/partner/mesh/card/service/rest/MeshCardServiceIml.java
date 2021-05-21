@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +144,9 @@ public class MeshCardServiceIml implements MeshCardService {
         category.setActualFrom(sdfForActualDates.format(card.getCreateTime()));
         category.setActualTo(sdfForActualDates.format(card.getValidTime()));
 
-        category.getParameterValues().add(new Parameter(CardPropertiesEnum.CARD_UID, card.getCardNo()));
+        category.getParameterValues().add(new Parameter(CardPropertiesEnum.CARD_UID,
+                card.getLongCardNo() != null && BooleanUtils.toBoolean(card.getIsLongUid()) ?
+                        card.getLongCardNo() : card.getCardNo()));
         category.getParameterValues().add(new Parameter(CardPropertiesEnum.CARD_TYPE, Card.TYPE_NAMES[card.getCardType()]));
         category.getParameterValues().add(new Parameter(CardPropertiesEnum.BOARD_CARD_NUMBER, card.getCardPrintedNo()));
         if(card.getIssueTime() != null) {

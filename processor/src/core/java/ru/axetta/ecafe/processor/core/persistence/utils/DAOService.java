@@ -524,10 +524,11 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
-    public boolean setClientExpenditureLimit(Long contractId, long limit) {
+    public boolean setClientExpenditureLimit(Long contractId, long limit, long version) {
         Query q = entityManager
-                .createQuery("update Client set expenditureLimit=:expenditureLimit where contractId=:contractId");
+                .createQuery("update Client set expenditureLimit=:expenditureLimit, clientRegistryVersion = :version where contractId=:contractId");
         q.setParameter("expenditureLimit", limit);
+        q.setParameter("version", version);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
@@ -541,13 +542,20 @@ public class DAOService {
     }
 
     public Org getOrg(Long idOfOrg) {
-        Query q = entityManager.createQuery("from Org where idOfOrg = :idOfOrg");
+        /*Query q = entityManager.createQuery("from Org where idOfOrg = :idOfOrg");
         q.setParameter("idOfOrg", idOfOrg);
         List l = q.getResultList();
         if (l.size() == 0) {
             return null;
         }
-        return (Org) l.get(0);
+        return (Org) l.get(0);*/
+        Session session = entityManager.unwrap(Session.class);
+        return getOrg(session, idOfOrg);
+    }
+
+    public Org getOrg(Session session, Long idOfOrg) {
+        Org org = (Org)session.get(Org.class, idOfOrg);
+        return org;
     }
 
     public Client getClientByContractId(long contractId) {
@@ -1677,16 +1685,13 @@ public class DAOService {
         return clients;
     }
 
-    public void applyFullSyncOperationByOrgList(List<Long> idOfOrgList) throws Exception {
-        Query query = entityManager.createQuery("update Org set fullSyncParam=1 where idOfOrg in :idOfOrgList");
-        query.setParameter("idOfOrgList", idOfOrgList);
-        query.executeUpdate();
-    }
-
     public void applyUsePlanOrdersOperationByOrgList(List<Long> idOfOrgList) throws Exception {
         Query query = entityManager.createQuery("update Org set usePlanOrders=1 where idOfOrg in :idOfOrgList");
         query.setParameter("idOfOrgList", idOfOrgList);
         query.executeUpdate();
+        for (Long idOfOrg : idOfOrgList) {
+            Org.sendInvalidateCache(idOfOrg);
+        }
     }
 
     public void applyHaveNewLPForOrg(Long idOfOrg, boolean value) throws Exception {
@@ -1694,6 +1699,7 @@ public class DAOService {
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("valueB", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public List<ComplexRole> findComplexRoles() {
@@ -2571,6 +2577,7 @@ public class DAOService {
             query.executeUpdate();
             transaction.commit();
             transaction = null;
+            Org.sendInvalidateCache(idOfOrg);
         } catch (Exception e) {
             logger.error("e", e);
         } finally {
@@ -2722,6 +2729,7 @@ public class DAOService {
         q.setParameter("value", TradeAccountConfigChange.NOT_CHANGED.getCode());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public void saveDirective(Long idOfOrg, String directiveName, Integer directiveValue) {
@@ -2735,6 +2743,7 @@ public class DAOService {
         q.setParameter("lastUpdate", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public Org findOrgById(Long idOfOrg) {
@@ -3074,7 +3083,12 @@ public class DAOService {
             return null;
         }
     }
-	
+
+    public List<WtDish> getWtDish() {
+        Query q = entityManager.createQuery("SELECT dish FROM WtDish dish");
+        return q.getResultList();
+    }
+
 	//Список союзов организаций, кужа входит данная организация
     public List<Long> getOrgGroupsbyOrgForWEBARM(Long idOforg) throws Exception {
         Session session = (Session) entityManager.getDelegate();
@@ -3131,14 +3145,6 @@ public class DAOService {
         return DAOUtils.getComplexesByWtDiscountRule(entityManager, discountRule);
     }
 
-    public List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryDiscountsByWtDiscountRule(entityManager, discountRule);
-    }
-
-    public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
-    }
-
     public CodeMSP findCodeNSPByCode(Integer code) {
         if(code == null){
             return null;
@@ -3169,6 +3175,16 @@ public class DAOService {
         return q.getResultList();
     }
 
+    public List<WtComplexGroupItem> getTypeComplexFood() {
+        Query q = entityManager.createQuery("SELECT wtComplex from WtComplexGroupItem wtComplex");
+        return q.getResultList();
+    }
+
+    public List<WtDietType> getMapDiet() {
+        Query q = entityManager.createQuery("SELECT wtDiet from WtDietType wtDiet");
+        return q.getResultList();
+    }
+
     public List<WtAgeGroupItem> getAgeGroups() {
         Query q = entityManager.createQuery("SELECT wtAge FROM WtAgeGroupItem wtAge");
         return q.getResultList();
@@ -3179,6 +3195,21 @@ public class DAOService {
         query.setParameter("currentDate", CalendarUtils.startOfDay(new Date()));
         query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
         query.executeUpdate();
+    }
+
+    public void saveQRinfo(ClientEnterQR clientEnterQR) {
+        entityManager.persist(clientEnterQR);
+        entityManager.flush();
+    }
+
+    @Transactional
+    public void setCardSignID(CardSign cardSign, int newID) {
+        String str_query = "update cf_card_signs set idofcardsign=:newID where idofcardsign=:oldID";
+        Query q = entityManager.createNativeQuery(str_query);
+        q = entityManager.createNativeQuery(str_query);
+        q.setParameter("newID", newID);
+        q.setParameter("oldID", cardSign.getIdOfCardSign());
+        q.executeUpdate();
     }
 }
 

@@ -3,7 +3,6 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting" table="cf_SyncSettings">
-        <cache usage="transactional"/>
         <id name="idOfSyncSetting" column="idOfSyncSetting" type="long">
             <generator class="identity"/>
         </id>

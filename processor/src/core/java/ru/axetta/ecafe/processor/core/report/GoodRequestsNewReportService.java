@@ -780,10 +780,10 @@ public class GoodRequestsNewReportService {
                 goodsCode = dishCode;
             } else if (complexId != null && complexInfoItem.goodInfos.containsKey(complexId.longValue())) {
                 GoodInfo info = complexInfoItem.goodInfos.get(complexId.longValue());
-                feedingPlanType = info.feedingPlanType;
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
                 price = info.price;
             } else {
-                feedingPlanType = FeedingPlanType.PAY_PLAN;
+                feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
             }
         } else {
             feedingPlanType = decodeFeedingPlan(position.getFeedingType(), complexId, dishId);
@@ -811,6 +811,36 @@ public class GoodRequestsNewReportService {
             position.setNotified(true);
             session.persist(position);
         }
+    }
+
+    private FeedingPlanType decodeFeedingPlan(Integer feedingType, Integer complexId) {
+        FeedingPlanType result = null;
+        switch (feedingType){
+            case 0: {
+                result = FeedingPlanType.GENERAL; break;
+            }
+            case 1: {
+                result = FeedingPlanType.REDUCED_PRICE_PLAN; break;
+            }
+            case 2: {
+                result = FeedingPlanType.PAY_PLAN; break;
+            }
+            case 3: {
+                result = FeedingPlanType.SUBSCRIPTION_FEEDING; break;
+            }
+            case 4: {
+                if (complexId != null)
+                    result = FeedingPlanType.COMPLEX;
+                else
+                    result = FeedingPlanType.DISH;
+                break;
+            }
+            case 5: {
+                result = FeedingPlanType.PREORDER; break;
+            }
+            default: result = FeedingPlanType.PAY_PLAN;
+        }
+        return result;
     }
 
     private FeedingPlanType decodeFeedingPlan(Integer feedingType, Integer complexId, Long dishId) {

@@ -4,15 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+import ru.axetta.ecafe.processor.core.service.CommonTaskService;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.persistence.PostUpdate;
 import javax.persistence.Version;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +41,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class Org implements Serializable {
-
+    private static final Logger logger = LoggerFactory.getLogger(Org.class);
     public static final String[] STATE_NAMES = {"Не обслуживается", "Обслуживается"};
     public static final int INACTIVE_STATE = 0;
     public static final int ACTIVE_STATE = 1;
@@ -165,6 +170,19 @@ public class Org implements Serializable {
     private String subordination;
     private Long orgIdFromNsi;
     private Boolean gooddatecheck;
+    private Boolean governmentContract;
+    private Boolean useLongCardNo;
+
+    @PostUpdate
+    public void sendInvalidateCache() {
+        logger.info("Send invalidate org id = " + idOfOrg);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
+    }
+
+    public static void sendInvalidateCache(long idOfOrg) {
+        logger.info("Send invalidate org id = " + idOfOrg);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
+    }
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -231,6 +249,8 @@ public class Org implements Serializable {
         this.requestForVisitsToOtherOrg = false;
         this.preordersEnabled = false;
         this.useWebArm = false;
+        this.governmentContract = false;
+        this.useLongCardNo = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1325,5 +1345,21 @@ public class Org implements Serializable {
 
     public void setGooddatecheck(Boolean gooddatecheck) {
         this.gooddatecheck = gooddatecheck;
+    }
+
+    public Boolean getGovernmentContract() {
+        return governmentContract;
+    }
+
+    public void setGovernmentContract(Boolean governmentContract) {
+        this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseLongCardNo() {
+        return useLongCardNo;
+    }
+
+    public void setUseLongCardNo(Boolean useLongCardNo) {
+        this.useLongCardNo = useLongCardNo;
     }
 }

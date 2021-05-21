@@ -7,9 +7,6 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.SyncHistoryException" table="CF_SyncHistory_Exceptions" mutable="false">
-        <!--<id name="idOfSyncHistoryException" column="IdOfSyncHistoryException" type="long">
-           <generator class="identity"/>
-        </id>-->
         <id name="idOfSyncHistoryException" column="IdOfSyncHistoryException" type="long">
             <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
                 <param name="optimizer">pooled-lo</param>

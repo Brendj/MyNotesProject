@@ -9,7 +9,6 @@
 <hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem" table="cf_wt_group_items">
-        <cache usage="transactional"/>
         <id name="idOfGroupItem">
             <column name="idofgroupitem" sql-type="long"/>
         </id>

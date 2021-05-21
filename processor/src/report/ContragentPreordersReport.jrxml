@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPreorderReport" pageWidth="1224" pageHeight="1008" orientation="Landscape" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="19"/>
+	<property name="ireport.x" value="689"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
@@ -1247,7 +1247,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{notPaidDish}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="716" y="0" width="54" height="30" uuid="4cb483aa-f3d3-4f09-b8bd-82eed39400f9">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
@@ -1260,7 +1260,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.format(Locale.US, "%.2f", new BigDecimal($F{complexPrice} / 100.0))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{complexPrice})) / 100.00]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="table" stretchType="RelativeToTallestObject" mode="Transparent" x="184" y="0" width="40" height="30" backcolor="#FFFFFF" uuid="a68f98ee-eacc-495f-9373-dea5a7bfa5f0">
@@ -1307,7 +1307,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{idOfOrder}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="1023" y="0" width="54" height="30" uuid="83d9f02c-9139-4cd7-89bf-2f3b6e67c59a"/>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -1318,7 +1318,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8" isItalic="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.format(Locale.US, "%.2f", new BigDecimal($F{usedSum} / 100.0))]]></textFieldExpression>
+				<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{usedSum})) / 100.00]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="482" y="0" width="54" height="30" uuid="04465fb2-ee56-4766-9ceb-afec57a87369">
@@ -1497,9 +1497,9 @@
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="89">
+		<band height="13">
 			<subreport runToBottom="false">
-				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="1184" height="88" uuid="b6a7e1ee-7a0d-47f6-8257-8289a6fefe75">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="1184" height="13" uuid="b6a7e1ee-7a0d-47f6-8257-8289a6fefe75">
 					<propertyExpression name="SUBREPORT_DIR"><![CDATA[$P{SUBREPORT_DIR}]]></propertyExpression>
 				</reportElement>
 				<subreportParameter name="SUBREPORT_DIR">

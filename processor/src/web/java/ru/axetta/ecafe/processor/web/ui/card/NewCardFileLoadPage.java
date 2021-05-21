@@ -187,7 +187,7 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
 
         try {
             Long idOfCard = cardManager
-                    .createNewCard(cardNo, cardPrintedNo, cardType);
+                    .createNewCard(cardNo, cardPrintedNo, null, cardType);
             return new LineResult(lineNo, 0, "Карта внесена в базу.", idOfCard);
         } catch (Exception e) {
             logger.debug("Failed to create card", e);

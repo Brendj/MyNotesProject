@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.service.CacheService;
 import ru.axetta.ecafe.processor.core.service.CommonTaskService;
 
 import org.slf4j.Logger;
@@ -30,8 +32,13 @@ public class CommonTaskServlet extends HttpServlet {
         final String operation = httpRequest.getParameter(CommonTaskService.OPERATION_PARAM);
         if (operation.equals(CommonTaskService.OPERATION_LOGGING)) {
             write_to_log(httpRequest);
+            httpResponse.sendError(HttpServletResponse.SC_OK);
         }
-        httpResponse.sendError(HttpServletResponse.SC_OK);
+        if (operation.equals(CommonTaskService.OPERATION_INVALIDATE_CACHE)) {
+            String idOfOrgStr = httpRequest.getParameter(CommonTaskService.OPERATION_IDOFORG);
+            runInvalidateCache(idOfOrgStr);
+            httpResponse.sendError(HttpServletResponse.SC_OK);
+        }
     }
 
     public void doGet(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ServletException, IOException {
@@ -45,5 +52,14 @@ public class CommonTaskServlet extends HttpServlet {
             logger.info(String.format("Node: %s, info: %s", node, httpRequest.getParameter(CommonTaskService.INFO_PARAM)));
         if (httpRequest.getParameter(CommonTaskService.ERROR_PARAM) != null)
             logger.error(String.format("Node: %s, error: %s", node, httpRequest.getParameter(CommonTaskService.ERROR_PARAM)));
+    }
+
+    private void runInvalidateCache(String idOfOrgStr) {
+        try {
+            Long idOfOrg = new Long(idOfOrgStr);
+            RuntimeContext.getAppContext().getBean(CacheService.class).invalidateCache(idOfOrg);
+        } catch (Exception e) {
+            logger.error("Error in runInvalidateCache: ", e);
+        }
     }
 }

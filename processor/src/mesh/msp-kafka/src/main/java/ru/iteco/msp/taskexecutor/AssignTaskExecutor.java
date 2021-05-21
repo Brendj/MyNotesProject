@@ -9,13 +9,13 @@ import ru.iteco.msp.enums.AssignOperationType;
 import ru.iteco.msp.kafka.KafkaService;
 import ru.iteco.msp.kafka.dto.AssignEvent;
 import ru.iteco.msp.models.CategoryDiscount;
+import ru.iteco.msp.models.Client;
 import ru.iteco.msp.models.ClientDTSZNDiscountInfo;
 import ru.iteco.msp.models.ClientDiscountHistory;
-import ru.iteco.msp.models.DiscountChangeHistory;
 import ru.iteco.msp.service.DiscountsService;
+import ru.iteco.msp.service.FileSupportService;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class AssignTaskExecutor {
@@ -40,6 +41,7 @@ public class AssignTaskExecutor {
     private final ThreadPoolTaskScheduler threadPoolAssignTaskScheduler;
     private final KafkaService kafkaService;
     private final DiscountsService discountsService;
+    private final FileSupportService fileSupportService;
 
     @Value(value = "${kafka.task.execution.assign.samplesize}")
     private Integer sampleSize;
@@ -55,11 +57,13 @@ public class AssignTaskExecutor {
             CronTrigger assignCronTrigger,
             ThreadPoolTaskScheduler threadPoolAssignTaskScheduler,
             KafkaService kafkaService,
-            DiscountsService discountsService){
+            DiscountsService discountsService,
+            FileSupportService fileSupportService){
         this.assignCronTrigger = assignCronTrigger;
         this.threadPoolAssignTaskScheduler = threadPoolAssignTaskScheduler;
         this.kafkaService = kafkaService;
         this.discountsService = discountsService;
+        this.fileSupportService = fileSupportService;
     }
 
     @PostConstruct
@@ -67,7 +71,7 @@ public class AssignTaskExecutor {
         threadPoolAssignTaskScheduler.schedule(new RunnableTask(), assignCronTrigger);
     }
 
-    class RunnableTask implements Runnable{
+    class RunnableTask implements Runnable {
 
         @Override
         @Transactional
@@ -88,20 +92,20 @@ public class AssignTaskExecutor {
                     begin = new Date(end.getTime() - delta);
 
                     List<ClientDiscountHistory> discountChangeHistoryList = discountsService.getNewHistoryByTime(begin);
-
                     for (ClientDiscountHistory h : discountChangeHistoryList) {
-                        if (StringUtils.isEmpty(h.getClient().getMeshGuid())) {
+                        if(h.getCategoryDiscount().getCategoryType() != 0){
                             continue;
                         }
                         type = AssignOperationType.getAssignTypeByOperationType(h.getOperationType());
-                        if(AssignOperationType.CHANGE.equals(type) || h.getCategoryDiscount().getCategoryDiscountDTSZN() != null){
-                            info = discountsService.getChangedDiscounts(
-                                    h.getCategoryDiscount().getCategoryDiscountDTSZN().getCode(), h.getClient(),
-                                    takeThreeMinute(h.getRegistryDate()), addThreeMinute(h.getRegistryDate())
-                            );
+                        if (AssignOperationType.CHANGE.equals(type)
+                                || h.getCategoryDiscount().getCategoryDiscountDTSZN() != null) {
+                            info = discountsService
+                                    .getLastInfoByClientAndCode(h.getClient(), h.getCategoryDiscount()
+                                            .getCategoryDiscountDTSZN().getCode());
                         }
 
-                        AssignEvent event = AssignEvent.build(h.getCategoryDiscount(), h.getClient(), type, info);
+                        AssignEvent event = AssignEvent.build(h.getCategoryDiscount(), h.getClient(), type, info,
+                                h.getRegistryDate().toString());
                         kafkaService.sendAssign(mapper.writeValueAsString(event));
                     }
                 }
@@ -110,63 +114,65 @@ public class AssignTaskExecutor {
             }
         }
 
-        private Date takeThreeMinute(Long time) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(time);
-            calendar.add(Calendar.MINUTE, -3);
-            return calendar.getTime();
-        }
-
-        private Date addThreeMinute(Long time) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(time);
-            calendar.add(Calendar.MINUTE, 3);
-            return calendar.getTime();
-        }
-
         @Transactional(propagation = Propagation.SUPPORTS)
         public void beginPrimalLoad() {
             try {
-                Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("idOfClient").and(Sort.by("registrationDate").descending()));
-                List<DiscountChangeHistory> discountChangeHistoryList = discountsService.getDistinctHistoryByClient(pageable);
-                while (CollectionUtils.isNotEmpty(discountChangeHistoryList)) {
-                    for(DiscountChangeHistory h : discountChangeHistoryList){
-                        if (StringUtils.isEmpty(h.getClient().getMeshGuid()) ||
-                                (StringUtils.isBlank(h.getCategoriesDiscounts()) && StringUtils.isBlank(h.getOldCategoriesDiscounts()))) {
-                            continue;
-                        }
-                        List<String> discounts = getSortedSplitList(h.getCategoriesDiscounts());
-                        for(String categoryId : discounts){
-                            CategoryDiscount discount = discountsService.getDiscountByStrId(categoryId);
+                Long lastProcessIdOfClient = fileSupportService.getLastProcessIdOfClient();
+                Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("idOfClient"));
+                List<Client> clientsList;
+                if(lastProcessIdOfClient == null) {
+                    clientsList = discountsService.getClientsWithMeshGuid(pageable);
+                } else {
+                    clientsList = discountsService
+                            .getClientsWithMeshGuidAndGreaterThenIdOfClient(lastProcessIdOfClient, pageable);
+                }
+                while (CollectionUtils.isNotEmpty(clientsList)) {
+                    for (Client c : clientsList) {
+                        List<CategoryDiscount> clientCategoryDiscount = discountsService.getDiscountsByClient(c);
+                        for (CategoryDiscount discount : clientCategoryDiscount) {
+                            if(discount.getCategoryType() != 0){
+                                continue;
+                            }
+                            ClientDiscountHistory history = discountsService.getLastHistoryByClientAndCategory(c, discount);
+                            if(history == null){
+                                /*log.warn(String
+                                        .format("Primary load: No history by ClientId %d and DiscountId %d, skipped",
+                                                c.getIdOfClient(), discount.getIdOfCategoryDiscount())
+                                );*/
+                                continue;
+                            }
 
                             ClientDTSZNDiscountInfo info = null;
                             if (discount.getCategoryDiscountDTSZN() != null) {
-                                info = discountsService.getLastInfoByClientAndCode(h.getClient(),
-                                        discount.getCategoryDiscountDTSZN().getCode());
+                                info = discountsService
+                                        .getLastInfoByClientAndCode(c, discount.getCategoryDiscountDTSZN().getCode());
+                            }
+                            if(info != null && (info.getStatus().equals(0) || isArchived(info))){
+                                log.warn(String
+                                        .format("Primary load: DTSZN Info for ClientId %d and DiscountId %d"
+                                                        + " is invalid (status == 1 or is archived),"
+                                                        + " but discount is active for the target client, skipped",
+                                                c.getIdOfClient(), discount.getIdOfCategoryDiscount()));
+                                continue;
                             }
 
-                            AssignEvent event = AssignEvent.build(discount, h.getClient(), AssignOperationType.ADD,
-                                    info);
+                            AssignEvent event = AssignEvent.build(discount, c, AssignOperationType.ADD, info, history.getRegistryDate().toString());
                             kafkaService.sendAssign(mapper.writeValueAsString(event));
                         }
-
+                        fileSupportService.writeLastProcessIdOfClient(c.getIdOfClient());
                     }
 
                     pageable = pageable.next();
-                    discountChangeHistoryList = discountsService.getDistinctHistoryByClient(pageable);
+                    clientsList = discountsService.getClientsWithMeshGuid(pageable);
                 }
+                log.info("--Primal load of assign MSP completed--");
             } catch (Exception e) {
                 log.error("Critical error in process sending primary discount change history records, task interrupt", e);
             }
         }
 
-        private List<String> getSortedSplitList(String s) {
-            if(StringUtils.isBlank(s)){
-                return Collections.emptyList();
-            }
-            String[] arr = StringUtils.split(s, ",");
-            Arrays.sort(arr);
-            return Arrays.asList(arr);
+        private boolean isArchived(ClientDTSZNDiscountInfo info) {
+            return info.getArchived() != null && info.getArchived().equals(1);
         }
     }
 }

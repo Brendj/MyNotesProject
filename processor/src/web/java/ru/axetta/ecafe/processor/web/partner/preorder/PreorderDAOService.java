@@ -334,7 +334,7 @@ public class PreorderDAOService {
                 // 15 Льготные комплексы по правилам соц. скидок
                 if (complexSign.get("Free") && !complexSign.get("Elem") && !complexSign.get("Middle")) {
                     Set<WtDiscountRule> discRules = getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
-                    resComplexes = getFreeWtComplexesByDiscountRules(startDate, startDate, discRules);
+                    resComplexes = getFreeWtComplexesByDiscountRules(startDate, startDate, discRules, org);
                     if (resComplexes.size() > 0) {
                         wtDiscComplexes.addAll(resComplexes);
                     }
@@ -1446,10 +1446,10 @@ public class PreorderDAOService {
 
     @Transactional
     public void relevancePreordersToWtMenu(PreorderComplex preorderComplex, long nextVersion) {
-        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        if (isGoodRequestExists(preorderComplex)) return;
         Date preorderDate = preorderComplex.getPreorderDate();
 
-        WtComplex wtComplex = getWtComplex(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderDate);
+        WtComplex wtComplex = getWtComplex(preorderComplex, preorderComplex.getArmComplexId(), preorderDate);
 
         if (wtComplex == null) {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
@@ -2467,14 +2467,19 @@ public class PreorderDAOService {
         }
     }
 
-    private WtComplex getWtComplex(Client client, Integer idOfComplex, Date date) {
+    private WtComplex getWtComplex(PreorderComplex preorderComplex, Integer idOfComplex, Date date) {
+        Org org = emReport.getReference(Org.class, preorderComplex.getIdOfOrgOnCreate());
+        return getWtComplex(org, preorderComplex.getClient(), idOfComplex, date);
+    }
+
+    private WtComplex getWtComplex(Org org, Client client, Integer idOfComplex, Date date) {
         Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
                 + "LEFT JOIN complex.wtOrgGroup orgGroup "
                 + "WHERE complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                 + "AND complex.deleteState = 0 "
                 + "AND complex.idOfComplex = :idOfComplex "
                 + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) ");
-        query.setParameter("org", client.getOrg());
+        query.setParameter("org", org);
         query.setParameter("idOfComplex", idOfComplex.longValue());
         query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
         query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.DATE);
@@ -2485,6 +2490,10 @@ public class PreorderDAOService {
                     idOfComplex, date, client.getIdOfClient()), e);
             return null;
         }
+    }
+
+    private WtComplex getWtComplex(Client client, Integer idOfComplex, Date date) {
+        return getWtComplex(client.getOrg(), client, idOfComplex, date);
     }
 
     private WtDish getWtDish(Long idOfDish, Date date) {
@@ -3372,15 +3381,16 @@ public class PreorderDAOService {
     }
 
     public Set<WtComplex> getFreeWtComplexesByDiscountRules(Date startDate, Date endDate,
-            Set<WtDiscountRule> wtDiscountRuleSet) {
+            Set<WtDiscountRule> wtDiscountRuleSet, Org org) {
         Set<WtComplex> wtComplexes = new HashSet<>();
         for (WtDiscountRule rule : wtDiscountRuleSet) {
-            Query query = emReport.createQuery("select complex from WtComplex complex "
+            Query query = emReport.createQuery("select complex from WtComplex complex LEFT JOIN complex.wtOrgGroup orgGroup "
                     + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
-                    + "and :rule in elements(complex.discountRules)");
+                    + "and :rule in elements(complex.discountRules) and (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs))");
             query.setParameter("rule", rule);
             query.setParameter("startDate", startDate, TemporalType.DATE);
             query.setParameter("endDate", endDate, TemporalType.DATE);
+            query.setParameter("org", org);
             List<WtComplex> res = query.getResultList();
             if (res != null && res.size() > 0) {
                 wtComplexes.addAll(res);
@@ -3395,10 +3405,12 @@ public class PreorderDAOService {
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("select complex from WtComplex complex "
+                        + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "and complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
                         + "and complex.contragent = :contragent "
                         + "and :rule in elements(complex.discountRules) "
+                        + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs))"
                         + "and (complex.wtComplexGroupItem.idOfComplexGroupItem = :freeComplex "
                         + "or complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
                 query.setParameter("rule", rule);
@@ -3408,6 +3420,7 @@ public class PreorderDAOService {
                 query.setParameter("freeComplex", FREE_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("contragent", org.getDefaultSupplier());
+                query.setParameter("org", org);
                 List<WtComplex> res = query.getResultList();
                 if (res != null && res.size() > 0) {
                     wtComplexes.addAll(res);
@@ -3572,7 +3585,7 @@ public class PreorderDAOService {
                 // проверка по календарю учебных дней
                 Boolean isLearningDay = DAOReadonlyService.getInstance()
                         .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-                if (isLearningDay != null && !isLearningDay) {
+                if (isLearningDay != null && isLearningDay) {
                     return false;
                 }
                 if (isLearningDay == null) {
@@ -3592,7 +3605,7 @@ public class PreorderDAOService {
         } else {
             Boolean isLearningDay = DAOReadonlyService.getInstance()
                     .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
-            if (isLearningDay != null && !isLearningDay) {
+            if (isLearningDay != null && isLearningDay) {
                 return false;
             }
         }

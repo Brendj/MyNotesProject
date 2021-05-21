@@ -8,13 +8,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" table="cf_wt_complexes">
-        <id name="idOfComplex" column="idOfComplex" type="long">
-            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
-                <param name="optimizer">pooled-lo</param>
-                <param name="increment_size">3</param>
-                <param name="sequence_name">cf_wt_complexes_Id_Gen_seq</param>
-            </generator>
-        </id>
+        <id name="idOfComplex" column="idOfComplex" type="long"/>
         <property name="name">
             <column name="name" sql-type="varchar(256)" length="256"/>
         </property>

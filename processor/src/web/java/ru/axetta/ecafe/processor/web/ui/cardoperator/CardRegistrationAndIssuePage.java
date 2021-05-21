@@ -167,7 +167,7 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
             RuntimeContext.getInstance().getCardManager()
                     .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, CardState.ISSUED.getValue(),
                             this.validTime, 1 /*Card.LIFE_STATE_NAMES[1]="Выдана клиенту"*/, this.lockReason, this.issueTime,
-                            this.cardPrintedNo, user);
+                            this.cardPrintedNo, null, user);
             printMessage("Карта зарегистрирована успешно");
         } catch (Exception e) {
             printError(e.getMessage());
@@ -203,8 +203,8 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
         }
         User user = MainPage.getSessionInstance().getCurrentUser();
         validTime = CalendarUtils.endOfDay(validTime);
-        RuntimeContext.getInstance().getCardManager().reissueCard(session, this.client.getIdOfClient(),  this.cardNo, this.cardType, CardState.ISSUED.getValue(),
-                            this.validTime, 1, this.lockReason, this.issueTime,
-                            this.cardPrintedNo, user);
+        RuntimeContext.getInstance().getCardManager().reissueCard(session, this.client.getIdOfClient(),
+                this.cardNo, this.cardType, CardState.ISSUED.getValue(), this.validTime, 1, this.lockReason,
+                this.issueTime, this.cardPrintedNo, null, user);
     }
 }

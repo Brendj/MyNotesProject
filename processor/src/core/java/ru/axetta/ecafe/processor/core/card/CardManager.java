@@ -20,19 +20,20 @@ import java.util.Date;
  */
 public interface CardManager {
 
-    Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, Long cardPrintedNo) throws Exception;
+    Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo,
+            int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
+            Long cardPrintedNo, Long longCardNo) throws Exception;
 
     Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, Long cardPrintedNo) throws Exception;
+            String lockReason, Date issueTime, Long cardPrintedNo, Long longCardNo) throws Exception;
 
     Long createCardTransactionFree(Session session, Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, Long cardPrintedNo) throws Exception;
+            String lockReason, Date issueTime, Long cardPrintedNo, Long longCardNo) throws Exception;
 
     Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception;;
+            String lockReason, Date issueTime, Long cardPrintedNo, Long longCardNo, User user) throws Exception;;
 
-    void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception;
+    void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo, Long longCardNo) throws Exception;
 
     void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId) throws Exception;
@@ -50,23 +51,25 @@ public interface CardManager {
     void updateCardInSession(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard, boolean ignoreValidTime) throws Exception;
 
-    void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception;
+    void changeCardOwner(Long idOfClient, Long cardNo, Long longCardNo, Date changeTime, Date validTime) throws Exception;
 
-    void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime, User cardOperatorUser) throws Exception;
+    void changeCardOwner(Long idOfClient, Long cardNo, Long longCardNo, Date changeTime, Date validTime, User cardOperatorUser) throws Exception;
 
-    Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo, Long cardPrintedNo, Integer cardType) throws Exception;
+    Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo, Long cardPrintedNo,
+            Long longCardNo, Integer cardType) throws Exception;
 
-    Long createNewCard(long cardNo, Long cardPrintedNo, Integer cardType) throws Exception;
+    Long createNewCard(long cardNo, Long cardPrintedNo, Long longCardNo, Integer cardType) throws Exception;
 
     NewCardItem getNewCardPrintedNo(Session persistenceSession, Transaction persistenceTransaction, long cardNo) throws Exception;
 
     NewCardItem getNewCardPrintedNo(long cardNo) throws Exception;
 
     Long createCard(Long idOfClient, Long cardNo, Integer cardType, Date validTime, String lockReason, Date issueTime,
-            Long cardPrintedNo) throws Exception;
+            Long cardPrintedNo, Long longCardNo) throws Exception;
 
-    void reissueCard(Session persistenceSession, Long idOfClient, Long cardNo, Integer cardType, Integer state, Date validTime, Integer lifeState,
-            String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception;
+    void reissueCard(Session persistenceSession, Long idOfClient, Long cardNo, Integer cardType, Integer state,
+            Date validTime, Integer lifeState, String lockReason, Date issueTime, Long cardPrintedNo, Long longCardNo,
+            User user) throws Exception;
 
     Long createSmartWatchAsCard(Session session, Long idOfClient, Long trackerIdAsCardPrintedNo, Integer state, Date validTime, Integer lifeState,
             String lockReason, Date issueTime, Long trackerUidAsCardNo, User user, Integer cardSignCertNum) throws Exception;

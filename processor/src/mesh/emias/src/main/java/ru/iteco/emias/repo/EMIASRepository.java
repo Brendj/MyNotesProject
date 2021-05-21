@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface EMIASRepository extends JpaRepository<EMIAS, Long> {
     @Query(value =
-            "select * from cf_emias where guid=:guid and kafka is true",
+            "select * from cf_emias where guid=:guid and kafka is true and processed=true",
             nativeQuery = true)
     List<EMIAS> findEmiasbyMeshGuidClient(@Param("guid") String guid);
 

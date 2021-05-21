@@ -68,7 +68,7 @@
                                     </h:inputText>
                                     <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                                     <h:inputText id="inputIdFilter" value="#{directorPage.orgListSelectPage.idFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
+                                                 size="60" maxlength="360" styleClass="input-text">
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{directorPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>

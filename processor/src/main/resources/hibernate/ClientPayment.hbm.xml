@@ -9,8 +9,7 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientPayment" table="CF_ClientPayments">
         <id name="idOfClientPayment" column="IdOfClientPayment" type="long">
             <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
-                <param name="optimizer">pooled-lo</param>
-                <param name="increment_size">32</param>
+                <param name="increment_size">1</param>
                 <param name="sequence_name">CF_ClientPayments_Id_Gen_seq</param>
             </generator>
         </id>

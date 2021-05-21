@@ -750,53 +750,32 @@ public class DAOReadonlyService {
         return resultMap;
     }
 
-    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
+    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
         try {
-            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and ce.kafka<>true");
-            query.setParameter("vers", maxVersion);
-            List<EMIAS> emias = query.getResultList();
-            //Фильтрация по орг
-            Iterator<EMIAS> emiasIterator = emias.iterator();
-            while (emiasIterator.hasNext()) {
-                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
-                Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
-                if (cl == null) {
-                    //Удаляем "удаленных" клиентов
-                    emiasIterator.remove();
-                    continue;
-                }
-                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
-                    //Удаляем "чужих" клиентов
-                    emiasIterator.remove();
-                }
-            }
-            return emias;
+            Session session = entityManager.unwrap(Session.class);
+            org.hibernate.Query q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS,"
+                    + " ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate, "
+                    + " ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version, "
+                    + " ce.kafka, ce.archive, ce.hazard_level_id, ce.processed from cf_emias ce "
+                    + " left join cf_clients cc on cc.meshguid = ce.guid "
+                    + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and (ce.kafka is null or ce.kafka = false)").addEntity(EMIAS.class);
+            q.setParameterList("orgs", idOfOrgs);
+            q.setParameter("vers", maxVersion);
+            return q.list();
         } catch (Exception e) {
             return new ArrayList<>();
         }
     }
 
-    public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
+    public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
         try {
-            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers and ce.kafka=true and ce.processed = true");
-            query.setParameter("vers", maxVersion);
-            List<EMIAS> emias = query.getResultList();
-            //Фильтрация по орг
-            Iterator<EMIAS> emiasIterator = emias.iterator();
-            while (emiasIterator.hasNext()) {
-                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
-                Client cl = DAOUtils.findClientByMeshGuid(entityManager.unwrap(Session.class), emias1.getGuid());
-                if (cl == null) {
-                    //Удаляем "удаленных" клиентов
-                    emiasIterator.remove();
-                    continue;
-                }
-                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
-                    //Удаляем "чужих" клиентов
-                    emiasIterator.remove();
-                }
-            }
-            return emias;
+            Session session = entityManager.unwrap(Session.class);
+            org.hibernate.Query q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS, ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate,  ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version,  ce.kafka, ce.archive, ce.hazard_level_id, ce.processed  from cf_emias ce "
+                    + " left join cf_clients cc on cc.meshguid = ce.guid "
+                    + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and ce.kafka=true and ce.processed = true").addEntity(EMIAS.class);
+            q.setParameterList("orgs", idOfOrgs);
+            q.setParameter("vers", maxVersion);
+            return q.list();
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -828,6 +807,26 @@ public class DAOReadonlyService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public Set<WtOrgGroup> getOfflineOrgGroupsSetFromVersion(Long version, Org org) {
+        Set<WtOrgGroup> offlineOrgGroups = new HashSet<>();
+        Query queryDeletedOrgGroups = entityManager.createNativeQuery("select idoforggroup from cf_wt_org_relation_aud a "
+                + "where a.versionoforggroup > :version and a.deletestate = 1 and a.idoforggroup is not null "
+                + "and a.idofcomplex is null and a.idofmenu is null "
+                + "and a.idoforg = :idoforg");
+        queryDeletedOrgGroups.setParameter("version", version);
+        queryDeletedOrgGroups.setParameter("idoforg", org.getIdOfOrg());
+        List list = queryDeletedOrgGroups.getResultList();
+        for (Object obj : list) {
+            Long idOfOrgGroup = HibernateUtils.getDbLong(obj);
+            Query query = entityManager.createQuery(
+                    "SELECT orgGroup from WtOrgGroup orgGroup left join fetch orgGroup.orgs items "
+                            + "where orgGroup.idOfOrgGroup = :idOfOrgGroup");
+            query.setParameter("idOfOrgGroup", idOfOrgGroup);
+            offlineOrgGroups.add((WtOrgGroup) query.getSingleResult());
+        }
+        return offlineOrgGroups;
     }
 
     public Set<WtCategoryItem> getCategoryItemsSetFromVersion(Long version) {
@@ -945,6 +944,25 @@ public class DAOReadonlyService {
 
     }
 
+    public Set<WtMenu> getOfflineMenusSetFromVersion(Long version, Org org) {
+        Set<WtMenu> offlineMenus = new HashSet<>();
+        Query queryDeletedMenus = entityManager.createNativeQuery("select idofmenu from cf_wt_org_relation_aud a "
+                + "where a.versionofmenu > :version and a.deletestate = 1 and a.idofmenu is not null "
+                + "and (a.idoforg = :idoforg or exists (select * from cf_wt_org_group_relations r where r.idoforggroup = a.idoforggroup and r.idoforg = :idoforg))");
+        queryDeletedMenus.setParameter("version", version);
+        queryDeletedMenus.setParameter("idoforg", org.getIdOfOrg());
+        List list = queryDeletedMenus.getResultList();
+        for (Object obj : list) {
+            Long idOfMenu = HibernateUtils.getDbLong(obj);
+            Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
+                    + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                    + "where menu.idOfMenu = :idOfMenu");
+            query.setParameter("idOfMenu", idOfMenu);
+            offlineMenus.add((WtMenu)query.getSingleResult());
+        }
+        return offlineMenus;
+    }
+
     public Set<WtMenu> getMenusSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
@@ -962,6 +980,26 @@ public class DAOReadonlyService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public Set<WtComplex> getOfflineComplexesSetFromVersion(Long version, Org org) {
+        Set<WtComplex> offlineComplexes = new HashSet<>();
+        Query queryDeletedComplexes = entityManager.createNativeQuery("select idofcomplex from cf_wt_org_relation_aud a "
+                + "where a.versionofcomplex > :version and a.deletestate = 1 and a.idofcomplex is not null "
+                + "and (a.idoforg = :idoforg or exists (select * from cf_wt_org_group_relations r where r.idoforggroup = a.idoforggroup and r.idoforg = :idoforg))");
+        queryDeletedComplexes.setParameter("version", version);
+        queryDeletedComplexes.setParameter("idoforg", org.getIdOfOrg());
+        List list = queryDeletedComplexes.getResultList();
+        for (Object obj : list) {
+            Long idOfComplex = HibernateUtils.getDbLong(obj);
+            Query query = entityManager.createQuery(
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items "
+                            + "left join fetch complex.orgs orgs "
+                            + "left join fetch items.dishes dishes where complex.idOfComplex = :idOfComplex");
+            query.setParameter("idOfComplex", idOfComplex);
+            offlineComplexes.add((WtComplex)query.getSingleResult());
+        }
+        return offlineComplexes;
     }
 
     public Set<WtComplex> getComplexesSetFromVersion(Long version, Contragent contragent, Org org) {
@@ -1258,6 +1296,18 @@ public class DAOReadonlyService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public List<CategoryOrg> getAllWtCategoryOrgs(List<WtDiscountRule> wtDiscountRules) {
+        return entityManager.createQuery("select distinct rule.categoryOrgs from WtDiscountRule rule where rule in :discountRules")
+                .setParameter("discountRules", wtDiscountRules)
+                .getResultList();
+    }
+
+    public List<CategoryDiscount> getAllWtCategoryDiscounts(List<WtDiscountRule> wtDiscountRules) {
+        return entityManager.createQuery("select distinct rule.categoryDiscounts from WtDiscountRule rule where rule in :discountRules")
+                .setParameter("discountRules", wtDiscountRules)
+                .getResultList();
     }
 
     public GoodRequestPosition findGoodRequestPositionByGuid(String guid) {

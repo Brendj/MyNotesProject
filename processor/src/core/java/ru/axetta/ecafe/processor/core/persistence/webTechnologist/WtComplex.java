@@ -12,7 +12,6 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -67,6 +66,9 @@ public class WtComplex {
 
     @Column(name = "barcode")
     private String barcode;
+
+    @Column(name = "comment")
+    private String comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idOfComplexGroupItem")
@@ -140,6 +142,7 @@ public class WtComplex {
         this.orgs = complex.orgs;
         this.discountRules = complex.discountRules;
         this.wtComplexesItems = complex.wtComplexesItems;
+        this.comment = complex.comment;
     }
 
     public WtComplex() {
@@ -358,6 +361,14 @@ public class WtComplex {
         return discountRules;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public void setDiscountRules(Set<WtDiscountRule> discountRules) {
         this.discountRules = discountRules;
     }
@@ -371,20 +382,12 @@ public class WtComplex {
             return false;
         }
         WtComplex that = (WtComplex) o;
-        return Objects.equals(idOfComplex, that.idOfComplex) && Objects.equals(name, that.name) && Objects
-                .equals(price, that.price) && Objects.equals(beginDate, that.beginDate) && Objects
-                .equals(endDate, that.endDate) && Objects.equals(cycleMotion, that.cycleMotion) && Objects
-                .equals(dayInCycle, that.dayInCycle) && Objects.equals(version, that.version) && Objects
-                .equals(guid, that.guid) && Objects.equals(createDate, that.createDate) && Objects
-                .equals(lastUpdate, that.lastUpdate) && Objects.equals(deleteState, that.deleteState) && Objects
-                .equals(composite, that.composite) && Objects.equals(startCycleDay, that.startCycleDay);
+        return idOfComplex.equals(that.getIdOfComplex());
     }
 
     @Override
     public int hashCode() {
-        return Objects
-                .hash(idOfComplex, name, price, beginDate, endDate, cycleMotion, dayInCycle, version, guid, createDate,
-                        lastUpdate, deleteState, composite, startCycleDay);
+        return idOfComplex.hashCode();
     }
 
     public Long getIdOfParentComplex() {

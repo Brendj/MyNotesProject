@@ -286,6 +286,8 @@
         <property name="subordination" column="subordination" type="string" length="512"/>
         <property name="orgIdFromNsi" column="organizationidfromnsi" type="long"/>
         <property name="gooddatecheck" column="gooddatecheck" type="boolean"/>
+        <property name="governmentContract" column="governmentContract" type="boolean"/>
+        <property name="useLongCardNo" column="useLongCardNo" type="boolean"/>
     </class>
 </hibernate-mapping>
 

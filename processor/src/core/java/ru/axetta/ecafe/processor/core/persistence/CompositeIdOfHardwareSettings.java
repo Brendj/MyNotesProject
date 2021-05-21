@@ -9,13 +9,13 @@ import java.io.Serializable;
 public class CompositeIdOfHardwareSettings implements Serializable {
 
     private Long idOfOrg;
-    private Long idOfHardwareSetting;
+    private String ipHost;
 
     protected CompositeIdOfHardwareSettings() {
     }
 
-    public CompositeIdOfHardwareSettings(Long idOfOrg, Long idOfHardwareSetting) {
-        this.idOfHardwareSetting = idOfHardwareSetting;
+    public CompositeIdOfHardwareSettings(Long idOfOrg, String ipHost) {
+        this.ipHost = ipHost;
         this.idOfOrg = idOfOrg;
     }
 
@@ -27,11 +27,11 @@ public class CompositeIdOfHardwareSettings implements Serializable {
         this.idOfOrg = idOfOrg;
     }
 
-    public Long getIdOfHardwareSetting() {
-        return idOfHardwareSetting;
+    public String getIpHost() {
+        return ipHost;
     }
 
-    public void setIdOfHardwareSetting(Long idOfHardwareSetting) {
-        this.idOfHardwareSetting = idOfHardwareSetting;
+    public void setIpHost(String ipHost) {
+        this.ipHost = ipHost;
     }
 }

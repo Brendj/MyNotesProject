@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
@@ -18,10 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: akmukov
@@ -47,7 +45,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         List discountRules = getAllDiscountRules(session);
 
         List<WtDiscountRule> wtDiscountRules = getAllWtDiscountRules(session);
-        Org mainOrg = DAOService.getInstance().getOrg(idOfOrg);
+        Org mainOrg = DAOService.getInstance().getOrg(session, idOfOrg);
 
         Set<Org> orgs = getProcessedOrgs(session, idOfOrg, manyOrgs);
         existOrgWithEmptyCategoryOrgSet = false;
@@ -70,13 +68,13 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
 
     private List getAllDiscountRules(Session session) {
         Criteria criteriaDiscountRule = session.createCriteria(DiscountRule.class);
-        criteriaDiscountRule.setFetchMode("categoryOrgs", FetchMode.SELECT);
+        criteriaDiscountRule.setFetchMode("categoryOrgs", FetchMode.JOIN);
         return criteriaDiscountRule.list();
     }
 
     private List<WtDiscountRule> getAllWtDiscountRules(Session session) {
         Criteria criteriaWtDiscountRule = session.createCriteria(WtDiscountRule.class);
-        criteriaWtDiscountRule.setFetchMode("categoryOrgs", FetchMode.SELECT);
+        criteriaWtDiscountRule.setFetchMode("categoryOrgs", FetchMode.JOIN);
         return criteriaWtDiscountRule.list();
     }
 
@@ -97,12 +95,14 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
     //wt
     private void addWtRulesWithEmptyCategoryOrgSet(List<WtDiscountRule> wtDiscountRules, Long idOfOrg) {
         List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(idOfOrg);
+        List<CategoryOrg> allCategoryOrgs = DAOReadonlyService.getInstance().getAllWtCategoryOrgs(wtDiscountRules);
+        List<CategoryDiscount> allCategoryDisounts = DAOReadonlyService.getInstance().getAllWtCategoryDiscounts(wtDiscountRules);
         for (WtDiscountRule rule : wtDiscountRules) {
             if (containWtRule(rule.getIdOfRule())) {
                 continue;
             }
-            if (DAOService.getInstance().getCategoryOrgsByWtDiscountRule(rule).isEmpty()) {
-                addWtDCRI(new DiscountCategoryWtRuleItem(rule, idOfOrg, fOrgs));
+            if (getCategoryOrgsByWtDiscountRule(allCategoryOrgs, rule).isEmpty()) {
+                addWtDCRI(new DiscountCategoryWtRuleItem(allCategoryOrgs, allCategoryDisounts, rule, fOrgs));
             }
         }
     }
@@ -148,21 +148,39 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             return;
         }
         List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
+        List<CategoryOrg> allCategoryOrgs = DAOReadonlyService.getInstance().getAllWtCategoryOrgs(wtDiscountRules);
+        List<CategoryDiscount> allCategoryDiscounts = DAOReadonlyService.getInstance().getAllWtCategoryDiscounts(wtDiscountRules);
         for (WtDiscountRule rule : wtDiscountRules) {
             if (containWtRule(rule.getIdOfRule())) {
                 continue;
             }
             boolean bIncludeRule = false;
-            List<CategoryOrg> categoryOrgs = DAOService.getInstance().getCategoryOrgsByWtDiscountRule(rule);
+            List<CategoryOrg> categoryOrgs = getCategoryOrgsByWtDiscountRule(allCategoryOrgs, rule);
             if (categoryOrgs.isEmpty()) {
                 bIncludeRule = true;
             } else if (categoryOrgSet.containsAll(categoryOrgs)) {
                 bIncludeRule = true;
             }
             if (bIncludeRule) {
-                addWtDCRI(new DiscountCategoryWtRuleItem(rule, org.getIdOfOrg(), fOrgs));
+                addWtDCRI(new DiscountCategoryWtRuleItem(allCategoryOrgs, allCategoryDiscounts, rule, fOrgs));
             }
         }
+    }
+
+    private static List<CategoryOrg> getCategoryOrgsByWtDiscountRule(List<CategoryOrg> allCategoryOrgs, WtDiscountRule rule) {
+        List<CategoryOrg> list = new ArrayList<>();
+        for (CategoryOrg categoryOrg : allCategoryOrgs) {
+            if (rule.getCategoryOrgs().contains(categoryOrg)) list.add(categoryOrg);
+        }
+        return list;
+    }
+
+    private static List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(List<CategoryDiscount> allCategoryDiscounts, WtDiscountRule rule) {
+        List<CategoryDiscount> list = new ArrayList<>();
+        for (CategoryDiscount categoryDiscount : allCategoryDiscounts) {
+            if (rule.getCategoryDiscounts().contains(categoryDiscount)) list.add(categoryDiscount);
+        }
+        return list;
     }
 
     private Set<Org> getProcessedOrgs(Session session, Long idOfOrg, boolean manyOrgs) {
@@ -178,6 +196,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
     @SuppressWarnings("unchecked")
     private void addCategoryDiscounts(Session session) {
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.setFetchMode("categoriesDiscountDSZN", FetchMode.JOIN);
         List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
         for (CategoryDiscount categoryDiscount : categoryDiscounts) {
             DiscountCategoryItem dci = new DiscountCategoryItem(categoryDiscount.getIdOfCategoryDiscount(),
@@ -517,11 +536,11 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.deletedState = deletedState;
         }
 
-        public DiscountCategoryWtRuleItem(WtDiscountRule wtDiscountRule, Long idOfOrg, List<Long> fOrgs) {
+        public DiscountCategoryWtRuleItem(List<CategoryOrg> allCategoryOrgs, List<CategoryDiscount> allCategoryDiscounts, WtDiscountRule wtDiscountRule, List<Long> fOrgs) {
             this.idOfRule = wtDiscountRule.getIdOfRule();
             this.description = wtDiscountRule.getDescription();
 
-            this.categoryDiscounts = buildCategoryDiscounts(wtDiscountRule);
+            this.categoryDiscounts = buildCategoryDiscounts(allCategoryDiscounts, wtDiscountRule);
 
             this.priority = wtDiscountRule.getPriority();
             this.operationOr = wtDiscountRule.isOperationOr();
@@ -531,7 +550,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.subCategory = wtDiscountRule.getSubCategory();
             Set<Long> orgs = new HashSet<>();
 
-            List<CategoryOrg> categoryOrgs = DAOService.getInstance().getCategoryOrgsByWtDiscountRule(wtDiscountRule);
+            List<CategoryOrg> categoryOrgs = getCategoryOrgsByWtDiscountRule(allCategoryOrgs, wtDiscountRule);
             for (CategoryOrg categoryOrg : categoryOrgs) {
                 for (Org org : categoryOrg.getOrgs()) {
                     if (fOrgs.contains(org.getIdOfOrg())) {
@@ -552,9 +571,8 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             return sb.toString();
         }
 
-        private String buildCategoryDiscounts(WtDiscountRule wtDiscountRule) {
-            List<CategoryDiscount> categoryDiscounts = DAOService.getInstance()
-                    .getCategoryDiscountsByWtDiscountRule(wtDiscountRule);
+        private String buildCategoryDiscounts(List<CategoryDiscount> allCategoryDiscounts, WtDiscountRule wtDiscountRule) {
+            List<CategoryDiscount> categoryDiscounts = getCategoryDiscountsByWtDiscountRule(allCategoryDiscounts, wtDiscountRule);
             StringBuilder sb = new StringBuilder();
             int counter = categoryDiscounts.size();
             for (CategoryDiscount category : categoryDiscounts) {

@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,17 +38,19 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
     @Override
     public ResClientPhotos process() throws Exception {
         ResClientPhotos result = new ResClientPhotos();
-        List<ResClientPhotosItem> items = new ArrayList<ResClientPhotosItem>();
+        List<ResClientPhotosItem> items = new LinkedList<>();
         try {
-            List<Long> clientIdsList = new ArrayList<Long>();
+            List<Long> clientIdsList = new LinkedList<>();
             for(ClientPhotosItem item : clientPhotos.getItems()) {
                 clientIdsList.add(item.getIdOfClient());
             }
+
             List<Client> clientList = DAOUtils.findClients(session, clientIdsList);
             Map<Long, Client> clientMap = new HashMap<Long, Client>();
             for(Client client : clientList) {
                 clientMap.put(client.getIdOfClient(), client);
             }
+
             List<ClientPhoto> clientPhotosList = ImageUtils.findClientPhotos(session, clientIdsList);
             Map<Long, ClientPhoto> clientPhotoMap = new HashMap<Long, ClientPhoto>();
             for(ClientPhoto clientPhoto : clientPhotosList) {
@@ -59,8 +58,9 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
             }
 
             ResClientPhotosItem resItem;
+            Long nextVersion = DAOUtils.nextVersionByClientPhoto(session);
+
             for(ClientPhotosItem item : clientPhotos.getItems()){
-                Long nextVersion = DAOUtils.nextVersionByClientPhoto(session);
                 if(item.getResCode().equals(ClientPhotosItem.ERROR_CODE_ALL_OK)) {
                     Client client = clientMap.get(item.getIdOfClient());
                     ClientPhoto clientPhoto = clientPhotoMap.get(client.getIdOfClient());

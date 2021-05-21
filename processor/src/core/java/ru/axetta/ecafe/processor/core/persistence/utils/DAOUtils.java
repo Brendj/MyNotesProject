@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -474,6 +475,7 @@ public class DAOUtils {
      * Обновляет орг. Ставит признак mainbuilding = 0
      * */
     public static int orgMainBuildingUnset(Session session, long idOfOrg) {
+        Org.sendInvalidateCache(idOfOrg);
         Query q = session.createSQLQuery("update cf_orgs set MainBuilding = 0 where idOfOrg = :idOfOrg")
                 .setParameter("idOfOrg", idOfOrg);
         return q.executeUpdate();
@@ -625,6 +627,12 @@ public class DAOUtils {
     public static CardTemp findCardTempByCardNo(Session persistenceSession, long cardNo) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
+        return (CardTemp) criteria.uniqueResult();
+    }
+
+    public static CardTemp findCardTempByLongCardNo(Session persistenceSession, Long longCardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
+        criteria.add(Restrictions.eq("longCardNo", longCardNo));
         return (CardTemp) criteria.uniqueResult();
     }
 
@@ -2084,18 +2092,6 @@ public class DAOUtils {
                 .getResultList();
     }
 
-    public static List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
-        return em.createQuery("select rule.categoryDiscounts from WtDiscountRule rule where rule = :discountRule")
-                .setParameter("discountRule", discountRule)
-                .getResultList();
-    }
-
-    public static List<CategoryOrg> getCategoryOrgsByWtDiscountRule(EntityManager em, WtDiscountRule discountRule) {
-        return em.createQuery("select rule.categoryOrgs from WtDiscountRule rule where rule = :discountRule")
-                .setParameter("discountRule", discountRule)
-                .getResultList();
-    }
-
     public static List getCategoryDiscountListWithIds(EntityManager em, List<Long> idOfCategoryList) {
         javax.persistence.Query q = em
                 .createQuery("from CategoryDiscount where idOfCategoryDiscount in (:idOfCategoryList)");
@@ -2407,6 +2403,7 @@ public class DAOUtils {
         q.setParameter("idOfOrg", idOfOrg);
         q.setParameter("contract", contract);
         q.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void removeContractLinkFromOrgs(EntityManager entityManager, Contract entity) {
@@ -2593,7 +2590,7 @@ public class DAOUtils {
         return query.getResultList();
     }
 
-    public static boolean isNextGradeTransfer(Session session, Long idOfOrg) {
+    /*public static boolean isNextGradeTransfer(Session session, Long idOfOrg) {
         Query query = session.createQuery("select org.nextGradeParam from Org org where org.idOfOrg = :idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         Boolean f = (Boolean) query.uniqueResult();
@@ -2615,12 +2612,13 @@ public class DAOUtils {
         } else {
             return f;
         }
-    }
+    }*/
 
     public static void falseFullSyncByOrg(Session session, Long idOfOrg) {
         Query query = session.createQuery("update Org set fullSyncParam=0 where id=:idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForMenusSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2628,6 +2626,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForClientsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2635,6 +2634,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForOrgSettingsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2642,6 +2642,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void savePreorderDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
@@ -2649,6 +2650,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static List<Client> fetchErrorClientsWithOutFriendlyOrg(final Session persistenceSession,
@@ -2690,7 +2692,8 @@ public class DAOUtils {
     // TODO: воспользоваться диклоративными пособами генерации запроса и на выходи получать только TempCardOperationItem
     public static CardTempOperation getLastTempCardOperationByOrgAndCartNo(Session session, Long idOfOrg, Long cardNo) {
         Query query = session.createQuery(
-                "select operation from CardTempOperation operation left join operation.cardTemp card  where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
+                "select operation from CardTempOperation operation left join operation.cardTemp card "
+                   + " where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("cardNo", cardNo);
         List list = query.list();
@@ -3044,10 +3047,19 @@ public class DAOUtils {
 
     private static long getDistributedObjectVersionFromSequence(Session session, String name) {
         long version = 0L;
-        Query query = session.createSQLQuery(String.format("select nextval('%s')", DAOService.getInstance().getDistributedObjectSequenceName(name)));
-        Object o = query.uniqueResult();
-        if (o != null) {
-            version = HibernateUtils.getDbLong(o);
+        String sequenceName = DAOService.getInstance().getDistributedObjectSequenceName(name);
+        session.createSQLQuery("savepoint before_get_version").executeUpdate();
+        Query query = session.createSQLQuery(String.format("select nextval('%s')", sequenceName));
+        try {
+            Object o = query.uniqueResult();
+            if (o != null) {
+                version = HibernateUtils.getDbLong(o);
+            }
+            session.createSQLQuery("release savepoint before_get_version").executeUpdate();
+        } catch (SQLGrammarException e) {
+            session.createSQLQuery("rollback to savepoint before_get_version").executeUpdate();
+            Query q = session.createSQLQuery(String.format("create sequence %s", sequenceName));
+            q.executeUpdate();
         }
         return version;
     }
@@ -5296,10 +5308,10 @@ public class DAOUtils {
         return version;
     }
 
-    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
-            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
+    public static HardwareSettings getHardwareSettingsByOrgAndHostIP(Session session,
+            String ip, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
-        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.ipHost", ip));
         criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
         return (HardwareSettings) criteria.uniqueResult();
     }
@@ -5485,5 +5497,42 @@ public class DAOUtils {
                 + "  and agetypegroup not like ''\n "
                 + "order by agetypegroup");
         return q.list();
+    }
+
+    public static Card findCardByLongCardNoExtended(Session session, Long longCardNo,
+            Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
+        if (longCardNo == null) return null;
+        try {
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("longCardNo", longCardNo));
+
+            if (idOfClient != null || idOfGuardian != null || idOfVisitor != null) {
+                List<Long> ids = new LinkedList<>();
+                if (idOfClient != null) ids.add(idOfClient);
+                if (idOfGuardian != null) ids.add(idOfGuardian);
+                if (idOfVisitor != null) ids.add(idOfVisitor);
+                if (!ids.isEmpty())
+                    criteria.add(Restrictions.in("client.idOfClient", ids));
+            }
+
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Error in findCardByCardNoExtended", e);
+            return null;
+        }
+    }
+
+    public static Card findCardByLongCardNo(Session persistenceSession, Long longCardNo) {
+        try {
+            Criteria criteria = persistenceSession.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("longCardNo", longCardNo));
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (NoResultException e){
+            return null;
+        }
     }
 }

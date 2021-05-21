@@ -68,8 +68,6 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
 
 
         //Build section for response
-
-        //Собираем данные по всем дружественным корпусам
         List<Long> friendlyOrg = new ArrayList<>();
         friendlyOrg.add(idOfOrg);
         Org org = (Org) session.load(Org.class, idOfOrg);

@@ -1130,34 +1130,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
@@ -1266,8 +1269,7 @@ public class Processor implements SyncProcessor {
         fullProcessingTempCardsOperationsAndData(request, syncHistory, responseSections);
 
         // Process ResCategoriesDiscountsAndRules
-        //Временно убираем
-        //fullProcessingCategoriesDiscountaAndRules(request, syncHistory, responseSections);
+        fullProcessingCategoriesDiscountaAndRules(request, syncHistory, responseSections);
 
         // Process CorrectingNumbersOrdersRegistry
         fullProcessingCorrectingNumbersSection(request, syncHistory, responseSections);
@@ -1360,12 +1362,13 @@ public class Processor implements SyncProcessor {
 
         fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
-        //Секция обработки заявок от ЕМИАС
-        fullProcessingEMIAS(request, responseSections);
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            //Секция обработки заявок от ЕМИАС
+            fullProcessingEMIAS(request, responseSections);
 
-        //Секция обработки заявок от ЕМИАС (от Кафки)
-        fullProcessingExemptionVisiting(request, responseSections);
-
+            //Секция обработки заявок от ЕМИАС (от Кафки)
+            fullProcessingExemptionVisiting(request, responseSections);
+        }
         // время окончания обработки
         Date syncEndTime = new Date();
 
@@ -2218,7 +2221,6 @@ public class Processor implements SyncProcessor {
         processMigrantsSections(request, syncHistory, responseSections, null);
         if (request.getClientRegistryRequest() == null)
             processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
-        processAccRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccountRegistrySectionsForMigrants(request, syncHistory, responseSections);
         if (request.getClientGuardianRequest() == null)
             processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
@@ -2253,22 +2255,6 @@ public class Processor implements SyncProcessor {
             String message = String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }
-    }
-
-    private void processAccRegistrySectionsForMigrants(SyncRequest request, SyncHistory syncHistory,
-            List<AbstractToElement> responseSections) {
-        SyncResponse.AccRegistry accRegistryForMigrants;
-        try {
-            accRegistryForMigrants = getAccRegistryForMigrants(request.getIdOfOrg());
-            addToResponseSections(accRegistryForMigrants, responseSections);
-        } catch (Exception e) {
-            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            if (syncHistory != null) {
-                processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory,
-                        message);
-            }
             logger.error(message, e);
         }
     }
@@ -2479,34 +2465,37 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
 
@@ -2611,34 +2600,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -2739,34 +2731,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -2869,34 +2864,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -2998,34 +2996,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -3166,34 +3167,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -3380,34 +3384,37 @@ public class Processor implements SyncProcessor {
                     e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -3568,34 +3575,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -3692,35 +3702,41 @@ public class Processor implements SyncProcessor {
 
         //info messages
         processInfoMessageSections(request, responseSections);
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias.accinc", "1").equals("1")) {
+                //if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.96")) {
+                //    try {
+                //        EmiasRequest emiasRequest = request.getEmiasRequest();
+                //        if (emiasRequest != null) {
+                //            FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                //            emiasSection = new EmiasSection();
+                //            emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                //            emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                //            emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                //            emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                //        }
+                //    } catch (Exception e) {
+                //        String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                //        logger.error(message, e);
+                //    }
+                //}
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                try {
+                    ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                    if (exemptionVisitingRequest != null) {
+                        FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                                exemptionVisitingRequest, request.getIdOfOrg());
+                        exemptionVisitingSection = new ExemptionVisitingSection();
+                        exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                        exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                        exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                        exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                    }
+                } catch (Exception e) {
+                    String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                    logger.error(message, e);
+                }
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
-
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
-            }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         try {
@@ -3924,34 +3940,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -4786,10 +4805,16 @@ public class Processor implements SyncProcessor {
                 // If cardNo specified - load card from data model
                 Card card = null;
                 Long cardNo = payment.getCardNo();
-                if (null != cardNo) {
-                    card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                Long longCardNo = payment.getLongCardNo();
+                if (null != cardNo || null != longCardNo) {
+                    if (longCardNo != null) {
+                        card = DAOUtils.findCardByLongCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                    } else {
+                        card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                    }
                     if (null == card) {
-                        logger.info(String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
+                        logger.info(
+                                String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
                                         payment.getIdOfOrder(), cardNo));
                     } else {
                         RuntimeContext.getAppContext().getBean(CardBlockService.class)
@@ -4983,13 +5008,10 @@ public class Processor implements SyncProcessor {
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     long totalRSum = totalBuffetRSum + totalLunchRSum;
                     long totalAmountBuyAll = totalBuffetRSum + totalLunchRSum;
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_PRICE,
-                            Long.toString(totalBuffetRSum / 100) + ',' + Long.toString(totalBuffetRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_LUNCH,
-                            Long.toString(totalLunchRSum / 100) + ',' + Long.toString(totalLunchRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT,
-                            Long.toString(totalRSum / 100) + ',' + Long.toString(totalRSum % 100), values);
-                    values = EventNotificationService.attachAmountBuyAllToValues(totalAmountBuyAll, values);
+                    values = EventNotificationService.attachMoneyToValues(totalBuffetRSum, values, EventNotificationService.PARAM_AMOUNT_PRICE);
+                    values = EventNotificationService.attachMoneyToValues(totalLunchRSum, values, EventNotificationService.PARAM_AMOUNT_LUNCH);
+                    values = EventNotificationService.attachMoneyToValues(totalRSum, values, EventNotificationService.PARAM_AMOUNT);
+                    values = EventNotificationService.attachMoneyToValues(totalAmountBuyAll, values, EventNotificationService.PARAM_AMOUNT_BUY_ALL);
                     if (client.getBalance() != null) {
                         values = EventNotificationService.attachToValues("balance",
                                 Long.toString(client.getBalance() / 100) + ',' + Long
@@ -5238,7 +5260,7 @@ public class Processor implements SyncProcessor {
                 return;
             }
 
-            if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
+            if (!orgMap.containsKey(client.getOrg().getIdOfOrg())) {
                 if (!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient())
                         .size() > 0)) {
                     if (!allocatedClients.contains(clientParamItem.getIdOfClient())) {
@@ -6708,6 +6730,7 @@ public class Processor implements SyncProcessor {
                     enterEvent.setPassDirection(e.getPassDirection());
                     enterEvent.setEventCode(e.getEventCode());
                     enterEvent.setIdOfCard(e.getIdOfCard());
+                    enterEvent.setLongCardId(e.getLongCardId());
                     enterEvent.setClient(clientFromEnterEvent);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
                     // Проверка корректности времени
@@ -7147,13 +7170,13 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Org organization = getOrgReference(persistenceSession, idOfOrg);
+            //Org organization = getOrgReference(persistenceSession, idOfOrg);
             OrgSync orgSync = (OrgSync) persistenceSession.load(OrgSync.class, idOfOrg);
             Long result = orgSync.getIdOfPacket();
             orgSync.setIdOfPacket(++result);
             //organization.setIdOfPacket(result + 1);
-            organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
-            persistenceSession.update(organization);
+            //organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
+            //persistenceSession.update(organization);
             persistenceSession.update(orgSync);
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -7668,34 +7691,37 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
         }
 
         Date syncEndTime = new Date();
@@ -8249,34 +8275,38 @@ public class Processor implements SyncProcessor {
         }
         discardOrgSettingsSyncParam(request.getIdOfOrg());
 
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
-            }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
-        }
 
-        try {
-            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
-            if (exemptionVisitingRequest != null) {
-                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
-                exemptionVisitingSection = new ExemptionVisitingSection();
-                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
-                exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
-                exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
-                exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
-            logger.error(message, e);
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
         }
 
         Date syncEndTime = new Date();
