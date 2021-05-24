@@ -41,7 +41,7 @@ public class WtCategory implements Comparable {
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
     private Set<WtDish> dishes = new HashSet<>();
 
-    @OneToMany(mappedBy = "wtCategory")
+    @OneToMany(mappedBy = "wtCategory", fetch = FetchType.EAGER)
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
 
     public static WtCategory build(String description) {

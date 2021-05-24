@@ -159,7 +159,7 @@ public class MenuService {
     @Transactional
     public List<Long> deleteProhibitionById(Long id) {
         ProhibitionMenu prohibition = prohibitionMenuReadOnlyRepo
-                .findById(id)
+                .findByIdOfProhibitionsAndDeletedStateIsFalse(id)
                 .orElseThrow(() -> new NotFoundException("Не удалось найти ограничение по ID: " + id));
 
         Set<ProhibitionMenu> deletedRows = new HashSet<>();
@@ -172,10 +172,10 @@ public class MenuService {
                     .findProhibitionWithCategoryItemsByClientAndCategory(prohibition.getClient(), prohibition.getCategory());
             deletedRows.addAll(categoryItemProhibitions);
 
-            for(WtCategoryItem i : prohibition.getCategory().getCategoryItems()){
-                deletedRows.addAll(prohibitionMenuReadOnlyRepo
-                        .findProhibitionWithDishByClientAndCategoryItem(prohibition.getClient(), i));
-            }
+            deletedRows.addAll(prohibitionMenuReadOnlyRepo
+                       .findProhibitionWithDishByClientAndCategoryItems(
+                               prohibition.getClient(),
+                               prohibition.getCategory().getCategoryItems()));
         } else if(prohibition.getCategoryItem() != null){
             dishProhibitions = prohibitionMenuReadOnlyRepo
                     .findProhibitionWithDishByClientAndCategoryItem(prohibition.getClient(), prohibition.getCategoryItem());

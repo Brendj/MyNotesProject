@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public interface ProhibitionMenuReadOnlyRepo extends JpaRepository<ProhibitionMenu, Long> {
     @Query("select pm from ProhibitionMenu pm where pm.client = :client and pm.deletedState = false")
@@ -22,11 +24,22 @@ public interface ProhibitionMenuReadOnlyRepo extends JpaRepository<ProhibitionMe
             @Param("category") WtCategory category);
 
     @Query("select distinct pm from ProhibitionMenu pm "
+         + "join pm.dish pmd "
+         + "join pmd.categoryItems ci "
+         + "where pm.client = :client and ci in :categoryItems ")
+    List<ProhibitionMenu> findProhibitionWithDishByClientAndCategoryItems(@Param("client") Client client,
+            @Param("categoryItems") Set<WtCategoryItem> categoryItem);
+
+    @Query("select distinct pm from ProhibitionMenu pm "
             + "join pm.dish pmd "
-            + "where pm.client = :client and :categoryItem in (pm.categoryItem)")
+            + "join pmd.categoryItems ci "
+            + "where pm.client = :client and ci = :categoryItem ")
     List<ProhibitionMenu> findProhibitionWithDishByClientAndCategoryItem(@Param("client") Client client,
             @Param("categoryItem") WtCategoryItem categoryItem);
 
+
     @Query ("select max(pm.version) from ProhibitionMenu pm")
     Long getMaxVersion();
+
+    Optional<ProhibitionMenu> findByIdOfProhibitionsAndDeletedStateIsFalse(Long id);
 }
