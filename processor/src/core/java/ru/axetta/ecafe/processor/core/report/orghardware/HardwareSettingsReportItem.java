@@ -81,7 +81,7 @@ public class HardwareSettingsReportItem {
         }
         setClientVersion(orgSync.getClientVersion());
 
-        setRemoteAddress(settings.getIpHost());
+        setRemoteAddress(settings.getCompositeIdOfHardwareSettings().getIpHost());
         setDotNetVersion(settings.getDotNetVer());
         setOsVersion(settings.getoSVer());
         setRamSize(settings.getRamSize());
@@ -89,11 +89,14 @@ public class HardwareSettingsReportItem {
         setReaderName(readerName);
         setFirmwareVersion(firmwareVersion);
 
-        Query query = persistenceSession.createSQLQuery("select " + "(select to_timestamp(max(date)/1000)"
-                + "from (values(lastupdateforiphost), (lastupdatefordotnetver), (lastupdateforosver),"
+        Query query = persistenceSession.createSQLQuery(
+                "select "
+                + "(select to_timestamp(max(date)/1000) "
+                + "from (values(lastupdateforiphost), (lastupdatefordotnetver), (lastupdateforosver), "
                 + "(lastupdateforramsize), (lastupdateforcpuhost)) as updatedate (date)) as date"
-                + " from cf_hardware_settings " + "where idofhardwaresetting = :idOfHardwareSetting ");
-        query.setParameter("idOfHardwareSetting", settings.getCompositeIdOfHardwareSettings().getIdOfHardwareSetting());
+                + " from cf_hardware_settings "
+                + "where ipHost = :ipHost ");
+        query.setParameter("ipHost", settings.getCompositeIdOfHardwareSettings().getIpHost());
         setLastUpdate((Date) query.setMaxResults(1).uniqueResult());
     }
 

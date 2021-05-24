@@ -48,7 +48,8 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
                     Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SALES_REPORTS,
                     Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
-                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
+                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     private static final List<String> securityAdminFunctions = Arrays
             .asList(Function.FUNC_USER_VIEW, Function.FUNC_USER_EDIT, Function.FUNC_USER_DELETE,
                     Function.FUNC_WORK_OPTION);
@@ -89,7 +90,8 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT,
                     Function.FUNC_RESTRICT_CARD_REPORTS, Function.FUNC_COUNT_CURRENT_POSITIONS,
                     Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_FEEDING_SETTINGS_ADMIN,
-                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT);
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     private static final List<String> onlineReportFuncsForSupplierReport = Arrays
             .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
                     Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT,
@@ -106,7 +108,7 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_INFORM_REPORTS, Function.FUNC_RESTRICT_CARD_REPORTS,
                     Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT, Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY,
                     Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_MANUAL_REPORT,
-                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO);
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
