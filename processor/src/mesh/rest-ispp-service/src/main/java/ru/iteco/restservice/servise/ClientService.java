@@ -8,6 +8,7 @@ import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.ClientRegistry;
 import ru.iteco.restservice.model.ClientsNotificationSettings;
 import ru.iteco.restservice.model.enums.ClientGroupAssignment;
 
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
@@ -108,5 +110,47 @@ public class ClientService {
         }
 
         return new LinkedList<>(c.getNotificationSettings());
+    }
+
+    @Transactional
+    public void setLimit(@NotNull Long contractId, @NotNull Long limit) {
+        Client c = clientReadOnlyRepo.getClientByContractId(contractId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));
+
+        if(c.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
+        }
+
+        ClientRegistry registry = writableEntityManager.find(ClientRegistry.class, ClientRegistry.THE_ONLY_INSTANCE_ID,
+                LockModeType.PESSIMISTIC_WRITE);
+
+        Long version = registry.getClientRegistryVersion() + 1;
+        registry.setClientRegistryVersion(version);
+        writableEntityManager.merge(registry);
+
+        c.setExpenditureLimit(limit);
+        c.setClientRegistryVersion(version);
+        writableEntityManager.merge(c);
+    }
+
+    @Transactional
+    public void setBalanceNotification(@NotNull Long contractId, @NotNull Long balanceNotification) {
+        Client c = clientReadOnlyRepo.getClientByContractId(contractId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));
+
+        if(c.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
+        }
+
+        ClientRegistry registry = writableEntityManager.find(ClientRegistry.class, ClientRegistry.THE_ONLY_INSTANCE_ID,
+                LockModeType.PESSIMISTIC_WRITE);
+
+        Long version = registry.getClientRegistryVersion() + 1;
+        registry.setClientRegistryVersion(version);
+        writableEntityManager.merge(registry);
+
+        c.setExpenditureLimit(balanceNotification);
+        c.setClientRegistryVersion(version);
+        writableEntityManager.merge(c);
     }
 }

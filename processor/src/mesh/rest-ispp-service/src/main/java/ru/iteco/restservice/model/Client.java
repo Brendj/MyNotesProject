@@ -187,6 +187,15 @@ public class Client {
     @Column(name = "parallel")
     private String parallel;
 
+    @Column(name = "expenditurelimit")
+    private Long expenditureLimit;
+
+    @Column(name = "balancetonotify")
+    private Long balanceToNotify;
+
+    @Column(name = "clientregistryversion")
+    private Long clientRegistryVersion;
+
     @ManyToOne
     @JoinColumn(name = "idoforg", insertable = false, updatable = false)
     private Org org;
@@ -225,6 +234,22 @@ public class Client {
     private Set<ClientsNotificationSettings> notificationSettings;
 
     public Client() {
+    }
+
+    public Long getExpenditureLimit() {
+        return expenditureLimit;
+    }
+
+    public void setExpenditureLimit(Long expenditureLimit) {
+        this.expenditureLimit = expenditureLimit;
+    }
+
+    public Long getBalanceToNotify() {
+        return balanceToNotify;
+    }
+
+    public void setBalanceToNotify(Long balanceToNotify) {
+        this.balanceToNotify = balanceToNotify;
     }
 
     public String getAgeGroup() {
@@ -361,6 +386,14 @@ public class Client {
 
     public void setNotificationSettings(Set<ClientsNotificationSettings> notificationSettings) {
         this.notificationSettings = notificationSettings;
+    }
+
+    public Long getClientRegistryVersion() {
+        return clientRegistryVersion;
+    }
+
+    public void setClientRegistryVersion(Long clientRegistryVersion) {
+        this.clientRegistryVersion = clientRegistryVersion;
     }
 
     @Override
