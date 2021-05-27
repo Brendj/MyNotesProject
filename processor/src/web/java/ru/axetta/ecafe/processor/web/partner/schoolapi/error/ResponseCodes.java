@@ -15,7 +15,8 @@ public enum ResponseCodes {
     CLIENT_GROUP_NOT_FOUND(102, "Группа клиентов не найден"),
     ORG_NOT_FOUND(103, "Организация не найдена"),
     ORG_GROUP_IS_NOT_FRIENDLY(104, "Организация не является дружественной"),
-    GROUP_MANAGER_NOT_FOUND(105, "Руководитель группы не найден");
+    GROUP_MANAGER_NOT_FOUND(105, "Руководитель группы не найден"),
+    ORDER_REGISTER_ERROR(110, "Ошибка при регистрации заказа");
 
     private final int code;
     private final String description;
