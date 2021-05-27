@@ -27,7 +27,9 @@ public interface EnterEventsReadOnlyRepo extends CrudRepository<EnterEvent, Ente
     Optional<Boolean> clientIsInside(@NotNull @Param("idOfClient") Long idOfClient,
                                      @NotNull @Param("today") Long today);
 
-    @Query(name = "getEnterEvents", nativeQuery = true)
+    @Query(name = "getEnterEvents",
+            countName = "countEvents",
+            nativeQuery = true)
     Page<EnterEventResponseDTO> getEnterEventsByClient(
             @NotNull @Param("contractId") Long contractId,
             @NotNull @Param("startDate") Long startDate,

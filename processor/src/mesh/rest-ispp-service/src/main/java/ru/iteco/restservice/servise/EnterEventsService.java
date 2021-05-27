@@ -41,6 +41,10 @@ public class EnterEventsService {
     public Page<EnterEventResponseDTO> getEnterEventsWitchExternalEventsByContractId(
             @NotNull Long contractId, @NotNull Long startDate,
             @NotNull Long endDate, @NotNull Pageable pageable) {
+        if(startDate > endDate){
+            throw new IllegalArgumentException("Дата начала выборки больше даты окончания");
+        }
+
         Client c = clientReadOnlyRepo.getClientByContractId(contractId)
                 .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));
 

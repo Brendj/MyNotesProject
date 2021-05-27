@@ -91,6 +91,23 @@ import java.util.Objects;
                         + "         JOIN cf_clients AS target ON target.idofclient = exe.idofclient\n"
                         + "WHERE exe.evtstatus in (0,1) and exe.evttype in (0,1) and target.contractid = :contractId "
                         + " AND exe.evtdatetime BETWEEN :startDate AND :endDate"
+        ),
+        @NamedNativeQuery(
+                name = "countEvents",
+                query =
+                  "WITH count_ee AS (SELECT count(ee.*) AS ct \n"
+                + "                  FROM cf_enterevents ee \n"
+                + "                           JOIN cf_clients AS target ON target.idofclient = ee.idofclient \n"
+                + "                  WHERE target.contractid = :contractId \n"
+                + "                    AND ee.evtdatetime BETWEEN :startDate AND :endDate), \n"
+                + "count_exe AS (SELECT count(exe.*) AS ct \n"
+                + "                   FROM cf_externalevents exe \n"
+                + "                            JOIN cf_clients AS target ON target.idofclient = exe.idofclient \n"
+                + "                   WHERE exe.evtstatus IN (0, 1) \n"
+                + "                     AND exe.evttype IN (0, 1) \n"
+                + "                     AND target.contractid = :contractId \n"
+                + "                     AND exe.evtdatetime BETWEEN :startDate AND :endDate) \n"
+                + "SELECT count_ee.ct + count_exe.ct from count_ee, count_exe"
         )
 })
 public class EnterEvent {
