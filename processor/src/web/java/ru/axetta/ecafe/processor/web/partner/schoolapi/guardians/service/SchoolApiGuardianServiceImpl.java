@@ -19,7 +19,7 @@ public class SchoolApiGuardianServiceImpl implements SchoolApiGuardiansService
     private DeleteGuardianCommand deleteGuardianCommand;
 
     @Autowired
-    private CreateOrUpdateGuardianCommand createGuardianCommand;
+    private CreateOrUpdateGuardianCommand createOrUpdateGuardianCommand;
 
     @Override
     public DeleteGuardianResponse deleteGuardian(long recordId, User user)
@@ -28,8 +28,8 @@ public class SchoolApiGuardianServiceImpl implements SchoolApiGuardiansService
     }
 
     @Override
-    public CreateOrUpdateGuardianResponse createGuardian(CreateOrUpdateGuardianRequest createGuardianRequest, User user)
+    public CreateOrUpdateGuardianResponse createOrUpdateGuardian(CreateOrUpdateGuardianRequest createOrUpdateGuardianRequest, User user)
     {
-        return createGuardianCommand.createGuardian(createGuardianRequest, user);
+        return createOrUpdateGuardianCommand.createOrUpdateGuardian(createOrUpdateGuardianRequest, user);
     }
 }

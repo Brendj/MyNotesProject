@@ -6,8 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto;
 
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.BaseResponse;
 
-public class DeleteGuardianResponse extends BaseResponse
-{
+public class DeleteGuardianResponse extends BaseResponse {
     private long recordId;
     private DeleteGuardianResponse() { }
 

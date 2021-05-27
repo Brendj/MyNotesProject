@@ -9,8 +9,7 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpd
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.DeleteGuardianResponse;
 
-public interface SchoolApiGuardiansService
-{
+public interface SchoolApiGuardiansService {
     DeleteGuardianResponse deleteGuardian(long idOfRecord, User user);
-    CreateOrUpdateGuardianResponse createGuardian(CreateOrUpdateGuardianRequest createGuardianRequest, User user);
+    CreateOrUpdateGuardianResponse createOrUpdateGuardian(CreateOrUpdateGuardianRequest createOrUpdateGuardianRequest, User user);
 }

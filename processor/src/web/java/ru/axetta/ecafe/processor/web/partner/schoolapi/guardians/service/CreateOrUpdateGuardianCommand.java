@@ -5,8 +5,8 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianResponse;
@@ -18,11 +18,11 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-@Component
+@Service
 public class CreateOrUpdateGuardianCommand {
     private final Logger logger = LoggerFactory.getLogger(CreateOrUpdateGuardianCommand.class);
     private final RuntimeContext runtimeContext;
@@ -32,14 +32,14 @@ public class CreateOrUpdateGuardianCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public CreateOrUpdateGuardianResponse createGuardian(CreateOrUpdateGuardianRequest request, User user) {
+    public CreateOrUpdateGuardianResponse createOrUpdateGuardian(CreateOrUpdateGuardianRequest request, User user) {
         Session session = null;
         Transaction transaction = null;
 
         try {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            Long newGuardianVersion = ClientManager.generateNewClientGuardianVersion(session);
+            Long newGuardianVersion = DAOUtils.nextVersionBySpecialDate(session);
 
             ClientGuardian guardian = FindExistingGuardianLink(request.getChildClientId(),
                     request.getGuardianClientId(), session);

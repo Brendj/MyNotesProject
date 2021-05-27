@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto.Ap
 import ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto.ApplicationForFoodConfirmResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto.ApplicationForFoodDeclineResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.service.SchoolApiApplicationForFoodService;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.AuthorityUtils;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiController;
 import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
@@ -27,7 +27,7 @@ import java.util.Date;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/applicationForFood")
 @Controller
-public class ApplicationForFoodRestController {
+public class ApplicationForFoodRestController extends BaseSchoolApiController{
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
@@ -71,11 +71,5 @@ public class ApplicationForFoodRestController {
     private SchoolApiApplicationForFoodService getService()
     {
         return RuntimeContext.getAppContext().getBean(SchoolApiApplicationForFoodService.class);
-    }
-
-    private boolean hasAnyRole(String... role)
-    {
-        AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
-        return authorityUtils.hasAnyRole(role);
     }
 }
