@@ -17,7 +17,7 @@ public class PaymentDTO {
     private int orderState;
     private int orderType;
     private String guidClientBalanceHold;
-    private Long totalSumClientBalanceHold;
+    private long totalSumClientBalanceHold;
     private String comments;
     private long sum;
     private long totalSum;
@@ -85,11 +85,11 @@ public class PaymentDTO {
         this.guidClientBalanceHold = guidClientBalanceHold;
     }
 
-    public Long getTotalSumClientBalanceHold() {
+    public long getTotalSumClientBalanceHold() {
         return totalSumClientBalanceHold;
     }
 
-    public void setTotalSumClientBalanceHold(Long totalSumClientBalanceHold) {
+    public void setTotalSumClientBalanceHold(long totalSumClientBalanceHold) {
         this.totalSumClientBalanceHold = totalSumClientBalanceHold;
     }
 
