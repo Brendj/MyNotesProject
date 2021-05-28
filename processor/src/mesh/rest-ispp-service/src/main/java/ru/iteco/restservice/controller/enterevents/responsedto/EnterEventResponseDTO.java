@@ -6,6 +6,8 @@ package ru.iteco.restservice.controller.enterevents.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.math.BigInteger;
+
 @Schema(name = "EnterEventResponseDTO", description = "Данные по событию прохода")
 public class EnterEventResponseDTO {
 
@@ -110,5 +112,23 @@ public class EnterEventResponseDTO {
 
     public void setRepName(String repName) {
         this.repName = repName;
+    }
+
+    public static EnterEventResponseDTO build (Object[] tuple){
+        if(tuple.length < 8){
+            throw new IllegalArgumentException("Incorrect parameter");
+        }
+
+        Long dateTime = ((BigInteger) tuple[0]).longValue();
+        Integer direction = (Integer) tuple[1];
+        String directionText = String.valueOf(tuple[2]);
+        String address = String.valueOf(tuple[3]);
+        String shortNameInfoService = String.valueOf(tuple[4]);
+        String childPassChecker = String.valueOf(tuple[5]);
+        Integer childPassCheckerMethod = (Integer) tuple[6];
+        String repName = String.valueOf(tuple[7]);
+
+        return new EnterEventResponseDTO(dateTime, direction, directionText, address, shortNameInfoService,
+                childPassChecker, childPassCheckerMethod, repName);
     }
 }

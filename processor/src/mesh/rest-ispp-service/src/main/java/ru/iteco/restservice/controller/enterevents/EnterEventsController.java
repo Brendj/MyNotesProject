@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +48,7 @@ public class EnterEventsController {
             @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "10")
             @Max(value = 100L, message = "Размер выборки не должен привышать 100 записей") @PositiveOrZero Integer size) {
         try {
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateTime"));
+            Pageable pageable = PageRequest.of(page, size);
         return enterEventsService
                     .getEnterEventsWitchExternalEventsByContractId(contractId, startDate, endDate, pageable);
         } catch (Exception e) {
