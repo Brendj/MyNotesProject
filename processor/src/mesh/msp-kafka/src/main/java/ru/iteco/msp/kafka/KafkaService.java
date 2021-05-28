@@ -36,7 +36,7 @@ public class KafkaService {
         try{
             SupplyEvent event = SupplyEvent.build(order);
             String msg = objectMapper.writeValueAsString(event);
-            sendSupply(msg);
+            sendSupply(msg, order.getIdOfOrder());
         } catch (Exception e){
             log.error(String.format("Can't send Order ID:%s ID OO:%s",
                     order.getCreatedDate(), order.getIdOfOrg()), e);
@@ -49,8 +49,8 @@ public class KafkaService {
         return future;
     }
 
-    private ListenableFuture sendSupply(String message){
-        ListenableFuture<SendResult<String, String>> future = kafkaStarshipTemplate.send(this.topicSupplyName, message);
+    private ListenableFuture sendSupply(String message, Long idOfOrder){
+        ListenableFuture<SendResult<String, String>> future = kafkaStarshipTemplate.send(this.topicSupplyName, idOfOrder.toString(), message);
         future.addCallback(new LoggingListenableFutureCallback(message));
         return future;
     }
