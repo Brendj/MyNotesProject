@@ -41,19 +41,24 @@ public class AuthorityUtils {
 
     public final User findCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetailsImpl principal = (JwtUserDetailsImpl) authentication.getPrincipal();
-        try {
-            return DAOService.getInstance().findUserById(principal.getIdOfUser());
-        } catch (Exception e) {
-            logger.error("Error when find user, not set idOfUser, ", e);
+        if (authentication != null) {
+            JwtUserDetailsImpl principal = (JwtUserDetailsImpl) authentication.getPrincipal();
+            try {
+                return DAOService.getInstance().findUserById(principal.getIdOfUser());
+            } catch (Exception e) {
+                logger.error("Error when find user, not set idOfUser, ", e);
+            }
         }
         return null;
     }
 
     private UserDetails getUserDetails() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return  (UserDetails) principal;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                return  (UserDetails) principal;
+            }
         }
         return null;
     }

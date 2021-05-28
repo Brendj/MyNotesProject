@@ -5,13 +5,10 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.payment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.dto.PaymentDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.dto.ResPaymentDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.service.SchoolApiPaymentsService;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiController;
-import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
-import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
 import org.springframework.stereotype.Controller;
 
@@ -29,9 +26,9 @@ public class PaymentRestConroller extends BaseSchoolApiController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/orgs/{id}")
     public Response registerPayments(@PathParam("id") Long idOfOrg, List<PaymentDTO> payments) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+/*        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
-        }
+        }*/
         List<ResPaymentDTO> response = getService().registerPayments(idOfOrg, payments, getUser());
         return Response.ok().entity(response).build();
     }

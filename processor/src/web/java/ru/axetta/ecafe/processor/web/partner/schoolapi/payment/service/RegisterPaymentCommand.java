@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.dto.ResPaymentDTO
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ class RegisterPaymentCommand {
     private final Logger logger = LoggerFactory.getLogger(RegisterPaymentCommand.class);
     private final RuntimeContext runtimeContext;
 
+    @Autowired
     public RegisterPaymentCommand(RuntimeContext runtimeContext) {
         this.runtimeContext = runtimeContext;
     }
@@ -54,13 +56,13 @@ class RegisterPaymentCommand {
             if (resPaymentRegistryItem.getResult() == 0) {
                 return ResPaymentDTO.success(resPaymentRegistryItem.getIdOfOrder());
             } else {
-                return ResPaymentDTO.error(resPaymentRegistryItem.getResult(), resPaymentRegistryItem.getError());
+                return ResPaymentDTO.error(resPaymentRegistryItem.getIdOfOrder(), resPaymentRegistryItem.getResult(), resPaymentRegistryItem.getError());
             }
         } catch (Exception e) {
             String message = String
                     .format("Error in register payment with Id: '%d', %s", payment.getIdOfOrder(), e.getMessage());
             logger.error(message, e);
-            return ResPaymentDTO.error(ResponseCodes.ORDER_REGISTER_ERROR.getCode(), message);
+            return ResPaymentDTO.error(payment.getIdOfOrder(), ResponseCodes.ORDER_REGISTER_ERROR.getCode(), message);
         }
     }
 

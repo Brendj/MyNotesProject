@@ -86,6 +86,9 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 : uri.startsWith(request.getContextPath() + getFilterProcessesUrl() + "authorization")) {
             return false;
         }
+        if (uri.contains("payments/")){
+            return false;
+        }
         return "".equals(request.getContextPath()) ? uri.startsWith(getFilterProcessesUrl())
                 : uri.startsWith(request.getContextPath() + getFilterProcessesUrl());
     }

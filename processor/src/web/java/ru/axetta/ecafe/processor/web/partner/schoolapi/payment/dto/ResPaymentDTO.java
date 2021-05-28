@@ -19,8 +19,8 @@ public class ResPaymentDTO {
         return new ResPaymentDTO(idOfOrder, 0, null);
     }
 
-    public static ResPaymentDTO error(int result, String error) {
-        return new ResPaymentDTO(0, result, error);
+    public static ResPaymentDTO error(long idOfOrder, int result, String error) {
+        return new ResPaymentDTO(idOfOrder, result, error);
     }
 
     public long getIdOfOrder() {
