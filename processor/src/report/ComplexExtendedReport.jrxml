@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ComplexExtendedReport" pageWidth="1375" pageHeight="10000" orientation="Landscape" columnWidth="1335" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="20" uuid="5d430cbf-dd87-4c9a-8eb2-95d9ca1e454d">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="129"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1" uuid="9e656313-e467-4c38-8b54-e624c9f1df47">
 		<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -32,6 +32,7 @@
 	<field name="note" class="java.lang.String"/>
 	<field name="day" class="java.lang.String"/>
 	<field name="dish" class="java.util.List"/>
+	<field name="price" class="java.lang.String"/>
 	<pageHeader>
 		<band height="119" splitType="Stretch">
 			<textField>
@@ -57,58 +58,58 @@
 				<textFieldExpression><![CDATA[$F{complexName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="34" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="d61b5ccd-05ba-4375-a69f-97de0f8c9b8f"/>
+				<reportElement x="0" y="51" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="d61b5ccd-05ba-4375-a69f-97de0f8c9b8f"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Вид рациона:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="51" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="c770badc-25b6-49ed-98ba-81bd46943efa"/>
+				<reportElement x="0" y="68" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="c770badc-25b6-49ed-98ba-81bd46943efa"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Возрастная категория:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="68" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="44e199ca-981a-45e2-a9ea-82c75c1150fc"/>
+				<reportElement x="0" y="85" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="44e199ca-981a-45e2-a9ea-82c75c1150fc"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Тип комплекса:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="85" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="a2cb573f-b3a7-47d8-bafd-191778cf716c"/>
+				<reportElement x="0" y="102" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="a2cb573f-b3a7-47d8-bafd-191778cf716c"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Передать внешним системам:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="102" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="327f17fc-ab0f-4191-a997-8b676b77359d"/>
+				<reportElement x="345" y="85" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="327f17fc-ab0f-4191-a997-8b676b77359d"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Штрихкод:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="190" y="34" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="8ca2cb90-e693-451b-896d-6d3d8e446aef"/>
+				<reportElement x="190" y="51" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="8ca2cb90-e693-451b-896d-6d3d8e446aef"/>
 				<textFieldExpression><![CDATA[$F{dietType}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="190" y="51" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="c1e9af05-5150-49a2-aa8a-b3876c4457d7"/>
+				<reportElement x="190" y="68" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="c1e9af05-5150-49a2-aa8a-b3876c4457d7"/>
 				<textFieldExpression><![CDATA[$F{ageGroupItem}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="190" y="68" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="85442bb0-0940-4b78-8c7a-340d302878d7"/>
+				<reportElement x="190" y="85" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="85442bb0-0940-4b78-8c7a-340d302878d7"/>
 				<textFieldExpression><![CDATA[$F{complexType}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="190" y="85" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="29978728-18e0-42ec-b994-7282fee13458"/>
+				<reportElement x="190" y="102" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="29978728-18e0-42ec-b994-7282fee13458"/>
 				<textFieldExpression><![CDATA[$F{isPortal}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="190" y="102" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="445957b7-4a39-4f68-8708-8bab09b9f8d7"/>
+			<textField isBlankWhenNull="false">
+				<reportElement x="586" y="85" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="445957b7-4a39-4f68-8708-8bab09b9f8d7"/>
 				<textFieldExpression><![CDATA[$F{barCode}]]></textFieldExpression>
 			</textField>
 			<staticText>
@@ -140,7 +141,7 @@
 				<text><![CDATA[Период действия комплекса:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="345" y="85" width="241" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="00462034-2852-473b-8df3-58517f0f13d0"/>
+				<reportElement x="345" y="102" width="241" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="00462034-2852-473b-8df3-58517f0f13d0"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
@@ -166,7 +167,7 @@
 				<textFieldExpression><![CDATA[$F{dayInCycle}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="586" y="85" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="0ad4b1d5-c274-43a2-a03c-d6751cef4db9"/>
+				<reportElement x="586" y="102" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="0ad4b1d5-c274-43a2-a03c-d6751cef4db9"/>
 				<textFieldExpression><![CDATA[$F{note}]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -176,6 +177,19 @@
 			<textField>
 				<reportElement x="586" y="51" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="b2517ca3-d169-4210-b589-b1e946c21b5e"/>
 				<textFieldExpression><![CDATA[$F{startDay}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="34" width="190" height="17" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="49b1946c-650b-4a71-8581-0e173b9b6e53"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Цена:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="190" y="34" width="150" height="17" isPrintWhenDetailOverflows="true" uuid="4810f528-3176-4d6d-9fbd-0f4505a25f51">
+					<printWhenExpression><![CDATA[new Boolean(!$F{price}.equals(""))]]></printWhenExpression>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{price}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
