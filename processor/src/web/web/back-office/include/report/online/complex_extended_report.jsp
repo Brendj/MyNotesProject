@@ -20,46 +20,57 @@
 <h:panelGrid id="complexExtendedMenuReportPanel" binding="#{mainPage.complexExtendedReportPage.pageComponent}" onclick="#{mainPage.complexExtendedReportPage.buildHTMLReport}"
              styleClass="borderless-grid" columns="1">
 
-    <h:panelGrid id="filterComplexMenuReportPanel" columns="4" >
+    <h:panelGrid id="filterComplexMenuReportPanel" columns="2" >
 
-        <h:outputText escape="true" value="Контрагент:" styleClass="output-text" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).contragent}" styleClass="output-text" />
+        <h:panelGrid id="filterComplexMenuReportLeftPanel" columns="2" >
 
-        <h:outputText styleClass="output-text" escape="true" value="Период действия комплекса:"  style="margin-left: 50px"/>
-        <h:outputText styleClass="output-text" escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).complexDate}" />
+            <h:outputText escape="true" value="Контрагент:" styleClass="output-text" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).contragent}" styleClass="output-text" />
 
-        <h:outputText styleClass="output-text" escape="true" value="Комплекс:" />
-        <h:outputText styleClass="output-text" escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).complexName}" />
+            <h:outputText styleClass="output-text" escape="true" value="Комплекс:" />
+            <h:outputText styleClass="output-text" escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).complexName}" />
 
-        <h:outputText escape="true" value="Кол-во дней в цикле:" styleClass="output-text" style="margin-left: 50px" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).dayInCycle}" styleClass="output-text" />
+            <h:outputText styleClass="output-text" escape="true" value="Цена:" />
+            <h:outputText styleClass="output-text" escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).price}" />
 
-        <h:outputText escape="true" value="Вид рациона:" styleClass="output-text" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).dietType}" styleClass="output-text" />
+            <h:outputText escape="true" value="Вид рациона:" styleClass="output-text" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).dietType}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Движение цикла:" styleClass="output-text" style="margin-left: 50px" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).cycleMotion}" styleClass="output-text" />
+            <h:outputText escape="true" value="Возрастная категория:" styleClass="output-text"  />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).ageGroupItem}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Возрастная категория:" styleClass="output-text"  />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).ageGroupItem}" styleClass="output-text" />
+            <h:outputText escape="true" value="Тип комплекса:" styleClass="output-text" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).complexType}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Стартовый день цикла:" styleClass="output-text" style="margin-left: 50px" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).startDay}" styleClass="output-text" />
+            <h:outputText escape="true" value="Передать внешним системам:" styleClass="output-text" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).isPortal}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Тип комплекса:" styleClass="output-text" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).complexType}" styleClass="output-text" />
+        </h:panelGrid>
 
-        <h:outputText escape="true" value="Пропуск дней в цикле:" styleClass="output-text" style="margin-left: 50px" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).passDay}" styleClass="output-text" />
+        <h:panelGrid id="filterComplexMenuReportRightPanel" columns="2" >
 
-        <h:outputText escape="true" value="Передать внешним системам:" styleClass="output-text" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).isPortal}" styleClass="output-text" />
+            <h:outputText styleClass="output-text" escape="true" value="Период действия комплекса:" style="margin-left: 50px" />
+            <h:outputText styleClass="output-text" escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).complexDate}" />
 
-        <h:outputText escape="true" value="Примечание:" styleClass="output-text" style="margin-left: 50px"  />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).note}" styleClass="output-text" />
+            <h:outputText escape="true" value="Кол-во дней в цикле:" styleClass="output-text" style="margin-left: 50px" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).dayInCycle}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Штрихкод:" styleClass="output-text" />
-        <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).barCode}" styleClass="output-text" />
+            <h:outputText escape="true" value="Движение цикла:" styleClass="output-text" style="margin-left: 50px" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).cycleMotion}" styleClass="output-text" />
+
+            <h:outputText escape="true" value="Стартовый день цикла:" styleClass="output-text" style="margin-left: 50px" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).startDay}" styleClass="output-text" />
+
+            <h:outputText escape="true" value="Пропуск дней в цикле:" styleClass="output-text" style="margin-left: 50px" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).passDay}" styleClass="output-text" />
+
+            <h:outputText escape="true" value="Штрихкод:" styleClass="output-text" style="margin-left: 50px" />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).barCode}" styleClass="output-text" />
+
+            <h:outputText escape="true" value="Примечание:" styleClass="output-text" style="margin-left: 50px"  />
+            <h:outputText escape="true" value="#{mainPage.complexExtendedReportPage.report.get(0).note}" styleClass="output-text" />
+
+        </h:panelGrid>
 
     </h:panelGrid>
 
@@ -104,7 +115,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Блюда" />
                 </rich:column>
-                <rich:column headerClass="column-header">
+                <rich:column headerClass="column-header" rendered="#{mainPage.complexExtendedReportPage.report.get(0).price == ''}" >
                     <h:outputText escape="true" value="Цена" />
                 </rich:column>
                 <rich:column headerClass="column-header">
@@ -158,7 +169,7 @@
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{complex.dish}" styleClass="output-text" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rendered="#{complex.price != ''}" >
                 <h:outputText escape="true" value="#{complex.price}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
