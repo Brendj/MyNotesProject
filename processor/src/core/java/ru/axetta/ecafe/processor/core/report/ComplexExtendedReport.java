@@ -33,7 +33,7 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
 
 
     public static class Builder extends BasicReportForContragentJob.Builder {
-        private String templateFilename;
+        private final String templateFilename;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -48,7 +48,7 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
-            Map<String, Object> parameterMap = new HashMap<String, Object>();
+            Map<String, Object> parameterMap = new HashMap<>();
             startTime = CalendarUtils.startOfDay(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             String idOfComplex = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfComplex"));
@@ -60,7 +60,7 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
         }
 
         public List<ComplexExtendedItem> createDataSource(Session session, Long idOfComplex) throws Exception {
-            List<ComplexExtendedItem> result = new LinkedList<ComplexExtendedItem>();
+            List<ComplexExtendedItem> result = new LinkedList<>();
             Set<Integer> days = new TreeSet<>();
             Criteria criteria = session.createCriteria(WtComplex.class);
             criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
@@ -107,22 +107,22 @@ public class ComplexExtendedReport extends BasicReportForContragentJob {
             }
 
             for(Integer day: days) {
-                result.add(new ComplexExtendedItem(complex.getContragent().getContragentName(), complex.getName(), complex.getWtDietType().getDescription(),
+                result.add(new ComplexExtendedItem(complex.getContragent().getContragentName(), complex.getName(), complex.getComposite() ? "" : complex.getPrice().toString() , complex.getWtDietType().getDescription(),
                         complex.getWtAgeGroupItem().getDescription(), complex.getWtComplexGroupItem().getDescription(),
                         complex.getIsPortal() ? "Да" : "Нет", complex.getBarcode(), complexDate, complex.getDayInCycle().toString(),
                         complex.getCycleMotion().toString().equals("0") ? "5-ти дневная рабочая неделя" : "6-ти дневная рабочая неделя", complex.getStartCycleDay().toString(), passDay.toString(),
-                        complex.getComment() == null ? "" : complex.getComment(), day.toString(), getDishList(dishData, day.toString())));
+                        complex.getComment() == null ? "" : complex.getComment(), day.toString(), getDishList(dishData, day.toString(), complex.getComposite())));
             }
 
             return result;
         }
 
-        private List<ComplexExtendedDishItem> getDishList(List<Object[]> dishData, String day){
+        private List<ComplexExtendedDishItem> getDishList(List<Object[]> dishData, String day, Boolean printPrice){
             List<ComplexExtendedDishItem> list = new ArrayList<>();
             for (Object[] dish: dishData){
                     if (day.equals(dish[0].toString())) {
                         String dishName = dish[1].toString();
-                        String price = dish[2].toString();
+                        String price = printPrice ? dish[2].toString() : "";
                         String structure = dish[3].toString();
                         String category = dish[4] == null ? "" : dish[4].toString();
                         String subCategory = "";
