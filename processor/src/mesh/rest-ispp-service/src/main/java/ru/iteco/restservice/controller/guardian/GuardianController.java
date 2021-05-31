@@ -7,11 +7,13 @@ package ru.iteco.restservice.controller.guardian;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ru.iteco.restservice.controller.guardian.request.SetRelationRequest;
 import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.servise.ClientService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,5 +50,15 @@ public class GuardianController {
             log.error("Exception in getGuardiansByClientList ", e);
             throw e;
         }
+    }
+
+    @PutMapping("/setGuardianRelations")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Создание связки между представителем и клиентом",
+            description = "Позволяет создать связку между представителем и клиентом с указанием степени родства и "
+    )
+    public void setGuardianRelations(SetRelationRequest relations){
+
     }
 }
