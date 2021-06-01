@@ -4,13 +4,18 @@
 
 package ru.iteco.restservice.servise;
 
+import ru.iteco.restservice.controller.guardian.request.SetRelationRequest;
 import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
+import ru.iteco.restservice.db.repo.readonly.ClientGuardianReadOnlyRepo;
 import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.ClientGuardian;
 import ru.iteco.restservice.model.ClientRegistry;
 import ru.iteco.restservice.model.ClientsNotificationSettings;
 import ru.iteco.restservice.model.enums.ClientGroupAssignment;
+import ru.iteco.restservice.model.enums.ClientGuardianRelationType;
+import ru.iteco.restservice.model.enums.ClientGuardianRepresentType;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -35,6 +40,7 @@ public class ClientService {
     private static final Pattern guidPattern = Pattern.compile("^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$");
 
     private final ClientReadOnlyRepo clientReadOnlyRepo;
+    private final ClientGuardianReadOnlyRepo guardianReadOnlyRepo;
 
     @PersistenceContext(name = "readonlyEntityManager", unitName = "readonlyPU")
     EntityManager readonlyEntityManager;
@@ -42,8 +48,10 @@ public class ClientService {
     @PersistenceContext(name = "writableEntityManager", unitName = "writablePU")
     EntityManager writableEntityManager;
 
-    public ClientService(ClientReadOnlyRepo clientReadOnlyRepo){
+    public ClientService(ClientReadOnlyRepo clientReadOnlyRepo,
+            ClientGuardianReadOnlyRepo clientGuardianReadOnlyRepo){
         this.clientReadOnlyRepo = clientReadOnlyRepo;
+        this.guardianReadOnlyRepo = clientGuardianReadOnlyRepo;
     }
 
     public List<Client> getClientsByGuardianPhone(@NotNull String guardPhone) {
@@ -152,5 +160,56 @@ public class ClientService {
         c.setExpenditureLimit(balanceNotification);
         c.setClientRegistryVersion(version);
         writableEntityManager.merge(c);
+    }
+
+    public void setRelations(@NotNull SetRelationRequest relations) {
+        if(relations.getContractId() == null){
+            throw new IllegalArgumentException("Не указан л/с клиента");
+        } else if(!phonePattern.matcher(relations.getGuardianMobile()).matches()){
+            throw new IllegalArgumentException("Номер телефона не соответствует паттерну");
+        } else if(relations.getRepContractId() == null){
+            throw new IllegalArgumentException("Не указан л/с представителя");
+        } else if(relations.getRelation() == null){
+            throw new IllegalArgumentException("Не указана степень родства");
+        } else if(relations.getIsLegalRepresent() == null){
+            throw new IllegalArgumentException("Не указана роль представителя");
+        }
+
+        ClientGuardianRepresentType representType = ClientGuardianRepresentType.of(relations.getIsLegalRepresent());
+        if(!(representType.equals(ClientGuardianRepresentType.IN_LAW) || representType.equals(ClientGuardianRepresentType.NOT_IN_LAW))){
+            throw new IllegalArgumentException("Операция доступна только для законного представителя");
+        }
+
+        ClientGuardianRelationType relationType = ClientGuardianRelationType.of(relations.getRelation());
+
+        Client child = clientReadOnlyRepo.getClientByContractId(relations.getContractId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Не найден клиент по л/с %d", relations.getContractId()))
+                );
+
+        Client guardian = clientReadOnlyRepo
+                .getClientByMobileAndContractId(relations.getGuardianMobile(), relations.getRepContractId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                String.format("Не найден представитель по л/с %d и телефону %s", relations.getContractId(), relations.getGuardianMobile()))
+        );
+
+        ClientGuardian clientGuardian = guardianReadOnlyRepo
+                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian).orElse(null);
+        if(clientGuardian != null){
+            throw new IllegalArgumentException("Связь между клиентом и представителем уже существует");
+        }
+
+        Long nextVersion = guardianReadOnlyRepo.getVersion() + 1L;
+
+        clientGuardian = new ClientGuardian();
+        clientGuardian.setGuardian(guardian);
+        clientGuardian.setChildren(child);
+        clientGuardian.setDeletedState(false);
+        clientGuardian.setRepresentType(representType);
+        clientGuardian.setRelationType(relationType);
+        clientGuardian.setDisabled(0);
+        clientGuardian.setVersion(nextVersion);
+
+        writableEntityManager.merge(clientGuardian);
     }
 }

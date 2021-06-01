@@ -58,7 +58,7 @@ public class GuardianController {
             summary = "Создание связки между представителем и клиентом",
             description = "Позволяет создать связку между представителем и клиентом с указанием степени родства и "
     )
-    public void setGuardianRelations(SetRelationRequest relations){
-
+    public void setGuardianRelations(@NotNull SetRelationRequest relations){
+        clientService.setRelations(relations);
     }
 }

@@ -9,10 +9,19 @@ import java.util.Objects;
 public class SetRelationRequest {
     private String guardianMobile;
     private Long contractId;
+    private Long repContractId;
     private Integer relation;
     private Integer isLegalRepresent;
 
     public SetRelationRequest() {
+    }
+
+    public Long getRepContractId() {
+        return repContractId;
+    }
+
+    public void setRepContractId(Long repContractId) {
+        this.repContractId = repContractId;
     }
 
     public String getGuardianMobile() {
@@ -57,11 +66,12 @@ public class SetRelationRequest {
         }
         SetRelationRequest that = (SetRelationRequest) o;
         return Objects.equals(guardianMobile, that.guardianMobile) && Objects.equals(contractId, that.contractId)
-                && Objects.equals(relation, that.relation) && Objects.equals(isLegalRepresent, that.isLegalRepresent);
+                && Objects.equals(repContractId, that.repContractId) && Objects.equals(relation, that.relation)
+                && Objects.equals(isLegalRepresent, that.isLegalRepresent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(guardianMobile, contractId, relation, isLegalRepresent);
+        return Objects.hash(guardianMobile, contractId, repContractId, relation, isLegalRepresent);
     }
 }

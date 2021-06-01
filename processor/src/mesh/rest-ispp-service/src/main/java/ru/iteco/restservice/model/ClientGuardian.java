@@ -14,6 +14,7 @@ import java.util.Objects;
 @Table(name = "cf_client_guardian")
 public class ClientGuardian {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idofclientguardian")
     private Long idOfClientGuardian;
 
@@ -38,8 +39,19 @@ public class ClientGuardian {
     @Column(name = "deletedstate")
     private Boolean deletedState;
 
+    @Column(name = "version")
+    private Long version;
+
     public ClientGuardian(){
 
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public Long getIdOfClientGuardian() {
