@@ -4,13 +4,24 @@
 
 package ru.iteco.restservice.controller.guardian.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Objects;
 
 public class SetRelationRequest {
+    @Schema(description = "Номер телефона представителя", example = "79001234567")
     private String guardianMobile;
+
+    @Schema(description = "Л/С клиента", example = "100345233")
     private Long contractId;
+
+    @Schema(description = "Л/С представителя", example = "1005187712")
     private Long repContractId;
+
+    @Schema(description = "Код степени родства", example = "1")
     private Integer relation;
+
+    @Schema(description = "Код роли представителя", example = "0")
     private Integer isLegalRepresent;
 
     public SetRelationRequest() {

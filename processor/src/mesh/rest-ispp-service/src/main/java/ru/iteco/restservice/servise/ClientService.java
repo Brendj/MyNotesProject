@@ -186,12 +186,19 @@ public class ClientService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         String.format("Не найден клиент по л/с %d", relations.getContractId()))
                 );
+        if(child.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
+        }
 
         Client guardian = clientReadOnlyRepo
                 .getClientByMobileAndContractId(relations.getGuardianMobile(), relations.getRepContractId())
                 .orElseThrow(() -> new IllegalArgumentException(
                 String.format("Не найден представитель по л/с %d и телефону %s", relations.getContractId(), relations.getGuardianMobile()))
         );
+        Long groupIdOfGuardian = guardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
+        if(ClientGroupAssignment.CLIENT_PARENTS.getId() > groupIdOfGuardian && groupIdOfGuardian > ClientGroupAssignment.CLIENT_VISITORS.getId() -1L){
+            throw new IllegalArgumentException("Указанный представитель не пренадлежит группе \"Родители\"");
+        }
 
         ClientGuardian clientGuardian = guardianReadOnlyRepo
                 .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian).orElse(null);
