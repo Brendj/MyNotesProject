@@ -14,7 +14,8 @@ import java.util.Objects;
 @Table(name = "cf_client_guardian")
 public class ClientGuardian {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clientGuardianGen")
+    @SequenceGenerator(name = "clientGuardianGen", sequenceName = "cf_client_guardian_id_gen_seq")
     @Column(name = "idofclientguardian")
     private Long idOfClientGuardian;
 
@@ -42,8 +43,31 @@ public class ClientGuardian {
     @Column(name = "version")
     private Long version;
 
-    public ClientGuardian(){
+    public ClientGuardian(Long idOfClientGuardian, Client children, Client guardian,
+            ClientGuardianRelationType relationType, ClientGuardianRepresentType representType, Integer disabled,
+            Boolean deletedState, Long version) {
+        this.idOfClientGuardian = idOfClientGuardian;
+        this.children = children;
+        this.guardian = guardian;
+        this.relationType = relationType;
+        this.representType = representType;
+        this.disabled = disabled;
+        this.deletedState = deletedState;
+        this.version = version;
+    }
 
+    public ClientGuardian(){
+    }
+
+    public ClientGuardian(Client guardian, Client child, ClientGuardianRepresentType representType,
+            ClientGuardianRelationType relationType, Long version) {
+        this.children = child;
+        this.guardian = guardian;
+        this.relationType = relationType;
+        this.representType = representType;
+        this.version = version;
+        this.disabled = 0;
+        this.deletedState = false;
     }
 
     public Long getVersion() {

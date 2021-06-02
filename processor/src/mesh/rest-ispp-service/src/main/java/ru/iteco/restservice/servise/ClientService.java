@@ -162,6 +162,7 @@ public class ClientService {
         writableEntityManager.merge(c);
     }
 
+    @Transactional
     public void setRelations(@NotNull SetRelationRequest relations) {
         if(relations.getContractId() == null){
             throw new IllegalArgumentException("Не указан л/с клиента");
@@ -175,15 +176,14 @@ public class ClientService {
             throw new IllegalArgumentException("Не указана роль представителя");
         }
 
+        ClientGuardianRelationType relationType = ClientGuardianRelationType.of(relations.getRelation());
         ClientGuardianRepresentType representType = ClientGuardianRepresentType.of(relations.getIsLegalRepresent());
         if(!(representType.equals(ClientGuardianRepresentType.IN_LAW) || representType.equals(ClientGuardianRepresentType.NOT_IN_LAW))){
             throw new IllegalArgumentException("Операция доступна только для законного представителя");
         }
 
-        ClientGuardianRelationType relationType = ClientGuardianRelationType.of(relations.getRelation());
-
         Client child = clientReadOnlyRepo.getClientByContractId(relations.getContractId())
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new NotFoundException(
                         String.format("Не найден клиент по л/с %d", relations.getContractId()))
                 );
         if(child.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
@@ -192,7 +192,7 @@ public class ClientService {
 
         Client guardian = clientReadOnlyRepo
                 .getClientByMobileAndContractId(relations.getGuardianMobile(), relations.getRepContractId())
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new NotFoundException(
                 String.format("Не найден представитель по л/с %d и телефону %s", relations.getContractId(), relations.getGuardianMobile()))
         );
         Long groupIdOfGuardian = guardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
@@ -205,18 +205,9 @@ public class ClientService {
         if(clientGuardian != null){
             throw new IllegalArgumentException("Связь между клиентом и представителем уже существует");
         }
-
         Long nextVersion = guardianReadOnlyRepo.getVersion() + 1L;
 
-        clientGuardian = new ClientGuardian();
-        clientGuardian.setGuardian(guardian);
-        clientGuardian.setChildren(child);
-        clientGuardian.setDeletedState(false);
-        clientGuardian.setRepresentType(representType);
-        clientGuardian.setRelationType(relationType);
-        clientGuardian.setDisabled(0);
-        clientGuardian.setVersion(nextVersion);
-
-        writableEntityManager.merge(clientGuardian);
+        clientGuardian = new ClientGuardian(guardian, child, representType, relationType, nextVersion);
+        clientGuardian = writableEntityManager.merge(clientGuardian);
     }
 }

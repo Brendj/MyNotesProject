@@ -26,9 +26,7 @@ import java.util.List;
 @RequestMapping("/guardian")
 @Tag(name = "Операции по представителям клиента")
 public class GuardianController {
-
     private final Logger log = LoggerFactory.getLogger(GuardianController.class);
-
     private final ClientService clientService;
 
     public GuardianController(ClientService clientService) {
@@ -52,13 +50,13 @@ public class GuardianController {
         }
     }
 
-    @PutMapping("/setGuardianRelations")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/setGuardianRelations")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(
             summary = "Создание связки между представителем и клиентом",
             description = "Позволяет создать связку между представителем и клиентом с указанием степени родства и "
     )
-    public void setGuardianRelations(@NotNull SetRelationRequest relations){
+    public void setGuardianRelations(@RequestBody @NotNull SetRelationRequest relations){
         clientService.setRelations(relations);
     }
 }
