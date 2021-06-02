@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
@@ -72,10 +73,12 @@ public class OrganizationStructure implements AbstractToElement {
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
             //session.refresh(org);
-            session.refresh(org.getOfficialPerson());
+            //session.refresh(org.getOfficialPerson());
+            Person person = DAOUtils.findPerson(session, org.getOfficialPerson().getIdOfPerson());
+            String personName = person == null ? "" : person.getFullName();
             OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(),
                     org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
-                    org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
+                    personName, org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
                     org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(),
                     org.getShortAddress(), org.getOrgStructureVersion(), org.multiCardModeIsEnabled(),

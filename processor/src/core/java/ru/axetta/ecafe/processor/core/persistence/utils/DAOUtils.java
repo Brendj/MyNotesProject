@@ -452,6 +452,10 @@ public class DAOUtils {
         return null;
     }
 
+    public static Person findPerson(Session session, Long id) {
+        return (Person)session.load(Person.class, id);
+    }
+
     public static Contragent findContragentIsSupplier(Session session, long idOfContragent) {
         Query query = session.createQuery("from Contragent c where c.idOfContragent = :idOfContragent "
                 + "and c.classId = 2"); // ТСП

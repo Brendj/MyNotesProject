@@ -7,8 +7,9 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT" table="CF_Hardware_Settings_Mt">
         <id name="idOfModuleType" column="idOfModuleType" type="long">
-            <generator class="sequence">
-                <param name="sequence">cf_hardwaresettings_idofhardwaresetting_mt_seq</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_hardwaresettings_idofhardwaresetting_mt_seq</param>
             </generator>
         </id>
         <many-to-one name="hardwareSettings" class="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" not-null="true">

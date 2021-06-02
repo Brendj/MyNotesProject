@@ -8,8 +8,9 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.HelpRequest" table="CF_HelpRequests" optimistic-lock="version">
         <id name="idOfHelpRequest" column="IdOfHelpRequests" type="long">
-            <generator class="sequence">
-                <param name="sequence">cf_helprequests_idofhelprequests_seq</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_helprequests_idofhelprequests_seq</param>
             </generator>
         </id>
         <version name="hibernateVersion" column="HibernateVersion" type="long"/>

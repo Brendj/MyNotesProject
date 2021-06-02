@@ -8,8 +8,9 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ESZMigrantsRequest" table="cf_esz_migrants_requests" optimistic-lock="version">
         <id name="idOfESZMigrantsRequest" column="IdOfESZMigrantsRequest" type="long">
-            <generator class="sequence">
-                <param name="sequence">cf_esz_migrants_requests_idofeszmigrantsrequest_seq</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_esz_migrants_requests_idofeszmigrantsrequest_seq</param>
             </generator>
         </id>
         <property name="idOfServiceClass" column="IdOfServiceClass" type="long" not-null="true" unique-key="idOfServiceClass_clientGuid_uq"/>

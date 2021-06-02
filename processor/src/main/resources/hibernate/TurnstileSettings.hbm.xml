@@ -7,8 +7,9 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.TurnstileSettings" table="CF_Turnstile_Settings">
         <id name="idOfTurnstileSetting" column="IdOfTurnstileSetting" type="long">
-            <generator class="sequence">
-                <param name="sequence">cf_turnstilesettings_idofturnstilesetting_seq</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_turnstilesettings_idofturnstilesetting_seq</param>
             </generator>
         </id>
         <property name="version" column="Version" type="long"/>

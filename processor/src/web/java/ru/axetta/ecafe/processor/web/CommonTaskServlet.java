@@ -55,11 +55,12 @@ public class CommonTaskServlet extends HttpServlet {
     }
 
     private void runInvalidateCache(String idOfOrgStr) {
-        try {
+        return;
+        /*try {
             Long idOfOrg = new Long(idOfOrgStr);
             RuntimeContext.getAppContext().getBean(CacheService.class).invalidateCache(idOfOrg);
         } catch (Exception e) {
             logger.error("Error in runInvalidateCache: ", e);
-        }
+        }*/
     }
 }
