@@ -37,7 +37,7 @@ public class RunTaskController {
     public ResponseEntity<String> runSupply(
             @NotNull @Positive @RequestParam("beginPeriod") Long beginParam,
             @NotNull @Positive @RequestParam("endPeriod") Long endParam,
-            @Max(1000) @RequestParam(value = "sampleSize", defaultValue = "500") Integer sampleSize){
+            @Max(500000) @RequestParam(value = "sampleSize", defaultValue = "50000") Integer sampleSize){
         Date begin = new Date(beginParam);
         Date end = new Date(endParam);
         supplyService.runFromController(begin, end, sampleSize);

@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +34,7 @@ public class SupplyService {
     }
 
     private void sendSupplyEvents(Date begin, Date end, Integer sampleSize) {
-        Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("createdDate"));
+        Pageable pageable = PageRequest.of(0, sampleSize);
         List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
 
         while (CollectionUtils.isNotEmpty(orderList)) {
@@ -51,33 +50,36 @@ public class SupplyService {
     }
 
     public void runFromTaskExecutor(Integer sampleSize){
-        try {
-            ReportingDate reportingDate = new ReportingDate();
-            reportingDate = reportingDate.getNext();
-            do {
-                sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
-                reportingDate = reportingDate.getNext();
-            } while (reportingDate != null);
-        } catch (Exception e) {
-            log.error("Critical error in process sending supply MSP info, task interrupt", e);
-        }
+        runTask(null, null, sampleSize);
     }
 
     @Async
-    public void runFromController(Date begin, Date end, Integer sampleSize){
-        try{
-            if(begin.after(end)){
-                throw new IllegalArgumentException("Begin date after end date");
-            }
-            if((end.getTime() - begin.getTime()) > DELTA_MONTH){
-                throw new IllegalArgumentException("Too long period");
+    public void runFromController(Date begin, Date end, Integer sampleSize) {
+        if (begin.after(end)) {
+            throw new IllegalArgumentException("Begin date after end date");
+        }
+        if ((end.getTime() - begin.getTime()) > DELTA_MONTH) {
+            throw new IllegalArgumentException("Too long period");
+        }
+
+        runTask(begin, end, sampleSize);
+    }
+
+    private void runTask(Date begin, Date end, Integer sampleSize){
+        ReportingDate reportingDate = null;
+        try {
+            if(begin == null || end == null) {
+                reportingDate = new ReportingDate();
+            } else {
+                reportingDate = new ReportingDate(begin, end);
             }
 
-            ReportingDate reportingDate = new ReportingDate(begin, end);
             do {
                 sendSupplyEvents(reportingDate.getBeginPeriod(), reportingDate.getEndPeriod(), sampleSize);
                 reportingDate = reportingDate.getNext();
             } while (reportingDate != null);
+
+            log.info("--Data sending completed--");
         } catch (Exception e) {
             log.error("Critical error in process sending supply MSP info, task interrupt", e);
         }
