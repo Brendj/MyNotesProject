@@ -794,10 +794,13 @@ public class DAOReadonlyService {
         }
     }
 
-    public List<EMIASbyDay> getEmiasbyDayForClient(Session session, Client client) {
+    public List<EMIASbyDay> getEmiasbyDayForClient(Session session, Client client, Long idOfClient) {
         try {
             Criteria criteria = session.createCriteria(EMIASbyDay.class);
-            criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+            if (idOfClient == null)
+                criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+            if (client == null)
+                criteria.add(Restrictions.eq("idOfClient", idOfClient));
             return criteria.list();
         } catch (Exception e) {
             return new ArrayList<EMIASbyDay>();

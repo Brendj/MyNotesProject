@@ -224,7 +224,7 @@
             </rich:column>
 
             <rich:column headerClass="column-header">
-                <h:selectBooleanCheckbox value="#{item.accepted}" styleClass="output-text" disabled="true"/>
+                <h:outputText escape="true" value="#{item.acceptedDate}" styleClass="output-text" />
             </rich:column>
 
             <rich:column headerClass="column-header">

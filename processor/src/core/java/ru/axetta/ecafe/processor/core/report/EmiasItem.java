@@ -30,7 +30,7 @@ public class EmiasItem {
     private String dateEndLiberation;
     private String emiasDatearchived;
     private String status;
-    private Boolean accepted;
+    private String acceptedDate;
     private String acceptedinOO;
 
     private Format formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -38,7 +38,7 @@ public class EmiasItem {
     public EmiasItem(Long recordID, Long orgID, String orgName, String orgAdress, String clientGroup,String firstname,
             String lastname, String middlename, Long contractID, String benefits, Long emiasID, Date emiasDate,
             Date dateStartLiberation, Date dateEndLiberation, Date emiasDatearchived, String status,
-            Boolean accepted, Date acceptedinOO)
+            String acceptedDate, Date acceptedinOO)
     {
         this.recordID = recordID;
         this.orgID = orgID;
@@ -60,7 +60,7 @@ public class EmiasItem {
         if (emiasDatearchived != null)
             this.emiasDatearchived = formatter.format(emiasDatearchived);
         this.status = status;
-        this.accepted = accepted;
+        this.acceptedDate = acceptedDate;
         if (acceptedinOO != null)
             this.acceptedinOO = formatter.format(acceptedinOO);
     }
@@ -112,14 +112,6 @@ public class EmiasItem {
 
     public void setDateEndLiberation(String dateEndLiberation) {
         this.dateEndLiberation = dateEndLiberation;
-    }
-
-    public Boolean getAccepted() {
-        return accepted;
-    }
-
-    public void setAccepted(Boolean accepted) {
-        this.accepted = accepted;
     }
 
     public Long getRecordID() {
@@ -208,5 +200,13 @@ public class EmiasItem {
 
     public void setAcceptedinOO(String acceptedinOO) {
         this.acceptedinOO = acceptedinOO;
+    }
+
+    public String getAcceptedDate() {
+        return acceptedDate;
+    }
+
+    public void setAcceptedDate(String acceptedDate) {
+        this.acceptedDate = acceptedDate;
     }
 }

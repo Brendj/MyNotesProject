@@ -92,7 +92,7 @@ public class EMIASController extends HttpServlet {
                 }
             }
             //Переопределяем записанные даты
-            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client);
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client, null);
             for (EMIASbyDay emiaSbyDay: emiaSbyDays)
             {
                 //Добавление только если есть такой дествительный промежуток
@@ -160,7 +160,7 @@ public class EMIASController extends HttpServlet {
                     return new ExemptionVisitingResult (ResponseItem.ERROR_INCORRECT_DATE, ResponseItem.ERROR_INCORRECT_DATE_MESSAGE);
             }
             List<EMIAS> emiasList = DAOReadonlyService.getInstance().getEmiasbyClient(session, client);
-            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client);
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client, null);
             //Находим все даты из промежутка
             Map<String, Boolean> dates = new HashMap<>();
             //Находим все даты из промежутка
