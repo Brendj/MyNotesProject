@@ -22,7 +22,7 @@ public class Menu {
     @JoinColumn(name = "idoforg", insertable = false, updatable = false)
     private Org org;
 
-    @OneToMany(mappedBy = "menu")
+    @OneToMany(mappedBy = "menu", fetch = FetchType.EAGER)
     private Set<MenuDetail> menuDetails;
 
     public Long getIdOfMenu() {

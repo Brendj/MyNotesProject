@@ -18,8 +18,6 @@ public interface OrderReadOnlyRepo extends CrudRepository<Order, OrderCompositeI
     @Query(value = "SELECT DISTINCT o FROM Order AS o "
                  + " INNER JOIN o.orderDetailSet AS od "
                  + " LEFT JOIN od.dish AS d "
-                 + " LEFT JOIN od.menu AS m "
-                 + " LEFT JOIN m.menuDetails AS md "
                  + " INNER JOIN o.client AS c "
                  + " WHERE c.contractId = :contractId "
                  + " AND o.createdDate BETWEEN :startDate AND :endDate ")

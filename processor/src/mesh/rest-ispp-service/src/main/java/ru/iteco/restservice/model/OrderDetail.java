@@ -8,9 +8,6 @@ import ru.iteco.restservice.model.compositid.OrderDetailCompositeId;
 import ru.iteco.restservice.model.enums.OrderDetailFRationType;
 import ru.iteco.restservice.model.wt.WtDish;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -55,11 +52,6 @@ public class OrderDetail {
     @ManyToOne
     @JoinColumn(name = "idofdish", insertable = false, updatable = false)
     private WtDish dish;
-
-    @ManyToOne
-    @NotFound(action = NotFoundAction.IGNORE)
-    @JoinColumn(name = "idofmenufromsync", insertable = false, updatable = false)
-    private Menu menu;
 
     public Long getIdOfMenuFromSync() {
         return idOfMenuFromSync;
@@ -139,14 +131,6 @@ public class OrderDetail {
 
     public void setMenuOutput(String menuOutput) {
         this.menuOutput = menuOutput;
-    }
-
-    public Menu getMenu() {
-        return menu;
-    }
-
-    public void setMenu(Menu menu) {
-        this.menu = menu;
     }
 
     @Override

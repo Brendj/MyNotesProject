@@ -35,6 +35,9 @@ public class MenuDetail {
     @Column(name = "carbohydrates")
     private Integer carbohydrates;
 
+    @Column(name = "idofmenufromsync")
+    private Long idOfMenuFromSync;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "idofmenu", updatable = false, insertable = false)
@@ -102,6 +105,14 @@ public class MenuDetail {
 
     public void setMenu(Menu menu) {
         this.menu = menu;
+    }
+
+    public Long getIdOfMenuFromSync() {
+        return idOfMenuFromSync;
+    }
+
+    public void setIdOfMenuFromSync(Long idOfMenuFromSync) {
+        this.idOfMenuFromSync = idOfMenuFromSync;
     }
 
     @Override
