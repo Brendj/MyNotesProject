@@ -9,7 +9,6 @@
 <hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup" table="cf_wt_org_groups">
-        <cache usage="transactional"/>
         <id name="idOfOrgGroup">
             <column name="idOfOrgGroup" sql-type="long"/>
         </id>

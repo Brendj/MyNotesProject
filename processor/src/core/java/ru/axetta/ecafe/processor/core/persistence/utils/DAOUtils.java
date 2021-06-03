@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -474,6 +475,7 @@ public class DAOUtils {
      * Обновляет орг. Ставит признак mainbuilding = 0
      * */
     public static int orgMainBuildingUnset(Session session, long idOfOrg) {
+        Org.sendInvalidateCache(idOfOrg);
         Query q = session.createSQLQuery("update cf_orgs set MainBuilding = 0 where idOfOrg = :idOfOrg")
                 .setParameter("idOfOrg", idOfOrg);
         return q.executeUpdate();
@@ -2401,6 +2403,7 @@ public class DAOUtils {
         q.setParameter("idOfOrg", idOfOrg);
         q.setParameter("contract", contract);
         q.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void removeContractLinkFromOrgs(EntityManager entityManager, Contract entity) {
@@ -2587,7 +2590,7 @@ public class DAOUtils {
         return query.getResultList();
     }
 
-    public static boolean isNextGradeTransfer(Session session, Long idOfOrg) {
+    /*public static boolean isNextGradeTransfer(Session session, Long idOfOrg) {
         Query query = session.createQuery("select org.nextGradeParam from Org org where org.idOfOrg = :idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         Boolean f = (Boolean) query.uniqueResult();
@@ -2609,12 +2612,13 @@ public class DAOUtils {
         } else {
             return f;
         }
-    }
+    }*/
 
     public static void falseFullSyncByOrg(Session session, Long idOfOrg) {
         Query query = session.createQuery("update Org set fullSyncParam=0 where id=:idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForMenusSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2622,6 +2626,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForClientsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2629,6 +2634,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void setValueForOrgSettingsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
@@ -2636,6 +2642,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static void savePreorderDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
@@ -2643,6 +2650,7 @@ public class DAOUtils {
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public static List<Client> fetchErrorClientsWithOutFriendlyOrg(final Session persistenceSession,
@@ -3039,10 +3047,19 @@ public class DAOUtils {
 
     private static long getDistributedObjectVersionFromSequence(Session session, String name) {
         long version = 0L;
-        Query query = session.createSQLQuery(String.format("select nextval('%s')", DAOService.getInstance().getDistributedObjectSequenceName(name)));
-        Object o = query.uniqueResult();
-        if (o != null) {
-            version = HibernateUtils.getDbLong(o);
+        String sequenceName = DAOService.getInstance().getDistributedObjectSequenceName(name);
+        session.createSQLQuery("savepoint before_get_version").executeUpdate();
+        Query query = session.createSQLQuery(String.format("select nextval('%s')", sequenceName));
+        try {
+            Object o = query.uniqueResult();
+            if (o != null) {
+                version = HibernateUtils.getDbLong(o);
+            }
+            session.createSQLQuery("release savepoint before_get_version").executeUpdate();
+        } catch (SQLGrammarException e) {
+            session.createSQLQuery("rollback to savepoint before_get_version").executeUpdate();
+            Query q = session.createSQLQuery(String.format("create sequence %s", sequenceName));
+            q.executeUpdate();
         }
         return version;
     }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SpecialDateHistory" table="cf_specialdates_history">
+        <id name="idOfSpecialDateHistory" column="IdOfSpecialDateHistory" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOfOrg" type="long" column="IdOfOrg" not-null="true"/>
+        <property name="date" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="date" not-null="true"/>
+        <property name="isWeekend" column="isweekend" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="deleted" column="deleted" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="comment" column="comment" type="string" not-null="true"/>
+        <property name="idOfClientGroup" column="idofclientgroup" type="long"/>
+        <property name="staffGuid" column="staffGuid" type="string"/>
+        <property name="armLastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="armLastUpdate"/>
+        <property name="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="createdDate"/>
+        <property name="idOfOrgOwner" type="long" column="IdOfOrgOwner" not-null="true"/>
+    </class>
+</hibernate-mapping>
+
+

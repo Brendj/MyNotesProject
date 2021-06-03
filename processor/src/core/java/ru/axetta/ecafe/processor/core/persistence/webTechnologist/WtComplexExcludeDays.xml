@@ -9,7 +9,6 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexExcludeDays"
            table="cf_wt_complex_exclude_days">
-        <cache usage="transactional"/>
         <id name="id">
             <column name="id" sql-type="long"/>
         </id>

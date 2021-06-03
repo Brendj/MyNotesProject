@@ -8,8 +8,6 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu" table="cf_wt_menu_group_relationships">
-
-        <cache usage="transactional"/>
         <id name="id">
             <column name="id" sql-type="long" not-null="true"/>
         </id>

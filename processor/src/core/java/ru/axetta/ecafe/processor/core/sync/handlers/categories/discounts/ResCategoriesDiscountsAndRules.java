@@ -45,7 +45,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         List discountRules = getAllDiscountRules(session);
 
         List<WtDiscountRule> wtDiscountRules = getAllWtDiscountRules(session);
-        Org mainOrg = DAOService.getInstance().getOrg(idOfOrg);
+        Org mainOrg = DAOService.getInstance().getOrg(session, idOfOrg);
 
         Set<Org> orgs = getProcessedOrgs(session, idOfOrg, manyOrgs);
         existOrgWithEmptyCategoryOrgSet = false;
