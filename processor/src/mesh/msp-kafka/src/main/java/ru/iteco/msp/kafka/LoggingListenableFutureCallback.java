@@ -11,8 +11,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 public class LoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, String>> {
-    private static final Logger log = LoggerFactory.getLogger(LoggingListenableFutureCallback.class);
-    private String message;
+    private final Logger log = LoggerFactory.getLogger(LoggingListenableFutureCallback.class);
+    private final String message;
 
     public LoggingListenableFutureCallback(String message){
         this.message = message;
@@ -20,7 +20,7 @@ public class LoggingListenableFutureCallback implements ListenableFutureCallback
 
     @Override
     public void onSuccess(@NonNull SendResult<String, String> result) {
-        log.info("Send message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "]");
+        log.info("Send message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "] Key: " + result.getProducerRecord().key());
     }
 
     @Override

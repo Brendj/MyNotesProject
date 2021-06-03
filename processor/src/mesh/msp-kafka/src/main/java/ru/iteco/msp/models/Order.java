@@ -74,8 +74,8 @@ import java.util.Set;
         "       o.idoforder as \"idOfOrder\",\n" +
         "       c.meshguid as \"meshGUID\",\n" +
         "       cast(null as int) as \"code\",\n" +
-        "       string_agg(cast(cd_dszn.code as text), ';')  as \"dtsznCodes\",\n" +
-        "       string_agg(cd.categoryname, ';') as \"categoryName\",\n" +
+        "       cast(null as text)  as \"dtsznCodes\",\n" +
+        "       'Резерв' as \"categoryName\",\n" +
         "       o.createddate as \"createdDate\",\n" +
         "       o.socdiscount  as \"rSum\",\n" +
         "       org.organizationidfromnsi  as \"organizationId\",\n" +
@@ -84,19 +84,15 @@ import java.util.Set;
         " from cf_orders o\n" +
         "         join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg\n" +
         "         join cf_clients c on o.idofclient = c.idofclient and c.meshguid is not null\n" +
-        "         join cf_clients_categorydiscounts ccd on c.idofclient = ccd.idofclient\n" +
-        "         join cf_categorydiscounts cd on cd.idofcategorydiscount = ccd.idofcategorydiscount\n" +
-        "         left join cf_categorydiscounts_dszn cd_dszn on cd.idofcategorydiscount = cd_dszn.idofcategorydiscount\n" +
         "         join cf_orgs org on o.idoforg = org.idoforg\n" +
         "where o.state = 0\n" +
         "  and (c.idofclientgroup < 1100000000 or c.idofclientgroup in (1100000120, 1100000080)) \n" +
         "  and o.createddate between :begin and :end \n" +
         "  and o.ordertype = 6 \n" +
-        "  and cd.idofcategorydiscount = 50 " +
         "  and od.menutype between 50 and 99\n" +
         "  and od.idofrule is not null\n" +
-        "  and (cd.idofcategorydiscount >= 0 or cd.idofcategorydiscount = -90)\n" +
-        "  group by 1,2,3,4,7,8,9,11 "
+        "  group by 1,2,3,4,5,7,8,9,11 " +
+        "  order by 7 "
 )
 public class Order {
     public static final int DISCOUNT_TYPE = 4;

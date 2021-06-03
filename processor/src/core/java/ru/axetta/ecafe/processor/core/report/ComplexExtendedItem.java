@@ -9,6 +9,7 @@ import java.util.List;
 public class ComplexExtendedItem {
     String contragent;
     String complexName;
+    String price;
     String dietType;
     String ageGroupItem;
     String complexType;
@@ -23,11 +24,13 @@ public class ComplexExtendedItem {
     String day;
     List<ComplexExtendedDishItem> dish;
 
-    public ComplexExtendedItem(String contragent, String complexName, String dietType, String ageGroupItem,
-            String complexType, String isPortal, String barCode, String complexDate, String dayInCycle,
-            String cycleMotion, String startDay, String passDay, String note, String day, List<ComplexExtendedDishItem> dish) {
+    public ComplexExtendedItem(String contragent, String complexName, String price, String dietType,
+            String ageGroupItem, String complexType, String isPortal, String barCode, String complexDate,
+            String dayInCycle, String cycleMotion, String startDay, String passDay, String note, String day,
+            List<ComplexExtendedDishItem> dish) {
         this.contragent = contragent;
         this.complexName = complexName;
+        this.price = price;
         this.dietType = dietType;
         this.ageGroupItem = ageGroupItem;
         this.complexType = complexType;
@@ -161,5 +164,13 @@ public class ComplexExtendedItem {
 
     public void setDish(List<ComplexExtendedDishItem> dish) {
         this.dish = dish;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 }
