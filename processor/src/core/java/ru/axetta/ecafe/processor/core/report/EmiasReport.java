@@ -152,7 +152,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
 
             Query queryEMIAS = session.createSQLQuery(
                     "select distinct co.idoforg, co.shortnameinfoservice, co.shortaddress, ccg.groupname, cp.firstname, cp.surname, cp.secondname,\n"
-                            + "cc.contractid, benefit.benef, ce.dateliberate, ce.ideventemias, ce.startdateliberate, ce.enddateliberate, "
+                            + "cc.contractid, benefit.benef, ce.dateliberate, ce.idemias, ce.startdateliberate, ce.enddateliberate, "
                             + " CASE "
                             + " WHEN ce.archive = true THEN 'Посещает'       else 'Не посещает' \n"
                             + "END as status, ce.accepteddatetime, cc.idofclient \n" + "from cf_emias ce \n"
