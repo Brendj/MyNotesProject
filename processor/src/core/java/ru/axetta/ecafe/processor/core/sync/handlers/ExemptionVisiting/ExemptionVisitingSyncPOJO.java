@@ -37,7 +37,7 @@ public class ExemptionVisitingSyncPOJO {
         element.setAttribute("dateLiberate", CalendarUtils.dateTimeToString(dateLiberate));
         element.setAttribute("accepted", accepted == null ? "false" : accepted.toString());
         element.setAttribute("version", version == null ? "-1" : version.toString());
-        element.setAttribute("acceptedDateTime", acceptedDateTime == null ? "null" : CalendarUtils.dateShortToStringFullYear(acceptedDateTime));
+        element.setAttribute("acceptedDateTime", acceptedDateTime == null ? "null" : CalendarUtils.dateTimeToString(acceptedDateTime));
         return element;
     }
 

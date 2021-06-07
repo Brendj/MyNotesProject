@@ -162,7 +162,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
                             + "left join (select cc.idofclient, string_agg(ccdd.dtiszndescription, ', ') as benef from cf_clients cc \n"
                             + "left join cf_client_dtiszn_discount_info ccdd on cc.idofclient=ccdd.idofclient group by cc.idofclient) as benefit on benefit.idofclient=cc.idofclient\n"
-                            + "where ce.processed = true " + filterOrgs + filterClients + filterPeriod);
+                            + "where ce.processed = true and ce.id=990 " + filterOrgs + filterClients + filterPeriod);
 
             List rListEmias = queryEMIAS.list();
             long counter = 1;
@@ -186,10 +186,10 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 {
                     dateliberate = null;
                 }
-                Long idEmias;
+                String idEmias;
                 try
                 {
-                    idEmias = ((BigInteger) row[10]).longValue();
+                    idEmias = ((String) row[10]);
                 } catch (Exception e)
                 {
                     idEmias = null;

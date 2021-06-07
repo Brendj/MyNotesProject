@@ -24,7 +24,7 @@ public class EmiasItem {
     private String middlename;
     private Long contractID;
     private String benefits;
-    private Long emiasID;
+    private String emiasID;
     private String emiasDate;
     private String dateStartLiberation;
     private String dateEndLiberation;
@@ -36,7 +36,7 @@ public class EmiasItem {
     private Format formatter = new SimpleDateFormat("dd.MM.yyyy");
 
     public EmiasItem(Long recordID, Long orgID, String orgName, String orgAdress, String clientGroup,String firstname,
-            String lastname, String middlename, Long contractID, String benefits, Long emiasID, Date emiasDate,
+            String lastname, String middlename, Long contractID, String benefits, String emiasID, Date emiasDate,
             Date dateStartLiberation, Date dateEndLiberation, Date emiasDatearchived, String status,
             String acceptedDate, Date acceptedinOO)
     {
@@ -66,11 +66,11 @@ public class EmiasItem {
     }
 
 
-    public Long getEmiasID() {
+    public String getEmiasID() {
         return emiasID;
     }
 
-    public void setEmiasID(Long emiasID) {
+    public void setEmiasID(String emiasID) {
         this.emiasID = emiasID;
     }
 
