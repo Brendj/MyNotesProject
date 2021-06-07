@@ -163,7 +163,7 @@ public class ClientService {
         registry.setClientRegistryVersion(version);
         writableEntityManager.merge(registry);
 
-        c.setExpenditureLimit(balanceNotification);
+        c.setBalanceToNotify(balanceNotification);
         c.setClientRegistryVersion(version);
         writableEntityManager.merge(c);
     }
