@@ -7,6 +7,7 @@ package ru.iteco.restservice.controller.client;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ru.iteco.restservice.controller.client.request.NotificationUpdateRequest;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
 import ru.iteco.restservice.controller.client.responsedto.NotificationResponseDTO;
 import ru.iteco.restservice.model.Client;
@@ -93,6 +94,16 @@ public class ClientController {
             @PositiveOrZero Long contractId) {
         List<ClientsNotificationSettings> settings = clientService.getNotificationSettingsByClients(contractId);
         return notificationSettingsConverter.toDTOs(settings);
+    }
+
+    @PutMapping("/notifications")
+    @ResponseBody
+    @Operation(
+            summary = "Изменения настроек оповещения для опекунов",
+            description = "Позволяет изменить настройки оповещения для опекунов"
+    )
+    public void updateNotifications(@NotNull @RequestBody NotificationUpdateRequest req) {
+        clientService.updateNotifications(req);
     }
 
     @PutMapping("/setLimit")

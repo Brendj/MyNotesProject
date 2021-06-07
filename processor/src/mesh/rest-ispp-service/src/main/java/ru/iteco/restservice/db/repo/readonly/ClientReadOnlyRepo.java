@@ -7,6 +7,7 @@ package ru.iteco.restservice.db.repo.readonly;
 import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.model.Client;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -56,4 +57,14 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
 
     @EntityGraph("getClientAndOrgByContractId")
     Optional<Client> getClientByMobileAndContractId(String mobile, Long contractId);
+
+    @Query("SELECT g FROM ClientGuardian cg "
+         + "JOIN cg.guardian g "
+         + "JOIN cg.children c "
+         + "WHERE c.contractId = :contractId AND g.mobile LIKE :mobile "
+         + "AND cg.deletedState = FALSE AND cg.disabled = 0 "
+         + "ORDER BY g.clientRegistryVersion DESC ")
+    List<Client> getGuardianByChild(@Param("contractId") Long contractId,
+                                    @Param("mobile") String mobile,
+                                    Pageable pageable);
 }
