@@ -17,4 +17,10 @@ public interface SpecialDateReadOnlyRepo extends JpaRepository<SpecialDate, Long
             + "AND (sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL)")
     List<Integer> getSpecialDate(@Param("dateBegin") Date dateBegin, @Param("dateEnd") Date dateEnd,
                                  @Param("org") Long org, @Param("idOfClientGroup") Long idOfClientGroup);
+
+    @Query(value = "select sd from SpecialDate sd where sd.date between :startDate and :endDate "
+            + "and sd.idOfOrg = :idOfOrg and sd.deleted = false")
+    List<SpecialDate> getSpecialDatesByOrg(@Param("startDate") Date startDate,
+                                           @Param("endDate") Date endDate,
+                                           @Param("idOfOrg") Long idOfOrg);
 }

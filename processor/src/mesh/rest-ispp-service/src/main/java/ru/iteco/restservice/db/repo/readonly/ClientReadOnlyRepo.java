@@ -56,4 +56,9 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
 
     @EntityGraph("getClientAndOrgByContractId")
     Optional<Client> getClientByMobileAndContractId(String mobile, Long contractId);
+
+    @Query(value = "select c from Client c where c.mobile = :mobile and (c.idOfClient = :idOfClient "
+            + "or exists (select g.idOfClient from Client g, ClientGuardian cg " +
+            "where g.mobile = :mobile and g.idOfClient = cg.idOfGuardian and cg.idOfChildren = :idOfClient))")
+    List<Client> getClientsByMobile(@Param("idOfClient") Long idOfClient, @Param("mobile") String mobile);
 }

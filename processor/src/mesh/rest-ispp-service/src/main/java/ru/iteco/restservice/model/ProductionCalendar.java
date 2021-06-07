@@ -14,6 +14,9 @@ import java.util.Date;
 @Entity
 @Table(name = "cf_production_calendar")
 public class ProductionCalendar {
+    public static final Integer HOLIDAY = 2;
+    public static final Integer REGULAR = 1;
+
     @Id
     @Column(name = "idofproductioncalendar")
     private Long id;

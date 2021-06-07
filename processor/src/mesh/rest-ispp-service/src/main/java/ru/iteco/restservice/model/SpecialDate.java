@@ -75,6 +75,14 @@ public class SpecialDate {
         return deleted;
     }
 
+    public boolean isDeleted() {
+        return deleted.equals(1);
+    }
+
+    public boolean isWeekend() {
+        return isWeekend.equals(1);
+    }
+
     public void setDeleted(Integer deleted) {
         this.deleted = deleted;
     }

@@ -6,8 +6,11 @@ import org.hibernate.annotations.Type;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
 import ru.iteco.restservice.model.enums.PreorderState;
+import ru.iteco.restservice.model.wt.WtComplexesItem;
+import ru.iteco.restservice.model.wt.WtDish;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -114,6 +117,50 @@ public class PreorderMenuDetail {
 
     @Column(name = "idOfDish")
     private Long idOfDish;
+
+    public PreorderMenuDetail() { }
+
+    public PreorderMenuDetail(PreorderComplex preorderComplex, WtDish wtDish, Client client, Date date,
+                              Integer amount, String groupName) {
+        this.preorderComplex = preorderComplex;
+        this.client = client;
+        this.preorderDate = date;
+        this.amount = amount;
+        this.deletedState = 0;
+        this.state = PreorderState.OK;
+        this.setMenuDetailName(wtDish.getComponentsOfDish());
+        this.setMenuDetailPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
+        this.setGroupName(groupName);
+        this.setItemCode(wtDish.getCode());
+        this.setAvailableNow(0);
+        this.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+        this.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
+                wtDish.getCarbohydrates().doubleValue());
+        this.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+        this.setMenuDetailOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+        this.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+        this.setShortName(wtDish.getDishName());
+        this.setIdOfDish(wtDish.getIdOfDish());
+        this.setMobile(mobile);
+        this.setMobileGroupOnCreate(mobileGroupOnCreate);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PreorderMenuDetail that = (PreorderMenuDetail) o;
+        return idOfPreorderMenuDetail.equals(that.getIdOfPreorderMenuDetail());
+    }
+
+    @Override
+    public int hashCode() {
+        return idOfPreorderMenuDetail.hashCode();
+    }
 
     public Long getIdOfPreorderMenuDetail() {
         return idOfPreorderMenuDetail;

@@ -37,4 +37,20 @@ public interface PreorderComplexReadOnlyRepo extends CrudRepository<PreorderComp
     List<PreorderComplex> getPreorderComplexesByClientAndDate(@Param("client") Client client,
                                                               @Param("startDate") Date startDate,
                                                               @Param("endDate") Date endDate);
+    @Query(value= "select pc from PreorderComplex pc " +
+            "where pc.client = :client and pc.deletedState = 0 and pc.armComplexId = :complexId " +
+            "and pc.preorderDate between :startDate and :endDate")
+    PreorderComplex getPreorderComplexesByClientDateAndComplexId(@Param("client") Client client,
+                                                              @Param("complexId") Integer complexId,
+                                                              @Param("startDate") Date startDate,
+                                                              @Param("endDate") Date endDate);
+
+
+    @Query(value = "select max(pc.version) from PreorderComplex pc")
+    Long getMaxVersion();
+
+    @Query(value = "select sum(p.amount), p.preorderDate, coalesce(p.idOfOrgOnCreate, p.client.org.idOfOrg) as org from PreorderComplex p "
+            + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.deletedState = false "
+            + "group by p.preorderDate, coalesce(p.idOfOrgOnCreate, p.client.org.idOfOrg)")
+    List getPreorderAmount(@Param("idOfClient") Long idOfClient, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 }

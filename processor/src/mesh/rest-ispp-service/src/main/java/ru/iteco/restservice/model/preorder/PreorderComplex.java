@@ -6,14 +6,19 @@ import org.hibernate.annotations.Type;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
 import ru.iteco.restservice.model.enums.PreorderState;
+import ru.iteco.restservice.model.wt.WtComplex;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "cf_preorder_complex")
 public class PreorderComplex {
+    public static final Integer COMPLEX_TYPE2 = 2;
+    public static final Integer COMPLEX_TYPE4 = 4;
+
     @Id
     @GeneratedValue(generator = "cf_preorder_complex-seq")
     @GenericGenerator(
@@ -105,6 +110,31 @@ public class PreorderComplex {
     @Column(name = "cancelnotification")
     private Integer cancelnotification;
 
+    public PreorderComplex() { }
+
+    public PreorderComplex(Client client, Date date, WtComplex wtComplex, Integer amount, Long version,
+                           String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+        this.client = client;
+        this.preorderDate = date;
+        this.armComplexId = wtComplex.getIdOfComplex().intValue();
+        this.amount = amount;
+        this.version = version;
+        this.deletedState = 0;
+        this.guid = UUID.randomUUID().toString();
+        this.usedSum = 0L;
+        this.usedAmount = 0L;
+        this.createdDate = new Date();
+        this.lastUpdate = new Date();
+        this.state = PreorderState.OK;
+        this.idOfOrgOnCreate = client.getOrg().getIdOfOrg();
+        this.mobile = guardianMobile;
+        this.mobileGroupOnCreate = mobileGroupOnCreate;
+        this.complexName = wtComplex.getName();
+        this.complexPrice = wtComplex.getPrice().longValue();
+        this.modeFree = 0;
+        this.modeOfAdd = wtComplex.getComposite() ? COMPLEX_TYPE4 : COMPLEX_TYPE2;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -120,6 +150,12 @@ public class PreorderComplex {
     @Override
     public int hashCode() {
         return idOfPreorderComplex.hashCode();
+    }
+
+    public static int getDaysOfRegularPreorders() {
+        //return Integer.parseInt(RuntimeContext
+        //        .getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.daysToGenerate", "14"));
+        return 14;
     }
 
     public Long getIdOfPreorderComplex() {

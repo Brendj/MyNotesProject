@@ -3,6 +3,7 @@ package ru.iteco.restservice.controller.menu;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ru.iteco.restservice.controller.menu.request.PreorderComplexRequest;
 import ru.iteco.restservice.controller.menu.request.ProhibitionRequest;
 import ru.iteco.restservice.controller.menu.responsedto.CategoryItem;
 import ru.iteco.restservice.controller.menu.responsedto.ComplexesResponse;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.iteco.restservice.servise.PreorderService;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -35,6 +37,9 @@ public class MenuController {
 
     @Autowired
     ComplexService complexService;
+
+    @Autowired
+    PreorderService preorderService;
 
     @GetMapping("/getMenuList")
     @ResponseBody
@@ -71,6 +76,23 @@ public class MenuController {
             return response;
         } catch (Exception e){
             logger.error("Exception in getComplexes: ", e);
+            throw e;
+        }
+    }
+
+    @PostMapping
+    @Operation(summary = "Создание предзаказа",
+            description = "Создание предзаказа")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    public Long createPreorderComplex(@RequestBody PreorderComplexRequest preorderComplexRequest) throws Exception {
+        try {
+            Date d = CalendarUtils.getDateFromLong(preorderComplexRequest.getDate());
+            return preorderService.createPreorder(preorderComplexRequest.getContractId(), d,
+                    preorderComplexRequest.getGuardianMobile(), preorderComplexRequest.getComplexId(),
+                    preorderComplexRequest.getAmount());
+        } catch (Exception e) {
+            logger.error("Exception in createPreorderComplex: ", e);
             throw e;
         }
     }

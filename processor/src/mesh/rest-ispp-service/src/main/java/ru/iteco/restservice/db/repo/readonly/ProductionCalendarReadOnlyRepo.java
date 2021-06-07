@@ -15,4 +15,6 @@ public interface ProductionCalendarReadOnlyRepo extends JpaRepository<Production
     @Query(value = "SELECT calend.flag from ProductionCalendar calend WHERE calend.day "
             + "between :dateBegin and :dateEnd")
     List<Integer> getWorkingDays(@Param("dateBegin") Date dateBegin, @Param("dateEnd") Date dateEnd);
+
+    List<ProductionCalendar> findByDayBetween(Date startDate, Date endDate);
 }

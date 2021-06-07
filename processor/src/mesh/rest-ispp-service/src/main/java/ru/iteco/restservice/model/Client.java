@@ -5,6 +5,7 @@
 package ru.iteco.restservice.model;
 
 import ru.iteco.restservice.model.enums.Gender;
+import ru.iteco.restservice.model.enums.Predefined;
 
 import javax.persistence.*;
 import java.util.List;
@@ -234,6 +235,22 @@ public class Client {
     private Set<ClientsNotificationSettings> notificationSettings;
 
     public Client() {
+    }
+
+    public boolean isStudent() {
+        return clientGroup != null && clientGroup.getClientGroupId().getIdOfClientGroup() < Predefined.CLIENT_EMPLOYEES.getValue();
+    }
+
+    public boolean isSotrudnikMsk() {
+        return clientGroup != null && (clientGroup.getClientGroupId().getIdOfClientGroup().equals(Predefined.CLIENT_ADMINISTRATION.getValue())
+                || clientGroup.getClientGroupId().getIdOfClientGroup().equals(Predefined.CLIENT_EMPLOYEES.getValue())
+                || clientGroup.getClientGroupId().getIdOfClientGroup().equals(Predefined.CLIENT_TECH_EMPLOYEES.getValue())
+                || clientGroup.getClientGroupId().getIdOfClientGroup().equals(Predefined.CLIENT_OTHERS.getValue())
+                || clientGroup.getClientGroupId().getIdOfClientGroup().equals(Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue()));
+    }
+
+    public boolean isParentMsk() {
+        return !isStudent() && !isSotrudnikMsk();
     }
 
     public Long getExpenditureLimit() {
