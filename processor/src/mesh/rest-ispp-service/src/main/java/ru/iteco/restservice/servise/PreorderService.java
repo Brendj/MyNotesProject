@@ -64,6 +64,12 @@ public class PreorderService {
                 || preorderComplexRequest.getAmount() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
     }
 
+    public void checkDeleteParameters(PreorderComplexRequest preorderComplexRequest) throws IllegalArgumentException {
+        if (preorderComplexRequest.getPreorderId() == null
+                || preorderComplexRequest.getContractId() == null
+                || preorderComplexRequest.getGuardianMobile() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+    }
+
     public PreorderComplex editPreorder(Long preorderId, Long contractId, String guardianMobile, Integer amount) throws Exception {
         PreorderComplex preorderComplex = pcRepo.findById(preorderId)
                 .orElseThrow(() -> new NotFoundException("Предзаказ с указанным идентификатором не найден"));
@@ -74,6 +80,19 @@ public class PreorderService {
 
         long nextVersion = pcRepo.getMaxVersion() + 1;
         preorderDAO.editPreorder(preorderComplex, guardianMobile, amount, nextVersion);
+        return preorderComplex;
+    }
+
+    public PreorderComplex deletePreorder(Long preorderId, Long contractId, String guardianMobile) throws Exception {
+        PreorderComplex preorderComplex = pcRepo.getPreorderComplexesWithDetails(preorderId)
+                .orElseThrow(() -> new NotFoundException("Предзаказ с указанным идентификатором не найден"));
+        Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
+        if (!preorderComplex.getClient().equals(client)) {
+            throw new IllegalArgumentException("Предзаказ не принадлежит данному клиенту");
+        }
+
+        long nextVersion = pcRepo.getMaxVersion() + 1;
+        preorderDAO.deletePreorder(preorderComplex, guardianMobile, nextVersion);
         return preorderComplex;
     }
 

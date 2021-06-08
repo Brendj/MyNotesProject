@@ -10,6 +10,7 @@ import ru.iteco.restservice.model.wt.WtComplex;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -37,6 +38,11 @@ public interface PreorderComplexReadOnlyRepo extends CrudRepository<PreorderComp
     List<PreorderComplex> getPreorderComplexesByClientAndDate(@Param("client") Client client,
                                                               @Param("startDate") Date startDate,
                                                               @Param("endDate") Date endDate);
+
+    @Query(value= "select pc from PreorderComplex pc join fetch pc.preorderMenuDetails pmd " +
+            "where pc.idOfPreorderComplex = :idOfPreorderComplex")
+    Optional<PreorderComplex> getPreorderComplexesWithDetails(@Param("idOfPreorderComplex") Long idOfPreorderComplex);
+
     @Query(value= "select pc from PreorderComplex pc " +
             "where pc.client = :client and pc.deletedState = 0 and pc.armComplexId = :complexId " +
             "and pc.preorderDate between :startDate and :endDate")
@@ -44,7 +50,6 @@ public interface PreorderComplexReadOnlyRepo extends CrudRepository<PreorderComp
                                                               @Param("complexId") Integer complexId,
                                                               @Param("startDate") Date startDate,
                                                               @Param("endDate") Date endDate);
-
 
     @Query(value = "select max(pc.version) from PreorderComplex pc")
     Long getMaxVersion();

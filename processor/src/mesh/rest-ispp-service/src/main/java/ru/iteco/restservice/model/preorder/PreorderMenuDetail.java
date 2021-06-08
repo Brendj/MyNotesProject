@@ -148,6 +148,12 @@ public class PreorderMenuDetail {
         this.setMobileGroupOnCreate(mobileGroupOnCreate);
     }
 
+    public void delete(String guardianMobile) {
+        this.deletedState = 1;
+        this.amount = 0;
+        this.mobile = guardianMobile;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

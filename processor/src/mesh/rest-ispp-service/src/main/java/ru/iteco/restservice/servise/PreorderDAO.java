@@ -60,6 +60,16 @@ public class PreorderDAO {
         entityManager.merge(preorderComplex);
     }
 
+    @Transactional
+    public void deletePreorder(PreorderComplex preorderComplex, String guardianMobile, long version) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            pmd.delete(guardianMobile);
+            entityManager.merge(pmd);
+        }
+        preorderComplex.delete(guardianMobile, version);
+        entityManager.merge(preorderComplex);
+    }
+
     public String getMenuGroupByWtDishAndCategories(WtDish wtDish) {
         StringBuilder sb = new StringBuilder();
         List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDish);

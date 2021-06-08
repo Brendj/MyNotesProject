@@ -115,7 +115,25 @@ public class MenuController {
                     preorderComplexRequest.getAmount());
             return PreorderComplexDTO.build(pc);
         } catch (Exception e) {
-            logger.error("Exception in createPreorderComplex: ", e);
+            logger.error("Exception in editPreorderComplex: ", e);
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/preorder/{id}")
+    @Operation(summary = "Удаление предзаказа",
+            description = "Удаление предзаказа")
+    @ResponseBody
+    public PreorderComplexDTO deletePreorderComplex(@RequestBody PreorderComplexRequest preorderComplexRequest, @NotNull @PathVariable Long id) throws Exception {
+        try {
+            preorderComplexRequest.setPreorderId(id);
+            preorderService.checkDeleteParameters(preorderComplexRequest);
+            PreorderComplex pc = preorderService.deletePreorder(preorderComplexRequest.getPreorderId(),
+                    preorderComplexRequest.getContractId(),
+                    preorderComplexRequest.getGuardianMobile());
+            return PreorderComplexDTO.build(pc);
+        } catch (Exception e) {
+            logger.error("Exception in editPreorderComplex: ", e);
             throw e;
         }
     }

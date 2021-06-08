@@ -142,6 +142,14 @@ public class PreorderComplex {
         this.version = version;
     }
 
+    public void delete(String guardianMobile, Long version) {
+        this.mobile = guardianMobile;
+        this.amount = 0;
+        this.deletedState = 1;
+        this.lastUpdate = new Date();
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
