@@ -4,9 +4,12 @@
 
 package ru.iteco.restservice.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import ru.iteco.restservice.property.SwaggerProperty;
 
 import org.springframework.context.annotation.Bean;
@@ -14,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
+
+    private static final String API_KEY_SCHEME = "apikey-scheme";
 
     public static final String[] AUTH_WHITELIST = {
             "/v3/api-docs",
@@ -33,11 +38,17 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI api() {
-        return new OpenAPI()
-                /*.host(swaggerProperty.getHostUrl())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("ru.iteco.restservice"))*/
-                .info(metaData());
+        OpenAPI api = new OpenAPI().info(metaData());
+
+        Components components = new Components();
+        components.addSecuritySchemes(API_KEY_SCHEME, getAPIKeySecurityScheme());
+        api.setComponents(components);
+
+        SecurityRequirement apikeyReq = new SecurityRequirement();
+        apikeyReq.addList(API_KEY_SCHEME);
+        api.addSecurityItem(apikeyReq);
+
+        return api;
     }
 
     private Info metaData() {
@@ -51,22 +62,11 @@ public class SwaggerConfig {
                 );
     }
 
-    /*private ApiKey apiKey() {
-        return new ApiKey("Token Access", HttpHeaders.AUTHORIZATION, SecurityScheme.In.HEADER.name());
+    private SecurityScheme getAPIKeySecurityScheme() {
+        SecurityScheme scheme = new SecurityScheme();
+        scheme.setType(SecurityScheme.Type.APIKEY);
+        scheme.setName("API-KEY");
+        scheme.setIn(SecurityScheme.In.HEADER);
+        return scheme;
     }
-
-    private SecurityContext securityContext() {
-        return SecurityContext.builder()
-                .securityReferences(defaultAuth())
-                .build();
-    }
-
-    List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope
-                = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        return newArrayList(
-                new SecurityReference("JWT", authorizationScopes));
-    }*/
 }

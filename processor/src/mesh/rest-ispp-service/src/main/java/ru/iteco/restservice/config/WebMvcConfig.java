@@ -4,8 +4,12 @@
 
 package ru.iteco.restservice.config;
 
+import ru.iteco.restservice.Interceptor.RestApiInterceptor;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -22,4 +26,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .maxAge(1800L);
     }
 
+    @Bean
+    public RestApiInterceptor requestHandler(){
+        return new RestApiInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(final InterceptorRegistry registry) {
+        registry.addInterceptor(requestHandler());
+    }
 }
