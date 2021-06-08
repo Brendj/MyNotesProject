@@ -162,7 +162,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
                             + "left join (select cc.idofclient, string_agg(ccdd.dtiszndescription, ', ') as benef from cf_clients cc \n"
                             + "left join cf_client_dtiszn_discount_info ccdd on cc.idofclient=ccdd.idofclient group by cc.idofclient) as benefit on benefit.idofclient=cc.idofclient\n"
-                            + "where ce.processed = true and ce.id=990 " + filterOrgs + filterClients + filterPeriod);
+                            + "where ce.processed = true " + filterOrgs + filterClients + filterPeriod);
 
             List rListEmias = queryEMIAS.list();
             long counter = 1;
@@ -251,7 +251,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                     }
                 }
                 if (!acceptedDates.isEmpty())
-                    acceptedDates = acceptedDates.substring(0, acceptedDates.length()-1);
+                    acceptedDates = acceptedDates.substring(0, acceptedDates.length()-2);
                 ///////////////////////////
                 EmiasItem emiasItem = new EmiasItem(counter, idoforg, shortnameinfoservice, shortaddress, groupname,
                         firstname, lastname, middlename, contractid, benefit, idEmias, dateliberate, startdateliberate,

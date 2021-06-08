@@ -167,7 +167,7 @@ public class EMIASController extends HttpServlet {
             for (EMIAS emias: emiasList)
             {
                 Date startdate = CalendarUtils.startOfDay(emias.getStartDateLiberate());
-                Date enddate = CalendarUtils.startOfDay(emias.getEndDateLiberate());
+                Date enddate = CalendarUtils.endOfDay(emias.getEndDateLiberate());
                 List<String> dates2 = CalendarUtils.datesBetween(startdate, enddate, 2);
 
                 for (String dateStr: dates2)
