@@ -271,7 +271,8 @@ public class ComplexService {
 
         List<PreorderComplex> list = preorderComplexReadOnlyRepo.getPreorderComplexesByClientAndDate(client, startDate, endDate);
         for (PreorderComplex pc : list) {
-            PreorderComplexAmountData data = new PreorderComplexAmountData(pc.getArmComplexId().longValue(), pc.getAmount());
+            PreorderComplexAmountData data = new PreorderComplexAmountData(pc.getArmComplexId().longValue(), pc.getAmount(),
+                    pc.getIdOfPreorderComplex());
             for (PreorderMenuDetail pmd : pc.getPreorderMenuDetails()) {
                 data.getDishAmounts().put(pmd.getIdOfDish(), pmd.getAmount());
             }

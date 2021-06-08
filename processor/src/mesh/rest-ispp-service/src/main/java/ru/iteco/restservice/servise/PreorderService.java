@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.iteco.restservice.controller.menu.request.PreorderComplexRequest;
 import ru.iteco.restservice.db.repo.readonly.*;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.*;
@@ -48,7 +49,35 @@ public class PreorderService {
     public static final Integer SOAP_RC_MOBILE_DIFFERENT_GROUPS = 711;
     public static final Integer DEFAULT_FORBIDDEN_DAYS = 2;
 
-    public Long createPreorder(Long contractId, Date date, String guardianMobile, Long complexId, Integer amount) throws Exception {
+    public void checkCreateParameters(PreorderComplexRequest preorderComplexRequest) throws IllegalArgumentException {
+        if (preorderComplexRequest.getAmount() == null
+                || preorderComplexRequest.getComplexId() == null
+                || preorderComplexRequest.getContractId() == null
+                || preorderComplexRequest.getDate() == null
+                || preorderComplexRequest.getGuardianMobile() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+    }
+
+    public void checkEditParameters(PreorderComplexRequest preorderComplexRequest) throws IllegalArgumentException {
+        if (preorderComplexRequest.getPreorderId() == null
+                || preorderComplexRequest.getContractId() == null
+                || preorderComplexRequest.getGuardianMobile() == null
+                || preorderComplexRequest.getAmount() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+    }
+
+    public PreorderComplex editPreorder(Long preorderId, Long contractId, String guardianMobile, Integer amount) throws Exception {
+        PreorderComplex preorderComplex = pcRepo.findById(preorderId)
+                .orElseThrow(() -> new NotFoundException("Предзаказ с указанным идентификатором не найден"));
+        Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
+        if (!preorderComplex.getClient().equals(client)) {
+            throw new IllegalArgumentException("Предзаказ не принадлежит данному клиенту");
+        }
+
+        long nextVersion = pcRepo.getMaxVersion() + 1;
+        preorderDAO.editPreorder(preorderComplex, guardianMobile, amount, nextVersion);
+        return preorderComplex;
+    }
+
+    public PreorderComplex createPreorder(Long contractId, Date date, String guardianMobile, Long complexId, Integer amount) throws Exception {
         Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
         Date startDate = CalendarUtils.startOfDay(date);
         Date endDate = CalendarUtils.endOfDay(date);

@@ -3,6 +3,9 @@ package ru.iteco.restservice.controller.menu.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class PreorderComplexRequest {
+    @Schema(description = "Идентификатор предзаказа", example = "1377")
+    private Long preorderId;
+
     @Schema(description = "Номер лицевого счета клиента", example = "13177")
     private Long contractId;
 
@@ -56,5 +59,13 @@ public class PreorderComplexRequest {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public Long getPreorderId() {
+        return preorderId;
+    }
+
+    public void setPreorderId(Long preorderId) {
+        this.preorderId = preorderId;
     }
 }

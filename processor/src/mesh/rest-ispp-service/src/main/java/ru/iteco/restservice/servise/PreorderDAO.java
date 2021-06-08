@@ -32,7 +32,7 @@ public class PreorderDAO {
     WtComplexReadOnlyRepo complexRepo;
 
     @Transactional
-    public Long createPreorder(Client client, Date date, Long complexId, Integer amount, Long version,
+    public PreorderComplex createPreorder(Client client, Date date, Long complexId, Integer amount, Long version,
                                String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         WtComplex complex = complexRepo.findById(complexId)
                 .orElseThrow(() -> new NotFoundException(String.format("Не найден комплекс с идентификатором %s", complexId)));
@@ -51,7 +51,13 @@ public class PreorderDAO {
         }
         preorderComplex.setPreorderMenuDetails(preorderMenuDetails);
         entityManager.merge(preorderComplex);
-        return preorderComplex.getIdOfPreorderComplex();
+        return preorderComplex;
+    }
+
+    @Transactional
+    public void editPreorder(PreorderComplex preorderComplex, String guardianMobile, Integer amount, long version) {
+        preorderComplex.editAmount(guardianMobile, amount, version);
+        entityManager.merge(preorderComplex);
     }
 
     public String getMenuGroupByWtDishAndCategories(WtDish wtDish) {

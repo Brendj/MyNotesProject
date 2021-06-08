@@ -1,6 +1,7 @@
 package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreorderAmountData;
@@ -24,8 +25,8 @@ public class ComplexItem {
     //private Integer complexType;
     @Schema(description = "Вид рациона комплекса")
     private Integer fRation;
-    @Schema(description = "Заказанное количество")
-    private Integer amount;
+    @Schema(description = "Информация о предзаказе")
+    private PreorderComplexDTO preorderInfo;
     @Schema(description = "Список блюд комплекса")
     private List<DishItem> menuItems;
 
@@ -35,7 +36,10 @@ public class ComplexItem {
         this.composite = wtComplex.getComposite();
         this.price = wtComplex.getPrice() == null ? 0 : wtComplex.getPrice().longValue();
         PreorderComplexAmountData data = PreorderAmountData.getByComplexId(preorderComplexAmounts, wtComplex.getIdOfComplex());
-        this.amount = data == null ? 0 : data.getAmount();
+        PreorderComplexDTO preorderInfo = new PreorderComplexDTO();
+        preorderInfo.setAmount(data == null ? 0 : data.getAmount());
+        preorderInfo.setPreorderId(data == null ? null : data.getIdOfPreorderComplex());
+        this.setPreorderInfo(preorderInfo);
         this.fRation = wtComplex.getWtDietType().getIdOfDietType().intValue();
         this.menuItems = new ArrayList<>();
         for (WtDish wtDish : dishes) {
@@ -100,11 +104,11 @@ public class ComplexItem {
         this.composite = composite;
     }
 
-    public Integer getAmount() {
-        return amount;
+    public PreorderComplexDTO getPreorderInfo() {
+        return preorderInfo;
     }
 
-    public void setAmount(Integer amount) {
-        this.amount = amount;
+    public void setPreorderInfo(PreorderComplexDTO preorderInfo) {
+        this.preorderInfo = preorderInfo;
     }
 }

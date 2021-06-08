@@ -9,11 +9,13 @@ import java.util.Map;
 public class PreorderComplexAmountData {
     private final Long idOfComplex;
     private final Integer amount;
+    private final Long idOfPreorderComplex;
     private final Map<Long, Integer> dishAmounts;
 
-    public PreorderComplexAmountData(Long idOfComplex, Integer amount) {
+    public PreorderComplexAmountData(Long idOfComplex, Integer amount, Long idOfPreorderComplex) {
         this.idOfComplex = idOfComplex;
         this.amount = amount;
+        this.idOfPreorderComplex = idOfPreorderComplex;
         this.dishAmounts = new HashMap<>();
     }
 
@@ -29,4 +31,7 @@ public class PreorderComplexAmountData {
         return dishAmounts;
     }
 
+    public Long getIdOfPreorderComplex() {
+        return idOfPreorderComplex;
+    }
 }

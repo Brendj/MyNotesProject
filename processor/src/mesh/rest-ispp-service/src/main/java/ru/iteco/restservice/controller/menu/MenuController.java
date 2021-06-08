@@ -8,6 +8,8 @@ import ru.iteco.restservice.controller.menu.request.ProhibitionRequest;
 import ru.iteco.restservice.controller.menu.responsedto.CategoryItem;
 import ru.iteco.restservice.controller.menu.responsedto.ComplexesResponse;
 import ru.iteco.restservice.controller.menu.responsedto.MenuListResponse;
+import ru.iteco.restservice.controller.menu.responsedto.PreorderComplexDTO;
+import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.servise.CalendarUtils;
 import ru.iteco.restservice.servise.ComplexService;
 import ru.iteco.restservice.servise.MenuService;
@@ -85,12 +87,33 @@ public class MenuController {
             description = "Создание предзаказа")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createPreorderComplex(@RequestBody PreorderComplexRequest preorderComplexRequest) throws Exception {
+    public PreorderComplexDTO createPreorderComplex(@RequestBody PreorderComplexRequest preorderComplexRequest) throws Exception {
         try {
+            preorderService.checkCreateParameters(preorderComplexRequest);
             Date d = CalendarUtils.getDateFromLong(preorderComplexRequest.getDate());
-            return preorderService.createPreorder(preorderComplexRequest.getContractId(), d,
+            PreorderComplex pc = preorderService.createPreorder(preorderComplexRequest.getContractId(), d,
                     preorderComplexRequest.getGuardianMobile(), preorderComplexRequest.getComplexId(),
                     preorderComplexRequest.getAmount());
+            return PreorderComplexDTO.build(pc);
+        } catch (Exception e) {
+            logger.error("Exception in createPreorderComplex: ", e);
+            throw e;
+        }
+    }
+
+    @PutMapping("/preorder/{id}")
+    @Operation(summary = "Редактирование количества в предзаказе",
+            description = "Редактирование количества в предзаказе")
+    @ResponseBody
+    public PreorderComplexDTO editPreorderComplex(@RequestBody PreorderComplexRequest preorderComplexRequest, @NotNull @PathVariable Long id) throws Exception {
+        try {
+            preorderComplexRequest.setPreorderId(id);
+            preorderService.checkEditParameters(preorderComplexRequest);
+            PreorderComplex pc = preorderService.editPreorder(preorderComplexRequest.getPreorderId(),
+                    preorderComplexRequest.getContractId(),
+                    preorderComplexRequest.getGuardianMobile(),
+                    preorderComplexRequest.getAmount());
+            return PreorderComplexDTO.build(pc);
         } catch (Exception e) {
             logger.error("Exception in createPreorderComplex: ", e);
             throw e;
