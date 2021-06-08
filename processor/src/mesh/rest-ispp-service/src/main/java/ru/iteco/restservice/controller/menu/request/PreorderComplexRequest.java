@@ -1,12 +1,21 @@
 package ru.iteco.restservice.controller.menu.request;
 
-import java.util.Date;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class PreorderComplexRequest {
+    @Schema(description = "Номер лицевого счета клиента", example = "13177")
     private Long contractId;
+
+    @Schema(description = "Номер телефона представителя", example = "79033987854")
     private String guardianMobile;
+
+    @Schema(description = "Дата предзаказа в Timestamp (ms)", example = "1623974400000")
     private Long date;
+
+    @Schema(description = "Идентификатор комплекса", example = "854")
     private Long complexId;
+
+    @Schema(description = "Заказываемое количество комплексов", example = "1")
     private Integer amount;
 
     public Long getContractId() {

@@ -50,7 +50,7 @@ public interface PreorderComplexReadOnlyRepo extends CrudRepository<PreorderComp
     Long getMaxVersion();
 
     @Query(value = "select sum(p.amount), p.preorderDate, coalesce(p.idOfOrgOnCreate, p.client.org.idOfOrg) as org from PreorderComplex p "
-            + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.deletedState = false "
+            + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.deletedState = 0 "
             + "group by p.preorderDate, coalesce(p.idOfOrgOnCreate, p.client.org.idOfOrg)")
     List getPreorderAmount(@Param("idOfClient") Long idOfClient, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 }

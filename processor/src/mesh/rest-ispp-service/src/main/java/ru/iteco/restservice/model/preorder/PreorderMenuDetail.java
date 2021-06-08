@@ -12,6 +12,7 @@ import ru.iteco.restservice.model.wt.WtDish;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "cf_preorder_menudetail")
@@ -121,13 +122,15 @@ public class PreorderMenuDetail {
     public PreorderMenuDetail() { }
 
     public PreorderMenuDetail(PreorderComplex preorderComplex, WtDish wtDish, Client client, Date date,
-                              Integer amount, String groupName) {
+                              Integer amount, String groupName, String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         this.preorderComplex = preorderComplex;
         this.client = client;
         this.preorderDate = date;
         this.amount = amount;
         this.deletedState = 0;
         this.state = PreorderState.OK;
+        this.usedSum = 0L;
+        this.usedAmount = 0L;
         this.setMenuDetailName(wtDish.getComponentsOfDish());
         this.setMenuDetailPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
         this.setGroupName(groupName);
@@ -141,7 +144,7 @@ public class PreorderMenuDetail {
         this.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
         this.setShortName(wtDish.getDishName());
         this.setIdOfDish(wtDish.getIdOfDish());
-        this.setMobile(mobile);
+        this.setMobile(guardianMobile);
         this.setMobileGroupOnCreate(mobileGroupOnCreate);
     }
 
@@ -153,13 +156,14 @@ public class PreorderMenuDetail {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PreorderMenuDetail that = (PreorderMenuDetail) o;
-        return idOfPreorderMenuDetail.equals(that.getIdOfPreorderMenuDetail());
+        PreorderMenuDetail preorderMenuDetail = (PreorderMenuDetail) o;
+        return preorderComplex.getGuid().equals(preorderMenuDetail.getPreorderComplex().getGuid())
+                && itemCode.equals(preorderMenuDetail.getItemCode());
     }
 
     @Override
     public int hashCode() {
-        return idOfPreorderMenuDetail.hashCode();
+        return idOfPreorderMenuDetail != null ? idOfPreorderMenuDetail.hashCode() : 0;
     }
 
     public Long getIdOfPreorderMenuDetail() {

@@ -59,6 +59,6 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
 
     @Query(value = "select c from Client c where c.mobile = :mobile and (c.idOfClient = :idOfClient "
             + "or exists (select g.idOfClient from Client g, ClientGuardian cg " +
-            "where g.mobile = :mobile and g.idOfClient = cg.idOfGuardian and cg.idOfChildren = :idOfClient))")
+            "where g.mobile = :mobile and g.idOfClient = cg.guardian.idOfClient and cg.children.idOfClient = :idOfClient))")
     List<Client> getClientsByMobile(@Param("idOfClient") Long idOfClient, @Param("mobile") String mobile);
 }

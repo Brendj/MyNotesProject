@@ -62,7 +62,7 @@ public class PreorderComplex {
     @Column(name = "usedAmount")
     private Long usedAmount;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "idofpreordercomplex")
     private Set<PreorderMenuDetail> preorderMenuDetails;
 
@@ -108,7 +108,7 @@ public class PreorderComplex {
     private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
 
     @Column(name = "cancelnotification")
-    private Integer cancelnotification;
+    private Boolean cancelnotification;
 
     public PreorderComplex() { }
 
@@ -342,11 +342,11 @@ public class PreorderComplex {
         this.mobileGroupOnCreate = mobileGroupOnCreate;
     }
 
-    public Integer getCancelnotification() {
+    public Boolean getCancelnotification() {
         return cancelnotification;
     }
 
-    public void setCancelnotification(Integer cancelnotification) {
+    public void setCancelnotification(Boolean cancelnotification) {
         this.cancelnotification = cancelnotification;
     }
 }

@@ -80,7 +80,7 @@ public class MenuController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/preorder")
     @Operation(summary = "Создание предзаказа",
             description = "Создание предзаказа")
     @ResponseBody

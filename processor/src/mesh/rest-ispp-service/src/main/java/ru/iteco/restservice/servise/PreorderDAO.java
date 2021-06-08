@@ -45,7 +45,8 @@ public class PreorderDAO {
         for (WtDish wtDish : complexesItem.getDishes()) {
             if (wtDish.getDeleteState().equals(1)) continue;
             String groupName = getMenuGroupByWtDishAndCategories(wtDish);
-            PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail(preorderComplex, wtDish, client, date, 0, groupName);
+            PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail(preorderComplex, wtDish, client, date, 0,
+                    groupName, guardianMobile, mobileGroupOnCreate);
             preorderMenuDetails.add(preorderMenuDetail);
         }
         preorderComplex.setPreorderMenuDetails(preorderMenuDetails);

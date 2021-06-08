@@ -22,6 +22,6 @@ public interface ClientGuardianReadOnlyRepo extends CrudRepository<ClientGuardia
     Long getVersion();
 
     @Query(value = "select cg.idOfClientGuardian from ClientGuardian cg where cg.guardian.idOfClient = :idOfClient " +
-            "and cg.deletedState = false and cg.disabled = false")
+            "and cg.deletedState = false and cg.disabled = 0")
     List<Long> getIdOfClientGuardianList(@Param("idOfClient") Long idOfClient);
 }

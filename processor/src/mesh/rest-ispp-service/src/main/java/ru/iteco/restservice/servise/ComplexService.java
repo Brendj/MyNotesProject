@@ -207,7 +207,11 @@ public class ComplexService {
                 if (complexSign.get("Free") && complexSign.get("Elem")) {
                     CategoryDiscount discount = categoryDiscountReadOnlyRepo.findById(CategoryDiscount.ELEM_DISCOUNT_ID)
                             .orElseThrow(()->new Exception("Не найдена льгота ид -90"));
-                    Set<WtDiscountRule> discRules = new HashSet<>(discountRuleRepo.getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount));
+                    Set<WtDiscountRule> discRules;
+                    if (wtDiscountRuleSet.isEmpty())
+                        discRules = new HashSet<>(discountRuleRepo.getWtDiscountRuleBySecondDiscount(discount));
+                    else
+                        discRules = new HashSet<>(discountRuleRepo.getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount));
                     discRules = getWtDiscountRulesWithMaxPriority(discRules);
                     resComplexes = complexRepo.getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds,
                             org, org.getDefaultSupplier(), WtComplex.FREE_COMPLEX_GROUP_ITEM_ID, WtComplex.ALL_COMPLEX_GROUP_ITEM_ID);

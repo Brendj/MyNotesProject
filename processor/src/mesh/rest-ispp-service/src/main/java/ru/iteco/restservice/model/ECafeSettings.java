@@ -5,7 +5,7 @@ import ru.iteco.restservice.model.enums.SettingsIds;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "cf_preorder_complex")
+@Table(name = "cf_ecafesettings")
 public class ECafeSettings {
     @Id
     @Column(name = "IdOfECafeSetting")

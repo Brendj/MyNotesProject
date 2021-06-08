@@ -28,6 +28,10 @@ public interface WtDiscountRuleReadOnlyRepo extends JpaRepository<WtDiscountRule
                                                           @Param("discount") CategoryDiscount discount);
 
     @Query(value = "SELECT discountRule FROM WtDiscountRule discountRule "
+            + "WHERE :discount IN ELEMENTS(discountRule.categoryDiscounts)")
+    List<WtDiscountRule> getWtDiscountRuleBySecondDiscount(@Param("discount") CategoryDiscount discount);
+
+    @Query(value = "SELECT discountRule FROM WtDiscountRule discountRule "
             + "WHERE discountRule in (:rules) AND (:firstDiscount IN ELEMENTS(discountRule.categoryDiscounts) "
             + "OR :secondDiscount IN ELEMENTS(discountRule.categoryDiscounts))")
     Set<WtDiscountRule> getWtDiscountRuleByTwoDiscounts(@Param("rules") Set<WtDiscountRule> wtDiscountRuleSet,
