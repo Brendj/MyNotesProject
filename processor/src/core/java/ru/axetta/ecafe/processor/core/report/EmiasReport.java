@@ -152,16 +152,18 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
 
             Query queryEMIAS = session.createSQLQuery(
                     "select distinct co.idoforg, co.shortnameinfoservice, co.shortaddress, ccg.groupname, cp.firstname, cp.surname, cp.secondname,\n"
-                            + "cc.contractid, benefit.benef, ce.dateliberate, ce.idemias, ce.startdateliberate, ce.enddateliberate, "
-                            + " CASE "
-                            + " WHEN ce.archive = true THEN 'Посещает'       else 'Не посещает' \n"
-                            + "END as status, ce.accepteddatetime, cc.idofclient \n" + "from cf_emias ce \n"
-                            + "left join cf_clients cc on cc.meshguid = ce.guid\n"
+                            + "cc.contractid, benefitdtiszn.benefdtiszn, ce.dateliberate, ce.idemias, ce.startdateliberate, ce.enddateliberate,  CASE  WHEN ce.archive = true THEN 'Посещает'       else 'Не посещает' \n"
+                            + "END as status, ce.accepteddatetime, cc.idofclient, benefitispp.benefispp \n"
+                            + "from cf_emias ce \n" + "left join cf_clients cc on cc.meshguid = ce.guid\n"
                             + "left join cf_orgs co on cc.idoforg = co.idoforg\n"
                             + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = co.idoforg\n"
                             + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
-                            + "left join (select cc.idofclient, string_agg(ccdd.dtiszndescription, ', ') as benef from cf_clients cc \n"
-                            + "left join cf_client_dtiszn_discount_info ccdd on cc.idofclient=ccdd.idofclient group by cc.idofclient) as benefit on benefit.idofclient=cc.idofclient\n"
+                            + "left join (select cc1.idofclient, string_agg(ccdd.dtiszndescription, ', ') as benefdtiszn from cf_clients cc1 \n"
+                            + "left join cf_client_dtiszn_discount_info ccdd on cc1.idofclient=ccdd.idofclient group by cc1.idofclient) as benefitdtiszn \n"
+                            + "on benefitdtiszn.idofclient=cc.idofclient\n"
+                            + "left join (select cccd.idofclient, string_agg(ccd.categoryname, ', ') as benefispp  from cf_clients_categorydiscounts cccd\n"
+                            + "left join cf_categorydiscounts ccd on ccd.idofcategorydiscount=cccd.idofcategorydiscount where cccd.idofcategorydiscount <> 50\n"
+                            + "group by cccd.idofclient) as benefitispp on benefitispp.idofclient=cc.idofclient "
                             + "where ce.processed = true " + filterOrgs + filterClients + filterPeriod);
 
             List rListEmias = queryEMIAS.list();
@@ -177,7 +179,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 String lastname = (String) row[5];
                 String middlename = (String) row[6];
                 Long contractid = ((BigInteger) row[7]).longValue();
-                String benefit = (String) row[8];
+                String benefitdtzn = (String) row[8];
                 Date dateliberate;
                 try
                 {
@@ -252,6 +254,16 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 }
                 if (!acceptedDates.isEmpty())
                     acceptedDates = acceptedDates.substring(0, acceptedDates.length()-2);
+                String benefitispp = (String) row[16];
+                String benefit = "";
+                if (benefitdtzn != null && benefitispp != null)
+                    benefit = benefitdtzn + ", " + benefitispp;
+                else {
+                    if (benefitdtzn != null)
+                        benefit = benefitdtzn;
+                    if (benefitispp != null)
+                        benefit = benefitispp;
+                }
                 ///////////////////////////
                 EmiasItem emiasItem = new EmiasItem(counter, idoforg, shortnameinfoservice, shortaddress, groupname,
                         firstname, lastname, middlename, contractid, benefit, idEmias, dateliberate, startdateliberate,
