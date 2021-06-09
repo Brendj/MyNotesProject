@@ -106,6 +106,32 @@ public class PreorderDAO {
         return entityManager.merge(preorderMenuDetail);
     }
 
+    @Transactional
+    public PreorderMenuDetail editPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail, String guardianMobile, Integer amount, long version) {
+        PreorderComplex preorderComplex = pcRepo.findById(preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex())
+                .orElseThrow(() -> new NotFoundException(String.format("Не найдено предзаказ с идентификатором %s",
+                        preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex())));;
+        preorderComplex.updateWithVersion(version);
+        entityManager.merge(preorderComplex);
+        preorderMenuDetail.setAmount(amount);
+        return entityManager.merge(preorderMenuDetail);
+    }
+
+    @Transactional
+    public void deletePreorderMenuDetail(PreorderMenuDetail preorderMenuDetail, String guardianMobile, long version) {
+        preorderMenuDetail.delete(guardianMobile);
+        entityManager.merge(preorderMenuDetail);
+
+        PreorderComplex preorderComplex = preorderMenuDetail.getPreorderComplex();
+        List<PreorderMenuDetail> list = pmdRepo.getPreorderMenuDetailsForDeleteTest(preorderComplex, preorderMenuDetail.getIdOfPreorderMenuDetail());
+        if (list.size() == 0) {
+            preorderComplex.delete(guardianMobile, version);
+        } else {
+            preorderComplex.updateWithVersion(version);
+        }
+        entityManager.merge(preorderComplex);
+    }
+
     public String getMenuGroupByWtDishAndCategories(WtDish wtDish) {
         StringBuilder sb = new StringBuilder();
         List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDish);

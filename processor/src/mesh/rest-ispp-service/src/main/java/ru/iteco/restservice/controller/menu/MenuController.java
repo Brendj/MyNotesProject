@@ -144,7 +144,7 @@ public class MenuController {
     @ResponseStatus(HttpStatus.CREATED)
     public PreorderMenuDetailDTO createPreorderMenuDetail(@RequestBody PreorderDishRequest preorderDishRequest) throws Exception {
         try {
-            //preorderService.checkCreateParameters(preorderComplexRequest);
+            preorderService.checkDishCreateParameters(preorderDishRequest);
             Date d = CalendarUtils.getDateFromLong(preorderDishRequest.getDate());
             PreorderMenuDetail pmd = preorderService.createPreorderMenuDetail(preorderDishRequest.getContractId(), d,
                     preorderDishRequest.getGuardianMobile(), preorderDishRequest.getComplexId(),
@@ -152,6 +152,43 @@ public class MenuController {
             return PreorderMenuDetailDTO.build(pmd);
         } catch (Exception e) {
             logger.error("Exception in createPreorderMenuDetail: ", e);
+            throw e;
+        }
+    }
+
+    @PutMapping("/preorderDish/{id}")
+    @Operation(summary = "Редактирование количества блюд в предзаказе",
+            description = "Редактирование количества блюд в предзаказе")
+    @ResponseBody
+    public PreorderMenuDetailDTO editPreorderMenuDetail(@RequestBody PreorderDishRequest preorderDishRequest, @NotNull @PathVariable Long id) throws Exception {
+        try {
+            preorderDishRequest.setPreorderDishId(id);
+            preorderService.checkDishEditParameters(preorderDishRequest);
+            PreorderMenuDetail pmd = preorderService.editPreorderMenuDetail(preorderDishRequest.getPreorderDishId(),
+                    preorderDishRequest.getContractId(),
+                    preorderDishRequest.getGuardianMobile(),
+                    preorderDishRequest.getAmount());
+            return PreorderMenuDetailDTO.build(pmd);
+        } catch (Exception e) {
+            logger.error("Exception in editPreorderMenuDetail: ", e);
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/preorderDish/{id}")
+    @Operation(summary = "Удаление предзаказа на блюдо",
+            description = "Удаление предзаказа на блюдо")
+    @ResponseBody
+    public PreorderMenuDetailDTO deletePreorderMenuDetail(@RequestBody PreorderDishRequest preorderDishRequest, @NotNull @PathVariable Long id) throws Exception {
+        try {
+            preorderDishRequest.setPreorderDishId(id);
+            preorderService.checkDishDeleteParameters(preorderDishRequest);
+            PreorderMenuDetail pmd = preorderService.deletePreorderMenuDetail(preorderDishRequest.getPreorderDishId(),
+                    preorderDishRequest.getContractId(),
+                    preorderDishRequest.getGuardianMobile());
+            return PreorderMenuDetailDTO.buildDeleted(pmd);
+        } catch (Exception e) {
+            logger.error("Exception in deletePreorderMenuDetail: ", e);
             throw e;
         }
     }

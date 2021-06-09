@@ -3,6 +3,9 @@ package ru.iteco.restservice.controller.menu.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class PreorderDishRequest {
+    @Schema(description = "Идентификатор предзаказа на блюдо", example = "1377")
+    private Long preorderDishId;
+
     @Schema(description = "Номер лицевого счета клиента", example = "13177")
     private Long contractId;
 
@@ -67,5 +70,13 @@ public class PreorderDishRequest {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public Long getPreorderDishId() {
+        return preorderDishId;
+    }
+
+    public void setPreorderDishId(Long preorderDishId) {
+        this.preorderDishId = preorderDishId;
     }
 }

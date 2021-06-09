@@ -1,6 +1,7 @@
 package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 
 public class PreorderMenuDetailDTO {
@@ -22,6 +23,15 @@ public class PreorderMenuDetailDTO {
             result.setPreorderMenuDetailId(preorderMenuDetail.getIdOfPreorderMenuDetail());
             result.setAmount(preorderMenuDetail.getAmount());
         }
+        return result;
+    }
+
+    public static PreorderMenuDetailDTO buildDeleted(PreorderMenuDetail preorderMenuDetail) {
+        PreorderMenuDetailDTO result = new PreorderMenuDetailDTO();
+        PreorderComplex pc = preorderMenuDetail.getPreorderComplex();
+        result.setPreorderId(pc.isDeleted() ? null : pc.getIdOfPreorderComplex());
+        result.setPreorderMenuDetailId(null);
+        result.setAmount(0);
         return result;
     }
 

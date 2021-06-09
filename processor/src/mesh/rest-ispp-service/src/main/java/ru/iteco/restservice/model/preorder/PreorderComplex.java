@@ -156,6 +156,10 @@ public class PreorderComplex {
         this.lastUpdate = new Date();
     }
 
+    public boolean isDeleted() {
+        return deletedState.equals(1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

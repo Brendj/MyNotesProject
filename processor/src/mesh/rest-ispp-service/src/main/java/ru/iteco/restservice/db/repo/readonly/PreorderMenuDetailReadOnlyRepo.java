@@ -9,6 +9,7 @@ import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface PreorderMenuDetailReadOnlyRepo extends CrudRepository<PreorderMenuDetail, Long> {
     @Query(value = "select sum(p.amount), p.preorderDate, coalesce(p.preorderComplex.idOfOrgOnCreate, p.client.org.idOfOrg) from PreorderMenuDetail p "
@@ -20,4 +21,13 @@ public interface PreorderMenuDetailReadOnlyRepo extends CrudRepository<PreorderM
             + "where pmd.preorderComplex = :preorderComplex and pmd.deletedState = 0 and pmd.idOfDish = :idOfDish")
     PreorderMenuDetail getPreorderMenuDetailByPreorderComplexAndDishId(@Param("preorderComplex") PreorderComplex preorderComplex,
                                                                  @Param("idOfDish") Long idOfDish);
+
+    @Query(value= "select pmd from PreorderMenuDetail pmd join fetch pmd.preorderComplex pc "
+            + "where pmd.idOfPreorderMenuDetail = :idOfPreorderMenuDetail")
+    Optional<PreorderMenuDetail> getPreorderMenuDetailWithPreorderComplex(@Param("idOfPreorderMenuDetail") Long idOfPreorderMenuDetail);
+
+    @Query(value= "select pmd from PreorderMenuDetail pmd "
+            + "where pmd.preorderComplex = :preorderComplex and pmd.deletedState = 0 and pmd.idOfPreorderMenuDetail <> :idOfPreorderMenuDetail")
+    List<PreorderMenuDetail> getPreorderMenuDetailsForDeleteTest(@Param("preorderComplex") PreorderComplex preorderComplex,
+            @Param("idOfPreorderMenuDetail") Long idOfPreorderMenuDetail);
 }
