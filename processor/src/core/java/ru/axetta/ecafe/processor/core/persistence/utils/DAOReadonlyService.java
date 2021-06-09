@@ -114,6 +114,15 @@ public class DAOReadonlyService {
         return result;
     }
 
+    public List<Card> getActiveCardsWithOverdueValidDate(Date now) {
+        Query query = entityManager.createQuery(
+                "FROM Card " +
+                  " WHERE state = 0 and validTime < :date and client is not null");
+        query.setParameter("date", now);
+
+        return query.getResultList();
+    }
+
     public Org findOrg(Long idOfOrg) throws Exception {
         Org org = entityManager.find(Org.class, idOfOrg);
         if (null == org) {

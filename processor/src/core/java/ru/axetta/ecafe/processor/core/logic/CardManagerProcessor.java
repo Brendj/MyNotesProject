@@ -338,7 +338,7 @@ public class CardManagerProcessor implements CardManager {
             historyCard.setCard(updatedCard);
             historyCard.setUpDatetime(new Date());
             if (state == CardState.BLOCKED.getValue()) {
-                historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo());
+                historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo() + ". Причина: " + lockReason);
             } else {
                 historyCard.setInformationAboutCard("Редактирование данных карты №: " + updatedCard.getCardNo()
                         + additionalInfoAboutCard);
