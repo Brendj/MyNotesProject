@@ -34,6 +34,7 @@ public class EmiasItem {
     private String acceptedinOO;
 
     private Format formatter = new SimpleDateFormat("dd.MM.yyyy");
+    private Format formatterfull = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     public EmiasItem(Long recordID, Long orgID, String orgName, String orgAdress, String clientGroup,String firstname,
             String lastname, String middlename, Long contractID, String benefits, String emiasID, Date emiasDate,
@@ -62,7 +63,7 @@ public class EmiasItem {
         this.status = status;
         this.acceptedDate = acceptedDate;
         if (acceptedinOO != null)
-            this.acceptedinOO = formatter.format(acceptedinOO);
+            this.acceptedinOO = formatterfull.format(acceptedinOO);
     }
 
 
