@@ -35,22 +35,24 @@ public class EmiasInternal {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            logger.info("Старт сервиса по отправке уведомлений в ЕМП для ЕМИАС от Кафки");
-            ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
-            Client cl = DAOUtils.findClientByMeshGuid(persistenceSession, infoForEMPFromKafkaEmias.getMeshGuid());
-            ExternalEvent event = new ExternalEvent(cl, cl.getOrg().getShortNameInfoService(), cl.getOrg().getOfficialName(), ExternalEventType.SPECIAL,
-                    infoForEMPFromKafkaEmias.getCreate_at(), ExternalEventStatus.fromInteger(infoForEMPFromKafkaEmias.getEventStatus()),
-                    handler);
-            persistenceSession.save(event);
-            event.setForTest(false);
-            ExternalEventNotificationService notificationService = RuntimeContext.getAppContext().getBean(ExternalEventNotificationService.class);
-            notificationService.setSTART_DATE(infoForEMPFromKafkaEmias.getStart_liberation());
-            notificationService.setEND_DATE(infoForEMPFromKafkaEmias.getEnd_liberation());
-            notificationService.sendNotification(cl, event);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+            if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.emias.kafka.notification", "1").equals("1")) {
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                logger.info("Старт сервиса по отправке уведомлений в ЕМП для ЕМИАС от Кафки");
+                ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
+                Client cl = DAOUtils.findClientByMeshGuid(persistenceSession, infoForEMPFromKafkaEmias.getMeshGuid());
+                ExternalEvent event = new ExternalEvent(cl, cl.getOrg().getShortNameInfoService(), cl.getOrg().getOfficialName(), ExternalEventType.SPECIAL,
+                        infoForEMPFromKafkaEmias.getCreate_at(), ExternalEventStatus.fromInteger(infoForEMPFromKafkaEmias.getEventStatus()),
+                        handler);
+                persistenceSession.save(event);
+                event.setForTest(false);
+                ExternalEventNotificationService notificationService = RuntimeContext.getAppContext().getBean(ExternalEventNotificationService.class);
+                notificationService.setSTART_DATE(infoForEMPFromKafkaEmias.getStart_liberation());
+                notificationService.setEND_DATE(infoForEMPFromKafkaEmias.getEnd_liberation());
+                notificationService.sendNotification(cl, event);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            }
             return Response.status(HttpURLConnection.HTTP_OK).entity(infoForEMPFromKafkaEmias).build();
         } catch (Exception e) {
             logger.error("Ошибка при отправке уведомлени в ЕМП от ЕМИАС", e);
