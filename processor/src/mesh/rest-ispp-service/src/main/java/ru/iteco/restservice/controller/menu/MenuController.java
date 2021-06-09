@@ -4,12 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ru.iteco.restservice.controller.menu.request.PreorderComplexRequest;
+import ru.iteco.restservice.controller.menu.request.PreorderDishRequest;
 import ru.iteco.restservice.controller.menu.request.ProhibitionRequest;
-import ru.iteco.restservice.controller.menu.responsedto.CategoryItem;
-import ru.iteco.restservice.controller.menu.responsedto.ComplexesResponse;
-import ru.iteco.restservice.controller.menu.responsedto.MenuListResponse;
-import ru.iteco.restservice.controller.menu.responsedto.PreorderComplexDTO;
+import ru.iteco.restservice.controller.menu.responsedto.*;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
+import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 import ru.iteco.restservice.servise.CalendarUtils;
 import ru.iteco.restservice.servise.ComplexService;
 import ru.iteco.restservice.servise.MenuService;
@@ -83,8 +82,8 @@ public class MenuController {
     }
 
     @PostMapping("/preorder")
-    @Operation(summary = "Создание предзаказа",
-            description = "Создание предзаказа")
+    @Operation(summary = "Создание предзаказа на комплекс",
+            description = "Создание предзаказа на комплекс")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     public PreorderComplexDTO createPreorderComplex(@RequestBody PreorderComplexRequest preorderComplexRequest) throws Exception {
@@ -131,9 +130,28 @@ public class MenuController {
             PreorderComplex pc = preorderService.deletePreorder(preorderComplexRequest.getPreorderId(),
                     preorderComplexRequest.getContractId(),
                     preorderComplexRequest.getGuardianMobile());
-            return PreorderComplexDTO.build(pc);
+            return PreorderComplexDTO.buildDeleted(pc);
         } catch (Exception e) {
-            logger.error("Exception in editPreorderComplex: ", e);
+            logger.error("Exception in deletePreorderComplex: ", e);
+            throw e;
+        }
+    }
+
+    @PostMapping("/preorderDish")
+    @Operation(summary = "Создание предзаказа на блюдо",
+            description = "Создание предзаказа на блюдо")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    public PreorderMenuDetailDTO createPreorderMenuDetail(@RequestBody PreorderDishRequest preorderDishRequest) throws Exception {
+        try {
+            //preorderService.checkCreateParameters(preorderComplexRequest);
+            Date d = CalendarUtils.getDateFromLong(preorderDishRequest.getDate());
+            PreorderMenuDetail pmd = preorderService.createPreorderMenuDetail(preorderDishRequest.getContractId(), d,
+                    preorderDishRequest.getGuardianMobile(), preorderDishRequest.getComplexId(),
+                    preorderDishRequest.getDishId(), preorderDishRequest.getAmount());
+            return PreorderMenuDetailDTO.build(pmd);
+        } catch (Exception e) {
+            logger.error("Exception in createPreorderMenuDetail: ", e);
             throw e;
         }
     }

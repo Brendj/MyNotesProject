@@ -8,6 +8,7 @@ import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
 import ru.iteco.restservice.model.enums.PreorderState;
 import ru.iteco.restservice.model.wt.WtComplexesItem;
 import ru.iteco.restservice.model.wt.WtDish;
+import ru.iteco.restservice.servise.CalendarUtils;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -125,7 +126,7 @@ public class PreorderMenuDetail {
                               Integer amount, String groupName, String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         this.preorderComplex = preorderComplex;
         this.client = client;
-        this.preorderDate = date;
+        this.preorderDate = CalendarUtils.startOfDayInUTC(date);
         this.amount = amount;
         this.deletedState = 0;
         this.state = PreorderState.OK;

@@ -25,7 +25,7 @@ public class ComplexItem {
     //private Integer complexType;
     @Schema(description = "Вид рациона комплекса")
     private Integer fRation;
-    @Schema(description = "Информация о предзаказе")
+    @Schema(description = "Информация о предзаказе на комплекс")
     private PreorderComplexDTO preorderInfo;
     @Schema(description = "Список блюд комплекса")
     private List<DishItem> menuItems;

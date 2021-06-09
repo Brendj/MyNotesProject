@@ -3,7 +3,10 @@ package ru.iteco.restservice.servise;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.iteco.restservice.db.repo.readonly.PreorderComplexReadOnlyRepo;
+import ru.iteco.restservice.db.repo.readonly.PreorderMenuDetailReadOnlyRepo;
 import ru.iteco.restservice.db.repo.readonly.WtComplexReadOnlyRepo;
+import ru.iteco.restservice.db.repo.readonly.WtDishReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
@@ -13,6 +16,7 @@ import ru.iteco.restservice.model.wt.WtCategoryItem;
 import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtComplexesItem;
 import ru.iteco.restservice.model.wt.WtDish;
+import ru.iteco.restservice.servise.data.PreorderComplexChangeData;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,28 +34,35 @@ public class PreorderDAO {
     ComplexService complexService;
     @Autowired
     WtComplexReadOnlyRepo complexRepo;
+    @Autowired
+    WtDishReadOnlyRepo dishRepo;
+    @Autowired
+    PreorderMenuDetailReadOnlyRepo pmdRepo;
+    @Autowired
+    PreorderComplexReadOnlyRepo pcRepo;
 
     @Transactional
-    public PreorderComplex createPreorder(Client client, Date date, Long complexId, Integer amount, Long version,
-                               String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+    public PreorderComplex createPreorder(Client client, Date startDate, Date endDate, Long complexId, Integer amount, Long version,
+                               String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate, boolean isDishMode) {
         WtComplex complex = complexRepo.findById(complexId)
                 .orElseThrow(() -> new NotFoundException(String.format("Не найден комплекс с идентификатором %s", complexId)));
-        WtComplexesItem complexesItem = complexService.getWtComplexItemByCycle(complex, date);
+        WtComplexesItem complexesItem = complexService.getWtComplexItemByCycle(complex, startDate);
 
-        PreorderComplex preorderComplex = new PreorderComplex(client, date, complex, amount, version,
+        PreorderComplex preorderComplex = new PreorderComplex(client, endDate, complex, amount, version,
                 guardianMobile, mobileGroupOnCreate);
 
-        Set<PreorderMenuDetail> preorderMenuDetails = new HashSet<>();
-        for (WtDish wtDish : complexesItem.getDishes()) {
-            if (wtDish.getDeleteState().equals(1)) continue;
-            String groupName = getMenuGroupByWtDishAndCategories(wtDish);
-            PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail(preorderComplex, wtDish, client, date, 0,
-                    groupName, guardianMobile, mobileGroupOnCreate);
-            preorderMenuDetails.add(preorderMenuDetail);
+        if (!isDishMode) {
+            Set<PreorderMenuDetail> preorderMenuDetails = new HashSet<>();
+            for (WtDish wtDish : complexesItem.getDishes()) {
+                if (wtDish.getDeleteState().equals(1)) continue;
+                String groupName = getMenuGroupByWtDishAndCategories(wtDish);
+                PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail(preorderComplex, wtDish, client, endDate, 0,
+                        groupName, guardianMobile, mobileGroupOnCreate);
+                preorderMenuDetails.add(preorderMenuDetail);
+            }
+            preorderComplex.setPreorderMenuDetails(preorderMenuDetails);
         }
-        preorderComplex.setPreorderMenuDetails(preorderMenuDetails);
-        entityManager.merge(preorderComplex);
-        return preorderComplex;
+        return entityManager.merge(preorderComplex);
     }
 
     @Transactional
@@ -68,6 +79,31 @@ public class PreorderDAO {
         }
         preorderComplex.delete(guardianMobile, version);
         entityManager.merge(preorderComplex);
+    }
+
+    @Transactional
+    public PreorderMenuDetail createPreorderMenuDetail(PreorderComplexChangeData data, Long complexId, Long dishId, Integer amount,
+                                                       String guardianMobile, long version) {
+        WtDish wtDish = dishRepo.findById(dishId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не найдено блюдо с идентификатором %s", dishId)));
+        PreorderComplex preorderComplex = pcRepo.getPreorderComplexesByClientDateAndComplexId(data.getClient(), complexId.intValue(),
+                data.getStartDate(), data.getEndDate());
+        if (preorderComplex == null) {
+            preorderComplex = createPreorder(data.getClient(), data.getStartDate(), data.getEndDate(), complexId, 0,
+                    version, guardianMobile, data.getMobileGroupOnCreate(), true);
+        }
+        PreorderMenuDetail preorderMenuDetail = pmdRepo.getPreorderMenuDetailByPreorderComplexAndDishId(preorderComplex, dishId);
+
+        if (preorderMenuDetail != null) {
+            throw new IllegalArgumentException("У данного клиента уже существует предзаказ на выбранную дату и блюдо");
+        }
+
+        String groupName = getMenuGroupByWtDishAndCategories(wtDish);
+        preorderMenuDetail = new PreorderMenuDetail(preorderComplex, wtDish, preorderComplex.getClient(),
+                preorderComplex.getPreorderDate(), amount, groupName, guardianMobile, preorderComplex.getMobileGroupOnCreate());
+        preorderComplex.updateWithVersion(version);
+        entityManager.merge(preorderComplex);
+        return entityManager.merge(preorderMenuDetail);
     }
 
     public String getMenuGroupByWtDishAndCategories(WtDish wtDish) {

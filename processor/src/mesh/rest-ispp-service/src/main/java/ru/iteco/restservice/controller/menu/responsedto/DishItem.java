@@ -1,6 +1,7 @@
 package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
 
@@ -46,6 +47,9 @@ public class DishItem {
     @Schema(description = "Код блюда")
     private String itemCode;
 
+    @Schema(description = "Информация о предзаказе на блюдо")
+    private PreorderMenuDetailDTO preorderInfo;
+
     public DishItem(WtDish wtDish, PreorderComplexAmountData data) {
         this.dishId = wtDish.getIdOfDish();
         this.dishName = wtDish.getDishName();
@@ -58,12 +62,27 @@ public class DishItem {
         this.carbohydrates = wtDish.getCarbohydrates();
         this.isRegular = (wtDish.getRepeatableComplex() != null && wtDish.getRepeatableComplex().size() > 0);
         this.itemCode = wtDish.getCode();
-        if (data == null) {
-            this.amount = 0;
-        } else {
-            Map<Long, Integer> map = data.getDishAmounts();
-            this.amount = map.get(wtDish.getIdOfDish()) == null ? 0 : map.get(wtDish.getIdOfDish());
+        PreorderMenuDetailDTO preorderMenuDetailDTO = new PreorderMenuDetailDTO();
+        if (data != null) {
+            preorderMenuDetailDTO.setPreorderId(data.getIdOfPreorderComplex());
+            PreorderMenuDetail pmd = findPreorderMenuDetail(wtDish.getIdOfDish(), data);
+            if (pmd != null) {
+                preorderMenuDetailDTO.setPreorderMenuDetailId(pmd.getIdOfPreorderMenuDetail());
+                preorderMenuDetailDTO.setAmount(pmd.getAmount());
+            } else {
+                preorderMenuDetailDTO.setAmount(0);
+            }
         }
+        this.preorderInfo = preorderMenuDetailDTO;
+    }
+
+    private PreorderMenuDetail findPreorderMenuDetail(Long idOfDish, PreorderComplexAmountData data) {
+        for (PreorderMenuDetail pmd: data.getMenuDetails()) {
+            if (idOfDish.equals(pmd.getIdOfDish())) {
+                return pmd;
+            }
+        }
+        return null;
     }
 
     public Long getDishId() {
@@ -160,5 +179,13 @@ public class DishItem {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public PreorderMenuDetailDTO getPreorderInfo() {
+        return preorderInfo;
+    }
+
+    public void setPreorderInfo(PreorderMenuDetailDTO preorderInfo) {
+        this.preorderInfo = preorderInfo;
     }
 }

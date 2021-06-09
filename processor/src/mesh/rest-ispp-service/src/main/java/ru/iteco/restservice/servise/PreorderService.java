@@ -11,7 +11,9 @@ import ru.iteco.restservice.model.*;
 import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
 import ru.iteco.restservice.model.enums.SettingsIds;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
+import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 import ru.iteco.restservice.servise.data.PreOrderFeedingSettingValue;
+import ru.iteco.restservice.servise.data.PreorderComplexChangeData;
 import ru.iteco.restservice.servise.data.PreorderDateComparator;
 
 import java.util.*;
@@ -53,21 +55,20 @@ public class PreorderService {
         if (preorderComplexRequest.getAmount() == null
                 || preorderComplexRequest.getComplexId() == null
                 || preorderComplexRequest.getContractId() == null
-                || preorderComplexRequest.getDate() == null
-                || preorderComplexRequest.getGuardianMobile() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+                || preorderComplexRequest.getDate() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+        if (preorderComplexRequest.getAmount() <= 0) throw new IllegalArgumentException("Количество должно быть > 0");
     }
 
     public void checkEditParameters(PreorderComplexRequest preorderComplexRequest) throws IllegalArgumentException {
         if (preorderComplexRequest.getPreorderId() == null
                 || preorderComplexRequest.getContractId() == null
-                || preorderComplexRequest.getGuardianMobile() == null
                 || preorderComplexRequest.getAmount() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+        if (preorderComplexRequest.getAmount() <= 0) throw new IllegalArgumentException("Количество должно быть > 0");
     }
 
     public void checkDeleteParameters(PreorderComplexRequest preorderComplexRequest) throws IllegalArgumentException {
         if (preorderComplexRequest.getPreorderId() == null
-                || preorderComplexRequest.getContractId() == null
-                || preorderComplexRequest.getGuardianMobile() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+                || preorderComplexRequest.getContractId() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
     }
 
     public PreorderComplex editPreorder(Long preorderId, Long contractId, String guardianMobile, Integer amount) throws Exception {
@@ -77,6 +78,8 @@ public class PreorderService {
         if (!preorderComplex.getClient().equals(client)) {
             throw new IllegalArgumentException("Предзаказ не принадлежит данному клиенту");
         }
+
+        if (!isEditedDay(preorderComplex.getPreorderDate(), client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
 
         long nextVersion = pcRepo.getMaxVersion() + 1;
         preorderDAO.editPreorder(preorderComplex, guardianMobile, amount, nextVersion);
@@ -91,18 +94,42 @@ public class PreorderService {
             throw new IllegalArgumentException("Предзаказ не принадлежит данному клиенту");
         }
 
+        if (!isEditedDay(preorderComplex.getPreorderDate(), client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
+
         long nextVersion = pcRepo.getMaxVersion() + 1;
         preorderDAO.deletePreorder(preorderComplex, guardianMobile, nextVersion);
         return preorderComplex;
     }
 
-    public PreorderComplex createPreorder(Long contractId, Date date, String guardianMobile, Long complexId, Integer amount) throws Exception {
+    public PreorderMenuDetail createPreorderMenuDetail(Long contractId, Date date, String guardianMobile, Long complexId,
+                                              Long dishId, Integer amount) throws Exception {
+        PreorderComplexChangeData data = getPreorderComplexChangeData(contractId, date, guardianMobile, complexId);
+
+        long nextVersion = pcRepo.getMaxVersion() + 1;
+        return preorderDAO.createPreorderMenuDetail(data, complexId, dishId, amount, guardianMobile, nextVersion);
+    }
+
+    public PreorderComplex createPreorder(Long contractId, Date date, String guardianMobile, Long complexId,
+                                          Integer amount) throws Exception {
+        PreorderComplexChangeData data = getPreorderComplexChangeData(contractId, date, guardianMobile, complexId);
+
+        PreorderComplex preorderComplex = pcRepo.getPreorderComplexesByClientDateAndComplexId(data.getClient(), complexId.intValue(),
+                data.getStartDate(), data.getEndDate());
+        if (preorderComplex != null) {
+            throw new IllegalArgumentException("У данного клиента уже существует предзаказ на выбранную дату и комплекс");
+        }
+        long nextVersion = pcRepo.getMaxVersion() + 1;
+
+        return preorderDAO.createPreorder(data.getClient(), data.getStartDate(), data.getEndDate(), complexId, amount,
+                nextVersion, guardianMobile, data.getMobileGroupOnCreate(), false);
+    }
+
+    private PreorderComplexChangeData getPreorderComplexChangeData(Long contractId, Date date, String guardianMobile,
+                                                                   Long complexId) throws Exception {
         Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
         Date startDate = CalendarUtils.startOfDay(date);
         Date endDate = CalendarUtils.endOfDay(date);
-        long nextVersion = pcRepo.getMaxVersion() + 1;
 
-        Org org = client.getOrg();
         if (guardianMobile != null && guardianMobile.equals("")) guardianMobile = null;
         List<Client> clientsByMobile = clientRepo.getClientsByMobile(client.getIdOfClient(), guardianMobile);
         Integer value = getClientGroupResult(clientsByMobile);
@@ -121,13 +148,9 @@ public class PreorderService {
         }
 
         if (!isEditedDay(date, client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
+        PreorderComplexChangeData data = new PreorderComplexChangeData(client, startDate, endDate, mobileGroupOnCreate);
 
-        PreorderComplex preorderComplex = pcRepo.getPreorderComplexesByClientDateAndComplexId(client, complexId.intValue(), startDate, endDate);
-        if (preorderComplex != null) {
-            throw new IllegalArgumentException("У данного клиента уже существует предзаказ на выбранную дату и комплекс");
-        }
-
-        return preorderDAO.createPreorder(client, startDate, complexId, amount, nextVersion, guardianMobile, mobileGroupOnCreate);
+        return data;
     }
 
     private boolean isEditedDay(Date date, Client client) throws Exception {
