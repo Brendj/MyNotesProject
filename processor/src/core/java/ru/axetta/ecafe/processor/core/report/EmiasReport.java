@@ -248,7 +248,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 }
                 //Достаем все даты по текущему клиенту
                 for (Date date: clientswithDates.get(idOOfClient)) {
-                    if (date.after(startdateliberate) && date.before(CalendarUtils.endOfDay(enddateliberate))) {
+                    if ((date.after(startdateliberate) || (date.equals(startdateliberate))) && date.before(CalendarUtils.endOfDay(enddateliberate))) {
                         acceptedDates += formatter.format(date);
                         acceptedDates += ", ";
                     }
