@@ -156,7 +156,7 @@ public class EMIASController extends HttpServlet {
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             for (ExemptionVisitingDay exemptionVisitingDay: exemptionVisitingDays)
             {
-                if (sdf.parse(exemptionVisitingDay.getDate()).before(new Date()))
+                if ((sdf.parse(exemptionVisitingDay.getDate()).getTime()+1L)<(CalendarUtils.startOfDay(new Date())).getTime())
                     return new ExemptionVisitingResult (ResponseItem.ERROR_INCORRECT_DATE, ResponseItem.ERROR_INCORRECT_DATE_MESSAGE);
             }
             List<EMIAS> emiasList = DAOReadonlyService.getInstance().getEmiasbyClient(session, client);

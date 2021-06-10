@@ -162,7 +162,8 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                             + "left join cf_client_dtiszn_discount_info ccdd on cc1.idofclient=ccdd.idofclient group by cc1.idofclient) as benefitdtiszn \n"
                             + "on benefitdtiszn.idofclient=cc.idofclient\n"
                             + "left join (select cccd.idofclient, string_agg(ccd.categoryname, ', ') as benefispp  from cf_clients_categorydiscounts cccd\n"
-                            + "left join cf_categorydiscounts ccd on ccd.idofcategorydiscount=cccd.idofcategorydiscount where cccd.idofcategorydiscount <> 50\n"
+                            + "left join cf_categorydiscounts ccd on ccd.idofcategorydiscount=cccd.idofcategorydiscount "
+                            + " where cccd.idofcategorydiscount <> 50 and ccd.categorytype=0 "
                             + "group by cccd.idofclient) as benefitispp on benefitispp.idofclient=cc.idofclient "
                             + "where ce.processed = true " + filterOrgs + filterClients + filterPeriod);
 
