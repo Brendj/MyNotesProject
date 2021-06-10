@@ -2,6 +2,7 @@ package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreorderAmountData;
@@ -22,15 +23,17 @@ public class ComplexItem {
     private Boolean composite;
     @Schema(description = "Цена комплекса")
     private Long price;
-    //private Integer complexType;
     @Schema(description = "Вид рациона комплекса")
     private Integer fRation;
     @Schema(description = "Информация о предзаказе на комплекс")
     private PreorderComplexDTO preorderInfo;
+    @Schema(description = "Информация о правиле регулярного предзаказа на комплекс")
+    private RegularPreorderDTO regularInfo;
     @Schema(description = "Список блюд комплекса")
     private List<DishItem> menuItems;
 
-    public ComplexItem(WtComplex wtComplex, List<WtDish> dishes, PreorderAmountData preorderComplexAmounts) {
+    public ComplexItem(WtComplex wtComplex, List<WtDish> dishes, PreorderAmountData preorderComplexAmounts,
+                       List<RegularPreorder> regulars) {
         this.complexId = wtComplex.getIdOfComplex();
         this.complexName = wtComplex.getName();
         this.composite = wtComplex.getComposite();
@@ -41,11 +44,24 @@ public class ComplexItem {
         preorderInfo.setPreorderId(data == null ? null : data.getIdOfPreorderComplex());
         this.setPreorderInfo(preorderInfo);
         this.fRation = wtComplex.getWtDietType().getIdOfDietType().intValue();
+        RegularPreorder regularPreorder = getRegularByComplexId(regulars, wtComplex.getIdOfComplex());
+        if (regularPreorder != null && regularPreorder.getIdOfDish() == null) {
+            this.setRegularInfo(RegularPreorderDTO.build(regularPreorder));
+        }
         this.menuItems = new ArrayList<>();
         for (WtDish wtDish : dishes) {
-            DishItem item = new DishItem(wtDish, data);
+            DishItem item = new DishItem(wtDish, data, regularPreorder);
             menuItems.add(item);
         }
+    }
+
+    private RegularPreorder getRegularByComplexId(List<RegularPreorder> regulars, Long complexId) {
+        for (RegularPreorder regularPreorder : regulars) {
+            if (complexId.equals(regularPreorder.getIdOfComplex().longValue())) {
+                return regularPreorder;
+            }
+        }
+        return null;
     }
 
     public Long getComplexId() {
@@ -110,5 +126,13 @@ public class ComplexItem {
 
     public void setPreorderInfo(PreorderComplexDTO preorderInfo) {
         this.preorderInfo = preorderInfo;
+    }
+
+    public RegularPreorderDTO getRegularInfo() {
+        return regularInfo;
+    }
+
+    public void setRegularInfo(RegularPreorderDTO regularInfo) {
+        this.regularInfo = regularInfo;
     }
 }

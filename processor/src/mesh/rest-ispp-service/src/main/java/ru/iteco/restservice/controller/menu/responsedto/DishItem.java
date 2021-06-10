@@ -2,6 +2,7 @@ package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
 
@@ -22,9 +23,6 @@ public class DishItem {
 
     @Schema(description = "Цена блюда")
     private Long price;
-
-    @Schema(description = "Заказанное количество")
-    private Integer amount;
 
     @Schema(description = "Калорийность блюда")
     private Integer calories;
@@ -50,7 +48,10 @@ public class DishItem {
     @Schema(description = "Информация о предзаказе на блюдо")
     private PreorderMenuDetailDTO preorderInfo;
 
-    public DishItem(WtDish wtDish, PreorderComplexAmountData data) {
+    @Schema(description = "Информация о правиле регулярного предзаказа на блюдо")
+    private RegularPreorderDTO regularInfo;
+
+    public DishItem(WtDish wtDish, PreorderComplexAmountData data, RegularPreorder regularPreorder) {
         this.dishId = wtDish.getIdOfDish();
         this.dishName = wtDish.getDishName();
         this.dishContent = wtDish.getComponentsOfDish();
@@ -64,16 +65,16 @@ public class DishItem {
         this.itemCode = wtDish.getCode();
         PreorderMenuDetailDTO preorderMenuDetailDTO = new PreorderMenuDetailDTO();
         if (data != null) {
-            preorderMenuDetailDTO.setPreorderId(data.getIdOfPreorderComplex());
             PreorderMenuDetail pmd = findPreorderMenuDetail(wtDish.getIdOfDish(), data);
             if (pmd != null) {
                 preorderMenuDetailDTO.setPreorderMenuDetailId(pmd.getIdOfPreorderMenuDetail());
                 preorderMenuDetailDTO.setAmount(pmd.getAmount());
-            } else {
-                preorderMenuDetailDTO.setAmount(0);
             }
         }
         this.preorderInfo = preorderMenuDetailDTO;
+        if (regularPreorder != null && regularPreorder.getIdOfDish() != null && wtDish.getIdOfDish().equals(regularPreorder.getIdOfDish())) {
+            this.setRegularInfo(RegularPreorderDTO.build(regularPreorder));
+        }
     }
 
     private PreorderMenuDetail findPreorderMenuDetail(Long idOfDish, PreorderComplexAmountData data) {
@@ -173,19 +174,19 @@ public class DishItem {
         this.itemCode = itemCode;
     }
 
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
-        this.amount = amount;
-    }
-
     public PreorderMenuDetailDTO getPreorderInfo() {
         return preorderInfo;
     }
 
     public void setPreorderInfo(PreorderMenuDetailDTO preorderInfo) {
         this.preorderInfo = preorderInfo;
+    }
+
+    public RegularPreorderDTO getRegularInfo() {
+        return regularInfo;
+    }
+
+    public void setRegularInfo(RegularPreorderDTO regularInfo) {
+        this.regularInfo = regularInfo;
     }
 }

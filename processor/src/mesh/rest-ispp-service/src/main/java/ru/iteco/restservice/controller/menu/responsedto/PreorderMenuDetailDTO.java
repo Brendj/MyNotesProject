@@ -5,21 +5,21 @@ import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 
 public class PreorderMenuDetailDTO {
-    @Schema(description = "Идентификатор предзаказа на комплекс")
-    private Long preorderId;
-
     @Schema(description = "Идентификатор предзаказа на блюдо")
     private Long preorderMenuDetailId;
 
     @Schema(description = "Количество блюд в предзаказе")
     private Integer amount;
 
+    public PreorderMenuDetailDTO() {
+        amount = 0;
+    }
+
     public static PreorderMenuDetailDTO build(PreorderMenuDetail preorderMenuDetail) {
         PreorderMenuDetailDTO result = new PreorderMenuDetailDTO();
         if (preorderMenuDetail == null) {
             result.setAmount(0);
         } else {
-            result.setPreorderId(preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex());
             result.setPreorderMenuDetailId(preorderMenuDetail.getIdOfPreorderMenuDetail());
             result.setAmount(preorderMenuDetail.getAmount());
         }
@@ -29,18 +29,9 @@ public class PreorderMenuDetailDTO {
     public static PreorderMenuDetailDTO buildDeleted(PreorderMenuDetail preorderMenuDetail) {
         PreorderMenuDetailDTO result = new PreorderMenuDetailDTO();
         PreorderComplex pc = preorderMenuDetail.getPreorderComplex();
-        result.setPreorderId(pc.isDeleted() ? null : pc.getIdOfPreorderComplex());
         result.setPreorderMenuDetailId(null);
         result.setAmount(0);
         return result;
-    }
-
-    public Long getPreorderId() {
-        return preorderId;
-    }
-
-    public void setPreorderId(Long preorderId) {
-        this.preorderId = preorderId;
     }
 
     public Long getPreorderMenuDetailId() {

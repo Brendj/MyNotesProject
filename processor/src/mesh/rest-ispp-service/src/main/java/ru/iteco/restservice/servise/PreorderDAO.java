@@ -3,6 +3,7 @@ package ru.iteco.restservice.servise;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.iteco.restservice.controller.menu.request.RegularPreorderRequest;
 import ru.iteco.restservice.db.repo.readonly.PreorderComplexReadOnlyRepo;
 import ru.iteco.restservice.db.repo.readonly.PreorderMenuDetailReadOnlyRepo;
 import ru.iteco.restservice.db.repo.readonly.WtComplexReadOnlyRepo;
@@ -10,8 +11,10 @@ import ru.iteco.restservice.db.repo.readonly.WtDishReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
+import ru.iteco.restservice.model.enums.RegularPreorderState;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.model.wt.WtCategoryItem;
 import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtComplexesItem;
@@ -130,6 +133,50 @@ public class PreorderDAO {
             preorderComplex.updateWithVersion(version);
         }
         entityManager.merge(preorderComplex);
+    }
+
+    @Transactional
+    public RegularPreorder createRegularPreorder(PreorderComplexChangeData data, RegularPreorderRequest regularPreorderRequest) {
+        WtComplex complex = complexRepo.findById(regularPreorderRequest.getComplexId().longValue())
+                .orElseThrow(() -> new NotFoundException(String.format("Не найден комплекс с идентификатором %s", regularPreorderRequest.getComplexId())));
+        WtDish dish = null;
+        if (regularPreorderRequest.getDishId() != null) {
+            dish = dishRepo.findById(regularPreorderRequest.getDishId())
+                    .orElseThrow(() -> new NotFoundException(String.format("Не найдено блюдо с идентификатором %s", regularPreorderRequest.getDishId())));
+        }
+
+        String itemCode = (dish == null ? null : dish.getCode());
+        RegularPreorder regularPreorder = new RegularPreorder(data.getClient(), regularPreorderRequest.getStartDate(),
+                regularPreorderRequest.getEndDate(), itemCode, regularPreorderRequest.getComplexId(),
+                regularPreorderRequest.getAmount(), complex.getName(), regularPreorderRequest.getMonday(),
+                regularPreorderRequest.getTuesday(), regularPreorderRequest.getWednesday(),
+                regularPreorderRequest.getThursday(), regularPreorderRequest.getFriday(), regularPreorderRequest.getSaturday(),
+                complex.getPrice().longValue(), regularPreorderRequest.getGuardianMobile(), RegularPreorderState.CHANGE_BY_USER,
+                data.getMobileGroupOnCreate(), dish == null ? null : dish.getIdOfDish());
+
+        return entityManager.merge(regularPreorder);
+    }
+
+    @Transactional
+    public RegularPreorder editRegularPreorder(RegularPreorder regularPreorder, RegularPreorderRequest regularPreorderRequest) {
+        regularPreorder.setStartDate(RegularPreorder.convertDate(regularPreorderRequest.getStartDate()));
+        regularPreorder.setEndDate(RegularPreorder.convertDate(regularPreorderRequest.getEndDate()));
+        regularPreorder.setAmount(regularPreorderRequest.getAmount());
+        regularPreorder.setMonday(regularPreorderRequest.getMonday() ? 1 : 0);
+        regularPreorder.setTuesday(regularPreorderRequest.getTuesday() ? 1 : 0);
+        regularPreorder.setWednesday(regularPreorderRequest.getWednesday() ? 1 : 0);
+        regularPreorder.setThursday(regularPreorderRequest.getThursday() ? 1 : 0);
+        regularPreorder.setFriday(regularPreorderRequest.getFriday() ? 1 : 0);
+        regularPreorder.setSaturday(regularPreorderRequest.getSaturday() ? 1 : 0);
+        regularPreorder.setLastUpdate(new Date());
+        return entityManager.merge(regularPreorder);
+    }
+
+    @Transactional
+    public void deleteRegularPreorder(RegularPreorder regularPreorder) {
+        regularPreorder.setDeletedState(1);
+        regularPreorder.setLastUpdate(new Date());
+        entityManager.merge(regularPreorder);
     }
 
     public String getMenuGroupByWtDishAndCategories(WtDish wtDish) {

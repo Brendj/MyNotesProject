@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ru.iteco.restservice.controller.menu.request.PreorderComplexRequest;
 import ru.iteco.restservice.controller.menu.request.PreorderDishRequest;
 import ru.iteco.restservice.controller.menu.request.ProhibitionRequest;
+import ru.iteco.restservice.controller.menu.request.RegularPreorderRequest;
 import ru.iteco.restservice.controller.menu.responsedto.*;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.servise.CalendarUtils;
 import ru.iteco.restservice.servise.ComplexService;
 import ru.iteco.restservice.servise.MenuService;
@@ -189,6 +191,55 @@ public class MenuController {
             return PreorderMenuDetailDTO.buildDeleted(pmd);
         } catch (Exception e) {
             logger.error("Exception in deletePreorderMenuDetail: ", e);
+            throw e;
+        }
+    }
+
+    @PostMapping("/preorderRegular")
+    @Operation(summary = "Создание регулярного предзаказа",
+            description = "Создание регулярного предзаказа")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    public RegularPreorderDTO createRegularPreorder(@RequestBody RegularPreorderRequest regularPreorderRequest) throws Exception {
+        try {
+            preorderService.checkRegularPreorderCreateParameters(regularPreorderRequest);
+            RegularPreorder rp = preorderService.createRegularPreorder(regularPreorderRequest);
+            return RegularPreorderDTO.build(rp);
+        } catch (Exception e) {
+            logger.error("Exception in createRegularPreorder: ", e);
+            throw e;
+        }
+    }
+
+    @PutMapping("/preorderRegular/{id}")
+    @Operation(summary = "Редактирование регулярного предзаказа",
+            description = "Редактирование регулярного предзаказа")
+    @ResponseBody
+    public RegularPreorderDTO editRegularPreorder(@RequestBody RegularPreorderRequest regularPreorderRequest, @NotNull @PathVariable Long id) throws Exception {
+        try {
+            regularPreorderRequest.setRegularPreorderId(id);
+            preorderService.checkRegularPreorderEditParameters(regularPreorderRequest);
+            RegularPreorder rp = preorderService.editRegularPreorder(regularPreorderRequest);
+            return RegularPreorderDTO.build(rp);
+        } catch (Exception e) {
+            logger.error("Exception in editRegularPreorder: ", e);
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/preorderRegular/{id}")
+    @Operation(summary = "Удаление регулярного предзаказа",
+            description = "Удаление регулярного предзаказа")
+    @ResponseBody
+    public RegularPreorderDTO deleteRegularPreorder(@RequestBody RegularPreorderRequest regularPreorderRequest, @NotNull @PathVariable Long id) throws Exception {
+        try {
+            regularPreorderRequest.setRegularPreorderId(id);
+            preorderService.checkRegularPreorderDeleteParameters(regularPreorderRequest);
+            preorderService.deleteRegularPreorder(regularPreorderRequest.getRegularPreorderId(),
+                    regularPreorderRequest.getContractId());
+            return null;
+        } catch (Exception e) {
+            logger.error("Exception in deleteRegularPreorder: ", e);
             throw e;
         }
     }

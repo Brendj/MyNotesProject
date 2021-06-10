@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.iteco.restservice.controller.menu.request.PreorderComplexRequest;
 import ru.iteco.restservice.controller.menu.request.PreorderDishRequest;
+import ru.iteco.restservice.controller.menu.request.RegularPreorderRequest;
 import ru.iteco.restservice.db.repo.readonly.*;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.*;
@@ -13,6 +14,7 @@ import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
 import ru.iteco.restservice.model.enums.SettingsIds;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.servise.data.PreOrderFeedingSettingValue;
 import ru.iteco.restservice.servise.data.PreorderComplexChangeData;
 import ru.iteco.restservice.servise.data.PreorderDateComparator;
@@ -39,6 +41,8 @@ public class PreorderService {
     ClientGroupReadOnlyRepo cgroupRepo;
     @Autowired
     GroupNamesToOrgsReadOnlyRepo gntoRepo;
+    @Autowired
+    RegularPreorderReadOnlyRepo regularRepo;
 
     @Autowired
     PreorderDAO preorderDAO;
@@ -93,6 +97,18 @@ public class PreorderService {
                 || preorderDishRequest.getContractId() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
     }
 
+    public void checkRegularPreorderCreateParameters(RegularPreorderRequest regularPreorderRequest) throws IllegalArgumentException {
+        if (!regularPreorderRequest.enoughDataForCreate()) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+    }
+
+    public void checkRegularPreorderEditParameters(RegularPreorderRequest regularPreorderRequest) throws IllegalArgumentException {
+        if (!regularPreorderRequest.enoughDataForEdit()) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+    }
+
+    public void checkRegularPreorderDeleteParameters(RegularPreorderRequest regularPreorderRequest) throws IllegalArgumentException {
+        if (!regularPreorderRequest.enoughDataForDelete()) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+    }
+
     public PreorderComplex editPreorder(Long preorderId, Long contractId, String guardianMobile, Integer amount) throws Exception {
         PreorderComplex preorderComplex = pcRepo.findById(preorderId)
                 .orElseThrow(() -> new NotFoundException("Предзаказ с указанным идентификатором не найден"));
@@ -125,7 +141,7 @@ public class PreorderService {
 
     public PreorderMenuDetail createPreorderMenuDetail(Long contractId, Date date, String guardianMobile, Long complexId,
                                               Long dishId, Integer amount) throws Exception {
-        PreorderComplexChangeData data = getPreorderComplexChangeData(contractId, date, guardianMobile, complexId);
+        PreorderComplexChangeData data = getPreorderComplexChangeData(contractId, date, guardianMobile);
 
         long nextVersion = pcRepo.getMaxVersion() + 1;
         return preorderDAO.createPreorderMenuDetail(data, complexId, dishId, amount, guardianMobile, nextVersion);
@@ -161,9 +177,52 @@ public class PreorderService {
         return preorderMenuDetail;
     }
 
+    public RegularPreorder createRegularPreorder(RegularPreorderRequest regularPreorderRequest) throws Exception {
+        PreorderComplexChangeData data = getPreorderComplexChangeData(regularPreorderRequest.getContractId(),
+                RegularPreorder.convertDate(regularPreorderRequest.getStartDate()), regularPreorderRequest.getGuardianMobile());
+        RegularPreorder regularPreorder;
+        if (regularPreorderRequest.getDishId() == null) {
+            regularPreorder = regularRepo.getRegularPreorderByClientAndComplex(data.getClient(), regularPreorderRequest.getComplexId());
+        } else {
+            regularPreorder = regularRepo.getRegularPreorderByClientComplexAndDish(data.getClient(), regularPreorderRequest.getComplexId(),
+                    regularPreorderRequest.getDishId());
+        }
+        if (regularPreorder != null) {
+            throw new IllegalArgumentException("У данного клиента уже существует регулярный предзаказ на выбранный комплекс или блюдо");
+        }
+
+        return preorderDAO.createRegularPreorder(data, regularPreorderRequest);
+    }
+
+    public RegularPreorder editRegularPreorder(RegularPreorderRequest regularPreorderRequest) {
+        RegularPreorder regularPreorder = regularRepo.findById(regularPreorderRequest.getRegularPreorderId())
+                .orElseThrow(() -> new NotFoundException("Регулярный заказ с указанным идентификатором не найден"));
+
+        Client client = clientRepo.getClientByContractId(regularPreorderRequest.getContractId())
+                .orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
+        if (!regularPreorder.getClient().equals(client)) {
+            throw new IllegalArgumentException("Регулярный заказ не принадлежит данному клиенту");
+        }
+
+        return preorderDAO.editRegularPreorder(regularPreorder, regularPreorderRequest);
+    }
+
+    public void deleteRegularPreorder(Long regularPreorderId, Long contractId) throws Exception {
+        RegularPreorder regularPreorder = regularRepo.findById(regularPreorderId)
+                .orElseThrow(() -> new NotFoundException("Регулярный заказ с указанным идентификатором не найден"));
+
+        Client client = clientRepo.getClientByContractId(contractId)
+                .orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
+        if (!regularPreorder.getClient().equals(client)) {
+            throw new IllegalArgumentException("Регулярный заказ не принадлежит данному клиенту");
+        }
+
+        preorderDAO.deleteRegularPreorder(regularPreorder);
+    }
+
     public PreorderComplex createPreorder(Long contractId, Date date, String guardianMobile, Long complexId,
                                           Integer amount) throws Exception {
-        PreorderComplexChangeData data = getPreorderComplexChangeData(contractId, date, guardianMobile, complexId);
+        PreorderComplexChangeData data = getPreorderComplexChangeData(contractId, date, guardianMobile);
 
         PreorderComplex preorderComplex = pcRepo.getPreorderComplexesByClientDateAndComplexId(data.getClient(), complexId.intValue(),
                 data.getStartDate(), data.getEndDate());
@@ -176,8 +235,8 @@ public class PreorderService {
                 nextVersion, guardianMobile, data.getMobileGroupOnCreate(), false);
     }
 
-    private PreorderComplexChangeData getPreorderComplexChangeData(Long contractId, Date date, String guardianMobile,
-                                                                   Long complexId) throws Exception {
+    private PreorderComplexChangeData getPreorderComplexChangeData(Long contractId, Date date,
+                                                                   String guardianMobile) throws Exception {
         Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
         Date startDate = CalendarUtils.startOfDay(date);
         Date endDate = CalendarUtils.endOfDay(date);

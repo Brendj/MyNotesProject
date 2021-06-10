@@ -10,6 +10,7 @@ import ru.iteco.restservice.model.enums.EntityStateType;
 import ru.iteco.restservice.model.enums.Predefined;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.model.wt.*;
 import ru.iteco.restservice.servise.data.PreorderAmountData;
 import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
@@ -40,6 +41,8 @@ public class ComplexService {
     WtComplexExcludeDaysReadOnlyRepo wtComplexExcludeDaysReadOnlyRepo;
     @Autowired
     WtComplexesItemReadOnlyRepo wtComplexesItemReadOnlyRepo;
+    @Autowired
+    RegularPreorderReadOnlyRepo regularRepo;
 
     @Autowired
     PreorderComplexReadOnlyRepo preorderComplexReadOnlyRepo;
@@ -250,20 +253,25 @@ public class ComplexService {
             }
 
             PreorderAmountData preorderComplexAmounts = getPreorderComplexAmounts(client, startDate, endDate);
+            List<RegularPreorder> regulars = getRegulars(client);
 
             Map<WtComplex, List<WtDish>> map = getDishesMap(wtPaidComplexes, startDate, endDate);
-            response.getPaidComplexes().fillComplexInfo(wtPaidComplexes, map, preorderComplexAmounts);
+            response.getPaidComplexes().fillComplexInfo(wtPaidComplexes, map, preorderComplexAmounts, regulars);
 
             map = getDishesMap(wtAllComplexes, startDate, endDate);
-            response.getPaidAndFreeComplexes().fillComplexInfo(wtAllComplexes, map, preorderComplexAmounts);
+            response.getPaidAndFreeComplexes().fillComplexInfo(wtAllComplexes, map, preorderComplexAmounts, regulars);
 
             map = getDishesMap(wtDiscComplexes, startDate, endDate);
-            response.getFreeComplexes().fillComplexInfo(wtDiscComplexes, map, preorderComplexAmounts);
+            response.getFreeComplexes().fillComplexInfo(wtDiscComplexes, map, preorderComplexAmounts, regulars);
 
             return response;
 
         }
         return response;
+    }
+
+    private List<RegularPreorder> getRegulars(Client client) {
+        return regularRepo.getRegularPreordersByClient(client);
     }
 
     private PreorderAmountData getPreorderComplexAmounts(Client client, Date startDate, Date endDate) {

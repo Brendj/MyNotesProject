@@ -6,6 +6,7 @@ import org.hibernate.annotations.Type;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
 import ru.iteco.restservice.model.enums.RegularPreorderState;
+import ru.iteco.restservice.servise.CalendarUtils;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -102,6 +103,39 @@ public class RegularPreorder {
 
     @Column(name = "cancelnotification")
     private Boolean cancelnotification;
+
+    public RegularPreorder() { }
+
+    public RegularPreorder(Client client, Long startDate, Long endDate, String itemCode, Integer idOfComplex,
+                           Integer amount, String itemName, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday,
+                           Boolean friday, Boolean saturday, Long price, String guardianMobile, RegularPreorderState state,
+                           PreorderMobileGroupOnCreateType mobileGroupOnCreate, Long idOfDish) {
+        this.client = client;
+        this.startDate = convertDate(startDate);
+        this.endDate = convertDate(endDate);
+        this.itemCode = itemCode;
+        this.idOfComplex = idOfComplex;
+        this.amount = amount;
+        this.itemName = itemName;
+        this.monday = monday ? 1 : 0;
+        this.tuesday = tuesday ? 1 : 0;
+        this.wednesday = wednesday ? 1 : 0;
+        this.thursday = thursday ? 1 : 0;
+        this.friday = friday ? 1 : 0;
+        this.saturday = saturday ? 1 : 0;
+        this.price = price;
+        this.createdDate = new Date();
+        this.lastUpdate = new Date();
+        this.deletedState = 0;
+        this.mobile = guardianMobile;
+        this.state = state;
+        this.mobileGroupOnCreate = mobileGroupOnCreate;
+    }
+
+    public static Date convertDate(Long date) {
+        Date d = CalendarUtils.endOfDay(new Date(date));
+        return CalendarUtils.startOfDayInUTC(d);
+    }
 
     public Long getIdOfRegularPreorder() {
         return idOfRegularPreorder;

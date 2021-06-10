@@ -1,6 +1,7 @@
 package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreorderAmountData;
@@ -23,9 +24,9 @@ public class ComplexGroupItem {
     }
 
     public void fillComplexInfo(Set<WtComplex> wtComplexSet, Map<WtComplex, List<WtDish>> map,
-                                PreorderAmountData preorderComplexAmounts) {
+                                PreorderAmountData preorderComplexAmounts, List<RegularPreorder> regulars) {
         for (WtComplex wtComplex : wtComplexSet) {
-            ComplexItem item = new ComplexItem(wtComplex, map.get(wtComplex), preorderComplexAmounts);
+            ComplexItem item = new ComplexItem(wtComplex, map.get(wtComplex), preorderComplexAmounts, regulars);
             complexes.add(item);
         }
     }
