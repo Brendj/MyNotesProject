@@ -143,14 +143,6 @@ public class PreorderComplex {
         this.version = version;
     }
 
-    public void delete(String guardianMobile, Long version) {
-        this.mobile = guardianMobile;
-        this.amount = 0;
-        this.deletedState = 1;
-        this.lastUpdate = new Date();
-        this.version = version;
-    }
-
     public void updateWithVersion(long version) {
         this.version = version;
         this.lastUpdate = new Date();
@@ -158,6 +150,18 @@ public class PreorderComplex {
 
     public boolean isDeleted() {
         return deletedState.equals(1);
+    }
+
+    public void deleteByReason(Long nextVersion, boolean doDelete, PreorderState reason) {
+        doDelete(nextVersion, doDelete, reason);
+    }
+
+    private void doDelete(Long nextVersion, boolean doDelete, PreorderState state) {
+        this.version = nextVersion;
+        this.deletedState = doDelete ? 1 : 0;
+        if (doDelete) this.amount = 0;
+        this.state = state;
+        this.lastUpdate = new Date();
     }
 
     @Override

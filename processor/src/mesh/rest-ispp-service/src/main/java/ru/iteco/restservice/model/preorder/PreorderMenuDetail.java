@@ -73,7 +73,7 @@ public class PreorderMenuDetail {
     @Column(name = "idOfGoodsRequestPosition")
     private Long idOfGoodsRequestPosition;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "idofregularpreorder")
     private RegularPreorder regularPreorder;
 
@@ -153,6 +153,27 @@ public class PreorderMenuDetail {
         this.deletedState = 1;
         this.amount = 0;
         this.mobile = guardianMobile;
+    }
+
+    public void deleteByReason(Long nextVersion, boolean doDelete, PreorderState reason) {
+        doDelete(nextVersion, doDelete, reason);
+    }
+
+    private void doDelete(Long nextVersion, boolean doDelete, PreorderState state) {
+        this.preorderComplex.setVersion(nextVersion);
+        this.deletedState = doDelete ? 1 : 0;
+        if (doDelete) this.amount = 0;
+        this.state = state;
+        this.preorderComplex.setLastUpdate(new Date());
+        boolean allDeleted = true;
+        for (PreorderMenuDetail pmd : this.preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getDeletedState().equals(0)) allDeleted = false;
+        }
+        if (allDeleted) {
+            this.preorderComplex.setState(state);
+            this.preorderComplex.setDeletedState(1);
+            this.preorderComplex.setAmount(0);
+        }
     }
 
     @Override

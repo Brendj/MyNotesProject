@@ -30,4 +30,29 @@ public interface PreorderMenuDetailReadOnlyRepo extends CrudRepository<PreorderM
             + "where pmd.preorderComplex = :preorderComplex and pmd.deletedState = 0 and pmd.idOfPreorderMenuDetail <> :idOfPreorderMenuDetail")
     List<PreorderMenuDetail> getPreorderMenuDetailsForDeleteTest(@Param("preorderComplex") PreorderComplex preorderComplex,
             @Param("idOfPreorderMenuDetail") Long idOfPreorderMenuDetail);
+
+    @Query(value = "select pmd from PreorderMenuDetail pmd left join pmd.preorderComplex pc "
+            + "where pmd.client = :client and pmd.preorderDate between :startDate and :endDate and "
+            + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish")
+    PreorderMenuDetail findPreorderWtDish(@Param("client") Client client,
+                                          @Param("startDate") Date startDate,
+                                          @Param("endDate") Date endDate,
+                                          @Param("idOfComplex") Integer idOfComplex,
+                                          @Param("idOfDish") Long idOfDish);
+
+    @Query(value = "select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd "
+            + "left join pmd.preorderComplex pc "
+            + "where pmd.client = :client and pmd.preorderDate = :date and "
+            + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish and pmd.deletedState = 0")
+    List<Long> getIdOfPreorderMenuDertailIds(@Param("client") Client client,
+                                             @Param("date") Date date,
+                                             @Param("idOfComplex") Integer idOfComplex,
+                                             @Param("idOfDish") Long idOfDish);
+
+    @Query(value = "select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd where pmd.preorderComplex = :preorderComplex "
+            + "and pmd.client = :client and pmd.preorderDate = :preorderDate and pmd.idOfDish = :idOfDish and pmd.deletedState = 0")
+    List<PreorderMenuDetail> getPreorderMenuDetailsList(@Param("preorderComplex") PreorderComplex preorderComplex,
+                                                        @Param("client") Client client,
+                                                        @Param("preorderDate") Date preorderDate,
+                                                        @Param("idOfDish") Long idOfDish);
 }

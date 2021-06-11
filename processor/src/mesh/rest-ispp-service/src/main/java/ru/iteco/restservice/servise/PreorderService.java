@@ -1,5 +1,6 @@
 package ru.iteco.restservice.servise;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,16 @@ import ru.iteco.restservice.controller.menu.request.RegularPreorderRequest;
 import ru.iteco.restservice.db.repo.readonly.*;
 import ru.iteco.restservice.errors.NotFoundException;
 import ru.iteco.restservice.model.*;
+import ru.iteco.restservice.model.enums.EntityStateType;
 import ru.iteco.restservice.model.enums.PreorderMobileGroupOnCreateType;
+import ru.iteco.restservice.model.enums.PreorderState;
 import ru.iteco.restservice.model.enums.SettingsIds;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 import ru.iteco.restservice.model.preorder.RegularPreorder;
+import ru.iteco.restservice.model.wt.WtComplex;
+import ru.iteco.restservice.model.wt.WtComplexesItem;
+import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreOrderFeedingSettingValue;
 import ru.iteco.restservice.servise.data.PreorderComplexChangeData;
 import ru.iteco.restservice.servise.data.PreorderDateComparator;
@@ -43,9 +49,15 @@ public class PreorderService {
     GroupNamesToOrgsReadOnlyRepo gntoRepo;
     @Autowired
     RegularPreorderReadOnlyRepo regularRepo;
+    @Autowired
+    WtComplexReadOnlyRepo complexRepo;
+    @Autowired
+    WtDishReadOnlyRepo dishRepo;
 
     @Autowired
     PreorderDAO preorderDAO;
+    @Autowired
+    ComplexService complexService;
 
     private final Logger logger = LoggerFactory.getLogger(PreorderService.class);
 
@@ -350,11 +362,11 @@ public class PreorderService {
         return isWeekend;
     }
 
-    private boolean isSixWorkWeek(Long idOfOrg, String groupName) {
+    public boolean isSixWorkWeek(Long idOfOrg, String groupName) {
         GroupNamesToOrgs gnto = gntoRepo.findByIdOfOrgAndGroupName(idOfOrg, groupName)
                 .orElse(null);
         if (gnto == null) return false;
-        return gnto.getSixDaysWorkWeek();
+        return gnto.getSixDaysWorkWeek() == null ? false : gnto.getSixDaysWorkWeek();
     }
 
     public Boolean isWeekendBySpecialDate(Date date, Long idOfClientGroup, List<SpecialDate> specialDates) {

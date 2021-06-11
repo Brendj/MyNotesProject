@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.Org;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
+import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.model.wt.WtComplex;
 
 import java.util.Date;
@@ -58,4 +59,23 @@ public interface PreorderComplexReadOnlyRepo extends CrudRepository<PreorderComp
             + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.deletedState = 0 "
             + "group by p.preorderDate, coalesce(p.idOfOrgOnCreate, p.client.org.idOfOrg)")
     List getPreorderAmount(@Param("idOfClient") Long idOfClient, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    @Query(value = "select pc from PreorderComplex pc "
+            + "where pc.client = :client and pc.regularPreorder = :regularPreorder "
+            + "order by pc.createdDate desc")
+    List<PreorderComplex> getPreorderComplexesByRegular(@Param("client") Client client, @Param("regularPreorder") RegularPreorder regularPreorder);
+
+    @Query(value = "select pc from PreorderComplex pc "
+            + "where pc.client = :client and pc.preorderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
+            + "order by pc.createdDate desc, pc.lastUpdate desc")
+    List<PreorderComplex> getPreorderComplexesByClient(@Param("client") Client client,
+                                                       @Param("idOfComplex") Integer idOfComplex,
+                                                       @Param("dateFrom") Date dateFrom,
+                                                       @Param("dateTo") Date dateTo);
+
+    @Query(value = "select pc.idOfPreorderComplex from PreorderComplex pc "
+            + "where pc.client = :client and pc.preorderDate = :date and pc.armComplexId = :complexId and pc.deletedState = 0")
+    List<Integer> getIdOfPreorderComplexIds(@Param("client") Client client,
+                                            @Param("date") Date date,
+                                            @Param("complexId") Integer idOfComplex);
 }

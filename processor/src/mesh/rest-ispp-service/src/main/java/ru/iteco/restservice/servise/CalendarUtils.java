@@ -115,4 +115,13 @@ public class CalendarUtils {
             return dateFormat.parse(s);
         }
     }
+
+    public static boolean betweenDate(Date createDate, Date generateBeginTime, Date generateEndTime) {
+        return createDate.before(generateEndTime) && createDate.after(generateBeginTime);
+    }
+
+    public static boolean isWorkDateWithoutParser(boolean isSixWorkWeek, Date date) {
+        int day = getDayOfWeek(date);
+        return (isSixWorkWeek ? (day != Calendar.SUNDAY) : (day != Calendar.SUNDAY && day != Calendar.SATURDAY));
+    }
 }

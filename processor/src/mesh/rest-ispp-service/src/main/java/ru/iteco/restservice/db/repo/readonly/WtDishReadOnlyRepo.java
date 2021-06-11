@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.iteco.restservice.model.enums.EntityStateType;
+import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.model.wt.WtComplexesItem;
 import ru.iteco.restservice.model.wt.WtDish;
 
@@ -61,4 +62,23 @@ public interface WtDishReadOnlyRepo extends JpaRepository<WtDish, Long> {
                                                   @Param("startDate") Date startDate,
                                                   @Param("endDate") Date endDate,
                                                   @Param("state") EntityStateType state);
+
+    @Query(value = "SELECT dish FROM WtDish dish "
+            + "LEFT JOIN dish.complexItems complexItems "
+            + "WHERE dish.idOfDish = :idOfDish "
+            + "AND :complexItem IN ELEMENTS(dish.complexItems) "
+            + "AND dish.deleteState = 0 "
+            + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+            + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+            + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+            + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))")
+    WtDish getWtDishByItemCodeAndId(@Param("complexItem") WtComplexesItem complexItem,
+                                    @Param("startDate") Date startDate,
+                                    @Param("endDate") Date endDate,
+                                    @Param("idOfDish") Long idOfDish);
+
+    @Query(value = "SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems items "
+            + "where items.wtComplex = :complex and dish.deleteState = 0")
+    List<WtDish> getWtDishesByComplex(@Param("complex") WtComplex complex);
+
 }

@@ -3,6 +3,7 @@ package ru.iteco.restservice.db.repo.readonly;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.Contragent;
 import ru.iteco.restservice.model.Org;
 import ru.iteco.restservice.model.wt.WtComplex;
@@ -57,5 +58,14 @@ public interface WtComplexReadOnlyRepo extends JpaRepository<WtComplex, Long> {
                                                          @Param("contragent") Contragent contragent,
                                                          @Param("freeComplex") Long freeComplex,
                                                          @Param("allComplexes") Long allComplexes);
-
+    @Query(value = "SELECT complex FROM WtComplex complex "
+            + "LEFT JOIN complex.wtOrgGroup orgGroup "
+            + "WHERE complex.beginDate <= :startDate AND complex.endDate >= :endDate "
+            + "AND complex.deleteState = 0 "
+            + "AND complex.idOfComplex = :idOfComplex "
+            + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) ")
+    WtComplex getWtComplex(@Param("org") Org org,
+                           @Param("idOfComplex") Long idOfComplex,
+                           @Param("startDate") Date startDate,
+                           @Param("endDate") Date endDate);
 }
