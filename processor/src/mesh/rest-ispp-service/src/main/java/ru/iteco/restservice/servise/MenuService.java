@@ -100,6 +100,9 @@ public class MenuService {
         List<ProhibitionMenu> prohibitions = prohibitionMenuReadOnlyRepo.findByClientAndDeletedState(client);
 
         for (ProhibitionMenu prohibition : prohibitions) {
+            if(prohibition.getProhibitionFilterType() == null){
+                continue;
+            }
             switch (prohibition.getProhibitionFilterType()) {
                 case PROHIBITION_BY_FILTER:
                     prohibitionData.getProhibitByFilter().put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
