@@ -26,6 +26,18 @@ public enum ClientNotificationSettingType {
         this.description = description;
     }
 
+    public static ClientNotificationSettingType of(Long code){
+        if(code == null){
+            return null;
+        }
+        for(ClientNotificationSettingType t : ClientNotificationSettingType.values()){
+            if(t.getCode().equals(code)){
+                return t;
+            }
+        }
+        return null;
+    }
+
     public Long getCode() {
         return code;
     }

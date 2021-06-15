@@ -4,22 +4,24 @@
 
 package ru.iteco.restservice.servise;
 
+import ru.iteco.restservice.controller.client.request.NotificationUpdateRequest;
 import ru.iteco.restservice.controller.guardian.request.SetRelationRequest;
 import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
+import ru.iteco.restservice.db.repo.readonly.ClientGuardianNotificationSettingsReadonlyRepo;
 import ru.iteco.restservice.db.repo.readonly.ClientGuardianReadOnlyRepo;
 import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
-import ru.iteco.restservice.model.Client;
-import ru.iteco.restservice.model.ClientGuardian;
-import ru.iteco.restservice.model.ClientRegistry;
-import ru.iteco.restservice.model.ClientsNotificationSettings;
+import ru.iteco.restservice.model.*;
 import ru.iteco.restservice.model.enums.ClientGroupAssignment;
 import ru.iteco.restservice.model.enums.ClientGuardianRelationType;
 import ru.iteco.restservice.model.enums.ClientGuardianRepresentType;
+import ru.iteco.restservice.model.enums.ClientNotificationSettingType;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -28,6 +30,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -41,6 +44,7 @@ public class ClientService {
 
     private final ClientReadOnlyRepo clientReadOnlyRepo;
     private final ClientGuardianReadOnlyRepo guardianReadOnlyRepo;
+    private final ClientGuardianNotificationSettingsReadonlyRepo guardianNotificationSettingsReadonlyRepo;
 
     @PersistenceContext(name = "readonlyEntityManager", unitName = "readonlyPU")
     EntityManager readonlyEntityManager;
@@ -49,9 +53,11 @@ public class ClientService {
     EntityManager writableEntityManager;
 
     public ClientService(ClientReadOnlyRepo clientReadOnlyRepo,
-            ClientGuardianReadOnlyRepo clientGuardianReadOnlyRepo){
+            ClientGuardianReadOnlyRepo clientGuardianReadOnlyRepo,
+            ClientGuardianNotificationSettingsReadonlyRepo guardianNotificationSettingsReadonlyRepo){
         this.clientReadOnlyRepo = clientReadOnlyRepo;
         this.guardianReadOnlyRepo = clientGuardianReadOnlyRepo;
+        this.guardianNotificationSettingsReadonlyRepo = guardianNotificationSettingsReadonlyRepo;
     }
 
     public List<Client> getClientsByGuardianPhone(@NotNull String guardPhone) {
@@ -157,7 +163,7 @@ public class ClientService {
         registry.setClientRegistryVersion(version);
         writableEntityManager.merge(registry);
 
-        c.setExpenditureLimit(balanceNotification);
+        c.setBalanceToNotify(balanceNotification);
         c.setClientRegistryVersion(version);
         writableEntityManager.merge(c);
     }
@@ -209,5 +215,70 @@ public class ClientService {
 
         clientGuardian = new ClientGuardian(guardian, child, representType, relationType, nextVersion);
         clientGuardian = writableEntityManager.merge(clientGuardian);
+    }
+
+    @Transactional
+    public void updateNotifications(NotificationUpdateRequest req) {
+        if(req.getContractId() == null){
+            throw new IllegalArgumentException("Не указан л/с");
+        } else if(StringUtils.isEmpty(req.getGuardianMobile())){
+            throw new IllegalArgumentException("Не указан номер телефона представителя");
+        } else if(!phonePattern.matcher(req.getGuardianMobile()).matches()){
+            throw new IllegalArgumentException("Номер телефона не соответствует паттерну");
+        } else if(req.getNotificationType() == null){
+            throw new IllegalArgumentException("Не указан тип оповещения");
+        } else if(req.getActivity() == null){
+            throw new IllegalArgumentException("Не указан флаг включения оповещения");
+        }
+
+        ClientNotificationSettingType type = ClientNotificationSettingType.of(req.getNotificationType());
+        if(type == null){
+            throw new NotFoundException("Не найден тип оповещения " + req.getNotificationType());
+        }
+
+        Client child = clientReadOnlyRepo.getClientByContractId(req.getContractId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Не найден клиент по л/с %d", req.getContractId()))
+                );
+        if(child.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
+        }
+
+        List<Client> guardians = clientReadOnlyRepo.getGuardianByChild(child.getContractId(), req.getGuardianMobile(),
+                PageRequest.of(0,1));
+        if(CollectionUtils.isEmpty(guardians)){
+            throw new NotFoundException(String.format("У указанного клиента л/с %d не найдены представители по номеру %s",
+                    child.getContractId(), req.getGuardianMobile()));
+        }
+        Client guardian = guardians.get(0);
+        Long groupIdOfGuardian = guardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
+        if(ClientGroupAssignment.CLIENT_PARENTS.getId() > groupIdOfGuardian
+                && groupIdOfGuardian > ClientGroupAssignment.CLIENT_VISITORS.getId() -1L){
+            throw new IllegalArgumentException("Указанный представитель не пренадлежит группе \"Родители\"");
+        }
+
+        ClientGuardian clientGuardianRelations = guardianReadOnlyRepo
+                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian)
+                .orElseThrow(() -> new NotFoundException("Не найдена активная связь между клиентом и представителем"));
+
+        ClientGuardianNotificationSettings guardianNotificationSettings = guardianNotificationSettingsReadonlyRepo
+                .getClientGuardianNotificationSettingsByClientGuardianAndType(clientGuardianRelations, type);
+
+        if(req.getActivity()){
+            if(guardianNotificationSettings != null){
+                throw new IllegalArgumentException("Оповещение уже активированно");
+            }
+            guardianNotificationSettings = new ClientGuardianNotificationSettings();
+            guardianNotificationSettings.setClientGuardian(clientGuardianRelations);
+            guardianNotificationSettings.setCreatedDate(new Date().getTime());
+            guardianNotificationSettings.setType(type);
+            writableEntityManager.merge(guardianNotificationSettings);
+        } else {
+            if(guardianNotificationSettings == null){
+                throw new IllegalArgumentException("Оповещение уже отключено");
+            }
+            guardianNotificationSettings = writableEntityManager.merge(guardianNotificationSettings);
+            writableEntityManager.remove(guardianNotificationSettings);
+        }
     }
 }
