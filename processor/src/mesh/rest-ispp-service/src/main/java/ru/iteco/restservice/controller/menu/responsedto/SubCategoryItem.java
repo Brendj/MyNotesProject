@@ -13,6 +13,9 @@ public class SubCategoryItem {
     @Schema(description = "Название подкатегории")
     private String subCategoryName;
 
+    @Schema(description = "Признак-идентификатора запрета покупки подкатегории")
+    private Long prohibitionId;
+
     public SubCategoryItem(WtCategoryItem wtCategoryItem) {
         this.subCategoryId = wtCategoryItem.getIdOfCategoryItem();
         this.subCategoryName = wtCategoryItem.getDescription();
@@ -32,5 +35,13 @@ public class SubCategoryItem {
 
     public void setSubCategoryName(String subCategoryName) {
         this.subCategoryName = subCategoryName;
+    }
+
+    public Long getProhibitionId() {
+        return prohibitionId;
+    }
+
+    public void setProhibitionId(Long prohibitionId) {
+        this.prohibitionId = prohibitionId;
     }
 }

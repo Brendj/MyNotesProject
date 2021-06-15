@@ -1,6 +1,7 @@
 package ru.iteco.restservice.controller.menu.responsedto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ru.iteco.restservice.model.ProhibitionMenu;
 import ru.iteco.restservice.model.wt.WtCategoryItem;
 import ru.iteco.restservice.model.wt.WtDish;
 
@@ -28,7 +29,7 @@ public class MenuItem {
     private String output;
 
     @Schema(description = "Признак-идентификатора запрета покупки блюда")
-    private Long idOfProhibition;
+    private Long prohibitionId;
 
     @Schema(description = "Белки")
     private Integer protein;
@@ -39,7 +40,7 @@ public class MenuItem {
     @Schema(description = "Углеводы")
     private Integer carbohydrates;
 
-    public MenuItem(WtDish wtDish) {
+    public MenuItem(WtDish wtDish, List<ProhibitionMenu> prohibitions) {
         this.dishId = wtDish.getIdOfDish();
         this.dishName = wtDish.getDishName();
         this.price = wtDish.getPrice().longValue();
@@ -50,8 +51,19 @@ public class MenuItem {
         this.carbohydrates = wtDish.getCarbohydrates();
         this.subcategories = new ArrayList<>();
         for (WtCategoryItem wtCategoryItem : wtDish.getCategoryItems()) {
-            this.subcategories.add(new SubCategoryItem(wtCategoryItem));
+            SubCategoryItem item = new SubCategoryItem(wtCategoryItem);
+            item.setProhibitionId(getProhibitionForSubcategory(wtCategoryItem, prohibitions));
+            this.subcategories.add(item);
         }
+    }
+
+    private Long getProhibitionForSubcategory(WtCategoryItem wtCategoryItem, List<ProhibitionMenu> prohibitions) {
+        for (ProhibitionMenu pm : prohibitions) {
+            if (pm.getCategoryItem() != null && pm.getCategoryItem().equals(wtCategoryItem)) {
+                return pm.getIdOfProhibitions();
+            }
+        }
+        return null;
     }
 
     public Long getPrice() {
@@ -76,14 +88,6 @@ public class MenuItem {
 
     public void setOutput(String output) {
         this.output = output;
-    }
-
-    public Long getIdOfProhibition() {
-        return idOfProhibition;
-    }
-
-    public void setIdOfProhibition(Long idOfProhibition) {
-        this.idOfProhibition = idOfProhibition;
     }
 
     public Integer getProtein() {
@@ -128,5 +132,13 @@ public class MenuItem {
 
     public List<SubCategoryItem> getSubcategories() {
         return subcategories;
+    }
+
+    public Long getProhibitionId() {
+        return prohibitionId;
+    }
+
+    public void setProhibitionId(Long prohibitionId) {
+        this.prohibitionId = prohibitionId;
     }
 }

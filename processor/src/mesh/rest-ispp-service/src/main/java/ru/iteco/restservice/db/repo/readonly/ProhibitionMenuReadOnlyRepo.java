@@ -42,4 +42,6 @@ public interface ProhibitionMenuReadOnlyRepo extends JpaRepository<ProhibitionMe
     Long getMaxVersion();
 
     Optional<ProhibitionMenu> findByIdOfProhibitionsAndDeletedStateIsFalse(Long id);
+
+    List<ProhibitionMenu> findByClientAndDeletedStateIsFalse(Long id);
 }
