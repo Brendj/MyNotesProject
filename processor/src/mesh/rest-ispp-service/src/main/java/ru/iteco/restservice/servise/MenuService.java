@@ -49,13 +49,13 @@ public class MenuService {
     public List<CategoryItem> getMenuList(Date date, Long contractId) {
         Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
         List<Long> menus = menuRepo.getWtMenuByDateAndOrg(date, client.getOrg());
-        ProhibitionData prohibitionData = getProhibitionData(client);
-        List<CategoryItem> result = generateWtMenuDetailWithProhibitions(client, menus, date, prohibitionData);
+        List<ProhibitionMenu> prohibitions = prohibitionMenuReadOnlyRepo.findByClientAndDeletedState(client);
+        List<CategoryItem> result = generateWtMenuDetailWithProhibitions(client, menus, date, prohibitions);
         return result;
     }
 
     //todo Добавить привязку к запретам меню к ответу метода
-    private List<CategoryItem> generateWtMenuDetailWithProhibitions(Client client, List<Long> menus, Date date, ProhibitionData prohibitionData) {
+    private List<CategoryItem> generateWtMenuDetailWithProhibitions(Client client, List<Long> menus, Date date, List<ProhibitionMenu> prohibitions) {
         List<CategoryItem> result = new ArrayList<>();
         List<WtDish> wtDishes = getWtDishesByMenuAndDate(menus, date);
 
@@ -68,15 +68,35 @@ public class MenuService {
         }
         for (WtCategory wtCategory : map.keySet()) {
             CategoryItem categoryItem = new CategoryItem(wtCategory);
+            categoryItem.setProhibitionId(getProhibitionForCategory(wtCategory, prohibitions));
             List<WtDish> list = map.get(wtCategory);
             for (WtDish wtDish : list) {
-                MenuItem menuItem = new MenuItem(wtDish);
+                MenuItem menuItem = new MenuItem(wtDish, prohibitions);
+                menuItem.setProhibitionId(getProhibitionForDish(wtDish, prohibitions));
                 categoryItem.getMenuItems().add(menuItem);
             }
             result.add(categoryItem);
         }
 
         return result;
+    }
+
+    private Long getProhibitionForCategory(WtCategory wtCategory, List<ProhibitionMenu> prohibitions) {
+        for (ProhibitionMenu pm : prohibitions) {
+            if (pm.getCategory()!= null && pm.getCategory().equals(wtCategory)) {
+                return pm.getIdOfProhibitions();
+            }
+        }
+        return null;
+    }
+
+    private Long getProhibitionForDish(WtDish wtDish, List<ProhibitionMenu> prohibitions) {
+        for (ProhibitionMenu pm : prohibitions) {
+            if (pm.getDish() != null && pm.getDish().equals(wtDish)) {
+                return pm.getIdOfProhibitions();
+            }
+        }
+        return null;
     }
 
     private List<WtDish> getWtDishesByMenuAndDate(List<Long> menus, Date date) {
@@ -92,27 +112,6 @@ public class MenuService {
             res.addAll(dishRepo.getWtDishList(list));
         }
         return res;
-    }
-
-    public ProhibitionData getProhibitionData(Client client) {
-        ProhibitionData prohibitionData = new ProhibitionData();
-
-        List<ProhibitionMenu> prohibitions = prohibitionMenuReadOnlyRepo.findByClientAndDeletedState(client);
-
-        for (ProhibitionMenu prohibition : prohibitions) {
-            switch (prohibition.getProhibitionFilterType()) {
-                case PROHIBITION_BY_FILTER:
-                    prohibitionData.getProhibitByFilter().put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
-                    break;
-                case PROHIBITION_BY_GOODS_NAME:
-                    prohibitionData.getProhibitByName().put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
-                    break;
-                case PROHIBITION_BY_GROUP_NAME:
-                    prohibitionData.getProhibitByGroup().put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
-                    break;
-            }
-        }
-        return prohibitionData;
     }
 
     @Transactional

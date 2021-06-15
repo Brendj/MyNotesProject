@@ -13,6 +13,9 @@ public class CategoryItem {
     @Schema(description = "Название категории")
     private String categoryName;
 
+    @Schema(description = "Признак-идентификатора запрета покупки категории")
+    private Long prohibitionId;
+
     @Schema(description = "Список блюд категории")
     private final List<MenuItem> menuItems;
 
@@ -40,5 +43,13 @@ public class CategoryItem {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public Long getProhibitionId() {
+        return prohibitionId;
+    }
+
+    public void setProhibitionId(Long prohibitionId) {
+        this.prohibitionId = prohibitionId;
     }
 }
