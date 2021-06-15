@@ -206,7 +206,7 @@ public class PreorderService {
         return preorderDAO.createRegularPreorder(data, regularPreorderRequest);
     }
 
-    public RegularPreorder editRegularPreorder(RegularPreorderRequest regularPreorderRequest) {
+    public RegularPreorder editRegularPreorder(RegularPreorderRequest regularPreorderRequest) throws Exception {
         RegularPreorder regularPreorder = regularRepo.findById(regularPreorderRequest.getRegularPreorderId())
                 .orElseThrow(() -> new NotFoundException("Регулярный заказ с указанным идентификатором не найден"));
 

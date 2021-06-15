@@ -27,6 +27,7 @@ import ru.iteco.restservice.servise.data.PreorderComplexChangeData;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -176,7 +177,7 @@ public class PreorderDAO {
     }
 
     @Transactional
-    public RegularPreorder editRegularPreorder(RegularPreorder regularPreorder, RegularPreorderRequest regularPreorderRequest) {
+    public RegularPreorder editRegularPreorder(RegularPreorder regularPreorder, RegularPreorderRequest regularPreorderRequest) throws Exception {
         regularPreorder.setStartDate(RegularPreorder.convertDate(regularPreorderRequest.getStartDate()));
         regularPreorder.setEndDate(RegularPreorder.convertDate(regularPreorderRequest.getEndDate()));
         regularPreorder.setAmount(regularPreorderRequest.getAmount());
@@ -187,14 +188,43 @@ public class PreorderDAO {
         regularPreorder.setFriday(regularPreorderRequest.getFriday() ? 1 : 0);
         regularPreorder.setSaturday(regularPreorderRequest.getSaturday() ? 1 : 0);
         regularPreorder.setLastUpdate(new Date());
-        return entityManager.merge(regularPreorder);
+        RegularPreorder rp = entityManager.merge(regularPreorder);
+        createPreordersFromRegular(rp, false);
+        return rp;
     }
 
     @Transactional
-    public void deleteRegularPreorder(RegularPreorder regularPreorder) {
+    public void deleteRegularPreorder(RegularPreorder regularPreorder) throws Exception {
         regularPreorder.setDeletedState(1);
         regularPreorder.setLastUpdate(new Date());
         entityManager.merge(regularPreorder);
+        deleteGeneratedPreordersByRegular(regularPreorder, PreorderState.OK);
+    }
+
+    private void deleteGeneratedPreordersByRegular(RegularPreorder regularPreorder, PreorderState state) throws Exception {
+        Date dateTo = CalendarUtils.addDays(new Date(), PreorderComplex.getDaysOfRegularPreorders()-1);
+        if (dateTo.after(regularPreorder.getEndDate())) dateTo = regularPreorder.getEndDate();
+        Date currentDate = CalendarUtils.startOfDay(new Date());
+        List<SpecialDate> specialDates = sdRepo.getSpecialDatesByOrg(currentDate, dateTo, regularPreorder.getClient().getOrg().getIdOfOrg());
+        List<ProductionCalendar> productionCalendar = productionCalendarRepo.findByDayBetween(new Date(), dateTo);
+        Date dateFrom = getStartDateForGeneratePreordersInternal(regularPreorder.getClient(), productionCalendar, specialDates);
+        long nextVersion = pcRepo.getMaxVersion() + 1;
+        Query delQuery = entityManager.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, state = :state, version = :version "
+                + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
+        delQuery.setParameter("lastUpdate", new Date());
+        delQuery.setParameter("regularPreorder", regularPreorder);
+        delQuery.setParameter("dateFrom", dateFrom);
+        delQuery.setParameter("state", state);
+        delQuery.setParameter("version", nextVersion);
+        delQuery.executeUpdate();
+
+        delQuery = entityManager.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0, state = :state "
+                //+ "where preorderComplex.idOfPreorderComplex in (select idOfPreorderComplex from PreorderComplex "
+                + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
+        delQuery.setParameter("regularPreorder", regularPreorder);
+        delQuery.setParameter("dateFrom", dateFrom);
+        delQuery.setParameter("state", state);
+        delQuery.executeUpdate();
     }
 
     @Transactional
@@ -238,16 +268,18 @@ public class PreorderDAO {
                     isWeekend, currentDate, regularPreorder.getClient().getClientGroup().getClientGroupId().getIdOfClientGroup(),
                     regularPreorder.getClient().getOrg().getIdOfOrg(), specialDates);
             if (!isWeekend) isWeekend = preorderService.isHolidayByProductionCalendar(currentDate, productionCalendar);
-            if (isWeekend) {
-                PreorderComplex pc = findPreorderComplexOnDate(preorderComplexes, currentDate, 0);
-                if (pc != null) {
-                    logger.info("Delete by change of calendar");
-                    deletePreorderComplex(pc, nextVersion, PreorderState.CHANGED_CALENDAR);
-                }
+            PreorderComplex pc = findPreorderComplexOnDate(preorderComplexes, currentDate, 0);
+            if (isWeekend && pc != null) {
+                logger.info("Delete by change of calendar");
+                deletePreorderComplex(pc, nextVersion, PreorderState.CHANGED_CALENDAR);
             }
 
             //генерить ли предзаказ по дню недели в регулярном заказе
             boolean doGenerate = doGenerate(currentDate, regularPreorder);
+            if (!doGenerate && pc != null) {
+                logger.info("Delete by user - no generate day in regular");
+                deletePreorderComplex(pc, nextVersion, PreorderState.OK);
+            }
             if (isWeekend || !doGenerate) {
                 logger.info("Weekend or not generated day");
                 currentDate = CalendarUtils.addDays(currentDate, 1);

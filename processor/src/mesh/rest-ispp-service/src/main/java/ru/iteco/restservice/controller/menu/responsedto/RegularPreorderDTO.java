@@ -1,21 +1,34 @@
 package ru.iteco.restservice.controller.menu.responsedto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.model.preorder.RegularPreorder;
 
 import java.util.Date;
 
 public class RegularPreorderDTO {
+    @Schema(description = "Идентификатор регулярного предзаказа", example = "13177")
     private Long regularPreorderId;
+    @Schema(description = "Дата начала действия регуляра в Timestamp (ms)", example = "1623974400000")
     private Long startDate;
+    @Schema(description = "Дата окончания действия регуляра в Timestamp (ms)", example = "1623974400000")
     private Long endDate;
+    @Schema(description = "Идентификатор комплекса", example = "123177")
     private Integer complexId;
+    @Schema(description = "Количество", example = "1")
     private Integer amount;
+    @Schema(description = "Флаг заказа на понедельник", example = "true")
     private Boolean monday;
+    @Schema(description = "Флаг заказа на вторник", example = "true")
     private Boolean tuesday;
+    @Schema(description = "Флаг заказа на среду", example = "true")
     private Boolean wednesday;
+    @Schema(description = "Флаг заказа на четверг", example = "true")
     private Boolean thursday;
+    @Schema(description = "Флаг заказа на пятницу", example = "true")
     private Boolean friday;
+    @Schema(description = "Флаг заказа на субботу", example = "true")
     private Boolean saturday;
+    @Schema(description = "Идентификатор блюда", example = "43242")
     private Long dishId;
 
     public static RegularPreorderDTO build(RegularPreorder regularPreorder) {
