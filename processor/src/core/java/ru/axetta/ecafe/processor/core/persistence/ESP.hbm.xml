@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ESP" table="cf_esp_request">
+        <id name="idesprequest" column="idesprequest" type="long">
+            <generator class="sequence">
+                <param name="sequence">cf_esp_request_id</param>
+            </generator>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient"
+                     not-null="true" update="false"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idOfOrg"
+                     not-null="true" update="false"/>
+        <property name="email" column="email" type="string"/>
+        <property name="message" column="message" type="string"/>
+        <property name="status" column="status" type="integer"/>
+        <property name="numberrequest" column="numberrequest" type="string"/>
+        <property name="topic" column="topic" type="string"/>
+        <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="updateDate" column="updateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="closeddate" column="closeddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="solution" column="solution" type="string"/>
+    </class>
+</hibernate-mapping>
+
+
