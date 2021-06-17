@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResponseESPRequests extends Result{
-    private List<ResponseESPRequestsPOJO> espRequestsPOJOS ;
+    private List<ResponseESPRequestsPOJO> espRequests ;
 
-    public List<ResponseESPRequestsPOJO> getEspRequestsPOJOS() {
-        if (espRequestsPOJOS == null)
-            espRequestsPOJOS = new ArrayList<>();
-        return espRequestsPOJOS;
+    public List<ResponseESPRequestsPOJO> getEspRequests() {
+        if (espRequests == null)
+            espRequests = new ArrayList<>();
+        return espRequests;
     }
 
-    public void setEspRequestsPOJOS(List<ResponseESPRequestsPOJO> espRequestsPOJOS) {
-        this.espRequestsPOJOS = espRequestsPOJOS;
+    public void setEspRequests(List<ResponseESPRequestsPOJO> espRequests) {
+        this.espRequests = espRequests;
     }
 }

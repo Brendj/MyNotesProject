@@ -3,18 +3,14 @@
  */
 
 /**
- * Created by a.voinov on 27.10.2020.
+ * Created by a.voinov on 16.06.2021.
  */
 
 package ru.axetta.ecafe.processor.web.internal.esp;
 
-import ru.axetta.ecafe.processor.web.partner.library.JsonLibraryDeSerializer;
-
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-
 import java.util.Date;
+import java.util.List;
 
-@JsonDeserialize(using = JsoneEspDeSerializer.class)
 public class ESPRequest {
     private Date dateRequest; //Дата подачи обращения
     private String meshGuid; //Клиент
@@ -22,6 +18,7 @@ public class ESPRequest {
     private Long idOfOrg; //Организация
     private String topic; //Тема обращения
     private String message; //Обращение
+    private List<ESPRequestAttachedFile> attached; //Доп файлы
 
     public Date getDateRequest() {
         return dateRequest;
@@ -69,5 +66,13 @@ public class ESPRequest {
 
     public void setMeshGuid(String meshGuid) {
         this.meshGuid = meshGuid;
+    }
+
+    public List<ESPRequestAttachedFile> getAttached() {
+        return attached;
+    }
+
+    public void setAttached(List<ESPRequestAttachedFile> attached) {
+        this.attached = attached;
     }
 }

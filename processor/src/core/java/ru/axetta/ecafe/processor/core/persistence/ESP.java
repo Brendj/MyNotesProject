@@ -6,13 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
 
-/**
- * Created with IntelliJ IDEA.
- * User: timur
- * Date: 07.08.12
- * Time: 11:15
- * To change this template use File | Settings | File Templates.
- */
 public class ESP {
     private Long idesprequest;
     private Client client;

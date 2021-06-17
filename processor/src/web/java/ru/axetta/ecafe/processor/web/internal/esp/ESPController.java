@@ -9,6 +9,7 @@
 package ru.axetta.ecafe.processor.web.internal.esp;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.file.FileUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -28,6 +29,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -82,6 +84,21 @@ public class ESPController {
             esp.setTopic(espRequest.getTopic());
             esp.setMessage(espRequest.getMessage());
             persistenceSession.save(esp);
+            /////
+            Integer count = 1;
+            for (ESPRequestAttachedFile espRequestAttachedFile: espRequest.getAttached())
+            {
+                String path = FileUtils.saveFile(esp.getIdesprequest(), espRequestAttachedFile.getAttached_filedata(),
+                        espRequestAttachedFile.getAttached_filename());
+                ESPattached espattached = new ESPattached();
+                espattached.setCreateDate(new Date());
+                espattached.setEsp(esp);
+                espattached.setNumber(count);
+                espattached.setPath(path);
+                count++;
+                persistenceSession.save(espattached);
+            }
+            /////////
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
@@ -156,7 +173,7 @@ public class ESPController {
                 responseESPRequestsPOJO.setUpdateDate(esp.getUpdateDate());
                 responseESPRequestsPOJO.setStatus(esp.getStatus());
                 responseESPRequestsPOJO.setSolution(esp.getSolution());
-                responseESPRequests.getEspRequestsPOJOS().add(responseESPRequestsPOJO);
+                responseESPRequests.getEspRequests().add(responseESPRequestsPOJO);
             }
             responseESPRequests.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             responseESPRequests.setErrorMessage(ResponseCodes.RC_OK.toString());

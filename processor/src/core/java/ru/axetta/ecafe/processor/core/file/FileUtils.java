@@ -53,6 +53,24 @@ public class FileUtils {
         return fileName;
     }
 
+    public static String saveFile(Long idOfRequestESP, String filedata, String fullfileName) throws IOException
+    {
+        try {
+            StringBuilder tmp = new StringBuilder();
+            tmp.append(idOfRequestESP);
+            tmp.append(DELIMITER);
+            tmp.append(fullfileName);
+            String path = tmp.toString();
+            String filepath =
+                    System.getProperty("jboss.server.base.dir") + DELIMITER + FILES_DIRECTORY + DELIMITER + "ESP" + DELIMITER + path;
+            writeByteArraysToFile(filepath, decodeFromeBase64(filedata));
+            return path;
+        } catch (Exception e)
+        {
+            return "";
+        }
+    }
+
     public static String loadFile(Long idOfOrg, String fileName, String fileExt) {
         String path= formFilePath(idOfOrg, fileName, fileExt);
         byte[] fileData = null;
