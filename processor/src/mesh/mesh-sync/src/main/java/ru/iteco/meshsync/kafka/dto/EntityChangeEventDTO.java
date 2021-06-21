@@ -1,8 +1,8 @@
 package ru.iteco.meshsync.kafka.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ru.iteco.meshsync.ActionType;
-import ru.iteco.meshsync.EntityType;
+import ru.iteco.meshsync.enums.ActionType;
+import ru.iteco.meshsync.enums.EntityType;
 
 import java.util.List;
 

@@ -1,16 +1,19 @@
 package ru.iteco.meshsync.mesh.service.logic;
 
 import ru.iteco.client.ApiException;
+import ru.iteco.client.model.ModelClass;
 import ru.iteco.client.model.PersonCategory;
 import ru.iteco.client.model.PersonEducation;
 import ru.iteco.client.model.PersonInfo;
-import ru.iteco.meshsync.EntityType;
+import ru.iteco.meshsync.enums.EntityType;
 import ru.iteco.meshsync.error.EducationNotFoundException;
 import ru.iteco.meshsync.error.NoRequiredDataException;
 import ru.iteco.meshsync.error.UnknownActionTypeException;
 import ru.iteco.meshsync.mesh.service.DAO.CatalogService;
+import ru.iteco.meshsync.mesh.service.DAO.ClassService;
 import ru.iteco.meshsync.mesh.service.DAO.EntityChangesService;
 import ru.iteco.meshsync.mesh.service.DAO.ServiceJournalService;
+import ru.iteco.meshsync.models.ClassEntity;
 import ru.iteco.meshsync.models.EntityChanges;
 import ru.iteco.meshsync.models.Person;
 import ru.iteco.meshsync.repo.PersonRepo;
@@ -31,8 +34,9 @@ public class MeshService {
     private static final Logger log = LoggerFactory.getLogger(MeshService.class);
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     private static final List<String> INNER_OBJ_FOR_INIT = Arrays.asList(
-            EntityType.person_education.getApiField(),
-            EntityType.category.getApiField()
+            EntityType.PERSON_EDUCATION.getApiField(),
+            EntityType.CATEGORY.getApiField(),
+            EntityType.CLASS.getApiField()
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
 
@@ -41,17 +45,54 @@ public class MeshService {
     private final EntityChangesService entityChangesService;
     private final CatalogService catalogService;
     private final ServiceJournalService serviceJournalService;
+    private final ClassService classService;
 
     public MeshService(PersonRepo personRepo,
                        RestService restService,
                        EntityChangesService entityChangesService,
                        CatalogService catalogService,
-                       ServiceJournalService serviceJournalService){
+                       ServiceJournalService serviceJournalService,
+                       ClassService classService){
         this.personRepo = personRepo;
         this.restService = restService;
         this.entityChangesService = entityChangesService;
         this.catalogService = catalogService;
         this.serviceJournalService = serviceJournalService;
+        this.classService = classService;
+    }
+
+    @Transactional
+    public boolean processClassChanges(EntityChanges entityChanges) {
+        if(entityChanges == null){
+            log.warn("Get entityChanges param as NULL");
+            return false;
+        }
+        ClassEntity classEntity = classService.getById(Long.parseLong(entityChanges.getEntityId()));
+        try {
+            switch (entityChanges.getAction()) {
+                case create:
+                case update:
+                case merge:
+                    ModelClass modelClass = restService.getClassById(UUID.fromString(entityChanges.getUid()));
+                    if(modelClass == null){
+                        throw new NoRequiredDataException("MESH-REST return NULL");
+                    }
+                    classEntity = changeEntityClass(classEntity, modelClass);
+                    classService.save(classEntity);
+                    break;
+                case delete:
+                    if(classEntity != null){
+                        classService.remove(classEntity);
+                    }
+                    break;
+                default:
+                    throw new UnknownActionTypeException();
+            }
+        } catch (Exception e) {
+            log.error("Cant process ModelClass change", e);
+            return false;
+        }
+        return true;
     }
 
     @Transactional
@@ -166,6 +207,20 @@ public class MeshService {
         return !invalidData;
     }
 
+    private ClassEntity changeEntityClass(ClassEntity classEntity, ModelClass modelClass) {
+        if(classEntity == null){
+            classEntity = new ClassEntity();
+            classEntity.setId(modelClass.getId());
+            classEntity.setUid(modelClass.getUid().toString());
+        }
+        classEntity.setName(modelClass.getName());
+        classEntity.setOrganizationId(modelClass.getOrganizationId());
+        classEntity.setParallelId(modelClass.getParallelId());
+        classEntity.setEducationStageId(modelClass.getEducationStageId());
+
+        return classEntity;
+    }
+
     private Person changePerson(Person person, PersonInfo info, Boolean inSupportedOrg, PersonEducation actualEdu,
                                 boolean homeStudy, String lastGuid) throws Exception {
         if(person == null) {
@@ -186,6 +241,8 @@ public class MeshService {
         }
 
         if(!homeStudy) {
+            ClassEntity classEntity = classService.getOrCreate(actualEdu.getPropertyClass());
+            person.setClassEntity(classEntity);
             person.setClassName(actualEdu.getPropertyClass().getName());
             person.setParallelID(actualEdu.getPropertyClass().getParallelId());
             person.setEducationStageId(actualEdu.getPropertyClass().getEducationStageId());
