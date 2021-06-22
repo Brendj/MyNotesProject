@@ -73,23 +73,24 @@ public class OrderService {
         dto.setCancel(o.getState() == 1);
         dto.setIdOfOrder(o.getCompositeId().getIdOfOrder());
         dto.setSum(o.getRsum());
-        dto.setTime(o.getOrderDate());
+        dto.setTime(o.getCreatedDate());
 
         for(OrderDetail detail : o.getOrderDetailSet()){
             OrderDetailResponseDTO detailDTO = new OrderDetailResponseDTO();
             detailDTO.setAmount(detail.getQty());
             detailDTO.setIdOfOrderDetail(detail.getCompositeId().getIdOfOrderDetail());
 
-            if(OrderDetail.TYPE_COMPLEX_MIN <= detail.getMenuType() && detail.getMenuType() <= OrderDetail.TYPE_COMPLEX_MAX ){
+            if(OrderDetail.TYPE_COMPLEX_MIN <= detail.getMenuType() && detail.getMenuType() <= OrderDetail.TYPE_COMPLEX_MAX){
                 detailDTO.setComplexName(detail.getMenuDetailName());
                 detailDTO.setCurrentPrice(detail.getRprice() * detail.getQty());
                 detailDTO.setDiscountComplex(
-                        o.getOrderType().equals(Order.DISCOUNT_TYPE)
-                                || o.getOrderType().equals(Order.DISCOUNT_TYPE_RESERVE)
-                );
+                        o.getOrderType().equals(Order.DISCOUNT_TYPE) || o.getOrderType().equals(Order.DISCOUNT_TYPE_RESERVE));
                 if(detail.getRationType() != null) {
                     detailDTO.setGoodType(detail.getRationType().toString());
                 }
+                detailDTO.setIdOfComplex(detail.getIdOfComplex());
+                detailDTO.setComplexDetail(new LinkedList<>());
+                dto.getDetails().add(detailDTO);
             } else {
                 detailDTO.setName(detail.getMenuDetailName());
                 detailDTO.setPrice(detail.getRprice() * detail.getQty());
@@ -114,8 +115,16 @@ public class OrderService {
                         detailDTO.setCarbohydrates(menuDetail.getCarbohydrates());
                     }
                 }
+                if(detail.getIdOfComplex() != null) {
+                    OrderDetailResponseDTO complexDTO = dto.getDetails()
+                            .stream()
+                            .filter((c) -> detail.getIdOfComplex().equals(c.getIdOfComplex()))
+                            .findFirst().orElse(null);
+                    complexDTO.getComplexDetail().add(detailDTO);
+                } else {
+                    dto.getDetails().add(detailDTO);
+                }
             }
-            dto.getDetails().add(detailDTO);
         }
         return dto;
     }

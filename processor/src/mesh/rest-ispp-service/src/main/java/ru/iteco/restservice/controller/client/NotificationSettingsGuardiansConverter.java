@@ -6,7 +6,7 @@ package ru.iteco.restservice.controller.client;
 
 import ru.iteco.restservice.controller.base.BaseConverter;
 import ru.iteco.restservice.controller.client.responsedto.NotificationResponseDTO;
-import ru.iteco.restservice.model.ClientsNotificationSettings;
+import ru.iteco.restservice.model.ClientGuardianNotificationSettings;
 import ru.iteco.restservice.model.enums.ClientNotificationSettingType;
 
 import org.springframework.stereotype.Component;
@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class NotificationSettingsConverter extends BaseConverter<NotificationResponseDTO, ClientsNotificationSettings> {
+public class NotificationSettingsGuardiansConverter extends BaseConverter<NotificationResponseDTO, ClientGuardianNotificationSettings> {
 
     @Override
-    public NotificationResponseDTO toDTO(ClientsNotificationSettings item) {
+    public NotificationResponseDTO toDTO(ClientGuardianNotificationSettings item) {
         NotificationResponseDTO dto = new NotificationResponseDTO();
 
         dto.setSettingsCode(item.getType().getCode());
@@ -30,9 +30,9 @@ public class NotificationSettingsConverter extends BaseConverter<NotificationRes
     }
 
     @Override
-    public List<NotificationResponseDTO> toDTOs(Iterable<ClientsNotificationSettings> items) {
+    public List<NotificationResponseDTO> toDTOs(Iterable<ClientGuardianNotificationSettings> items) {
         List<NotificationResponseDTO> res = new LinkedList<>();
-        for(ClientsNotificationSettings s : items){
+        for(ClientGuardianNotificationSettings s : items){
             if(s.getType().equals(ClientNotificationSettingType.SMS_SETTING_CHANGED)){
                 continue;
             }
@@ -43,9 +43,9 @@ public class NotificationSettingsConverter extends BaseConverter<NotificationRes
     }
 
     @Override
-    public Set<NotificationResponseDTO> toDTOs(Set<ClientsNotificationSettings> items) {
+    public Set<NotificationResponseDTO> toDTOs(Set<ClientGuardianNotificationSettings> items) {
         Set<NotificationResponseDTO> res = new HashSet<>();
-        for(ClientsNotificationSettings s : items){
+        for(ClientGuardianNotificationSettings s : items){
             if(s.getType().equals(ClientNotificationSettingType.SMS_SETTING_CHANGED)){
                 continue;
             }

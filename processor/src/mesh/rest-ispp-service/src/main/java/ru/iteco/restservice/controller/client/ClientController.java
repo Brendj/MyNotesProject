@@ -11,7 +11,7 @@ import ru.iteco.restservice.controller.client.request.NotificationUpdateRequest;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
 import ru.iteco.restservice.controller.client.responsedto.NotificationResponseDTO;
 import ru.iteco.restservice.model.Client;
-import ru.iteco.restservice.model.ClientsNotificationSettings;
+import ru.iteco.restservice.model.ClientGuardianNotificationSettings;
 import ru.iteco.restservice.servise.ClientService;
 
 import org.slf4j.Logger;
@@ -34,14 +34,14 @@ public class ClientController {
 
     private final ClientService clientService;
     private final ClientConverter clientConverter;
-    private final NotificationSettingsConverter notificationSettingsConverter;
+    private final NotificationSettingsGuardiansConverter notificationSettingsGuardiansConverter;
 
     public ClientController(ClientService clientService,
             ClientConverter clientConverter,
-            NotificationSettingsConverter notificationSettingsConverter) {
+            NotificationSettingsGuardiansConverter notificationSettingsGuardiansConverter) {
         this.clientService = clientService;
         this.clientConverter = clientConverter;
-        this.notificationSettingsConverter = notificationSettingsConverter;
+        this.notificationSettingsGuardiansConverter = notificationSettingsGuardiansConverter;
     }
 
     @GetMapping("/getByGuardMobile")
@@ -51,7 +51,7 @@ public class ClientController {
             description = "Позволяет получить список детей по номеру телефона опекуна, если такой опекун присуствует в системе"
     )
     public List<ClientResponseDTO> getClientByGuardian(
-           @Parameter(description = "Номер телефона опекуна чере \"7\"", example = "79000000000")
+           @Parameter(description = "Номер телефона опекуна через \"7\"", example = "79000000000")
            @NotNull
            @RequestParam String guardPhone) {
         try {
@@ -91,9 +91,12 @@ public class ClientController {
     public List<NotificationResponseDTO> getNotifications(
             @NotNull @RequestParam
             @Parameter(description = "Номер лицевого счета клиента")
-            @PositiveOrZero Long contractId) {
-        List<ClientsNotificationSettings> settings = clientService.getNotificationSettingsByClients(contractId);
-        return notificationSettingsConverter.toDTOs(settings);
+            @PositiveOrZero Long contractId,
+            @NotNull @RequestParam
+            @Parameter(description = "Номер телефона представителя", example = "79000000000")
+            String guardPhone) {
+        List<ClientGuardianNotificationSettings> settings = clientService.getNotificationSettingsByClients(contractId, guardPhone);
+        return notificationSettingsGuardiansConverter.toDTOs(settings);
     }
 
     @PutMapping("/notifications")

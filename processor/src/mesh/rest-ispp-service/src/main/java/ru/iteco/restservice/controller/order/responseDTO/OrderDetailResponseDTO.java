@@ -4,9 +4,11 @@
 
 package ru.iteco.restservice.controller.order.responseDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.List;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -53,6 +55,27 @@ public class OrderDetailResponseDTO {
 
     @Schema(description = "Количество", example = "1")
     private Integer amount;
+
+    @JsonIgnore
+    private Long idOfComplex;
+
+    private List<OrderDetailResponseDTO> complexDetail;
+
+    public List<OrderDetailResponseDTO> getComplexDetail() {
+        return complexDetail;
+    }
+
+    public void setComplexDetail(List<OrderDetailResponseDTO> complexDetail) {
+        this.complexDetail = complexDetail;
+    }
+
+    public Long getIdOfComplex() {
+        return idOfComplex;
+    }
+
+    public void setIdOfComplex(Long idOfComplex) {
+        this.idOfComplex = idOfComplex;
+    }
 
     public String getComplexName() {
         return complexName;

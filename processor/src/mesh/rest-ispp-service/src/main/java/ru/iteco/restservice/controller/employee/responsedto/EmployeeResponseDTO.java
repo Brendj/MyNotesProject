@@ -56,11 +56,11 @@ public class EmployeeResponseDTO  extends BaseResponseDTO {
         this.address = address;
     }
 
-    public Boolean getInside() {
+    public Boolean getIsInside() {
         return isInside;
     }
 
-    public void setInside(Boolean inside) {
+    public void setIsInside(Boolean inside) {
         isInside = inside;
     }
 

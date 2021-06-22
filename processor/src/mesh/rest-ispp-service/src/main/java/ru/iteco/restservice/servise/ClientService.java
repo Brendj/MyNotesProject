@@ -11,7 +11,10 @@ import ru.iteco.restservice.db.repo.readonly.ClientGuardianNotificationSettingsR
 import ru.iteco.restservice.db.repo.readonly.ClientGuardianReadOnlyRepo;
 import ru.iteco.restservice.db.repo.readonly.ClientReadOnlyRepo;
 import ru.iteco.restservice.errors.NotFoundException;
-import ru.iteco.restservice.model.*;
+import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.ClientGuardian;
+import ru.iteco.restservice.model.ClientGuardianNotificationSettings;
+import ru.iteco.restservice.model.ClientRegistry;
 import ru.iteco.restservice.model.enums.ClientGroupAssignment;
 import ru.iteco.restservice.model.enums.ClientGuardianRelationType;
 import ru.iteco.restservice.model.enums.ClientGuardianRepresentType;
@@ -31,7 +34,6 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -115,15 +117,38 @@ public class ClientService {
     }
 
     @Transactional
-    public List<ClientsNotificationSettings> getNotificationSettingsByClients(@NotNull Long contractId) {
-        Client c = clientReadOnlyRepo.getClientByContractId(contractId)
-                .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));
-
-        if(c.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+    public List<ClientGuardianNotificationSettings> getNotificationSettingsByClients(@NotNull Long contractId,
+            @NotNull String guardPhone) {
+        if(!phonePattern.matcher(guardPhone).matches()){
+            throw new IllegalArgumentException("Номер телефона не соответствует паттерну");
+        }
+        Client child = clientReadOnlyRepo.getClientByContractId(contractId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Не найден клиент по л/с %d", contractId))
+                );
+        if(child.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
             throw new IllegalArgumentException("Клиент из предопределенной группы");
         }
 
-        return new LinkedList<>(c.getNotificationSettings());
+        List<Client> guardians = clientReadOnlyRepo.getGuardianByChild(child.getContractId(), guardPhone,
+                PageRequest.of(0,1));
+        if(CollectionUtils.isEmpty(guardians)){
+            throw new NotFoundException(String.format("У указанного клиента л/с %d не найдены представители по номеру %s",
+                    child.getContractId(), guardPhone));
+        }
+        Client guardian = guardians.get(0);
+        Long groupIdOfGuardian = guardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
+        if(ClientGroupAssignment.CLIENT_PARENTS.getId() > groupIdOfGuardian
+                && groupIdOfGuardian > ClientGroupAssignment.CLIENT_VISITORS.getId() -1L){
+            throw new IllegalArgumentException("Указанный представитель не пренадлежит группе \"Родители\"");
+        }
+
+        ClientGuardian clientGuardianRelations = guardianReadOnlyRepo
+                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian)
+                .orElseThrow(() -> new NotFoundException("Не найдена активная связь между клиентом и представителем"));
+
+        return guardianNotificationSettingsReadonlyRepo
+                .getClientGuardianNotificationSettingsByClientGuardian(clientGuardianRelations);
     }
 
     @Transactional

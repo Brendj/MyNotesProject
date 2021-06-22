@@ -10,7 +10,11 @@ import ru.iteco.restservice.model.enums.ClientNotificationSettingType;
 
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface ClientGuardianNotificationSettingsReadonlyRepo extends CrudRepository<ClientGuardianNotificationSettings, Long> {
     ClientGuardianNotificationSettings getClientGuardianNotificationSettingsByClientGuardianAndType(ClientGuardian clientGuardian,
             ClientNotificationSettingType type);
+
+    List<ClientGuardianNotificationSettings> getClientGuardianNotificationSettingsByClientGuardian(ClientGuardian clientGuardian);
 }

@@ -42,6 +42,9 @@ public class OrderDetail {
     @Column(name = "menuoutput")
     private String menuOutput;
 
+    @Column(name = "idofcomplex")
+    private Long idOfComplex;
+
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name="idoforder", insertable = false, updatable = false),
@@ -59,6 +62,14 @@ public class OrderDetail {
 
     public void setIdOfMenuFromSync(Long idOfMenuFromSync) {
         this.idOfMenuFromSync = idOfMenuFromSync;
+    }
+
+    public Long getIdOfComplex() {
+        return idOfComplex;
+    }
+
+    public void setIdOfComplex(Long idOfComplex) {
+        this.idOfComplex = idOfComplex;
     }
 
     public WtDish getDish() {

@@ -19,7 +19,7 @@ public interface ProhibitionMenuReadOnlyRepo extends JpaRepository<ProhibitionMe
 
     @Query("select distinct pm from ProhibitionMenu pm "
          + "join pm.categoryItem i "
-         + "where pm.client = :client and i.wtCategory = :category")
+         + "where pm.client = :client and i.wtCategory = :category and pm.deletedState = false")
     List<ProhibitionMenu> findProhibitionWithCategoryItemsByClientAndCategory(@Param("client") Client client,
             @Param("category") WtCategory category);
 
@@ -33,7 +33,7 @@ public interface ProhibitionMenuReadOnlyRepo extends JpaRepository<ProhibitionMe
     @Query("select distinct pm from ProhibitionMenu pm "
             + "join pm.dish pmd "
             + "join pmd.categoryItems ci "
-            + "where pm.client = :client and ci = :categoryItem ")
+            + "where pm.client = :client and ci = :categoryItem and pm.deletedState = false")
     List<ProhibitionMenu> findProhibitionWithDishByClientAndCategoryItem(@Param("client") Client client,
             @Param("categoryItem") WtCategoryItem categoryItem);
 
