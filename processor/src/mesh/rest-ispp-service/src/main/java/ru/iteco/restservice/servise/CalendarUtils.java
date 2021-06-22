@@ -46,7 +46,7 @@ public class CalendarUtils {
     }
 
     public static Date getDateFromLong(Long value) {
-        return new Date(value);
+        return CalendarUtils.startOfDayInUTC(new Date(value));
     }
 
     public static Date addDays(Date date, int nDays) {

@@ -51,7 +51,7 @@ public interface PreorderMenuDetailReadOnlyRepo extends CrudRepository<PreorderM
 
     @Query(value = "select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd where pmd.preorderComplex = :preorderComplex "
             + "and pmd.client = :client and pmd.preorderDate = :preorderDate and pmd.idOfDish = :idOfDish and pmd.deletedState = 0")
-    List<PreorderMenuDetail> getPreorderMenuDetailsList(@Param("preorderComplex") PreorderComplex preorderComplex,
+    List<Long> getPreorderMenuDetailsList(@Param("preorderComplex") PreorderComplex preorderComplex,
                                                         @Param("client") Client client,
                                                         @Param("preorderDate") Date preorderDate,
                                                         @Param("idOfDish") Long idOfDish);

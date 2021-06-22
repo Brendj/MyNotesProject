@@ -136,8 +136,7 @@ public class PreorderComplex {
         this.modeOfAdd = wtComplex.getComposite() ? COMPLEX_TYPE4 : COMPLEX_TYPE2;
     }
 
-    public void editAmount(String guardianMobile, Integer amount, Long version) {
-        this.mobile = guardianMobile;
+    public void editAmount(Integer amount, Long version) {
         this.amount = amount;
         this.lastUpdate = new Date();
         this.version = version;

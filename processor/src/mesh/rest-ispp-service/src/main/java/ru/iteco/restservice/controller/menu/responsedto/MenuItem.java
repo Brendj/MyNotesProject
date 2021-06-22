@@ -16,6 +16,9 @@ public class MenuItem {
     @Schema(description = "Название блюда")
     private String dishName;
 
+    @Schema(description = "Состав блюда")
+    private String dishContent;
+
     @Schema(description = "Список подкатегорий блюда")
     private final List<SubCategoryItem> subcategories;
 
@@ -43,6 +46,7 @@ public class MenuItem {
     public MenuItem(WtDish wtDish, List<ProhibitionMenu> prohibitions) {
         this.dishId = wtDish.getIdOfDish();
         this.dishName = wtDish.getDishName();
+        this.dishContent = wtDish.getComponentsOfDish();
         this.price = wtDish.getPrice().longValue();
         this.calories = wtDish.getCalories();
         this.output = wtDish.getQty() == null ? "" : wtDish.getQty();
@@ -140,5 +144,13 @@ public class MenuItem {
 
     public void setProhibitionId(Long prohibitionId) {
         this.prohibitionId = prohibitionId;
+    }
+
+    public String getDishContent() {
+        return dishContent;
+    }
+
+    public void setDishContent(String dishContent) {
+        this.dishContent = dishContent;
     }
 }

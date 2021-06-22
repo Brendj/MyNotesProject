@@ -121,7 +121,7 @@ public class PreorderService {
         if (!regularPreorderRequest.enoughDataForDelete()) throw new IllegalArgumentException("Не заполнены обязательные параметры");
     }
 
-    public PreorderComplex editPreorder(Long preorderId, Long contractId, String guardianMobile, Integer amount) throws Exception {
+    public PreorderComplex editPreorder(Long preorderId, Long contractId, Integer amount) throws Exception {
         PreorderComplex preorderComplex = pcRepo.findById(preorderId)
                 .orElseThrow(() -> new NotFoundException("Предзаказ с указанным идентификатором не найден"));
         Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
@@ -132,7 +132,7 @@ public class PreorderService {
         if (!isEditedDay(preorderComplex.getPreorderDate(), client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
 
         long nextVersion = pcRepo.getMaxVersion() + 1;
-        preorderDAO.editPreorder(preorderComplex, guardianMobile, amount, nextVersion);
+        preorderDAO.editPreorder(preorderComplex, amount, nextVersion);
         return preorderComplex;
     }
 
@@ -160,7 +160,7 @@ public class PreorderService {
     }
 
     public PreorderMenuDetail editPreorderMenuDetail(Long preorderDishId, Long contractId,
-                                                     String guardianMobile, Integer amount) throws Exception {
+                                                     Integer amount) throws Exception {
         PreorderMenuDetail preorderMenuDetail = pmdRepo.findById(preorderDishId)
                 .orElseThrow(() -> new NotFoundException("Предзаказ на блюдо с указанным идентификатором не найден"));
         Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
@@ -171,7 +171,7 @@ public class PreorderService {
         if (!isEditedDay(preorderMenuDetail.getPreorderDate(), client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
 
         long nextVersion = pcRepo.getMaxVersion() + 1;
-        return preorderDAO.editPreorderMenuDetail(preorderMenuDetail, guardianMobile, amount, nextVersion);
+        return preorderDAO.editPreorderMenuDetail(preorderMenuDetail, amount, nextVersion);
     }
 
     public PreorderMenuDetail deletePreorderMenuDetail(Long preorderDishId, Long contractId, String guardianMobile) throws Exception {

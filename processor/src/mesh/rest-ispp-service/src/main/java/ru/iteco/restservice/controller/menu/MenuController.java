@@ -112,7 +112,6 @@ public class MenuController {
             preorderService.checkEditParameters(preorderComplexRequest);
             PreorderComplex pc = preorderService.editPreorder(preorderComplexRequest.getPreorderId(),
                     preorderComplexRequest.getContractId(),
-                    preorderComplexRequest.getGuardianMobile(),
                     preorderComplexRequest.getAmount());
             return PreorderComplexDTO.build(pc);
         } catch (Exception e) {
@@ -168,7 +167,6 @@ public class MenuController {
             preorderService.checkDishEditParameters(preorderDishRequest);
             PreorderMenuDetail pmd = preorderService.editPreorderMenuDetail(preorderDishRequest.getPreorderDishId(),
                     preorderDishRequest.getContractId(),
-                    preorderDishRequest.getGuardianMobile(),
                     preorderDishRequest.getAmount());
             return PreorderMenuDetailDTO.build(pmd);
         } catch (Exception e) {

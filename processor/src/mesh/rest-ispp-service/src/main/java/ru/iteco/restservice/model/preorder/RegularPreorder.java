@@ -130,6 +130,7 @@ public class RegularPreorder {
         this.mobile = guardianMobile;
         this.state = state;
         this.mobileGroupOnCreate = mobileGroupOnCreate;
+        this.idOfDish = idOfDish;
     }
 
     public static Date convertDate(Long date) {

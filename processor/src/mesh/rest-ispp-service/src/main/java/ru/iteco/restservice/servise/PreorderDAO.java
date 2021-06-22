@@ -85,8 +85,8 @@ public class PreorderDAO {
     }
 
     @Transactional
-    public void editPreorder(PreorderComplex preorderComplex, String guardianMobile, Integer amount, long version) {
-        preorderComplex.editAmount(guardianMobile, amount, version);
+    public void editPreorder(PreorderComplex preorderComplex, Integer amount, long version) {
+        preorderComplex.editAmount(amount, version);
         entityManager.merge(preorderComplex);
     }
 
@@ -126,7 +126,7 @@ public class PreorderDAO {
     }
 
     @Transactional
-    public PreorderMenuDetail editPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail, String guardianMobile, Integer amount, long version) {
+    public PreorderMenuDetail editPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail, Integer amount, long version) {
         PreorderComplex preorderComplex = pcRepo.findById(preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex())
                 .orElseThrow(() -> new NotFoundException(String.format("Не найдено предзаказ с идентификатором %s",
                         preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex())));;
@@ -209,7 +209,7 @@ public class PreorderDAO {
         List<ProductionCalendar> productionCalendar = productionCalendarRepo.findByDayBetween(new Date(), dateTo);
         Date dateFrom = getStartDateForGeneratePreordersInternal(regularPreorder.getClient(), productionCalendar, specialDates);
         long nextVersion = pcRepo.getMaxVersion() + 1;
-        Query delQuery = entityManager.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, state = :state, version = :version "
+        Query delQuery = entityManager.createQuery("update PreorderComplex set deletedState = 1, lastUpdate = :lastUpdate, amount = 0, state = :state, version = :version "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
         delQuery.setParameter("lastUpdate", new Date());
         delQuery.setParameter("regularPreorder", regularPreorder);
@@ -218,7 +218,7 @@ public class PreorderDAO {
         delQuery.setParameter("version", nextVersion);
         delQuery.executeUpdate();
 
-        delQuery = entityManager.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0, state = :state "
+        delQuery = entityManager.createQuery("update PreorderMenuDetail set deletedState = 1, amount = 0, state = :state "
                 //+ "where preorderComplex.idOfPreorderComplex in (select idOfPreorderComplex from PreorderComplex "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
         delQuery.setParameter("regularPreorder", regularPreorder);
@@ -351,6 +351,10 @@ public class PreorderDAO {
                         nextVersion, regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
                 preorderComplex.setRegularPreorder(regularPreorder);
                 entityManager.persist(preorderComplex);
+            } else if (preorderComplex != null
+                    && doEditRegular(preorderComplex, regularPreorder.getAmount())
+                    && !isMenuDetailPreorder(regularPreorder)) {
+                editPreorder(preorderComplex, regularPreorder.getAmount(), nextVersion);
             } else if (!isMenuDetailPreorder(regularPreorder)) {
                 logger.info("Preorder complex exists or deleted by user");
                 currentDate = CalendarUtils.addDays(currentDate, 1);
@@ -391,12 +395,22 @@ public class PreorderDAO {
                                 regularPreorder.getMobileGroupOnCreate());
                         preorderMenuDetail.setRegularPreorder(regularPreorder);
                         entityManager.persist(preorderMenuDetail);
+
+                        Set<PreorderMenuDetail> set = createPreorderWtMenuDetails(wtDishes, regularPreorder,
+                                currentDate, preorderComplex, wtDish);
+                        if (set.size() > 0) {
+                            preorderComplex.setPreorderMenuDetails(set);
+                            preorderComplex.setVersion(nextVersion);
+                        }
+                        entityManager.merge(preorderComplex);
                     }
                 } else if (preorderMenuDetail != null) {
-                    if (preorderMenuDetail.getAmount() == 0) {
+                    if (preorderMenuDetail.getAmount() != regularPreorder.getAmount()) {
                         preorderMenuDetail.setAmount(regularPreorder.getAmount());
                         preorderMenuDetail.setRegularPreorder(regularPreorder);
                         entityManager.merge(preorderMenuDetail);
+                        preorderComplex.updateWithVersion(nextVersion);
+                        entityManager.merge(preorderComplex);
                     } else {
                         currentDate = CalendarUtils.addDays(currentDate, 1);
                         continue;
@@ -404,13 +418,6 @@ public class PreorderDAO {
                 }
             }
 
-            Set<PreorderMenuDetail> set = createPreorderWtMenuDetails(wtDishes, regularPreorder,
-                        currentDate, preorderComplex);
-            if (set.size() > 0) {
-                preorderComplex.setPreorderMenuDetails(set);
-                preorderComplex.setVersion(nextVersion);
-            }
-            entityManager.merge(preorderComplex);
             currentDate = CalendarUtils.addDays(currentDate, 1);
 
         }
@@ -426,9 +433,10 @@ public class PreorderDAO {
     }
 
     private Set<PreorderMenuDetail> createPreorderWtMenuDetails(List<WtDish> list, RegularPreorder regularPreorder, Date date,
-                                                                PreorderComplex preorderComplex) throws Exception {
+                                                                PreorderComplex preorderComplex, WtDish wtDish) throws Exception {
         Set<PreorderMenuDetail> result = new HashSet<>();
         for (WtDish dish : list) {
+            if (dish.equals(wtDish)) continue;
             if (!preorderWtMenuDetailExists(preorderComplex, regularPreorder.getClient(), date, dish.getIdOfDish())) {
                 PreorderMenuDetail pmd = createPreorderWtMenuDetail(regularPreorder.getClient(), preorderComplex, dish, date, 0,
                         regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
@@ -440,7 +448,7 @@ public class PreorderDAO {
     }
 
     private boolean preorderWtMenuDetailExists(PreorderComplex preorderComplex, Client client, Date date, Long idOfDish) {
-        return pmdRepo.getPreorderMenuDetailsList(preorderComplex, client, date, idOfDish).size() > 0;
+        return (pmdRepo.getPreorderMenuDetailsList(preorderComplex, client, date, idOfDish).size() > 0);
     }
 
     private PreorderMenuDetail createPreorderWtMenuDetail(Client client, PreorderComplex preorderComplex,
@@ -490,6 +498,10 @@ public class PreorderDAO {
                 !(preorderComplex.getState().equals(PreorderState.OK)
                         || preorderComplex.getState().equals(PreorderState.CHANGE_ORG)
                         || preorderComplex.getState().equals(PreorderState.PREORDER_OFF));
+    }
+
+    private boolean doEditRegular(PreorderComplex preorderComplex, Integer regularAmount) {
+        return preorderComplex.getDeletedState().equals(0) && preorderComplex.getAmount() != regularAmount;
     }
 
     private boolean doGenerate(Date date, RegularPreorder regularPreorder) {
