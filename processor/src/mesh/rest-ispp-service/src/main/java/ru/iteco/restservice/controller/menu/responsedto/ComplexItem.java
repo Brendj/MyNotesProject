@@ -44,20 +44,32 @@ public class ComplexItem {
         preorderInfo.setPreorderId(data == null ? null : data.getIdOfPreorderComplex());
         this.setPreorderInfo(preorderInfo);
         this.fRation = wtComplex.getWtDietType().getIdOfDietType().intValue();
-        RegularPreorder regularPreorder = getRegularByComplexId(regulars, wtComplex.getIdOfComplex());
+        RegularPreorder regularPreorder = findProperRegularOnComplex(regulars, wtComplex.getIdOfComplex());
         if (regularPreorder != null && regularPreorder.getIdOfDish() == null) {
             this.setRegularInfo(RegularPreorderDTO.build(regularPreorder));
         }
         this.menuItems = new ArrayList<>();
         for (WtDish wtDish : dishes) {
-            DishItem item = new DishItem(wtDish, data, regularPreorder);
+            RegularPreorder regularPreorder2 = findProperRegularOnDish(regulars, wtComplex.getIdOfComplex(), wtDish.getIdOfDish());
+            DishItem item = new DishItem(wtDish, data, regularPreorder2);
             menuItems.add(item);
         }
     }
 
-    private RegularPreorder getRegularByComplexId(List<RegularPreorder> regulars, Long complexId) {
+    private RegularPreorder findProperRegularOnComplex(List<RegularPreorder> regulars, Long complexId) {
         for (RegularPreorder regularPreorder : regulars) {
-            if (complexId.equals(regularPreorder.getIdOfComplex().longValue())) {
+            if (complexId.equals(regularPreorder.getIdOfComplex().longValue()) && regularPreorder.getIdOfDish() == null) {
+                return regularPreorder;
+            }
+        }
+        return null;
+    }
+
+    private RegularPreorder findProperRegularOnDish(List<RegularPreorder> regulars, Long complexId, Long dishId) {
+        for (RegularPreorder regularPreorder : regulars) {
+            if (complexId.equals(regularPreorder.getIdOfComplex().longValue())
+                    && regularPreorder.getIdOfDish() != null
+                    && regularPreorder.getIdOfDish().equals(dishId)) {
                 return regularPreorder;
             }
         }
