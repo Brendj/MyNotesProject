@@ -109,11 +109,11 @@ public class ClassEntity implements Auditable {
         ClassEntity that = (ClassEntity) o;
         return Objects.equals(id, that.id) && Objects.equals(uid, that.uid) && Objects
                 .equals(organizationId, that.organizationId) && Objects.equals(name, that.name) && Objects
-                .equals(audit, that.audit);
+                .equals(parallelId, that.parallelId) && Objects.equals(educationStageId, that.educationStageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, uid, organizationId, name, audit);
+        return Objects.hash(id, uid, organizationId, name, parallelId, educationStageId);
     }
 }

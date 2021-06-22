@@ -35,8 +35,7 @@ public class MeshService {
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     private static final List<String> INNER_OBJ_FOR_INIT = Arrays.asList(
             EntityType.PERSON_EDUCATION.getApiField(),
-            EntityType.CATEGORY.getApiField(),
-            EntityType.CLASS.getApiField()
+            EntityType.CATEGORY.getApiField()
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
 
