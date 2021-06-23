@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -117,8 +117,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -9084,6 +9084,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             String guid = client.getClientGUID();
+            String meshGuid = client.getMeshGUID();
+            if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(meshGuid)) {
+                return new MuseumEnterInfo(RC_CLIENT_GUID_NOT_FOUND, RC_CLIENT_GUID_NOT_FOUND_DESC);
+            }
             Date currentDate = new Date();
             boolean clientPredefined = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
                     >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
@@ -9091,11 +9095,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     <= ClientGroup.Predefined.CLIENT_DELETED.getValue();
             if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
                     && card.getValidTime().after(currentDate) && !clientPredefined) {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 0L, "Карта активна");
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 0L, "Карта активна");
             } else if (!clientPredefined) {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 2L, "Карта не активна");
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 2L, "Карта не активна");
             } else {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 1L,
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 1L,
                         "Карта принадлежит другой группе держателей «Москвенка»");
             }
         } catch (Exception e) {
