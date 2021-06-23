@@ -506,7 +506,8 @@ public interface ClientRoomController {
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus);
 
-    @WebMethod Result enterCulture(@XmlElement(required=true)@WebParam(name = "guid") String guid,
+    @WebMethod Result enterCulture(@WebParam(name = "guid") String guid,
+            @WebParam(name = "mesId") String mesId,
             @XmlElement(required=true)@WebParam(name = "orgCode") String orgCode,
             @XmlElement(required=true)@WebParam(name = "CultureName") String CultureName,
             @XmlElement(required=true)@WebParam(name = "CultureShortName") String CultureShortName,

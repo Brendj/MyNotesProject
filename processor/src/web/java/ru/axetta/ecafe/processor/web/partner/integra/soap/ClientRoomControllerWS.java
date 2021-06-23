@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -117,8 +117,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -9244,15 +9244,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "orgCode") String orgCode,
             @WebParam(name = "CultureName") String cultureName,
             @WebParam(name = "CultureShortName") String cultureShortName,
             @WebParam(name = "CultureAddress") String cultureAddress, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
-        if (StringUtils.isEmpty(guid)) {
+        if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(mesId)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+
+        if (!StringUtils.isEmpty(guid) && !StringUtils.isEmpty(mesId)) {
+            return new Result(RC_INVALID_DATA, "В запросе должен быть указан только один идентификатор - guid или mesId");
         }
 
         if (StringUtils.isEmpty(orgCode)) {
@@ -9284,7 +9289,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, guid);
+            Client cl = null;
+            if (!StringUtils.isEmpty(guid)) {
+                cl = DAOUtils.findClientByGuid(session, guid);
+            }
+            if (!StringUtils.isEmpty(mesId)) {
+                cl = DAOUtils.findClientByMeshGuid(session, mesId);
+            }
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
