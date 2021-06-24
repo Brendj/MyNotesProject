@@ -1605,6 +1605,9 @@
         <rich:panelMenuItem id="helpdeskMenuItem" binding="#{helpdeskReportPage.mainMenuComponent}"
                             label="Заявки в службу помощи" action="#{helpdeskReportPage.show}"
                             reRender="workspaceForm" />
+        <rich:panelMenuItem id="helpdeskESP" binding="#{mainPage.espHelpdeskReportPage.mainMenuComponent}"
+                            label="Заявки в единую службу помощи" action="#{mainPage.showESPHelpDeskReportPage}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
