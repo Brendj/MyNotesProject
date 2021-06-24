@@ -68,16 +68,18 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              to_char(p.birthdate, 'DD.MM.YYYY') AS birthdate,\n"
                     + "              g.title AS gender,\n"
                     + "              prll.title AS parallel,\n"
-                    + "              p.classname AS group,\n"
+                    + "              case when cl.id is not null then cl.name\n"
+                    + "                  else p.classname end AS group,\n"
                     + "              p.deletestate AS deleted,\n"
                     + "              el.title AS ageTypeGroup,\n"
                     + "              o.organizationidfromnsi,\n"
                     + "              p.personguid\n"
                     + "       FROM cf_mh_persons AS p\n"
                     + "                   JOIN cf_orgs AS o ON p.organizationid = o.organizationIdFromNSI\n"
-                    + "                   LEFT JOIN cf_kf_ct_educationlevel AS el ON p.educationstageid = el.id\n"
+                    + "                   LEFT JOIN cf_mh_classes cl ON p.idofclass = cl.id\n"
+                    + "                   LEFT JOIN cf_kf_ct_educationlevel AS el ON cl.educationstageid = el.id\n"
                     + "                   LEFT JOIN cf_kf_ct_gender AS g ON p.genderid = g.id\n"
-                    + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON p.parallelid = prll.id\n"
+                    + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON cl.parallelid = prll.id\n"
                     + "  WHERE p.invaliddata IS FALSE and o.organizationidfromnsi IN :guids";
         }
     }
