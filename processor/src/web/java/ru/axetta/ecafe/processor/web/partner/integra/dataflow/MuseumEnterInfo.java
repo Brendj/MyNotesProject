@@ -60,7 +60,7 @@ public class MuseumEnterInfo extends Result {
         return mesId;
     }
 
-    public void setMeshId(String mesId) {
+    public void setMesId(String mesId) {
         this.mesId = mesId;
     }
 }
