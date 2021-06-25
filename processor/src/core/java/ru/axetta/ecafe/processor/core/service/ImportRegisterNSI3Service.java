@@ -39,6 +39,9 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
         if (orgGuids.getOrgNSIIds().size() == 0) {
             return "У организации не задан НСИ-3 Id";
         }
+        if (orgGuids.getOrgNSIIds().size() > 1) {
+            return "У организации заданы несколько разных НСИ-3 Id: " + orgGuids.getNsiInfo();
+        }
         Boolean guidOK;
         Session session = null;
         Transaction transaction = null;
