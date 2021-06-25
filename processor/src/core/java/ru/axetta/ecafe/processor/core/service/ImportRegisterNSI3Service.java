@@ -17,7 +17,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by i.semenov on 14.01.2020.
@@ -34,13 +36,27 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
         query.setParameterList("guids", orgGuids.getOrgNSIIds());
     }
 
+    private String extractDifferentOrgInfo(String info) {
+        String[] arr = info.split(",");
+        Set<String> set = new HashSet<>();
+        for (String str : arr) {
+            set.add(str.trim());
+        }
+        String result = "";
+        for (String str : set) {
+            String[] arr2 = str.split(":");
+            result += "Школа №" + arr2[0] + ": НСИ-3 ид " + arr2[1] + ", ";
+        }
+        return result.substring(0, result.length()-2);
+    }
+
     public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> list = new ArrayList<String>();
         if (orgGuids.getOrgNSIIds().size() == 0) {
             return "У организации не задан НСИ-3 Id";
         }
         if (orgGuids.getOrgNSIIds().size() > 1) {
-            return "У организации заданы несколько разных НСИ-3 Id: " + orgGuids.getNsiInfo();
+            return "У организации заданы несколько разных НСИ-3 Id: " + extractDifferentOrgInfo(orgGuids.getNsiInfo());
         }
         Boolean guidOK;
         Session session = null;
