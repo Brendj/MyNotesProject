@@ -51,8 +51,9 @@ public class ClientConverter extends BaseConverter<ClientResponseDTO, Client> {
         String categoryDiscount = StringUtils.join(discountsName, ",");
 
         Boolean preorderAllowed =
-                c.getPreorderFlag() != null && c.getPreorderFlag().getAllowedPreorder() != null && c.getPreorderFlag().getAllowedPreorder().equals(1);
-        Long limit = c.getLimits();
+                c.getPreorderFlag() != null && c.getPreorderFlag().getAllowedPreorder() != null
+                        && c.getPreorderFlag().getAllowedPreorder().equals(1);
+        Long limit = c.getExpenditureLimit();
 
         return new ClientResponseDTO(contractId, balance, firstName, lastname, middleName, grade, orgName, orgType,
                 address, isInside, meshGUID, specialMenu, gender, categoryDiscount, preorderAllowed, limit);
