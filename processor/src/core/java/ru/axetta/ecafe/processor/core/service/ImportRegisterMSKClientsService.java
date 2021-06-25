@@ -550,7 +550,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                 }
                 try {
-                    if (cl != null && !cl.getOrg().getOrgIdFromNsi().equals(pupil.orgId) && !crossFound) {
+                    if (cl != null && (cl.getOrg().getOrgIdFromNsi() == null || !cl.getOrg().getOrgIdFromNsi().equals(pupil.orgId)) && !crossFound) {
                         log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
                                 cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " + emptyIfNull(
                                 cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " + emptyIfNull(
