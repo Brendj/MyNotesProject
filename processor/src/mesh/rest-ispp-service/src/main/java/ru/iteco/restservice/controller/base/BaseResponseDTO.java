@@ -30,8 +30,8 @@ public abstract class BaseResponseDTO implements Serializable {
     @Schema(description = "Название организации, к которой привязан клиент", example = "ГБОУ СОШ № 1367 (13)")
     private String orgName;
 
-    public BaseResponseDTO(Long contractId, String firstName, String middleName, String lastname, String grade
-            , String orgType, String orgName) {
+    public BaseResponseDTO(Long contractId, String firstName, String middleName, String lastname, String grade,
+            String orgType, String orgName) {
         this.contractId = contractId;
         this.firstName = firstName;
         this.middleName = middleName;

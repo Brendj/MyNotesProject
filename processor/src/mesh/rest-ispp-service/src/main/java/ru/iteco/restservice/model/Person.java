@@ -21,10 +21,10 @@ public class Person {
     @Column(name = "firstname")
     private String firstName;
 
-    @Column(name = "surname")
+    @Column(name = "secondname")
     private String middleName;
 
-    @Column(name = "secondname")
+    @Column(name = "surname")
     private String lastName;
 
     public Person() {
