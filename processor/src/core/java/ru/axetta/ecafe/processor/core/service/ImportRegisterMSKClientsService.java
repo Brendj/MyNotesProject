@@ -1207,7 +1207,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             for (Org o : orgs) {
                 if (o.getOrgIdFromNsi() == null) continue;
                 if (nsiInfo.length() > 0) nsiInfo += ", ";
-                nsiInfo += o.getOrgNumberInName() + ": " + o.getOrgIdFromNsi().toString();
+                nsiInfo += o.getIdOfOrg() + ": " + o.getOrgIdFromNsi().toString();
                 orgNSIIds.add(o.getOrgIdFromNsi().toString());
                 orgNSIIdsLong.add(o.getOrgIdFromNsi());
             }

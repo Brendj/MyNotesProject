@@ -45,7 +45,7 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
         String result = "";
         for (String str : set) {
             String[] arr2 = str.split(":");
-            result += "Школа №" + arr2[0] + ": НСИ-3 ид " + arr2[1] + ", ";
+            result += "Ид. ОО " + arr2[0] + ": НСИ-3 ид " + arr2[1] + ", ";
         }
         return result.substring(0, result.length()-2);
     }
