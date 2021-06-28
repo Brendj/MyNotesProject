@@ -97,8 +97,8 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.shortAddress = org.getShortAddress();
         this.type = org.getType().getShortType();
         this.status = Org.STATE_NAMES[org.getState()];
-        this.organizationStatus = org.getStatus().toString();
-        this.statusDetailing = org.getStatusDetailing();
+        this.organizationStatus = StringUtils.substringBefore(org.getStatusDetailing(), "/");
+        this.statusDetailing = StringUtils.substringAfter(org.getStatusDetailing(), "/");
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
 
         this.GUID = org.getGuid();
