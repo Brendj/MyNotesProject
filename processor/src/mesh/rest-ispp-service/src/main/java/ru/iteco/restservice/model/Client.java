@@ -109,8 +109,8 @@ import java.util.Set;
                 resultSetMapping = "guardResponse",
                 query = "SELECT guardian.contractId AS \"contractId\",\n"
                         + "       cp.firstname AS \"firstName\",\n"
-                        + "       cp.secondname AS \"lastName\",\n"
-                        + "       cp.surname AS \"middleName\",\n"
+                        + "       cp.surname AS \"lastName\",\n"
+                        + "       cp.secondname AS \"middleName\",\n"
                         + "       cc.groupname AS \"grade\",\n"
                         + "       co.shortnameinfoservice AS \"orgName\",\n"
                         + "       CASE\n"
