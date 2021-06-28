@@ -5,11 +5,9 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.Class;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.MeshSyncPerson;
-import ru.axetta.ecafe.processor.core.persistence.MeshTrainingForm;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -172,8 +170,25 @@ public class MeshPersonsSyncService {
                 logger.info("Not found NSI guid for person with mesh guid " + personguid);
             }
 
+            MeshClass meshClass = null;
+            if(education.getClass_() != null){
+                Class class_ = education.getClass_();
+                meshClass = (MeshClass) session.get(MeshClass.class, class_.getId().longValue());
+                if(meshClass == null){
+                    meshClass = new MeshClass(class_.getId(), classuid);
+                }
+                meshClass.setLastUpdate(new Date());
+                meshClass.setName(classname);
+                meshClass.setParallelId(parallelid);
+                meshClass.setEducationStageId(educationstageid);
+                meshClass.setOrganizationId(organizationid);
+                session.saveOrUpdate(meshClass);
+            }
+
             MeshSyncPerson meshSyncPerson = (MeshSyncPerson)session.get(MeshSyncPerson.class, personguid);
-            if (meshSyncPerson == null) meshSyncPerson = new MeshSyncPerson(personguid);
+            if (meshSyncPerson == null){
+                meshSyncPerson = new MeshSyncPerson(personguid);
+            }
             meshSyncPerson.setBirthdate(birthdate);
             meshSyncPerson.setClassname(classname);
             meshSyncPerson.setClassuid(classuid);
@@ -188,6 +203,7 @@ public class MeshPersonsSyncService {
             meshSyncPerson.setLastupdateRest(new Date());
             meshSyncPerson.setDeletestate(deleted);
             meshSyncPerson.setInvaliddata(false);
+            meshSyncPerson.setMeshClass(meshClass);
             session.saveOrUpdate(meshSyncPerson);
         } catch (Exception e) {
             logger.error(String.format("Error in process Mesh person with guid %s: ", personguid), e);
