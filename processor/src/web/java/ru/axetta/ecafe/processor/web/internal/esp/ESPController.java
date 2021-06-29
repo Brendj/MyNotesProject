@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.esp.service.ESPrequestsService;
 import ru.axetta.ecafe.processor.web.internal.esp.service.InfoESPresponse;
 import ru.axetta.ecafe.processor.web.internal.esp.service.NewESPresponse;
+import ru.axetta.ecafe.processor.web.internal.esp.service.SendFileESPresponse;
 import ru.axetta.ecafe.processor.web.partner.library.ResponseCodes;
 import ru.axetta.ecafe.processor.web.partner.library.Result;
 
@@ -129,7 +130,7 @@ public class ESPController {
                 //Если обращение успешно создано
                 esp.setNumberrequest(newESPresponse.getId());
                 InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(newESPresponse.getId());
-                esp.setCloseddate();
+                //esp.setCloseddate();
                 persistenceSession.save(esp);
             }
 
@@ -236,26 +237,16 @@ public class ESPController {
         logger.debug( "FILE::" + file.exists() ); // IT IS NOT NULL
         try
         {
-            PostMethod filePost = new PostMethod( "https://edutools.mos.ru/fos/attach/" );
+            ESPrequestsService esPrequestsService = new ESPrequestsService();
+            SendFileESPresponse sendFileESPresponse = esPrequestsService.sendFileForESPRequest(file);
+            System.out.println("ewtw");
 
-            Part[] parts = {new FilePart( "file", file )};
-            filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
-
-            // DEBUG
-            int response = httpclient.executeMethod( filePost );
-            logger.info( "Response : "+response );
-            logger.info( filePost.getResponseBodyAsString());
         }
-        catch( HttpException e )
+        catch( Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        catch( IOException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
     }
 
     private boolean validateAccess(HttpServletRequest request) {

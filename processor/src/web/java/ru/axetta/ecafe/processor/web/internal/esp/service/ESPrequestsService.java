@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.web.internal.esp.ESPRequest;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
@@ -88,26 +89,15 @@ public class ESPrequestsService {
     }
 
     public byte[] executeSendFileForESPRequest(File file) throws Exception {
-        //Part[] parts = {new FilePart( "file", file )};
-        //URL url = new URL(getServiceAddress());
-        //logger.info("Execute POST sendFile to ESP REST: " + url);
-        //PostMethod httpMethod = new PostMethod(url.getPath());
-        //httpMethod.setRequestHeader("X-Api-Key", getApiKey());
-        //httpMethod.setRequestHeader( "file", file);
-        //return executeRequest(httpMethod, url);
-
-
-        String url = getServiceAddress();
-        MultipartRequestEntity multipartRequestEntity = new MultipartRequestEntity();
-        MultipartEntity entity = new MultipartEntity();
-        entity.addPart("file", new FileBody(file));
-        HttpResponse returnResponse = Request.Post(url)
-                .body(entity)
-                .execute().returnResponse();
-        System.out.println("Response status: " + returnResponse.getStatusLine().getStatusCode());
-        System.out.println(EntityUtils.toString(returnResponse.getEntity()));
-
-
+        Part[] parts = {new FilePart( "file", file )};
+        URL url = new URL(getServiceAddress());
+        logger.info("Execute POST sendFile to ESP REST: " + url);
+        PostMethod httpMethod = new PostMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        httpMethod.setRequestEntity(
+                new MultipartRequestEntity(parts, httpMethod.getParams())
+        );
+        return executeRequest(httpMethod, url);
     }
 
     public byte[] executeCreateESPRequest(String json) throws Exception {
