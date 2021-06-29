@@ -13,9 +13,19 @@ import ru.axetta.ecafe.processor.core.file.FileUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.internal.esp.service.ESPrequestsService;
+import ru.axetta.ecafe.processor.web.internal.esp.service.InfoESPresponse;
+import ru.axetta.ecafe.processor.web.internal.esp.service.NewESPresponse;
 import ru.axetta.ecafe.processor.web.partner.library.ResponseCodes;
 import ru.axetta.ecafe.processor.web.partner.library.Result;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -28,7 +38,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -39,6 +52,16 @@ public class ESPController {
 
     private Logger logger = LoggerFactory.getLogger(ESPController.class);
     public static final String KEY = "ecafe.processor.sendtoesp.key";
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "test")
+    public Response test(@Context HttpServletRequest request, ESPRequest espRequest) {
+        Result result = new Result();
+                sendFile();
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -99,6 +122,19 @@ public class ESPController {
                 persistenceSession.save(espattached);
             }
             /////////
+            ESPrequestsService esPrequestsService = new ESPrequestsService();
+            NewESPresponse newESPresponse = esPrequestsService.sendNewESPRequst(espRequest, client);
+            if (newESPresponse != null && newESPresponse.getType().equals("success"))
+            {
+                //Если обращение успешно создано
+                esp.setNumberrequest(newESPresponse.getId());
+                InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(newESPresponse.getId());
+                esp.setCloseddate();
+                persistenceSession.save(esp);
+            }
+
+
+            /////////
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
@@ -115,6 +151,8 @@ public class ESPController {
         result.setErrorMessage(ResponseCodes.RC_OK.toString());
         return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
     }
+
+
     public static class Org1 {
         @JsonProperty("idOfOrg")
         private Long idOfOrg;
@@ -186,6 +224,38 @@ public class ESPController {
         result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
         result.setErrorMessage(ResponseCodes.RC_OK.toString());
         return Response.status(HttpURLConnection.HTTP_OK).entity(responseESPRequests).build();
+    }
+
+    @POST
+    @Path(value = "sendFile")
+    public void sendFile() {
+        HttpClient httpclient = new HttpClient();
+        File file = new File( "C:\\JBosser\\7.1.1\\standalone\\files\\ESP\\10\\testdog1.jpg" );
+
+        // DEBUG
+        logger.debug( "FILE::" + file.exists() ); // IT IS NOT NULL
+        try
+        {
+            PostMethod filePost = new PostMethod( "https://edutools.mos.ru/fos/attach/" );
+
+            Part[] parts = {new FilePart( "file", file )};
+            filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+
+            // DEBUG
+            int response = httpclient.executeMethod( filePost );
+            logger.info( "Response : "+response );
+            logger.info( filePost.getResponseBodyAsString());
+        }
+        catch( HttpException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch( IOException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     private boolean validateAccess(HttpServletRequest request) {

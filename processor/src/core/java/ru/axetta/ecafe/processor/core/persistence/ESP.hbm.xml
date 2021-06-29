@@ -18,13 +18,14 @@
                      not-null="true" update="false"/>
         <property name="email" column="email" type="string"/>
         <property name="message" column="message" type="string"/>
-        <property name="status" column="status" type="integer"/>
+        <property name="status" column="status" type="string"/>
         <property name="numberrequest" column="numberrequest" type="string"/>
         <property name="topic" column="topic" type="string"/>
         <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="updateDate" column="updateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="closeddate" column="closeddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="solution" column="solution" type="string"/>
+        <property name="sd" column="SD" type="string"/>
     </class>
 </hibernate-mapping>
 

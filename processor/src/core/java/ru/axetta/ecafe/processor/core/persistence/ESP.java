@@ -19,6 +19,7 @@ public class ESP {
     private Date updateDate;
     private Date closeddate;
     private String solution;
+    private String sd;
 
    public ESP(){}
 
@@ -117,5 +118,13 @@ public class ESP {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getSd() {
+        return sd;
+    }
+
+    public void setSd(String sd) {
+        this.sd = sd;
     }
 }
