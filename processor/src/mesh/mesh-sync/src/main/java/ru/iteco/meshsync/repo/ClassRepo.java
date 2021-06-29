@@ -8,6 +8,8 @@ import ru.iteco.meshsync.models.ClassEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ClassRepo extends JpaRepository<ClassEntity, Long> {
+import java.util.Optional;
 
+public interface ClassRepo extends JpaRepository<ClassEntity, Long> {
+    Optional<ClassEntity> findByUid(String uid);
 }

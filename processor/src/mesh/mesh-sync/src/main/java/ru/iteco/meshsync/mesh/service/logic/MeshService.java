@@ -66,7 +66,7 @@ public class MeshService {
             log.warn("Get entityChanges param as NULL");
             return false;
         }
-        ClassEntity classEntity = classService.getById(Long.parseLong(entityChanges.getEntityId()));
+        ClassEntity classEntity = classService.getByUid(entityChanges.getUid());
         try {
             switch (entityChanges.getAction()) {
                 case create:
@@ -240,7 +240,7 @@ public class MeshService {
         }
 
         if(!homeStudy) {
-            ClassEntity classEntity = classService.getOrCreate(actualEdu.getPropertyClass());
+            ClassEntity classEntity = classService.getAndChange(actualEdu.getPropertyClass());
             person.setClassEntity(classEntity);
             person.setClassName(actualEdu.getPropertyClass().getName());
             person.setParallelID(actualEdu.getPropertyClass().getParallelId());

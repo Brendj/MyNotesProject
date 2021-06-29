@@ -18,11 +18,11 @@ public class ClassService {
         this.classRepo = classRepo;
     }
 
-    public ClassEntity getById(Long id) {
-        if(id == null){
+    public ClassEntity getByUid(String uid) {
+        if(uid == null){
             return null;
         }
-        return classRepo.findById(id).orElse(null);
+        return classRepo.findByUid(uid).orElse(null);
     }
 
     public void remove(ClassEntity classEntity) {
@@ -33,19 +33,19 @@ public class ClassService {
         classRepo.save(classEntity);
     }
 
-    public ClassEntity getOrCreate(ModelClass propertyClass) {
-        ClassEntity entity = classRepo.findById(propertyClass.getId()).orElse(null);
-        if(entity == null){
+    public ClassEntity getAndChange(ModelClass propertyClass) {
+        ClassEntity entity = classRepo.findByUid(propertyClass.getUid().toString()).orElse(null);
+        if (entity == null) {
             entity = new ClassEntity();
             entity.setId(propertyClass.getId());
             entity.setUid(propertyClass.getUid().toString());
-            entity.setName(propertyClass.getName());
-            entity.setOrganizationId(propertyClass.getOrganizationId());
-            entity.setEducationStageId(propertyClass.getEducationStageId());
-            entity.setParallelId(propertyClass.getParallelId());
-
-            entity = classRepo.save(entity);
         }
+        entity.setName(propertyClass.getName());
+        entity.setOrganizationId(propertyClass.getOrganizationId());
+        entity.setEducationStageId(propertyClass.getEducationStageId());
+        entity.setParallelId(propertyClass.getParallelId());
+
+        entity = classRepo.save(entity);
         return entity;
     }
 }

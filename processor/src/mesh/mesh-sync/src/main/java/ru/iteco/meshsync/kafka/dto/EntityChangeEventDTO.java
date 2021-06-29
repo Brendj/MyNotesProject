@@ -13,6 +13,7 @@ public class EntityChangeEventDTO {
     private String person_id;
     private String entity_id;
     private List<String> merged_person_ids;
+    private String uid;
 
     public EntityChangeEventDTO() {
     }
@@ -22,6 +23,14 @@ public class EntityChangeEventDTO {
         this.entity_name = entity_name;
         this.person_id = person_id;
         this.entity_id = entity_id;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public ActionType getAction() {

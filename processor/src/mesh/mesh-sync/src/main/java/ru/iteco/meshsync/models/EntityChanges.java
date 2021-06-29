@@ -61,13 +61,15 @@ public class EntityChanges implements Serializable, Auditable { // legacy code
     @Embedded
     private AuditEntity audit;
 
-    public EntityChanges(String entityId, String personGUID, String mergedPersonIds, EntityType entity, ActionType action, AuditEntity audit) {
+    public EntityChanges(String entityId, String personGUID, String mergedPersonIds, EntityType entity, ActionType action,
+            AuditEntity audit, String uid) {
         this.entityId = entityId;
         this.personGUID = personGUID;
         this.mergedPersonIds = mergedPersonIds;
         this.entity = entity;
         this.action = action;
         this.audit = audit;
+        this.uid = uid;
     }
 
     public EntityChanges() {
@@ -79,7 +81,8 @@ public class EntityChanges implements Serializable, Auditable { // legacy code
         String mergedPersonIds = Strings.join(dto.getMerged_person_ids(), ',');
         EntityType entity = dto.getEntity_name();
         ActionType action = dto.getAction();
-        return new EntityChanges(entityId, personGUID, mergedPersonIds, entity, action, null);
+        String uid = dto.getUid();
+        return new EntityChanges(entityId, personGUID, mergedPersonIds, entity, action, null, uid);
     }
 
     @Override
