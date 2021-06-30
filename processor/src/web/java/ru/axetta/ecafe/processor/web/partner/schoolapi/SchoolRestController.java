@@ -139,7 +139,7 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "changepassword")
+    @Path(value = "authorization/changepassword")
     public Response changePassword(@Context HttpServletRequest request, ChangePasswordData changePasswordData) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
@@ -164,7 +164,7 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "checksmscode")
+    @Path(value = "authorization/checksmscode")
     public Response checkSmsCode(ConfirmSmsData confirmSmsData) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
@@ -172,6 +172,10 @@ public class SchoolRestController {
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             User.checkSmsCode(jwtUserDetails.getUsername(), confirmSmsData.getSmsCode());
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "Ok")).build();
+        } catch (CredentialException e) {
+            logger.error("checkSmsCode error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(new Result(JwtLoginErrors.INVALID_CHANGE_PASSWORD_DATA.getErrorCode(), e.getMessage())).build();
         } catch (WebApplicationException e){
             logger.error(("checkSmsCode bad request: " + ";"+e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
@@ -184,7 +188,7 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "resendsms")
+    @Path(value = "authorization/resendsms")
     public Response resendSmsCode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
