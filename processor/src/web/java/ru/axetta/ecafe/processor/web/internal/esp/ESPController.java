@@ -142,6 +142,7 @@ public class ESPController {
                     esp.setStatus(infoESPresponse.getStatus());
                 if (infoESPresponse.getSd() != null)
                     esp.setSd(infoESPresponse.getSd());
+                esp.setUpdateDate(new Date());
                 persistenceSession.save(esp);
             }
 
@@ -220,6 +221,7 @@ public class ESPController {
                     esp.setStatus(infoESPresponse.getStatus());
                 if (infoESPresponse.getSd() != null)
                     esp.setSd(infoESPresponse.getSd());
+                esp.setUpdateDate(new Date());
                 ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
                 responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
                 responseESPRequestsPOJO.setEmail(esp.getEmail());
