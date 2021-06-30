@@ -152,7 +152,7 @@ public class SchoolRestController {
             logger.error("Change password error: " + e.getMessage(), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(new Result(JwtLoginErrors.INVALID_CHANGE_PASSWORD_DATA.getErrorCode(), e.getMessage())).build();
-        } catch (RequestProcessingException e){
+        } catch (WebApplicationException e){
             logger.error(("Change password bad request: " + e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         } catch (Exception e) {
@@ -172,7 +172,7 @@ public class SchoolRestController {
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             User.checkSmsCode(jwtUserDetails.getUsername(), confirmSmsData.getSmsCode());
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "Ok")).build();
-        } catch (RequestProcessingException e){
+        } catch (WebApplicationException e){
             logger.error(("checkSmsCode bad request: " + ";"+e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         } catch (Exception e) {
@@ -197,7 +197,7 @@ public class SchoolRestController {
                 return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(
                         new Result(JwtLoginErrors.CANNOT_SEND_SMS.getErrorCode(), JwtLoginErrors.CANNOT_SEND_SMS.getErrorMessage())).build();
             }
-        } catch (RequestProcessingException e){
+        } catch (WebApplicationException e){
             logger.error(("resendSmsCode bad request: " + ";"+e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         } catch (Exception e) {
