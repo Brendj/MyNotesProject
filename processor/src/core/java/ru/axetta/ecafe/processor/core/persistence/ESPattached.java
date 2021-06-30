@@ -12,6 +12,7 @@ public class ESPattached {
     private String path;
     private Integer number;
     private Date createDate;
+    private String linkinfos;
 
    public ESPattached(){}
 
@@ -54,5 +55,13 @@ public class ESPattached {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getLinkinfos() {
+        return linkinfos;
+    }
+
+    public void setLinkinfos(String linkinfos) {
+        this.linkinfos = linkinfos;
     }
 }

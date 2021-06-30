@@ -5,10 +5,12 @@
 package ru.axetta.ecafe.processor.web.internal.esp.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.file.FileUtils;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshUnprocessableEntityException;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 import ru.axetta.ecafe.processor.web.internal.esp.ESPController;
 import ru.axetta.ecafe.processor.web.internal.esp.ESPRequest;
@@ -35,6 +37,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 public class ESPrequestsService {
     public static final String ESP_REST_ADDRESS_PROPERTY = "ecafe.processing.esp.rest.address";
@@ -43,11 +46,14 @@ public class ESPrequestsService {
     private final ObjectMapper ob = new ObjectMapper();
     private Logger logger = LoggerFactory.getLogger(ESPrequestsService.class);
 
-    public NewESPresponse sendNewESPRequst(ESPRequest espRequest, Client client) {
+    public NewESPresponse sendNewESPRequst(ESPRequest espRequest, Client client, Org org, List<String> files) {
         NewESPForService newESPForService = new NewESPForService();
-        newESPForService.setDescription(espRequest.getMessage());
+        String description = "округ=" + org.getDistrict() + "\nкраткий адрес=" + org.getShortAddress() + "\nтема=" +
+                espRequest.getTopic() + "\nтело обращения=" + espRequest.getMessage();
+        newESPForService.setDescription(description);
         newESPForService.setProblem(espRequest.getTopic());
         newESPForService.setTemplate("ИСПП Прочее");
+        newESPForService.setAttachments(files);
         NewESPUserInfo newESPUserInfo = new NewESPUserInfo();
         newESPUserInfo.setEmail(espRequest.getEmail());
         newESPUserInfo.setFio(client.getPerson().getFullName());
@@ -76,7 +82,8 @@ public class ESPrequestsService {
         return infoESPresponse;
     }
 
-    public SendFileESPresponse sendFileForESPRequest(File file) {
+    public SendFileESPresponse sendFileForESPRequest(String path) {
+        File file = new File(FileUtils.getBaseFilePathForFOS() + path);
         SendFileESPresponse sendFileESPresponse = null;
         try {
             byte[] response = executeSendFileForESPRequest(file);
@@ -90,7 +97,7 @@ public class ESPrequestsService {
 
     public byte[] executeSendFileForESPRequest(File file) throws Exception {
         Part[] parts = {new FilePart( "file", file )};
-        URL url = new URL(getServiceAddress());
+        URL url = new URL(getServiceAddress1());
         logger.info("Execute POST sendFile to ESP REST: " + url);
         PostMethod httpMethod = new PostMethod(url.getPath());
         httpMethod.setRequestHeader("X-Api-Key", getApiKey());
@@ -159,6 +166,13 @@ public class ESPrequestsService {
         String address = RuntimeContext.getInstance().getConfigProperties().getProperty(ESP_REST_ADDRESS_PROPERTY, "");
         if (address.equals("")) throw new Exception("ESP REST address not specified");
         return address;
+    }
+
+    private String getServiceAddress1() throws Exception{
+        String address = RuntimeContext.getInstance().getConfigProperties().getProperty(ESP_REST_ADDRESS_PROPERTY, "");
+
+        if (address.equals("")) throw new Exception("ESP REST address not specified");
+        return address + "attach/";
     }
 
     private String getApiKey() throws Exception{

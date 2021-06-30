@@ -71,6 +71,11 @@ public class FileUtils {
         }
     }
 
+    public static String getBaseFilePathForFOS()
+    {
+        return System.getProperty("jboss.server.base.dir") + DELIMITER + FILES_DIRECTORY + DELIMITER + "ESP" + DELIMITER;
+    }
+
     public static String loadFile(Long idOfOrg, String fileName, String fileExt) {
         String path= formFilePath(idOfOrg, fileName, fileExt);
         byte[] fileData = null;

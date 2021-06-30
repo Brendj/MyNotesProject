@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.Set;
 
 public class ESP {
     private Long idesprequest;
@@ -20,6 +21,7 @@ public class ESP {
     private Date closeddate;
     private String solution;
     private String sd;
+    private Set<ESPattached> espFiles;
 
    public ESP(){}
 
@@ -126,5 +128,13 @@ public class ESP {
 
     public void setSd(String sd) {
         this.sd = sd;
+    }
+
+    public Set<ESPattached> getEspFiles() {
+        return espFiles;
+    }
+
+    public void setEspFiles(Set<ESPattached> espFiles) {
+        this.espFiles = espFiles;
     }
 }

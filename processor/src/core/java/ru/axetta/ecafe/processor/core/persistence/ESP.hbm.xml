@@ -26,6 +26,10 @@
         <property name="closeddate" column="closeddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="solution" column="solution" type="string"/>
         <property name="sd" column="SD" type="string"/>
+        <set name="espFiles" inverse="true" cascade="all">
+            <key column="idesprequest"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ESPattached"/>
+        </set>
     </class>
 </hibernate-mapping>
 

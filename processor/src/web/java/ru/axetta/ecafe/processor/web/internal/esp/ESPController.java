@@ -43,6 +43,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -53,16 +55,7 @@ public class ESPController {
 
     private Logger logger = LoggerFactory.getLogger(ESPController.class);
     public static final String KEY = "ecafe.processor.sendtoesp.key";
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "test")
-    public Response test(@Context HttpServletRequest request, ESPRequest espRequest) {
-        Result result = new Result();
-                sendFile();
-                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-    }
+    private static final String SUCCESS = "success";
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -109,7 +102,9 @@ public class ESPController {
             esp.setMessage(espRequest.getMessage());
             persistenceSession.save(esp);
             /////
+            ESPrequestsService esPrequestsService = new ESPrequestsService();
             Integer count = 1;
+            List<String> files = new ArrayList<>();
             for (ESPRequestAttachedFile espRequestAttachedFile: espRequest.getAttached())
             {
                 String path = FileUtils.saveFile(esp.getIdesprequest(), espRequestAttachedFile.getAttached_filedata(),
@@ -119,23 +114,37 @@ public class ESPController {
                 espattached.setEsp(esp);
                 espattached.setNumber(count);
                 espattached.setPath(path);
+                //Отправка в FOS файлов
+                SendFileESPresponse sendFileESPresponse = esPrequestsService.sendFileForESPRequest(path);
+                if (sendFileESPresponse != null && sendFileESPresponse.getType().equals(SUCCESS))
+                {
+                    espattached.setLinkinfos(sendFileESPresponse.getUrl());
+                    files.add(sendFileESPresponse.getUrl());
+                }
                 count++;
                 persistenceSession.save(espattached);
+
             }
             /////////
-            ESPrequestsService esPrequestsService = new ESPrequestsService();
-            NewESPresponse newESPresponse = esPrequestsService.sendNewESPRequst(espRequest, client);
-            if (newESPresponse != null && newESPresponse.getType().equals("success"))
+            //Создание нового обращения
+            NewESPresponse newESPresponse = esPrequestsService.sendNewESPRequst(espRequest, client, org, files);
+
+            if (newESPresponse != null && newESPresponse.getType().equals(SUCCESS))
             {
                 //Если обращение успешно создано
                 esp.setNumberrequest(newESPresponse.getId());
                 InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(newESPresponse.getId());
-                //esp.setCloseddate();
+                if (infoESPresponse.getClosed_at() != null)
+                    esp.setCloseddate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at()));
+                if (infoESPresponse.getSolution() != null)
+                    esp.setSolution(infoESPresponse.getSolution());
+                if (infoESPresponse.getStatus() != null)
+                    esp.setStatus(infoESPresponse.getStatus());
+                if (infoESPresponse.getSd() != null)
+                    esp.setSd(infoESPresponse.getSd());
                 persistenceSession.save(esp);
             }
 
-
-            /////////
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
@@ -199,8 +208,18 @@ public class ESPController {
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
             List<ESP> esps = DAOUtils.getESPForOrg(persistenceSession,org);
+            ESPrequestsService esPrequestsService = new ESPrequestsService();
             for (ESP esp: esps)
             {
+                InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(esp.getNumberrequest());
+                if (infoESPresponse.getClosed_at() != null)
+                    esp.setCloseddate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at()));
+                if (infoESPresponse.getSolution() != null)
+                    esp.setSolution(infoESPresponse.getSolution());
+                if (infoESPresponse.getStatus() != null)
+                    esp.setStatus(infoESPresponse.getStatus());
+                if (infoESPresponse.getSd() != null)
+                    esp.setSd(infoESPresponse.getSd());
                 ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
                 responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
                 responseESPRequestsPOJO.setEmail(esp.getEmail());
@@ -213,6 +232,7 @@ public class ESPController {
                 responseESPRequestsPOJO.setStatus(esp.getStatus());
                 responseESPRequestsPOJO.setSolution(esp.getSolution());
                 responseESPRequests.getEspRequests().add(responseESPRequestsPOJO);
+                persistenceSession.save(esp);
             }
             responseESPRequests.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             responseESPRequests.setErrorMessage(ResponseCodes.RC_OK.toString());
@@ -225,28 +245,6 @@ public class ESPController {
         result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
         result.setErrorMessage(ResponseCodes.RC_OK.toString());
         return Response.status(HttpURLConnection.HTTP_OK).entity(responseESPRequests).build();
-    }
-
-    @POST
-    @Path(value = "sendFile")
-    public void sendFile() {
-        HttpClient httpclient = new HttpClient();
-        File file = new File( "C:\\JBosser\\7.1.1\\standalone\\files\\ESP\\10\\testdog1.jpg" );
-
-        // DEBUG
-        logger.debug( "FILE::" + file.exists() ); // IT IS NOT NULL
-        try
-        {
-            ESPrequestsService esPrequestsService = new ESPrequestsService();
-            SendFileESPresponse sendFileESPresponse = esPrequestsService.sendFileForESPRequest(file);
-            System.out.println("ewtw");
-
-        }
-        catch( Exception e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     private boolean validateAccess(HttpServletRequest request) {

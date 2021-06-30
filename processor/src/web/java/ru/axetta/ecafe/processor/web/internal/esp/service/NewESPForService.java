@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.internal.esp.service;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.List;
+
 public class NewESPForService {
     @JsonProperty("problem")
     private String problem;
@@ -15,6 +17,9 @@ public class NewESPForService {
     private String description;
     @JsonProperty("user")
     private NewESPUserInfo user;
+    @JsonProperty("attachments")
+    private List<String> attachments;
+
 
     @JsonProperty("problem")
     public String getProblem() {
@@ -54,5 +59,15 @@ public class NewESPForService {
     @JsonProperty("user")
     public void setUser(NewESPUserInfo user) {
         this.user = user;
+    }
+
+    @JsonProperty("attachments")
+    public List<String> getAttachments() {
+        return attachments;
+    }
+
+    @JsonProperty("attachments")
+    public void setAttachments(List<String> attachments) {
+        this.attachments = attachments;
     }
 }
