@@ -100,6 +100,53 @@ public class User {
         this.setPassword(plainPassword);
     }
 
+    public static void changePasswordExternal(String userName, String newPassword, String newPasswordConfirm, String remoteAddr) throws Exception {
+        User user = DAOService.getInstance().findUserByUserName(userName);
+        try {
+            if (!newPassword.equals(newPasswordConfirm)) {
+                throw new CredentialException("Неверный ввод пароля: введенные значения не совпадают");
+            }
+            if (!User.passwordIsEnoughComplex(newPassword)) {
+                throw new CredentialException("Пароль не удовлетворяет требованиям безопасности: минимальная длина - 6 символов, "
+                        + "должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол");
+            }
+
+            user.doChangePassword(newPassword);
+            user.setNeedChangePassword(false);
+            user.setPasswordDate(new Date(System.currentTimeMillis()));
+            DAOService.getInstance().setUserInfo(user);
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, remoteAddr,
+                            userName, user, true, null, null);
+            DAOService.getInstance().writeAuthJournalRecord(record);
+        } catch (CredentialException e) {
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, remoteAddr,
+                            userName, user, false,
+                            SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), e.getMessage());
+            DAOService.getInstance().writeAuthJournalRecord(record);
+            throw e;
+        }
+    }
+
+    public static void checkSmsCode(String userName, String smsCode) throws Exception {
+        User user = DAOService.getInstance().findUserByUserName(userName);
+        String reqCode = user.getLastSmsCode();
+        if (reqCode != null && smsCode != null && reqCode.equals(smsCode)) {
+            user.setSmsCodeEnterDate(new Date(System.currentTimeMillis()));
+            DAOService.getInstance().setUserInfo(user);
+        } else {
+            throw new CredentialException("Введен неверный код активации");
+        }
+    }
+
+    public static boolean sendSmsAgain(String userName) throws Exception {
+        logger.info(String.format("Start of sending SMS code for the user %s", userName));
+        Boolean requstSMS = User.requestSmsCode(userName);
+        logger.info(String.format("End of sending SMS code for the user %s", userName));
+        return requstSMS;
+    }
+
     public Date getPasswordDate() {
         return passwordDate;
     }

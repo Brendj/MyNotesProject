@@ -86,6 +86,14 @@ public class JwtTokenProvider {
         return refreshTokenEntity;
     }
 
+    public Boolean getUserNeedChangePassword(String username) throws Exception {
+        return User.isNeedChangePassword(username);
+    }
+
+    public Boolean getUserNeedEnterSmsCode(String username) throws Exception {
+        return User.needEnterSmsCode(username);
+    }
+
     public String createRefreshToken(String username, String remoteAddress, Session persistenceSession)
             throws Exception {
         User user = DAOUtils.findUser(persistenceSession, username);

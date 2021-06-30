@@ -22,7 +22,6 @@ import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
 import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -33,6 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
+import javax.security.auth.login.CredentialException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -71,10 +71,13 @@ public class SchoolRestController {
             if(jwtLoginService.login(loginData.getUsername(), loginData.getPassword(), request.getRemoteAddr(), persistenceSession)){
                 String token = tokenService.createToken(loginData.getUsername());
                 String refreshToken = tokenService.createRefreshToken(loginData.getUsername(),request.getRemoteAddr(),persistenceSession);
+                Boolean needChangePassword = tokenService.getUserNeedChangePassword(loginData.getUsername());
+                Boolean needEnterSmsCode = tokenService.getUserNeedEnterSmsCode(loginData.getUsername());
                 persistenceSession.flush();
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                return Response.status(HttpURLConnection.HTTP_OK).entity(new JwtLoginDTO(token, refreshToken)).build();
+                return Response.status(HttpURLConnection.HTTP_OK).entity(new JwtLoginDTO(token, refreshToken,
+                        needChangePassword, needEnterSmsCode)).build();
             }
             else
                 throw new JwtLoginException(JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorCode(),
@@ -113,7 +116,10 @@ public class SchoolRestController {
             String accessToken = tokenService.createToken(refreshToken.getUser().getUserName());
             String newRefreshToken = tokenService.createRefreshToken(refreshToken.getUser().getUserName(),
                     request.getRemoteAddr(), persistenceSession);
-            return Response.status(HttpURLConnection.HTTP_OK).entity(new JwtLoginDTO(accessToken, newRefreshToken)).build();
+            Boolean needChangePassword = tokenService.getUserNeedChangePassword(refreshToken.getUser().getUserName());
+            Boolean needEnterSmsCode = tokenService.getUserNeedEnterSmsCode(refreshToken.getUser().getUserName());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(new JwtLoginDTO(accessToken, newRefreshToken,
+                    needChangePassword, needEnterSmsCode)).build();
 
         }
         catch (JwtLoginException e){
@@ -128,6 +134,76 @@ public class SchoolRestController {
         finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "changepassword")
+    public Response changePassword(@Context HttpServletRequest request, ChangePasswordData changePasswordData) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            User.changePasswordExternal(jwtUserDetails.getUsername(), changePasswordData.getPassword(),
+                    changePasswordData.getConfirmPassword(), request.getRemoteAddr());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "Ok")).build();
+        } catch (CredentialException e) {
+            logger.error("Change password error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(new Result(JwtLoginErrors.INVALID_CHANGE_PASSWORD_DATA.getErrorCode(), e.getMessage())).build();
+        } catch (RequestProcessingException e){
+            logger.error(("Change password bad request: " + e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        } catch (Exception e) {
+            logger.error("Internal error: "+e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100, "Ошибка сервера")).build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "checksmscode")
+    public Response checkSmsCode(ConfirmSmsData confirmSmsData) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            User.checkSmsCode(jwtUserDetails.getUsername(), confirmSmsData.getSmsCode());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "Ok")).build();
+        } catch (RequestProcessingException e){
+            logger.error(("checkSmsCode bad request: " + ";"+e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        } catch (Exception e) {
+            logger.error("Internal error: "+e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100, "Ошибка сервера")).build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "resendsms")
+    public Response resendSmsCode() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            boolean result = User.sendSmsAgain(jwtUserDetails.getUsername());
+            if (result) {
+                return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "Ok")).build();
+            } else {
+                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(
+                        new Result(JwtLoginErrors.CANNOT_SEND_SMS.getErrorCode(), JwtLoginErrors.CANNOT_SEND_SMS.getErrorMessage())).build();
+            }
+        } catch (RequestProcessingException e){
+            logger.error(("resendSmsCode bad request: " + ";"+e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        } catch (Exception e) {
+            logger.error("Internal error: "+e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100, "Ошибка сервера")).build();
         }
     }
 

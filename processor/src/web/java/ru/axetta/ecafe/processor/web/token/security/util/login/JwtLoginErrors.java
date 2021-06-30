@@ -10,7 +10,9 @@ public enum JwtLoginErrors {
     USER_NOT_FOUND(203,"User not found"),
     USER_IS_BLOCKED(204,"User is blocked"),
     UNSUCCESSFUL_AUTHORIZATION(205, "Unsuccessful authorization"),
-    INVALID_REFRESH_TOKEN(206, "Invalid refresh token");
+    INVALID_REFRESH_TOKEN(206, "Invalid refresh token"),
+    INVALID_CHANGE_PASSWORD_DATA(207, "Invalid change password data"),
+    CANNOT_SEND_SMS(208, "Can not send sms code");
 
     private int errorCode;
     private String errorMessage;

@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -10305,16 +10304,13 @@ public class MainPage implements Serializable {
     public Object checkUserSmsCode() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
-        User user = DAOService.getInstance().findUserByUserName(userName);
-        String reqCode = user.getLastSmsCode();
-        if (reqCode != null && smsCode != null && reqCode.equals(smsCode)) {
-            user.setSmsCodeEnterDate(new Date(System.currentTimeMillis()));
-            DAOService.getInstance().setUserInfo(user);
+        try {
+            User.checkSmsCode(userName, smsCode);
             context.redirect(context.getRequestContextPath() + "/back-office/index.faces");
-        } else {
+        } catch (CredentialException e) {
             smsCode = "";
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Введен неверный код активации", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
         }
         return null;
     }
@@ -10322,9 +10318,7 @@ public class MainPage implements Serializable {
     public Object sendSMSagain() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
-        logger.info(String.format("Start of sending SMS code for the user %s", userName));
-        Boolean requstSMS = User.requestSmsCode(userName);
-        logger.info(String.format("End of sending SMS code for the user %s", userName));
+        Boolean requstSMS = User.sendSmsAgain(userName);
         if (requstSMS){
             setCanSendAgain(true);
             context.redirect(context.getRequestContextPath() + "/back-office/confirm-sms.faces");
@@ -10340,44 +10334,15 @@ public class MainPage implements Serializable {
     public Object doChangeUserPassword() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
-        User user = DAOService.getInstance().findUserByUserName(userName);
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
         try {
-            if (!newPassword.equals(newPasswordConfirm)) {
-                newPassword = "";
-                newPasswordConfirm = "";
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ОШИБКА: введенные значения не совпадают", null));
-                throw new CredentialException("Неверный ввод пароля");
-            }
-            if (!User.passwordIsEnoughComplex(newPassword)) {
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Пароль не удовлетворяет требованиям безопасности:", null));
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "- минимальная длина - 6 символов", null));
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
-                throw new CredentialException("Пароль не удовлетворяет требованиям безопасности");
-            }
-
-            user.doChangePassword(newPassword);
-            user.setNeedChangePassword(false);
-            user.setPasswordDate(new Date(System.currentTimeMillis()));
-            DAOService.getInstance().setUserInfo(user);
-            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
-                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, request.getRemoteAddr(),
-                            userName, user, true, null, null);
-            DAOService.getInstance().writeAuthJournalRecord(record);
+            User.changePasswordExternal(userName, newPassword, newPasswordConfirm, request.getRemoteAddr());
             context.redirect(context.getRequestContextPath() + "/back-office/index.faces");
         } catch (CredentialException e) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
             newPassword = "";
             newPasswordConfirm = "";
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
-            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
-                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, request.getRemoteAddr(),
-                            userName, user, false,
-                            SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), e.getMessage());
-            DAOService.getInstance().writeAuthJournalRecord(record);
         }
         return null;
     }
