@@ -4,11 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.token.security.jwt;
 
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationErrorResponse;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrorDTO;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtConfig;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,14 +30,12 @@ import java.io.IOException;
 
 public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-
     public JWTAuthenticationFilter() {
         super("/school/api/v1/");
         setAuthenticationSuccessHandler(new AuthenticationSuccessHandler() {
             @Override
-            public void onAuthenticationSuccess(HttpServletRequest request,
-                    HttpServletResponse response, Authentication authentication)
-                    throws IOException, ServletException {
+            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                    Authentication authentication) throws IOException, ServletException {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 request.getRequestDispatcher(request.getServletPath() + request.getPathInfo())
                         .forward(request, response);
@@ -42,12 +43,21 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
         });
         setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
             @Override
-            public void onAuthenticationFailure(HttpServletRequest request,
-                    HttpServletResponse response, AuthenticationException authenticationException)
-                    throws IOException, ServletException {
-                response.setStatus(401);
-                response.setContentType("application/json");
-                response.getOutputStream().print(authenticationException.getMessage());
+            public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+                    AuthenticationException e) throws IOException, ServletException {
+
+                String type = "401";
+                if (e instanceof JwtAuthenticationException) {
+                    type = ((JwtAuthenticationException) e).getCode().toString();
+                }
+                WebApplicationErrorResponse apiError = new WebApplicationErrorResponse(type,
+                        HttpServletResponse.SC_UNAUTHORIZED, e.getMessage(),
+                        ExceptionUtils.getStackTrace(e), request.getRequestURI());
+
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.writeValue(response.getOutputStream(), apiError);
             }
         });
         super.setAuthenticationManager(new JWTAuthenticationManager());
@@ -58,30 +68,38 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException, ServletException {
         String token = request.getHeader(JwtConfig.TOKEN_HEADER);
-        if (token == null || !token.startsWith(JwtConfig.TOKEN_PREFIX)) {
-            throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
-                    JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
+        if (token == null) {
+            throw new JwtAuthenticationException(
+                    new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
+                            JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
         }
-        JWTAuthentication JWTAuthentication = new JWTAuthentication(token.substring(7));
+        JWTAuthentication JWTAuthentication = new JWTAuthentication(token);
         Authentication authentication = getAuthenticationManager().authenticate(JWTAuthentication);
         return authentication;
     }
 
 
     @Override
-    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response){
+    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
         String uri = request.getRequestURI();
-        if("".equals(request.getContextPath()) ? uri.startsWith(getFilterProcessesUrl()+"authorization")
-                : uri.startsWith(request.getContextPath() + getFilterProcessesUrl()+"authorization"))
+        if ("".equals(request.getContextPath()) ? uri.startsWith(getFilterProcessesUrl() + "authorization")
+                : uri.startsWith(request.getContextPath() + getFilterProcessesUrl() + "authorization")) {
             return false;
-        return "".equals(request.getContextPath()) ? uri.startsWith(getFilterProcessesUrl()) : uri.startsWith(request.getContextPath() + getFilterProcessesUrl());
+        }
+        if (uri.contains("payments/")){
+            return false;
+        }
+        return "".equals(request.getContextPath()) ? uri.startsWith(getFilterProcessesUrl())
+                : uri.startsWith(request.getContextPath() + getFilterProcessesUrl());
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res,
-            FilterChain chain) throws IOException, ServletException {
-        super.doFilter(req,res,chain);
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
+        super.doFilter(req, res, chain);
     }
+
+
 }
 
 

@@ -11,11 +11,11 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.RequestDTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.*;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.service.ISchoolApiService;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.service.SchoolApiService;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.Constants;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.GroupManagementErrors;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
@@ -51,7 +51,6 @@ import java.util.List;
 public class SchoolRestController {
 
     private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
-
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -224,7 +223,7 @@ public class SchoolRestController {
             checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             if(!groupManagementService.isFriendlyOrg(createGroupData.getOrgId(), jwtUserDetails.getIdOfOrg().longValue()))
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             //Проверка на доступ определенной роли
             groupManagementService.addOrgGroup(createGroupData.getOrgId(), createGroupData.getGroupName());
@@ -234,7 +233,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_CREATED).entity(new Result(0, "Ok")).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(("Bad request: "+createGroupData.toString()+";"+e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -275,7 +274,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseGroups).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: ", e));
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -315,7 +314,7 @@ public class SchoolRestController {
             responseEmployees.setErrorMessage("Ok");
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseEmployees).build();
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -346,7 +345,7 @@ public class SchoolRestController {
             checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             if(!groupManagementService.isFriendlyOrg(editEmployeeData.getOrgId(), jwtUserDetails.getIdOfOrg().longValue()))
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             //Проверка на доступ определенной роли
             groupManagementService.editEmployee(editEmployeeData.getOrgId(), editEmployeeData.getGroupName(),
@@ -356,7 +355,7 @@ public class SchoolRestController {
             persistenceTransaction = null;
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "Ok")).build();
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(("Bad request: "+editEmployeeData.toString()+";"+e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -395,7 +394,7 @@ public class SchoolRestController {
             responseClients.setErrorMessage("Ok");
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseClients).build();
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -432,7 +431,7 @@ public class SchoolRestController {
             responseDiscounts.setErrorMessage("Ok");
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -473,7 +472,7 @@ public class SchoolRestController {
             responseDiscounts.setErrorMessage("Ok");
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -515,7 +514,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -546,7 +545,7 @@ public class SchoolRestController {
             checkPermission(authentication, User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification());
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             if(!groupManagementService.isFriendlyOrg(editClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             ClientGroup clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(editClientsGroupRequest.getNewOrgId(),
@@ -562,7 +561,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseEditClientsGroup).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -594,7 +593,7 @@ public class SchoolRestController {
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             //Проверка на доступ определенной роли
             if(!groupManagementService.isFriendlyOrg(editGroupClientsGroupRequest.getNewOrgId(), jwtUserDetails.getIdOfOrg())){
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             ClientGroup clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(editGroupClientsGroupRequest.getNewOrgId(),
@@ -610,7 +609,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseEditClientsGroup).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -629,6 +628,7 @@ public class SchoolRestController {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "friendlyorgs")
     public Response friendlyOrgs() {
+
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -647,7 +647,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseFriendlyOrgs).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -678,12 +678,12 @@ public class SchoolRestController {
             if(!checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER.getIdentification())
                     && !checkRolePermission(authentication,
                     User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
             if(jwtUserDetails.getContractId() == null)
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             ResponseManagerGroups responseManagerGroups =
                     new ResponseManagerGroups(groupManagementService.getManagerGroups(jwtUserDetails.getContractId()));
@@ -692,7 +692,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseManagerGroups).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -729,7 +729,7 @@ public class SchoolRestController {
                 clientGroup = groupManagementService.getClientGroupByOrgIdAndGroupName(jwtUserDetails.getIdOfOrg(),
                         createClientRequestDTO.getGroupName());
             }
-            catch (RequestProcessingException ex){
+            catch (WebApplicationException ex){
                 logger.info(String.format("Client group %s with org id %d not found. Create client group.", createClientRequestDTO.getGroupName(), jwtUserDetails.getIdOfOrg()));
                 clientGroup = DAOUtils.createClientGroup(persistenceSession, jwtUserDetails.getIdOfOrg(),
                         createClientRequestDTO.getGroupName());
@@ -745,7 +745,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "OK")).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -776,7 +776,7 @@ public class SchoolRestController {
                 planDate = format.parse(planDateString);
             }
             catch (Exception e){
-                throw new RequestProcessingException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
                         GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorMessage());
             }
             persistenceSession = runtimeContext.createPersistenceSession();
@@ -788,7 +788,7 @@ public class SchoolRestController {
                     User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())
                     && !checkRolePermission(authentication,
                     User.DefaultRole.PRODUCTION_DIRECTOR.getIdentification())){
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
@@ -800,7 +800,7 @@ public class SchoolRestController {
                         .getClientGroupsByGroupNamesAndOrgId(groupsList, jwtUserDetails.getIdOfOrg());
                 Client classroomClient = DAOUtils.findClientByContractId(persistenceSession, jwtUserDetails.getContractId());
                 if(classroomClient == null)
-                    throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                             GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
                 filteredGroups = groupManagementService.getClientGroupsForClientManager(unfilteredGroups, classroomClient.getIdOfClient());
             }
@@ -809,11 +809,11 @@ public class SchoolRestController {
                 filteredGroups = groupManagementService.getClientGroupsByGroupNamesAndOrgId(groupsList, jwtUserDetails.getIdOfOrg());
             }
             else {
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             if(filteredGroups == null || filteredGroups.isEmpty())
-                throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
             List<PlanOrderGroupDTO> groupsDTOList = new ArrayList<>();
             for(ClientGroup group: filteredGroups){
@@ -840,7 +840,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responsePlanOrders).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -866,7 +866,7 @@ public class SchoolRestController {
         ISchoolApiService groupManagementService;
         try{
             if(setToPayRequestDTO.getPlanDate() == null)
-                throw new RequestProcessingException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
                         GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorMessage());
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -874,7 +874,7 @@ public class SchoolRestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if(!checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER.getIdentification())
                     && !checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
@@ -885,19 +885,19 @@ public class SchoolRestController {
                 managerGroupsNames.add(groupNameDTO.getGroupName());
             }
             if(managerGroupsNames.isEmpty())
-                throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.GROUPS_NOT_FOUND.getErrorMessage());
             clients = groupManagementService.getClientsByGroupsAndContractIds(managerGroupsNames,
                     setToPayRequestDTO.getContractIds(), jwtUserDetails.getIdOfOrg());
             if(clients.isEmpty()){
-                throw new RequestProcessingException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorMessage());
             }
             List<Long> clientsContractIds = getContractIdsForClients(clients);
             List<PlanOrder> planOrders = groupManagementService.getPlanOrdersWithoutOrder(setToPayRequestDTO.getPlanDate(),
                     clientsContractIds, setToPayRequestDTO.getComplexName());
             if(planOrders.isEmpty()){
-                throw new RequestProcessingException(GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorMessage());
             }
             planOrders = groupManagementService.setToPayForPlanOrders(planOrders, jwtUserDetails.getIdOfUser(), setToPayRequestDTO.isToPay());
@@ -907,7 +907,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseSetToPay).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -932,7 +932,7 @@ public class SchoolRestController {
         ISchoolApiService groupManagementService;
         try{
             if(setOrderRequestDTO.getPlanDate() == null)
-                throw new RequestProcessingException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorCode(),
                         GroupManagementErrors.DATE_VALIDATION_ERROR.getErrorMessage());
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -940,7 +940,7 @@ public class SchoolRestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if(!checkRolePermission(authentication, User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())
                     && !checkRolePermission(authentication, User.DefaultRole.PRODUCTION_DIRECTOR.getIdentification())){
-                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
             }
             JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
@@ -948,7 +948,7 @@ public class SchoolRestController {
             if(checkRolePermission(authentication,User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT.getIdentification())){
                 List<GroupNameDTO> managerGroups = groupManagementService.getManagerGroups(jwtUserDetails.getContractId());
                 if(managerGroups.isEmpty()){
-                    throw new RequestProcessingException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
+                    throw new WebApplicationException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
                             GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorMessage());
                 }
                 List<String> managerGroupsNames = new ArrayList<>();
@@ -963,13 +963,13 @@ public class SchoolRestController {
             }
             List<Long> clientsContractIds = getContractIdsForClients(clients);
             if(clientsContractIds.isEmpty()){
-                throw new RequestProcessingException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.CLIENTS_NOT_FOUND.getErrorMessage());
             }
             List<PlanOrder> planOrders = groupManagementService.getPlanOrdersByToPay(setOrderRequestDTO.getPlanDate(),
                     clientsContractIds, setOrderRequestDTO.getComplexName(), true);
             if(planOrders.isEmpty()){
-                throw new RequestProcessingException(GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorCode(),
+                throw new WebApplicationException(GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorCode(),
                         GroupManagementErrors.PLANORDERS_NOT_FOUND.getErrorMessage());
             }
             planOrders = groupManagementService.createOrderForPlanOrders(planOrders, setOrderRequestDTO.isOrder(), jwtUserDetails.getIdOfUser());
@@ -979,7 +979,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseSetOrder).build();
 
         }
-        catch (RequestProcessingException e){
+        catch (WebApplicationException e){
             logger.error(String.format("Bad request: %s", e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
@@ -1016,23 +1016,23 @@ public class SchoolRestController {
         checkAuthentication(authentication);
         Integer userIdOfGroup = ((JwtUserDetailsImpl) authentication.getPrincipal()).getIdOfRole();
         if(userIdOfGroup == null || idOfGroup == null)
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
         if(userIdOfGroup.intValue() != idOfGroup.intValue())
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
     }
 
     private void checkAuthentication(Authentication authentication) throws Exception {
         if(authentication == null || authentication.getPrincipal() == null || !authentication.isAuthenticated()){
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
         }
         if(!authentication.isAuthenticated())
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
         if(!userDetailsIsValid((JwtUserDetailsImpl) authentication.getPrincipal())){
-            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+            throw new WebApplicationException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
         }
     }

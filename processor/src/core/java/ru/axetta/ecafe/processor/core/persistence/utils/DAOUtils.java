@@ -4683,6 +4683,13 @@ public class DAOUtils {
         return (ApplicationForFood) criteria.uniqueResult();
     }
 
+    public static ApplicationForFood getApplicationForFoodByRecordId(Session persistanceSession, long recordId)
+    {
+        Criteria criteria = persistanceSession.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("idOfApplicationForFood", recordId));
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
     public static List<ApplicationForFood> getApplicationsForFoodForOrgsSinceVersion(Session session,
             List<Long> idOfOrgs, long version) throws Exception {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);

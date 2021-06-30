@@ -8,11 +8,19 @@ import org.springframework.security.core.AuthenticationException;
 
 public class JwtAuthenticationException extends AuthenticationException {
 
-    public JwtAuthenticationException(String msg) {
-        super(msg);
-    }
+    private Integer code;
 
     public JwtAuthenticationException(JwtAuthenticationErrorDTO jwtAuthenticationErrorDTO){
-        super(jwtAuthenticationErrorDTO.toString());
+        super(jwtAuthenticationErrorDTO.getErrorMessage());
+        this.code = jwtAuthenticationErrorDTO.getErrorCode();
+    }
+
+    public JwtAuthenticationException(JwtAuthenticationErrors error) {
+        super(error.getErrorMessage());
+        this.code = error.getErrorCode();
+    }
+
+    public Integer getCode() {
+        return code;
     }
 }

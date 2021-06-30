@@ -27,6 +27,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -134,7 +135,7 @@ public class JwtTokenProvider {
 
     public UserDetails getUserDetailsFromToken(DefaultClaims claims) throws AuthenticationException {
         try {
-            Collection<GrantedAuthority> grantedAuthorities = (Collection<GrantedAuthority>) claims.get(JwtClaimsConstant.AUTHORITIES);
+            Collection<GrantedAuthority> grantedAuthorities = getGrantedAuthorities(claims);
             Number idOfUserNum = ((Number) claims.get(JwtClaimsConstant.ID_OF_USER)).longValue();
             Long idOfUser = null;
             if(idOfUserNum != null){
@@ -170,6 +171,26 @@ public class JwtTokenProvider {
             throw  new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
                     JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
         }
+    }
+
+    private Collection<GrantedAuthority> getGrantedAuthorities(DefaultClaims claims) {
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        Collection<?> items = (Collection<?>) claims.get(JwtClaimsConstant.AUTHORITIES);
+        if (items != null) {
+            for (Object item : items) {
+                if (item instanceof GrantedAuthority) {
+                    grantedAuthorities.add((GrantedAuthority) item);
+                }
+                else if (item instanceof Map){
+                    for (Object o : ((Map) item).values()) {
+                        if (o instanceof String) {
+                            grantedAuthorities.add(new GrantedAuthorityImpl((String) o));
+                        }
+                    }
+                }
+            }
+        }
+        return grantedAuthorities;
     }
 
     public void closeAllUserRefreshTokenSessions(User user, Session persistenceSession) throws Exception {

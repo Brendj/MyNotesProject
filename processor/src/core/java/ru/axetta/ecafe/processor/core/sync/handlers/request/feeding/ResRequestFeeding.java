@@ -15,8 +15,10 @@ public class ResRequestFeeding implements AbstractToElement {
     private List<ResRequestFeedingItem> items;
     private List<ResRequestFeedingETPStatuses> statuses;
 
-    public ResRequestFeeding() {
-
+    public ResRequestFeeding() { }
+    public ResRequestFeeding(List<ResRequestFeedingItem> items, List<ResRequestFeedingETPStatuses> statuses) {
+        this.items = items;
+        this.statuses = statuses;
     }
 
     @Override

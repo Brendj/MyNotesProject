@@ -31,7 +31,7 @@ public class SpecialDate {
     public SpecialDate() {
     }
 
-    public SpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate,  Boolean isWeekend, String comment) {
+    public SpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate, Boolean isWeekend, String comment) {
         this.idOfOrg = compositeIdOfSpecialDate.getIdOfOrg();
         this.date = compositeIdOfSpecialDate.getDate();
         this.isWeekend = isWeekend;

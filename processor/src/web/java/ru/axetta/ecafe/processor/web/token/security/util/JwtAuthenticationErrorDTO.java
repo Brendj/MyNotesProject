@@ -17,6 +17,10 @@ public class JwtAuthenticationErrorDTO {
         this.errorMessage = errorMessage;
     }
 
+    public JwtAuthenticationErrorDTO(JwtAuthenticationErrors error) {
+        this(error.getErrorCode(), error.getErrorMessage());
+    }
+
     public int getErrorCode() {
         return errorCode;
     }
