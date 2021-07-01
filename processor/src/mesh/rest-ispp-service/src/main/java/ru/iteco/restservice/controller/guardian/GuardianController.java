@@ -7,7 +7,7 @@ package ru.iteco.restservice.controller.guardian;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ru.iteco.restservice.controller.guardian.request.SetRelationRequest;
+import ru.iteco.restservice.controller.guardian.request.RelationRequest;
 import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.servise.ClientService;
 
@@ -54,9 +54,18 @@ public class GuardianController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
             summary = "Создание связки между представителем и клиентом",
-            description = "Позволяет создать связку между представителем и клиентом с указанием степени родства и "
+            description = "Позволяет создать связку между представителем и клиентом с указанием степени родства и роли представителя"
     )
-    public void setGuardianRelations(@RequestBody @NotNull SetRelationRequest relations){
+    public void setGuardianRelations(@RequestBody @NotNull RelationRequest relations){
         clientService.setRelations(relations);
+    }
+
+    @PutMapping("/changeGuardianRelations")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Изменение степени родства и роли представителя"
+    )
+    public void changeGuardianRelations(@RequestBody @NotNull RelationRequest relations){
+        clientService.changeRelations(relations);
     }
 }

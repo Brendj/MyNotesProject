@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
-public class SetRelationRequest {
+public class RelationRequest {
     @Schema(description = "Номер телефона представителя", example = "79001234567")
     private String guardianMobile;
 
@@ -24,7 +24,7 @@ public class SetRelationRequest {
     @Schema(description = "Код роли представителя", example = "0")
     private Integer isLegalRepresent;
 
-    public SetRelationRequest() {
+    public RelationRequest() {
     }
 
     public Long getRepContractId() {
@@ -75,7 +75,7 @@ public class SetRelationRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SetRelationRequest that = (SetRelationRequest) o;
+        RelationRequest that = (RelationRequest) o;
         return Objects.equals(guardianMobile, that.guardianMobile) && Objects.equals(contractId, that.contractId)
                 && Objects.equals(repContractId, that.repContractId) && Objects.equals(relation, that.relation)
                 && Objects.equals(isLegalRepresent, that.isLegalRepresent);

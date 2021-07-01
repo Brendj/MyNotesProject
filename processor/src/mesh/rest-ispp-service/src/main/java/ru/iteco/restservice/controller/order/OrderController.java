@@ -39,7 +39,7 @@ public class OrderController {
     @GetMapping("/getList")
     @ResponseBody
     @Operation(
-            summary = "Получение списка обытий предоставления питания",
+            summary = "Получение списка событий предоставления питания",
             description = "Позволяет получить события предоставления питания обучающемуся в ОО")
     public Page<OrderResponseDTO> getList(
             @Parameter(description = "Номер лицевого счета клиента") @NotNull @PositiveOrZero @RequestParam Long contractId,
