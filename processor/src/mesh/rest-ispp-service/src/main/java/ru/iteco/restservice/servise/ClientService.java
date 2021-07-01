@@ -5,7 +5,7 @@
 package ru.iteco.restservice.servise;
 
 import ru.iteco.restservice.controller.client.request.NotificationUpdateRequest;
-import ru.iteco.restservice.controller.guardian.request.SetRelationRequest;
+import ru.iteco.restservice.controller.guardian.request.RelationRequest;
 import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.db.repo.readonly.ClientGuardianNotificationSettingsReadonlyRepo;
 import ru.iteco.restservice.db.repo.readonly.ClientGuardianReadOnlyRepo;
@@ -194,7 +194,7 @@ public class ClientService {
     }
 
     @Transactional
-    public void setRelations(@NotNull SetRelationRequest relations) {
+    public void setRelations(@NotNull RelationRequest relations) {
         if(relations.getContractId() == null){
             throw new IllegalArgumentException("Не указан л/с клиента");
         } else if(!phonePattern.matcher(relations.getGuardianMobile()).matches()){
@@ -305,5 +305,57 @@ public class ClientService {
             guardianNotificationSettings = writableEntityManager.merge(guardianNotificationSettings);
             writableEntityManager.remove(guardianNotificationSettings);
         }
+    }
+
+    @Transactional
+    public void changeRelations(RelationRequest req) {
+        if(req.getContractId() == null){
+            throw new IllegalArgumentException("Не указан л/с клиента");
+        } else if(!phonePattern.matcher(req.getGuardianMobile()).matches()){
+            throw new IllegalArgumentException("Номер телефона не соответствует паттерну");
+        } else if(req.getRepContractId() == null){
+            throw new IllegalArgumentException("Не указан л/с представителя");
+        } else if(req.getRelation() == null){
+            throw new IllegalArgumentException("Не указана степень родства");
+        } else if(req.getIsLegalRepresent() == null){
+            throw new IllegalArgumentException("Не указана роль представителя");
+        }
+
+        ClientGuardianRelationType relationType = ClientGuardianRelationType.of(req.getRelation());
+        ClientGuardianRepresentType representType = ClientGuardianRepresentType.of(req.getIsLegalRepresent());
+        if(!(representType.equals(ClientGuardianRepresentType.IN_LAW) || representType.equals(ClientGuardianRepresentType.NOT_IN_LAW))){
+            throw new IllegalArgumentException("Операция доступна только для законного представителя");
+        }
+
+        Client child = clientReadOnlyRepo.getClientByContractId(req.getContractId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Не найден клиент по л/с %d", req.getContractId()))
+                );
+        if(child.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+            throw new IllegalArgumentException("Клиент из предопределенной группы");
+        }
+
+        Client guardian = clientReadOnlyRepo
+                .getClientByMobileAndContractId(req.getGuardianMobile(), req.getRepContractId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Не найден представитель по л/с %d и телефону %s", req.getContractId(), req.getGuardianMobile()))
+                );
+        Long groupIdOfGuardian = guardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
+        if(ClientGroupAssignment.CLIENT_PARENTS.getId() > groupIdOfGuardian && groupIdOfGuardian > ClientGroupAssignment.CLIENT_VISITORS.getId() -1L){
+            throw new IllegalArgumentException("Указанный представитель не пренадлежит группе \"Родители\"");
+        }
+
+        Long nextVersion = guardianReadOnlyRepo.getVersion() + 1L;
+
+        ClientGuardian clientGuardian = guardianReadOnlyRepo
+                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian)
+                .orElseThrow(() -> new NotFoundException("Нет связи между клиентом и представителем"));
+
+
+        clientGuardian.setVersion(nextVersion);
+        clientGuardian.setRelationType(relationType);
+        clientGuardian.setRepresentType(representType);
+
+        clientGuardian = writableEntityManager.merge(clientGuardian);
     }
 }
