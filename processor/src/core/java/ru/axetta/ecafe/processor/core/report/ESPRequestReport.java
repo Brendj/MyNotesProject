@@ -146,7 +146,7 @@ public class ESPRequestReport extends BasicReportForMainBuildingOrgJob {
                     + "cc.mobile from cf_esp_request  cer\n"
                     + "left join cf_orgs co on co.idoforg = cer.idoforg\n"
                     + "left join cf_clients cc on cc.idofclient = cer.idofclient\n"
-                    + "left join cf_persons cp on cp.idofperson=cc.idofclient "
+                    + "left join cf_persons cp on cp.idofperson=cc.idofperson "
                     + "where " + fullfilter);
 
             List rListESP = queryESPrequest.list();

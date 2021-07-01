@@ -143,4 +143,6 @@
             </f:facet>
         </rich:dataTable>
     </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 </h:panelGrid>
