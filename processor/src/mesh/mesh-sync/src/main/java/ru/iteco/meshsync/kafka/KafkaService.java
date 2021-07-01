@@ -2,9 +2,8 @@ package ru.iteco.meshsync.kafka;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.iteco.meshsync.EntityType;
+import ru.iteco.meshsync.enums.EntityType;
 import ru.iteco.meshsync.kafka.dto.EntityChangeEventDTO;
-import ru.iteco.meshsync.mesh.service.DAO.EntityChangesService;
 import ru.iteco.meshsync.mesh.service.logic.MeshService;
 import ru.iteco.meshsync.models.EntityChanges;
 
@@ -23,22 +22,20 @@ import java.util.stream.Stream;
 public class KafkaService {
     private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
     private static final Set<EntityType> trackedEntities = Stream.of(
-            EntityType.person,
-            EntityType.person_education,
-            EntityType.category
+            EntityType.PERSON,
+            EntityType.PERSON_EDUCATION,
+            EntityType.CATEGORY,
+            EntityType.CLASS
     ).collect(Collectors.toSet());
 
     private final ObjectMapper objectMapper;
     private final MeshService meshService;
-    private final EntityChangesService entityChangesService;
 
     public KafkaService(ObjectMapper objectMapper,
-                        MeshService meshService,
-                        EntityChangesService entityChangesService){
+                        MeshService meshService){
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
         this.objectMapper = objectMapper;
         this.meshService = meshService;
-        this.entityChangesService = entityChangesService;
     }
 
     @KafkaListener(topics = "#{'${kafka.topic.mesh}'}")
@@ -56,15 +53,20 @@ public class KafkaService {
     }
 
     private void commitJson(EntityChangeEventDTO dto) {
-        if(!trackedEntities.contains(dto.getEntity_name())){
+        if (dto.getEntity_name() == null || !trackedEntities.contains(dto.getEntity_name())) {
             log.warn("Not tracked entity for updates: " + dto.getEntity_name());
             return;
         }
         EntityChanges entityChanges = EntityChanges.buildFromDTO(dto);
         dto = null;
         try {
-            boolean process = meshService.processEntityChanges(entityChanges);
-        } catch (Exception e){
+            boolean process = false;
+            if (entityChanges.getEntity().equals(EntityType.CLASS)) {
+                process = meshService.processClassChanges(entityChanges);
+            } else {
+                process = meshService.processEntityChanges(entityChanges);
+            }
+        } catch (Exception e) {
             log.error("Can't process message: ", e);
         }
     }
