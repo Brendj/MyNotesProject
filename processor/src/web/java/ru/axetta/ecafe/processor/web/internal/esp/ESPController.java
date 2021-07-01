@@ -77,10 +77,10 @@ public class ESPController {
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Client client = DAOUtils.findClientByMeshGuid(persistenceSession, espRequest.getMeshGuid());
+            Client client = DAOUtils.findClient(persistenceSession, espRequest.getIdOfClient());
             if (client == null)
             {
-                logger.error(String.format("Client with meshGuid=%s not found", espRequest.getMeshGuid()));
+                logger.error(String.format("Client with idOfClient=%s not found", espRequest.getIdOfClient()));
                 result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();

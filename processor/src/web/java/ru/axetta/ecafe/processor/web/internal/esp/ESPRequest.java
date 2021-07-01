@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ESPRequest {
     private Date dateRequest; //Дата подачи обращения
-    private String meshGuid; //Клиент
+    private Long idOfClient ; //Клиент
     private String email; //Почта
     private Long idOfOrg; //Организация
     private String topic; //Тема обращения
@@ -60,19 +60,19 @@ public class ESPRequest {
         this.message = message;
     }
 
-    public String getMeshGuid() {
-        return meshGuid;
-    }
-
-    public void setMeshGuid(String meshGuid) {
-        this.meshGuid = meshGuid;
-    }
-
     public List<ESPRequestAttachedFile> getAttached() {
         return attached;
     }
 
     public void setAttached(List<ESPRequestAttachedFile> attached) {
         this.attached = attached;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 }
