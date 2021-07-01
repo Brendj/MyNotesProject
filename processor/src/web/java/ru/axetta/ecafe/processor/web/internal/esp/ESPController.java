@@ -239,7 +239,7 @@ public class ESPController {
             responseESPRequests.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             responseESPRequests.setErrorMessage(ResponseCodes.RC_OK.toString());
         } catch (Exception e) {
-            logger.error("Ошибка при сохранении данных обращения", e);
+            logger.error("Ошибка при получении списка обращений", e);
             result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
