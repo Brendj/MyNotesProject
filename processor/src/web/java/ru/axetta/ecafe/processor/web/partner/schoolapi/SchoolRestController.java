@@ -139,7 +139,7 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "authorization/changepassword")
+    @Path(value = "infos/changepassword")
     public Response changePassword(@Context HttpServletRequest request, ChangePasswordData changePasswordData) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
@@ -164,7 +164,7 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "authorization/checksmscode")
+    @Path(value = "infos/checksmscode")
     public Response checkSmsCode(ConfirmSmsData confirmSmsData) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
@@ -188,7 +188,7 @@ public class SchoolRestController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "authorization/resendsms")
+    @Path(value = "infos/resendsms")
     public Response resendSmsCode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
