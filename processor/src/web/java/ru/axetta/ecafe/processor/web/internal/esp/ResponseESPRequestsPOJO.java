@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class ResponseESPRequestsPOJO {
     private Date dateRequest; //Дата подачи обращения
-    private String meshGuid; //Клиент
+    private Long idOfClient ; //Клиент
     private String email; //Почта
     private Long idOfOrg; //Организация
     private String topic; //Тема обращения
@@ -29,14 +29,6 @@ public class ResponseESPRequestsPOJO {
 
     public void setDateRequest(Date dateRequest) {
         this.dateRequest = dateRequest;
-    }
-
-    public String getMeshGuid() {
-        return meshGuid;
-    }
-
-    public void setMeshGuid(String meshGuid) {
-        this.meshGuid = meshGuid;
     }
 
     public String getEmail() {
@@ -101,5 +93,13 @@ public class ResponseESPRequestsPOJO {
 
     public void setSolution(String solution) {
         this.solution = solution;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 }

@@ -226,7 +226,7 @@ public class ESPController {
                 responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
                 responseESPRequestsPOJO.setEmail(esp.getEmail());
                 responseESPRequestsPOJO.setIdOfOrg(esp.getOrg().getIdOfOrg());
-                responseESPRequestsPOJO.setMeshGuid(esp.getClient().getMeshGUID());
+                responseESPRequestsPOJO.setIdOfClient(esp.getClient().getIdOfClient());
                 responseESPRequestsPOJO.setMessage(esp.getMessage());
                 responseESPRequestsPOJO.setTopic(esp.getTopic());
                 responseESPRequestsPOJO.setNumberrequest(esp.getNumberrequest());

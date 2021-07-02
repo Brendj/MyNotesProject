@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ESPRequest {
     private Date dateRequest; //Дата подачи обращения
-    private Long idOfClient ; //Клиент
+    private Long idOfClient; //Клиент
     private String email; //Почта
     private Long idOfOrg; //Организация
     private String topic; //Тема обращения
