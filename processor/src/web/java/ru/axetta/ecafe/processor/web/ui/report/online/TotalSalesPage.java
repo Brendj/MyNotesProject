@@ -630,10 +630,10 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 });
 
                 Query query = session.createSQLQuery(
-                        "SELECT od.socdiscount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                        "SELECT od.socdiscount, od.rprice, od.discount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                                 + "WHERE o.idoforg IN (:idOfOrgs) AND o.createdDate >= :startDate AND o.createdDate <= :endDate AND od.rprice = 0 AND"
                                 + "      (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99)) AND o.state = 0 AND od.state = 0"
-                                + "GROUP BY od.socdiscount ORDER BY od.socdiscount");
+                                + "GROUP BY od.socdiscount, od.rprice, od.discount ORDER BY od.socdiscount");
 
                 query.setParameter("startDate", startDate.getTime());
                 query.setParameter("endDate", endDate.getTime());
@@ -644,9 +644,15 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 String str;
                 titleAndSumBenefitMap = new HashMap<String, String>();
                 for (Object o : resultList) {
-                    str = "Льготный комплекс " + ((BigInteger) o).longValue() / 100 + "."
-                            + ((BigInteger) o).longValue() % 100 + " руб.";
-                    titleAndSumBenefitMap.put(str, o.toString());
+                    Object[] row = (Object[]) o;
+                    Long socdiscount = ((BigInteger) row[0]).longValue();
+                    Long price = ((BigInteger) row[1]).longValue() + ((BigInteger) row[2]).longValue();
+                    if (socdiscount > 0) {
+                        str = "Льготный комплекс " + socdiscount / 100 + "." + socdiscount % 100 + " руб.";
+                    } else {
+                        str = "Льготный комплекс " + price / 100 + "." + price % 100 + " руб.";
+                    }
+                    titleAndSumBenefitMap.put(str, socdiscount > 0 ? socdiscount.toString() : price.toString());
                     titles.add(str);
                 }
             }
