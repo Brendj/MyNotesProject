@@ -321,12 +321,6 @@ public class ClientService {
             throw new IllegalArgumentException("Не указана роль представителя");
         }
 
-        ClientGuardianRelationType relationType = ClientGuardianRelationType.of(req.getRelation());
-        ClientGuardianRepresentType representType = ClientGuardianRepresentType.of(req.getIsLegalRepresent());
-        if(!(representType.equals(ClientGuardianRepresentType.IN_LAW) || representType.equals(ClientGuardianRepresentType.NOT_IN_LAW))){
-            throw new IllegalArgumentException("Операция доступна только для законного представителя");
-        }
-
         Client child = clientReadOnlyRepo.getClientByContractId(req.getContractId())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Не найден клиент по л/с %d", req.getContractId()))
@@ -335,27 +329,46 @@ public class ClientService {
             throw new IllegalArgumentException("Клиент из предопределенной группы");
         }
 
-        Client guardian = clientReadOnlyRepo
-                .getClientByMobileAndContractId(req.getGuardianMobile(), req.getRepContractId())
+        Client changingGuardian = clientReadOnlyRepo
+                .getFirstByMobileOrderByClientRegistryVersionDesc(req.getGuardianMobile())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Не найден представитель по л/с %d и телефону %s", req.getContractId(), req.getGuardianMobile()))
+                        String.format("Не найден представитель по номеру телефону %s", req.getGuardianMobile()))
                 );
-        Long groupIdOfGuardian = guardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
-        if(ClientGroupAssignment.CLIENT_PARENTS.getId() > groupIdOfGuardian && groupIdOfGuardian > ClientGroupAssignment.CLIENT_VISITORS.getId() -1L){
-            throw new IllegalArgumentException("Указанный представитель не пренадлежит группе \"Родители\"");
-        }
-
-        Long nextVersion = guardianReadOnlyRepo.getVersion() + 1L;
 
         ClientGuardian clientGuardian = guardianReadOnlyRepo
-                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian)
-                .orElseThrow(() -> new NotFoundException("Нет связи между клиентом и представителем"));
+                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, changingGuardian)
+                .orElseThrow(() -> new NotFoundException("Нет связи между клиентом и инициатором операции"));
 
+        Long groupIdOfGuardian = changingGuardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
+        if(ClientGroupAssignment.CLIENT_PARENTS.getId() > groupIdOfGuardian && groupIdOfGuardian > ClientGroupAssignment.CLIENT_VISITORS.getId() -1L){
+            throw new IllegalArgumentException("Инициатор операции не пренадлежит группе \"Родители\"");
+        }
 
-        clientGuardian.setVersion(nextVersion);
-        clientGuardian.setRelationType(relationType);
-        clientGuardian.setRepresentType(representType);
+        if(!(clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW)
+                || clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.NOT_IN_LAW))){
+            throw new IllegalArgumentException("Операция доступна только для законного представителя");
+        }
 
-        clientGuardian = writableEntityManager.merge(clientGuardian);
+        clientGuardian = null;
+
+        Client targetGuardian = clientReadOnlyRepo
+                .getClientByContractId(req.getRepContractId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Не найден целевой представитель по л/с %d", req.getRepContractId()))
+                );
+
+        ClientGuardian targetClientGuardian = guardianReadOnlyRepo
+                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, targetGuardian)
+                .orElseThrow(() -> new NotFoundException("Нет связи между клиентом и целевым представителем"));
+
+        Long nextVersion = guardianReadOnlyRepo.getVersion() + 1L;
+        ClientGuardianRelationType relationType = ClientGuardianRelationType.of(req.getRelation());
+        ClientGuardianRepresentType representType = ClientGuardianRepresentType.of(req.getIsLegalRepresent());
+
+        targetClientGuardian.setVersion(nextVersion);
+        targetClientGuardian.setRelationType(relationType);
+        targetClientGuardian.setRepresentType(representType);
+
+        targetClientGuardian = writableEntityManager.merge(targetClientGuardian);
     }
 }
