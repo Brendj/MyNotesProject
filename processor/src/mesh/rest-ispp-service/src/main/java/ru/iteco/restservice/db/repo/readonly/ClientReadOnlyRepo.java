@@ -58,6 +58,8 @@ public interface ClientReadOnlyRepo extends CrudRepository<Client, Long> {
     @EntityGraph("getClientAndOrgByContractId")
     Optional<Client> getClientByMobileAndContractId(String mobile, Long contractId);
 
+    Optional<Client> getFirstByMobileOrderByClientRegistryVersionDesc(String mobile);
+
     @Query("SELECT g FROM ClientGuardian cg "
          + "JOIN cg.guardian g "
          + "JOIN cg.children c "
