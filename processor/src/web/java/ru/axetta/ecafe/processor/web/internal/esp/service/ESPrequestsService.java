@@ -74,6 +74,7 @@ public class ESPrequestsService {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append(CalendarUtils.dateTimeToString(new Date()));
+            sb.append(" ");
             if (type==1)
                 sb.append("(new request) out: ");
             if (type==2)
