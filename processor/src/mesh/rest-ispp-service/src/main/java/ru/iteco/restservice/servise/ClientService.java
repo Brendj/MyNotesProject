@@ -344,8 +344,7 @@ public class ClientService {
             throw new IllegalArgumentException("Инициатор операции не пренадлежит группе \"Родители\"");
         }
 
-        if(!(clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW)
-                || clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.NOT_IN_LAW))){
+        if(!clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW)){
             throw new IllegalArgumentException("Операция доступна только для законного представителя");
         }
 
