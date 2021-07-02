@@ -435,7 +435,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                         && totalSalesItem.getAgeGroup().equals(ageGroup)) {
                     totalSalesItem.setSum(totalSalesItem.getSum() + buffetOrder.getSum());
                     totalSalesItem.setSumPay(totalSalesItem.getSumPay() + buffetOrder.getSumPay());
-                    totalSalesItem.setSumDiscount(totalSalesItem.getSumDiscount() + buffetOrder.getSumDiscount() + buffetOrder.getKazanDiscount());
+                    long realDiscountAdd = buffetOrder.getSumDiscount() > 0 ? buffetOrder.getSumDiscount() : buffetOrder.getKazanDiscount();
+                    totalSalesItem.setSumDiscount(totalSalesItem.getSumDiscount() + realDiscountAdd);
                     if(buffetOrder.getIdOfClient() != null && !totalSalesItem.getIdOfClientList().contains(buffetOrder.getIdOfClient())) {
                         totalSalesItem.getIdOfClientList().add(buffetOrder.getIdOfClient());
                         totalSalesItem.setUniqueClientCount(totalSalesItem.getIdOfClientList().size());
