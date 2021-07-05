@@ -711,10 +711,10 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 });
 
                 Query query = session.createSQLQuery(
-                        "SELECT od.rprice, od.socdiscount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                        "SELECT od.rprice, od.socdiscount, od.discount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                                 + "WHERE o.idoforg IN (:idOfOrgs) AND o.createdDate >= :startDate AND o.createdDate <= :endDate  AND od.rprice > 0 "
                                 + "AND(od.menuType >= 50 AND od.menuType <= 99) AND o.state = 0 AND od.state = 0"
-                                + "GROUP BY od.rprice, od.socdiscount ORDER BY od.rprice");
+                                + "GROUP BY od.rprice, od.socdiscount, od.discount ORDER BY od.rprice");
 
                 query.setParameter("startDate", startDate.getTime());
                 query.setParameter("endDate", endDate.getTime());
