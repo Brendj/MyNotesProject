@@ -726,11 +726,13 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 titleAndSumPaidMap = new HashMap<String, String>();
                 for (Object o : resultList) {
                     Object[] row = (Object[]) o;
-                    str = "Платный комплекс " + ((BigInteger) row[0]).longValue() / 100 + "."
-                            + ((BigInteger) row[0]).longValue() % 100 + " руб.";
-                    Long discount = ((BigInteger) row[1]).longValue();
+                    Long rprice = ((BigInteger) row[0]).longValue();
+                    Long discount = ((BigInteger) row[1]).longValue() + ((BigInteger) row[2]).longValue();
+                    str = "Платный комплекс " + (rprice + discount) / 100 + "."
+                            + (rprice + discount) % 100 + " руб.";
+
                     if (discount > 0) {
-                        str += String.format(" (скидка %s.%s)", ((BigInteger) row[1]).longValue() / 100, ((BigInteger) row[1]).longValue() % 100);
+                        str += String.format(" (скидка %s.%s)", discount / 100, discount % 100);
                     }
                     titleAndSumPaidMap.put(str, row[0].toString());
                     titles.add(str);

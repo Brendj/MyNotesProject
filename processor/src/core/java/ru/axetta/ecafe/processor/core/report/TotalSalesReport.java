@@ -397,11 +397,11 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             for (OrderItem allOrder : allOrdersPaid) {
                 if (!priceAndSumPaidHashMap.isEmpty()) {
-                    if (priceAndSumPaidHashMap.get(allOrder.getSum()) != null && allOrder.getSumDiscount() == 0L) {
-                        Long sum = priceAndSumPaidHashMap.get(allOrder.getSum()).getSum();
+                    if (priceAndSumPaidHashMap.get(allOrder.getSumPay()) != null && allOrder.getSumDiscount() == 0L) {
+                        Long sum = priceAndSumPaidHashMap.get(allOrder.getSumPay()).getSum();
                         sum += handleOrders(totalListMap, allOrder,
-                                priceAndSumPaidHashMap.get(allOrder.getSum()).getTitle(), showAgeGroups);
-                        priceAndSumPaidHashMap.get(allOrder.getSum()).setSum(sum);
+                                priceAndSumPaidHashMap.get(allOrder.getSumPay()).getTitle(), showAgeGroups);
+                        priceAndSumPaidHashMap.get(allOrder.getSumPay()).setSum(sum);
                     }
                     if (priceAndSumPaidHashMap.get(allOrder.getSumPay()) != null && allOrder.getSumDiscount() > 0) {
                         Long sum = priceAndSumPaidHashMap.get(allOrder.getSumPay()).getSum();
