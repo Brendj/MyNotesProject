@@ -167,7 +167,8 @@ public class PreorderDAO {
                 regularPreorderRequest.getAmount(), complex.getName(), regularPreorderRequest.getMonday(),
                 regularPreorderRequest.getTuesday(), regularPreorderRequest.getWednesday(),
                 regularPreorderRequest.getThursday(), regularPreorderRequest.getFriday(), regularPreorderRequest.getSaturday(),
-                complex.getPrice() == null ? 0 : complex.getPrice().longValue(), regularPreorderRequest.getGuardianMobile(),
+                complex.getPrice() == null ? 0 : (complex.getPrice().multiply(BigDecimal.valueOf(100))).longValue(),
+                regularPreorderRequest.getGuardianMobile(),
                 RegularPreorderState.CHANGE_BY_USER,
                 data.getMobileGroupOnCreate(), dish == null ? null : dish.getIdOfDish());
 

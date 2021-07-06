@@ -10,6 +10,7 @@ import ru.iteco.restservice.model.wt.WtComplex;
 import ru.iteco.restservice.servise.CalendarUtils;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -131,7 +132,7 @@ public class PreorderComplex {
         this.mobile = guardianMobile;
         this.mobileGroupOnCreate = mobileGroupOnCreate;
         this.complexName = wtComplex.getName();
-        this.complexPrice = wtComplex.getPrice() == null ? 0 : wtComplex.getPrice().longValue();
+        this.complexPrice = wtComplex.getPrice() == null ? 0 : (wtComplex.getPrice().multiply(BigDecimal.valueOf(100))).longValue();
         this.modeFree = 0;
         this.modeOfAdd = wtComplex.getComposite() ? COMPLEX_TYPE4 : COMPLEX_TYPE2;
     }
