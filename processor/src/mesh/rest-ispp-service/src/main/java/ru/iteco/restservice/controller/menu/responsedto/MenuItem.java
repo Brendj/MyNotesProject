@@ -5,6 +5,7 @@ import ru.iteco.restservice.model.ProhibitionMenu;
 import ru.iteco.restservice.model.wt.WtCategoryItem;
 import ru.iteco.restservice.model.wt.WtDish;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class MenuItem {
     @Schema(description = "Список подкатегорий блюда")
     private final List<SubCategoryItem> subcategories;
 
-    @Schema(description = "Цена блюда")
+    @Schema(description = "Цена блюда в копейках")
     private Long price;
 
     @Schema(description = "Калорийность блюда")
@@ -47,7 +48,7 @@ public class MenuItem {
         this.dishId = wtDish.getIdOfDish();
         this.dishName = wtDish.getDishName();
         this.dishContent = wtDish.getComponentsOfDish();
-        this.price = wtDish.getPrice().longValue();
+        this.price = (wtDish.getPrice().multiply(BigDecimal.valueOf(100))).longValue();
         this.calories = wtDish.getCalories();
         this.output = wtDish.getQty() == null ? "" : wtDish.getQty();
         this.protein = wtDish.getProtein();

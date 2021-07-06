@@ -8,6 +8,7 @@ import ru.iteco.restservice.controller.base.BaseConverter;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
 import ru.iteco.restservice.model.CategoryDiscount;
 import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.PreorderFlag;
 import ru.iteco.restservice.servise.EnterEventsService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,9 +51,13 @@ public class ClientConverter extends BaseConverter<ClientResponseDTO, Client> {
         String gender = c.getGender().toString();
         String categoryDiscount = StringUtils.join(discountsName, ",");
 
-        Boolean preorderAllowed =
-                c.getPreorderFlag() != null && c.getPreorderFlag().getAllowedPreorder() != null
-                        && c.getPreorderFlag().getAllowedPreorder().equals(1);
+        Boolean preorderAllowed = false;
+        for (PreorderFlag pf : c.getPreorderFlag()) {
+            if (pf.getAllowedPreorder() != null && pf.getAllowedPreorder().equals(1)) {
+                preorderAllowed = true;
+            }
+        }
+
         Long limit = c.getExpenditureLimit();
 
         return new ClientResponseDTO(contractId, balance, firstName, lastname, middleName, grade, orgName, orgType,

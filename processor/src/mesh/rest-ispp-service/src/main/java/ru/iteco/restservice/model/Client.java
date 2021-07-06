@@ -228,8 +228,8 @@ public class Client {
     @JoinColumn(name = "idofperson")
     private Person person;
 
-    @OneToOne(mappedBy = "client")
-    private PreorderFlag preorderFlag;
+    @OneToMany(mappedBy = "client")
+    private Set<PreorderFlag> preorderFlag;
 
     @OneToMany(mappedBy = "client")
     private Set<ClientsNotificationSettings> notificationSettings;
@@ -389,11 +389,11 @@ public class Client {
         this.limits = limits;
     }
 
-    public PreorderFlag getPreorderFlag() {
+    public Set<PreorderFlag> getPreorderFlag() {
         return preorderFlag;
     }
 
-    public void setPreorderFlag(PreorderFlag preorderFlag) {
+    public void setPreorderFlag(Set<PreorderFlag> preorderFlag) {
         this.preorderFlag = preorderFlag;
     }
 

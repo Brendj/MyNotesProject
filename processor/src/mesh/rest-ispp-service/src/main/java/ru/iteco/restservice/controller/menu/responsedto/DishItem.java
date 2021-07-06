@@ -6,6 +6,7 @@ import ru.iteco.restservice.model.preorder.RegularPreorder;
 import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -21,7 +22,7 @@ public class DishItem {
     @Schema(description = "Состав блюда")
     private String dishContent;
 
-    @Schema(description = "Цена блюда")
+    @Schema(description = "Цена блюда в копейках")
     private Long price;
 
     @Schema(description = "Калорийность блюда")
@@ -55,7 +56,7 @@ public class DishItem {
         this.dishId = wtDish.getIdOfDish();
         this.dishName = wtDish.getDishName();
         this.dishContent = wtDish.getComponentsOfDish();
-        this.price = wtDish.getPrice() == null ? 0 : wtDish.getPrice().longValue();
+        this.price = wtDish.getPrice() == null ? 0 : (wtDish.getPrice().multiply(BigDecimal.valueOf(100))).longValue();
         this.calories = wtDish.getCalories();
         this.output = wtDish.getQty() == null ? "" : wtDish.getQty();
         this.protein = wtDish.getProtein();

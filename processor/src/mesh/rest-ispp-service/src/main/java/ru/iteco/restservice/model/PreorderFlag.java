@@ -17,7 +17,7 @@ public class PreorderFlag {
     @Column(name = "allowedpreorder")
     private Integer allowedPreorder;
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "idofclient")
     private Client client;
 

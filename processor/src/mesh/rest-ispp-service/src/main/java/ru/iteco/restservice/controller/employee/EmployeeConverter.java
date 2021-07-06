@@ -7,6 +7,7 @@ package ru.iteco.restservice.controller.employee;
 import ru.iteco.restservice.controller.base.BaseConverter;
 import ru.iteco.restservice.controller.employee.responsedto.EmployeeResponseDTO;
 import ru.iteco.restservice.model.Client;
+import ru.iteco.restservice.model.PreorderFlag;
 import ru.iteco.restservice.servise.EnterEventsService;
 
 import org.springframework.stereotype.Component;
@@ -36,8 +37,12 @@ public class EmployeeConverter extends BaseConverter<EmployeeResponseDTO, Client
         Boolean specialMenu = c.getSpecialMenu() != null && c.getSpecialMenu().equals(1);
         String gender = c.getGender().toString();
 
-        Boolean preorderAllowed =
-                c.getPreorderFlag() != null && c.getPreorderFlag().getAllowedPreorder() != null && c.getPreorderFlag().getAllowedPreorder().equals(1);
+        Boolean preorderAllowed = false;
+        for (PreorderFlag pf : c.getPreorderFlag()) {
+            if (pf.getAllowedPreorder() != null && pf.getAllowedPreorder().equals(1)) {
+                preorderAllowed = true;
+            }
+        }
 
         return new EmployeeResponseDTO(contractId, balance, firstName, middleName, lastname, grade, orgType, orgName,
                 address, isInside, specialMenu, gender, preorderAllowed);

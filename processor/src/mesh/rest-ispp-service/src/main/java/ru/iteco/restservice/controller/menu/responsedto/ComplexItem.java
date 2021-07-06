@@ -8,6 +8,7 @@ import ru.iteco.restservice.model.wt.WtDish;
 import ru.iteco.restservice.servise.data.PreorderAmountData;
 import ru.iteco.restservice.servise.data.PreorderComplexAmountData;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class ComplexItem {
     private String complexName;
     @Schema(description = "Признак составного комплекса")
     private Boolean composite;
-    @Schema(description = "Цена комплекса")
+    @Schema(description = "Цена комплекса в копейках")
     private Long price;
     @Schema(description = "Вид рациона комплекса")
     private Integer fRation;
@@ -37,7 +38,7 @@ public class ComplexItem {
         this.complexId = wtComplex.getIdOfComplex();
         this.complexName = wtComplex.getName();
         this.composite = wtComplex.getComposite();
-        this.price = wtComplex.getPrice() == null ? 0 : wtComplex.getPrice().longValue();
+        this.price = wtComplex.getPrice() == null ? 0 : (wtComplex.getPrice().multiply(BigDecimal.valueOf(100))).longValue();
         PreorderComplexAmountData data = PreorderAmountData.getByComplexId(preorderComplexAmounts, wtComplex.getIdOfComplex());
         PreorderComplexDTO preorderInfo = new PreorderComplexDTO();
         preorderInfo.setAmount(data == null ? 0 : data.getAmount());
