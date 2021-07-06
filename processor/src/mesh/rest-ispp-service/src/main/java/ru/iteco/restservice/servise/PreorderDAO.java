@@ -288,14 +288,14 @@ public class PreorderDAO {
             }
 
             //проверяем, нет ли на дату удаленного пользователем предзаказа
-            PreorderComplex pc2 = findPreorderComplexOnDate(preordersForClient, currentDate, null);
+            /*PreorderComplex pc2 = findPreorderComplexOnDate(preordersForClient, currentDate, null);
             if (pc2 != null) {
                 if (pc2.getDeletedState().equals(1) && pc2.getState() == PreorderState.OK && pc2.getLastUpdate().after(regularPreorder.getCreatedDate())) {
                     logger.info("Client deleted preorder on this date earlier");
                     currentDate = CalendarUtils.addDays(currentDate, 1);
                     continue;
                 }
-            }
+            }*/
 
             //предзаказ на комплекс
             PreorderComplex preorderComplex = findPreorderComplexOnDate(preorderComplexes, currentDate, null);
@@ -495,10 +495,10 @@ public class PreorderDAO {
 
 
     private boolean allowCreateNewPreorderComplex(PreorderComplex preorderComplex) {
-        return preorderComplex.getDeletedState().equals(1) &&
+        return preorderComplex.getDeletedState().equals(1) /*&&
                 !(preorderComplex.getState().equals(PreorderState.OK)
                         || preorderComplex.getState().equals(PreorderState.CHANGE_ORG)
-                        || preorderComplex.getState().equals(PreorderState.PREORDER_OFF));
+                        || preorderComplex.getState().equals(PreorderState.PREORDER_OFF))*/;
     }
 
     private boolean doEditRegular(PreorderComplex preorderComplex, Integer regularAmount) {
