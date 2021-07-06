@@ -269,8 +269,8 @@
             <h:outputText escape="true" value="#{helpdeskItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="ЕСП" styleClass="output-text" rendered="#{mainPage.userEditPage.getIsDefaultOrAdmin}"/>
-    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.espItems}" var="espdeskItems" rendered="#{mainPage.userEditPage.getIsDefaultOrAdmin}">
+    <h:outputText escape="true" value="ЕСП" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefaultOrAdmin}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.espItems}" var="espdeskItems" rendered="#{mainPage.userEditPage.isDefaultOrAdmin}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{espdeskItems.selected}" styleClass="output-text" />
         </rich:column>
