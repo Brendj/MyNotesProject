@@ -161,27 +161,19 @@ public class ESPrequestsService {
     }
 
     private byte[] executeRequest(HttpMethodBase httpMethod, URL url) throws Exception {
-        try {
-            HttpClient httpClient = getHttpClient(url);
-            int statusCode = httpClient.executeMethod(httpMethod);
-            //if (statusCode == HttpStatus.SC_OK) {
-                InputStream inputStream = httpMethod.getResponseBodyAsStream();
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int nRead;
-                byte[] data = new byte[1024*1024];
-                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
-                }
-
-                buffer.flush();
-                return buffer.toByteArray();
-            //} else {
-            //    String errorMessage = "ESP request has status " + statusCode;
-            //    throw new Exception(errorMessage);
-            //}
-        } finally {
-            httpMethod.releaseConnection();
+        HttpClient httpClient = getHttpClient(url);
+        int statusCode = httpClient.executeMethod(httpMethod);
+        //if (statusCode == HttpStatus.SC_OK) {
+        InputStream inputStream = httpMethod.getResponseBodyAsStream();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[1024*1024];
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
         }
+
+        buffer.flush();
+        return buffer.toByteArray();
     }
 
     private HttpClient getHttpClient(URL url) {
