@@ -314,6 +314,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage orgParametersGroup = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistCatalogGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage espHelpdeskGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -6778,6 +6779,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showEspHelpdeskGroupPage(){
+        currentWorkspacePage = espHelpdeskGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public BasicWorkspacePage getDiscountGroupPage() {
         return discountGroupPage;
     }
@@ -9929,6 +9936,10 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_HELPDESK);
     }
 
+    public boolean isEligibleToViewESPdesk() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_ESP);
+    }
+
     public boolean isEligibleToViewTotalServicesReport() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT);
     }
@@ -11152,5 +11163,9 @@ public class MainPage implements Serializable {
 
     public ESPHelpdeskReportPage getEspHelpdeskReportPage() {
         return espHelpdeskReportPage;
+    }
+
+    public BasicWorkspacePage getEspHelpdeskGroupPage() {
+        return espHelpdeskGroupPage;
     }
 }

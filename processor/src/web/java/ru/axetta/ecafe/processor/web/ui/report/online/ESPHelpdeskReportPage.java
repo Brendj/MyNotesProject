@@ -11,6 +11,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -22,6 +24,8 @@ import java.util.*;
 /**
  * Created by voinov on 22.06.21.
  */
+@Component
+@Scope(value = "session")
 public class ESPHelpdeskReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(ESPHelpdeskReportPage.class);
