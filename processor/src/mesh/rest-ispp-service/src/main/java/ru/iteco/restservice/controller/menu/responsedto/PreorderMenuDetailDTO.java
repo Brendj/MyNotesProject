@@ -4,49 +4,48 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import ru.iteco.restservice.model.preorder.PreorderComplex;
 import ru.iteco.restservice.model.preorder.PreorderMenuDetail;
 
-public class PreorderMenuDetailDTO {
-    @Schema(description = "Идентификатор предзаказа на блюдо")
-    private Long preorderMenuDetailId;
+import java.util.ArrayList;
+import java.util.List;
 
-    @Schema(description = "Количество блюд в предзаказе")
-    private Integer amount;
+public class PreorderMenuDetailDTO {
+    @Schema(description = "Идентификатор предзаказа")
+    private Long preorderId;
+
+    @Schema(description = "Список предзаказов на блюда")
+    private List<PreorderMenuDetailItemDTO> dishes;
 
     public PreorderMenuDetailDTO() {
-        amount = 0;
+
     }
 
-    public static PreorderMenuDetailDTO build(PreorderMenuDetail preorderMenuDetail) {
+    public static PreorderMenuDetailDTO build(List<PreorderMenuDetail> preorderMenuDetails) {
         PreorderMenuDetailDTO result = new PreorderMenuDetailDTO();
-        if (preorderMenuDetail == null) {
-            result.setAmount(0);
-        } else {
-            result.setPreorderMenuDetailId(preorderMenuDetail.getIdOfPreorderMenuDetail());
-            result.setAmount(preorderMenuDetail.getAmount());
+
+        List<PreorderMenuDetailItemDTO> dishes = new ArrayList<>();
+        for (PreorderMenuDetail preorderMenuDetail : preorderMenuDetails) {
+            result.setPreorderId(preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex());
+            PreorderMenuDetailItemDTO preorderMenuDetailItemDTO = new PreorderMenuDetailItemDTO();
+            preorderMenuDetailItemDTO.setPreorderMenuDetailId(preorderMenuDetail.getIdOfPreorderMenuDetail());
+            preorderMenuDetailItemDTO.setAmount(preorderMenuDetail.getAmount());
+            dishes.add(preorderMenuDetailItemDTO);
         }
+        result.setDishes(dishes);
         return result;
     }
 
-    public static PreorderMenuDetailDTO buildDeleted(PreorderMenuDetail preorderMenuDetail) {
-        PreorderMenuDetailDTO result = new PreorderMenuDetailDTO();
-        PreorderComplex pc = preorderMenuDetail.getPreorderComplex();
-        result.setPreorderMenuDetailId(null);
-        result.setAmount(0);
-        return result;
+    public Long getPreorderId() {
+        return preorderId;
     }
 
-    public Long getPreorderMenuDetailId() {
-        return preorderMenuDetailId;
+    public void setPreorderId(Long preorderId) {
+        this.preorderId = preorderId;
     }
 
-    public void setPreorderMenuDetailId(Long preorderMenuDetailId) {
-        this.preorderMenuDetailId = preorderMenuDetailId;
+    public List<PreorderMenuDetailItemDTO> getDishes() {
+        return dishes;
     }
 
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
-        this.amount = amount;
+    public void setDishes(List<PreorderMenuDetailItemDTO> dishes) {
+        this.dishes = dishes;
     }
 }

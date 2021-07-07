@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.iteco.restservice.controller.menu.request.PreorderDishInfo;
 import ru.iteco.restservice.controller.menu.request.RegularPreorderRequest;
 import ru.iteco.restservice.db.repo.readonly.*;
 import ru.iteco.restservice.errors.NotFoundException;
@@ -29,6 +30,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 @Service
@@ -56,6 +58,8 @@ public class PreorderDAO {
     SpecialDateReadOnlyRepo sdRepo;
     @Autowired
     ClientGroupReadOnlyRepo cgroupRepo;
+    @Autowired
+    ClientReadOnlyRepo clientRepo;
 
     @Autowired
     PreorderService preorderService;
@@ -100,55 +104,88 @@ public class PreorderDAO {
         entityManager.merge(preorderComplex);
     }
 
-    @Transactional
-    public PreorderMenuDetail createPreorderMenuDetail(PreorderComplexChangeData data, Long complexId, Long dishId, Integer amount,
-                                                       String guardianMobile, long version) {
+    private PreorderMenuDetail createPreorderMenuDetail(PreorderComplex preorderComplex, Long dishId, Integer amount, String guardianMobile) {
         WtDish wtDish = dishRepo.findById(dishId)
                 .orElseThrow(() -> new NotFoundException(String.format("Не найдено блюдо с идентификатором %s", dishId)));
+        String groupName = getMenuGroupByWtDishAndCategories(wtDish);
+        return new PreorderMenuDetail(preorderComplex, wtDish, preorderComplex.getClient(),
+                preorderComplex.getPreorderDate(), amount, groupName, guardianMobile, preorderComplex.getMobileGroupOnCreate());
+    }
+
+    @Transactional
+    public List<PreorderMenuDetail> createPreorderMenuDetail(PreorderComplexChangeData data, Long complexId, List<PreorderDishInfo> dishes,
+                                                       String guardianMobile, long version) {
+        List<PreorderMenuDetail> result = new ArrayList<>();
         PreorderComplex preorderComplex = pcRepo.getPreorderComplexesByClientDateAndComplexId(data.getClient(), complexId.intValue(),
                 data.getStartDate(), data.getEndDate());
-        if (preorderComplex == null) {
-            preorderComplex = createPreorder(data.getClient(), data.getStartDate(), data.getEndDate(), complexId, 0,
-                    version, guardianMobile, data.getMobileGroupOnCreate(), true);
+        if (dishes.size() > 0) {
+            if (preorderComplex == null) {
+                preorderComplex = createPreorder(data.getClient(), data.getStartDate(), data.getEndDate(), complexId, 0,
+                        version, guardianMobile, data.getMobileGroupOnCreate(), true);
+            }
+            entityManager.merge(preorderComplex);
         }
-        PreorderMenuDetail preorderMenuDetail = pmdRepo.getPreorderMenuDetailByPreorderComplexAndDishId(preorderComplex, dishId);
+        for (PreorderDishInfo info : dishes) {
+            WtDish wtDish = dishRepo.findById(info.getDishId())
+                    .orElseThrow(() -> new NotFoundException(String.format("Не найдено блюдо с идентификатором %s", info.getDishId())));
 
-        if (preorderMenuDetail != null) {
-            throw new IllegalArgumentException("У данного клиента уже существует предзаказ на выбранную дату и блюдо");
+            PreorderMenuDetail preorderMenuDetail = pmdRepo.getPreorderMenuDetailByPreorderComplexAndDishId(preorderComplex, info.getDishId());
+            if (preorderMenuDetail != null) {
+                throw new IllegalArgumentException("У данного клиента уже существует предзаказ на выбранную дату и блюдо");
+            }
+
+            String groupName = getMenuGroupByWtDishAndCategories(wtDish);
+            preorderMenuDetail = new PreorderMenuDetail(preorderComplex, wtDish, preorderComplex.getClient(),
+                    preorderComplex.getPreorderDate(), info.getAmount(), groupName, guardianMobile, preorderComplex.getMobileGroupOnCreate());
+            preorderComplex.updateWithVersion(version);
+
+            PreorderMenuDetail pmd = entityManager.merge(preorderMenuDetail);
+            result.add(pmd);
         }
+        return result;
 
-        String groupName = getMenuGroupByWtDishAndCategories(wtDish);
-        preorderMenuDetail = new PreorderMenuDetail(preorderComplex, wtDish, preorderComplex.getClient(),
-                preorderComplex.getPreorderDate(), amount, groupName, guardianMobile, preorderComplex.getMobileGroupOnCreate());
-        preorderComplex.updateWithVersion(version);
-        entityManager.merge(preorderComplex);
-        return entityManager.merge(preorderMenuDetail);
     }
 
     @Transactional
-    public PreorderMenuDetail editPreorderMenuDetail(PreorderMenuDetail preorderMenuDetail, Integer amount, long version) {
-        PreorderComplex preorderComplex = pcRepo.findById(preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex())
-                .orElseThrow(() -> new NotFoundException(String.format("Не найдено предзаказ с идентификатором %s",
-                        preorderMenuDetail.getPreorderComplex().getIdOfPreorderComplex())));;
-        preorderComplex.updateWithVersion(version);
-        entityManager.merge(preorderComplex);
-        preorderMenuDetail.setAmount(amount);
-        return entityManager.merge(preorderMenuDetail);
-    }
+    public List<PreorderMenuDetail> editPreorderMenuDetail(Long contractId, String guardianMobile, Long preorderId, List<PreorderDishInfo> dishes, long version) throws Exception {
+        List<PreorderMenuDetail> result = new ArrayList<>();
+        Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
+        PreorderComplex preorderComplex = pcRepo.getPreorderComplexesWithDetails(preorderId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не найден предзаказ с идентификатором %s", preorderId)));
+        if (!preorderComplex.getClient().equals(client)) {
+            throw new IllegalArgumentException("Предзаказ на блюдо не принадлежит данному клиенту");
+        }
+        if (!preorderService.isEditedDay(preorderComplex.getPreorderDate(), client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
 
-    @Transactional
-    public void deletePreorderMenuDetail(PreorderMenuDetail preorderMenuDetail, String guardianMobile, long version) {
-        preorderMenuDetail.delete(guardianMobile);
-        entityManager.merge(preorderMenuDetail);
+        for (PreorderDishInfo info : dishes) {
+            PreorderMenuDetail preorderMenuDetail = pmdRepo.getPreorderMenuDetailByPreorderComplexAndDishId(preorderComplex, info.getDishId());
+            if (preorderMenuDetail != null) {
+                if (info.getAmount() > 0)
+                    preorderMenuDetail.setAmount(info.getAmount());
+                else
+                    preorderMenuDetail.delete(guardianMobile);
+            } else if (info.getAmount() > 0) {
+                preorderMenuDetail = createPreorderMenuDetail(preorderComplex, info.getDishId(), info.getAmount(), guardianMobile);
+            }
 
-        PreorderComplex preorderComplex = preorderMenuDetail.getPreorderComplex();
-        List<PreorderMenuDetail> list = pmdRepo.getPreorderMenuDetailsForDeleteTest(preorderComplex, preorderMenuDetail.getIdOfPreorderMenuDetail());
-        if (list.size() == 0) {
+            if (preorderMenuDetail != null) {
+                result.add(entityManager.merge(preorderMenuDetail));
+            }
+        }
+        boolean delete = true;
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getDeletedState().equals(0)) {
+                delete = false;
+                break;
+            }
+        }
+        if (delete) {
             preorderComplex.deleteByReason(version, true, PreorderState.OK);
         } else {
             preorderComplex.updateWithVersion(version);
         }
         entityManager.merge(preorderComplex);
+        return result;
     }
 
     @Transactional

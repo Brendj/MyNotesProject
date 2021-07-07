@@ -147,48 +147,29 @@ public class MenuController {
         try {
             preorderService.checkDishCreateParameters(preorderDishRequest);
             Date d = CalendarUtils.getDateFromLong(preorderDishRequest.getDate());
-            PreorderMenuDetail pmd = preorderService.createPreorderMenuDetail(preorderDishRequest.getContractId(), d,
+            List<PreorderMenuDetail> pmdList = preorderService.createPreorderMenuDetail(preorderDishRequest.getContractId(), d,
                     preorderDishRequest.getGuardianMobile(), preorderDishRequest.getComplexId(),
-                    preorderDishRequest.getDishId(), preorderDishRequest.getAmount());
-            return PreorderMenuDetailDTO.build(pmd);
+                    preorderDishRequest.getDishes());
+            return PreorderMenuDetailDTO.build(pmdList);
         } catch (Exception e) {
             logger.error("Exception in createPreorderMenuDetail: ", e);
             throw e;
         }
     }
 
-    @PutMapping("/preorderDish/{id}")
+    @PutMapping("/preorderDish")
     @Operation(summary = "Редактирование количества блюд в предзаказе",
             description = "Редактирование количества блюд в предзаказе")
     @ResponseBody
-    public PreorderMenuDetailDTO editPreorderMenuDetail(@RequestBody PreorderDishRequest preorderDishRequest, @NotNull @PathVariable Long id) throws Exception {
+    public PreorderMenuDetailDTO editPreorderMenuDetail(@RequestBody PreorderDishRequest preorderDishRequest) throws Exception {
         try {
-            preorderDishRequest.setPreorderDishId(id);
             preorderService.checkDishEditParameters(preorderDishRequest);
-            PreorderMenuDetail pmd = preorderService.editPreorderMenuDetail(preorderDishRequest.getPreorderDishId(),
-                    preorderDishRequest.getContractId(),
-                    preorderDishRequest.getAmount());
-            return PreorderMenuDetailDTO.build(pmd);
+            List<PreorderMenuDetail> pmdList = preorderService.editPreorderMenuDetail(preorderDishRequest.getContractId(),
+                    preorderDishRequest.getGuardianMobile(),
+                    preorderDishRequest.getPreorderId(), preorderDishRequest.getDishes());
+            return PreorderMenuDetailDTO.build(pmdList);
         } catch (Exception e) {
             logger.error("Exception in editPreorderMenuDetail: ", e);
-            throw e;
-        }
-    }
-
-    @DeleteMapping("/preorderDish/{id}")
-    @Operation(summary = "Удаление предзаказа на блюдо",
-            description = "Удаление предзаказа на блюдо")
-    @ResponseBody
-    public PreorderMenuDetailDTO deletePreorderMenuDetail(@RequestBody PreorderDishRequest preorderDishRequest, @NotNull @PathVariable Long id) throws Exception {
-        try {
-            preorderDishRequest.setPreorderDishId(id);
-            preorderService.checkDishDeleteParameters(preorderDishRequest);
-            PreorderMenuDetail pmd = preorderService.deletePreorderMenuDetail(preorderDishRequest.getPreorderDishId(),
-                    preorderDishRequest.getContractId(),
-                    preorderDishRequest.getGuardianMobile());
-            return PreorderMenuDetailDTO.buildDeleted(pmd);
-        } catch (Exception e) {
-            logger.error("Exception in deletePreorderMenuDetail: ", e);
             throw e;
         }
     }

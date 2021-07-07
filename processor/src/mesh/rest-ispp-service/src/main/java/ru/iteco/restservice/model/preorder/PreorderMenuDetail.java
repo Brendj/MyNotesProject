@@ -128,7 +128,7 @@ public class PreorderMenuDetail {
         this.client = client;
         this.preorderDate = CalendarUtils.startOfDayInUTC(date);
         this.amount = amount;
-        this.deletedState = 0;
+        this.deletedState = (amount > 0 ? 0 : 1);
         this.state = PreorderState.OK;
         this.usedSum = 0L;
         this.usedAmount = 0L;

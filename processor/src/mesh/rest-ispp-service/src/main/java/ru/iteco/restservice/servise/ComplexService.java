@@ -282,7 +282,8 @@ public class ComplexService {
             PreorderComplexAmountData data = new PreorderComplexAmountData(pc.getArmComplexId().longValue(), pc.getAmount(),
                     pc.getIdOfPreorderComplex());
             for (PreorderMenuDetail pmd : pc.getPreorderMenuDetails()) {
-                data.getMenuDetails().add(pmd);
+                if (pmd.getDeletedState().equals(0))
+                    data.getMenuDetails().add(pmd);
             }
             result.getPreorderComplexAmountData().add(data);
         }

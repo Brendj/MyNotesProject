@@ -2,10 +2,11 @@ package ru.iteco.restservice.controller.menu.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public class PreorderDishRequest {
-    @Schema(description = "Идентификатор предзаказа на блюдо", example = "1377")
-    private Long preorderDishId;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
+public class PreorderDishRequest {
+    @NotNull
     @Schema(description = "Номер лицевого счета клиента", example = "13177")
     private Long contractId;
 
@@ -18,11 +19,12 @@ public class PreorderDishRequest {
     @Schema(description = "Идентификатор комплекса", example = "854")
     private Long complexId;
 
-    @Schema(description = "Идентификатор блюда", example = "8555")
-    private Long dishId;
+    @Schema(description = "Идентификатор предзаказа на комплекса. " +
+            "Не заполняется в запросе на редактирование блюд ранее созданного предзаказа", example = "8542")
+    private Long preorderId;
 
-    @Schema(description = "Заказываемое количество блюда", example = "1")
-    private Integer amount;
+    @Schema(description = "Заказываемые блюда с количествами")
+    private List<PreorderDishInfo> dishes;
 
     public Long getContractId() {
         return contractId;
@@ -56,27 +58,19 @@ public class PreorderDishRequest {
         this.complexId = complexId;
     }
 
-    public Long getDishId() {
-        return dishId;
+    public List<PreorderDishInfo> getDishes() {
+        return dishes;
     }
 
-    public void setDishId(Long dishId) {
-        this.dishId = dishId;
+    public void setDishes(List<PreorderDishInfo> dishes) {
+        this.dishes = dishes;
     }
 
-    public Integer getAmount() {
-        return amount;
+    public Long getPreorderId() {
+        return preorderId;
     }
 
-    public void setAmount(Integer amount) {
-        this.amount = amount;
-    }
-
-    public Long getPreorderDishId() {
-        return preorderDishId;
-    }
-
-    public void setPreorderDishId(Long preorderDishId) {
-        this.preorderDishId = preorderDishId;
+    public void setPreorderId(Long preorderId) {
+        this.preorderId = preorderId;
     }
 }

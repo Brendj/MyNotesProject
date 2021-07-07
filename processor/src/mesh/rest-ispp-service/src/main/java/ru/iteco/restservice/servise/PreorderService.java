@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.iteco.restservice.controller.menu.request.PreorderComplexRequest;
+import ru.iteco.restservice.controller.menu.request.PreorderDishInfo;
 import ru.iteco.restservice.controller.menu.request.PreorderDishRequest;
 import ru.iteco.restservice.controller.menu.request.RegularPreorderRequest;
 import ru.iteco.restservice.db.repo.readonly.*;
@@ -89,24 +90,27 @@ public class PreorderService {
     }
 
     public void checkDishCreateParameters(PreorderDishRequest preorderDishRequest) throws IllegalArgumentException {
-        if (preorderDishRequest.getAmount() == null
-                || preorderDishRequest.getComplexId() == null
-                || preorderDishRequest.getDishId() == null
-                || preorderDishRequest.getContractId() == null
-                || preorderDishRequest.getDate() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
-        if (preorderDishRequest.getAmount() <= 0) throw new IllegalArgumentException("Количество должно быть > 0");
+        for (PreorderDishInfo info : preorderDishRequest.getDishes()) {
+            if (info.getAmount() == null
+                    || preorderDishRequest.getComplexId() == null
+                    || info.getDishId() == null
+                    || preorderDishRequest.getContractId() == null
+                    || preorderDishRequest.getDate() == null)
+                throw new IllegalArgumentException("Не заполнены обязательные параметры");
+            if (info.getAmount() <= 0) throw new IllegalArgumentException("Количество должно быть > 0");
+        }
     }
 
     public void checkDishEditParameters(PreorderDishRequest preorderDishRequest) throws IllegalArgumentException {
-        if (preorderDishRequest.getPreorderDishId() == null
-                || preorderDishRequest.getContractId() == null
-                || preorderDishRequest.getAmount() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
-        if (preorderDishRequest.getAmount() <= 0) throw new IllegalArgumentException("Количество должно быть > 0");
-    }
-
-    public void checkDishDeleteParameters(PreorderDishRequest preorderDishRequest) throws IllegalArgumentException {
-        if (preorderDishRequest.getPreorderDishId() == null
-                || preorderDishRequest.getContractId() == null) throw new IllegalArgumentException("Не заполнены обязательные параметры");
+        for (PreorderDishInfo info : preorderDishRequest.getDishes()) {
+            if (preorderDishRequest.getContractId() == null
+                    || preorderDishRequest.getPreorderId() == null
+                    || info.getDishId() == null
+                    || info.getAmount() == null
+                    || preorderDishRequest.getDate() == null)
+                throw new IllegalArgumentException("Не заполнены обязательные параметры");
+            if (info.getAmount() < 0) throw new IllegalArgumentException("Количество должно быть >= 0");
+        }
     }
 
     public void checkRegularPreorderCreateParameters(RegularPreorderRequest regularPreorderRequest) throws IllegalArgumentException {
@@ -151,42 +155,19 @@ public class PreorderService {
         return preorderComplex;
     }
 
-    public PreorderMenuDetail createPreorderMenuDetail(Long contractId, Date date, String guardianMobile, Long complexId,
-                                              Long dishId, Integer amount) throws Exception {
+    public List<PreorderMenuDetail> createPreorderMenuDetail(Long contractId, Date date, String guardianMobile, Long complexId,
+                                                       List<PreorderDishInfo> dishes) throws Exception {
+                                              //Long dishId, Integer amount) throws Exception {
         PreorderComplexChangeData data = getPreorderComplexChangeData(contractId, date, guardianMobile);
 
         long nextVersion = pcRepo.getMaxVersion() + 1;
-        return preorderDAO.createPreorderMenuDetail(data, complexId, dishId, amount, guardianMobile, nextVersion);
+        return preorderDAO.createPreorderMenuDetail(data, complexId, dishes, guardianMobile, nextVersion);
     }
 
-    public PreorderMenuDetail editPreorderMenuDetail(Long preorderDishId, Long contractId,
-                                                     Integer amount) throws Exception {
-        PreorderMenuDetail preorderMenuDetail = pmdRepo.findById(preorderDishId)
-                .orElseThrow(() -> new NotFoundException("Предзаказ на блюдо с указанным идентификатором не найден"));
-        Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
-        if (!preorderMenuDetail.getClient().equals(client)) {
-            throw new IllegalArgumentException("Предзаказ на блюдо не принадлежит данному клиенту");
-        }
-
-        if (!isEditedDay(preorderMenuDetail.getPreorderDate(), client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
-
+    public List<PreorderMenuDetail> editPreorderMenuDetail(Long contractId, String guardianMobile, Long preorderId,
+                                                     List<PreorderDishInfo> dishes) throws Exception {
         long nextVersion = pcRepo.getMaxVersion() + 1;
-        return preorderDAO.editPreorderMenuDetail(preorderMenuDetail, amount, nextVersion);
-    }
-
-    public PreorderMenuDetail deletePreorderMenuDetail(Long preorderDishId, Long contractId, String guardianMobile) throws Exception {
-        PreorderMenuDetail preorderMenuDetail = pmdRepo.getPreorderMenuDetailWithPreorderComplex(preorderDishId)
-                .orElseThrow(() -> new NotFoundException("Предзаказ на блюдо с указанным идентификатором не найден"));
-        Client client = clientRepo.getClientByContractId(contractId).orElseThrow(() -> new NotFoundException("Клиент не найден по номеру л/с"));
-        if (!preorderMenuDetail.getClient().equals(client)) {
-            throw new IllegalArgumentException("Предзаказ не принадлежит данному клиенту");
-        }
-
-        if (!isEditedDay(preorderMenuDetail.getPreorderDate(), client)) throw new IllegalArgumentException("День недоступен для редактирования предзаказа");
-
-        long nextVersion = pcRepo.getMaxVersion() + 1;
-        preorderDAO.deletePreorderMenuDetail(preorderMenuDetail, guardianMobile, nextVersion);
-        return preorderMenuDetail;
+        return preorderDAO.editPreorderMenuDetail(contractId, guardianMobile, preorderId, dishes, nextVersion);
     }
 
     public RegularPreorder createRegularPreorder(RegularPreorderRequest regularPreorderRequest) throws Exception {
@@ -276,7 +257,7 @@ public class PreorderService {
         return data;
     }
 
-    private boolean isEditedDay(Date date, Client client) throws Exception {
+    public boolean isEditedDay(Date date, Client client) throws Exception {
         boolean result = false;
         Date today = CalendarUtils.startOfDay(new Date());
         Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();

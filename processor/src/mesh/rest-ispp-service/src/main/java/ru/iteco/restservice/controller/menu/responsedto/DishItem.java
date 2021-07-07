@@ -47,7 +47,7 @@ public class DishItem {
     private String itemCode;
 
     @Schema(description = "Информация о предзаказе на блюдо")
-    private PreorderMenuDetailDTO preorderInfo;
+    private PreorderDishDTO preorderInfo;
 
     @Schema(description = "Информация о правиле регулярного предзаказа на блюдо")
     private RegularPreorderDTO regularInfo;
@@ -64,7 +64,7 @@ public class DishItem {
         this.carbohydrates = wtDish.getCarbohydrates();
         this.isRegular = (wtDish.getRepeatableComplex() != null && wtDish.getRepeatableComplex().size() > 0);
         this.itemCode = wtDish.getCode();
-        PreorderMenuDetailDTO preorderMenuDetailDTO = new PreorderMenuDetailDTO();
+        PreorderDishDTO preorderMenuDetailDTO = new PreorderDishDTO();
         if (data != null) {
             PreorderMenuDetail pmd = findPreorderMenuDetail(wtDish.getIdOfDish(), data);
             if (pmd != null) {
@@ -175,19 +175,19 @@ public class DishItem {
         this.itemCode = itemCode;
     }
 
-    public PreorderMenuDetailDTO getPreorderInfo() {
-        return preorderInfo;
-    }
-
-    public void setPreorderInfo(PreorderMenuDetailDTO preorderInfo) {
-        this.preorderInfo = preorderInfo;
-    }
-
     public RegularPreorderDTO getRegularInfo() {
         return regularInfo;
     }
 
     public void setRegularInfo(RegularPreorderDTO regularInfo) {
         this.regularInfo = regularInfo;
+    }
+
+    public PreorderDishDTO getPreorderInfo() {
+        return preorderInfo;
+    }
+
+    public void setPreorderInfo(PreorderDishDTO preorderInfo) {
+        this.preorderInfo = preorderInfo;
     }
 }
