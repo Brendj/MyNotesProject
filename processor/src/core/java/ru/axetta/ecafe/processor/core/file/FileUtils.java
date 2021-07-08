@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.file;
 
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
+import ru.axetta.ecafe.processor.core.persistence.ESPattached;
 import ru.axetta.ecafe.processor.core.persistence.OrgFile;
 
 import org.apache.commons.codec.binary.Base64;
@@ -61,8 +62,7 @@ public class FileUtils {
             tmp.append(DELIMITER);
             tmp.append(fullfileName);
             String path = tmp.toString();
-            String filepath =
-                    System.getProperty("jboss.server.base.dir") + DELIMITER + FILES_DIRECTORY + DELIMITER + "ESP" + DELIMITER + path;
+            String filepath = getBaseFilePathForESP() + path;
             writeByteArraysToFile(filepath, decodeFromeBase64(filedata));
             return path;
         } catch (Exception e)
@@ -70,8 +70,18 @@ public class FileUtils {
             return "";
         }
     }
+    public static String loadFile(String path) {
+        byte[] fileData = null;
+        try {
+            fileData = loadFileAsBytesArray(getBaseFilePathForESP() + path);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
-    public static String getBaseFilePathForFOS()
+        return new String(encodeToBase64(fileData));
+    }
+
+    public static String getBaseFilePathForESP()
     {
         return System.getProperty("jboss.server.base.dir") + DELIMITER + FILES_DIRECTORY + DELIMITER + "ESP" + DELIMITER;
     }

@@ -5545,4 +5545,14 @@ public class DAOUtils {
             return null;
         }
     }
+
+    public static ESP findESPByRequestByNumber (Session persistenceSession, String numberrequest) {
+        try {
+            Criteria criteria = persistenceSession.createCriteria(ESP.class);
+            criteria.add(Restrictions.eq("numberrequest", numberrequest));
+            return (ESP)criteria.list().get(0);
+        } catch (NoResultException e){
+            return null;
+        }
+    }
 }

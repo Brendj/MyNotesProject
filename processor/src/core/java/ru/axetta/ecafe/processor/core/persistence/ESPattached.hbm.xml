@@ -14,6 +14,7 @@
         </id>
         <many-to-one name="esp" class="ru.axetta.ecafe.processor.core.persistence.ESP" column="idesprequest"
                      not-null="true" update="false"/>
+        <property name="filename" column="filename" type="string"/>
         <property name="path" column="path" type="string"/>
         <property name="number" column="number" type="integer"/>
         <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

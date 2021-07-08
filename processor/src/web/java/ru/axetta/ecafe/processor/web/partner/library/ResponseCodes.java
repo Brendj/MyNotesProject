@@ -14,8 +14,8 @@ public enum ResponseCodes {
     RC_WRONG_REQUST(130L, "Не все обязательные поля заполнены"),
     RC_WRONG_DATE(210L, "Неверная дата и время операции"),
     RC_NOT_FOUND_CLIENT(150L, "Клиент не найден"),
-    RC_NOT_FOUND_ORG(160L, "Организация не найдена");
-
+    RC_NOT_FOUND_ORG(160L, "Организация не найдена"),
+    RC_NOT_FOUND_ESP(170L, "Заявка не найдена");
 
     private final Long code;
     private final String description;

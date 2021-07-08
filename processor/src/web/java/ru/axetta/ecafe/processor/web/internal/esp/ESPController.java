@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.file.FileUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.DishMenuWebArmPPItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.esp.service.ESPrequestsService;
@@ -51,10 +52,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 @Path(value = "")
 @Controller
@@ -253,6 +251,83 @@ public class ESPController {
         result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
         result.setErrorMessage(ResponseCodes.RC_OK.toString());
         return Response.status(HttpURLConnection.HTTP_OK).entity(responseESPRequests).build();
+    }
+
+    public static class Number {
+        @JsonProperty("numberrequest")
+        private String numberrequest;
+
+        public Number() {
+        }
+
+        public String getNumberrequest() {
+            return numberrequest;
+        }
+
+        public void setNumberrequest(String numberrequest) {
+            this.numberrequest = numberrequest;
+        }
+    }
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "getRequestESPFile")
+    public Response getESPRequestFiles(@Context HttpServletRequest request, Number number) {
+        Result result = new Result();
+        ResponseESPRequestFiles responseESPRequestFiles = new ResponseESPRequestFiles();
+        //Контроль безопасности
+        if (!validateAccess(request)) {
+            logger.error("Неверный ключ доступа");
+            result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ESP esp = DAOUtils.findESPByRequestByNumber(persistenceSession, number.getNumberrequest());
+            if (esp == null)
+            {
+                logger.error(String.format("ESP request with numberrequest=%s not found", number.getNumberrequest()));
+                result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ESP.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ESP.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+            List<ESPattached> esPattacheds = new ArrayList<>(esp.getEspFiles());
+            Collections.sort(esPattacheds, new Comparator<ESPattached>() {
+                public int compare(ESPattached o1, ESPattached o2) {
+                    if (o1.getNumber().equals(o2.getNumber())) {
+                        return 0;
+                    } else if (o1.getNumber() > o2.getNumber()) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+            for (ESPattached esPattached : esPattacheds)
+            {
+                ESPRequestAttachedFile espRequestAttachedFile = new ESPRequestAttachedFile();
+                espRequestAttachedFile.setAttached_filename(esPattached.getFilename());
+                espRequestAttachedFile.setAttached_filedata(FileUtils.loadFile(esPattached.getPath()));
+                responseESPRequestFiles.getAttached().add(espRequestAttachedFile);
+            }
+
+            responseESPRequestFiles.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
+            responseESPRequestFiles.setErrorMessage(ResponseCodes.RC_OK.toString());
+        } catch (Exception e) {
+            logger.error("Ошибка при отдаче файлов заявки", e);
+            result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
+        result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
+        result.setErrorMessage(ResponseCodes.RC_OK.toString());
+        return Response.status(HttpURLConnection.HTTP_OK).entity(responseESPRequestFiles).build();
     }
 
     private boolean validateAccess(HttpServletRequest request) {

@@ -111,7 +111,7 @@ public class ESPrequestsService {
 
     public SendFileESPresponse sendFileForESPRequest(String path) {
         logESP(path, 4);
-        File file = new File(FileUtils.getBaseFilePathForFOS() + path);
+        File file = new File(FileUtils.getBaseFilePathForESP() + path);
         SendFileESPresponse sendFileESPresponse = null;
         try {
             byte[] response = executeSendFileForESPRequest(file);

@@ -9,6 +9,7 @@ import java.util.Date;
 public class ESPattached {
     private Long idespattached;
     private ESP esp;
+    private String filename;
     private String path;
     private Integer number;
     private Date createDate;
@@ -63,5 +64,13 @@ public class ESPattached {
 
     public void setLinkinfos(String linkinfos) {
         this.linkinfos = linkinfos;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }
