@@ -12,8 +12,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.file.FileUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.DishMenuWebArmPPItem;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.esp.service.ESPrequestsService;
 import ru.axetta.ecafe.processor.web.internal.esp.service.InfoESPresponse;
@@ -22,35 +20,19 @@ import ru.axetta.ecafe.processor.web.internal.esp.service.SendFileESPresponse;
 import ru.axetta.ecafe.processor.web.partner.library.ResponseCodes;
 import ru.axetta.ecafe.processor.web.partner.library.Result;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.cxf.common.util.StringUtils;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.w3c.dom.Document;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.soap.SOAPPart;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -118,6 +100,7 @@ public class ESPController {
                 espattached.setCreateDate(new Date());
                 espattached.setEsp(esp);
                 espattached.setNumber(count);
+                espattached.setFilename(espRequestAttachedFile.getAttached_filename());
                 espattached.setPath(path);
                 //Отправка в FOS файлов
                 SendFileESPresponse sendFileESPresponse = esPrequestsService.sendFileForESPRequest(path);
