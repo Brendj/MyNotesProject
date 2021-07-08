@@ -31,7 +31,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequestMapping("/menu")
-@Tag(name = "Menu-controller", description = "Школьное меню")
+@Tag(name = "Операции по школьному меню")
 public class MenuController {
     private final Logger logger = LoggerFactory.getLogger(MenuController.class);
 

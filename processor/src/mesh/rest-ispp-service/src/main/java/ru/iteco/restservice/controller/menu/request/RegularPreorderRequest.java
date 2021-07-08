@@ -2,7 +2,9 @@ package ru.iteco.restservice.controller.menu.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by nuc on 10.06.2021.
@@ -10,39 +12,51 @@ import java.util.Date;
 public class RegularPreorderRequest {
     private Long regularPreorderId;
 
+    @NotNull
     @Schema(description = "Номер лицевого счета клиента", example = "13177")
     private Long contractId;
 
+    @NotNull
     @Schema(description = "Номер телефона представителя", example = "79033987854")
     private String guardianMobile;
 
-    @Schema(description = "Заказываемое количество в регулярном заказе", example = "2")
+    @NotNull
+    @Schema(description = "Заказываемое количество в регулярном заказе", example = "1")
     private Integer amount;
 
+    @NotNull
     @Schema(description = "Дата начала действия регуляра в Timestamp (ms)", example = "1623974400000")
     private Long startDate;
 
+    @NotNull
     @Schema(description = "Дата окончания действия регуляра в Timestamp (ms)", example = "1623974400000")
     private Long endDate;
 
+    @NotNull
     @Schema(description = "Идентификатор комплекса", example = "131")
     private Integer complexId;
 
+    @NotNull
     @Schema(description = "Флаг заказа на понедельник", example = "true")
     private Boolean monday;
 
+    @NotNull
     @Schema(description = "Флаг заказа на вторник", example = "true")
     private Boolean tuesday;
 
+    @NotNull
     @Schema(description = "Флаг заказа на среду", example = "true")
     private Boolean wednesday;
 
+    @NotNull
     @Schema(description = "Флаг заказа на четверг", example = "true")
     private Boolean thursday;
 
+    @NotNull
     @Schema(description = "Флаг заказа на пятницу", example = "true")
     private Boolean friday;
 
+    @NotNull
     @Schema(description = "Флаг заказа на субботу", example = "true")
     private Boolean saturday;
 

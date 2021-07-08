@@ -13,16 +13,21 @@ public class PreorderDishRequest {
     @Schema(description = "Номер телефона представителя", example = "79033987854")
     private String guardianMobile;
 
+    @NotNull
     @Schema(description = "Дата предзаказа в Timestamp (ms)", example = "1623974400000")
     private Long date;
 
-    @Schema(description = "Идентификатор комплекса", example = "854")
+    @Schema(description = "Идентификатор комплекса. " +
+            "Заполняется в запросе на создание предзаказа, не заполняется в запросе на редактирование блюд ранее созданного предзаказа по отдельным блюдам",
+            example = "854")
     private Long complexId;
 
     @Schema(description = "Идентификатор предзаказа на комплекса. " +
-            "Не заполняется в запросе на редактирование блюд ранее созданного предзаказа", example = "8542")
+            "Заполняется в запросе на редактирование блюд ранее созданного предзаказа по отдельным блюдам, не заполняется при создании предзаказа",
+            example = "8542")
     private Long preorderId;
 
+    @NotNull
     @Schema(description = "Заказываемые блюда с количествами")
     private List<PreorderDishInfo> dishes;
 
