@@ -12,7 +12,8 @@ public enum JwtLoginErrors {
     UNSUCCESSFUL_AUTHORIZATION(205, "Unsuccessful authorization"),
     INVALID_REFRESH_TOKEN(206, "Invalid refresh token"),
     INVALID_CHANGE_PASSWORD_DATA(207, "Invalid change password data"),
-    CANNOT_SEND_SMS(208, "Can not send sms code");
+    CANNOT_SEND_SMS(208, "Can not send sms code"),
+    USER_INVALID_ROLE(209, "Invalid user role");
 
     private int errorCode;
     private String errorMessage;

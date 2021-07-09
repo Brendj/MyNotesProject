@@ -115,13 +115,18 @@ public class JWTLoginServiceImpl implements JWTLoginService {
             }
             if (!user.loginAllowed()) {
                 String mess = String.format("User \"%s\" is blocked . Access denied.", username);
-                logger.debug(mess);
+                logger.info(mess);
                 SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                         .createLoginFaultRecord(remoteAddr, username, user,
                                 SecurityJournalAuthenticate.DenyCause.LONG_INACTIVITY.getIdentification());
                 DAOService.getInstance().writeAuthJournalRecord(record);
 
                 throw new JwtLoginException(JwtLoginErrors.USER_IS_BLOCKED.getErrorCode(), mess);
+            }
+            if (!user.isWebArmUser()) {
+                String mess = String.format("User \"%s\" has wrong role. Access denied.", username);
+                logger.info(mess);
+                throw new JwtLoginException(JwtLoginErrors.USER_INVALID_ROLE.getErrorCode(), mess);
             }
             final Integer idOfRole = user.getIdOfRole();
             /*final String userRole = request.getParameter("ecafeUserRole");
