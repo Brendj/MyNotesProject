@@ -205,6 +205,35 @@ public class User {
         isGroup = group;
     }
 
+    public enum WebArmRole {
+        WA_OPP(10000,"Ответственный за питание"),
+        WA_OEE(10001,"Ответственный за проход"),
+        WA_OPP_OEE(10002,"Ответственный за питание и проход");
+
+        private Integer identification;
+        private String description;
+
+        WebArmRole(Integer identification, String description) {
+            this.description = description;
+            this.identification = identification;
+        }
+
+        static Map<Integer, WebArmRole> integerDefaultRoleMap = new HashMap<Integer, WebArmRole>();
+        static {
+            for (WebArmRole role: WebArmRole.values()){
+                integerDefaultRoleMap.put(role.identification, role);
+            }
+        }
+
+        public static WebArmRole parse(Integer identification){
+            return integerDefaultRoleMap.get(identification);
+        }
+
+        public Integer getIdentification() {
+            return identification;
+        }
+    }
+
     public enum DefaultRole{
         DEFAULT(0,"Настраиваемая роль"),
         ADMIN(1,"Администратор"),
@@ -217,7 +246,8 @@ public class User {
         PRODUCTION_DIRECTOR(8, "Заведующий производством"),
         INFORMATION_SYSTEM_OPERATOR(9,"Оператор ИС"),
         CLASSROOM_TEACHER(10,"Классный руководитель"),
-        CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания");
+        CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания"),
+        WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)");
 
 
         private Integer identification;
@@ -336,6 +366,13 @@ public class User {
         this.deletedState = false;
         this.person = null;
         this.isGroup = true;
+    }
+
+    public boolean isWebArmUser() {
+        return idOfRole.equals(DefaultRole.WA_ADMIN_SECURITY.getIdentification())
+                || idOfRole.equals(WebArmRole.WA_OPP.getIdentification())
+                || idOfRole.equals(WebArmRole.WA_OEE.getIdentification())
+                || idOfRole.equals(WebArmRole.WA_OPP_OEE.getIdentification());
     }
 
     public Long getIdOfUser() {

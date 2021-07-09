@@ -264,7 +264,7 @@ public class JBossLoginModule implements LoginModule {
             }
             final Integer idOfRole = user.getIdOfRole();
             final String userRole = request.getParameter("ecafeUserRole");
-            if (!loginFromCorrectURL(userRole, idOfRole)) {
+            if (!loginFromCorrectURL(userRole, idOfRole) || user.isWebArmUser()) {
                 request.setAttribute("errorMessage", AUTH_ERROR_THROUGH_CURRENT_URL);
                 final String message = String.format("%s Login: %s.", AUTH_ERROR_THROUGH_CURRENT_URL, username);
                 logger.debug(message);
