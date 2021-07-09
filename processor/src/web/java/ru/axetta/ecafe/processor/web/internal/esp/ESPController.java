@@ -200,15 +200,34 @@ public class ESPController {
             for (ESP esp: esps)
             {
                 InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(esp.getNumberrequest());
-                if (infoESPresponse.getClosed_at() != null)
+                if (infoESPresponse.getClosed_at() != null) {
+                    if (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at()) != esp.getCloseddate())
+                    {
+                        esp.setUpdateDate(new Date());
+                    }
                     esp.setCloseddate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at()));
-                if (infoESPresponse.getSolution() != null)
+                }
+                if (infoESPresponse.getSolution() != null) {
+                    if (esp.getSolution() == null && !infoESPresponse.getSolution().equals(esp.getSolution()))
+                    {
+                        esp.setUpdateDate(new Date());
+                    }
                     esp.setSolution(infoESPresponse.getSolution());
-                if (infoESPresponse.getStatus() != null)
+                }
+                if (infoESPresponse.getStatus() != null) {
+                    if (esp.getStatus() == null && !infoESPresponse.getStatus().equals(esp.getStatus()))
+                    {
+                        esp.setUpdateDate(new Date());
+                    }
                     esp.setStatus(infoESPresponse.getStatus());
-                if (infoESPresponse.getSd() != null)
+                }
+                if (infoESPresponse.getSd() != null) {
+                    if (esp.getSd() == null && !infoESPresponse.getSd().equals(esp.getSd()))
+                    {
+                        esp.setUpdateDate(new Date());
+                    }
                     esp.setSd(infoESPresponse.getSd());
-                esp.setUpdateDate(new Date());
+                }
                 ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
                 responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
                 responseESPRequestsPOJO.setEmail(esp.getEmail());
