@@ -200,34 +200,38 @@ public class ESPController {
             for (ESP esp: esps)
             {
                 InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(esp.getNumberrequest());
+                boolean needUpdateDate = false;
                 if (infoESPresponse.getClosed_at() != null) {
-                    if (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at()) != esp.getCloseddate())
+                    Date closed = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at());
+                    if (closed != esp.getCloseddate())
                     {
-                        esp.setUpdateDate(new Date());
+                        needUpdateDate = true;
                     }
-                    esp.setCloseddate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at()));
+                    esp.setCloseddate(closed);
                 }
                 if (infoESPresponse.getSolution() != null) {
                     if (esp.getSolution() == null && !infoESPresponse.getSolution().equals(esp.getSolution()))
                     {
-                        esp.setUpdateDate(new Date());
+                        needUpdateDate = true;
                     }
                     esp.setSolution(infoESPresponse.getSolution());
                 }
                 if (infoESPresponse.getStatus() != null) {
                     if (esp.getStatus() == null && !infoESPresponse.getStatus().equals(esp.getStatus()))
                     {
-                        esp.setUpdateDate(new Date());
+                        needUpdateDate = true;
                     }
                     esp.setStatus(infoESPresponse.getStatus());
                 }
                 if (infoESPresponse.getSd() != null) {
                     if (esp.getSd() == null && !infoESPresponse.getSd().equals(esp.getSd()))
                     {
-                        esp.setUpdateDate(new Date());
+                        needUpdateDate = true;
                     }
                     esp.setSd(infoESPresponse.getSd());
                 }
+                if (needUpdateDate)
+                    esp.setUpdateDate(new Date());
                 ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
                 responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
                 responseESPRequestsPOJO.setEmail(esp.getEmail());
