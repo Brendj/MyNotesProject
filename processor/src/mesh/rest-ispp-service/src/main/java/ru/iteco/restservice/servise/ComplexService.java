@@ -230,13 +230,14 @@ public class ComplexService {
                             .orElseThrow(() -> new Exception("Не найдена льгота ид -91"));
                     CategoryDiscount highDiscount = categoryDiscountReadOnlyRepo.findById(CategoryDiscount.HIGH_DISCOUNT_ID)
                             .orElseThrow(() -> new Exception("Не найдена льгота ид -92"));
-                    Set<WtDiscountRule> discRules = discountRuleRepo.getWtDiscountRuleByTwoDiscounts(wtDiscountRuleSet, middleDiscount,
-                            highDiscount);
-                    discRules = getWtDiscountRulesWithMaxPriority(discRules);
-                    resComplexes = complexRepo.getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds,
-                            org, org.getDefaultSupplier(), WtComplex.FREE_COMPLEX_GROUP_ITEM_ID, WtComplex.ALL_COMPLEX_GROUP_ITEM_ID);
-                    if (resComplexes.size() > 0) {
-                        wtDiscComplexes.addAll(resComplexes);
+                    if (!wtDiscountRuleSet.isEmpty()) {
+                        Set<WtDiscountRule> discRules = discountRuleRepo.getWtDiscountRuleByTwoDiscounts(wtDiscountRuleSet, middleDiscount, highDiscount);
+                        discRules = getWtDiscountRulesWithMaxPriority(discRules);
+                        resComplexes = complexRepo.getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds,
+                                org, org.getDefaultSupplier(), WtComplex.FREE_COMPLEX_GROUP_ITEM_ID, WtComplex.ALL_COMPLEX_GROUP_ITEM_ID);
+                        if (resComplexes.size() > 0) {
+                            wtDiscComplexes.addAll(resComplexes);
+                        }
                     }
                 }
             }
