@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.guardians;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.DeleteGuardianResponse;
@@ -29,7 +28,7 @@ public class GuardiansRestController extends BaseSchoolApiController {
     //@Consumes(MediaType.APPLICATION_JSON)
     @Path("/{idOfRecord}")
     public Response deleteGuardian(@PathParam("idOfRecord") Long idOfRecord) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+        if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
         DeleteGuardianResponse response = getService().deleteGuardian(idOfRecord, getUser());
@@ -39,7 +38,7 @@ public class GuardiansRestController extends BaseSchoolApiController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrUpdateGuardian(CreateOrUpdateGuardianRequest request) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name(), User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.name())) {
+        if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
         CreateOrUpdateGuardianResponse response = getService().createOrUpdateGuardian(request, getUser());

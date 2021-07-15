@@ -6,12 +6,10 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.util;
 
 public enum EditClientsGroupErrors {
     OK(0,"OK"),
-    CLIENT_NOT_FROM_FRIENDLY_ORG(100,"Клиент не принадлежит дружеским организациям."),
+    CLIENT_NOT_FROM_FRIENDLY_ORG(100,"Клиент не принадлежит дружеским организациям.");
 
-    ;
-
-    private int errorCode;
-    private String errorMessage;
+    private final int errorCode;
+    private final String errorMessage;
 
     private EditClientsGroupErrors(int errorCode, String errorMessage){
         this.errorCode = errorCode;

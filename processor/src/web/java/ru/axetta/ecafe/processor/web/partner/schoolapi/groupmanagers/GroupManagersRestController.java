@@ -6,10 +6,9 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
-import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.dto.ClientGroupManagerDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.service.ClientGroupManagersService;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.AuthorityUtils;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiController;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
@@ -23,12 +22,12 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/groupmanagers")
 @Controller
-public class GroupManagersRestController {
+public class GroupManagersRestController extends BaseSchoolApiController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response attachedGroups(List<ClientGroupManagerDTO> groupClientManagers) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+        if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
         List<ClientGroupManager> clientGroupManagers = getService().attachedGroups(groupClientManagers);
@@ -39,7 +38,7 @@ public class GroupManagersRestController {
     @DELETE
     @Path("/{id}")
     public Response dettachedGroup(@PathParam("id") Long idOfClientGroupManager) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+        if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
         getService().dettachedGroup(idOfClientGroupManager);
@@ -49,26 +48,15 @@ public class GroupManagersRestController {
     @DELETE
     @Path("")
     public Response dettachedGroups(@QueryParam("id") final List<Long> ids) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+        if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
         getService().dettachedGroups(ids);
         return Response.ok().build();
     }
 
-
-    private User getUser() {
-        AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
-        return authorityUtils.findCurrentUser();
-    }
-
     private ClientGroupManagersService getService() {
         return RuntimeContext.getAppContext().getBean(ClientGroupManagersService.class);
-    }
-
-    private boolean hasAnyRole(String... role){
-        AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
-        return authorityUtils.hasAnyRole(role);
     }
 
 }

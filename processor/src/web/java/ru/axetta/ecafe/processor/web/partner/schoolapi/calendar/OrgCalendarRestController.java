@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.calendar;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.calendar.dto.CreateOrUpdateOrgCalendarDateRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.calendar.dto.CreateOrUpdateOrgCalendarDateResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.calendar.dto.DeleteOrgCalendarDateResponse;
@@ -27,7 +26,7 @@ public class OrgCalendarRestController extends BaseSchoolApiController {
     @DELETE
     @Path("/{idOfRecord}/{idOfOrgRequester}")
     public Response deleteOrgCalendarDate(@PathParam("idOfRecord") long idOfRecord, @PathParam("idOfOrgRequester") long idOfOrgRequester) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        if (!isWebArmAnyRole()) throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         DeleteOrgCalendarDateResponse response = getService().deleteOrgCalendarDate(idOfRecord, idOfOrgRequester, getUser());
         return Response.ok().entity(response).build();
     }
@@ -35,7 +34,7 @@ public class OrgCalendarRestController extends BaseSchoolApiController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrUpdateOrgCalendarDate(CreateOrUpdateOrgCalendarDateRequest request) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name(), User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.name())) throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        if (!isWebArmAnyRole()) throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         CreateOrUpdateOrgCalendarDateResponse response = getService().createOrUpdateOrgCalendarDate(request, getUser());
         return Response.ok().entity(response).build();
     }

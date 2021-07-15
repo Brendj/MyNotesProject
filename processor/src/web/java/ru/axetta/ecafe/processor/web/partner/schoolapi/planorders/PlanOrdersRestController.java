@@ -6,10 +6,9 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.planorders;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction;
-import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.dto.PlanOrderRestrictionDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.service.SchoolApiPlanOrderRestrictionsService;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.AuthorityUtils;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiController;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
@@ -23,14 +22,14 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/planorders")
 @Controller
-public class PlanOrdersRestController {
+public class PlanOrdersRestController extends BaseSchoolApiController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/restrictions/client/{id}")
     public Response setClientPlanOrderRestrictions(@PathParam("id") Long idOfClient,
             @QueryParam(value = "notified") @DefaultValue("false") Boolean notified,
             List<PlanOrderRestrictionDTO> restrictions) {
-        if (!hasAnyRole(User.DefaultRole.ADMIN.name())) {
+        if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
         List<PlanOrdersRestriction> updatedItems = getService()
@@ -43,9 +42,5 @@ public class PlanOrdersRestController {
         return RuntimeContext.getAppContext().getBean(SchoolApiPlanOrderRestrictionsService.class);
     }
 
-    private boolean hasAnyRole(String... role) {
-        AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
-        return authorityUtils.hasAnyRole(role);
-    }
 
 }

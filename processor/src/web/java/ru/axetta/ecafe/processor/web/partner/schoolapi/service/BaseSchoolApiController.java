@@ -18,4 +18,10 @@ public class BaseSchoolApiController {
         AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
         return authorityUtils.hasAnyRole(role);
     }
+
+    protected boolean isWebArmAnyRole() {
+        AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
+        return authorityUtils.hasAnyRole(User.WebArmRole.WA_OEE.name(), User.WebArmRole.WA_OPP.name(), User.WebArmRole.WA_OPP_OEE
+                .name());
+    }
 }

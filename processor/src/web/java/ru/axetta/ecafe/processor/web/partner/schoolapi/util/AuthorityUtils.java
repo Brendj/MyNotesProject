@@ -21,7 +21,7 @@ import java.util.Collection;
 
 @Component
 public class AuthorityUtils {
-    private Logger logger = LoggerFactory.getLogger(AuthorityUtils.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthorityUtils.class);
 
     public final boolean hasRole(String role) {
         UserDetails userDetails = getUserDetails();
