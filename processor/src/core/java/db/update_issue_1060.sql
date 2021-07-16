@@ -21,8 +21,6 @@ create table cf_wa_journal_client
 
 CREATE SEQUENCE cf_wa_journal_client_idofoperation_seq
     INCREMENT 256
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
     START 1;
 
 comment on table cf_wa_journal_client is 'Журнал действий пользователя в веб АРМ администратора';
