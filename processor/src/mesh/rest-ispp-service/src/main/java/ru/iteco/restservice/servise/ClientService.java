@@ -329,26 +329,23 @@ public class ClientService {
             throw new IllegalArgumentException("Клиент из предопределенной группы");
         }
 
-        Client changingGuardian = clientReadOnlyRepo
-                .getFirstByMobileOrderByClientRegistryVersionDesc(req.getGuardianMobile())
+        ClientGuardian changingClientGuardian = guardianReadOnlyRepo
+                .getActiveGuardiansByMobileAndChild(req.getContractId(), req.getGuardianMobile())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Не найден представитель по номеру телефону %s", req.getGuardianMobile()))
-                );
-
-        ClientGuardian clientGuardian = guardianReadOnlyRepo
-                .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, changingGuardian)
-                .orElseThrow(() -> new NotFoundException("Нет связи между клиентом и инициатором операции"));
+                ).get(0);
+        Client changingGuardian = changingClientGuardian.getGuardian();
 
         Long groupIdOfGuardian = changingGuardian.getClientGroup().getClientGroupId().getIdOfClientGroup();
         if(ClientGroupAssignment.CLIENT_PARENTS.getId() > groupIdOfGuardian && groupIdOfGuardian > ClientGroupAssignment.CLIENT_VISITORS.getId() -1L){
             throw new IllegalArgumentException("Инициатор операции не пренадлежит группе \"Родители\"");
         }
 
-        if(!clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW)){
+        if(!changingClientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW)){
             throw new IllegalArgumentException("Операция доступна только для законного представителя");
         }
 
-        clientGuardian = null;
+        changingClientGuardian = null;
 
         Client targetGuardian = clientReadOnlyRepo
                 .getClientByContractId(req.getRepContractId())
