@@ -744,9 +744,7 @@ public class CardManagerProcessor implements CardManager {
         if(cardNo == null){
             return null;
         }
-        Long longCardId = (cardNo % 0x100) * 0x1000000 + ((cardNo / 0x100) % 0x100)*0x10000
+        return  (cardNo % 0x100) * 0x1000000 + ((cardNo / 0x100) % 0x100)*0x10000
                 + ((cardNo / 0x10000) % 0x100)*0x100 + cardNo / 0x1000000;
-
-        return longCardId;
     }
 }
