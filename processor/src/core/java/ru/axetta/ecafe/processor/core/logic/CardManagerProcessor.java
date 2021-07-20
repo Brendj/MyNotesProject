@@ -716,6 +716,7 @@ public class CardManagerProcessor implements CardManager {
         card.setCreateTime(new Date());
         card.setTransitionState(CardTransitionState.OWN.getCode());
         card.setCardSignCertNum(cardSignCertNum);
+        card.setLongCardNo(calculateLongCardNoByShortCardNo(trackerUidAsCardNo));
         session.save(card);
 
         HistoryCard historyCard = new HistoryCard();
@@ -737,5 +738,15 @@ public class CardManagerProcessor implements CardManager {
                 persistenceSession.update(card);
             }
         }
+    }
+
+    public static Long calculateLongCardNoByShortCardNo(Long cardNo){
+        if(cardNo == null){
+            return null;
+        }
+        Long longCardId = (cardNo % 0x100) * 0x1000000 + ((cardNo / 0x100) % 0x100)*0x10000
+                + ((cardNo / 0x10000) % 0x100)*0x100 + cardNo / 0x1000000;
+
+        return longCardId;
     }
 }
