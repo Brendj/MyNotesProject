@@ -121,6 +121,9 @@ public class MeshPersonsSyncService {
     protected boolean isHomeStudy(Education education, Map<Integer, MeshTrainingForm> trainingForms) throws Exception {
         if (education.getActualFrom() == null && education.getEducationFormId() == null)
             throw new Exception("Arguments educationForm and educationFormId are NULL");
+        if (Education.OUT_OF_ORG_EDUCATIONS.contains(education.getServiceTypeId())) {
+            return true;
+        }
         Integer id = education.getEducationForm() == null ? education.getEducationFormId() : education.getEducationForm().getId();
         MeshTrainingForm trainingForm = trainingForms.get(id);
         if (trainingForm == null) throw new Exception(String.format("TrainingForm by ID %d does exists", id));
@@ -221,6 +224,13 @@ public class MeshPersonsSyncService {
 
     protected Education findEducation(ResponsePersons person) {
         try {
+            Iterator<Education> iterator = person.getEducation().iterator();
+            while (iterator.hasNext()) {
+                Education education = iterator.next();
+                if (education.getServiceTypeId() == null || !Education.ACCEPTABLE_EDUCATIONS.contains(education.getServiceTypeId())) {
+                    iterator.remove();
+                }
+            }
             Collections.sort(person.getEducation());
             return person.getEducation().get(person.getEducation().size() - 1);
         } catch (Exception e) {
