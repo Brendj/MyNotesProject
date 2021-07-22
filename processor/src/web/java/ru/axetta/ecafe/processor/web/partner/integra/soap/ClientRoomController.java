@@ -502,7 +502,8 @@ public interface ClientRoomController {
 
     @WebMethod CultureEnterInfo getCultureEnterInfo(@WebParam(name = "cardId") String cardId);
 
-    @WebMethod Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
+    @WebMethod Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "museumCode") String museumCode,
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus);
 
