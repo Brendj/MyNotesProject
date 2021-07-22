@@ -100,11 +100,11 @@ public class MeshClass {
             return false;
         }
         MeshClass meshClass = (MeshClass) o;
-        return Objects.equals(id, meshClass.id);
+        return Objects.equals(uid, meshClass.uid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(uid);
     }
 }
