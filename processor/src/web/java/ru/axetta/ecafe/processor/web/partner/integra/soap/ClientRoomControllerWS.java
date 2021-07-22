@@ -9130,11 +9130,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (client.getAgeTypeGroup() != null && ArrayUtils.contains(Client.GROUP_NAME_SCHOOL, client.getAgeTypeGroup())) {
                 //Если клиент школьник
-                if (StringUtils.isEmpty(client.getClientGUID())) {
+                if (StringUtils.isEmpty(client.getClientGUID()) && StringUtils.isEmpty(client.getMeshGUID())) {
                     return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
                 }
                 cultureEnterInfo.setFullAge(getFullAge(client));
                 cultureEnterInfo.setGuid(client.getClientGUID());
+                cultureEnterInfo.setMesId(client.getMeshGUID());
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
             } else {
                 List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
@@ -9161,6 +9162,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (clientPredefined) {
                             CultureEnterInfo cultureEnterInfoChield = new CultureEnterInfo();
                             cultureEnterInfoChield.setGuid(child.getClientGUID());
+                            cultureEnterInfoChield.setMesId(child.getMeshGUID());
                             cultureEnterInfoChield.setGroupName(child.getClientGroup().getGroupName());
                             cultureEnterInfoChield.setFullAge(getFullAge(child));
                             cultureEnterInfo.getChildrens().get(0).getChild().add(cultureEnterInfoChield);
