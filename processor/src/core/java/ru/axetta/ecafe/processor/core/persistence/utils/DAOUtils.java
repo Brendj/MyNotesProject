@@ -974,7 +974,8 @@ public class DAOUtils {
     public static List<InfoMessage> getInfoMessagesSinceVersion(Session session, long idOfOrg, long version)
             throws Exception {
         Query query = session.createQuery("select m from InfoMessage m join m.infoMessageDetails d "
-                + "where d.compositeIdOfInfoMessageDetail.idOfOrg = :idOfOrg and m.version > :version");
+                + "where m.mtype = :type and d.compositeIdOfInfoMessageDetail.idOfOrg = :idOfOrg and m.version > :version");
+        query.setParameter("type", InfoMessageType.TO_SCHOOL_ARM);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("version", version);
         return query.list();
