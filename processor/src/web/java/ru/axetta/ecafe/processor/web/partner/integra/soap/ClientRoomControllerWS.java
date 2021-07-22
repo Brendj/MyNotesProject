@@ -9260,15 +9260,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "orgCode") String orgCode,
             @WebParam(name = "CultureName") String cultureName,
             @WebParam(name = "CultureShortName") String cultureShortName,
             @WebParam(name = "CultureAddress") String cultureAddress, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
-        if (StringUtils.isEmpty(guid)) {
+        if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(mesId)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+
+        if (!StringUtils.isEmpty(guid) && !StringUtils.isEmpty(mesId)) {
+            return new Result(RC_INVALID_DATA, "В запросе должен быть указан только один идентификатор - guid или mesId");
         }
 
         if (StringUtils.isEmpty(orgCode)) {
@@ -9300,7 +9305,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, guid);
+            Client cl = null;
+            if (!StringUtils.isEmpty(guid)) {
+                cl = DAOUtils.findClientByGuid(session, guid);
+            }
+            if (!StringUtils.isEmpty(mesId)) {
+                cl = DAOUtils.findClientByMeshGuid(session, mesId);
+            }
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
