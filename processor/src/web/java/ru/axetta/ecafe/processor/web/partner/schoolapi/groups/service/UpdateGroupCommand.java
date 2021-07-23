@@ -53,7 +53,7 @@ class UpdateGroupCommand {
             ClientGroup clientGroup = (ClientGroup) session.get(ClientGroup.class, idOfClientGroup);
 
             if (clientGroup == null) {
-                throw new WebApplicationException(ResponseCodes.CLIENT_GROUP_NOT_FOUND.getCode(),
+                throw WebApplicationException.notFound(ResponseCodes.CLIENT_GROUP_NOT_FOUND.getCode(),
                         String.format("Группа с ID: '%d' и OrgID: '%d' не найдена", id, orgId));
             }
             response = GroupClientsUpdateResponse.from(clientGroup);

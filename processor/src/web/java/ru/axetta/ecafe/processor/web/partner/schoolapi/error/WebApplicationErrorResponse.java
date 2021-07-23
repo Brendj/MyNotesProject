@@ -8,12 +8,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class WebApplicationErrorResponse implements Serializable {
-    private String type;
-    private Integer status;
-    private String title;
-    private String detail;
-    private String instance;
-    private Date timestamp;
+    private final String type;
+    private final Integer status;
+    private final String title;
+    private final String detail;
+    private final String instance;
+    private final Date timestamp;
 
     public WebApplicationErrorResponse(String type, int status, String title, String detail, String instance) {
         this.type = type;

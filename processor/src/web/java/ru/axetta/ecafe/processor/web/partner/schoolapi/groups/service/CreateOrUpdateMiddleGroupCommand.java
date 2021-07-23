@@ -47,7 +47,7 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
         try {
             boolean isPredefined = isPredefined(idOfGroupClients);
             if (!isPredefined) {
-                throw new WebApplicationException(GROUP_NOT_PREDEFINED,
+                throw WebApplicationException.badRequest(GROUP_NOT_PREDEFINED,
                         String.format("Group with ID='%d' not predefined", idOfGroupClients));
             }
 
@@ -59,7 +59,7 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
                 GroupNamesToOrgs subGroup = createSubGroup(request, mainBuildingOrgId, session);
                 response = MiddleGroupResponse.from(subGroup);
             } else {
-                throw new WebApplicationException(DUPLICATE_GROUP_NAME,
+                throw WebApplicationException.badRequest(DUPLICATE_GROUP_NAME,
                         String.format("Подгруппа '%s' для группы '%s' уже существует", request.getName(),
                                 request.getParentGroupName()));
             }
@@ -71,8 +71,7 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
             throw wex;
         } catch (Exception e) {
             logger.error("Error in create middle group, ", e);
-            throw new WebApplicationException(String.format("Ошибка при создании подгруппы '%s'", request.getName()),
-                    e);
+            throw new WebApplicationException(String.format("Ошибка при создании подгруппы '%s'", request.getName()), e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -91,11 +90,11 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
         try {
             boolean isPredefined = isPredefined(idOfGroupClients);
             if (!isPredefined) {
-                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(),
+                throw WebApplicationException.badRequest(ResponseCodes.BAD_REQUEST_ERROR.getCode(),
                         String.format("Group with ID='%d' not predefined", idOfGroupClients));
             }
             if (StringUtils.isEmpty(request.getName())) {
-                throw new WebApplicationException(ResponseCodes.BAD_REQUEST_ERROR.getCode(),
+                throw WebApplicationException.badRequest(ResponseCodes.BAD_REQUEST_ERROR.getCode(),
                         "Is empty middle group name");
             }
             session = runtimeContext.createPersistenceSession();
@@ -109,12 +108,12 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
                     GroupNamesToOrgs middleGroup = updateMiddleGroup(request, foundCurrentGroup, user, session);
                     response = MiddleGroupResponse.from(middleGroup);
                 } else {
-                    throw new WebApplicationException(DUPLICATE_GROUP_NAME,
+                    throw WebApplicationException.badRequest(DUPLICATE_GROUP_NAME,
                             String.format("Подгруппа '%s' для группы '%s' уже существует", request.getName(),
                                     request.getParentGroupName()));
                 }
             } else {
-                throw new WebApplicationException(GROUP_NOT_FOUND,
+                throw WebApplicationException.notFound(GROUP_NOT_FOUND,
                         String.format("Подгруппа '%s' для группы '%s' не найдена", request.getName(),
                                 request.getParentGroupName()));
             }

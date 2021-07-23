@@ -193,7 +193,7 @@ class UpdatePlanOrderRestrictionsCommand {
     private Client checkClientOrRaiseError(long idOfClient, Session session) {
         Client client = (Client) session.load(Client.class, idOfClient);
         if (client == null) {
-            throw new WebApplicationException(ResponseCodes.CLIENT_NOT_FOUND.getCode(),
+            throw WebApplicationException.notFound(ResponseCodes.CLIENT_NOT_FOUND.getCode(),
                     String.format("Client with id='%d' not found", idOfClient));
         }
         return client;

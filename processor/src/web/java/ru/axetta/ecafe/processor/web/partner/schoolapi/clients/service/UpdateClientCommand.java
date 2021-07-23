@@ -47,7 +47,7 @@ class UpdateClientCommand {
             transaction = session.beginTransaction();
             Client client = (Client) session.get(Client.class, idOfClient);
             if (client == null) {
-                throw new WebApplicationException(NOT_FOUND,
+                throw WebApplicationException.notFound(NOT_FOUND,
                         String.format("Client with ID='%d' not found", idOfClient));
             }
             setMobilePhone(client, request.getMobile(), user);
@@ -84,7 +84,7 @@ class UpdateClientCommand {
             ClientGroup moveToGroup = (ClientGroup) session.get(ClientGroup.class,
                     new CompositeIdOfClientGroup(idOfOrg, request.getIdOfClientGroup()));
             if (moveToGroup == null) {
-                throw new WebApplicationException(NOT_FOUND,
+                throw WebApplicationException.notFound(NOT_FOUND,
                         String.format("Group of client with ID='%d' not found", request.getIdOfClientGroup()));
             }
             // обновляем группу
@@ -131,7 +131,7 @@ class UpdateClientCommand {
             if (gender == 0 || gender == 1) {
                 client.setGender(gender);
             } else {
-                throw new WebApplicationException(BAD_PARAMS, "Не верное значение для gender, " + gender);
+                throw WebApplicationException.badRequest(BAD_PARAMS, "Не верное значение для gender, " + gender);
             }
         }
     }
@@ -142,7 +142,7 @@ class UpdateClientCommand {
         }
         mobilePhone = Client.checkAndConvertMobile(mobilePhone);
         if (mobilePhone == null) {
-            throw new WebApplicationException(BAD_PARAMS, "Неправильный формат мобильного телефона");
+            throw WebApplicationException.badRequest(BAD_PARAMS, "Неправильный формат мобильного телефона");
         }
         ClientsMobileHistory clientsMobileHistory = new ClientsMobileHistory("REST API, updateClient метод");
         clientsMobileHistory.setUser(user);

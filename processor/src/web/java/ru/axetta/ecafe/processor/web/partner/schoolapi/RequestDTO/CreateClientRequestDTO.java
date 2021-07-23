@@ -129,9 +129,9 @@ public class CreateClientRequestDTO {
     public void validateRequest() throws WebApplicationException {
         String errorMessage = "Поля GroupName, Surname, Name, Gender обязательные для заполнения.";
         if(isEmpty(this.groupName) || isEmpty(this.surname) || isEmpty(this.name) || this.gender == null )
-            throw new WebApplicationException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(), errorMessage);
+            throw WebApplicationException.badRequest(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(), errorMessage);
         if(this.gender.intValue() != 0 && this.gender.intValue() != 1)
-            throw new WebApplicationException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(),
+            throw WebApplicationException.badRequest(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(),
                     "Значение поля Gender должно быть 0 или 1.");
     }
 

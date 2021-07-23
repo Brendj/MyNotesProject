@@ -172,7 +172,7 @@ class AttachedGroupCommand {
             foundClientGroupManager.setDeleted(true);
             session.save(foundClientGroupManager);
         } else {
-            throw new WebApplicationException(GROUP_MANAGER_NOT_FOUND,
+            throw WebApplicationException.notFound(GROUP_MANAGER_NOT_FOUND,
                     String.format("Group manager with idOfClientGroupManager='%d' not found", idOfClientGroupManager));
         }
     }
@@ -180,7 +180,7 @@ class AttachedGroupCommand {
     private void checkClientOrRaiseError(Session session, ClientGroupManagerDTO clientGroupManager) {
         Client client = (Client) session.load(Client.class, clientGroupManager.getIdOfClient());
         if (client == null) {
-            throw new WebApplicationException(CLIENT_NOT_FOUND,
+            throw WebApplicationException.notFound(CLIENT_NOT_FOUND,
                     String.format("Client with id='%d' not found", clientGroupManager.getIdOfClient()));
         }
         Org clientOrg = client.getOrg();
@@ -192,7 +192,7 @@ class AttachedGroupCommand {
                 clientGroupManager.getIdOfClientGroup());
         ClientGroup clientGroup = (ClientGroup) session.get(ClientGroup.class, idOfClientGroup);
         if (clientGroup == null) {
-            throw new WebApplicationException(CLIENT_GROUP_NOT_FOUND,
+            throw WebApplicationException.notFound(CLIENT_GROUP_NOT_FOUND,
                     String.format("Client group with idOfClientGroup='%d' not found",
                             clientGroupManager.getIdOfClientGroup()));
         }
@@ -207,7 +207,7 @@ class AttachedGroupCommand {
             }
         }
         if (!found) {
-            throw new WebApplicationException(ORG_GROUP_IS_NOT_FRIENDLY, String.format(
+            throw WebApplicationException.badRequest(ORG_GROUP_IS_NOT_FRIENDLY, String.format(
                     "Organization of group with idOfOrg='%d' is not friendly for client organization with idOfOrg='%d',",
                     checkedOrgId, clientOrgId));
         }

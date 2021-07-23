@@ -44,11 +44,11 @@ class DeleteMiddleGroupCommand extends BaseMiddleGroupCommand{
 
             GroupNamesToOrgs middleGroupItem = foundMiddleGroupById(session, idOfMiddleGroup);
             if (middleGroupItem == null) {
-                throw new WebApplicationException(GROUP_NOT_FOUND,
+                throw WebApplicationException.notFound(GROUP_NOT_FOUND,
                         String.format("Middle group with  id='%d' not found", idOfMiddleGroup));
             }
             if (middleGroupItem.getIsMiddleGroup() == null || !middleGroupItem.getIsMiddleGroup()) {
-                throw new WebApplicationException(GROUP_NOT_CORRECT_STATE,
+                throw WebApplicationException.internalServerError(GROUP_NOT_CORRECT_STATE,
                         String.format("Middle group with  id='%d' is not correct state", idOfMiddleGroup));
             }
             resetMiddleGroupForClients(session, middleGroupItem);
