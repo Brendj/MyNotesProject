@@ -21,7 +21,7 @@ public class OrderResponseDTO {
     private Boolean cancel;
 
     @Schema(description = "ID записи", example = "704602893596893184")
-    private Long idOfOrder;
+    private String idOfOrder;
 
     @Schema(description = "Детали заказа")
     private List<OrderDetailResponseDTO> details = new LinkedList<>();
@@ -50,11 +50,11 @@ public class OrderResponseDTO {
         this.cancel = cancel;
     }
 
-    public Long getIdOfOrder() {
+    public String getIdOfOrder() {
         return idOfOrder;
     }
 
-    public void setIdOfOrder(Long idOfOrder) {
+    public void setIdOfOrder(String idOfOrder) {
         this.idOfOrder = idOfOrder;
     }
 

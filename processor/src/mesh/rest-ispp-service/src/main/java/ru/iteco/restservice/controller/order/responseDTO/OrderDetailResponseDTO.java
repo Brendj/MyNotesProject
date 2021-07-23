@@ -18,7 +18,7 @@ import java.util.Objects;
         + " Оставшийся поля, помеченные как nullable, заполняются для блюд.")
 public class OrderDetailResponseDTO {
     @Schema(description = "ID записи", example = "704602893601087488")
-    private Long idOfOrderDetail;
+    private String idOfOrderDetail;
 
     @Schema(description = "Название комплекса", example = "Составной_Платный", nullable = true)
     private String complexName;
@@ -125,11 +125,11 @@ public class OrderDetailResponseDTO {
         this.amount = amount;
     }
 
-    public Long getIdOfOrderDetail() {
+    public String getIdOfOrderDetail() {
         return idOfOrderDetail;
     }
 
-    public void setIdOfOrderDetail(Long idOfOrderDetail) {
+    public void setIdOfOrderDetail(String idOfOrderDetail) {
         this.idOfOrderDetail = idOfOrderDetail;
     }
 

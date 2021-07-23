@@ -71,14 +71,14 @@ public class OrderService {
         OrderResponseDTO dto = new OrderResponseDTO();
 
         dto.setCancel(o.getState() == 1);
-        dto.setIdOfOrder(o.getCompositeId().getIdOfOrder());
+        dto.setIdOfOrder(o.getCompositeId().getIdOfOrder().toString());
         dto.setSum(o.getRsum());
         dto.setTime(o.getCreatedDate());
 
         for(OrderDetail detail : o.getOrderDetailSet()){
             OrderDetailResponseDTO detailDTO = new OrderDetailResponseDTO();
             detailDTO.setAmount(detail.getQty());
-            detailDTO.setIdOfOrderDetail(detail.getCompositeId().getIdOfOrderDetail());
+            detailDTO.setIdOfOrderDetail(detail.getCompositeId().getIdOfOrderDetail().toString());
 
             if(OrderDetail.TYPE_COMPLEX_MIN <= detail.getMenuType() && detail.getMenuType() <= OrderDetail.TYPE_COMPLEX_MAX){
                 detailDTO.setComplexName(detail.getMenuDetailName());

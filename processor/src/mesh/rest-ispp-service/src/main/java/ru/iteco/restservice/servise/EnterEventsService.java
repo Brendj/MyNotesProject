@@ -56,7 +56,7 @@ public class EnterEventsService {
         Client c = clientReadOnlyRepo.getClientByContractId(contractId)
                 .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));
 
-        if(c.getClientGroup().getClientGroupId().getIdOfClientGroup() >= ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
+        if(c.getClientGroup().getClientGroupId().getIdOfClientGroup() > ClientGroupAssignment.CLIENT_EMPLOYEES.getId()){
             throw new IllegalArgumentException("Клиент из предопределенной группы");
         }
         Page<Object[]> fromDB = readOnlyRepo.getEnterEventsByClient(contractId, startDate, endDate, pageable);
