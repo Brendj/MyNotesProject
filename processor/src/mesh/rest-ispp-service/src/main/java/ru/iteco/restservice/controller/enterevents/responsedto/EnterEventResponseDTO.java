@@ -30,7 +30,7 @@ public class EnterEventResponseDTO {
             example = "Евгений Иванович Иванов", nullable = true)
     private String childPassChecker;
 
-    @Schema(description = "Флаг того, что отметка сделана работником (1 – классный руководитель; 0 – охранник)",
+    @Schema(description = "Флаг того, что отметка сделана работником (0 – классный руководитель; 1 – охранник)",
             example = "1", nullable = true)
     private Integer childPassCheckerMethod;
 
