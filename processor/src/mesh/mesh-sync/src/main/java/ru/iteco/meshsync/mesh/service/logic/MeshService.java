@@ -41,6 +41,11 @@ public class MeshService {
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
 
+    private static final List<Integer> notInOrganization = Arrays.asList(
+            ServiceType.ATTESTATION.getCode(),
+            ServiceType.ACADEMIC_LEAVE.getCode()
+    );
+
     private static final List<Integer> enabledServiceTypeIds = Arrays.asList(
             ServiceType.EDUCATION.getCode(),
             ServiceType.ATTESTATION.getCode(),
@@ -140,7 +145,7 @@ public class MeshService {
                                 throw new NoRequiredDataException(String.format("Person %s have no info about Class and EducationForm",
                                         entityChanges.getPersonGUID()));
                             } else {
-                                homeStudy = catalogService.isHomeStudy(actualEdu.getEducationForm(), actualEdu.getEducationFormId());
+                                homeStudy = notInOrganization.contains(actualEdu.getServiceTypeId());
                             }
                         }
                         inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
