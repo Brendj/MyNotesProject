@@ -53,7 +53,7 @@ public class OnlinePaymentProcessor {
             PaymentResponse.ResPaymentRegistry.Item processResult = RuntimeContext.getInstance().getPaymentProcessor().processPayPaymentRegistryPayment(
                     request.getContragentId(), payment);
             ////
-            PaymentResponse.ResPaymentRegistry.Item.ClientInfo client=processResult.getClient();
+            PaymentResponse.ResPaymentRegistry.Item.ClientInfo client = processResult.getClient();
             PayResponse payResponse = new PayResponse(request.protoVersion, request.isCheckOnly(),
                     processResult.getResult(), processResult.getError(), processResult.getTspContragentId(), clientId,
                     request.getPaymentId(), processResult.getBalance(), processResult.getSubBalance1(),

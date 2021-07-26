@@ -144,10 +144,10 @@ public class MeshService {
                             if (actualEdu.getEducationForm() == null && actualEdu.getEducationFormId() == null) {
                                 throw new NoRequiredDataException(String.format("Person %s have no info about Class and EducationForm",
                                         entityChanges.getPersonGUID()));
-                            } else {
-                                homeStudy = notInOrganization.contains(actualEdu.getServiceTypeId());
                             }
                         }
+
+                        homeStudy = notInOrganization.contains(actualEdu.getServiceTypeId());
                         inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
 
                         if (person == null && !inSupportedOrg) {
@@ -264,6 +264,7 @@ public class MeshService {
             person.setParallelID(null);
             person.setEducationStageId(null);
             person.setClassUID(null);
+            person.setClassEntity(null);
         }
 
         if(!inSupportedOrg) {
