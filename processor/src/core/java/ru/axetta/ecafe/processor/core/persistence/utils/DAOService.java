@@ -22,8 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -3210,6 +3210,16 @@ public class DAOService {
         q.setParameter("newID", newID);
         q.setParameter("oldID", cardSign.getIdOfCardSign());
         q.executeUpdate();
+    }
+
+    public MeshClass getMeshClassByUID(String uid){
+        try {
+            Query q = entityManager.createQuery("SELECT c FROM MeshClass AS c WHERE c.uid = :uid");
+            q.setParameter("uid", uid);
+            return (MeshClass) q.getSingleResult();
+        } catch (NoResultException e){
+            return null;
+        }
     }
 }
 
