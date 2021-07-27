@@ -24,6 +24,7 @@ public class ExemptionVisitingSyncPOJO {
     private Date updateDate;
     private Long version;
     private Boolean accepted;
+    private Date acceptedDateTime;
 
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("Record");
@@ -36,6 +37,7 @@ public class ExemptionVisitingSyncPOJO {
         element.setAttribute("dateLiberate", CalendarUtils.dateTimeToString(dateLiberate));
         element.setAttribute("accepted", accepted == null ? "false" : accepted.toString());
         element.setAttribute("version", version == null ? "-1" : version.toString());
+        element.setAttribute("acceptedDateTime", acceptedDateTime == null ? "null" : CalendarUtils.dateTimeToString(acceptedDateTime));
         return element;
     }
 
@@ -125,5 +127,13 @@ public class ExemptionVisitingSyncPOJO {
 
     public void setHazard_level_id(Integer hazard_level_id) {
         this.hazard_level_id = hazard_level_id;
+    }
+
+    public Date getAcceptedDateTime() {
+        return acceptedDateTime;
+    }
+
+    public void setAcceptedDateTime(Date acceptedDateTime) {
+        this.acceptedDateTime = acceptedDateTime;
     }
 }

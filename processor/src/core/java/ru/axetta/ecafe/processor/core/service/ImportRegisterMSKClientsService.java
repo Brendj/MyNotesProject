@@ -550,7 +550,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                 }
                 try {
-                    if (cl != null && !cl.getOrg().getOrgIdFromNsi().equals(pupil.orgId) && !crossFound) {
+                    if (cl != null && (cl.getOrg().getOrgIdFromNsi() == null || !cl.getOrg().getOrgIdFromNsi().equals(pupil.orgId)) && !crossFound) {
                         log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
                                 cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " + emptyIfNull(
                                 cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " + emptyIfNull(
@@ -1207,7 +1207,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             for (Org o : orgs) {
                 if (o.getOrgIdFromNsi() == null) continue;
                 if (nsiInfo.length() > 0) nsiInfo += ", ";
-                nsiInfo += o.getOrgNumberInName() + ": " + o.getOrgIdFromNsi().toString();
+                nsiInfo += o.getIdOfOrg() + ": " + o.getOrgIdFromNsi().toString();
                 orgNSIIds.add(o.getOrgIdFromNsi().toString());
                 orgNSIIdsLong.add(o.getOrgIdFromNsi());
             }

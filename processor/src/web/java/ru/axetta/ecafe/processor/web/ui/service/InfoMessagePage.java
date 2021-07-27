@@ -51,6 +51,7 @@ public class InfoMessagePage extends BasicWorkspacePage {
             InfoMessageItem item = new InfoMessageItem();
             item.setIdOfMessage(message.getIdOfInfoMessage());
             item.setCreatedDate(message.getCreatedDate());
+            item.setType(message.getMtype().toString());
             item.setHeader(message.getHeader());
             item.setContent(message.getContent());
             item.setAuthor(message.getUser().getUserName());
@@ -93,6 +94,7 @@ public class InfoMessagePage extends BasicWorkspacePage {
     public static class InfoMessageItem {
         private Long idOfMessage;
         private Date createdDate;
+        private String type;
         private String header;
         private String author;
         private String content;
@@ -144,6 +146,14 @@ public class InfoMessagePage extends BasicWorkspacePage {
 
         public void setDetails(List<OrgDeliveryInfo> details) {
             this.details = details;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
     }
 
