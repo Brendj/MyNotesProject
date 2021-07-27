@@ -128,7 +128,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         return  parseGetParams(httpRequest);
     }
 
-    private OnlinePaymentProcessor.PayRequest parseForCheckAccount(long defaultContragentId, ParseResult parseResult) throws Exception{
+    private OnlinePaymentProcessor.PayRequest parseForCheckAccount(long defaultContragentId, ParseResult parseResult) throws Exception {
         String account = parseResult.getParam("ACCOUNT");
         Long contractId;
         Long sum = 0L;
@@ -140,9 +140,8 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         } catch (Exception e) {
             throw new InvalidContractIdFormatException("Invalid contractId format");
         }
-        return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true ,defaultContragentId,
-                null, paymentMethod, contractId,
-                receipt, source, sum, false);
+        return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true,
+                defaultContragentId, null, paymentMethod, contractId, receipt, source, sum, false);
     }
 
     private OnlinePaymentProcessor.PayRequest parseForPayment(long defaultContragentId, ParseResult parseResult) throws Exception{

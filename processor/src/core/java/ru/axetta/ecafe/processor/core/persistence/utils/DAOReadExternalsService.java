@@ -120,7 +120,9 @@ public class DAOReadExternalsService {
         if ((idOfClient != null && contractId != null) || (idOfClient == null && contractId == null))
             throw new Exception("Invalid arguments");
         try {
-            String query_str = (idOfClient != null ? "select c from Client c where c.idOfClient = :parameter" : "select c from Client c where c.contractId = :parameter");
+            String query_str = (idOfClient != null ?
+                    "select c from Client c join fetch c.org o join fetch o.defaultSupplier where c.idOfClient = :parameter"
+                    : "select c from Client c join fetch c.org o join fetch o.defaultSupplier where c.contractId = :parameter");
             Query query = entityManager.createQuery(query_str);
             query.setParameter("parameter", idOfClient != null ? idOfClient : contractId);
             return (Client) query.getSingleResult();

@@ -51,6 +51,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
                         version = DAOUtils.getMaxVersionOfExemptionVisiting(session) + 1;
                         emias.setAccepted(pojo.getAccepted());
                         emias.setUpdateDate(new Date());
+                        emias.setAcceptedDateTime(pojo.getAcceptedDateTime());
                         emias.setVersion(version);
                         session.persist(emias);
                     }
@@ -91,6 +92,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
             exemptionVisitingSyncPOJO.setVersion(emias.getVersion());
             exemptionVisitingSyncPOJO.setCreateDate(emias.getCreateDate());
             exemptionVisitingSyncPOJO.setUpdateDate(emias.getUpdateDate());
+            exemptionVisitingSyncPOJO.setAcceptedDateTime(emias.getAcceptedDateTime());
             fullExemptionVisitingAnswerForARM.getItems().add(exemptionVisitingSyncPOJO);
         }
         return fullExemptionVisitingAnswerForARM;

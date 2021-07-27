@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -117,8 +117,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -9084,6 +9084,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             String guid = client.getClientGUID();
+            String meshGuid = client.getMeshGUID();
+            if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(meshGuid)) {
+                return new MuseumEnterInfo(RC_CLIENT_GUID_NOT_FOUND, RC_CLIENT_GUID_NOT_FOUND_DESC);
+            }
             Date currentDate = new Date();
             boolean clientPredefined = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
                     >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
@@ -9091,11 +9095,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     <= ClientGroup.Predefined.CLIENT_DELETED.getValue();
             if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
                     && card.getValidTime().after(currentDate) && !clientPredefined) {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 0L, "Карта активна");
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 0L, "Карта активна");
             } else if (!clientPredefined) {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 2L, "Карта не активна");
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 2L, "Карта не активна");
             } else {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 1L,
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 1L,
                         "Карта принадлежит другой группе держателей «Москвенка»");
             }
         } catch (Exception e) {
@@ -9126,11 +9130,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (client.getAgeTypeGroup() != null && ArrayUtils.contains(Client.GROUP_NAME_SCHOOL, client.getAgeTypeGroup())) {
                 //Если клиент школьник
-                if (StringUtils.isEmpty(client.getClientGUID())) {
+                if (StringUtils.isEmpty(client.getClientGUID()) && StringUtils.isEmpty(client.getMeshGUID())) {
                     return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
                 }
                 cultureEnterInfo.setFullAge(getFullAge(client));
                 cultureEnterInfo.setGuid(client.getClientGUID());
+                cultureEnterInfo.setMesId(client.getMeshGUID());
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
             } else {
                 List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
@@ -9157,6 +9162,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (clientPredefined) {
                             CultureEnterInfo cultureEnterInfoChield = new CultureEnterInfo();
                             cultureEnterInfoChield.setGuid(child.getClientGUID());
+                            cultureEnterInfoChield.setMesId(child.getMeshGUID());
                             cultureEnterInfoChield.setGroupName(child.getClientGroup().getGroupName());
                             cultureEnterInfoChield.setFullAge(getFullAge(child));
                             cultureEnterInfo.getChildrens().get(0).getChild().add(cultureEnterInfoChield);
@@ -9187,12 +9193,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
+    public Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "museumCode") String museumCode,
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus) {
         authenticateRequest(null);
-        if (StringUtils.isEmpty(guid)) {
+        if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(mesId)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+        if (!StringUtils.isEmpty(guid) && !StringUtils.isEmpty(mesId)) {
+            return new Result(RC_INVALID_DATA, "В запросе должен быть указан только один идентификатор - guid или mesId");
         }
         if (accessTime == null) {
             return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
@@ -9203,7 +9213,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, guid);
+            Client cl = null;
+            if (!StringUtils.isEmpty(guid)) {
+                cl = DAOUtils.findClientByGuid(session, guid);
+            }
+            if (!StringUtils.isEmpty(mesId)) {
+                cl = DAOUtils.findClientByMeshGuid(session, mesId);
+            }
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
@@ -9244,15 +9260,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "orgCode") String orgCode,
             @WebParam(name = "CultureName") String cultureName,
             @WebParam(name = "CultureShortName") String cultureShortName,
             @WebParam(name = "CultureAddress") String cultureAddress, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
-        if (StringUtils.isEmpty(guid)) {
+        if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(mesId)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+
+        if (!StringUtils.isEmpty(guid) && !StringUtils.isEmpty(mesId)) {
+            return new Result(RC_INVALID_DATA, "В запросе должен быть указан только один идентификатор - guid или mesId");
         }
 
         if (StringUtils.isEmpty(orgCode)) {
@@ -9284,7 +9305,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, guid);
+            Client cl = null;
+            if (!StringUtils.isEmpty(guid)) {
+                cl = DAOUtils.findClientByGuid(session, guid);
+            }
+            if (!StringUtils.isEmpty(mesId)) {
+                cl = DAOUtils.findClientByMeshGuid(session, mesId);
+            }
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }

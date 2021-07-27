@@ -175,6 +175,9 @@ public class MeshPersonsSyncService {
                 Class class_ = education.getClass_();
                 meshClass = (MeshClass) session.get(MeshClass.class, class_.getId().longValue());
                 if(meshClass == null){
+                    meshClass = DAOService.getInstance().getMeshClassByUID(class_.getUid());
+                }
+                if(meshClass == null){
                     meshClass = new MeshClass(class_.getId(), classuid);
                 }
                 meshClass.setLastUpdate(new Date());
@@ -205,6 +208,8 @@ public class MeshPersonsSyncService {
             meshSyncPerson.setInvaliddata(false);
             meshSyncPerson.setMeshClass(meshClass);
             session.saveOrUpdate(meshSyncPerson);
+            session.flush();
+            session.clear();
         } catch (Exception e) {
             logger.error(String.format("Error in process Mesh person with guid %s: ", personguid), e);
         }
