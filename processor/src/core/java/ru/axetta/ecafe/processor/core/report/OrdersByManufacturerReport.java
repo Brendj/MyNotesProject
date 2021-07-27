@@ -113,7 +113,7 @@ public class OrdersByManufacturerReport extends BasicReportForContragentJob {
 
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
-            List<String> dates = CalendarUtils.datesBetween(startTime, endTime);
+            List<String> dates = CalendarUtils.datesBetween(startTime, endTime, 1);
             Map<Long, List<ReportItem>> totalListMap = new HashMap<Long, List<ReportItem>>();
             //Получаем список всех школ, заполняем ими список
             List<Long> idOfOrgsList = new LinkedList<Long>();

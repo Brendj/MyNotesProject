@@ -5269,6 +5269,12 @@ public class DAOUtils {
         return maxVer == null ? 0 : maxVer;
     }
 
+    public static Long getMaxVersionOfEmiasbyDay(Session session) {
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIASbyDay AS em");
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
     public static Long getMaxVersionOfExemptionVisiting(Session session) {
         Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em where em.kafka = true");
         Long maxVer = (Long) query.uniqueResult();

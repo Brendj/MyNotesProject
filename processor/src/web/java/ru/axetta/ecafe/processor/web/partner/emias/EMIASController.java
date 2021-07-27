@@ -1,14 +1,17 @@
 /*
- * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.internal;
+package ru.axetta.ecafe.processor.web.partner.emias;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.cxf.message.Message;
@@ -26,9 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by a.voinov on 28.10.2019.
@@ -44,6 +46,182 @@ public class EMIASController extends HttpServlet {
 
     @Resource
     private WebServiceContext context;
+
+    @WebMethod(operationName = "getExemptionVisitingList")
+    public ExemptionVisitingResult getExemptionVisitingList(
+            @WebParam(name = "contractId") Long contractId, @WebParam(name = "guardMobile") String guardMobile) {
+        ExemptionVisitingResult exemptionVisitingResult = new ExemptionVisitingResult();
+        guardMobile = Client.checkAndConvertMobile(guardMobile);
+        if (guardMobile == null) {
+            return new ExemptionVisitingResult(ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE, ResponseItem.ERROR_INCORRECT_FORMAT);
+        }
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        try {
+            session = runtimeContext.createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                return new ExemptionVisitingResult (ResponseItem.ERROR_CLIENT_NOT_FOUND, ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS);
+            }
+
+            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+            boolean guardianWithMobileFound = false;
+            for (Client item : guardians) {
+                if (item.getMobile().equals(guardMobile))
+                {
+                    guardianWithMobileFound = true;
+                    break;
+                }
+            }
+            if (!guardianWithMobileFound)
+                return new ExemptionVisitingResult (ResponseItem.ERROR_GUARDIAN, ResponseItem.ERROR_GUARDIAN_MESSAGE);
+            List<EMIAS> emiasList = DAOReadonlyService.getInstance().getEmiasbyClient(session, client);
+            Map<Long, Boolean> dates = new HashMap<>();
+            //Находим все даты из промежутка
+            for (EMIAS emias: emiasList)
+            {
+                Date startdate = CalendarUtils.startOfDay(emias.getStartDateLiberate());
+                Date enddate = CalendarUtils.startOfDay(emias.getEndDateLiberate());
+                List<Long> dates2 = CalendarUtils.daysBetweenInMillis(startdate, enddate);
+                for (Long dateStr: dates2)
+                {
+                    dates.put(dateStr, false);
+                }
+            }
+            //Переопределяем записанные даты
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client, null);
+            for (EMIASbyDay emiaSbyDay: emiaSbyDays)
+            {
+                //Добавление только если есть такой дествительный промежуток
+                if (dates.containsKey(emiaSbyDay.getDate().getTime()))
+                    dates.put(emiaSbyDay.getDate().getTime(), emiaSbyDay.getEat());
+            }
+            //Сортируем список дат
+            SortedSet<Long> keys = new TreeSet<>(dates.keySet());
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            for (Long key : keys) {
+                ExemptionVisitingDay exemptionVisitingResultDays = new ExemptionVisitingDay();
+                exemptionVisitingResultDays.setDate(sdf.format(new Date(key)));
+                exemptionVisitingResultDays.setAgreed(dates.get(key));
+                exemptionVisitingResult.getExemptionVisitingResultDays().add(exemptionVisitingResultDays);
+            }
+            persistenceTransaction = null;
+            exemptionVisitingResult.resultCode = ResponseItem.OK;
+            exemptionVisitingResult.description = ResponseItem.OK_MESSAGE;
+            return exemptionVisitingResult;
+        } catch (Exception e) {
+            new ExemptionVisitingResult (ResponseItem.ERROR_INTERNAL_EMIAS, ResponseItem.ERROR_INTERNAL_MESSAGE_EMIAS);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return exemptionVisitingResult;
+    }
+
+    @WebMethod(operationName = "setExemptionVisitingClientList")
+    public ExemptionVisitingResult setExemptionVisitingClientList(
+            @WebParam(name = "contractId") Long contractId, @WebParam(name = "guardMobile") String guardMobile,
+            @WebParam(name = "exemptionVisitingDays") List<ExemptionVisitingDay> exemptionVisitingDays) {
+        ExemptionVisitingResult exemptionVisitingResult = new ExemptionVisitingResult();
+        guardMobile = Client.checkAndConvertMobile(guardMobile);
+        if (guardMobile == null) {
+            return new ExemptionVisitingResult (ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE, ResponseItem.ERROR_INCORRECT_FORMAT);
+        }
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        try {
+            session = runtimeContext.createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                return new ExemptionVisitingResult (ResponseItem.ERROR_CLIENT_NOT_FOUND, ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS);
+            }
+
+            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+            boolean guardianWithMobileFound = false;
+            for (Client item : guardians) {
+                if (item.getMobile().equals(guardMobile))
+                {
+                    guardianWithMobileFound = true;
+                    break;
+                }
+            }
+            if (!guardianWithMobileFound)
+                return new ExemptionVisitingResult (ResponseItem.ERROR_GUARDIAN, ResponseItem.ERROR_GUARDIAN_MESSAGE);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            for (ExemptionVisitingDay exemptionVisitingDay: exemptionVisitingDays)
+            {
+                if ((sdf.parse(exemptionVisitingDay.getDate()).getTime()+1L)<(CalendarUtils.startOfDay(new Date())).getTime())
+                    return new ExemptionVisitingResult (ResponseItem.ERROR_INCORRECT_DATE, ResponseItem.ERROR_INCORRECT_DATE_MESSAGE);
+            }
+            List<EMIAS> emiasList = DAOReadonlyService.getInstance().getEmiasbyClient(session, client);
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client, null);
+            //Находим все даты из промежутка
+            Map<String, Boolean> dates = new HashMap<>();
+            //Находим все даты из промежутка
+            for (EMIAS emias: emiasList)
+            {
+                Date startdate = CalendarUtils.startOfDay(emias.getStartDateLiberate());
+                Date enddate = CalendarUtils.endOfDay(emias.getEndDateLiberate());
+                List<String> dates2 = CalendarUtils.datesBetween(startdate, enddate, 2);
+
+                for (String dateStr: dates2)
+                {
+                    dates.put(dateStr, false);
+                }
+            }
+            for (ExemptionVisitingDay exemptionVisitingDay: exemptionVisitingDays)
+            {
+                if (dates.containsKey(exemptionVisitingDay.getDate()))
+                {
+                    boolean datefind = false;
+                    for (EMIASbyDay emiaSbyDay: emiaSbyDays) {
+                        //Есть ли эта дата уже в списке в отдельной таблице
+                        if (sdf.format(emiaSbyDay.getDate()).equals(exemptionVisitingDay.getDate()))
+                        {
+                            emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
+                            emiaSbyDay.setVersion(DAOUtils.getMaxVersionOfEmiasbyDay(session) + 1);
+                            emiaSbyDay.setIdOfOrg(client.getOrg().getIdOfOrg());
+                            emiaSbyDay.setUpdateDate(new Date());
+                            session.save(emiaSbyDay);
+                            datefind = true;
+                            break;
+                        }
+                    }
+                    //Дату не нашли
+                    if (!datefind)
+                    {
+                        EMIASbyDay emiaSbyDay = new EMIASbyDay();
+                        emiaSbyDay.setIdOfClient(client.getIdOfClient());
+                        emiaSbyDay.setDate(sdf.parse(exemptionVisitingDay.getDate()));
+                        emiaSbyDay.setEat(exemptionVisitingDay.getAgreed());
+                        emiaSbyDay.setCreateDate(new Date());
+                        emiaSbyDay.setUpdateDate(new Date());
+                        emiaSbyDay.setVersion(DAOUtils.getMaxVersionOfEmiasbyDay(session) + 1);
+                        emiaSbyDay.setIdOfOrg(client.getOrg().getIdOfOrg());
+                        session.save(emiaSbyDay);
+                    }
+                }
+            }
+            session.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            exemptionVisitingResult.resultCode = ResponseItem.OK;
+            exemptionVisitingResult.description = ResponseItem.OK_MESSAGE;
+            return exemptionVisitingResult;
+        } catch (Exception e) {
+            new ExemptionVisitingResult (ResponseItem.ERROR_INTERNAL_EMIAS, ResponseItem.ERROR_INTERNAL_MESSAGE_EMIAS);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return exemptionVisitingResult;
+    }
 
     @WebMethod(operationName = "getLiberateClientsList")
     public List<OrgSummaryResult> getLiberateClientsList(

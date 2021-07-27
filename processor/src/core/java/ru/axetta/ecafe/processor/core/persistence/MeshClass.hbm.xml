@@ -6,7 +6,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.MeshClass" table="cf_mh_classes">
-        <id name="id" type="long"/>
+        <id name="id" type="long" column="id"/>
         <property name="createDate">
             <column name="createdate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         </property>
