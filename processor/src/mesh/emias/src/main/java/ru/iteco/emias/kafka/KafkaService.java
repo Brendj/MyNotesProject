@@ -8,13 +8,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.PartitionOffset;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 import ru.iteco.emias.kafka.Request.PersonExemption;
 import ru.iteco.emias.service.EmiasProcessorService;
+import ru.iteco.emias.service.rest.SendMessage;
 
 @Service
 public class KafkaService {
@@ -25,6 +24,7 @@ public class KafkaService {
     public KafkaService(ObjectMapper objectMapper, EmiasProcessorService emiasProcessorService) {
         this.objectMapper = objectMapper;
         this.emiasProcessorService = emiasProcessorService;
+        SendMessage.disableSslVerification();
     }
 
     @KafkaListener(topics = "#{'${kafka.topic.emias}'}")

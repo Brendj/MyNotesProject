@@ -164,7 +164,7 @@ the signature crypto configuration.  See SignaturePropRefId. -->
     <jaxws:endpoint
             id="EMIASController"
             address='http://localhost:8080/processor/soap/emias'
-            implementor='ru.axetta.ecafe.processor.web.internal.EMIASController'>
+            implementor='ru.axetta.ecafe.processor.web.partner.emias.EMIASController'>
     </jaxws:endpoint>
 
     <jaxws:endpoint

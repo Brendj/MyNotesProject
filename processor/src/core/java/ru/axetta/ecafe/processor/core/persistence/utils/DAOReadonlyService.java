@@ -765,7 +765,7 @@ public class DAOReadonlyService {
             org.hibernate.Query q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS,"
                     + " ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate, "
                     + " ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version, "
-                    + " ce.kafka, ce.archive, ce.hazard_level_id, ce.processed from cf_emias ce "
+                    + " ce.kafka, ce.archive, ce.hazard_level_id, ce.processed, ce.accepteddatetime from cf_emias ce "
                     + " left join cf_clients cc on cc.meshguid = ce.guid "
                     + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and (ce.kafka is null or ce.kafka = false)").addEntity(EMIAS.class);
             q.setParameterList("orgs", idOfOrgs);
@@ -779,7 +779,7 @@ public class DAOReadonlyService {
     public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
         try {
             Session session = entityManager.unwrap(Session.class);
-            org.hibernate.Query q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS, ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate,  ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version,  ce.kafka, ce.archive, ce.hazard_level_id, ce.processed  from cf_emias ce "
+            org.hibernate.Query q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS, ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate,  ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version,  ce.kafka, ce.archive, ce.hazard_level_id, ce.processed, ce.accepteddatetime   from cf_emias ce "
                     + " left join cf_clients cc on cc.meshguid = ce.guid "
                     + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and ce.kafka=true and ce.processed = true").addEntity(EMIAS.class);
             q.setParameterList("orgs", idOfOrgs);
@@ -788,6 +788,39 @@ public class DAOReadonlyService {
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+
+    public List<EMIAS> getEmiasbyClient(Session session, Client client) {
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("guid", client.getMeshGUID()));
+            criteria.add(Restrictions.eq("kafka", true));
+            criteria.add(Restrictions.eq("processed", true));
+            criteria.add(Restrictions.ne("archive", true));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIAS>();
+        }
+    }
+
+    public List<EMIASbyDay> getEmiasbyDayForClient(Session session, Client client, Long idOfClient) {
+        try {
+            Criteria criteria = session.createCriteria(EMIASbyDay.class);
+            if (idOfClient == null)
+                criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+            if (client == null)
+                criteria.add(Restrictions.eq("idOfClient", idOfClient));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIASbyDay>();
+        }
+    }
+
+    public List<EMIASbyDay> getEmiasbyDayForOrgs(Long maxVersion, List<Long> idforgs) {
+        return entityManager.createQuery("select distinct embd from EMIASbyDay embd where embd.version>:maxVersion and"
+                + " embd.idOfOrg in :idforgs")
+                .setParameter("idforgs", idforgs).setParameter("maxVersion", maxVersion)
+                .getResultList();
     }
 
     public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
