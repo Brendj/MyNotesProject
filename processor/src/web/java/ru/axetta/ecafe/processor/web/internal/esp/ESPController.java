@@ -253,6 +253,9 @@ public class ESPController {
             result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
         result.setErrorMessage(ResponseCodes.RC_OK.toString());
@@ -330,6 +333,9 @@ public class ESPController {
             result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
         result.setErrorMessage(ResponseCodes.RC_OK.toString());
