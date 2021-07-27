@@ -57,6 +57,10 @@ public class EmiasReportPage extends OnlineReportPage {
     private List<EmiasItem> items;
 
     public Object buildReportHTML() {
+        if (this.idOfOrg == null) {
+            printError("Не выбрана организация");
+            return null;
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
 
@@ -86,6 +90,10 @@ public class EmiasReportPage extends OnlineReportPage {
     }
 
     public void generateXLS(ActionEvent event) {
+        if (this.idOfOrg == null) {
+            printError("Не выбрана организация");
+            return;
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
         if (templateFilename != null) {

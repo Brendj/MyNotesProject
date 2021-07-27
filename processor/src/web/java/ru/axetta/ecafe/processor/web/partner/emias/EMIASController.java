@@ -92,7 +92,7 @@ public class EMIASController extends HttpServlet {
                 }
             }
             //Переопределяем записанные даты
-            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client);
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client, null);
             for (EMIASbyDay emiaSbyDay: emiaSbyDays)
             {
                 //Добавление только если есть такой дествительный промежуток
@@ -156,18 +156,18 @@ public class EMIASController extends HttpServlet {
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             for (ExemptionVisitingDay exemptionVisitingDay: exemptionVisitingDays)
             {
-                if (sdf.parse(exemptionVisitingDay.getDate()).before(new Date()))
+                if ((sdf.parse(exemptionVisitingDay.getDate()).getTime()+1L)<(CalendarUtils.startOfDay(new Date())).getTime())
                     return new ExemptionVisitingResult (ResponseItem.ERROR_INCORRECT_DATE, ResponseItem.ERROR_INCORRECT_DATE_MESSAGE);
             }
             List<EMIAS> emiasList = DAOReadonlyService.getInstance().getEmiasbyClient(session, client);
-            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client);
+            List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance().getEmiasbyDayForClient(session, client, null);
             //Находим все даты из промежутка
             Map<String, Boolean> dates = new HashMap<>();
             //Находим все даты из промежутка
             for (EMIAS emias: emiasList)
             {
                 Date startdate = CalendarUtils.startOfDay(emias.getStartDateLiberate());
-                Date enddate = CalendarUtils.startOfDay(emias.getEndDateLiberate());
+                Date enddate = CalendarUtils.endOfDay(emias.getEndDateLiberate());
                 List<String> dates2 = CalendarUtils.datesBetween(startdate, enddate, 2);
 
                 for (String dateStr: dates2)

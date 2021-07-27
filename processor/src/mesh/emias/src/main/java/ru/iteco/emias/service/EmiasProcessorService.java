@@ -4,7 +4,6 @@
 
 package ru.iteco.emias.service;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,6 +11,8 @@ import ru.iteco.emias.kafka.Request.PersonExemption;
 import ru.iteco.emias.kafka.Request.PersonExemptionItem;
 import ru.iteco.emias.models.Client;
 import ru.iteco.emias.models.EMIAS;
+import ru.iteco.emias.service.rest.InfoForEMPFromKafkaEmias;
+import ru.iteco.emias.service.rest.SendMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,6 +28,7 @@ public class EmiasProcessorService {
     }
 
     public void processEmiasRequest(PersonExemption request) {
+        InfoForEMPFromKafkaEmias infoForEMPFromKafkaEmias = new InfoForEMPFromKafkaEmias();
         Date created_at;
         try {
             SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -37,6 +39,7 @@ public class EmiasProcessorService {
                     + e.getMessage());
             return;
         }
+        infoForEMPFromKafkaEmias.setCreate_at(created_at);
 
         Client client = serviceBD.getClientByMeshGuid(request.getPerson_id());;
         if (client == null)
@@ -44,6 +47,7 @@ public class EmiasProcessorService {
             serviceBD.writeRecord(request.getId(), request.getPerson_id(), "Клиент с таким MeshGuid не найден");
             return;
         }
+        infoForEMPFromKafkaEmias.setMeshGuid(request.getPerson_id());
 
         //Получаем список уже имеющихся данных по этому клиенту
         List<EMIAS> emiasInBD = serviceBD.getEmiasByGuid(request.getPerson_id());
@@ -51,6 +55,17 @@ public class EmiasProcessorService {
         List<PersonExemptionItem> emiasItems = request.getItems();
         if (emiasItems == null || emiasItems.isEmpty())
         {
+            //Отправляем сообщене, что клиент выздоровел
+            for (EMIAS emias: emiasInBD)
+            {
+                if (!emias.getArchive())
+                {
+                    infoForEMPFromKafkaEmias.setStart_liberation(new Date(emias.getStartdateliberate()));
+                    infoForEMPFromKafkaEmias.setEnd_liberation(new Date(emias.getEnddateliberate()));
+                    infoForEMPFromKafkaEmias.setEventStatus(4);
+                    SendMessage.send(infoForEMPFromKafkaEmias);
+                }
+            }
             //Значик клиент уже выздоровел т.е. проставляем ему флаг Архивный
             serviceBD.setArchivedFlag(emiasInBD, true);
             return;
@@ -92,18 +107,34 @@ public class EmiasProcessorService {
                         !emias.getArchive())
                 {
                     reWrite = true;
-                    serviceBD.changeRecord(emias, request.getId(), created_at, personExemptionItem.getHazard_level_id());
+                    serviceBD.changeRecord(emias, request.getId(), created_at,
+                            personExemptionItem.getHazard_level_id());
                     //Удаляем из списка подлежащих архивации
                     emiasIterator.remove();
                     break;
                 }
 
             }
-            if (!reWrite)
-            serviceBD.writeRecord(request.getId(), request.getPerson_id(), created_at, dateFrom, dateTo,
-                    personExemptionItem.getHazard_level_id());
+            if (!reWrite) {
+                serviceBD.writeRecord(request.getId(), request.getPerson_id(), created_at, dateFrom, dateTo,
+                        personExemptionItem.getHazard_level_id());
+                infoForEMPFromKafkaEmias.setStart_liberation(dateFrom);
+                infoForEMPFromKafkaEmias.setEnd_liberation(dateTo);
+                infoForEMPFromKafkaEmias.setEventStatus(2);
+                SendMessage.send(infoForEMPFromKafkaEmias);
+            }
         }
-        //Старым периодам ставим флаг архивный
+        //Старым периодам ставим флаг архивный и отправляем клиенту сообщение
+        for (EMIAS emias: emiasInBD)
+        {
+            if (!emias.getArchive())
+            {
+                infoForEMPFromKafkaEmias.setStart_liberation(new Date(emias.getStartdateliberate()));
+                infoForEMPFromKafkaEmias.setEnd_liberation(new Date(emias.getEnddateliberate()));
+                infoForEMPFromKafkaEmias.setEventStatus(4);
+                SendMessage.send(infoForEMPFromKafkaEmias);
+            }
+        }
         serviceBD.setArchivedFlag(emiasInBD, true);
     }
 

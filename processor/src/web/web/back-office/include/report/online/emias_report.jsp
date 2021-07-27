@@ -224,7 +224,7 @@
             </rich:column>
 
             <rich:column headerClass="column-header">
-                <h:selectBooleanCheckbox value="#{item.accepted}" styleClass="output-text" disabled="true"/>
+                <h:outputText escape="true" value="#{item.acceptedDate}" styleClass="output-text" />
             </rich:column>
 
             <rich:column headerClass="column-header">
@@ -244,5 +244,7 @@
             </f:facet>
         </rich:dataTable>
     </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 </h:panelGrid>
 

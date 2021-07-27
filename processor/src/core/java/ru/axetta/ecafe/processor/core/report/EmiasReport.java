@@ -9,7 +9,9 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.EMIASbyDay;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.CardBlockUnblockService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -22,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -45,7 +49,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
     final public static String P_ALL_FRIENDLY_ORGS = "friendsOrg";
 
     private final static Logger logger = LoggerFactory.getLogger(EmiasReport.class);
-
+    private static Format formatter = new SimpleDateFormat("dd.MM.yyyy");
 
     public EmiasReport(Date generateTime, long generateDuration, JasperPrint jasperPrint, Date startTime,
             Date endTime, Long idOfOrg) {
@@ -148,21 +152,24 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
 
             Query queryEMIAS = session.createSQLQuery(
                     "select distinct co.idoforg, co.shortnameinfoservice, co.shortaddress, ccg.groupname, cp.firstname, cp.surname, cp.secondname,\n"
-                            + "cc.contractid, benefit.benef, ce.dateliberate, ce.ideventemias, ce.startdateliberate, ce.enddateliberate, \n"
-                            + "CASE   \n" + "      WHEN ce.archive = true THEN ce.updatedate   \n"
-                            + "      else null   \n" + "END as dateArchived, \n" + "CASE   \n"
-                            + "      WHEN ce.archive = true THEN 'Посещает'    \n" + "      else 'Не посещает' \n"
-                            + "END as status, ce.accepted, ce.accepteddatetime\n" + "from cf_emias ce \n"
-                            + "left join cf_clients cc on cc.meshguid = ce.guid\n"
+                            + "cc.contractid, benefitdtiszn.benefdtiszn, ce.dateliberate, ce.idemias, ce.startdateliberate, ce.enddateliberate,  CASE  WHEN ce.archive = true THEN 'Посещает'       else 'Не посещает' \n"
+                            + "END as status, ce.accepteddatetime, cc.idofclient, benefitispp.benefispp \n"
+                            + "from cf_emias ce \n" + "left join cf_clients cc on cc.meshguid = ce.guid\n"
                             + "left join cf_orgs co on cc.idoforg = co.idoforg\n"
                             + "left join cf_clientgroups ccg on ccg.idofclientgroup = cc.idofclientgroup and ccg.idoforg = co.idoforg\n"
                             + "left join cf_persons cp on cp.idofperson = cc.idofperson\n"
-                            + "left join (select cc.idofclient, string_agg(ccdd.dtiszndescription, ', ') as benef from cf_clients cc \n"
-                            + "left join cf_client_dtiszn_discount_info ccdd on cc.idofclient=ccdd.idofclient group by cc.idofclient) as benefit on benefit.idofclient=cc.idofclient\n"
+                            + "left join (select cc1.idofclient, string_agg(ccdd.dtiszndescription, ', ') as benefdtiszn from cf_clients cc1 \n"
+                            + "left join cf_client_dtiszn_discount_info ccdd on cc1.idofclient=ccdd.idofclient group by cc1.idofclient) as benefitdtiszn \n"
+                            + "on benefitdtiszn.idofclient=cc.idofclient\n"
+                            + "left join (select cccd.idofclient, string_agg(ccd.categoryname, ', ') as benefispp  from cf_clients_categorydiscounts cccd\n"
+                            + "left join cf_categorydiscounts ccd on ccd.idofcategorydiscount=cccd.idofcategorydiscount "
+                            + " where cccd.idofcategorydiscount <> 50 and ccd.categorytype=0 "
+                            + "group by cccd.idofclient) as benefitispp on benefitispp.idofclient=cc.idofclient "
                             + "where ce.processed = true " + filterOrgs + filterClients + filterPeriod);
 
             List rListEmias = queryEMIAS.list();
             long counter = 1;
+            Map<Long,ArrayList<Date>> clientswithDates = new HashMap<>();
             for (Object o : rListEmias) {
                 Object[] row = (Object[]) o;
                 Long idoforg = ((BigInteger) row[0]).longValue();
@@ -173,7 +180,7 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 String lastname = (String) row[5];
                 String middlename = (String) row[6];
                 Long contractid = ((BigInteger) row[7]).longValue();
-                String benefit = (String) row[8];
+                String benefitdtzn = (String) row[8];
                 Date dateliberate;
                 try
                 {
@@ -182,10 +189,10 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 {
                     dateliberate = null;
                 }
-                Long idEmias;
+                String idEmias;
                 try
                 {
-                    idEmias = ((BigInteger) row[10]).longValue();
+                    idEmias = ((String) row[10]);
                 } catch (Exception e)
                 {
                     idEmias = null;
@@ -206,29 +213,62 @@ public class EmiasReport extends BasicReportForMainBuildingOrgJob {
                 {
                     enddateliberate = null;
                 }
-                Date dateArchived;
+                Date dateArchived = null;
                 try
                 {
-                    dateArchived = new Date(((BigInteger)row[13]).longValue());
+                    if (formatter.format(startdateliberate).equals(formatter.format(enddateliberate)))
+                        dateArchived = startdateliberate;
                 } catch (Exception e)
                 {
                     dateArchived = null;
                 }
-                String status = (String) row[14];
-                Boolean accepted = (Boolean) row[15];
-                if (accepted == null)
-                    accepted = false;
+                String status = (String) row[13];
                 Date accepteddatetime;
                 try
                 {
-                    accepteddatetime = new Date(((BigInteger)row[16]).longValue());
+                    accepteddatetime = new Date(((BigInteger)row[14]).longValue());
                 } catch (Exception e)
                 {
                     accepteddatetime = null;
                 }
+                Long idOOfClient = ((BigInteger) row[15]).longValue();
+                String acceptedDates = "";
+                ///////////////
+                if (!clientswithDates.containsKey(idOOfClient)) {
+                    //Кладем запись в контейнер
+                    List<EMIASbyDay> emiaSbyDays = DAOReadonlyService.getInstance()
+                            .getEmiasbyDayForClient(session, null, idOOfClient);
+                    ArrayList<Date> dates = new ArrayList<>();
+                    for (EMIASbyDay emiaSbyDay : emiaSbyDays) {
+                        //Если ребенок ест
+                        if (emiaSbyDay.getEat())
+                            dates.add(emiaSbyDay.getDate());
+                    }
+                    clientswithDates.put(idOOfClient, dates);
+                }
+                //Достаем все даты по текущему клиенту
+                for (Date date: clientswithDates.get(idOOfClient)) {
+                    if ((date.after(startdateliberate) || (date.equals(startdateliberate))) && date.before(CalendarUtils.endOfDay(enddateliberate))) {
+                        acceptedDates += formatter.format(date);
+                        acceptedDates += ", ";
+                    }
+                }
+                if (!acceptedDates.isEmpty())
+                    acceptedDates = acceptedDates.substring(0, acceptedDates.length()-2);
+                String benefitispp = (String) row[16];
+                String benefit = "";
+                if (benefitdtzn != null && benefitispp != null)
+                    benefit = benefitdtzn + ", " + benefitispp;
+                else {
+                    if (benefitdtzn != null)
+                        benefit = benefitdtzn;
+                    if (benefitispp != null)
+                        benefit = benefitispp;
+                }
+                ///////////////////////////
                 EmiasItem emiasItem = new EmiasItem(counter, idoforg, shortnameinfoservice, shortaddress, groupname,
                         firstname, lastname, middlename, contractid, benefit, idEmias, dateliberate, startdateliberate,
-                        enddateliberate, dateArchived, status, accepted, accepteddatetime);
+                        enddateliberate, dateArchived, status, acceptedDates, accepteddatetime);
                 emiasItems.add(emiasItem);
                 counter++;
             }
