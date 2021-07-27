@@ -790,6 +790,36 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<EMIAS> getEmiasbyClient(Session session, Client client) {
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("guid", client.getMeshGUID()));
+            criteria.add(Restrictions.eq("kafka", true));
+            criteria.add(Restrictions.eq("processed", true));
+            criteria.add(Restrictions.ne("archive", true));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIAS>();
+        }
+    }
+
+    public List<EMIASbyDay> getEmiasbyDayForClient(Session session, Client client) {
+        try {
+            Criteria criteria = session.createCriteria(EMIASbyDay.class);
+            criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIASbyDay>();
+        }
+    }
+
+    public List<EMIASbyDay> getEmiasbyDayForOrgs(Long maxVersion, List<Long> idforgs) {
+        return entityManager.createQuery("select distinct embd from EMIASbyDay embd where embd.version>:maxVersion and"
+                + " embd.idOfOrg in :idforgs")
+                .setParameter("idforgs", idforgs).setParameter("maxVersion", maxVersion)
+                .getResultList();
+    }
+
     public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
         try {
             String groupName = getClientGroupName(orgId, idOfClientGroup);

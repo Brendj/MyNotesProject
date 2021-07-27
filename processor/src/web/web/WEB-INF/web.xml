@@ -402,7 +402,7 @@
 
     <servlet>
         <servlet-name>EMIASControllewWS</servlet-name>
-        <servlet-class>ru.axetta.ecafe.processor.web.internal.EMIASController</servlet-class>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.emias.EMIASController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EMIASControllewWS</servlet-name>

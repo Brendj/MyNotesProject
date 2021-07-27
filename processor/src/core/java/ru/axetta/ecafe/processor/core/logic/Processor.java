@@ -28,6 +28,9 @@ import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClient;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestProcessor;
@@ -168,6 +171,8 @@ public class Processor implements SyncProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private static final int RESPONSE_MENU_PERIOD_IN_DAYS = 7;
+    private static final String SYNC_CONFIG_EMIAS = "ecafe.processor.sync.emias";
+    private static final String SYNC_CONFIG_EXEMPTION_CLIENT = "ecafe.processor.sync.exemptionvisitingclient";
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS =
@@ -437,6 +442,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         StringBuilder performanceLogger = new StringBuilder();
@@ -1130,7 +1136,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -1163,6 +1169,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
         fullProcessingPreorderFeedingStatus(request, responseSections);
@@ -1185,7 +1203,8 @@ public class Processor implements SyncProcessor {
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
                 cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -1362,12 +1381,15 @@ public class Processor implements SyncProcessor {
 
         fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             //Секция обработки заявок от ЕМИАС
             fullProcessingEMIAS(request, responseSections);
 
             //Секция обработки заявок от ЕМИАС (от Кафки)
             fullProcessingExemptionVisiting(request, responseSections);
+        }
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            fullProcessingExemptionVisitingClient(request, responseSections);
         }
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -2432,6 +2454,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2465,7 +2488,7 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2498,6 +2521,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
 
         Date syncEndTime = new Date();
 
@@ -2516,7 +2551,8 @@ public class Processor implements SyncProcessor {
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
 				resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -2583,6 +2619,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2600,7 +2637,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2633,6 +2670,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2649,7 +2698,8 @@ public class Processor implements SyncProcessor {
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildReestrTaloonsPreorderSyncResponse(SyncRequest request) throws Exception {
@@ -2715,6 +2765,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2731,7 +2782,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2764,6 +2815,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2780,7 +2843,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildRequestsSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -2846,7 +2910,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
-
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<>();
 
@@ -2864,7 +2928,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -2897,6 +2961,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2912,7 +2988,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -2979,6 +3056,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2996,7 +3074,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3029,6 +3107,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -3045,7 +3135,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -3112,6 +3203,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3167,7 +3259,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3200,6 +3292,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
@@ -3214,7 +3318,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -3305,6 +3410,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3384,7 +3490,7 @@ public class Processor implements SyncProcessor {
                     e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3417,6 +3523,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -3433,7 +3551,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -3504,6 +3623,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3575,7 +3695,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3608,6 +3728,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -3624,7 +3756,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -3691,6 +3824,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3702,7 +3836,7 @@ public class Processor implements SyncProcessor {
 
         //info messages
         processInfoMessageSections(request, responseSections);
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias.accinc", "1").equals("1")) {
                 //if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.96")) {
                 //    try {
@@ -3720,7 +3854,6 @@ public class Processor implements SyncProcessor {
                 //        logger.error(message, e);
                 //    }
                 //}
-
                 try {
                     ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
                     if (exemptionVisitingRequest != null) {
@@ -3734,6 +3867,20 @@ public class Processor implements SyncProcessor {
                     }
                 } catch (Exception e) {
                     String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                    logger.error(message, e);
+                }
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.exemptionvisitingclient.accinc", "1").equals("1")) {
+                try {
+                    if (request.getExemptionVisitingClientRequest() != null) {
+                        exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                                request.getIdOfOrg());
+                    }
+                } catch (Exception e) {
+                    String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
                     logger.error(message, e);
                 }
             }
@@ -3859,7 +4006,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildMenuSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -3925,6 +4073,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3940,7 +4089,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -3973,6 +4122,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -3988,7 +4149,8 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -4148,6 +4310,26 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private ExemptionVisitingClient processExemptionVisitingClient(ExemptionVisitingClientRequest exemptionVisitingClientRequest, Long idOfOrg)
+            throws Exception
+    {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ExemptionVisitingClientProcessor(persistenceSession, exemptionVisitingClientRequest,
+                    idOfOrg);
+            exemptionVisitingClient = (ExemptionVisitingClient) processor.process();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return exemptionVisitingClient;
     }
 
     private PlanOrdersRestrictions processPlanOrdersRestrictions(PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest) {
@@ -7675,6 +7857,7 @@ public class Processor implements SyncProcessor {
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -7691,7 +7874,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -7724,6 +7907,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -7740,7 +7935,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory,
@@ -7942,6 +8138,20 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingExemptionVisitingClient(SyncRequest request, List<AbstractToElement> responseSections) {
+        ExemptionVisitingClient exemptionVisitingClient = null;
+        try {
+            if (request.getExemptionVisitingClientRequest() != null) {
+                exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                        request.getIdOfOrg());
+                addToResponseSections(exemptionVisitingClient,responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
             logger.error(message, e);
         }
     }
@@ -8227,6 +8437,7 @@ public class Processor implements SyncProcessor {
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -8276,7 +8487,7 @@ public class Processor implements SyncProcessor {
         discardOrgSettingsSyncParam(request.getIdOfOrg());
 
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias", "1").equals("1")) {
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
             try {
                 EmiasRequest emiasRequest = request.getEmiasRequest();
                 if (emiasRequest != null) {
@@ -8309,6 +8520,18 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -8325,7 +8548,8 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSetting, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private OrgSettingSection processOrgSettings(OrgSettingsRequest orgSettingsRequest) throws Exception {
