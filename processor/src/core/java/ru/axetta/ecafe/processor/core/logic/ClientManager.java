@@ -1631,7 +1631,11 @@ public class ClientManager {
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("allowedPreorder", true));
-        if (idOfGuardian != null) criteria.add(Restrictions.eq("guardianAllowedPreorder.idOfClient", idOfGuardian));
+        if (idOfGuardian != null) {
+            criteria.add(Restrictions.eq("guardianAllowedPreorder.idOfClient", idOfGuardian));
+        } else {
+            criteria.add(Restrictions.isNull("guardianAllowedPreorder"));
+        }
 
         List<PreorderFlag> list = criteria.list(); //getPreorderFlagByClient(session, idOfClient, null);
         if (list.size() == 0) return false;
