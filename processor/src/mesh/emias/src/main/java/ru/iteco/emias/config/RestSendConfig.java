@@ -13,7 +13,7 @@ public class RestSendConfig {
     @Bean
     public SendMessage setAdressProcessing(){
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setUrl(targetUrl);
+        sendMessage.setUrl(targetUrl + "processor/emias_internal/kafkaEmias");
         return sendMessage;
     }
 }
