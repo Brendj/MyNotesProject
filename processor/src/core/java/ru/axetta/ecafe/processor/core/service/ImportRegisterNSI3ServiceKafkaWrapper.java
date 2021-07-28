@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -68,7 +69,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              to_char(p.birthdate, 'DD.MM.YYYY') AS birthdate,\n"
                     + "              g.title AS gender,\n"
                     + "              prll.title AS parallel,\n"
-                    + "              case when cl.id is not null then cl.name\n"
+                    + "              case when p.classname = :classNameOutOrg then p.classname when cl.id is not null then cl.name\n"
                     + "                  else p.classname end AS group,\n"
                     + "              p.deletestate AS deleted,\n"
                     + "              el.title AS ageTypeGroup,\n"
@@ -120,6 +121,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
             Query query = session.createSQLQuery(str_query);
             fillOrgGuids(query, orgGuids);
 
+            query.setParameter("classNameOutOrg", ClientGroup.Predefined.CLIENT_OUT_ORG.getNameOfGroup());
             if (StringUtils.isNotBlank(familyName))
                 query.setParameter("surname", familyName);
             if (StringUtils.isNotBlank(firstName))
