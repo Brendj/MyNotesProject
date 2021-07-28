@@ -6,6 +6,7 @@ import ru.iteco.client.model.PersonCategory;
 import ru.iteco.client.model.PersonEducation;
 import ru.iteco.client.model.PersonInfo;
 import ru.iteco.meshsync.enums.EntityType;
+import ru.iteco.meshsync.enums.ServiceType;
 import ru.iteco.meshsync.error.EducationNotFoundException;
 import ru.iteco.meshsync.error.NoRequiredDataException;
 import ru.iteco.meshsync.error.UnknownActionTypeException;
@@ -28,6 +29,7 @@ import javax.transaction.Transactional;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MeshService {
@@ -38,6 +40,17 @@ public class MeshService {
             EntityType.CATEGORY.getApiField()
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
+
+    private static final List<Integer> notInOrganization = Arrays.asList(
+            ServiceType.ATTESTATION.getCode(),
+            ServiceType.ACADEMIC_LEAVE.getCode()
+    );
+
+    private static final List<Integer> enabledServiceTypeIds = Arrays.asList(
+            ServiceType.EDUCATION.getCode(),
+            ServiceType.ATTESTATION.getCode(),
+            ServiceType.ACADEMIC_LEAVE.getCode()
+    );
 
     private final PersonRepo personRepo;
     private final RestService restService;
@@ -131,10 +144,10 @@ public class MeshService {
                             if (actualEdu.getEducationForm() == null && actualEdu.getEducationFormId() == null) {
                                 throw new NoRequiredDataException(String.format("Person %s have no info about Class and EducationForm",
                                         entityChanges.getPersonGUID()));
-                            } else {
-                                homeStudy = catalogService.isHomeStudy(actualEdu.getEducationForm(), actualEdu.getEducationFormId());
                             }
                         }
+
+                        homeStudy = notInOrganization.contains(actualEdu.getServiceTypeId());
                         inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
 
                         if (person == null && !inSupportedOrg) {
@@ -251,6 +264,7 @@ public class MeshService {
             person.setParallelID(null);
             person.setEducationStageId(null);
             person.setClassUID(null);
+            person.setClassEntity(null);
         }
 
         if(!inSupportedOrg) {
@@ -293,6 +307,11 @@ public class MeshService {
         if(CollectionUtils.isEmpty(allEdu)){
             return null;
         }
+
+        allEdu = allEdu
+                .stream()
+                .filter((e) -> enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null)
+                .collect(Collectors.toList());
         allEdu.sort(Comparator.comparing(PersonEducation::getTrainingEndAt));
         return allEdu.get(allEdu.size() - 1);
     }

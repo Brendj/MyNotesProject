@@ -321,6 +321,10 @@ public class CalendarUtils {
         SimpleDateFormat safeDateShortFormat = dateShortFormat.get();
         return safeDateShortFormat.format(date);
     }
+    public static String dateShotFullYearToString(Date date) {
+        SimpleDateFormat safeDateShortFormat = dateShortFormatFullYear.get();
+        return safeDateShortFormat.format(date);
+    }
     /**
     * @return new SimpleDateFormat("yy_MM_dd");
     * */
@@ -646,7 +650,7 @@ public class CalendarUtils {
         return result;
     }
 
-    public static List<Long> daysBetweenInMillis( Date start, Date end ){
+    public static List<Long> daysBetweenInMillis( Date start, Date end){
         Date startLocal = (Date) start.clone();
         int i = getDifferenceInDays(startLocal,end);
         List<Long> result = new ArrayList<Long>();
@@ -657,18 +661,22 @@ public class CalendarUtils {
         return result;
     }
 
-    public static List<String> datesBetween(Date start, Date end) {
+    public static List<String> datesBetween(Date start, Date end, int format) {
         List<String> dates = new ArrayList<String>();
 
         Calendar c = Calendar.getInstance();
         c.setTime(start);
         while (c.getTimeInMillis() < end.getTime() ){
-            dates.add(dateShortToString(c.getTime()));
+            if (format == 1)
+                dates.add(dateShortToString(c.getTime()));
+            if (format == 2)
+                dates.add(dateShotFullYearToString(c.getTime()));
             c.add(Calendar.DATE, 1);
         }
 
         return dates;
     }
+
 
     public static Integer getMonthNumb(Date date) {
         Calendar c = Calendar.getInstance();

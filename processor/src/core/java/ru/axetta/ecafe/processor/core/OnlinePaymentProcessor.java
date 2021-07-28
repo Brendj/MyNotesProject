@@ -53,7 +53,7 @@ public class OnlinePaymentProcessor {
             PaymentResponse.ResPaymentRegistry.Item processResult = RuntimeContext.getInstance().getPaymentProcessor().processPayPaymentRegistryPayment(
                     request.getContragentId(), payment);
             ////
-            PaymentResponse.ResPaymentRegistry.Item.ClientInfo client=processResult.getClient();
+            PaymentResponse.ResPaymentRegistry.Item.ClientInfo client = processResult.getClient();
             PayResponse payResponse = new PayResponse(request.protoVersion, request.isCheckOnly(),
                     processResult.getResult(), processResult.getError(), processResult.getTspContragentId(), clientId,
                     request.getPaymentId(), processResult.getBalance(), processResult.getSubBalance1(),
@@ -125,9 +125,9 @@ public class OnlinePaymentProcessor {
         public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId, int paymentMethod, long clientId,
                 String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
                 throws Exception {
-            if (!bNegativeSum && sum<0) throw new Exception("Payment sum is negative: "+sum);
+            if (!bNegativeSum && sum < 0) throw new Exception("Payment sum is negative: " + sum);
             this.protoVersion = protoVersion;
-            this.bCheckOnly=bCheckOnly;
+            this.bCheckOnly = bCheckOnly;
             this.contragentId = contragentId;
             this.paymentMethod = paymentMethod;
             this.clientId = clientId;

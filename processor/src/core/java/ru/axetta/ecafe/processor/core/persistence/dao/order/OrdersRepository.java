@@ -111,7 +111,7 @@ public class OrdersRepository extends BaseJpaDao {
             org.hibernate.Query nativeQuery = session.createSQLQuery(
                     "SELECT (o.idoforg) AS name, o.createdDate, ((od.rprice + od.discount) *od.qty)AS sum, od.socDiscount, "
                             + "od.menutype, od.menuOrigin, o.idofclient, g.groupname, o.idofclientgroup, od.rprice*od.qty as sumPay, "
-                            + "od.socdiscount*od.qty as sumDiscount "
+                            + "od.socdiscount*od.qty as sumDiscount, od.discount*od.qty as kazanDiscount "
                             + "FROM CF_Orders o "
                             + "INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                             + "LEFT JOIN cf_clientgroups g ON o.idofclientgroup = g.idofclientgroup AND o.idoforg = g.idoforg "
@@ -130,7 +130,7 @@ public class OrdersRepository extends BaseJpaDao {
                 orderItemList.add(new OrderItem(((BigInteger) o[0]).longValue(), ((BigInteger) o[1]).longValue(),
                         ((BigInteger) o[2]).longValue(), ((BigInteger) o[3]).longValue(), (Integer) o[4],
                         (Integer) o[5], o[6] == null ? null : ((BigInteger) o[6]).longValue(), (String) o[7], o[8] == null ? null : ((BigInteger) o[8]).longValue(),
-                        ((BigInteger) o[9]).longValue(), ((BigInteger) o[10]).longValue()));
+                        ((BigInteger) o[9]).longValue(), ((BigInteger) o[10]).longValue(), ((BigInteger) o[11]).longValue()));
             }
 
             session.doWork(new Work() {
@@ -171,7 +171,7 @@ public class OrdersRepository extends BaseJpaDao {
             org.hibernate.Query nativeQuery = session.createSQLQuery(
                     "SELECT (o.idoforg) AS name, o.createdDate, ((od.rprice + od.discount) *od.qty)AS sum, od.socDiscount, "
                             + "od.menutype, od.menuOrigin, o.idofclient, g.groupname, o.idofclientgroup, "
-                            + "od.rprice*od.qty as sumPay, od.socdiscount*od.qty as sumDiscount "
+                            + "od.rprice*od.qty as sumPay, od.socdiscount*od.qty as sumDiscount, od.discount*od.qty as kazanDiscount "
                             + "FROM CF_Orders o "
                             + "INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                             + "LEFT JOIN cf_clientgroups g ON o.idofclientgroup = g.idofclientgroup AND o.idoforg = g.idoforg "
@@ -190,7 +190,7 @@ public class OrdersRepository extends BaseJpaDao {
                         ((BigInteger) o[2]).longValue(), ((BigInteger) o[3]).longValue(), (Integer) o[4],
                         (Integer) o[5], o[6] == null ? null : ((BigInteger) o[6]).longValue(), (String) o[7],
                         o[8] == null ? null : ((BigInteger) o[8]).longValue(),
-                        ((BigInteger) o[9]).longValue(), ((BigInteger) o[10]).longValue()));
+                        ((BigInteger) o[9]).longValue(), ((BigInteger) o[10]).longValue(), ((BigInteger) o[11]).longValue()));
             }
 
             session.doWork(new Work() {
