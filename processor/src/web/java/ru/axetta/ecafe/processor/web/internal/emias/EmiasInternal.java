@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -31,10 +32,15 @@ public class EmiasInternal {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "kafkaEmias")
     public Response kafkaEmias(@RequestBody InfoForEMPFromKafkaEmias infoForEMPFromKafkaEmias) {
+        if (!isOn())
+        {
+            return Response.status(HttpURLConnection.HTTP_OK).entity(infoForEMPFromKafkaEmias).build();
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
+
             if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.emias.kafka.notification", "1").equals("1")) {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
@@ -61,5 +67,20 @@ public class EmiasInternal {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().
+                getProperty("ecafe.processor.emias.kafka.node", "1");
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
+                    && instance.trim().equals(node.trim())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
