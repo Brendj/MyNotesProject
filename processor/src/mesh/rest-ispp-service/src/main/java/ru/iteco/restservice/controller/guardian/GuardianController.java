@@ -7,6 +7,7 @@ package ru.iteco.restservice.controller.guardian;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ru.iteco.restservice.controller.guardian.request.DeleteRelationRequest;
 import ru.iteco.restservice.controller.guardian.request.RelationRequest;
 import ru.iteco.restservice.controller.guardian.responsedto.GuardianResponseDTO;
 import ru.iteco.restservice.servise.ClientService;
@@ -67,5 +68,14 @@ public class GuardianController {
     )
     public void changeGuardianRelations(@RequestBody @NotNull RelationRequest relations){
         clientService.changeRelations(relations);
+    }
+
+    @DeleteMapping("/deleteGuardianRelations")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Удаление связки между клиентом и целевым представителем"
+    )
+    public void archiveGuardianRelations(@RequestBody @NotNull DeleteRelationRequest relations){
+        clientService.archiveRelations(relations);
     }
 }
