@@ -160,7 +160,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                     + " and (cf_clients.clientguid is not null or cf_clients.meshguid is not null)  \n"
                     + " and cf_cards.state in (:card_states)  \n"
                     + " and cf_client_guardian.deletedstate = false and cf_client_guardian.disabled = 0 \n"
-                    + " and cf_clients.agetypegroup in (:schoolchild) and cf_cards.validData > :date";
+                    + " and cf_clients.agetypegroup in (:schoolchild) and cf_cards.validDate > :date";
 
             query = entityManager.createNativeQuery(query_str);
 
