@@ -151,7 +151,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
 
 
             query_str = " select distinct cf_cards.cardno, coalesce(cf_clients.clientguid, '') as clientguid, "
-                    + "cf_cards.ValidDate, coalesce(cf_clients.meshguid, '') as meshguid \n"
+                    + "coalesce(cf_clients.meshguid, '') as meshguid \n"
                     + " from cf_clients\n"
                     + " inner join cf_client_guardian on cf_client_guardian.idofchildren = cf_clients.idofclient\n"
                     + " inner join cf_cards on cf_client_guardian.idofguardian = cf_cards.idofclient\n"
@@ -160,7 +160,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                     + " and (cf_clients.clientguid is not null or cf_clients.meshguid is not null)  \n"
                     + " and cf_cards.state in (:card_states)  \n"
                     + " and cf_client_guardian.deletedstate = false and cf_client_guardian.disabled = 0 \n"
-                    + " and cf_clients.agetypegroup in (:schoolchild)";
+                    + " and cf_clients.agetypegroup in (:schoolchild) and cf_cards.validData > :date";
 
             query = entityManager.createNativeQuery(query_str);
 
@@ -168,6 +168,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             query.setParameter("group_deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
             query.setParameter("card_states", card_states);
             query.setParameter("schoolchild", before_school_group);
+            query.setParameter("date", startDate.getTime());
 
             result = formatedList (query.getResultList(), result, true, startDate);
             uploadFile (filename, result);
@@ -214,13 +215,9 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                 cardId = convertCardId(cardId);
                 StringBuilder b = new StringBuilder();
                 if (parent) {
-                    if ((((BigInteger) row[2]).longValue() > time)) {
-                        b.append(row[1]).append("\t").append(cardId).append("\t").append("1").append("\t").append(row[2]);
-                        result.add(b.toString());
-                    }
-                }
-                else
-                {
+                    b.append(row[1]).append("\t").append(cardId).append("\t").append("1").append("\t").append(row[2]);
+                    result.add(b.toString());
+                } else {
                     b.append(row[1]).append("\t").append(cardId).append("\t").append("0").append("\t").append(row[2]);
                     result.add(b.toString());
                 }
