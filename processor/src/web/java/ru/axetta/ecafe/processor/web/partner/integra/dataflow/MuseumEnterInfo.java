@@ -10,6 +10,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 public class MuseumEnterInfo extends Result {
 
     private String guid;
+    private String mesId;
     private Long cardStatusCode;
     private String cardStatusName;
 
@@ -22,12 +23,13 @@ public class MuseumEnterInfo extends Result {
         this.description = description;
     }
 
-    public MuseumEnterInfo(Long resultCode, String description, String guid, Long cardStatusCode, String cardStatusName) {
+    public MuseumEnterInfo(Long resultCode, String description, String guid, String mesId, Long cardStatusCode, String cardStatusName) {
         this.resultCode = resultCode;
         this.description = description;
         this.setCardStatusCode(cardStatusCode);
         this.setCardStatusName(cardStatusName);
         this.guid = guid;
+        this.mesId = mesId;
     }
 
     public String getGuid() {
@@ -52,5 +54,13 @@ public class MuseumEnterInfo extends Result {
 
     public void setCardStatusName(String cardStatusName) {
         this.cardStatusName = cardStatusName;
+    }
+
+    public String getMesId() {
+        return mesId;
+    }
+
+    public void setMesId(String mesId) {
+        this.mesId = mesId;
     }
 }

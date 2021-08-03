@@ -5,11 +5,9 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.Class;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.MeshSyncPerson;
-import ru.axetta.ecafe.processor.core.persistence.MeshTrainingForm;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -123,6 +121,9 @@ public class MeshPersonsSyncService {
     protected boolean isHomeStudy(Education education, Map<Integer, MeshTrainingForm> trainingForms) throws Exception {
         if (education.getActualFrom() == null && education.getEducationFormId() == null)
             throw new Exception("Arguments educationForm and educationFormId are NULL");
+        if (Education.OUT_OF_ORG_EDUCATIONS.contains(education.getServiceTypeId())) {
+            return true;
+        }
         Integer id = education.getEducationForm() == null ? education.getEducationFormId() : education.getEducationForm().getId();
         MeshTrainingForm trainingForm = trainingForms.get(id);
         if (trainingForm == null) throw new Exception(String.format("TrainingForm by ID %d does exists", id));
@@ -172,8 +173,28 @@ public class MeshPersonsSyncService {
                 logger.info("Not found NSI guid for person with mesh guid " + personguid);
             }
 
+            MeshClass meshClass = null;
+            if(education.getClass_() != null){
+                Class class_ = education.getClass_();
+                meshClass = (MeshClass) session.get(MeshClass.class, class_.getId().longValue());
+                if(meshClass == null){
+                    meshClass = DAOService.getInstance().getMeshClassByUID(class_.getUid());
+                }
+                if(meshClass == null){
+                    meshClass = new MeshClass(class_.getId(), classuid);
+                }
+                meshClass.setLastUpdate(new Date());
+                meshClass.setName(classname);
+                meshClass.setParallelId(parallelid);
+                meshClass.setEducationStageId(educationstageid);
+                meshClass.setOrganizationId(organizationid);
+                session.saveOrUpdate(meshClass);
+            }
+
             MeshSyncPerson meshSyncPerson = (MeshSyncPerson)session.get(MeshSyncPerson.class, personguid);
-            if (meshSyncPerson == null) meshSyncPerson = new MeshSyncPerson(personguid);
+            if (meshSyncPerson == null){
+                meshSyncPerson = new MeshSyncPerson(personguid);
+            }
             meshSyncPerson.setBirthdate(birthdate);
             meshSyncPerson.setClassname(classname);
             meshSyncPerson.setClassuid(classuid);
@@ -188,7 +209,10 @@ public class MeshPersonsSyncService {
             meshSyncPerson.setLastupdateRest(new Date());
             meshSyncPerson.setDeletestate(deleted);
             meshSyncPerson.setInvaliddata(false);
+            meshSyncPerson.setMeshClass(meshClass);
             session.saveOrUpdate(meshSyncPerson);
+            session.flush();
+            session.clear();
         } catch (Exception e) {
             logger.error(String.format("Error in process Mesh person with guid %s: ", personguid), e);
         }
@@ -205,6 +229,13 @@ public class MeshPersonsSyncService {
 
     protected Education findEducation(ResponsePersons person) {
         try {
+            Iterator<Education> iterator = person.getEducation().iterator();
+            while (iterator.hasNext()) {
+                Education education = iterator.next();
+                if (education.getServiceTypeId() == null || !Education.ACCEPTABLE_EDUCATIONS.contains(education.getServiceTypeId())) {
+                    iterator.remove();
+                }
+            }
             Collections.sort(person.getEducation());
             return person.getEducation().get(person.getEducation().size() - 1);
         } catch (Exception e) {

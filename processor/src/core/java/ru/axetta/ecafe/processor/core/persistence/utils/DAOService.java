@@ -3211,5 +3211,15 @@ public class DAOService {
         q.setParameter("oldID", cardSign.getIdOfCardSign());
         q.executeUpdate();
     }
+
+    public MeshClass getMeshClassByUID(String uid){
+        try {
+            Query q = entityManager.createQuery("SELECT c FROM MeshClass AS c WHERE c.uid = :uid");
+            q.setParameter("uid", uid);
+            return (MeshClass) q.getSingleResult();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
 }
 

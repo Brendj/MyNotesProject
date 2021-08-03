@@ -34,10 +34,10 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
      *
      * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
      */
-    public static final String REPORT_NAME = "Детализированный отчет по посещению";
-    public static final String[] TEMPLATE_FILE_NAMES = {"DetailedEnterEventReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = true;
-    public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
+    //public static final String REPORT_NAME = "Детализированный отчет по посещению";
+    //public static final String[] TEMPLATE_FILE_NAMES = {"DetailedEnterEventReport.jasper"};
+    //public static final boolean IS_TEMPLATE_REPORT = true;
+    //public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
     final public static String P_ID_OF_CLIENTS = "idOfClients";
 
     private final static Logger logger = LoggerFactory.getLogger(DishMenuWebArmPPReport.class);

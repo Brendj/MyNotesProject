@@ -330,6 +330,7 @@ public class MainPage implements Serializable {
 
     private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
     private final BlockUnblockReportPage blockUnblockReportPage = new BlockUnblockReportPage();
+    private final EmiasReportPage emiasReportPage = new EmiasReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -7793,6 +7794,19 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showEmiasReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = emiasReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set EMIAS page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
 
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;
@@ -11099,5 +11113,9 @@ public class MainPage implements Serializable {
 
     public DishListSelectPage getDishWebListSelectPage() {
         return dishWebListSelectPage;
+    }
+	
+    public EmiasReportPage getEmiasReportPage() {
+        return emiasReportPage;
     }
 }
