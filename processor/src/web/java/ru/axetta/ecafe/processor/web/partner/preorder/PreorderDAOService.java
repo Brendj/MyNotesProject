@@ -736,6 +736,8 @@ public class PreorderDAOService {
         }
 
         if (complexItem != null) {
+            Set<Long> dishesRepeatable = DAOReadExternalsService.getInstance().getDishesRepeatable(wtComplex);
+
             wtDishes = DAOReadExternalsService.getInstance()
                     .getWtDishesByComplexItemAndDates(complexItem, startDate, endDate);
             for (WtDish wtDish : wtDishes) {
@@ -753,7 +755,7 @@ public class PreorderDAOService {
                 menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
                 menuItemExt.setAmount(isComposite ? getAmountForPreorderMenuDetail(wtDish, amounts) : 0);
                 menuItemExt.setIsRegular(isComposite && getRegularSignForPreorderMenuDetail(wtDish, regularSigns));
-                menuItemExt.setAvailableForRegular(false);
+                menuItemExt.setAvailableForRegular(dishesRepeatable.contains(wtDish.getIdOfDish()));
                 menuItemExtList.add(menuItemExt);
             }
         }
