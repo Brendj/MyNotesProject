@@ -363,7 +363,7 @@ public class DAOReadExternalsService {
         Set<Long> result = new HashSet<>();
         if (!wtComplex.getComposite()) return result;
         Query query = entityManager.createNativeQuery("select t.idofdish from cf_wt_complexes_dishes_repeatable t "
-                + "where t.idofcomplex = :idOfComplex");
+                + "where t.idofcomplex = :idOfComplex and t.deletestate = 0");
         query.setParameter("idOfComplex", wtComplex.getIdOfComplex());
         List list = query.getResultList();
         for (Object entry : list) {
