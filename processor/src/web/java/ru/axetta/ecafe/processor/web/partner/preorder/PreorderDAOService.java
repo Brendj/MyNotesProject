@@ -2001,8 +2001,8 @@ public class PreorderDAOService {
         if (!CalendarUtils.betweenDate(new Date(), regularPreorder.getStartDate(), regularPreorder.getEndDate())) return;
         Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc join pc.preorderMenuDetails pmd "
                 + "where (pc.regularPreorder = :regularPreorder or pmd.regularPreorder = :regularPreorder) "
-                + "and pc.preorderDate > :date and (pc.deletedState = false or pc.state in :states) and pc.idOfGoodsRequestPosition is null "
-                + "and (pmd.deletedState = false or pmd.state in :states)");
+                + "and pc.preorderDate > :date and (pc.deletedState = false or pc.state in (:states)) and pc.idOfGoodsRequestPosition is null "
+                + "and (pmd.deletedState = false or pmd.state in (:states))");
         query.setParameter("regularPreorder", regularPreorder);
         query.setParameter("date", new Date());
         List<PreorderState> states = Arrays.asList(PreorderState.OK, PreorderState.NOT_ENOUGH_BALANCE, PreorderState.CHANGED_CALENDAR);
