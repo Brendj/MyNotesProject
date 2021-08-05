@@ -36,8 +36,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -416,7 +416,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     }
 
     public void runTask(PreorderRequestsReportServiceParam params, String instance, String firstNode) throws Exception {
-        logger.info("Start runTask for gererate preorder requests");
+        logger.info("Start runTask for generate preorder requests");
         //проверки на актуальность предзаказов
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().relevancePreorders(params);
         //генерация предзаказов по регулярному правилу
