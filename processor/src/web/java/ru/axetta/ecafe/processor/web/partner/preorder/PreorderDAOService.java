@@ -2006,6 +2006,7 @@ public class PreorderDAOService {
         query.setParameter("regularPreorder", regularPreorder);
         query.setParameter("date", new Date());
         List<PreorderState> states = Arrays.asList(PreorderState.OK, PreorderState.NOT_ENOUGH_BALANCE, PreorderState.CHANGED_CALENDAR);
+        query.setParameter("states", states);
         if (query.getResultList().size() == 0) {
             regularPreorder.setState(RegularPreorderState.CHANGE_BY_SERVICE);
             regularPreorder.setDeletedState(true);
