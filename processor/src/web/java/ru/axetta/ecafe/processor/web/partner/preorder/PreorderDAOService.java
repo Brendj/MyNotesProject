@@ -1058,7 +1058,7 @@ public class PreorderDAOService {
                 && regularComplex.getThursday().equals(regularPreorder.getThursday())
                 && regularComplex.getFriday().equals(regularPreorder.getFriday())
                 && regularComplex.getSaturday().equals(regularPreorder.getSaturday())
-                && regularComplex.getStartDate().equals(regularPreorder.getStartDate())
+                //&& regularComplex.getStartDate().equals(regularPreorder.getStartDate())
                 && regularComplex.getEndDate().equals(regularPreorder.getEndDate());
     }
 
@@ -1162,7 +1162,7 @@ public class PreorderDAOService {
         if (regularPreorderList.size() > 0) {
             for (RegularPreorder regularPreorderItem : regularPreorderList) {
                 if (regularEquals(regularComplex, regularPreorderItem) && regularPreorderItem.getAmount().equals(amount)) {
-                    return;
+                    throw new RegularExistsException("Уже существут повтор заказа с выбранными параметрами");
                 }
                 if (regularDatesIntersect(regularComplex, regularPreorderItem)) {
                     deleteRegularPreorderInternal((Session) em.getDelegate(), regularPreorderItem, PreorderState.OK,
