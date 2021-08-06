@@ -1059,7 +1059,7 @@ public class PreorderDAOService {
                 && regularComplex.getFriday().equals(regularPreorder.getFriday())
                 && regularComplex.getSaturday().equals(regularPreorder.getSaturday())
                 //&& regularComplex.getStartDate().equals(regularPreorder.getStartDate())
-                && regularComplex.getEndDate().equals(regularPreorder.getEndDate());
+                && CalendarUtils.startOfDay(regularComplex.getEndDate()).equals(CalendarUtils.startOfDay(regularPreorder.getEndDate()));
     }
 
     private boolean regularDatesIntersect(RegularPreorderParam regularComplex, RegularPreorder regularPreorder) {
