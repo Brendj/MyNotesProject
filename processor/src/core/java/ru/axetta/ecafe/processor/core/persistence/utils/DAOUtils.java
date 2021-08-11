@@ -2011,6 +2011,32 @@ public class DAOUtils {
         session.save(emias);
     }
 
+    public static void archivedEMIAS(Session session, EMIAS emias) {
+        Long version = getMaxVersionEMIAS(session, false);
+        emias.setArchive(true);
+        emias.setVersion(version);
+        emias.setUpdateDate(new Date());
+        session.save(emias);
+    }
+
+    public static void saveEMIASkafka(Session session, LiberateClientsList liberateClientsList) {
+        Long version = getMaxVersionEMIAS(session, true);
+
+        EMIAS emias = new EMIAS();
+        emias.setKafka(true);
+        emias.setProcessed(true);
+        emias.setIdemias(liberateClientsList.getIdEventEMIAS().toString());
+        emias.setGuid(liberateClientsList.getGuid());
+        //mias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
+        emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
+        emias.setDateLiberate(liberateClientsList.getDateLiberate());
+        emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
+        emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
+        emias.setCreateDate(new Date());
+        emias.setVersion(version);
+        session.save(emias);
+    }
+
     public static Long getMaxVersionEMIAS(Session session, Boolean kafka) {
         Long version = 0L;
         try {
@@ -5257,6 +5283,18 @@ public class DAOUtils {
             Criteria criteria = session.createCriteria(EMIAS.class);
             criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
             criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIAS>();
+        }
+    }
+
+    public static List<EMIAS> getEmiasbyMeshGuid(String meshGuid, Session session) {
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("guid", meshGuid));
+            criteria.add(Restrictions.eq("kafka", true));
+            criteria.add(Restrictions.eq("processed", true));
             return criteria.list();
         } catch (Exception e) {
             return new ArrayList<EMIAS>();

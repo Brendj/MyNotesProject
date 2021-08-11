@@ -226,7 +226,8 @@ public class EMIASController extends HttpServlet {
     @WebMethod(operationName = "getLiberateClientsList")
     public List<OrgSummaryResult> getLiberateClientsList(
             @WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists) {
-
+        //Какой алгоритм обработки использовать: старый или новый ?
+        Boolean usedOld = Boolean.parseBoolean(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.emias.old", "false"));
         List<OrgSummaryResult> orgSummaryResults = new ArrayList<>();
 
         //Контроль безопасности
@@ -266,15 +267,19 @@ public class EMIASController extends HttpServlet {
                             ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS, liberateClientsList.getIdEventEMIAS()));
                     continue;
                 }
-
-                List<EMIAS> emias = DAOUtils
-                        .getEmiasbyidEventEMIAS(liberateClientsList.getIdEventEMIAS(), persistenceSession);
-
-                if (liberateClientsList.getIdEventEMIAS() < 0L || !emias.isEmpty()) {
-                    orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
-                            ResponseItem.ERROR_ID_EVENT_EMIAS, liberateClientsList.getIdEventEMIAS()));
-                    continue;
+                List<EMIAS> emias;
+                if (usedOld) {
+                    emias = DAOUtils.getEmiasbyidEventEMIAS(liberateClientsList.getIdEventEMIAS(), persistenceSession);
+                    if (liberateClientsList.getIdEventEMIAS() < 0L || !emias.isEmpty()) {
+                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
+                                ResponseItem.ERROR_ID_EVENT_EMIAS, liberateClientsList.getIdEventEMIAS()));
+                        continue;
+                    }
                 }
+                else {
+                    emias = DAOUtils.getEmiasbyMeshGuid(cl.getMeshGUID(), persistenceSession);
+                }
+
                 Integer eventsStatus = -1;
                 boolean goodIdEmias = true;
                 switch (liberateClientsList.getTypeEventEMIAS().intValue()) {
@@ -286,7 +291,10 @@ public class EMIASController extends HttpServlet {
                                     liberateClientsList.getIdEventEMIAS()));
                             continue;
                         }
-                        DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        if (usedOld)
+                            DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        else
+                            DAOUtils.saveEMIASkafka(persistenceSession, liberateClientsList);
                         eventsStatus = 2;
                         break;
                     case 2:
@@ -297,12 +305,26 @@ public class EMIASController extends HttpServlet {
                             goodIdEmias = false;
                         } else
                         {
-                            DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                            if (usedOld)
+                                DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                            else
+                            {
+                                for (EMIAS emias1: emias)
+                                {
+                                    if (emias1.getIdemias().equals(liberateClientsList.getIdEventCancelEMIAS().toString()))
+                                    {
+                                        DAOUtils.archivedEMIAS(persistenceSession, emias1);
+                                    }
+                                }
+                            }
                             eventsStatus = 3;
                         }
                         break;
                     case 3:
-                        DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        if (usedOld)
+                            DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        else
+                            DAOUtils.saveEMIASkafka(persistenceSession, liberateClientsList);
                         eventsStatus = 4;
                         break;
                     case 4:
@@ -313,7 +335,18 @@ public class EMIASController extends HttpServlet {
                             goodIdEmias = false;
                         }
                         else {
-                            DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                            if (usedOld)
+                                DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                            else
+                            {
+                                for (EMIAS emias1: emias)
+                                {
+                                    if (emias1.getIdemias().equals(liberateClientsList.getIdEventCancelEMIAS().toString()))
+                                    {
+                                        DAOUtils.archivedEMIAS(persistenceSession, emias1);
+                                    }
+                                }
+                            }
                             eventsStatus = 5;
                         }
                         break;
