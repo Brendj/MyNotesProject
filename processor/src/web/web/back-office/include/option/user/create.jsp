@@ -253,6 +253,18 @@
             <h:outputText escape="true" value="#{helpdeskItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="ЕСП" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefaultOrAdmin}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.espItems}" var="espdeskItems" rendered="#{mainPage.userCreatePage.isDefaultOrAdmin}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{espdeskItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{espdeskItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{espdeskItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
     <h:outputText escape="true" value="Настройки" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
     <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.optionsItems}" var="optionsItems" rendered="#{mainPage.userCreatePage.isDefault}">
         <rich:column>

@@ -5546,4 +5546,24 @@ public class DAOUtils {
             return null;
         }
     }
+
+    public static List<ESP> getESPForOrg(Session persistenceSession, Org org) {
+        try {
+            Criteria criteria = persistenceSession.createCriteria(ESP.class);
+            criteria.add(Restrictions.eq("org", org));
+            return (List<ESP>) criteria.list();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public static ESP findESPByRequestByNumber (Session persistenceSession, String numberrequest) {
+        try {
+            Criteria criteria = persistenceSession.createCriteria(ESP.class);
+            criteria.add(Restrictions.eq("numberrequest", numberrequest));
+            return (ESP)criteria.list().get(0);
+        } catch (NoResultException e){
+            return null;
+        }
+    }
 }
