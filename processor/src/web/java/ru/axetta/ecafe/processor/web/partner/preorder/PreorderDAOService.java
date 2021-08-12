@@ -1457,6 +1457,10 @@ public class PreorderDAOService {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             return;
         }
+        if (!wtComplex.getIsPortal()) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+            return;
+        }
 
         // Определяем подходящий состав комплекса
         WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, CalendarUtils.startOfDay(preorderDate));
@@ -1752,6 +1756,11 @@ public class PreorderDAOService {
                 complexInfo = getComplexInfo(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate);
             } else {
                 wtComplex = getWtComplex(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate);
+                if (!wtComplex.getIsPortal()) {
+                    logger.info("WtComplex IsPortal flag disabled");
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
+                }
             }
             if ((!isWtMenu && complexInfo == null) || (isWtMenu && wtComplex == null)){
                 if (preorderComplex != null && !preorderComplex.getDeletedState()) {
