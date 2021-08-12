@@ -510,6 +510,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return role.equals(User.DefaultRole.DEFAULT);
     }
 
+    public Boolean getIsDefaultOrAdmin(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.DEFAULT) || role.equals(User.DefaultRole.ADMIN);
+    }
+
     public Boolean getIsSecurityAdmin(){
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);

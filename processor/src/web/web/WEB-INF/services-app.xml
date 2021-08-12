@@ -190,11 +190,11 @@
         <task:scheduled ref="smsSubscriptionFeeService" method="smsSubscriptionFeeWithdraw" cron="0 0 16 1-4 * ?"/>
     </task:scheduled-tasks>
 
-    <task:scheduler id="regularPaymentSchedule"/>
-    <task:scheduled-tasks scheduler="regularPaymentSchedule">
-        <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"
-                        cron="0 10 11,17 * * ?"/>
-    </task:scheduled-tasks>
+<!--    <task:scheduler id="regularPaymentSchedule"/>-->
+<!--    <task:scheduled-tasks scheduler="regularPaymentSchedule">-->
+<!--        <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"-->
+<!--                        cron="0 10 11,17 * * ?"/>-->
+<!--    </task:scheduled-tasks>-->
 
     <task:scheduler id="regularPaymentExpireNotificationSchedule"/>
     <task:scheduled-tasks scheduler="regularPaymentExpireNotificationSchedule">

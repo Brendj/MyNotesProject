@@ -14,8 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -950,7 +950,11 @@ public class DAOUtils {
     //Находит все включая текущую.
     public static List<Org> findAllFriendlyOrgs(Session session, long organization) throws Exception {
         Criteria criteria = session.createCriteria(Org.class);
-        criteria.add(Restrictions.in("idOfOrg", findFriendlyOrgIds(session, organization)));
+        List<Long> friendlyOrgsIds = findFriendlyOrgIds(session, organization);
+        if(CollectionUtils.isEmpty(friendlyOrgsIds)){
+            friendlyOrgsIds = Collections.singletonList(organization);
+        }
+        criteria.add(Restrictions.in("idOfOrg", friendlyOrgsIds));
         List<Org> result = criteria.list();
         return result != null ? result : new ArrayList<Org>();
 
@@ -5545,6 +5549,26 @@ public class DAOUtils {
             criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
             criteria.setMaxResults(1);
             return (Card) criteria.uniqueResult();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public static List<ESP> getESPForOrg(Session persistenceSession, Org org) {
+        try {
+            Criteria criteria = persistenceSession.createCriteria(ESP.class);
+            criteria.add(Restrictions.eq("org", org));
+            return (List<ESP>) criteria.list();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public static ESP findESPByRequestByNumber (Session persistenceSession, String numberrequest) {
+        try {
+            Criteria criteria = persistenceSession.createCriteria(ESP.class);
+            criteria.add(Restrictions.eq("numberrequest", numberrequest));
+            return (ESP)criteria.list().get(0);
         } catch (NoResultException e){
             return null;
         }

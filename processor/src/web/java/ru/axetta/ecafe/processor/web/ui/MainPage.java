@@ -5,7 +5,17 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import net.sf.jasperreports.engine.JRException;
-
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
+import org.richfaces.component.html.HtmlPanelMenu;
+import org.richfaces.event.UploadEvent;
+import org.richfaces.model.UploadItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
@@ -68,18 +78,6 @@ import ru.axetta.ecafe.processor.web.ui.user.UserListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmLoadPage;
 import ru.axetta.ecafe.processor.web.ui.webTechnolog.ComplexListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.webTechnolog.DishListSelectPage;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
-import org.richfaces.component.html.HtmlPanelMenu;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -313,6 +311,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage orgParametersGroup = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistCatalogGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage espHelpdeskGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -330,7 +329,8 @@ public class MainPage implements Serializable {
 
     private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
     private final BlockUnblockReportPage blockUnblockReportPage = new BlockUnblockReportPage();
-    private final EmiasReportPage emiasReportPage = new EmiasReportPage();
+	private final EmiasReportPage emiasReportPage = new EmiasReportPage();
+	private final ESPHelpdeskReportPage espHelpdeskReportPage = new ESPHelpdeskReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -2003,9 +2003,10 @@ public class MainPage implements Serializable {
     public Object showOrgListSelectPage(List<Long> idOfContragents) {
         return showOrgListSelectPageWebArm(idOfContragents, null);
     }
+
     public Object showOrgListSelectPageWebArm(List<Long> idOfContragents, Boolean webARM) {
         webARMppFilter = webARM;
-        this.idOfContragentList = new ArrayList<Long>(idOfContragents);
+        this.idOfContragentList = new ArrayList<>(idOfContragents);
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -2014,7 +2015,7 @@ public class MainPage implements Serializable {
             Transaction persistenceTransaction = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setIdFilter("");
@@ -6777,6 +6778,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showEspHelpdeskGroupPage(){
+        currentWorkspacePage = espHelpdeskGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public BasicWorkspacePage getDiscountGroupPage() {
         return discountGroupPage;
     }
@@ -7806,7 +7813,19 @@ public class MainPage implements Serializable {
         updateSelectedMainMenu();
         return null;
     }
-
+	
+	    public Object showESPHelpDeskReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = espHelpdeskReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set esp report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
 
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;
@@ -9928,6 +9947,10 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_HELPDESK);
     }
 
+    public boolean isEligibleToViewESPdesk() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_ESP);
+    }
+
     public boolean isEligibleToViewTotalServicesReport() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT);
     }
@@ -11114,8 +11137,15 @@ public class MainPage implements Serializable {
     public DishListSelectPage getDishWebListSelectPage() {
         return dishWebListSelectPage;
     }
-	
     public EmiasReportPage getEmiasReportPage() {
         return emiasReportPage;
+    }
+
+    public ESPHelpdeskReportPage getEspHelpdeskReportPage() {
+        return espHelpdeskReportPage;
+    }
+
+    public BasicWorkspacePage getEspHelpdeskGroupPage() {
+        return espHelpdeskGroupPage;
     }
 }

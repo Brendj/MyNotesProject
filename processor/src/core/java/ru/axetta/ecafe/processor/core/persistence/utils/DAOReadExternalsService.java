@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.*;
 
 /***
@@ -356,6 +357,20 @@ public class DAOReadExternalsService {
         query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
         query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
         return (List<WtDish>) query.getResultList();
+    }
+
+    public Set<Long> getDishesRepeatable(WtComplex wtComplex) {
+        Set<Long> result = new HashSet<>();
+        if (!wtComplex.getComposite()) return result;
+        Query query = entityManager.createNativeQuery("select t.idofdish from cf_wt_complexes_dishes_repeatable t "
+                + "where t.idofcomplex = :idOfComplex and t.deletestate = 0");
+        query.setParameter("idOfComplex", wtComplex.getIdOfComplex());
+        List list = query.getResultList();
+        for (Object entry : list) {
+            Long id = ((BigInteger)entry).longValue ();
+            result.add(id);
+        }
+        return result;
     }
 
     public List<WtDish> getWtDishesByComplexItemAndDates(WtComplexesItem complexItem, Date startDate, Date endDate) {

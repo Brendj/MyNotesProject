@@ -549,6 +549,23 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>ESPServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.internal.esp.ESPController</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/ispp/ESP</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ESPServlet</servlet-name>
+        <url-pattern>/ispp/ESP/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>SchoolServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
@@ -594,7 +611,8 @@
         <url-pattern>/school/api/v1/*</url-pattern>
         <url-pattern>/ispp/library/*</url-pattern>
         <url-pattern>/ispp/ezd/*</url-pattern>
-        <url-pattern>/emias_internal/*</url-pattern>
+	<url-pattern>/emias_internal/*</url-pattern>
+	<url-pattern>/ispp/ESP/*</url-pattern>
     </filter-mapping>
 
     <filter>
