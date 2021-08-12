@@ -736,6 +736,8 @@ public class PreorderDAOService {
         }
 
         if (complexItem != null) {
+            Set<Long> dishesRepeatable = DAOReadExternalsService.getInstance().getDishesRepeatable(wtComplex);
+
             wtDishes = DAOReadExternalsService.getInstance()
                     .getWtDishesByComplexItemAndDates(complexItem, startDate, endDate);
             for (WtDish wtDish : wtDishes) {
@@ -753,7 +755,7 @@ public class PreorderDAOService {
                 menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
                 menuItemExt.setAmount(isComposite ? getAmountForPreorderMenuDetail(wtDish, amounts) : 0);
                 menuItemExt.setIsRegular(isComposite && getRegularSignForPreorderMenuDetail(wtDish, regularSigns));
-                menuItemExt.setAvailableForRegular(false);
+                menuItemExt.setAvailableForRegular(dishesRepeatable.contains(wtDish.getIdOfDish()));
                 menuItemExtList.add(menuItemExt);
             }
         }
@@ -1455,6 +1457,10 @@ public class PreorderDAOService {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             return;
         }
+        if (!wtComplex.getIsPortal()) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
+            return;
+        }
 
         // Определяем подходящий состав комплекса
         WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, CalendarUtils.startOfDay(preorderDate));
@@ -1750,6 +1756,11 @@ public class PreorderDAOService {
                 complexInfo = getComplexInfo(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate);
             } else {
                 wtComplex = getWtComplex(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate);
+                if (!wtComplex.getIsPortal()) {
+                    logger.info("WtComplex IsPortal flag disabled");
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
+                }
             }
             if ((!isWtMenu && complexInfo == null) || (isWtMenu && wtComplex == null)){
                 if (preorderComplex != null && !preorderComplex.getDeletedState()) {
