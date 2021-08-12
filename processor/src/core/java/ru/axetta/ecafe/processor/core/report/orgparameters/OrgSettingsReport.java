@@ -124,6 +124,9 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob {
                     subQuery.setParameterList("idOfOrgs", idOfOrgList);
 
                     List<Long> idsOfFriendlyOrg = subQuery.list();
+                    if(CollectionUtils.isEmpty(idsOfFriendlyOrg)){
+                        idsOfFriendlyOrg = idOfOrgList;
+                    }
                     orgCriteria.add(Restrictions.in("idOfOrg", idsOfFriendlyOrg));
                 } else {
                     orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
