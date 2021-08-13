@@ -36,8 +36,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -417,6 +417,8 @@ public class PreorderRequestsReportService extends RecoverableService {
 
     public void runTask(PreorderRequestsReportServiceParam params, String instance, String firstNode) throws Exception {
         logger.info("Start runTask for gererate preorder requests");
+        // проверка на актуальность связок с контрагентами для нового меню
+        checkOrgContragentBinding(params);
         //проверки на актуальность предзаказов
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().relevancePreorders(params);
         //генерация предзаказов по регулярному правилу
@@ -433,6 +435,147 @@ public class PreorderRequestsReportService extends RecoverableService {
         //
         logger.info("Finish runTask for gererate preorder requests");
     }
+
+    public void checkOrgContragentBinding(PreorderRequestsReportServiceParam params) {
+        logger.info("Start checking org and contragent bindings");
+        Map<Long, Set<Long>> contragentMap = GoodRequestsChangeAsyncNotificationService.getInstance()
+                .findOrgSetForContragent(params);
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+            for (Long idOfContragent : contragentMap.keySet()) {
+                List<Long> orgGroups = findWtOrgGroupIdsExcludingContragent(session, idOfContragent);
+                List<Long> menus = findWtMenuIdsExcludingContragent(session, idOfContragent);
+                List<Long> complexes = findWtComplexIdsExcludingContragent(session, idOfContragent);
+                for (Long idOfOrg : contragentMap.get(idOfContragent)) {
+                    if (deleteWtOrgGroupBindings(session, orgGroups, idOfOrg)) {
+                        logger.info(String.format("Deleted old orgGroup bindings for idOfOrg = %s", idOfOrg));
+                    }
+                    if (deleteWtMenuBindings(session, menus, idOfOrg)) {
+                        logger.info(String.format("Deleted old menu bindings for idOfOrg = %s", idOfOrg));
+                    }
+                    if (deleteWtComplexBindings(session, complexes, idOfOrg)) {
+                        logger.info(String.format("Deleted old complex bindings for idOfOrg = %s", idOfOrg));
+                    }
+                }
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error("Error in checking org and contragent bindings requests: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        logger.info("End checking org and contragent bindings");
+    }
+
+    private boolean deleteWtComplexBindings(Session session, List<Long> complexIds, Long idOfOrg) {
+        if (complexIds.size() == 0) {
+            return false;
+        }
+        //
+        Query insQuery = session.createSQLQuery("insert into cf_wt_org_relation_aud"
+                + "(idofcomplex, idoforg, deletestate, createdate, idofuser, versionofcomplex) "
+                + "select idofcomplex, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
+                + "(select idofuser from cf_users where username = 'admin') as idofuser, "
+                + "(select coalesce(max(versionofcomplex), 0) + 1 from cf_wt_org_relation_aud) as versionofcomplex "
+                + " from cf_wt_complexes_org where idoforg = :idOfOrg and idofcomplex in (:complexIds)");
+        insQuery.setParameter("idOfOrg", idOfOrg);
+        insQuery.setParameterList("complexIds", complexIds);
+        insQuery.executeUpdate();
+        //
+        Query sqlQuery = session.createSQLQuery("delete from cf_wt_complexes_org "
+                + "where idoforg = :idOfOrg and idofcomplex in (:complexIds)");
+        sqlQuery.setParameter("idOfOrg", idOfOrg);
+        sqlQuery.setParameterList("complexIds", complexIds);
+        return sqlQuery.executeUpdate() > 0;
+    }
+
+    private List<Long> findWtComplexIdsExcludingContragent(Session session, Long idOfContragent) {
+        List<Long> res = new ArrayList<>();
+        Query query = session.createQuery("select c.idOfComplex from WtComplex c "
+                + "where c.contragent.idOfContragent <> :idOfContragent");
+        query.setParameter("idOfContragent", idOfContragent);
+        List list = query.list();
+        for (Object o : list) {
+            res.add(Long.valueOf(o.toString()));
+        }
+        return res;
+    }
+
+    private boolean deleteWtMenuBindings(Session session, List<Long> menuIds, Long idOfOrg) {
+        if (menuIds.size() == 0) {
+            return false;
+        }
+        //
+        Query insQuery = session.createSQLQuery("insert into cf_wt_org_relation_aud"
+                + "(idofmenu, idoforg, deletestate, createdate, idofuser, versionofmenu) "
+                + "select idofmenu, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
+                + "(select idofuser from cf_users where username = 'admin') as idofuser, "
+                + "(select coalesce(max(versionofmenu), 0) + 1 from cf_wt_org_relation_aud) as versionofmenu "
+                + " from cf_wt_menu_org where idoforg = :idOfOrg and idofmenu in (:menuIds)");
+        insQuery.setParameter("idOfOrg", idOfOrg);
+        insQuery.setParameterList("menuIds", menuIds);
+        insQuery.executeUpdate();
+        //
+        Query sqlQuery = session.createSQLQuery("delete from cf_wt_menu_org "
+                + "where idoforg = :idOfOrg and idofmenu in (:menuIds)");
+        sqlQuery.setParameter("idOfOrg", idOfOrg);
+        sqlQuery.setParameterList("menuIds", menuIds);
+        return sqlQuery.executeUpdate() > 0;
+    }
+
+    private List<Long> findWtMenuIdsExcludingContragent(Session session, Long idOfContragent) {
+        List<Long> res = new ArrayList<>();
+        Query query = session.createQuery("select m.idOfMenu from WtMenu m "
+                + "where m.contragent.idOfContragent <> :idOfContragent");
+        query.setParameter("idOfContragent", idOfContragent);
+        List list = query.list();
+        for (Object o : list) {
+            res.add(Long.valueOf(o.toString()));
+        }
+        return res;
+    }
+
+    private boolean deleteWtOrgGroupBindings(Session session, List<Long> orgGroupIds, Long idOfOrg) {
+        if (orgGroupIds.size() == 0) {
+            return false;
+        }
+        //
+        Query insQuery = session.createSQLQuery("insert into cf_wt_org_relation_aud"
+                + "(idoforggroup, idoforg, deletestate, createdate, idofuser, versionoforggroup) "
+                + "select idoforggroup, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
+                + "(select idofuser from cf_users where username = 'admin') as idofuser, "
+                + "(select coalesce(max(versionoforggroup), 0) + 1 from cf_wt_org_relation_aud) as versionoforggroup "
+                + " from cf_wt_org_group_relations where idoforg = :idOfOrg and idoforggroup in (:orgGroupIds)");
+        insQuery.setParameter("idOfOrg", idOfOrg);
+        insQuery.setParameterList("orgGroupIds", orgGroupIds);
+        insQuery.executeUpdate();
+        //
+        Query sqlQuery = session.createSQLQuery("delete from cf_wt_org_group_relations "
+                + "where idoforg = :idOfOrg and idoforggroup in (:orgGroupIds)");
+        sqlQuery.setParameter("idOfOrg", idOfOrg);
+        sqlQuery.setParameterList("orgGroupIds", orgGroupIds);
+        return sqlQuery.executeUpdate() > 0;
+    }
+
+    private List<Long> findWtOrgGroupIdsExcludingContragent(Session session, Long idOfContragent) {
+        List<Long> res = new ArrayList<>();
+        Query query = session.createQuery("select og.idOfOrgGroup from WtOrgGroup og "
+                + "where og.contragent.idOfContragent <> :idOfContragent");
+        query.setParameter("idOfContragent", idOfContragent);
+        List list = query.list();
+        for (Object o : list) {
+            res.add(Long.valueOf(o.toString()));
+        }
+        return res;
+    }
+
 
     public String checkIsExistFile() throws Exception {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
