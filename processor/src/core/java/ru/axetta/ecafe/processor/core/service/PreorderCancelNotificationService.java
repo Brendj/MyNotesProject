@@ -72,7 +72,7 @@ public class PreorderCancelNotificationService {
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } catch (Exception e) {
-                logger.error("Error in PreorderCancelNotificationService.execute: ", e);
+                logger.error("Error in PreorderCancelNotificationService.manualStart: ", e);
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
