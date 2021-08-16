@@ -7,22 +7,19 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.BlockUnblockItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -37,7 +34,7 @@ import java.util.*;
 @Scope("singleton")
 public class PreorderCancelNotificationService {
 
-
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PreorderCancelNotificationService.class);
     final static String CANCEL_PREORDER_NOTIFICATION = "CancelPreorderNotification";
     final EventNotificationService notificationService = RuntimeContext.getAppContext()
             .getBean(EventNotificationService.class);
@@ -54,7 +51,12 @@ public class PreorderCancelNotificationService {
                 RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class)
                         .start(persistenceSession);
                 persistenceTransaction.commit();
+                persistenceTransaction = null;
             } catch (Exception e) {
+                logger.error("Error in PreorderCancelNotificationService.execute: ", e);
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
             }
         }
 
