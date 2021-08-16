@@ -70,7 +70,12 @@ public class PreorderCancelNotificationService {
                 RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class)
                         .start(persistenceSession);
                 persistenceTransaction.commit();
+                persistenceTransaction = null;
             } catch (Exception e) {
+                logger.error("Error in PreorderCancelNotificationService.execute: ", e);
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
             }
         }
     }
