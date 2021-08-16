@@ -6,8 +6,8 @@ package ru.axetta.ecafe.processor.core.partner.etpmv;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import generated.contingent.ispp.*;
-import generated.etp.*;
 import generated.etp.ObjectFactory;
+import generated.etp.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -356,7 +356,6 @@ public class ETPMVService {
         for (ApplicationForFood applicationForFood : list) {
             Child child = objectFactory.createChild();
             child.setBenefitCode(applicationForFood.getDtisznCode() == null ? "0" : applicationForFood.getDtisznCode().toString());
-            child.setGuid(applicationForFood.getClient().getClientGUID());
             child.setMeshGUID(applicationForFood.getClient().getMeshGUID());
             children.getChild().add(child);
             sent_counter++;
@@ -385,7 +384,7 @@ public class ETPMVService {
             Long nextVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodNextVersion();
             Long historyVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodHistoryNextVersion();
             for (Child child : response.getResult().getSuccess().getChild()) {
-                List<ApplicationForFood> apps = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(child.getGuid(), child.getMeshGUID(),
+                List<ApplicationForFood> apps = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(child.getMeshGUID(),
                         nextVersion, historyVersion);
                 for (ApplicationForFood applicationForFood : apps) {
                     sendStatus(System.currentTimeMillis() - PAUSE_IN_MILLIS, applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(), null);
