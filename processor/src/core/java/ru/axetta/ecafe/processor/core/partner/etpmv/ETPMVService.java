@@ -394,7 +394,7 @@ public class ETPMVService {
         if (response != null && response.getResult() != null && response.getResult().getNotFound() != null && response.getResult().getNotFound().getChild().size() > 0) {
             StringBuilder notFoundGuids = new StringBuilder();
             for (Child child : response.getResult().getNotFound().getChild()) {
-                notFoundGuids.append("Guid: " + emptyIfNull(child.getGuid()) + ", MeshGuid: " + emptyIfNull(child.getMeshGUID()));
+                notFoundGuids.append("MeshGuid: " + emptyIfNull(child.getMeshGUID()));
             }
             logger.error("Not found guids from AIS Contingent: " + notFoundGuids.toString());
         }
