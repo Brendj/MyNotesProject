@@ -4,6 +4,19 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.message.Message;
+import org.hibernate.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -80,20 +93,6 @@ import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.message.Message;
-import org.hibernate.*;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -5437,7 +5436,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new ClientNotFoundException("Не удалось найти клиента по л/с " + contractId);
             }
 
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient(), false);
             boolean guardianWithMobileFound = false;
             for (ClientGuardianItem item : guardians) {
                 Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
@@ -5563,7 +5562,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         client.getContractId()));
             }
 
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient(), false);
             for (ClientGuardianItem item : guardians) {
                 Client guardian = DAOUtils.findClientByContractId(session, item.getContractId());
                 if (phone.equals(guardian.getMobile())) {
@@ -9430,7 +9429,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), null);
         if (mode.equals("child")) {
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient(), false);
             boolean informed = false;
             for (ClientGuardianItem item : guardians) {
                 if (item.getInformedSpecialMenu()) {

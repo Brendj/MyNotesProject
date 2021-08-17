@@ -4,17 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -204,7 +203,7 @@ public class ClientSmsList {
             String childFIO = "";
             try {
                 Client client = DAOUtils.findClientByContractId(session, this.contractId);
-                List<ClientGuardianItem> wards = ClientManager.loadWardsByClient(session, client.getIdOfClient());
+                List<ClientGuardianItem> wards = ClientManager.loadWardsByClient(session, client.getIdOfClient(), false);
                 HashSet<Long> orgs = new HashSet<Long>();
                 HashSet<Long> children = new HashSet<Long>();
                 children.add(client.getIdOfClient());
