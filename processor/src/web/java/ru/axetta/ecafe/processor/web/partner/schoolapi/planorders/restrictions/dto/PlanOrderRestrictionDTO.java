@@ -16,9 +16,7 @@ public class PlanOrderRestrictionDTO {
     private Long id;
     private Long idOfClient;
     private Long idOfOrg;
-    private Long idOfConfigurationProvider;
     private Integer planType;
-    private String complexName;
     private Long complexId;
     private Integer resolution;
 
@@ -28,11 +26,9 @@ public class PlanOrderRestrictionDTO {
             PlanOrderRestrictionDTO dto = new PlanOrderRestrictionDTO();
             dto.setId(item.getIdOfPlanOrdersRestriction());
             dto.setComplexId(Long.valueOf(item.getArmComplexId()));
-            dto.setComplexName(item.getComplexName());
             dto.setPlanType(item.getPlanOrdersRestrictionType().ordinal());
             dto.setIdOfClient(item.getIdOfClient());
             dto.setResolution(item.getResol());
-            dto.setIdOfConfigurationProvider(item.getIdOfConfigurationProoviderOnCreate());
             dto.setIdOfOrg(item.getIdOfOrgOnCreate());
             result.add(dto);
         }
@@ -71,14 +67,6 @@ public class PlanOrderRestrictionDTO {
         this.planType = planType;
     }
 
-    public String getComplexName() {
-        return complexName;
-    }
-
-    public void setComplexName(String complexName) {
-        this.complexName = complexName;
-    }
-
     public Long getComplexId() {
         return complexId;
     }
@@ -95,11 +83,4 @@ public class PlanOrderRestrictionDTO {
         this.resolution = resolution;
     }
 
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
-    }
-
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
-    }
 }
