@@ -782,12 +782,8 @@ public class PreorderDAOService {
         }
     }
 
-    private boolean isEditedDay(Date date, Client client) throws Exception {
+    private boolean isEditedDay(Date date, Client client, Map<String, Integer[]> sd) throws Exception {
         boolean result = false;
-        Date today = CalendarUtils.startOfDay(new Date());
-        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
-        Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
-                client.getOrg().getIdOfOrg(), client);
         for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
             if (date.equals(CalendarUtils.parseDate(entry.getKey()))) {
                 result = (entry.getValue())[0].equals(0);
@@ -795,6 +791,21 @@ public class PreorderDAOService {
             }
         }
         return result;
+    }
+
+    private Date getFirstAvailableDateForRegular(Map<String, Integer[]> sd) throws Exception {
+        for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
+            if ((entry.getValue())[0].equals(0)) return CalendarUtils.parseDate(entry.getKey());
+        }
+        return null;
+    }
+
+    private boolean isEditedDay(Date date, Client client) throws Exception {
+        Date today = CalendarUtils.startOfDay(new Date());
+        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
+        Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
+                client.getOrg().getIdOfOrg(), client);
+        return isEditedDay(date, client, sd);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -859,7 +870,12 @@ public class PreorderDAOService {
             }
         }
 
-        if (!isEditedDay(date, client)) throw new NotEditedDayException("День недоступен для редактирования предзаказа");
+        Date today = CalendarUtils.startOfDay(new Date());
+        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
+        Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
+                client.getOrg().getIdOfOrg(), client);
+        if (!isEditedDay(date, client, sd)) throw new NotEditedDayException("День недоступен для редактирования предзаказа");
+        Date regularStartDate = getFirstAvailableDateForRegular(sd);
 
         Query queryComplexSelect = em.createQuery("select p from PreorderComplex p "
                 + "where p.client.idOfClient = :idOfClient and p.armComplexId = :idOfComplexInfo "
