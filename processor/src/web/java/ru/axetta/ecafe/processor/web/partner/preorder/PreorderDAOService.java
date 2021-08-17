@@ -1144,7 +1144,10 @@ public class PreorderDAOService {
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
             Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
             PreorderMobileGroupOnCreateType mobileGroupOnCreate, Date regularStartDate) throws Exception {
-        if (regularComplex.getStartDate().before(regularStartDate)) throw new RegularWrongStartDate("Неверная дата начала повтора");
+        if (regularStartDate == null ||
+                RegularPreorder.convertDate(regularComplex.getStartDate()).before(regularStartDate)) {
+            throw new RegularWrongStartDate("Неверная дата начала повтора");
+        }
         String menuDetailName = null;
         Long menuDetailPrice = null;
         String itemCode = null;
