@@ -966,7 +966,7 @@ public class PreorderDAOService {
                     if (regularMenuItem != null) {
                         if (regularMenuItem.getEnabled() && menuItem.getAmount() > 0) {
                             createRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
-                                        false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreateб
+                                        false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreate,
                                     regularStartDate);
                         } else {
                             deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(),
@@ -1144,7 +1144,7 @@ public class PreorderDAOService {
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
             Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
             PreorderMobileGroupOnCreateType mobileGroupOnCreate, Date regularStartDate) throws Exception {
-        if (regularComplex.getStartDate().before(regularStartDate)) throw new Exception("Неверная дата начала повтора");
+        if (regularComplex.getStartDate().before(regularStartDate)) throw new RegularWrongStartDate("Неверная дата начала повтора");
         String menuDetailName = null;
         Long menuDetailPrice = null;
         String itemCode = null;
