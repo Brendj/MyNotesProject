@@ -10217,7 +10217,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_REGULAR_ALREADY_DELETED;
             result.description = RC_REGULAR_ALREADY_DELETED_DESC;
         } catch (RegularWrongStartDate e) {
-            result.resultCode = RC_REGULAR_WRONG_START_DATE
+            result.resultCode = RC_REGULAR_WRONG_START_DATE;
             result.description = RC_REGULAR_WRONG_DATE_DESC;
         } catch (Exception e) {
             logger.error("Error in putPreorderComplex", e);
