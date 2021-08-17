@@ -915,7 +915,8 @@ public class PreorderDAOService {
             if (regularComplex != null) {
                 if (regularComplex.getEnabled() && complex.getAmount() > 0) {
                     createRegularPreorder(client, regularComplex, complex.getAmount(), complex.getIdOfComplex(),
-                                date, true, null, guardianMobile, mobileGroupOnCreate);
+                                date, true, null, guardianMobile, mobileGroupOnCreate,
+                            regularStartDate);
 
                 } else {
                     deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date,
@@ -1141,7 +1142,8 @@ public class PreorderDAOService {
 
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
             Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
-            PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws Exception {
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate, Date regularStartDate) throws Exception {
+        if (regularComplex.getStartDate().before(regularStartDate)) throw new Exception("Неверная дата начала повтора");
         String menuDetailName = null;
         Long menuDetailPrice = null;
         String itemCode = null;
