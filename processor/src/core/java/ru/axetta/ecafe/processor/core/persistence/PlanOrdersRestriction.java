@@ -10,6 +10,7 @@ import java.util.Date;
  * Created by i.semenov on 27.01.2020.
  */
 public class PlanOrdersRestriction {
+    public static final int RESOLUTION_EXCLUDE = 0, RESOLUTION_INCLUDE = 1;
     private Long idOfPlanOrdersRestriction;
     private Long idOfClient;
     private Long idOfOrgOnCreate;

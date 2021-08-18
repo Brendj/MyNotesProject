@@ -41,17 +41,16 @@ class UpdatePlanOrderRestrictionsCommand {
 
     public List<PlanOrdersRestriction> updateClientPlanOrderRestrictions(long idOfClient,
             List<PlanOrderRestrictionDTO> updateItems, boolean notified) {
-
         if (!notified) {
-            // перезапись ограничений
-            return setClientPlanOrderRestrictions(idOfClient, updateItems);
+            // обновить ограничения
+            return updateClientPlanOrderRestrictions(idOfClient, updateItems);
         } else {
             // удаление ограничений от старой конф. поставщика
             return notifiedOldClientPlanOrderRestrictions(idOfClient, updateItems);
         }
     }
 
-    private List<PlanOrdersRestriction> setClientPlanOrderRestrictions(long idOfClient,
+    private List<PlanOrdersRestriction> updateClientPlanOrderRestrictions(long idOfClient,
             List<PlanOrderRestrictionDTO> updateItems) {
         if (updateItems == null || updateItems.isEmpty()) {
             return new ArrayList<>();
@@ -62,12 +61,10 @@ class UpdatePlanOrderRestrictionsCommand {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = checkClientOrRaiseError(idOfClient, session);
-            List<PlanOrdersRestriction> clientRestrictions = DAOUtils.getPlanOrdersRestrictionByClient(session,idOfClient);
-            List<PlanOrderRestrictionDTO> currentRestrictions = filterCurrentConfProviderRestrictions( client, updateItems);
-
+            List<PlanOrdersRestriction> clientRestrictions = DAOUtils.getPlanOrdersRestrictionByClient(session, idOfClient);
+            List<PlanOrderRestrictionDTO> currentRestrictions = filterCurrentRestrictions(client, updateItems);
             long nextVersion = getNextVersion(session);
-            List<PlanOrdersRestriction> updatedRestrictions = updateRestrictions(currentRestrictions, session, client, nextVersion, clientRestrictions);
-            deleteOldRestrictions(session, nextVersion, clientRestrictions, updatedRestrictions);
+            List<PlanOrdersRestriction> updatedRestrictions = updateRestrictions(currentRestrictions, session, nextVersion, clientRestrictions);
             session.flush();
             transaction.commit();
             transaction = null;
@@ -87,17 +84,7 @@ class UpdatePlanOrderRestrictionsCommand {
         return DAOUtils.nextVersionByTableWithoutLock(session, "cf_plan_orders_restrictions");
     }
 
-    private List<PlanOrderRestrictionDTO> filterCurrentConfProviderRestrictions(Client client, List<PlanOrderRestrictionDTO> updateItems) {
-        List<PlanOrderRestrictionDTO> oldRestrictions = filterOlderRestrictions(client, updateItems);
-        List<PlanOrderRestrictionDTO> result = new ArrayList<>(updateItems);
-        if (!oldRestrictions.isEmpty()) {
-            result.removeAll(oldRestrictions);
-        }
-        return result;
-    }
-
-    private List<PlanOrdersRestriction> notifiedOldClientPlanOrderRestrictions(long idOfClient,
-            List<PlanOrderRestrictionDTO> updateItems) {
+    private List<PlanOrdersRestriction> notifiedOldClientPlanOrderRestrictions(long idOfClient, List<PlanOrderRestrictionDTO> updateItems) {
         if (updateItems == null || updateItems.isEmpty()) {
             return new ArrayList<>();
         }
@@ -111,11 +98,9 @@ class UpdatePlanOrderRestrictionsCommand {
             List<PlanOrdersRestriction> result = new ArrayList<>();
             if (olderRestrictions.size() > 0) {
                 long nextVersion = getNextVersion(session);
-                List<PlanOrdersRestriction> currentRestrictions = DAOUtils.getPlanOrdersRestrictionByClient(session,
-                        idOfClient);
-
+                List<PlanOrdersRestriction> clientRestrictions = DAOUtils.getPlanOrdersRestrictionByClient(session, idOfClient);
                 for (PlanOrderRestrictionDTO item : olderRestrictions) {
-                    PlanOrdersRestriction foundItem = findRestrictionsByIdIn(currentRestrictions, item.getId());
+                    PlanOrdersRestriction foundItem = findRestrictionsByIdIn(clientRestrictions, item.getId());
                     if (foundItem != null && !foundItem.getDeletedState()) {
                         result.add(deleteRestriction(session, nextVersion, foundItem));
                     }
@@ -136,10 +121,18 @@ class UpdatePlanOrderRestrictionsCommand {
         }
     }
 
-    private List<PlanOrderRestrictionDTO> filterOlderRestrictions(Client client,
-            List<PlanOrderRestrictionDTO> updateItems) {
+    private List<PlanOrderRestrictionDTO> filterCurrentRestrictions(Client client, List<PlanOrderRestrictionDTO> restrictins) {
+        List<PlanOrderRestrictionDTO> oldRestrictions = filterOlderRestrictions(client, restrictins);
+        List<PlanOrderRestrictionDTO> result = new ArrayList<>(restrictins);
+        if (!oldRestrictions.isEmpty()) {
+            result.removeAll(oldRestrictions);
+        }
+        return result;
+    }
+
+    private List<PlanOrderRestrictionDTO> filterOlderRestrictions(Client client, List<PlanOrderRestrictionDTO> restrictions) {
         List<PlanOrderRestrictionDTO> result = new ArrayList<>();
-        for (PlanOrderRestrictionDTO item : updateItems) {
+        for (PlanOrderRestrictionDTO item : restrictions) {
             if (!client.getOrg().getIdOfOrg().equals(item.getIdOfOrg())) {
                 result.add(item);
             }
@@ -147,9 +140,17 @@ class UpdatePlanOrderRestrictionsCommand {
         return result;
     }
 
+    private PlanOrdersRestriction findRestrictionsByIdIn(List<PlanOrdersRestriction> restrictions, Long id) {
+        for (PlanOrdersRestriction restriction : restrictions) {
+            if (Objects.equals(restriction.getIdOfPlanOrdersRestriction(), id)) {
+                return restriction;
+            }
+        }
+        return null;
+    }
 
     private List<PlanOrdersRestriction> updateRestrictions(List<PlanOrderRestrictionDTO> updateItems, Session session,
-            Client client, long nextVersion, List<PlanOrdersRestriction> currentRestrictions) {
+            long nextVersion, List<PlanOrdersRestriction> currentRestrictions) {
         List<PlanOrdersRestriction> result = new ArrayList<>();
         for (PlanOrderRestrictionDTO item : updateItems) {
             if (item.getId() == null) {
@@ -178,7 +179,7 @@ class UpdatePlanOrderRestrictionsCommand {
             PlanOrdersRestriction foundUpdatedRestriction = findRestrictionsByIdIn(updatedRestrictions,
                     restriction.getIdOfPlanOrdersRestriction());
             if (foundUpdatedRestriction == null && !restriction.getDeletedState()
-                    && restriction.getResol() == 0 /*Exclude*/) {
+                    && restriction.getResol() == PlanOrdersRestriction.RESOLUTION_EXCLUDE) {
                 // если не прислали ограничение, значит оно устарело
                 deleteRestriction(session, nextVersion, restriction);
             }
@@ -195,14 +196,7 @@ class UpdatePlanOrderRestrictionsCommand {
         return client;
     }
 
-    private PlanOrdersRestriction findRestrictionsByIdIn(List<PlanOrdersRestriction> restrictions, Long id) {
-        for (PlanOrdersRestriction restriction : restrictions) {
-            if (Objects.equals(restriction.getIdOfPlanOrdersRestriction(), id)) {
-                return restriction;
-            }
-        }
-        return null;
-    }
+
 
     private PlanOrdersRestriction deleteRestriction(Session session, long nextVersion,
             PlanOrdersRestriction foundItem) {
@@ -217,7 +211,7 @@ class UpdatePlanOrderRestrictionsCommand {
     private PlanOrdersRestriction updateRestriction(Session session, long nextVersion,
             PlanOrdersRestriction currentItem, PlanOrderRestrictionDTO updateItem) {
         try {
-            if (Boolean.FALSE.equals(currentItem.getDeletedState()) && Objects.equals(currentItem.getResol(),
+            if (Objects.equals(currentItem.getDeletedState(), false) && Objects.equals(currentItem.getResol(),
                     updateItem.getResolution())) {
                 return currentItem;
             }
@@ -229,22 +223,23 @@ class UpdatePlanOrderRestrictionsCommand {
             return currentItem;
         } catch (Exception e) {
             logger.error("Error saving planOrdersRestriction item = " + updateItem.toString(), e);
-            throw new WebApplicationException("Error saving planOrdersRestriction item = " + updateItem.toString());
+            throw new WebApplicationException("Error saving planOrdersRestriction item = " + updateItem);
         }
     }
 
-    private PlanOrdersRestriction createNewRestriction(Session session, long nextVersion, PlanOrderRestrictionDTO updateItem) {
+    private PlanOrdersRestriction createNewRestriction(Session session, long nextVersion,
+            PlanOrderRestrictionDTO updateItem) {
         try {
-            WtComplex complex = (WtComplex)session.load(WtComplex.class, updateItem.getComplexId());
+            WtComplex complex = (WtComplex) session.load(WtComplex.class, updateItem.getComplexId());
             if (complex == null) {
-                throw WebApplicationException.notFound(404, String.format("Комплекс с ид: '%d' не найден",updateItem.getComplexId()));
+                throw WebApplicationException.notFound(404,
+                        String.format("Комплекс с ид: '%d' не найден", updateItem.getComplexId()));
             }
             PlanOrdersRestrictionType planOrdersRestrictionType = PlanOrdersRestrictionType.fromInteger(
                     updateItem.getPlanType());
             if (planOrdersRestrictionType == null) {
                 planOrdersRestrictionType = PlanOrdersRestrictionType.LP;
             }
-
             PlanOrdersRestriction planOrdersRestriction = new PlanOrdersRestriction();
             planOrdersRestriction.setIdOfClient(updateItem.getIdOfClient());
             planOrdersRestriction.setIdOfOrgOnCreate(updateItem.getIdOfOrg());
