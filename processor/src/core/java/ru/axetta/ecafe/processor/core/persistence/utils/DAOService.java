@@ -3191,7 +3191,7 @@ public class DAOService {
     }
     public void updateExemptionVisiting() {
         Query query = entityManager.createQuery(
-                "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate");
+                "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate and archive=false");
         query.setParameter("currentDate", CalendarUtils.startOfDay(new Date()));
         query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
         query.executeUpdate();
