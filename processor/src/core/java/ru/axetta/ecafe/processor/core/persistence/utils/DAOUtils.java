@@ -2019,14 +2019,14 @@ public class DAOUtils {
         session.save(emias);
     }
 
-    public static void saveEMIASkafka(Session session, LiberateClientsList liberateClientsList) {
+    public static void saveEMIASkafka(Session session, LiberateClientsList liberateClientsList, String meshGuid) {
         Long version = getMaxVersionEMIAS(session, true);
 
         EMIAS emias = new EMIAS();
         emias.setKafka(true);
         emias.setProcessed(true);
         emias.setIdemias(liberateClientsList.getIdEventEMIAS().toString());
-        emias.setGuid(liberateClientsList.getGuid());
+        emias.setGuid(meshGuid);
         //mias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
         emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
         emias.setDateLiberate(liberateClientsList.getDateLiberate());

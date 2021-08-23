@@ -276,9 +276,6 @@ public class EMIASController extends HttpServlet {
                         continue;
                     }
                 }
-                else {
-                    emias = DAOUtils.getEmiasbyMeshGuid(cl.getMeshGUID(), persistenceSession);
-                }
 
                 Integer eventsStatus = -1;
                 boolean goodIdEmias = true;
@@ -294,7 +291,7 @@ public class EMIASController extends HttpServlet {
                         if (usedOld)
                             DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
                         else
-                            DAOUtils.saveEMIASkafka(persistenceSession, liberateClientsList);
+                            DAOUtils.saveEMIASkafka(persistenceSession, liberateClientsList, cl.getMeshGUID());
                         eventsStatus = 2;
                         break;
                     case 2:
@@ -309,6 +306,7 @@ public class EMIASController extends HttpServlet {
                                 DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
                             else
                             {
+                                emias = DAOUtils.getEmiasbyMeshGuid(cl.getMeshGUID(), persistenceSession);
                                 for (EMIAS emias1: emias)
                                 {
                                     if (emias1.getIdemias().equals(liberateClientsList.getIdEventCancelEMIAS().toString()))
@@ -324,7 +322,7 @@ public class EMIASController extends HttpServlet {
                         if (usedOld)
                             DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
                         else
-                            DAOUtils.saveEMIASkafka(persistenceSession, liberateClientsList);
+                            DAOUtils.saveEMIASkafka(persistenceSession, liberateClientsList, cl.getMeshGUID());
                         eventsStatus = 4;
                         break;
                     case 4:
@@ -339,6 +337,7 @@ public class EMIASController extends HttpServlet {
                                 DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
                             else
                             {
+                                emias = DAOUtils.getEmiasbyMeshGuid(cl.getMeshGUID(), persistenceSession);
                                 for (EMIAS emias1: emias)
                                 {
                                     if (emias1.getIdemias().equals(liberateClientsList.getIdEventCancelEMIAS().toString()))
