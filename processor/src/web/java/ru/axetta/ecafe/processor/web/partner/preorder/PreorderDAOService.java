@@ -782,12 +782,8 @@ public class PreorderDAOService {
         }
     }
 
-    private boolean isEditedDay(Date date, Client client) throws Exception {
+    private boolean isEditedDay(Date date, Client client, Map<String, Integer[]> sd) throws Exception {
         boolean result = false;
-        Date today = CalendarUtils.startOfDay(new Date());
-        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
-        Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
-                client.getOrg().getIdOfOrg(), client);
         for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
             if (date.equals(CalendarUtils.parseDate(entry.getKey()))) {
                 result = (entry.getValue())[0].equals(0);
@@ -795,6 +791,21 @@ public class PreorderDAOService {
             }
         }
         return result;
+    }
+
+    private Date getFirstAvailableDateForRegular(Map<String, Integer[]> sd) throws Exception {
+        for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
+            if ((entry.getValue())[0].equals(0)) return CalendarUtils.parseDate(entry.getKey());
+        }
+        return null;
+    }
+
+    private boolean isEditedDay(Date date, Client client) throws Exception {
+        Date today = CalendarUtils.startOfDay(new Date());
+        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
+        Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
+                client.getOrg().getIdOfOrg(), client);
+        return isEditedDay(date, client, sd);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -859,7 +870,12 @@ public class PreorderDAOService {
             }
         }
 
-        if (!isEditedDay(date, client)) throw new NotEditedDayException("День недоступен для редактирования предзаказа");
+        Date today = CalendarUtils.startOfDay(new Date());
+        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
+        Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
+                client.getOrg().getIdOfOrg(), client);
+        if (!isEditedDay(date, client, sd)) throw new NotEditedDayException("День недоступен для редактирования предзаказа");
+        Date regularStartDate = getFirstAvailableDateForRegular(sd);
 
         Query queryComplexSelect = em.createQuery("select p from PreorderComplex p "
                 + "where p.client.idOfClient = :idOfClient and p.armComplexId = :idOfComplexInfo "
@@ -899,7 +915,8 @@ public class PreorderDAOService {
             if (regularComplex != null) {
                 if (regularComplex.getEnabled() && complex.getAmount() > 0) {
                     createRegularPreorder(client, regularComplex, complex.getAmount(), complex.getIdOfComplex(),
-                                date, true, null, guardianMobile, mobileGroupOnCreate);
+                                date, true, null, guardianMobile, mobileGroupOnCreate,
+                            regularStartDate);
 
                 } else {
                     deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date,
@@ -949,7 +966,8 @@ public class PreorderDAOService {
                     if (regularMenuItem != null) {
                         if (regularMenuItem.getEnabled() && menuItem.getAmount() > 0) {
                             createRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
-                                        false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreate);
+                                        false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreate,
+                                    regularStartDate);
                         } else {
                             deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(),
                                         date, guardianMobile, regularMenuItem.getStartDate(), regularMenuItem.getEndDate(), isWtMenu);
@@ -1125,7 +1143,11 @@ public class PreorderDAOService {
 
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
             Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
-            PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws Exception {
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate, Date regularStartDate) throws Exception {
+        if (regularStartDate == null ||
+                RegularPreorder.convertDate(regularComplex.getStartDate()).before(regularStartDate)) {
+            throw new RegularWrongStartDate("Неверная дата начала повтора");
+        }
         String menuDetailName = null;
         Long menuDetailPrice = null;
         String itemCode = null;

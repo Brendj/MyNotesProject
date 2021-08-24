@@ -195,6 +195,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_WRONG_GROUP = 710L;
     private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
     private static final Long RC_REGULAR_ALREADY_DELETED = 712L;
+    private static final Long RC_REGULAR_WRONG_START_DATE = 713L;
     private static final Long RC_INVALID_CREATOR = 720L;
 
 
@@ -251,6 +252,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
     private static final String RC_REGULAR_ALREADY_DELETED_DESC = "Для выбранного комплекса или блюда не настроен повтор заказа";
+    private static final String RC_REGULAR_WRONG_DATE_DESC = "На выбранную дату начала повтора невозможно создать предзаказ";
     private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
     private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
     private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
@@ -10213,6 +10215,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } catch (RegularAlreadyDeleted e) {
             result.resultCode = RC_REGULAR_ALREADY_DELETED;
             result.description = RC_REGULAR_ALREADY_DELETED_DESC;
+        } catch (RegularWrongStartDate e) {
+            result.resultCode = RC_REGULAR_WRONG_START_DATE;
+            result.description = RC_REGULAR_WRONG_DATE_DESC;
         } catch (Exception e) {
             logger.error("Error in putPreorderComplex", e);
             result.resultCode = RC_INTERNAL_ERROR;
