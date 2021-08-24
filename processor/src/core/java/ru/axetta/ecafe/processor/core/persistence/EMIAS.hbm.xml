@@ -28,6 +28,7 @@
         <property name="kafka" column="kafka" type="boolean"/>
         <property name="archive" column="archive" type="boolean"/>
         <property name="hazard_level_id" column="hazard_level_id" type="integer"/>
+        <property name="idemias" column="idemias" type="string"/>
         <property name="processed" column="processed" type="boolean"/>
         <property name="acceptedDateTime" column="acceptedDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>
