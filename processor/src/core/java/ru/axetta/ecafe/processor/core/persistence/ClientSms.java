@@ -37,7 +37,7 @@ public class ClientSms {
             "Возврат билета в музей", //15 - TYPE_NOENTER_MUSEUM_NOTIFICATION
             "Генерация нового пароля", //16 - TYPE_CLIENT_NEWPASSWORD_NOTIFICATION
             "Уведомление об окончании подписки на автопополнение л/с", //17 - TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION
-            "Уведомление ЕМИАС", //18 - TYPE_SPECIAL(SICK)
+            "Приостановка предоставления льготного питания", //18 - TYPE_SPECIAL(SICK)
             "Окончание срока действия льготы", //19 - TYPE_CLIENT_END_BENEFIT_NOTIFICATION
             "Отказ в предоставлении услуги получения льготного питания", //20 - TYPE_CLIENT_PREFERENTIAL_FOOD_NOTIFICATION
             "Посещение здания культуры", //21 - TYPE_ENTER_CULTURE_NOTIFICATION

@@ -182,8 +182,11 @@ public class ClientSmsList {
         }*/
 
         public String getContentsTypeAsString() {
-            if (contentsType >= 0 && contentsType < ClientSms.CONTENTS_TYPE_DESCRIPTION.length) {
-                return ClientSms.CONTENTS_TYPE_DESCRIPTION[contentsType];
+            Integer contentTypeInternal = contentsType;
+            if (contentTypeInternal >= 0 && contentTypeInternal < (ClientSms.CONTENTS_TYPE_DESCRIPTION.length + 4)) { //4 - это все ЕМИАС, которые уже включены в 18
+                if (contentTypeInternal > 24 && contentTypeInternal < 29) //Если это одно из событий ЕМИАС, то это тип SPECIAL
+                    contentTypeInternal = 18;
+                return ClientSms.CONTENTS_TYPE_DESCRIPTION[contentTypeInternal];
             }
             return ClientSms.UNKNOWN_CONTENTS_TYPE_DESCRIPTION;
         }
@@ -261,6 +264,23 @@ public class ClientSmsList {
                         contactid = contactid.substring(0,contactid.indexOf(" ") - 2);
                         String squery ="select idofclient from cf_clients where contractid=" + contactid;
                         query = session.createSQLQuery(squery);
+                    }
+
+                    //При специальном типе
+                    if (contentsType >= ClientSms.TYPE_NOTIFICATION_START_SICK &&
+                            contentsType <= ClientSms.TYPE_NOTIFICATION_CANCEL_END_SICK) {
+                        try{
+                            ClientSmsNodeLogging clientSmsNodeLogging = DAOUtils.findSmsNodeLogging(session, this.idOfSms.trim());
+                            String contactid = clientSmsNodeLogging.getParams();
+                            String cons = "account;value:";
+                            contactid = contactid.substring(contactid.indexOf(cons) + cons.length());
+                            contactid = contactid.substring(0,contactid.indexOf(";"));
+                            String squery ="select idofclient from cf_clients where contractid=" + contactid;
+                            query = session.createSQLQuery(squery);
+                        } catch (Exception e)
+                        {
+                            query = null;
+                        }
                     }
                 }
                 if (query != null) {

@@ -28,6 +28,7 @@ public class EMIAS {
     private Boolean kafka;
     private Boolean archive;
     private Integer hazard_level_id;
+    private String idemias;
     private Boolean processed;
     private Date acceptedDateTime;
 
@@ -168,5 +169,13 @@ public class EMIAS {
 
     public void setAcceptedDateTime(Date acceptedDateTime) {
         this.acceptedDateTime = acceptedDateTime;
+    }
+
+    public String getIdemias() {
+        return idemias;
+    }
+
+    public void setIdemias(String idemias) {
+        this.idemias = idemias;
     }
 }
