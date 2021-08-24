@@ -317,7 +317,7 @@ public class PreorderDAOService {
             // 7-9, 11-12 Платные комплексы по возрастным группам и группам
             if (complexSign.get("Paid")) {
                 ageGroupIds.add(7L); // Все
-                Set<WtComplex> wtComComplexes = getPaidWtComplexesByAgeGroupsAndPortal(startDate, endDate, ageGroupIds,
+                Set<WtComplex> wtComComplexes = getPaidWtComplexesByAgeGroupsAndPortal(startDate, startDate, ageGroupIds,
                         org);
                 if (wtComComplexes.size() > 0) {
                     wtComplexes.addAll(wtComComplexes);
@@ -3374,7 +3374,7 @@ public class PreorderDAOService {
                         + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "WHERE complex.isPortal = true AND complex.deleteState = 0 "
                         + "AND complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
-                        + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
+                        + "AND complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) "
                         + "AND (complex.wtComplexGroupItem.idOfComplexGroupItem = :paidComplex OR "
                         + "complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
