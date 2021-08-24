@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +37,8 @@ public class EmiasInternal {
         {
             return Response.status(HttpURLConnection.HTTP_OK).entity(infoForEMPFromKafkaEmias).build();
         }
+        //Преобразуем даты в правильный формат
+        converDates(infoForEMPFromKafkaEmias);
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -82,5 +85,13 @@ public class EmiasInternal {
             }
         }
         return false;
+    }
+
+    private InfoForEMPFromKafkaEmias converDates(InfoForEMPFromKafkaEmias infoForEMPFromKafkaEmias)
+    {
+        infoForEMPFromKafkaEmias.setCreate_at(CalendarUtils.convertdateInUTC(infoForEMPFromKafkaEmias.getCreate_at()));
+        infoForEMPFromKafkaEmias.setStart_liberation(CalendarUtils.convertdateInUTC(infoForEMPFromKafkaEmias.getStart_liberation()));
+        infoForEMPFromKafkaEmias.setEnd_liberation(CalendarUtils.convertdateInUTC(infoForEMPFromKafkaEmias.getEnd_liberation()));
+        return infoForEMPFromKafkaEmias;
     }
 }
