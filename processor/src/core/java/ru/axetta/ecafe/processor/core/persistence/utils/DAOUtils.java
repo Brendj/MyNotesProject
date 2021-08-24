@@ -5604,4 +5604,15 @@ public class DAOUtils {
             return null;
         }
     }
+
+	public static ClientSmsNodeLogging findSmsNodeLogging(Session persistenceSession, String idOfSms) {
+        try {
+            Criteria criteria = persistenceSession.createCriteria(ClientSmsNodeLogging.class);
+            criteria.add(Restrictions.eq("idOfSms", idOfSms));
+            criteria.setMaxResults(1);
+            return (ClientSmsNodeLogging) criteria.uniqueResult();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
 }
