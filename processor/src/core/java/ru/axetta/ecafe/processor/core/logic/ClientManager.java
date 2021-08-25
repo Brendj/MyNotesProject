@@ -4,18 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
@@ -30,6 +18,19 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
+
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -1205,7 +1206,7 @@ public class ClientManager {
         fc.setValue(FieldId.SECONDNAME, secondName);
         fc.setValue(FieldId.GROUP, "Обучающиеся других ОО"); //todo переделать на новую константу из ClientGroup.Predefined
         fc.setValue(FieldId.EXTERNAL_ID, eszId);
-        fc.setValue(FieldId.CLIENT_GUID, clientGuid);
+        fc.setValue(FieldId.MESH_GUID, clientGuid);
         return ClientManager.registerClient(idOfESZOrg, fc, false, true, clientsMobileHistory);
     }
 
