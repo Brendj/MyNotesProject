@@ -23,6 +23,7 @@ public class ClientUpdateItem {
     private Date birthDate;
     private Boolean confirmVisualRecognition;
     private String mobile;
+    private PersonDTO person;
     private List<Long> categoriesDiscounts = new ArrayList<>();
 
     public static ClientUpdateItem from(Client client, ClientGroup clientGroup){
@@ -127,5 +128,13 @@ public class ClientUpdateItem {
 
     public void setUseLastEEModeForPlan(Boolean useLastEEModeForPlan) {
         this.useLastEEModeForPlan = useLastEEModeForPlan;
+    }
+
+    public PersonDTO getPerson() {
+        return person;
+    }
+
+    public void setPerson(PersonDTO person) {
+        this.person = person;
     }
 }

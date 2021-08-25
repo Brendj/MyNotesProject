@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateClientRegistryVersion;
 
@@ -30,6 +31,7 @@ class UpdateClientCommand {
     private final RuntimeContext runtimeContext;
     private final MoveClientsCommand moveClientsCommand;
     private static final int NOT_FOUND = 404, BAD_PARAMS = 400;
+    private final Pattern namePattern = Pattern.compile("[a-zA-Zа-яА-Я\\s-]+");
 
     @Autowired
     public UpdateClientCommand(RuntimeContext runtimeContext, MoveClientsCommand moveClientsCommand) {
@@ -54,8 +56,10 @@ class UpdateClientCommand {
             setBirthDate(request.getBirthDate(), client);
             setGender(request.getGender(), client);
             setConfirmVideo(request.getConfirmVisualRecognition(), client);
-            setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(), request.getUseLastEEModeForPlan(), client);
+            setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(),
+                    request.getUseLastEEModeForPlan(), client);
             setGroupAndMiddleGroup(request, client, session, user);
+            setPersonName(request, client);
             client.setUpdateTime(new Date());
             client.setClientRegistryVersion(version);
             session.update(client);
@@ -74,13 +78,47 @@ class UpdateClientCommand {
         }
     }
 
+    private void setPersonName(ClientUpdateItem request, Client client) {
+        if (request.getPerson() == null) {
+            return;
+        }
+        ClientGroup.Predefined predefinedGroup = ClientGroup.Predefined.parse(client.getIdOfClientGroup());
+        if (predefinedGroup == null) {
+            throw WebApplicationException.badRequest(400,
+                    "Изменить ФИО можно только для клиентов предопределенных групп");
+        }
+        if (validateName(request.getPerson().getSurname(), 128)) {
+            client.getPerson().setSurname(request.getPerson().getSurname().trim());
+        }
+        if (validateName(request.getPerson().getFirstName(), 64)) {
+            client.getPerson().setFirstName(request.getPerson().getFirstName().trim());
+        }
+        if (validateName(request.getPerson().getSecondName(), 128)) {
+            client.getPerson().setSecondName(request.getPerson().getSecondName().trim());
+        }
+    }
+
+    private boolean validateName(String name, int maxLength) {
+        if (StringUtils.isNotEmpty(name)) {
+            if (name.trim().length() > maxLength) {
+                throw new WebApplicationException(400,
+                        String.format("Превышен максимально допустимый размер имени, '%s' (%d символов)", name,
+                                maxLength));
+            }
+            return namePattern.matcher(name.trim()).matches();
+        } else {
+            return false;
+        }
+    }
+
     private void setGroupAndMiddleGroup(ClientUpdateItem request, Client client, Session session, User user) {
         if (request.getIdOfClientGroup() == null) {
             return;
         }
         if (!client.getIdOfClientGroup().equals(request.getIdOfClientGroup())) {
 
-            long idOfOrg = request.getIdOfOrg() != null ? request.getIdOfOrg() : client.getClientGroup().getCompositeIdOfClientGroup().getIdOfOrg();
+            long idOfOrg = request.getIdOfOrg() != null ? request.getIdOfOrg()
+                    : client.getClientGroup().getCompositeIdOfClientGroup().getIdOfOrg();
             ClientGroup moveToGroup = (ClientGroup) session.get(ClientGroup.class,
                     new CompositeIdOfClientGroup(idOfOrg, request.getIdOfClientGroup()));
             if (moveToGroup == null) {
@@ -93,16 +131,16 @@ class UpdateClientCommand {
                 throw new WebApplicationException(result);
             }
             // обновляем подгруппу если нужно
-            result = moveClientsCommand
-                    .updateMiddleGroupOrGetError(session, request.getIdOfClientGroup(), request.getIdOfMiddleGroup(),
-                            client);
+            result = moveClientsCommand.updateMiddleGroupOrGetError(session, request.getIdOfClientGroup(),
+                    request.getIdOfMiddleGroup(), client);
             if (StringUtils.isNotEmpty(result)) {
                 throw new WebApplicationException(result);
             }
         }
     }
 
-    private void setDisableFromPlan(Date startExcludeDate, Date endExcludedDate,Boolean useLastEEModeForPlan, Client client) {
+    private void setDisableFromPlan(Date startExcludeDate, Date endExcludedDate, Boolean useLastEEModeForPlan,
+            Client client) {
         if (useLastEEModeForPlan != null) {
             client.setUseLastEEModeForPlan(useLastEEModeForPlan);
         }

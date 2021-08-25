@@ -18,6 +18,8 @@ public enum ResponseCodes {
     GROUP_MANAGER_NOT_FOUND(105, "Руководитель группы не найден"),
     ORDER_REGISTER_ERROR(110, "Ошибка при регистрации заказа");
 
+
+
     private final int code;
     private final String description;
 
