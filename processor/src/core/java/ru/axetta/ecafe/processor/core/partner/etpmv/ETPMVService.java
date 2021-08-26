@@ -11,6 +11,7 @@ import generated.etp.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.ApplicationForFoodExistsException;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -154,7 +155,15 @@ public class ETPMVService {
             }
         }
         Long _benefit = yavl_lgot.equals(BENEFIT_INOE) ? null : RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefit);
-        daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber, ApplicationForFoodCreatorType.PORTAL);
+        try {
+            daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber,
+                    ApplicationForFoodCreatorType.PORTAL);
+        } catch (ApplicationForFoodExistsException e) {
+            logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
+            return;
+        }
+
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.TRY_TO_REGISTER, null);
         begin_time = System.currentTimeMillis();
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.REGISTERED, null);
@@ -185,7 +194,7 @@ public class ETPMVService {
         return false;
     }
 
-    private boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
+    public static boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DELIVERY_ERROR)) return true; //103099
         if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED)

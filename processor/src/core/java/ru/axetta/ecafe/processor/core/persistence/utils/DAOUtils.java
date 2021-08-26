@@ -4447,7 +4447,7 @@ public class DAOUtils {
 
     public static ApplicationForFood createApplicationForFood(Session session, Client client, Long dtisznCode,
             String mobile, String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
-            ApplicationForFoodCreatorType creatorType) {
+            ApplicationForFoodCreatorType creatorType) throws Exception {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
         Long historyVersion = nextVersionByApplicationForFoodHistory(session);
         return createApplicationForFoodWithVersion(session, client, dtisznCode, mobile, guardianName,
@@ -4457,7 +4457,13 @@ public class DAOUtils {
 
     public static ApplicationForFood createApplicationForFoodWithVersion(Session session, Client client,
             Long dtisznCode, String mobile, String guardianName, String guardianSecondName, String guardianSurname,
-            String serviceNumber, ApplicationForFoodCreatorType creatorType, Long version, Long historyVersion) {
+            String serviceNumber, ApplicationForFoodCreatorType creatorType, Long version, Long historyVersion) throws Exception {
+        //Дополнительно проверяем на существование заявления перед созданием нового
+        List<ApplicationForFood> existingApps = getApplicationForFoodByClient(session, client);
+        if (!allowedCreateNewApplicationForFood(existingApps)) {
+            throw new ApplicationForFoodExistsException("Существует ранее поданное заявление");
+        }
+
         ApplicationForFood applicationForFood = new ApplicationForFood(client, dtisznCode,
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), mobile, guardianName,
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version);
@@ -4467,6 +4473,15 @@ public class DAOUtils {
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), historyVersion);
 
         return applicationForFood;
+    }
+
+    public static boolean allowedCreateNewApplicationForFood(List<ApplicationForFood> existingApps) {
+        for (ApplicationForFood applicationForFood : existingApps) {
+            if (!ETPMVService.testForApplicationForFoodStatus(applicationForFood)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static ApplicationForFood updateApplicationForFood(Session session, Client client,
