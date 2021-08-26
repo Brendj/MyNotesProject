@@ -102,7 +102,7 @@ public class ETPMVDaoService {
 
     @Transactional(readOnly = true)
     public ApplicationForFood findApplicationForFood(String guid) {
-        Query query = entityManager.createQuery("select a from ApplicationForFood a where a.client.clientGUID = :guid order by a.createdDate desc");
+        Query query = entityManager.createQuery("select a from ApplicationForFood a where a.client.meshGUID = :guid order by a.createdDate desc");
         query.setParameter("guid", guid);
         query.setMaxResults(1);
         try {
@@ -115,7 +115,7 @@ public class ETPMVDaoService {
     @Transactional
     public void createApplicationForGood(Client client, Long dtisznCode, String mobile,
             String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
-            ApplicationForFoodCreatorType creatorType) {
+            ApplicationForFoodCreatorType creatorType) throws Exception {
         Session session = entityManager.unwrap(Session.class);
         DAOUtils.createApplicationForFood(session, client, dtisznCode, mobile,
                 guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType);
