@@ -1201,7 +1201,8 @@ public class PreorderDAOService {
 
     private void deleteRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfMenu, Date date,
             String guardianMobile, Date startDate, Date endDate, boolean isWtMenu) throws Exception {
-        String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : " and m.itemCode = :itemCode ";
+        String detailCondition = isWtMenu ? " and m.idOfDish = :idOfDish " : " and m.itemCode = :itemCode ";
+        String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : detailCondition;
         Query regularPreorderSelect = em.createQuery("select m from RegularPreorder m "
                 + "where m.client = :client " + condition + " and m.deletedState = false and m.startDate = :startDate "
                 + "and m.endDate = :endDate");
