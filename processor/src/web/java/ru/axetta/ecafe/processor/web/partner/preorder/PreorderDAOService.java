@@ -1168,7 +1168,7 @@ public class PreorderDAOService {
         else {
             if (!isWtMenu) {
                 MenuDetail md = getMenuDetail(client, idOfMenu, date);
-                if (md == null) return;
+                if (md == null) throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
                 menuDetailName = md.getMenuDetailName();
                 menuDetailPrice = md.getPrice();
                 itemCode = md.getItemCode();
