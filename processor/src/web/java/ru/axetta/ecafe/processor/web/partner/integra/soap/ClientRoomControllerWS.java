@@ -253,7 +253,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
     private static final String RC_REGULAR_ALREADY_DELETED_DESC = "Для выбранного комплекса или блюда не настроен повтор заказа";
-    private static final String RC_REGULAR_EXISTS_DESC = "Уже существут повтор заказа с выбранными параметрами";
+    private static final String RC_REGULAR_EXISTS_DESC = "Уже существует повтор заказа с выбранными параметрами";
     private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
     private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
     private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
