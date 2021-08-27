@@ -32,6 +32,7 @@ class UpdateClientCommand {
     private final MoveClientsCommand moveClientsCommand;
     private static final int NOT_FOUND = 404, BAD_PARAMS = 400;
     private final Pattern namePattern = Pattern.compile("[a-zA-Zа-яА-Я\\s-]+");
+    private final Pattern secondNamePattern = Pattern.compile("[a-zA-Zа-яА-Я\\s-]*");
 
     @Autowired
     public UpdateClientCommand(RuntimeContext runtimeContext, MoveClientsCommand moveClientsCommand) {
@@ -93,8 +94,13 @@ class UpdateClientCommand {
         if (validateName(request.getPerson().getFirstName(), 64)) {
             client.getPerson().setFirstName(request.getPerson().getFirstName().trim());
         }
-        if (validateName(request.getPerson().getSecondName(), 128)) {
-            client.getPerson().setSecondName(request.getPerson().getSecondName().trim());
+        if (StringUtils.isNotEmpty(request.getPerson().getSecondName())) {
+            if (validateName(request.getPerson().getSecondName(), 128)) {
+                client.getPerson().setSecondName(request.getPerson().getSecondName().trim());
+            }
+        }
+        else {
+            client.getPerson().setSecondName("");
         }
     }
 
