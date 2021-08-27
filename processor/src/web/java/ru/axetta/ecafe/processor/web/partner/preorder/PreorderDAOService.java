@@ -1040,7 +1040,6 @@ public class PreorderDAOService {
         }
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
     private void updateMobileGroupOnCreateOnMenuDetails(PreorderComplex preorderComplex, String mobile,
             PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         Query query = em.createQuery("update PreorderMenuDetail pmd set pmd.mobile = :mobile, pmd.mobileGroupOnCreate = :mobileGroupOnCreate "
@@ -1058,7 +1057,7 @@ public class PreorderDAOService {
                 && regularComplex.getThursday().equals(regularPreorder.getThursday())
                 && regularComplex.getFriday().equals(regularPreorder.getFriday())
                 && regularComplex.getSaturday().equals(regularPreorder.getSaturday())
-                //&& regularComplex.getStartDate().equals(regularPreorder.getStartDate())
+                && CalendarUtils.startOfDay(regularComplex.getStartDate()).equals(CalendarUtils.startOfDay(regularPreorder.getStartDate()))
                 && CalendarUtils.startOfDay(regularComplex.getEndDate()).equals(CalendarUtils.startOfDay(regularPreorder.getEndDate()));
     }
 
