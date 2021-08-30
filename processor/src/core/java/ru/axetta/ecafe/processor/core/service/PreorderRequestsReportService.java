@@ -180,6 +180,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                         try {
                             transaction = session.beginTransaction();
                             List<PreorderItem> preordersByOrg = getPreorderItemsByOrg(idOfOrg, preorderItemList, dateWork); //предзаказы по ОО на дату
+                            logger.info(String.format("Found % preorders on %s", preordersByOrg.size(), CalendarUtils.dateToString(dateWork)));
                             for (PreorderItem item : preordersByOrg) {
                                 try {
                                     Org org = DAOUtils.getOrgById(session, idOfOrg);
@@ -530,11 +531,16 @@ public class PreorderRequestsReportService extends RecoverableService {
         Org org = DAOUtils.getOrgById(session, preorderItem.getIdOfOrg());
         if (!org.getUseWebArm()) {
             good = DAOService.getInstance().getGood(preorderItem.getIdOfGood());
-            if (null == good)
+            if (null == good) {
+                logger.info(String.format("Not found good for preorder id = %s", preorderItem.getIdOfPreorderComplex()));
                 return null;
+            }
         }
-        if (null == staff)
+        if (null == staff) {
+            logger.info(String.format("Not found staff admin for org id = %s, preorder id = %s",
+                    org.getIdOfOrg(), preorderItem.getIdOfPreorderComplex()));
             return null;
+        }
 
         GoodRequest goodRequest = new GoodRequest();
         goodRequest.setOrgOwner(preorderItem.getIdOfOrg());
