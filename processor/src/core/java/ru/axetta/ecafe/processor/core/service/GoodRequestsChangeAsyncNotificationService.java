@@ -652,6 +652,26 @@ public class GoodRequestsChangeAsyncNotificationService {
         return items;
     }
 
+    @Transactional(readOnly = true)
+    public Map<Long, Set<Long>> findOrgSetForContragent(PreorderRequestsReportServiceParam params) {
+        Map<Long, Set<Long>> contragentMap = new HashMap<>();
+        String strQuery = "select o.idOfOrg, o.defaultSupplier.id from Org o where o.useWebArm = true "
+                + params.getWtMenuJPACondition() + " order by o.idOfOrg";
+        Query query = entityManager.createQuery(strQuery);
+        List data = query.getResultList();
+        for (Object entry : data) {
+            Object[] row = (Object[]) entry;
+            Long idOfOrg = (null != row[0]) ? Long.valueOf(row[0].toString()) : null;
+            Long idOfContragent = (null != row[1]) ? Long.valueOf(row[1].toString()) : null;
+            if (idOfOrg != null && idOfContragent != null) {
+                if (!contragentMap.containsKey(idOfContragent)) {
+                    contragentMap.put(idOfContragent, new HashSet<Long>());
+                }
+                contragentMap.get(idOfContragent).add(idOfOrg);
+            }
+        }
+        return contragentMap;
+    }
 
     public List<Date> getProductionCalendarDates(Date date) {
         return entityManager.createQuery("select pc.day from ProductionCalendar pc where pc.day between :date1 and :date2")
