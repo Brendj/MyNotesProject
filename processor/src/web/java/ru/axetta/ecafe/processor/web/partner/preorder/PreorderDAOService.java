@@ -1167,7 +1167,7 @@ public class PreorderDAOService {
         else {
             if (!isWtMenu) {
                 MenuDetail md = getMenuDetail(client, idOfMenu, date);
-                if (md == null) return;
+                if (md == null) throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
                 menuDetailName = md.getMenuDetailName();
                 menuDetailPrice = md.getPrice();
                 itemCode = md.getItemCode();
@@ -1200,7 +1200,8 @@ public class PreorderDAOService {
 
     private void deleteRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfMenu, Date date,
             String guardianMobile, Date startDate, Date endDate, boolean isWtMenu) throws Exception {
-        String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : " and m.itemCode = :itemCode ";
+        String detailCondition = isWtMenu ? " and m.idOfDish = :idOfDish " : " and m.itemCode = :itemCode ";
+        String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : detailCondition;
         Query regularPreorderSelect = em.createQuery("select m from RegularPreorder m "
                 + "where m.client = :client " + condition + " and m.deletedState = false and m.startDate = :startDate "
                 + "and m.endDate = :endDate");
