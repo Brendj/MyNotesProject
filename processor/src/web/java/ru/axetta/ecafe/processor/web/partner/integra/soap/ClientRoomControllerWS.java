@@ -4,19 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.message.Message;
-import org.hibernate.*;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -93,6 +80,20 @@ import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.message.Message;
+import org.hibernate.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -2808,23 +2809,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
             menuDateItemExt.setDate(toXmlDateTime(menuDate));
-            Set<WtDish> wtDishSet = new HashSet<>();
+            Set<WtDishInfo> wtDishSet = new HashSet<>();
 
             for (WtMenu menu : menus) {
                 if (nRecs++ > MAX_RECS) {
                     break;
                 }
-                List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                List<WtDishInfo> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .getWtDishesByMenuAndDates(menu, menuDate, menuDate);
                 if (wtDishes != null && wtDishes.size() > 0) {
                     wtDishSet.addAll(wtDishes);
                 }
             }
-
+            Map<Long, Set<String>> menuGroups = DAOReadonlyService.getInstance().getWtMenuGroupsForAllDishes(org.getIdOfOrg());
             if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
-                for (WtDish wtDish : wtDishSet) {
-                    List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDish, false);
+                for (WtDishInfo wtDishInfo : wtDishSet) {
+                    List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDishInfo, false, menuGroups);
                     menuDateItemExt.getE().addAll(menuItemExt);
                 }
             }
@@ -3608,24 +3609,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             WtMenu menu = (WtMenu) currObject;
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
 
-            List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+            List<WtDishInfo> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtDishesByMenuAndDates(menu, startDate, endDate);
 
+            Map<Long, Set<String>> menuGroups = DAOReadonlyService.getInstance().getWtMenuGroupsForAllDishes(client.getOrg().getIdOfOrg());
             if (wtDishes != null && wtDishes.size() > 0) {
                 menuDateItemExt.setDate(toXmlDateTime(startDate));
-                for (WtDish wtDish : wtDishes) {
-                    List<MenuItemExt> menuItemExtList = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(), wtDish, false);
+                for (WtDishInfo wtDishInfo : wtDishes) {
+                    List<MenuItemExt> menuItemExtList = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(),
+                            wtDishInfo, false, menuGroups);
                     // Добавляем блокировки
                     for (MenuItemExt menuItemExt : menuItemExtList) {
                         if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
                             menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
                         } else {
-                            if (ProhibitByName.containsKey(wtDish.getDishName())) {
-                                menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                            if (ProhibitByName.containsKey(wtDishInfo.getDishName())) {
+                                menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDishInfo.getDishName()));
                             } else {
                                 //пробегаться в цикле.
                                 for (String filter : ProhibitByFilter.keySet()) {
-                                    if (wtDish.getDishName().contains(filter)) {
+                                    if (wtDishInfo.getDishName().contains(filter)) {
                                         menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
                                     }
                                 }
@@ -7081,32 +7084,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDish, true);
+                WtDishInfo wtDishInfo = new WtDishInfo(wtDish);
+                List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDishInfo, true, null);
                 menuItemExtList.addAll(menuItemExt);
             }
         }
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDish wtDish, boolean isGroupByCategory) {
+    private List<MenuItemExt> getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDishInfo wtDishInfo,
+            boolean isGroupByCategory, Map<Long, Set<String>> menuGroups) {
         List<MenuItemExt> result = new ArrayList<>();
         Set<String> menuGroupSet = null;
         if (isGroupByCategory) {
-            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
+            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDishInfo);
         } else {
-            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(idOfOrg, wtDish);
+            menuGroupSet = menuGroups.get(wtDishInfo.getIdOfDish());
         }
         for (String menuGroup : menuGroupSet) {
             MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
             menuItemExt.setGroup(menuGroup);
-            menuItemExt.setName(wtDish.getDishName());
-            menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
-            menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
-            menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+            menuItemExt.setName(wtDishInfo.getDishName());
+            menuItemExt.setPrice(wtDishInfo.getPrice());
+            menuItemExt.setCalories(wtDishInfo.getCalories() == null ? (double) 0 : wtDishInfo.getCalories().doubleValue());
+            menuItemExt.setOutput(wtDishInfo.getQty() == null ? "" : wtDishInfo.getQty());
             menuItemExt.setAvailableNow(1);
-            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
-            menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
-            menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+            menuItemExt.setCarbohydrates(wtDishInfo.getCarbohydrates() == null ? (double) 0 : wtDishInfo.getCarbohydrates().doubleValue());
+            menuItemExt.setFat(wtDishInfo.getFat() == null ? (double) 0 : wtDishInfo.getFat().doubleValue());
+            menuItemExt.setProtein(wtDishInfo.getProtein() == null ? (double) 0 : wtDishInfo.getProtein().doubleValue());
             menuItemExt.setVitB1(0.0);
             menuItemExt.setVitB2(0.0);
             menuItemExt.setVitPp(0.0);
@@ -7117,8 +7122,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             menuItemExt.setMinP(0.0);
             menuItemExt.setMinMg(0.0);
             menuItemExt.setMinFe(0.0);
-            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-            menuItemExt.setFullName(wtDish.getComponentsOfDish());
+            menuItemExt.setIdOfMenuDetail(wtDishInfo.getIdOfDish());
+            menuItemExt.setFullName(wtDishInfo.getComponentsOfDish());
             result.add(menuItemExt);
         }
         return result;

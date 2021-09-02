@@ -19,10 +19,7 @@ import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientWithAddInfo;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientsWithResultCode;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderAllComplexesOnDateResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderAllComplexesResult;
@@ -646,25 +643,26 @@ public class PreorderDAOService {
         return menuItemExtList;
     }
 
-    private List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
-        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(wtDish);
+    private List<WtCategoryItem> getCategoryItemsByWtDish(WtDishInfo wtDishInfo) {
+        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(wtDishInfo.getIdOfDish());
     }
 
-    public Set<String> getWtMenuGroupByWtDish(Long idOfOrg, WtDish wtDish) {
-        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getWtMenuGroupByWtDish(idOfOrg, wtDish);
+    public Set<String> getWtMenuGroupByWtDish(Long idOfOrg, WtDishInfo wtDishInfo) {
+        return RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getWtMenuGroupByWtDish(idOfOrg, wtDishInfo.getIdOfDish());
     }
 
     public String getMenuGroupByWtDishAndCategoriesAsString(WtDish wtDish) {
-        Set<String> set = getMenuGroupByWtDishAndCategories(wtDish);
+        WtDishInfo wtDishInfo = new WtDishInfo(wtDish);
+        Set<String> set = getMenuGroupByWtDishAndCategories(wtDishInfo);
         for(String str: set) {
             return str;
         }
         return "";
     }
 
-    public Set<String> getMenuGroupByWtDishAndCategories(WtDish wtDish) {
+    public Set<String> getMenuGroupByWtDishAndCategories(WtDishInfo wtDishInfo) {
         StringBuilder sb = new StringBuilder();
-        List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDish);
+        List<WtCategoryItem> items = getCategoryItemsByWtDish(wtDishInfo);
         if (items != null && items.size() > 0) {
             for (WtCategoryItem ci : items) {
                 sb.append(ci.getDescription()).append(",");
@@ -3102,11 +3100,13 @@ public class PreorderDAOService {
         return query.getResultList();
     }
 
-    public List<WtDish> getWtDishesByMenuAndDates(WtMenu menu, Date startDate, Date endDate) {
+    public List<WtDishInfo> getWtDishesByMenuAndDates(WtMenu menu, Date startDate, Date endDate) {
         List<Long> groupTypes = Arrays.asList(3L, 4L, 5L); // Буфет, Коммерческое питание, Все
-        List<WtDish> res = new ArrayList<>();
+        List<WtDishInfo> res = new ArrayList<>();
 
-        Query query = emReport.createNativeQuery("SELECT DISTINCT dish.idofdish FROM cf_wt_dishes dish "
+        Query query = emReport.createNativeQuery("SELECT DISTINCT dish.idofdish, dish.dishname, "
+                + "dish.price, dish.calories, dish.qty, dish.carbohydrates, dish.fat, dish.protein, dish.componentsofdish "
+                + "FROM cf_wt_dishes dish "
                 + "LEFT JOIN cf_wt_dish_groupitem_relationships groups ON dish.idofdish = groups.idofdish "
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgdr ON dish.idofdish = mgdr.idofdish "
                 + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgdr.idofmenumenugrouprelation = mgr.id "
@@ -3122,14 +3122,21 @@ public class PreorderDAOService {
         query.setParameter("endDate", endDate, TemporalType.DATE);
         query.setParameter("groupTypes", groupTypes);
 
-        List<BigInteger> tempRes = query.getResultList();
-        if (tempRes != null && !tempRes.isEmpty()) {
-            for (BigInteger id : tempRes) {
-                WtDish dish = getWtDishById(id.longValue());
-                if (dish != null) {
-                    res.add(dish);
-                }
-            }
+        List tempRes = query.getResultList();
+        for (Object o : tempRes) {
+            Object[] row = (Object[]) o;
+            Long idOfDish = ((BigInteger) row[0]).longValue();
+            String dishName = (String) row[1];
+            Long price = ((BigDecimal)row[2]).multiply(new BigDecimal(100)).longValue();
+            Integer calories = (Integer) row[3];
+            String qty = (String) row[4];
+            Integer carbohydrates = (Integer) row[5];
+            Integer fat = (Integer) row[6];
+            Integer protein = (Integer) row[7];
+            String componentsOfDish = (String) row[8];
+            WtDishInfo info = new WtDishInfo(idOfDish, dishName, price, calories, qty, carbohydrates,
+                    fat, protein, componentsOfDish);
+            res.add(info);
         }
         return res;
     }
