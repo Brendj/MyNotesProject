@@ -3128,11 +3128,11 @@ public class PreorderDAOService {
             Long idOfDish = ((BigInteger) row[0]).longValue();
             String dishName = (String) row[1];
             Long price = ((BigDecimal)row[2]).multiply(new BigDecimal(100)).longValue();
-            Integer calories = (Integer) row[3];
+            Integer calories = ((BigDecimal)row[3]).intValue();
             String qty = (String) row[4];
-            Integer carbohydrates = (Integer) row[5];
-            Integer fat = (Integer) row[6];
-            Integer protein = (Integer) row[7];
+            Integer carbohydrates = ((BigDecimal)row[5]).intValue();
+            Integer fat = ((BigDecimal)row[6]).intValue();
+            Integer protein = ((BigDecimal)row[7]).intValue();
             String componentsOfDish = (String) row[8];
             WtDishInfo info = new WtDishInfo(idOfDish, dishName, price, calories, qty, carbohydrates,
                     fat, protein, componentsOfDish);
