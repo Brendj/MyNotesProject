@@ -36,8 +36,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -180,7 +180,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                         try {
                             transaction = session.beginTransaction();
                             List<PreorderItem> preordersByOrg = getPreorderItemsByOrg(idOfOrg, preorderItemList, dateWork); //предзаказы по ОО на дату
-                            logger.info(String.format("Found % preorders on %s", preordersByOrg.size(), CalendarUtils.dateToString(dateWork)));
+                            logger.info(String.format("Found %s preorders on %s", preordersByOrg.size(), CalendarUtils.dateToString(dateWork)));
                             for (PreorderItem item : preordersByOrg) {
                                 try {
                                     Org org = DAOUtils.getOrgById(session, idOfOrg);
