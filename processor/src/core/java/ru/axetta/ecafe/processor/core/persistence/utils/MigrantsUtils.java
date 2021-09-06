@@ -156,9 +156,12 @@ public class MigrantsUtils {
         /*Query query = session.createQuery("select distinct v.migrant.clientMigrate from VisitReqResolutionHist v join fetch v.migrant m join fetch m.clientMigrate "
                 + "where m.orgVisit.idOfOrg = :idOfOrg and "
                 + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1 order by v.resolutionDateTime desc");*/
-        Query query = session.createQuery("select distinct m.clientMigrate from Migrant m join m.visitReqResolutionHists v "
+        Query query = session.createQuery("select distinct cl from Migrant m join m.visitReqResolutionHists v "
+                + "join m.clientMigrate cl "
                 + "where m.orgVisit.idOfOrg = :idOfOrg and "
+                + "(cl.clientGroup is null or cl.idOfClientGroup not in (:groups)) and "
                 + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1");
+        query.setParameterList("groups", Arrays.asList(ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_DELETED.getValue()));
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("date", new Date());
         List<Client> list = query.list();
