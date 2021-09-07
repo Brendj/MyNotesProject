@@ -27,10 +27,10 @@ import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotifica
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
-import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClient;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestProcessor;
@@ -6096,7 +6096,7 @@ public class Processor implements SyncProcessor {
         List<Client> clients;
         Org organization;
         List<Org> orgList;
-        List<Long> activeClientsId;
+        Set<Long> activeClientsId;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -6126,7 +6126,7 @@ public class Processor implements SyncProcessor {
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
                 }
             }
-            activeClientsId = findActiveClientsId(persistenceSession, orgList);
+            activeClientsId = new HashSet<>(findActiveClientsId(persistenceSession, orgList));
             // Получаем чужих клиентов.
             Map<String, Set<Client>> alienClients = ClientManager
                     .findAllocatedClients(persistenceSession, organization);
