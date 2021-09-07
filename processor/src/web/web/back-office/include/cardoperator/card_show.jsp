@@ -61,11 +61,6 @@
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
-    <a4j:status id="updateStatus">
-        <f:facet name="start">
-            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-        </f:facet>
-    </a4j:status>
     <rich:dataTable id="cardOperatorTable" value="#{cardOperatorPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
                     left-aligned-column, center-aligned-column, center-aligned-column"
