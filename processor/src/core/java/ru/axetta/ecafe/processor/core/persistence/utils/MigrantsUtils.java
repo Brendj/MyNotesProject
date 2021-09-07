@@ -159,7 +159,7 @@ public class MigrantsUtils {
         Query query = session.createQuery("select distinct m.clientMigrate from Migrant m join m.visitReqResolutionHists v "
                 + "where m.orgVisit.idOfOrg = :idOfOrg and "
                 + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1 and "
-                + "and v.resolutionDateTime = (select max(v2.resolutionDateTime) from VisitReqResolutionHist v2 where v2.migrant = m)");
+                + "v.resolutionDateTime = (select max(v2.resolutionDateTime) from VisitReqResolutionHist v2 where v2.migrant = m)");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("date", new Date());
         List<Client> list = query.list();
