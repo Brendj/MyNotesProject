@@ -5,17 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import net.sf.jasperreports.engine.JRException;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
-import org.richfaces.component.html.HtmlPanelMenu;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
@@ -79,6 +69,18 @@ import ru.axetta.ecafe.processor.web.ui.user.UserListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmLoadPage;
 import ru.axetta.ecafe.processor.web.ui.webTechnolog.ComplexListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.webTechnolog.DishListSelectPage;
+
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
+import org.richfaces.component.html.HtmlPanelMenu;
+import org.richfaces.event.UploadEvent;
+import org.richfaces.model.UploadItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -3846,7 +3848,11 @@ public class MainPage implements Serializable {
         return clientSelectListPage;
     }
 
-    public Object showClientSelectPage() {
+    public Object showEmptyClientSelectPage() {
+        return showClientSelectPage(true);
+    }
+
+    public Object showClientSelectPage(boolean doClear) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ClientSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -3857,6 +3863,9 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                if (doClear) {
+                    clientSelectPage.getClientFilter().clear();
+                }
                 clientSelectPage.fill(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -3874,6 +3883,10 @@ public class MainPage implements Serializable {
             }
         }
         return null;
+    }
+
+    public Object showClientSelectPage() {
+        return showClientSelectPage(false);
     }
 
     public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {

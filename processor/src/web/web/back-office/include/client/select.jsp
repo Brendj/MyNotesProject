@@ -7,6 +7,12 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<script language="javascript">
+    function disableButtons(value) {
+        document.getElementById("clientSelectSubView:modalClientSelectorForm:orgButtonSelectClient").disabled=value;
+        document.getElementById("clientSelectSubView:modalClientSelectorForm:applyButtonSelectClient").disabled=value;
+    }
+</script>
 
 <rich:modalPanel id="modalClientSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalClientSelectorPanel')}.hide();return false;"/>
@@ -37,7 +43,7 @@
                                              value="#{mainPage.clientSelectPage.clientFilter.org.shortName}"
                                              readonly="true" styleClass="input-text long-field" style="margin-right: 2px;" />
                                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
-                                                   reRender="modalOrgSelectorPanel"
+                                                   reRender="modalOrgSelectorPanel" id="orgButtonSelectClient"
                                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
                                                    styleClass="command-link" style="width: 25px;" />
                             </h:panelGroup>
@@ -56,11 +62,18 @@
                         </h:panelGrid>
                         <h:panelGrid columns="2" styleClass="borderless-grid">
                             <a4j:commandButton value="Применить" action="#{mainPage.updateClientSelectPage}"
-                                               reRender="modalClientSelectorForm" styleClass="command-button" />
+                                               reRender="modalClientSelectorForm" styleClass="command-button"
+                                               onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                            id="applyButtonSelectClient"/>
                             <a4j:commandButton value="Очистить" action="#{mainPage.clearClientSelectPageFilter}"
                                                reRender="modalClientSelectorForm" ajaxSingle="true"
                                                styleClass="command-button" />
                         </h:panelGrid>
+                        <a4j:status id="updateStatus">
+                            <f:facet name="start">
+                                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                            </f:facet>
+                        </a4j:status>
                     </rich:simpleTogglePanel>
                 </td>
             </tr>
