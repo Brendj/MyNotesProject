@@ -59,11 +59,12 @@
                             <a4j:commandButton value="Применить" action="#{mainPage.updateClientSelectPage}"
                                                reRender="modalClientSelectorForm" styleClass="command-button"
                                                onclick="disableButtons(true);" oncomplete="disableButtons(false)"
-                            id="applyButtonSelectClient"/>
+                                               id="applyButtonSelectClient"/>
                             <a4j:commandButton value="Очистить" action="#{mainPage.clearClientSelectPageFilter}"
                                                reRender="modalClientSelectorForm" ajaxSingle="true"
                                                styleClass="command-button"
-                                               onclick="disableButtons(true);" oncomplete="disableButtons(false)"/>
+                                               onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                                               id="clearButtonSelectClient"/>
                         </h:panelGrid>
                         <a4j:status id="updateStatus">
                             <f:facet name="start">

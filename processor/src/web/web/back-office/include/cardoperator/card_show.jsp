@@ -28,8 +28,10 @@
     function disableButtons(value) {
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clientButtonCardShow").disabled=value;
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:applyButtonCardShow").disabled=value;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clearButtonCardShow").disabled=value;
         document.getElementById("clientSelectSubView:modalClientSelectorForm:orgButtonSelectClient").disabled=value;
         document.getElementById("clientSelectSubView:modalClientSelectorForm:applyButtonSelectClient").disabled=value;
+        document.getElementById("clientSelectSubView:modalClientSelectorForm:clearButtonSelectClient").disabled=value;
     }
 </script>
 
@@ -54,7 +56,7 @@
         <a4j:commandButton value="Применить" action="#{cardOperatorPage.applyClient}" id="applyButtonCardShow"
                            reRender="workspaceTogglePanel" styleClass="command-button"
                            onclick="disableButtons(true);" oncomplete="disableButtons(false)"/>
-        <a4j:commandButton value="Очистить" action="#{cardOperatorPage.clearCardOperatorPage}"
+        <a4j:commandButton value="Очистить" action="#{cardOperatorPage.clearCardOperatorPage}" id="clearButtonCardShow"
                            reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"
                            onclick="disableButtons(true);" oncomplete="disableButtons(false)"/>
 
