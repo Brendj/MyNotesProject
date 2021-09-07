@@ -28,6 +28,8 @@
     function disableButtons(value) {
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clientButtonCardShow").disabled=value;
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:applyButtonCardShow").disabled=value;
+        document.getElementById("clientSelectSubView:modalClientSelectorForm:orgButtonSelectClient").disabled=value;
+        document.getElementById("clientSelectSubView:modalClientSelectorForm:applyButtonSelectClient").disabled=value;
     }
 </script>
 
@@ -41,17 +43,20 @@
         <h:outputText escape="true" value="Клиент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
             <a4j:commandButton value="..." action="#{mainPage.showEmptyClientSelectPage}" reRender="modalClientSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" id="clientButtonCardShow" />
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();disableButtons(false);"
+                               styleClass="command-link" style="width: 25px;" id="clientButtonCardShow"
+                               onclick="disableButtons(true);"/>
             <h:inputText value="#{cardOperatorPage.client.shortNameContractId}" readonly="true" styleClass="input-text long-field"
                          style="margin-right: 2px;" id="cardOperatorPageClient" />
         </h:panelGroup>
 
 
         <a4j:commandButton value="Применить" action="#{cardOperatorPage.applyClient}" id="applyButtonCardShow"
-                           reRender="workspaceTogglePanel" styleClass="command-button" />
+                           reRender="workspaceTogglePanel" styleClass="command-button"
+                           onclick="disableButtons(true);" oncomplete="disableButtons(false)"/>
         <a4j:commandButton value="Очистить" action="#{cardOperatorPage.clearCardOperatorPage}"
-                           reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                           reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"
+                           onclick="disableButtons(true);" oncomplete="disableButtons(false)"/>
 
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
