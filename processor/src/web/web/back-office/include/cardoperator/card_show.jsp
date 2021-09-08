@@ -25,14 +25,6 @@
         }
         return false;
     }
-    function disableButtons(value) {
-        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clientButtonCardShow").disabled=value;
-        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:applyButtonCardShow").disabled=value;
-        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clearButtonCardShow").disabled=value;
-        document.getElementById("clientSelectSubView:modalClientSelectorForm:orgButtonSelectClient").disabled=value;
-        document.getElementById("clientSelectSubView:modalClientSelectorForm:applyButtonSelectClient").disabled=value;
-        document.getElementById("clientSelectSubView:modalClientSelectorForm:clearButtonSelectClient").disabled=value;
-    }
 </script>
 
 <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
@@ -63,6 +55,11 @@
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+    <a4j:status id="cardShowStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
     <rich:dataTable id="cardOperatorTable" value="#{cardOperatorPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
                     left-aligned-column, center-aligned-column, center-aligned-column"
@@ -125,11 +122,14 @@
                     <f:selectItems value="#{cardOperatorPage.cardLockReasonMenu.items}" />
                 </h:selectOneMenu>
                 <a4j:commandButton value="Заблокировать" action="#{cardOperatorPage.blockCard}"
-                                   reRender="cardOperatorTable" styleClass="command-button">
+                                   reRender="cardOperatorTable" styleClass="command-button"
+                                   onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                                   id="blockCardButtonCardShow">
                     <f:setPropertyActionListener value="#{item}" target="#{cardOperatorPage.selectedItem}" />
                 </a4j:commandButton>
                 <a4j:commandButton value="Отмена" action="#{cardOperatorPage.hideBlockCardPanel}"
-                                   reRender="cardOperatorTable" styleClass="command-button">
+                                   reRender="cardOperatorTable" styleClass="command-button"
+                                   id="cancelCardButtonCardShow">
                     <f:setPropertyActionListener value="#{item}" target="#{cardOperatorPage.selectedItem}" />
                 </a4j:commandButton>
             </h:panelGrid>
