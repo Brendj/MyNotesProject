@@ -10919,16 +10919,16 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карта зарегистрирована успешно", null));
-            if (!modalPages.empty()) {
-                if (modalPages.peek() == cardRegistrationConfirm) {
-                    modalPages.pop();
-                }
-            }
         } catch(Exception e){
             logger.error("Failed to re-issue card", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при заказе карты: " + e.getMessage(), null));
         } finally {
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == cardRegistrationConfirm) {
+                    modalPages.pop();
+                }
+            }
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
