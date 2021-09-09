@@ -103,7 +103,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     if (CalendarUtils.betweenDate(new Date(), item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate())) DiscountManager.addOtherDiscountForClient(session, client);
                 }
 
-                applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(), client, item.getDtisznCode(), newStatus, item.getApplicantPhone(), item.getApplicantName(), item.getApplicantSecondName(), item.getApplicantSurname(), nextVersion, nextHistoryVersion);
+                applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(), client, item.getDtisznCode(), newStatus, item.getApplicantPhone(), item.getApplicantName(),
+                        item.getApplicantSecondName(), item.getApplicantSurname(), nextVersion, nextHistoryVersion, item.getDocOrderDate(), item.getIdOfDocOrder());
                 if (!oldStatus.equals(newStatus)) etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, new ApplicationForFoodStatus(newStatus.getApplicationForFoodState(), newStatus.getDeclineReason())));
             }
             catch (ApplicationForFoorStatusExistsException e)

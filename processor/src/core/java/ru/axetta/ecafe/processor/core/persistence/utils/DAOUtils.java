@@ -4833,7 +4833,7 @@ public class DAOUtils {
     public static ApplicationForFood updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession,
             String serviceNumber, Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile,
             String applicantName, String applicantSecondName, String applicantSurname, Long version,
-            Long historyVersion) throws Exception {
+            Long historyVersion, Date docOrderDate, String idOfDocOrder) throws Exception {
         ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession,
                 serviceNumber);
         if (applicationForFood == null) {
@@ -4847,6 +4847,8 @@ public class DAOUtils {
         applicationForFood.setApplicantName(applicantName);
         applicationForFood.setApplicantSecondName(applicantSecondName);
         applicationForFood.setApplicantSurname(applicantSurname);
+        applicationForFood.setDocOrderDate(docOrderDate);
+        applicationForFood.setIdOfDocOrder(idOfDocOrder);
         applicationForFood.setVersion(version);
         applicationForFood.setLastUpdate(new Date());
         persistenceSession.update(applicationForFood);
