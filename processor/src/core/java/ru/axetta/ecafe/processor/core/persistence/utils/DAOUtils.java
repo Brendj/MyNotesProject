@@ -1999,8 +1999,8 @@ public class DAOUtils {
         session.save(emias);
     }
 
-    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session, false);
+    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList, boolean kafka) {
+        Long version = getMaxVersionEMIAS(session, kafka);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
