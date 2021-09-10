@@ -4,16 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder;
 
+import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
-
-import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Node;
 
 import java.util.Date;
 
@@ -92,12 +91,11 @@ public class TaloonPreorderItem {
         if(StringUtils.isNotEmpty(strOrgId)){
             try {
                 orgId =  Long.parseLong(strOrgId);
-                Org o = DAOService.getInstance().getOrg(orgId);
+                Org o = DAOReadonlyService.getInstance().findOrg(orgId);
                 if (o == null) {
                     errorMessage.append(String.format("Org with id=%s not found", orgId));
                 } else {
-                    DAOService daoService = DAOService.getInstance();
-                    if (!daoService.isOrgFriendly(orgId, orgOwner)) {
+                    if (!DAOReadonlyService.getInstance().isOrgFriendly(orgId, orgOwner)) {
                         errorMessage.append(String.format("Org id=%s is not friendly to Org id=%s", orgId, orgOwner));
                     }
                 }
@@ -112,12 +110,11 @@ public class TaloonPreorderItem {
         if(StringUtils.isNotEmpty(strOrgIdCreated)){
             try {
                 orgIdCreated =  Long.parseLong(strOrgIdCreated);
-                Org o = DAOService.getInstance().getOrg(orgIdCreated);
+                Org o = DAOReadonlyService.getInstance().findOrg(orgIdCreated);
                 if (o == null) {
                     errorMessage.append(String.format("OrgCreated with id=%s not found", orgIdCreated));
                 } else {
-                    DAOService daoService = DAOService.getInstance();
-                    if (!daoService.isOrgFriendly(orgIdCreated, orgOwner)) {
+                    if (!DAOReadonlyService.getInstance().isOrgFriendly(orgIdCreated, orgOwner)) {
                         errorMessage.append(String.format("OrgCreated id=%s is not friendly to Org id=%s", orgIdCreated, orgOwner));
                     }
                 }

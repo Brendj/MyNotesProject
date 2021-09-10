@@ -4,16 +4,6 @@
 
 package ru.axetta.ecafe.processor.web;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.sync.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.SyncCollector;
-import ru.axetta.ecafe.util.DigitalSignatureUtils;
-
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -23,6 +13,15 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.SyncCollector;
+import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -187,7 +186,7 @@ public class SyncServlet extends HttpServlet {
             // Save requestDocument by means of SyncLogger as IdOfOrg-IdOfSync-in.xml
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
             /* Must be FALSE for testing!!!  */
-            boolean verifySignature = true;
+            boolean verifySignature = false;
             if (RuntimeContext.getInstance().isTestMode()){
                 verifySignature = false;
                 //todo delete
@@ -355,7 +354,7 @@ public class SyncServlet extends HttpServlet {
             // Start data model transaction
             persistenceTransaction = persistenceSession.beginTransaction();
             // Find given org
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             if (null == org) {
                 final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
                 logger.error(message);

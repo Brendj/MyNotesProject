@@ -4,14 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.card.CardManager;
-import ru.axetta.ecafe.processor.core.event.EventNotificator;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -21,6 +13,13 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.event.EventNotificator;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -116,6 +115,7 @@ public class CardManagerProcessor implements CardManager {
             for (Card card : client.getCards()) {
                 if (CardState.ISSUED.getValue() == card.getState()) {
                     haveActiveCard = true;
+                    break;
                 }
             }
             if (haveActiveCard && client.getOrg().getOneActiveCard()) {

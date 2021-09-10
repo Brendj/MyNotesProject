@@ -4,15 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.card.request;
 
-import ru.axetta.ecafe.processor.core.persistence.CardRequest;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
-
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.persistence.CardRequest;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,8 +41,8 @@ public class CardRequestsProcessor extends AbstractProcessor<ResCardRequests> {
 
     public CardRequestsData processData() throws Exception {
         CardRequestsData result = new CardRequestsData();
-        List<ResCardRequestItem> items = new ArrayList<ResCardRequestItem>();
-        List<Long> orgs = DAOUtils.findFriendlyOrgIds(session, cardRequests.getIdOfOrgOwner());
+        List<ResCardRequestItem> items = new LinkedList<>();
+        List<Long> orgs = DAOReadonlyService.getInstance().findFriendlyOrgsIds(cardRequests.getIdOfOrgOwner());
         List<CardRequest> requests = DAOUtils.getCardRequestsForOrgSinceVersion(session,
                 orgs, cardRequests.getMaxVersion());
         for (CardRequest cardRequest : requests) {

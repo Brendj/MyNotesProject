@@ -4,20 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
-import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
-import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
@@ -32,6 +18,19 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -123,14 +122,13 @@ public class DAOReadonlyService {
         return query.getResultList();
     }
 
-    public Org findOrg(Long idOfOrg) throws Exception {
-        Org org = entityManager.find(Org.class, idOfOrg);
-        if (null == org) {
-            final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
-            logger.error(message);
-            throw new NullPointerException(message);
-        }
-        return org;
+    public Org findOrg(Long idOfOrg) {
+        return entityManager.find(Org.class, idOfOrg);
+    }
+
+    public List<Org> findOrgs(List<Long> ids){
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findOrgs(session, ids);
     }
 
     public Integer getMenuCountDays(Long idOfOrg) {
@@ -1096,17 +1094,35 @@ public class DAOReadonlyService {
         List<Long> friendlyOrgIds = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
         Set<Org> result = new HashSet<>();
         for (Long friendlyOrgId : friendlyOrgIds) {
-            result.add(DAOService.getInstance().getOrg(friendlyOrgId));
+            result.add(entityManager.find(Org.class, friendlyOrgId));
         }
         return result;
     }
 
+    public List<Long> findFriendlyOrgsIds(Long idOfOrg) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+    }
+
+    public Set<Long> findFriendlyOrgsIdsAsSet(Long idOfOrg) {
+        Session session = entityManager.unwrap(Session.class);
+        return new HashSet<>(DAOUtils.findFriendlyOrgIds(session, idOfOrg));
+    }
+
+    public Boolean isOrgFriendly(Long targetOrgId, Long testOrgId) {
+        Org testOrg = entityManager.find(Org.class, testOrgId);
+        Set<Org> set = testOrg.getFriendlyOrg();
+        for (Org o : set) {
+            if (targetOrgId.equals(o.getIdOfOrg())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Contragent findDefaultSupplier(Long idOfOrg) {
         Session session = entityManager.unwrap(Session.class);
-        org.hibernate.Query query = session
-                .createQuery("SELECT defaultSupplier FROM Org org where org.idOfOrg = :idOfOrg");
-        query.setParameter("idOfOrg", idOfOrg);
-        return (Contragent) query.uniqueResult();
+        return DAOUtils.findDefaultSupplier(session, idOfOrg);
     }
 
     public List<WtDish> getMenuDishes(WtMenu menu) {
@@ -1386,6 +1402,7 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
 	public boolean isSixWorkWeekOrgAndGroup(Long orgId, String groupName) {
         boolean resultByOrg = false; //isSixWorkWeek(orgId);
         try {
@@ -1400,5 +1417,13 @@ public class DAOReadonlyService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public Long getClientGroupByClientId(Long idOfClient) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        Client client = (Client) criteria.uniqueResult();
+        return client.getIdOfClientGroup();
     }
 }

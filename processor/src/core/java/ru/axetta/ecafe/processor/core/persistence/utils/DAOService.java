@@ -4,6 +4,18 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -17,19 +29,6 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.io.BufferedReader;
@@ -539,23 +538,6 @@ public class DAOService {
         q.setParameter("threshold", threshold);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
-    }
-
-    public Org getOrg(Long idOfOrg) {
-        /*Query q = entityManager.createQuery("from Org where idOfOrg = :idOfOrg");
-        q.setParameter("idOfOrg", idOfOrg);
-        List l = q.getResultList();
-        if (l.size() == 0) {
-            return null;
-        }
-        return (Org) l.get(0);*/
-        Session session = entityManager.unwrap(Session.class);
-        return getOrg(session, idOfOrg);
-    }
-
-    public Org getOrg(Session session, Long idOfOrg) {
-        Org org = (Org)session.get(Org.class, idOfOrg);
-        return org;
     }
 
     public Client getClientByContractId(long contractId) {
@@ -1781,17 +1763,6 @@ public class DAOService {
         return org.getFriendlyOrg();
     }
 
-    public Boolean isOrgFriendly(Long targetOrgId, Long testOrgId) {
-        Org testOrg = entityManager.find(Org.class, testOrgId);
-        Set<Org> set = testOrg.getFriendlyOrg();
-        for (Org o : set) {
-            if (targetOrgId.equals(o.getIdOfOrg())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public List<RegistryChange> getLastRegistryChanges_WithFullFIO(long idOfOrg, long revisionDate, Integer actionFilter,
             String lastName, String firstName, String patronymic, String className) throws Exception {
         if (revisionDate < 1L) {
@@ -2394,14 +2365,6 @@ public class DAOService {
         }
     }
 
-    public Long getClientGroupByClientId(Long idOfClient) {
-        Session session = entityManager.unwrap(Session.class);
-        Criteria criteria = session.createCriteria(Client.class);
-        criteria.add(Restrictions.eq("idOfClient", idOfClient));
-        Client client = (Client) criteria.uniqueResult();
-        return client.getIdOfClientGroup();
-    }
-
     public List findClientPaymentsByPaymentId(Contragent contragent, String idOfPayment) throws Exception {
         Session session = entityManager.unwrap(Session.class);
         return DAOUtils.findClientPaymentsForCorrectionOperation(session, contragent, idOfPayment);
@@ -2521,7 +2484,8 @@ public class DAOService {
     }
 
     public String getDefaultSupplierNameByOrg(Long idOfOrg) {
-        Contragent cc = getOrg(idOfOrg).getDefaultSupplier();
+        Session session = entityManager.unwrap(Session.class);
+        Contragent cc = DAOUtils.findDefaultSupplier(session, idOfOrg);
         if (cc != null) {
             return cc.getContragentName();
         } else {
@@ -2530,7 +2494,11 @@ public class DAOService {
     }
 
     public String getConfigurationProviderNameByOrg(Long idOfOrg) {
-        ConfigurationProvider prov = getOrg(idOfOrg).getConfigurationProvider();
+        Org o = entityManager.find(Org.class, idOfOrg);
+        if(o == null){
+            return null;
+        }
+        ConfigurationProvider prov = o.getConfigurationProvider();
         if (prov != null) {
             return prov.getName();
         }

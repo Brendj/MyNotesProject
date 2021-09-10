@@ -5,7 +5,14 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JasperPrint;
-
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -21,15 +28,6 @@ import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.Hint;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleEditPage;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
@@ -617,7 +615,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
             //  Если были выбраны орги, то для каждого орга запускаем отчет..
             List<String> idOfOrgList = values.get("idOfOrg");
             for (String idOfOrg : idOfOrgList) {
-                Org org = DAOService.getInstance().getOrg(Long.parseLong(idOfOrg));
+                Org org = DAOReadonlyService.getInstance().findOrg(Long.parseLong(idOfOrg));
                 try {
                     buildReport(values, org);
                 } catch (Exception e) {

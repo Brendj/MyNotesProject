@@ -4,16 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
-import ru.axetta.ecafe.processor.core.sync.AbstractGroupProcessor;
-import ru.axetta.ecafe.processor.core.sync.ResultOperation;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -24,6 +14,16 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractGroupProcessor;
+import ru.axetta.ecafe.processor.core.sync.ResultOperation;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -166,10 +166,10 @@ public class ClientgroupManagersProcessor extends AbstractGroupProcessor<ResClie
     private ClientgroupManagerData executeProcess(Session session,long idOfOrg) {
         DetachedCriteria idOfClient = DetachedCriteria.forClass(Client.class);
         idOfClient.createAlias("org", "o");
-        idOfClient.add(Restrictions.in("o.idOfOrg", getFriendlyOrgsId(session, idOfOrg)));
+        idOfClient.add(Restrictions.in("o.idOfOrg", DAOReadonlyService.getInstance().findFriendlyOrgsIds(idOfOrg)));
         idOfClient.setProjection(Property.forName("idOfClient"));
         Criteria subCriteria = idOfClient.getExecutableCriteria(session);
-        Integer countResult = subCriteria.list().size();
+        int countResult = subCriteria.list().size();
         ClientgroupManagerData clientGuardianData;
         if (countResult > 0) {
             Criteria criteria = session.createCriteria(ClientGroupManager.class);

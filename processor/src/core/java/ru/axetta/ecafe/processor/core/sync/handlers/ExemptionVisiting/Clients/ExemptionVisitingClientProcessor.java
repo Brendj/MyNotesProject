@@ -4,17 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients;
 
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.persistence.EMIASbyDay;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ExemptionVisitingClientProcessor extends AbstractProcessor<OrgSettingSection> {
@@ -34,7 +34,7 @@ public class ExemptionVisitingClientProcessor extends AbstractProcessor<OrgSetti
         Long maxVersionFromARM = exemptionVisitingClientRequest.getMaxVersion();
         ExemptionVisitingClient exemptionVisitingClient = new ExemptionVisitingClient();
         //Собираем данные по всем дружественным корпусам
-        List<Long> friendlyOrg = new ArrayList<>();
+        List<Long> friendlyOrg = new LinkedList<>();
         friendlyOrg.add(idOfOrg);
         Org org = (Org) session.load(Org.class, idOfOrg);
         for (Org friendlyOrgs : org.getFriendlyOrg()) {
