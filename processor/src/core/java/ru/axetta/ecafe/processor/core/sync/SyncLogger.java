@@ -20,4 +20,8 @@ public interface SyncLogger {
     void registerSyncResponse(Document responseDocument, long idOfOrg, String idOfSync);
 
     void registerSyncRequestInDb(long idOfOrg, String idOfSync);
+
+    void queueSyncRequestAsync(long idOfOrg, String idOfSync);
+
+    void runRegisterSyncRequestInDb();
 }

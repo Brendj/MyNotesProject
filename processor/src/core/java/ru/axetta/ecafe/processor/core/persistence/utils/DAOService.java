@@ -2394,6 +2394,11 @@ public class DAOService {
         }
     }
 
+    public void saveSyncRequestInDb(String query_str) {
+        Query query = entityManager.createNativeQuery(query_str);
+        query.executeUpdate();
+    }
+
     public Long getClientGroupByClientId(Long idOfClient) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(Client.class);
