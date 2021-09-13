@@ -6098,7 +6098,7 @@ public class Processor implements SyncProcessor {
         List<Client> clients;
         Org organization;
         List<Org> orgList;
-        List<Long> activeClientsId;
+        Set<Long> activeClientsId;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -6128,7 +6128,7 @@ public class Processor implements SyncProcessor {
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
                 }
             }
-            activeClientsId = findActiveClientsId(persistenceSession, orgList);
+            activeClientsId = new HashSet<>(findActiveClientsId(persistenceSession, orgList));
             // Получаем чужих клиентов.
             Map<String, Set<Client>> alienClients = ClientManager
                     .findAllocatedClients(persistenceSession, organization);
