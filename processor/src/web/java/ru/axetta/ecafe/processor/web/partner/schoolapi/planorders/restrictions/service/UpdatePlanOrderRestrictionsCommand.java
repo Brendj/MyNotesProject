@@ -5,9 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction;
-import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestrictionType;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -211,9 +209,22 @@ class UpdatePlanOrderRestrictionsCommand {
     private PlanOrdersRestriction updateRestriction(Session session, long nextVersion,
             PlanOrdersRestriction currentItem, PlanOrderRestrictionDTO updateItem) {
         try {
-            if (Objects.equals(currentItem.getDeletedState(), false) && Objects.equals(currentItem.getResol(),
-                    updateItem.getResolution())) {
+            if (Objects.equals(currentItem.getDeletedState(), false)
+                    && Objects.equals(currentItem.getResol(), updateItem.getResolution())
+                    && currentItem.getArmComplexId().longValue() == updateItem.getComplexId()) {
                 return currentItem;
+            }
+            if (currentItem.getIdOfConfigurationProoviderOnCreate() == null) {
+                // если нет конфг, проставляем
+                currentItem.setIdOfConfigurationProoviderOnCreate(getIdOfConfigurationProvider(session, updateItem.getIdOfOrg()));
+            }
+            if (currentItem.getArmComplexId().longValue() != updateItem.getComplexId()) {
+                currentItem.setArmComplexId(updateItem.getComplexId().intValue());
+                WtComplex complex = (WtComplex) session.load(WtComplex.class, updateItem.getComplexId());
+                if (complex == null) {
+                    throw WebApplicationException.notFound(404, String.format("Комплекс с ид: '%d' не найден", updateItem.getComplexId()));
+                }
+                currentItem.setComplexName(complex.getName());
             }
             currentItem.setDeletedState(false);
             currentItem.setResol(updateItem.getResolution());
@@ -245,6 +256,7 @@ class UpdatePlanOrderRestrictionsCommand {
             planOrdersRestriction.setIdOfOrgOnCreate(updateItem.getIdOfOrg());
             planOrdersRestriction.setArmComplexId(updateItem.getComplexId().intValue());
             planOrdersRestriction.setComplexName(complex.getName());
+            planOrdersRestriction.setIdOfConfigurationProoviderOnCreate(getIdOfConfigurationProvider(session, updateItem.getIdOfOrg()));
             planOrdersRestriction.setPlanOrdersRestrictionType(planOrdersRestrictionType);
             planOrdersRestriction.setDeletedState(false);
             planOrdersRestriction.setResol(updateItem.getResolution());
@@ -258,5 +270,52 @@ class UpdatePlanOrderRestrictionsCommand {
         }
     }
 
+    /*
+    * Получить ид. конфигурации,  в порядке убывания приоритета
+    * 1. тек. организация
+    * 2. любая конф друж. организации того же корпуса того же типа орг
+    * 3. любая конф друж. организации того же корпуса
+    * 4. любая конф организации того же округа
+    * 5. null
+    * */
+    private Long getIdOfConfigurationProvider(Session session, Long idOfOrg) throws Exception {
+        Long orgConfigurationProvider = DAOUtils.getOrgConfigurationProvider(session, idOfOrg);
+        // конфигурация тек. организации
+        if (orgConfigurationProvider > 0) {
+            return orgConfigurationProvider;
+        }
+        List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(session, idOfOrg);
+        OrganizationType orgType = null;
+        String district = "";
+        // сохраняю тип текущей организации
+        for (Org org : friendlyOrgs) {
+            if (org.getIdOfOrg().equals(idOfOrg)) {
+                orgType = org.getType();
+                district = org.getDistrict();
+                break;
+            }
+        }
+        // беру первую конфигурацию организации того же типа, что и исходная
+        for (Org org : friendlyOrgs) {
+            if (org.getType().equals(orgType) && org.getConfigurationProvider() != null) {
+                return org.getConfigurationProvider().getIdOfConfigurationProvider();
+            }
+        }
+        // если ничего нет, беру первую не пустую конфигурацию
+        for (Org org : friendlyOrgs) {
+            if (org.getConfigurationProvider() != null) {
+                return org.getConfigurationProvider().getIdOfConfigurationProvider();
+            }
+        }
+        // последний случай, либо конф орг из того же округа либо ничего
+        return findFirstConfProviderOrgFromDistrict(session, district);
+    }
+
+    private static Long findFirstConfProviderOrgFromDistrict(Session session, String district) {
+        List result = session.createQuery(
+                        "select o.configurationProvider.idOfConfigurationProvider from Org o where o.district=:district and o.configurationProvider is not null")
+                .setParameter("district", district).setFirstResult(1).list();
+        return result != null && !result.isEmpty() ? (Long) result.get(0) : null;
+    }
 
 }
