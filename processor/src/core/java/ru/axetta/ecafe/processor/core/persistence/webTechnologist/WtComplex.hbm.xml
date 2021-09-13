@@ -109,5 +109,9 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" column="idOfRule"/>
         </set>
 
+        <property name="idOfOrgGroup">
+            <column name="idoforggroup" sql-type="long"/>
+        </property>
+
     </class>
 </hibernate-mapping>
