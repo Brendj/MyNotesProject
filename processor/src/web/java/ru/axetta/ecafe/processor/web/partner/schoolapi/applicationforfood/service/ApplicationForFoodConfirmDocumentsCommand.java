@@ -13,9 +13,9 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingItem;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto.AplicationForFoodConfirmDocumentsResponse;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.service.DeleteGuardianCommand;
 
 import org.hibernate.Session;
@@ -29,6 +29,7 @@ import java.util.Date;
 
 @Service
 public class ApplicationForFoodConfirmDocumentsCommand {
+
     private final Logger logger = LoggerFactory.getLogger(DeleteGuardianCommand.class);
     private final RuntimeContext runtimeContext;
 
@@ -38,44 +39,60 @@ public class ApplicationForFoodConfirmDocumentsCommand {
     }
 
     public AplicationForFoodConfirmDocumentsResponse confirmDocuments(long recordId, User user) {
+        try {
+            ApplicationForFood applicationForFood = loadAndCheckApplicationForFood(recordId);
+            RequestFeedingItem requestFeedingItem = createRequestFeedingItem(applicationForFood);
+            Processor processor = runtimeContext.getProcessor();
+            RequestFeeding requestFeeding = new RequestFeeding(requestFeedingItem,
+                    applicationForFood.getClient().getOrg().getIdOfOrg());
+            processor.processRequestFeeding(requestFeeding);
+            return AplicationForFoodConfirmDocumentsResponse.success(recordId);
+        } catch (WebApplicationException wex) {
+            logger.error("Error in confirm documents ApplicationForFood, ", wex);
+            return AplicationForFoodConfirmDocumentsResponse.error(recordId, wex.getErrorCode(), wex.getErrorMessage());
+        } catch (Exception e) {
+            logger.error("Error in confirm documents ApplicationForFood, ", e);
+            return AplicationForFoodConfirmDocumentsResponse.error(recordId, 500, e.getMessage());
+        }
+    }
+
+    private RequestFeedingItem createRequestFeedingItem(ApplicationForFood applicationForFood) {
+        RequestFeedingItem requestFeedingItem = new RequestFeedingItem(applicationForFood,
+                new Date(System.currentTimeMillis()));
+        requestFeedingItem.setStatus(ApplicationForFoodState.RESUME.getCode());
+        requestFeedingItem.setResCode(RequestFeedingItem.ERROR_CODE_ALL_OK);
+        return requestFeedingItem;
+    }
+
+    private ApplicationForFood loadAndCheckApplicationForFood(long recordId) throws Exception {
         Session session = null;
         Transaction transaction = null;
-
         try {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             ApplicationForFood applicationForFood = DAOUtils.getApplicationForFoodByRecordId(session, recordId);
             if (applicationForFood == null) {
-                return AplicationForFoodConfirmDocumentsResponse.error(recordId, 404,
+                throw WebApplicationException.notFound(404,
                         "ApplicationForFood with record ID = '" + recordId + "' was not found");
             }
             if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.PAUSED
                     || applicationForFood.getDtisznCode() != null) {
-                return AplicationForFoodConfirmDocumentsResponse.error(recordId, 400,
-                        "ApplicationForFood with record ID = '" + recordId
-                                + "' confirm documents not available due its state");
+                throw WebApplicationException.badRequest(400, "ApplicationForFood with record ID = '" + recordId
+                        + "' confirm documents not available due its state");
             }
-
             Client client = (Client) session.load(Client.class, applicationForFood.getClient().getIdOfClient());
             if (client == null) {
-                return AplicationForFoodConfirmDocumentsResponse.error(recordId, 500,
+                throw WebApplicationException.internalServerError(500,
                         "Error in confirm documents ApplicationForFood, client is NULL");
             }
-
-            RequestFeedingItem requestFeedingItem = new RequestFeedingItem(applicationForFood, new Date(System.currentTimeMillis()));
-            requestFeedingItem.setStatus(ApplicationForFoodState.RESUME.getCode());
-            Processor processor = runtimeContext.getProcessor();
-            ResRequestFeeding result = processor.processRequestFeeding(new RequestFeeding(requestFeedingItem, client.getOrg().getIdOfOrg()));
-
+            if (client.getOrg() == null) {
+                throw WebApplicationException.internalServerError(500,
+                        "Error in confirm documents ApplicationForFood, org is NULL");
+            }
             session.flush();
             transaction.commit();
             transaction = null;
-
-            return AplicationForFoodConfirmDocumentsResponse.success(recordId);
-        } catch (Exception e) {
-            logger.error("Error in confirm documents ApplicationForFood, ", e);
-            return AplicationForFoodConfirmDocumentsResponse.error(recordId, 500,
-                    "Error in confirm documents ApplicationForFood: " + e.getMessage());
+            return applicationForFood;
         } finally {
             if (transaction != null) {
                 HibernateUtils.rollback(transaction, logger);
@@ -84,5 +101,7 @@ public class ApplicationForFoodConfirmDocumentsCommand {
                 HibernateUtils.close(session, logger);
             }
         }
+
     }
+
 }
