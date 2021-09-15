@@ -5,15 +5,15 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingItem;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeedingETPStatuses;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeedingItem;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.dto.ApplicationForFoodConfirmResponse;
 
@@ -25,12 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class ApplicationForFoodConfirmCommand {
-    private Logger logger = LoggerFactory.getLogger(ApplicationForFoodConfirmCommand.class);
+    private final Logger logger = LoggerFactory.getLogger(ApplicationForFoodConfirmCommand.class);
     private final RuntimeContext runtimeContext;
 
     @Autowired
@@ -43,20 +41,22 @@ public class ApplicationForFoodConfirmCommand {
     {
         Session session = null;
         Transaction transaction = null;
-
         try
         {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             ApplicationForFood applicationForFood = DAOUtils.getApplicationForFoodByRecordId(session, recordId);
-            if (applicationForFood == null) return ApplicationForFoodConfirmResponse.error(recordId, 404, "ApplicationForFood with record ID = '" + recordId + "' was not found");
-            if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.RESUME || applicationForFood.getDtisznCode() != null) return ApplicationForFoodConfirmResponse.error(recordId, 400, "ApplicationForFood with record ID = '" + recordId + "' confirm not available due its state");
-
-            long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
-            long nextHistoryVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
-
+            if (applicationForFood == null) {
+                return ApplicationForFoodConfirmResponse.error(recordId, 404, "ApplicationForFood with record ID = '" + recordId + "' was not found");
+            }
+            if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.RESUME || applicationForFood.getDtisznCode() != null)
+            {
+                return ApplicationForFoodConfirmResponse.error(recordId, 400, "ApplicationForFood with record ID = '" + recordId + "' confirm not available due its state");
+            }
             Client client = (Client) session.load(Client.class, applicationForFood.getClient().getIdOfClient());
-            if (client == null) return ApplicationForFoodConfirmResponse.error(recordId, 500, "Error in confirm ApplicationForFood, client is NULL");
+            if (client == null) {
+                return ApplicationForFoodConfirmResponse.error(recordId, 500, "Error in confirm ApplicationForFood, client is NULL");
+            }
 
             RequestFeedingItem requestFeedingItem = new RequestFeedingItem(applicationForFood, new Date(System.currentTimeMillis()));
             requestFeedingItem.setDocOrderDate(docOrderDate);
@@ -66,14 +66,12 @@ public class ApplicationForFoodConfirmCommand {
             requestFeedingItem.setStatus(ApplicationForFoodState.OK.getCode());
             requestFeedingItem.setDeclineReason(null);
 
-            RequestFeedingProcessor requestFeedingProcessor = new RequestFeedingProcessor(session, null);
-            Map.Entry<ResRequestFeedingItem, List<ResRequestFeedingETPStatuses>> proceedResult = requestFeedingProcessor.proceedOneItem(requestFeedingItem, nextVersion, nextHistoryVersion, client);
-
+            Processor processor = runtimeContext.getProcessor();
+            ResRequestFeeding result = processor.processRequestFeeding(new RequestFeeding(requestFeedingItem, client.getOrg().getIdOfOrg()));
             session.flush();
             transaction.commit();
             transaction = null;
 
-            requestFeedingProcessor.processETPStatuses(proceedResult.getValue());
             return ApplicationForFoodConfirmResponse.success(recordId);
         }
         catch (Exception e)

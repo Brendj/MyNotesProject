@@ -5,19 +5,13 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import com.google.common.base.Joiner;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrTokenizer;
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
 import ru.axetta.ecafe.processor.core.file.FileUtils;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
@@ -117,10 +111,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts.AccountsRe
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplierData;
 import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplierProcessor;
@@ -151,6 +142,15 @@ import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperatio
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrTokenizer;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.*;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -196,47 +196,47 @@ public class Processor implements SyncProcessor {
         try {
             switch (request.getSyncType()) {
                 case TYPE_FULL: {
-                    // обработка полной синхронизации
+                    // РѕР±СЂР°Р±РѕС‚РєР° РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
                     response = buildFullSyncResponse(request, syncStartTime, syncResult);
                     break;
                 }
                 case TYPE_GET_ACC_INC: {
-                    // обработка синхронизации покупок и прохода клиентов (быстрая синхронизация)
+                    // РѕР±СЂР°Р±РѕС‚РєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РїРѕРєСѓРїРѕРє Рё РїСЂРѕС…РѕРґР° РєР»РёРµРЅС‚РѕРІ (Р±С‹СЃС‚СЂР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ)
                     response = buildAccIncSyncResponse(request);
                     break;
                 }
                 case TYPE_GET_CLIENTS_PARAMS: {
-                    // обработка синхронизации параметров клиента
+                    // РѕР±СЂР°Р±РѕС‚РєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РїР°СЂР°РјРµС‚СЂРѕРІ РєР»РёРµРЅС‚Р°
                     response = buildClientsParamsSyncResponse(request);
                     break;
                 }
                 case TYPE_GET_GET_ACC_REGISGTRY_UPDATE: {
-                    // обработка синхронизации параметров клиента
+                    // РѕР±СЂР°Р±РѕС‚РєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РїР°СЂР°РјРµС‚СЂРѕРІ РєР»РёРµРЅС‚Р°
                     response = buildAccRegisgtryUpdate(request);
                     break;
                 }
                 case TYPE_COMMODITY_ACCOUNTING: {
-                    // обработка синхронизации параметров клиента
+                    // РѕР±СЂР°Р±РѕС‚РєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РїР°СЂР°РјРµС‚СЂРѕРІ РєР»РёРµРЅС‚Р°
                     response = buildCommodityAccountingSyncResponse(request);
                     break;
                 }
                 case TYPE_REESTR_TALOONS_APPROVAL: {
-                    //обработка синхронизации ручного реестра талонов
+                    //РѕР±СЂР°Р±РѕС‚РєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё СЂСѓС‡РЅРѕРіРѕ СЂРµРµСЃС‚СЂР° С‚Р°Р»РѕРЅРѕРІ
                     response = buildReestrTaloonsApprovalSyncResponse(request);
                     break;
                 }
                 case TYPE_ZERO_TRANSACTIONS: {
-                    //обработка нулевых транзакций
+                    //РѕР±СЂР°Р±РѕС‚РєР° РЅСѓР»РµРІС‹С… С‚СЂР°РЅР·Р°РєС†РёР№
                     response = buildZeroTransactionsSyncResponse(request);
                     break;
                 }
                 case TYPE_MIGRANTS: {
-                    //обработка временных посетителей (мигрантов)
+                    //РѕР±СЂР°Р±РѕС‚РєР° РІСЂРµРјРµРЅРЅС‹С… РїРѕСЃРµС‚РёС‚РµР»РµР№ (РјРёРіСЂР°РЅС‚РѕРІ)
                     response = buildMigrantsSyncResponse(request);
                     break;
                 }
                 case TYPE_HELP_REQUESTS: {
-                    //обработка запросов в службу помощи
+                    //РѕР±СЂР°Р±РѕС‚РєР° Р·Р°РїСЂРѕСЃРѕРІ РІ СЃР»СѓР¶Р±Сѓ РїРѕРјРѕС‰Рё
                     response = buildHelpRequestsSyncResponse(request);
                     break;
                 }
@@ -245,24 +245,24 @@ public class Processor implements SyncProcessor {
                     break;
                 }
                 case TYPE_ORG_SETTINGS: {
-                    //обработка настроек ОО
+                    //РѕР±СЂР°Р±РѕС‚РєР° РЅР°СЃС‚СЂРѕРµРє РћРћ
                     response = buildOrgSettingsSectionsResponse(request, syncStartTime, syncResult);
                     break;
                 }
                 case TYPE_REESTR_TALOONS_PREORDER: {
-                    //обработка синхронизации ручного реестра талонов (платное питание)
+                    //РѕР±СЂР°Р±РѕС‚РєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё СЂСѓС‡РЅРѕРіРѕ СЂРµРµСЃС‚СЂР° С‚Р°Р»РѕРЅРѕРІ (РїР»Р°С‚РЅРѕРµ РїРёС‚Р°РЅРёРµ)
                     response = buildReestrTaloonsPreorderSyncResponse(request);
                     break;
                 }
                 case TYPE_MENU_SUPPLIER: {
-                    //обработка синхронизации веб-технолога
+                    //РѕР±СЂР°Р±РѕС‚РєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РІРµР±-С‚РµС…РЅРѕР»РѕРіР°
                     if (request.getOrg().getUseWebArm()) {
                         response = buildMenuSupplierSyncResponse(request);
                     }
                     break;
                 }
                 case TYPE_REQUEST_SUPPLIER: {
-                    //обработка заявок на питание
+                    //РѕР±СЂР°Р±РѕС‚РєР° Р·Р°СЏРІРѕРє РЅР° РїРёС‚Р°РЅРёРµ
                     response = buildRequestsSupplierSyncResponse(request);
                     break;
                 }
@@ -285,25 +285,25 @@ public class Processor implements SyncProcessor {
             return;
         }
         Boolean isReplaceOrg = !client.getOrg().getIdOfOrg()
-                .equals(newIdOfOrg); //сравниваем старую организацию клиента с новой
+                .equals(newIdOfOrg); //СЃСЂР°РІРЅРёРІР°РµРј СЃС‚Р°СЂСѓСЋ РѕСЂРіР°РЅРёР·Р°С†РёСЋ РєР»РёРµРЅС‚Р° СЃ РЅРѕРІРѕР№
         for (Org o : oldOrgs) {
-            if (o.getIdOfOrg().equals(newIdOfOrg)) {                             //и с дружественными организациями
+            if (o.getIdOfOrg().equals(newIdOfOrg)) {                             //Рё СЃ РґСЂСѓР¶РµСЃС‚РІРµРЅРЅС‹РјРё РѕСЂРіР°РЅРёР·Р°С†РёСЏРјРё
                 isReplaceOrg = false;
                 break;
             }
         }
-        //Если новая организация не совпадает ни со старой, ни с дружественными старой, то блокируем карты клиента
+        //Р•СЃР»Рё РЅРѕРІР°СЏ РѕСЂРіР°РЅРёР·Р°С†РёСЏ РЅРµ СЃРѕРІРїР°РґР°РµС‚ РЅРё СЃРѕ СЃС‚Р°СЂРѕР№, РЅРё СЃ РґСЂСѓР¶РµСЃС‚РІРµРЅРЅС‹РјРё СЃС‚Р°СЂРѕР№, С‚Рѕ Р±Р»РѕРєРёСЂСѓРµРј РєР°СЂС‚С‹ РєР»РёРµРЅС‚Р°
         if (isReplaceOrg) {
             Set<Card> cards = client.getCards();
             for (Card card : cards) {
                 if (card.getState()
-                        .equals(CardState.BLOCKED.getValue())) {     //если карта уже заблокирована, ее пропускаем
+                        .equals(CardState.BLOCKED.getValue())) {     //РµСЃР»Рё РєР°СЂС‚Р° СѓР¶Рµ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅР°, РµРµ РїСЂРѕРїСѓСЃРєР°РµРј
                     continue;
                 }
                 RuntimeContext.getInstance().getCardManager()
                         .updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                                 CardState.BLOCKED.getValue(),
-                                //статус = Заблокировано
+                                //СЃС‚Р°С‚СѓСЃ = Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРѕ
                                 card.getValidTime(), card.getLifeState(), card.getLockReason(), card.getIssueTime(),
                                 card.getExternalId());
             }
@@ -376,7 +376,7 @@ public class Processor implements SyncProcessor {
             throws Exception {
 
         Long idOfPacket = null;
-        SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
+        SyncHistory syncHistory = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 
         ResPaymentRegistry resPaymentRegistry = null;
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
@@ -493,9 +493,9 @@ public class Processor implements SyncProcessor {
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
             ClientsMobileHistory clientsMobileHistory =
-                    new ClientsMobileHistory("Полная синхронизация");
+                    new ClientsMobileHistory("РџРѕР»РЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ");
             clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
-            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+            clientsMobileHistory.setShowing("РђР Рњ РћРћ (РёРґ." + request.getIdOfOrg() + ")");
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
                     errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
         } catch (Exception e) {
@@ -959,7 +959,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData = processSpecialDatesData(request.getSpecialDates());
                 resSpecialDates = processSpecialDates(request.getSpecialDates());
                 //
-                //Удаление всех SpecalDate, у которых группа null
+                //РЈРґР°Р»РµРЅРёРµ РІСЃРµС… SpecalDate, Сѓ РєРѕС‚РѕСЂС‹С… РіСЂСѓРїРїР° null
                 deleteOldVersionSpecialDate(request);
                 //
             }
@@ -1122,10 +1122,10 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        //секция отправок заявок от ЭЖД
+        //СЃРµРєС†РёСЏ РѕС‚РїСЂР°РІРѕРє Р·Р°СЏРІРѕРє РѕС‚ Р­Р–Р”
         try {
             GoodRequestEZDRequest goodRequestEZDRequest = request.getGoodRequestEZDRequest();
-            //Если такая секция существует в исходном запросе
+            //Р•СЃР»Рё С‚Р°РєР°СЏ СЃРµРєС†РёСЏ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ РёСЃС…РѕРґРЅРѕРј Р·Р°РїСЂРѕСЃРµ
             if (goodRequestEZDRequest != null) {
                 goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest, request.getIdOfOrg());
             }
@@ -1210,7 +1210,7 @@ public class Processor implements SyncProcessor {
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
             int syncResult) throws Exception {
         Long idOfPacket = null;
-        SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
+        SyncHistory syncHistory = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         List<Long> errorClientIds = new ArrayList<Long>();
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
@@ -1228,10 +1228,10 @@ public class Processor implements SyncProcessor {
             discardClientSyncParam(request.getIdOfOrg());
         }
 
-        // мигранты
+        // РјРёРіСЂР°РЅС‚С‹
         processMigrantsSectionsWithClientsData(request, syncHistory, responseSections);
 
-        // операции со счетами
+        // РѕРїРµСЂР°С†РёРё СЃРѕ СЃС‡РµС‚Р°РјРё
         fullProcessingAccountOperationsRegistry(request, responseSections);
 
         // Process paymentRegistry
@@ -1254,7 +1254,7 @@ public class Processor implements SyncProcessor {
         // Build client registry
         fullProcessingClientsRegistry(request, syncHistory, responseSections, errorClientIds, clientsWithWrongVersion);
 
-        // базовая корзина (товарный учет)
+        // Р±Р°Р·РѕРІР°СЏ РєРѕСЂР·РёРЅР° (С‚РѕРІР°СЂРЅС‹Р№ СѓС‡РµС‚)
         fullProcessingGoodsBasicBaskerData(request, syncHistory, responseSections);
 
         // Process menu from Org
@@ -1266,16 +1266,16 @@ public class Processor implements SyncProcessor {
         //Process organization structure
         fullProcessingOrganizationStructure(request, syncHistory, responseSections);
 
-        // обработка структуры комплексов в организации
+        // РѕР±СЂР°Р±РѕС‚РєР° СЃС‚СЂСѓРєС‚СѓСЂС‹ РєРѕРјРїР»РµРєСЃРѕРІ РІ РѕСЂРіР°РЅРёР·Р°С†РёРё
         fullProcessingOrganizationComplexesStructure(request, syncHistory, responseSections);
 
-        // обработка интерактивного отчета
+        // РѕР±СЂР°Р±РѕС‚РєР° РёРЅС‚РµСЂР°РєС‚РёРІРЅРѕРіРѕ РѕС‚С‡РµС‚Р°
         fullProcessingInteractiveReport(request, syncHistory, responseSections);
 
         // Build AccRegistry
         fullProcessingAccRegistry(request, syncHistory, responseSections);
 
-        // обработка операций по картам
+        // РѕР±СЂР°Р±РѕС‚РєР° РѕРїРµСЂР°С†РёР№ РїРѕ РєР°СЂС‚Р°Рј
         fullProcessingCardsOperationsRegistry(request, responseSections);
 
         // Process ReqDiary
@@ -1284,7 +1284,7 @@ public class Processor implements SyncProcessor {
         // Process enterEvents
         fullProcessingEnterEvents(request, syncHistory, responseSections);
 
-        // обработка временных карт
+        // РѕР±СЂР°Р±РѕС‚РєР° РІСЂРµРјРµРЅРЅС‹С… РєР°СЂС‚
         fullProcessingTempCardsOperationsAndData(request, syncHistory, responseSections);
 
         // Process ResCategoriesDiscountsAndRules
@@ -1293,13 +1293,13 @@ public class Processor implements SyncProcessor {
         // Process CorrectingNumbersOrdersRegistry
         fullProcessingCorrectingNumbersSection(request, syncHistory, responseSections);
 
-        // обработка OrgOwnerData
+        // РѕР±СЂР°Р±РѕС‚РєР° OrgOwnerData
         fullProcessingOrgOwnerData(request, syncHistory, responseSections);
 
-        // обработка анкет
+        // РѕР±СЂР°Р±РѕС‚РєР° Р°РЅРєРµС‚
         fullProcessingQuestionaryData(request, syncHistory, responseSections);
 
-        // RO (товарный учет)
+        // RO (С‚РѕРІР°СЂРЅС‹Р№ СѓС‡РµС‚)
         fullProcessingRO(request, syncHistory, responseSections);
 
         if (request.isFullSync() || request.isAccIncSync()) {
@@ -1311,40 +1311,40 @@ public class Processor implements SyncProcessor {
             runRegularPaymentsIfEnabled(request);
         }
 
-        // обработка директив
+        // РѕР±СЂР°Р±РѕС‚РєР° РґРёСЂРµРєС‚РёРІ
         fullProcessingDirectives(request, responseSections);
 
         // AccountRegistry
         fullProcessingAccountsRegistry(request, responseSections);
 
-        // обработка реестра TallonApproval
+        // РѕР±СЂР°Р±РѕС‚РєР° СЂРµРµСЃС‚СЂР° TallonApproval
         fullProcessingReestTaloonApproval(request, syncHistory, responseSections);
 
-        // обработка реестра TaloonPreorder
+        // РѕР±СЂР°Р±РѕС‚РєР° СЂРµРµСЃС‚СЂР° TaloonPreorder
         fullProcessingReestrTaloonPreorder(request, syncHistory, responseSections);
 
-        // обработка заявок на питание
+        // РѕР±СЂР°Р±РѕС‚РєР° Р·Р°СЏРІРѕРє РЅР° РїРёС‚Р°РЅРёРµ
         fullProcessingRequestsSupplier(request, syncHistory, responseSections);
 
-        //обработка стaтусов предзаказов
+        //РѕР±СЂР°Р±РѕС‚РєР° СЃС‚aС‚СѓСЃРѕРІ РїСЂРµРґР·Р°РєР°Р·РѕРІ
         fullProcessingPreorderFeedingStatus(request, responseSections);
 
-        // обработка справочников веб-технолога
+        // РѕР±СЂР°Р±РѕС‚РєР° СЃРїСЂР°РІРѕС‡РЅРёРєРѕРІ РІРµР±-С‚РµС…РЅРѕР»РѕРіР°
         fullProcessingMenuSupplier(request, syncHistory, responseSections);
 
-        // обработка нулевых транзакций
+        // РѕР±СЂР°Р±РѕС‚РєР° РЅСѓР»РµРІС‹С… С‚СЂР°РЅР·Р°РєС†РёР№
         fullProcessingZeroTransactions(request, syncHistory, responseSections);
 
-        //обработка расписания комплексов
+        //РѕР±СЂР°Р±РѕС‚РєР° СЂР°СЃРїРёСЃР°РЅРёСЏ РєРѕРјРїР»РµРєСЃРѕРІ
         fullProcessingComplexSchedule(request, syncHistory, responseSections);
 
-        // обработка SpecialDates
+        // РѕР±СЂР°Р±РѕС‚РєР° SpecialDates
         fullProcessingSpecialDates(request, syncHistory, responseSections);
 
-        // обработка ClientPhotos
+        // РѕР±СЂР°Р±РѕС‚РєР° ClientPhotos
         fullProcessingClientPhotos(request, syncHistory, responseSections);
 
-        //Process GroupManagers (классных руководителей)
+        //Process GroupManagers (РєР»Р°СЃСЃРЅС‹С… СЂСѓРєРѕРІРѕРґРёС‚РµР»РµР№)
         fullProcessingClientGroupManagers(request, syncHistory, responseSections);
 
         //GroupsOrganization
@@ -1369,7 +1369,7 @@ public class Processor implements SyncProcessor {
 
         fullProcessingOrgSettings(request, syncHistory, responseSections);
 
-        //Секция заявок по ЭЖД
+        //РЎРµРєС†РёСЏ Р·Р°СЏРІРѕРє РїРѕ Р­Р–Р”
         fullProcessingGoogRequestEZD(request, syncHistory, responseSections);
 
         fullProcessingCardRequests(request, syncHistory, responseSections);
@@ -1382,16 +1382,16 @@ public class Processor implements SyncProcessor {
         fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
         if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
-            //Секция обработки заявок от ЕМИАС
+            //РЎРµРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё Р·Р°СЏРІРѕРє РѕС‚ Р•РњРРђРЎ
             fullProcessingEMIAS(request, responseSections);
 
-            //Секция обработки заявок от ЕМИАС (от Кафки)
+            //РЎРµРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё Р·Р°СЏРІРѕРє РѕС‚ Р•РњРРђРЎ (РѕС‚ РљР°С„РєРё)
             fullProcessingExemptionVisiting(request, responseSections);
         }
         if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
             fullProcessingExemptionVisitingClient(request, responseSections);
         }
-        // время окончания обработки
+        // РІСЂРµРјСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ РѕР±СЂР°Р±РѕС‚РєРё
         Date syncEndTime = new Date();
 
         if (request.isFullSync() && syncHistory != null) {
@@ -1509,7 +1509,7 @@ public class Processor implements SyncProcessor {
                 ResSpecialDates resSpecialDates = processSpecialDates(specialDatesRequest);
                 addToResponseSections(resSpecialDates, responseSections);
                 //
-                //Удаление всех SpecalDate, у которых группа null
+                //РЈРґР°Р»РµРЅРёРµ РІСЃРµС… SpecalDate, Сѓ РєРѕС‚РѕСЂС‹С… РіСЂСѓРїРїР° null
                 deleteOldVersionSpecialDate(request);
                 //
             }
@@ -2060,7 +2060,7 @@ public class Processor implements SyncProcessor {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception ignore) {
-        } //если не можем получить значение из конфигурации, берем дефолт
+        } //РµСЃР»Рё РЅРµ РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ РёР· РєРѕРЅС„РёРіСѓСЂР°С†РёРё, Р±РµСЂРµРј РґРµС„РѕР»С‚
         finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2152,9 +2152,9 @@ public class Processor implements SyncProcessor {
             SyncRequest.ClientParamRegistry clientParamRegistry = request.getClientParamRegistry();
             if (clientParamRegistry != null) {
                 ClientsMobileHistory clientsMobileHistory =
-                        new ClientsMobileHistory("Синхронизация по секциям (ConstructedSections)");
+                        new ClientsMobileHistory("РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РїРѕ СЃРµРєС†РёСЏРј (ConstructedSections)");
                 clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
-                clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+                clientsMobileHistory.setShowing("РђР Рњ РћРћ (РёРґ." + request.getIdOfOrg() + ")");
                 processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds,
                         clientsWithWrongVersion, clientsMobileHistory);
             }
@@ -2230,7 +2230,7 @@ public class Processor implements SyncProcessor {
                 addToResponseSections(resAccountOperationsRegistry, responseSections);
             }
         } catch (Exception e) {
-            logger.error("Ошибка при обработке AccountOperationsRegistry: ", e);
+            logger.error("РћС€РёР±РєР° РїСЂРё РѕР±СЂР°Р±РѕС‚РєРµ AccountOperationsRegistry: ", e);
         }
     }
 
@@ -2333,7 +2333,7 @@ public class Processor implements SyncProcessor {
             if (error != null) {
                 error = true;
             }
-            String message = String.format("Ошибка при обработке AccountOperationsRegistry: %s", e.getMessage());
+            String message = String.format("РћС€РёР±РєР° РїСЂРё РѕР±СЂР°Р±РѕС‚РєРµ AccountOperationsRegistry: %s", e.getMessage());
             if (syncHistory != null) {
                 processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory,
                         message);
@@ -2391,7 +2391,7 @@ public class Processor implements SyncProcessor {
     private SyncResponse buildCommodityAccountingSyncResponse(SyncRequest request) throws Exception {
 
         Long idOfPacket = null;
-        SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
+        SyncHistory syncHistory = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 
         ResPaymentRegistry resPaymentRegistry = null;
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
@@ -2549,7 +2549,7 @@ public class Processor implements SyncProcessor {
                 resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
-				resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
+                resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
                 resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
                 exemptionVisitingClient);
@@ -2557,7 +2557,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -2693,9 +2693,9 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
-				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
+                clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
@@ -2704,7 +2704,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildReestrTaloonsPreorderSyncResponse(SyncRequest request) throws Exception {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -2849,7 +2849,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildRequestsSupplierSyncResponse(SyncRequest request) throws Exception {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -2994,7 +2994,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -3141,7 +3141,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -3345,7 +3345,7 @@ public class Processor implements SyncProcessor {
     /* Do process short synchronization for update Client parameters */
     private SyncResponse buildClientsParamsSyncResponse(SyncRequest request) {
 
-        Long idOfPacket = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         SyncHistory idOfSync = null;
 
         ResPaymentRegistry resPaymentRegistry = null;
@@ -3447,9 +3447,9 @@ public class Processor implements SyncProcessor {
         try {
 
             ClientsMobileHistory clientsMobileHistory =
-                    new ClientsMobileHistory("Синхронизация типа GetClientParams (синхра клиентов)");
+                    new ClientsMobileHistory("РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ С‚РёРїР° GetClientParams (СЃРёРЅС…СЂР° РєР»РёРµРЅС‚РѕРІ)");
             clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
-            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+            clientsMobileHistory.setShowing("РђР Рњ РћРћ (РёРґ." + request.getIdOfOrg() + ")");
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
                     errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
         } catch (Exception e) {
@@ -3558,7 +3558,7 @@ public class Processor implements SyncProcessor {
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
     private SyncResponse buildAccRegisgtryUpdate(SyncRequest request) {
 
-        Long idOfPacket = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         SyncHistory idOfSync = null;
 
         ResPaymentRegistry resPaymentRegistry = null;
@@ -3763,7 +3763,7 @@ public class Processor implements SyncProcessor {
     /* Do process short synchronization for update payment register and account inc register */
     private SyncResponse buildAccIncSyncResponse(SyncRequest request) {
 
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -4012,7 +4012,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildMenuSupplierSyncResponse(SyncRequest request) throws Exception {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -4158,7 +4158,7 @@ public class Processor implements SyncProcessor {
             OrgSyncWritableRepository orgSyncWritableRepository = OrgSyncWritableRepository.getInstance();
             orgSyncWritableRepository.updateAccRegistryDate(idOfOrg);
         } catch (Exception e) {
-            logger.error("Не удалось обновить время синхронизации, idOfOrg: " + idOfOrg, e);
+            logger.error("РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±РЅРѕРІРёС‚СЊ РІСЂРµРјСЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё, idOfOrg: " + idOfOrg, e);
         }
     }
 
@@ -4267,7 +4267,7 @@ public class Processor implements SyncProcessor {
                 logger.error(String.format("Failed to process payment == %s", Payment), e);
                 resAcc = new ResPaymentRegistryItem(Payment.getIdOfOrder(), 100, "Internal error");
             }
-            // TODO: если resAcc.getResult() != 0 записать в журнал ошибок синхры
+            // TODO: РµСЃР»Рё resAcc.getResult() != 0 Р·Р°РїРёСЃР°С‚СЊ РІ Р¶СѓСЂРЅР°Р» РѕС€РёР±РѕРє СЃРёРЅС…СЂС‹
             resPaymentRegistry.addItem(resAcc);
         }
         return resPaymentRegistry;
@@ -4926,7 +4926,7 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            //  Применяем фильтр оборудования
+            //  РџСЂРёРјРµРЅСЏРµРј С„РёР»СЊС‚СЂ РѕР±РѕСЂСѓРґРѕРІР°РЅРёСЏ
             idOfOrg = DAOService.getInstance()
                     .receiveIdOfOrgByAccessory(idOfOrg, Accessory.BANK_ACCESSORY_TYPE, payment.getIdOfPOS());
 
@@ -5063,7 +5063,7 @@ public class Processor implements SyncProcessor {
                 long totalPurchaseRSum = 0;
                 long totalLunchRSum = 0;
                 Set<String> rations = new HashSet<>();
-                //Проверяем, есть ли среди деталей элемент со ссылкой на предзаказ
+                //РџСЂРѕРІРµСЂСЏРµРј, РµСЃС‚СЊ Р»Рё СЃСЂРµРґРё РґРµС‚Р°Р»РµР№ СЌР»РµРјРµРЅС‚ СЃРѕ СЃСЃС‹Р»РєРѕР№ РЅР° РїСЂРµРґР·Р°РєР°Р·
                 PreorderComplex preorderComplex = findPreorderComplexByPayment(persistenceSession, payment);
                 boolean saveAllPreorderDetails = (preorderComplex == null ? false : preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4));
 
@@ -5132,7 +5132,7 @@ public class Processor implements SyncProcessor {
                                     idOfOrg, payment.getIdOfOrder()));
                 }
 
-                //Если заказ есть и по нему не было сообщения, то отправляем сообщение
+                //Р•СЃР»Рё Р·Р°РєР°Р· РµСЃС‚СЊ Рё РїРѕ РЅРµРјСѓ РЅРµ Р±С‹Р»Рѕ СЃРѕРѕР±С‰РµРЅРёСЏ, С‚Рѕ РѕС‚РїСЂР°РІР»СЏРµРј СЃРѕРѕР±С‰РµРЅРёРµ
                 NotificationOrders notificationOrder =
                         DAOUtils.findNotificationOrder(persistenceSession,payment.getIdOfOrder(), client,false);
 
@@ -5143,9 +5143,9 @@ public class Processor implements SyncProcessor {
 
                 SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
 
-                // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
-                /* в случае анонимного заказа мы не знаем клиента */
-                /* не оповещаем в случае пробития корректировочных заказов */
+                // !!!!! РћРџРћР’Р•Р©Р•РќРР• РџРћ РЎРњРЎ !!!!!!!!
+                /* РІ СЃР»СѓС‡Р°Рµ Р°РЅРѕРЅРёРјРЅРѕРіРѕ Р·Р°РєР°Р·Р° РјС‹ РЅРµ Р·РЅР°РµРј РєР»РёРµРЅС‚Р° */
+                /* РЅРµ РѕРїРѕРІРµС‰Р°РµРј РІ СЃР»СѓС‡Р°Рµ РїСЂРѕР±РёС‚РёСЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРѕС‡РЅС‹С… Р·Р°РєР°Р·РѕРІ */
                 if (client != null) {
                     if (client.clientHasActiveSmartWatch()) {
                         try {
@@ -5186,7 +5186,7 @@ public class Processor implements SyncProcessor {
                                     values);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     values = EventNotificationService
-                            .attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
+                            .attachSourceOrgIdToValues(idOfOrg, values); //РѕСЂРіР°РЅРёР·Р°С†РёСЏ РёР· РїР°РєРµС‚Р° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     long totalRSum = totalBuffetRSum + totalLunchRSum;
                     long totalAmountBuyAll = totalBuffetRSum + totalLunchRSum;
@@ -5220,8 +5220,8 @@ public class Processor implements SyncProcessor {
                     }
                 }
             } else {
-                // TODO: есть ли необходимость оповещать клиента о сторне?
-                // отмена заказа
+                // TODO: РµСЃС‚СЊ Р»Рё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РѕРїРѕРІРµС‰Р°С‚СЊ РєР»РёРµРЅС‚Р° Рѕ СЃС‚РѕСЂРЅРµ?
+                // РѕС‚РјРµРЅР° Р·Р°РєР°Р·Р°
                 if (null != order) {
                     if (payment.getIdOfClient() != null) {
                         Client client = DAOService.getInstance().findClientById(payment.getIdOfClient());
@@ -5336,7 +5336,7 @@ public class Processor implements SyncProcessor {
         } else if (EventNotificationService.findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
             return ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_FREE.getValue();
         } else {
-            throw new Exception("Не определен тип события");
+            throw new Exception("РќРµ РѕРїСЂРµРґРµР»РµРЅ С‚РёРї СЃРѕР±С‹С‚РёСЏ");
         }
     }
 
@@ -5355,7 +5355,7 @@ public class Processor implements SyncProcessor {
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>();
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
-            /* совместимость организаций которые не имеют дружественных организаций */
+            /* СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ РѕСЂРіР°РЅРёР·Р°С†РёР№ РєРѕС‚РѕСЂС‹Рµ РЅРµ РёРјРµСЋС‚ РґСЂСѓР¶РµСЃС‚РІРµРЅРЅС‹С… РѕСЂРіР°РЅРёР·Р°С†РёР№ */
             orgSet.add(org);
             for (Org o : orgSet) {
                 List clientGroups = getClientGroupsByIdOfOrg(persistenceSession, o.getIdOfOrg());
@@ -5377,7 +5377,7 @@ public class Processor implements SyncProcessor {
             while (clientParamItems.hasNext()) {
                 SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
 
-                //Проверяем, если у клиента меняется организация, то блокируем ему карты в старой организации
+                //РџСЂРѕРІРµСЂСЏРµРј, РµСЃР»Рё Сѓ РєР»РёРµРЅС‚Р° РјРµРЅСЏРµС‚СЃСЏ РѕСЂРіР°РЅРёР·Р°С†РёСЏ, С‚Рѕ Р±Р»РѕРєРёСЂСѓРµРј РµРјСѓ РєР°СЂС‚С‹ РІ СЃС‚Р°СЂРѕР№ РѕСЂРіР°РЅРёР·Р°С†РёРё
                 Client client = DAOReadonlyService.getInstance().findClientById(clientParamItem.getIdOfClient());
                 disableClientCardsIfChangeOrg(client, orgSet, idOfOrg);
                 Boolean isRemoveDiscount = removeClientDiscountIfChangeOrg(client, persistenceSession, orgSet, idOfOrg);
@@ -5386,10 +5386,10 @@ public class Processor implements SyncProcessor {
                 }
 
                 /*ClientGroup clientGroup = orgMap.get(2L).get(clientParamItem.getGroupName());
-                 *//* если группы нет то создаем *//*
+                 *//* РµСЃР»Рё РіСЂСѓРїРїС‹ РЅРµС‚ С‚Рѕ СЃРѕР·РґР°РµРј *//*
                 if(clientGroup == null){
                     clientGroup = DAOUtils.createClientGroup(persistenceSession, idOfOrg, clientParamItem.getGroupName());
-                    *//* заносим в хэш - карту*//*
+                    *//* Р·Р°РЅРѕСЃРёРј РІ С…СЌС€ - РєР°СЂС‚Сѓ*//*
                     nameIdGroupMap.put(clientGroup.getGroupName(),clientGroup);
                 }*/
                 try {
@@ -5539,21 +5539,21 @@ public class Processor implements SyncProcessor {
                         client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
                     }
                 }
-                /* FAX клиента */
+                /* FAX РєР»РёРµРЅС‚Р° */
                 if (clientParamItem.getFax() != null) {
                     client.setFax(clientParamItem.getFax());
                 }
-                /* разрешает клиенту подтверждать оплату групового питания */
+                /* СЂР°Р·СЂРµС€Р°РµС‚ РєР»РёРµРЅС‚Сѓ РїРѕРґС‚РІРµСЂР¶РґР°С‚СЊ РѕРїР»Р°С‚Сѓ РіСЂСѓРїРѕРІРѕРіРѕ РїРёС‚Р°РЅРёСЏ */
                 if (clientParamItem.getCanConfirmGroupPayment() != null) {
                     client.setCanConfirmGroupPayment(clientParamItem.getCanConfirmGroupPayment());
                 }
 
-                /* согласие на видеоидентификацию */
+                /* СЃРѕРіР»Р°СЃРёРµ РЅР° РІРёРґРµРѕРёРґРµРЅС‚РёС„РёРєР°С†РёСЋ */
                 if (clientParamItem.getConfirmVisualRecognition() != null) {
                     client.setConfirmVisualRecognition(clientParamItem.getConfirmVisualRecognition());
                 }
 
-                /* заносим клиента в группу */
+                /* Р·Р°РЅРѕСЃРёРј РєР»РёРµРЅС‚Р° РІ РіСЂСѓРїРїСѓ */
                 if (StringUtils.isNotEmpty(clientParamItem.getGroupName())) {
                     ClientGroup  clientGroup;
                     if (changeOrg) {
@@ -5562,24 +5562,24 @@ public class Processor implements SyncProcessor {
                     } else {
                         clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
                     }
-                    //если группы нет то создаем
+                    //РµСЃР»Рё РіСЂСѓРїРїС‹ РЅРµС‚ С‚Рѕ СЃРѕР·РґР°РµРј
                     if (clientGroup == null) {
                         clientGroup = createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
                                 clientParamItem.getGroupName());
-                        // заносим в хэш - карту
+                        // Р·Р°РЅРѕСЃРёРј РІ С…СЌС€ - РєР°СЂС‚Сѓ
                         orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                     }
 
                     if (changeOrg) {
                         ClientManager.addClientMigrationEntry(persistenceSession, oldOrg, client.getClientGroup(),
                                 client.getOrg(), client, ClientGroupMigrationHistory.MODIFY_IN_ARM
-                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGroup.getGroupName());
+                                        .concat(String.format(" (РёРґ. РћРћ=%s)", idOfOrg)), clientGroup.getGroupName());
                     } else {
                         if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
                             ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
                                     clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
                                     ClientGroupMigrationHistory.MODIFY_IN_ARM
-                                            .concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                                            .concat(String.format(" (РёРґ. РћРћ=%s)", idOfOrg)));
                         }
                     }
                     client.setClientGroup(clientGroup);
@@ -5607,7 +5607,7 @@ public class Processor implements SyncProcessor {
             int newClientDiscountMode = clientParamItem.getDiscountMode();
             int oldClientDiscountMode = client.getDiscountMode();
             if (clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY) {
-                /* распарсим строку с категориями */
+                /* СЂР°СЃРїР°СЂСЃРёРј СЃС‚СЂРѕРєСѓ СЃ РєР°С‚РµРіРѕСЂРёСЏРјРё */
                 if (clientParamItem.getCategoriesDiscounts() != null) {
                     String[] catArray = categoriesFromPacket.split(",");
                     List<Long> idOfCategoryDiscount = new ArrayList<Long>();
@@ -5626,13 +5626,13 @@ public class Processor implements SyncProcessor {
                     }
                 }
             } else {
-                /* Льгота по категориями то очищаем */
+                /* Р›СЊРіРѕС‚Р° РїРѕ РєР°С‚РµРіРѕСЂРёСЏРјРё С‚Рѕ РѕС‡РёС‰Р°РµРј */
                 if (!client.getCategories().isEmpty()) {
                     client.setCategories(new HashSet<CategoryDiscount>());
                 }
             }
 
-            // Если льготы изменились, то сохраняем историю
+            // Р•СЃР»Рё Р»СЊРіРѕС‚С‹ РёР·РјРµРЅРёР»РёСЃСЊ, С‚Рѕ СЃРѕС…СЂР°РЅСЏРµРј РёСЃС‚РѕСЂРёСЋ
             if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet
                     .equals(categoryDiscountOfClient))) {
                 Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
@@ -5722,11 +5722,11 @@ public class Processor implements SyncProcessor {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = findOrg(persistenceSession, idOfOrg);
-            // Ищем "лишние" группы
+            // РС‰РµРј "Р»РёС€РЅРёРµ" РіСЂСѓРїРїС‹
             List<ClientGroup> superfluousClientGroups = new ArrayList<ClientGroup>();
             for (ClientGroup clientGroup : organization.getClientGroups()) {
                 if (clientGroup.isTemporaryGroup()) {
-                    // добавляем временную группу в список для удаления если она уже есть в постоянных
+                    // РґРѕР±Р°РІР»СЏРµРј РІСЂРµРјРµРЅРЅСѓСЋ РіСЂСѓРїРїСѓ РІ СЃРїРёСЃРѕРє РґР»СЏ СѓРґР°Р»РµРЅРёСЏ РµСЃР»Рё РѕРЅР° СѓР¶Рµ РµСЃС‚СЊ РІ РїРѕСЃС‚РѕСЏРЅРЅС‹С…
                     if (findClientGroupByName(clientGroup.getGroupName(), reqStructure)) {
                         superfluousClientGroups.add(clientGroup);
                     }
@@ -5737,21 +5737,21 @@ public class Processor implements SyncProcessor {
                     }
                 }
             }
-            // Удаляем "лишние" группы
+            // РЈРґР°Р»СЏРµРј "Р»РёС€РЅРёРµ" РіСЂСѓРїРїС‹
             for (ClientGroup clientGroup : superfluousClientGroups) {
-                // Отсоединяем группу от организации
+                // РћС‚СЃРѕРµРґРёРЅСЏРµРј РіСЂСѓРїРїСѓ РѕС‚ РѕСЂРіР°РЅРёР·Р°С†РёРё
                 organization.removeClientGroup(clientGroup);
-                // Удаляем из группы всех ее клиентов
+                // РЈРґР°Р»СЏРµРј РёР· РіСЂСѓРїРїС‹ РІСЃРµС… РµРµ РєР»РёРµРЅС‚РѕРІ
                 for (Client client : clientGroup.getClients()) {
                     client.setIdOfClientGroup(null);
                     client.setClientGroup(null);
                     client.setUpdateTime(new Date());
                     persistenceSession.update(client);
                 }
-                // Удаляем группу из БД
+                // РЈРґР°Р»СЏРµРј РіСЂСѓРїРїСѓ РёР· Р‘Р”
                 persistenceSession.delete(clientGroup);
             }
-            // Добавляем и обновляем группы согласно запроса
+            // Р”РѕР±Р°РІР»СЏРµРј Рё РѕР±РЅРѕРІР»СЏРµРј РіСЂСѓРїРїС‹ СЃРѕРіР»Р°СЃРЅРѕ Р·Р°РїСЂРѕСЃР°
             for (SyncRequest.OrgStructure.Group reqGroup : reqStructure.getGroups()) {
                 try {
                     processSyncOrgStructureGroup(persistenceSession, organization, reqGroup);
@@ -5807,15 +5807,15 @@ public class Processor implements SyncProcessor {
             persistenceSession.save(clientGroup);
         }
 
-        /* не нужный код - т.к. список клиентов всегда полный, из за него при регистрации с клиента сбрасывался класс после синхронизации
-        // Ищем "лишних" клиентов
+        /* РЅРµ РЅСѓР¶РЅС‹Р№ РєРѕРґ - С‚.Рє. СЃРїРёСЃРѕРє РєР»РёРµРЅС‚РѕРІ РІСЃРµРіРґР° РїРѕР»РЅС‹Р№, РёР· Р·Р° РЅРµРіРѕ РїСЂРё СЂРµРіРёСЃС‚СЂР°С†РёРё СЃ РєР»РёРµРЅС‚Р° СЃР±СЂР°СЃС‹РІР°Р»СЃСЏ РєР»Р°СЃСЃ РїРѕСЃР»Рµ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
+        // РС‰РµРј "Р»РёС€РЅРёС…" РєР»РёРµРЅС‚РѕРІ
         List<Client> superfluousClients = new ArrayList<Client>();
         for (Client client : clientGroup.getClients()) {
             if (!find(client, reqGroup)) {
                 superfluousClients.add(client);
             }
         }
-        // Убираем из группы "лишних" клиентов
+        // РЈР±РёСЂР°РµРј РёР· РіСЂСѓРїРїС‹ "Р»РёС€РЅРёС…" РєР»РёРµРЅС‚РѕРІ
         for (Client client : superfluousClients) {
             client.setIdOfClientGroup(null);
             client.setUpdateTime(new Date());
@@ -5823,7 +5823,7 @@ public class Processor implements SyncProcessor {
             clientGroup.removeClient(client);
         }*/
 
-        // Добавляем в группу клиентов согласно запросу
+        // Р”РѕР±Р°РІР»СЏРµРј РІ РіСЂСѓРїРїСѓ РєР»РёРµРЅС‚РѕРІ СЃРѕРіР»Р°СЃРЅРѕ Р·Р°РїСЂРѕСЃСѓ
         for (Long idOfClient : reqGroup.getClients()) {
             Long idOfClientGroup = getClientGroup(persistenceSession, idOfClient, organization.getIdOfOrg());
             if (idOfClientGroup != null && (idOfClientGroup.longValue() == clientGroup.getCompositeIdOfClientGroup()
@@ -5948,7 +5948,7 @@ public class Processor implements SyncProcessor {
 
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
-            /* совместимость организаций которые не имеют дружественных организаций */
+            /* СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ РѕСЂРіР°РЅРёР·Р°С†РёР№ РєРѕС‚РѕСЂС‹Рµ РЅРµ РёРјРµСЋС‚ РґСЂСѓР¶РµСЃС‚РІРµРЅРЅС‹С… РѕСЂРіР°РЅРёР·Р°С†РёР№ */
             for (Org o : orgSet) {
                 idOfOrgSet.add(o.getIdOfOrg());
             }
@@ -5958,7 +5958,7 @@ public class Processor implements SyncProcessor {
                 Client client = card.getClient();
                 accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
             }
-            // Добавляем карты перемещенных клиентов.
+            // Р”РѕР±Р°РІР»СЏРµРј РєР°СЂС‚С‹ РїРµСЂРµРјРµС‰РµРЅРЅС‹С… РєР»РёРµРЅС‚РѕРІ.
             if (clientIds == null || clientIds.isEmpty()) {
                 List<Client> allocClients = ClientManager.findAllAllocatedClients(persistenceSession, org);
                 for (Client client : allocClients) {
@@ -5968,7 +5968,7 @@ public class Processor implements SyncProcessor {
                 }
             }
 
-            // Добавляем карты временных посетителей (мигрантов)
+            // Р”РѕР±Р°РІР»СЏРµРј РєР°СЂС‚С‹ РІСЂРµРјРµРЅРЅС‹С… РїРѕСЃРµС‚РёС‚РµР»РµР№ (РјРёРіСЂР°РЅС‚РѕРІ)
             List<Client> migrantClients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
             for (Client client : migrantClients) {
                 for (Card card : client.getCards()) {
@@ -5995,7 +5995,7 @@ public class Processor implements SyncProcessor {
 
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
 
-            // Добавляем карты временных посетителей (мигрантов)
+            // Р”РѕР±Р°РІР»СЏРµРј РєР°СЂС‚С‹ РІСЂРµРјРµРЅРЅС‹С… РїРѕСЃРµС‚РёС‚РµР»РµР№ (РјРёРіСЂР°РЅС‚РѕРІ)
             List<Client> migrantClients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
             for (Client client : migrantClients) {
                 for (Card card : client.getCards()) {
@@ -6112,7 +6112,7 @@ public class Processor implements SyncProcessor {
             orgList.add(organization);
             clients = findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
 
-            // Добавляем временных посетителей (мигрантов)
+            // Р”РѕР±Р°РІР»СЏРµРј РІСЂРµРјРµРЅРЅС‹С… РїРѕСЃРµС‚РёС‚РµР»РµР№ (РјРёРіСЂР°РЅС‚РѕРІ)
             List<Client> migrants = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
             clients.addAll(migrants);
 
@@ -6131,7 +6131,7 @@ public class Processor implements SyncProcessor {
                 }
             }
             activeClientsId = new HashSet<>(findActiveClientsId(persistenceSession, orgList));
-            // Получаем чужих клиентов.
+            // РџРѕР»СѓС‡Р°РµРј С‡СѓР¶РёС… РєР»РёРµРЅС‚РѕРІ.
             Map<String, Set<Client>> alienClients = ClientManager
                     .findAllocatedClients(persistenceSession, organization);
             for (Map.Entry<String, Set<Client>> entry : alienClients.entrySet()) {
@@ -6144,7 +6144,7 @@ public class Processor implements SyncProcessor {
                 }
             }
 
-            // Добавляем временных посетителей (мигрантов)
+            // Р”РѕР±Р°РІР»СЏРµРј РІСЂРµРјРµРЅРЅС‹С… РїРѕСЃРµС‚РёС‚РµР»РµР№ (РјРёРіСЂР°РЅС‚РѕРІ)
             for (Client migrant : migrants) {
                 activeClientsId.add(migrant.getIdOfClient());
             }
@@ -6158,8 +6158,8 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            // "при отличии количества активных клиентов в базе админки от клиентов, которые должны быть у данной организации
-            // с учетом дружественных и правил - выдаем список идентификаторов всех клиентов в отдельном теге"
+            // "РїСЂРё РѕС‚Р»РёС‡РёРё РєРѕР»РёС‡РµСЃС‚РІР° Р°РєС‚РёРІРЅС‹С… РєР»РёРµРЅС‚РѕРІ РІ Р±Р°Р·Рµ Р°РґРјРёРЅРєРё РѕС‚ РєР»РёРµРЅС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ Сѓ РґР°РЅРЅРѕР№ РѕСЂРіР°РЅРёР·Р°С†РёРё
+            // СЃ СѓС‡РµС‚РѕРј РґСЂСѓР¶РµСЃС‚РІРµРЅРЅС‹С… Рё РїСЂР°РІРёР» - РІС‹РґР°РµРј СЃРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РІСЃРµС… РєР»РёРµРЅС‚РѕРІ РІ РѕС‚РґРµР»СЊРЅРѕРј С‚РµРіРµ"
             if (clientRegistryRequest.getCurrentCount() != null && activeClientsId.size() != clientRegistryRequest
                     .getCurrentCount()) {
                 for (Long id : activeClientsId) {
@@ -6171,7 +6171,7 @@ public class Processor implements SyncProcessor {
                         organization.getFriendlyOrg(), errorClientIds);
                 ClientGroup clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
                         organization.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                // Есть возможность отсутсвия даной группы
+                // Р•СЃС‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РѕС‚СЃСѓС‚СЃРІРёСЏ РґР°РЅРѕР№ РіСЂСѓРїРїС‹
                 if (clientGroup == null) {
                     clientGroup = createClientGroup(persistenceSession, organization.getIdOfOrg(),
                             ClientGroup.Predefined.CLIENT_LEAVING);
@@ -6358,7 +6358,7 @@ public class Processor implements SyncProcessor {
 
                 boolean bOrgIsMenuExchangeSource = DAOUtils.isOrgMenuExchangeSource(persistenceSession, idOfOrg);
 
-                /// сохраняем секцию Settings
+                /// СЃРѕС…СЂР°РЅСЏРµРј СЃРµРєС†РёСЋ Settings
                 if (bOrgIsMenuExchangeSource && (reqMenu.getSettingsSectionRawXML() != null)) {
                     persistenceTransaction = persistenceSession.beginTransaction();
 
@@ -6374,15 +6374,15 @@ public class Processor implements SyncProcessor {
                 Iterator<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
                 boolean bFirstMenuItem = true;
                 while (menuItems.hasNext()) {
-                    //  Открываем тразнакцию для каждого дня
+                    //  РћС‚РєСЂС‹РІР°РµРј С‚СЂР°Р·РЅР°РєС†РёСЋ РґР»СЏ РєР°Р¶РґРѕРіРѕ РґРЅСЏ
                     persistenceTransaction = persistenceSession.beginTransaction();
 
                     SyncRequest.ReqMenu.Item item = menuItems.next();
-                    /// сохраняем данные меню для распространения
+                    /// СЃРѕС…СЂР°РЅСЏРµРј РґР°РЅРЅС‹Рµ РјРµРЅСЋ РґР»СЏ СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ
                     if (bOrgIsMenuExchangeSource) {
                         MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
                                 bFirstMenuItem ? MenuExchange.FLAG_ANCHOR_MENU : MenuExchange.FLAG_NONE);
-                        //Удаление объекта из сессии с одинаковым идентификатором
+                        //РЈРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р° РёР· СЃРµСЃСЃРёРё СЃ РѕРґРёРЅР°РєРѕРІС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј
                         MenuExchange menuExchangeFromSession = (MenuExchange) persistenceSession.load(MenuExchange.class, menuExchange.getCompositeIdOfMenuExchange());
                         if(menuExchangeFromSession != null) {
                             persistenceSession.evict(menuExchangeFromSession);
@@ -6394,18 +6394,18 @@ public class Processor implements SyncProcessor {
                     ////
                     Menu menu = findMenu(persistenceSession, organization, Menu.ORG_MENU_SOURCE, menuDate);
                     Integer detailsHashCode = null;
-                    // Подсчитываем хеш-код входных данных
+                    // РџРѕРґСЃС‡РёС‚С‹РІР°РµРј С…РµС€-РєРѕРґ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…
                     final int detailsHashCode1 = item.hashCode();
                     if (null == menu) {
-                        // Если меню не найдено то создаем
+                        // Р•СЃР»Рё РјРµРЅСЋ РЅРµ РЅР°Р№РґРµРЅРѕ С‚Рѕ СЃРѕР·РґР°РµРј
                         menu = new Menu(organization, menuDate, new Date(), Menu.ORG_MENU_SOURCE,
                                 bFirstMenuItem ? Menu.FLAG_ANCHOR_MENU : Menu.FLAG_NONE, detailsHashCode1);
                         persistenceSession.save(menu);
                     } else {
-                        // если меню найдено смотрим его хеш-код
+                        // РµСЃР»Рё РјРµРЅСЋ РЅР°Р№РґРµРЅРѕ СЃРјРѕС‚СЂРёРј РµРіРѕ С…РµС€-РєРѕРґ
                         detailsHashCode = menu.getDetailsHashCode();
-                        // обновляем занчение хеша в случае если оно пусто (меню возможно уже есть но не имееет хеша)
-                        // или в случае если меню изменилось
+                        // РѕР±РЅРѕРІР»СЏРµРј Р·Р°РЅС‡РµРЅРёРµ С…РµС€Р° РІ СЃР»СѓС‡Р°Рµ РµСЃР»Рё РѕРЅРѕ РїСѓСЃС‚Рѕ (РјРµРЅСЋ РІРѕР·РјРѕР¶РЅРѕ СѓР¶Рµ РµСЃС‚СЊ РЅРѕ РЅРµ РёРјРµРµРµС‚ С…РµС€Р°)
+                        // РёР»Рё РІ СЃР»СѓС‡Р°Рµ РµСЃР»Рё РјРµРЅСЋ РёР·РјРµРЅРёР»РѕСЃСЊ
 
                         if (detailsHashCode == null || !detailsHashCode.equals(detailsHashCode1)) {
                             //menu.setDetailsHashCode(detailsHashCode1);
@@ -6419,7 +6419,7 @@ public class Processor implements SyncProcessor {
                             query.executeUpdate();
                         }
                     }
-                    // проверяем спомощью хеш-кода изменилось ли меню, в случае если изменилось то перезаписываем
+                    // РїСЂРѕРІРµСЂСЏРµРј СЃРїРѕРјРѕС‰СЊСЋ С…РµС€-РєРѕРґР° РёР·РјРµРЅРёР»РѕСЃСЊ Р»Рё РјРµРЅСЋ, РІ СЃР»СѓС‡Р°Рµ РµСЃР»Рё РёР·РјРµРЅРёР»РѕСЃСЊ С‚Рѕ РїРµСЂРµР·Р°РїРёСЃС‹РІР°РµРј
                     if (detailsHashCode == null || !detailsHashCode.equals(detailsHashCode1)) {
                         /*List<PreorderComplex> preorderComplexes = DAOUtils.getPreorderComplexesForOrgByPeriod(persistenceSession,
                                 idOfOrg, CalendarUtils.startOfDay(menuDate), CalendarUtils.endOfDay(menuDate)); */
@@ -6433,7 +6433,7 @@ public class Processor implements SyncProcessor {
                     }
 
                     bFirstMenuItem = false;
-                    //  Подтверждаем транзакцию для каждого дня
+                    //  РџРѕРґС‚РІРµСЂР¶РґР°РµРј С‚СЂР°РЅР·Р°РєС†РёСЋ РґР»СЏ РєР°Р¶РґРѕРіРѕ РґРЅСЏ
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -6584,14 +6584,14 @@ public class Processor implements SyncProcessor {
     private void processReqMenuDetails(Session persistenceSession, Menu menu, SyncRequest.ReqMenu.Item item,
             Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
             HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
-        // Ищем "лишние" элементы меню
+        // РС‰РµРј "Р»РёС€РЅРёРµ" СЌР»РµРјРµРЅС‚С‹ РјРµРЅСЋ
         List<MenuDetail> superfluousMenuDetails = new LinkedList<MenuDetail>();
         for (MenuDetail menuDetail : menu.getMenuDetails()) {
             if (!find(menuDetail, item)) {
                 superfluousMenuDetails.add(menuDetail);
             }
         }
-        // Удаляем "лишние" элементы меню
+        // РЈРґР°Р»СЏРµРј "Р»РёС€РЅРёРµ" СЌР»РµРјРµРЅС‚С‹ РјРµРЅСЋ
         for (MenuDetail menuDetail : superfluousMenuDetails) {
             menu.removeMenuDetail(menuDetail);
 
@@ -6614,7 +6614,7 @@ public class Processor implements SyncProcessor {
             persistenceSession.delete(menuDetail);
         }
 
-        // Добавляем новые элементы из пришедшего меню
+        // Р”РѕР±Р°РІР»СЏРµРј РЅРѕРІС‹Рµ СЌР»РµРјРµРЅС‚С‹ РёР· РїСЂРёС€РµРґС€РµРіРѕ РјРµРЅСЋ
         while (reqMenuDetails.hasNext()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
             boolean exists = false;
@@ -6636,7 +6636,7 @@ public class Processor implements SyncProcessor {
                         reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(), reqMenuDetail.getFlags());
                 newMenuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
                 newMenuDetail.setGroupName(reqMenuDetail.getGroup() == null ? ""
-                        : reqMenuDetail.getGroup()); // в старых версиях клиента могут быть без группы
+                        : reqMenuDetail.getGroup()); // РІ СЃС‚Р°СЂС‹С… РІРµСЂСЃРёСЏС… РєР»РёРµРЅС‚Р° РјРѕРіСѓС‚ Р±С‹С‚СЊ Р±РµР· РіСЂСѓРїРїС‹
                 newMenuDetail.setMenuDetailOutput(reqMenuDetail.getOutput());
                 newMenuDetail.setPrice(reqMenuDetail.getPrice());
                 newMenuDetail.setPriority(reqMenuDetail.getPriority());
@@ -6669,7 +6669,7 @@ public class Processor implements SyncProcessor {
 
                 localIdsToMenuDetailMap.put(reqMenuDetail.getIdOfMenu(), newMenuDetail);
             }
-            //Заполнение новой таблицы cf_good_bb_menu_price
+            //Р—Р°РїРѕР»РЅРµРЅРёРµ РЅРѕРІРѕР№ С‚Р°Р±Р»РёС†С‹ cf_good_bb_menu_price
             saveBasicBasketPriceHistoryByMenu(persistenceSession, menu, reqMenuDetail);
         }
     }
@@ -6766,7 +6766,7 @@ public class Processor implements SyncProcessor {
                         break;
                     }
                 }
-                /// если в период выборки не попало корневое меню, то ищем его на предыдущие даты
+                /// РµСЃР»Рё РІ РїРµСЂРёРѕРґ РІС‹Р±РѕСЂРєРё РЅРµ РїРѕРїР°Р»Рѕ РєРѕСЂРЅРµРІРѕРµ РјРµРЅСЋ, С‚Рѕ РёС‰РµРј РµРіРѕ РЅР° РїСЂРµРґС‹РґСѓС‰РёРµ РґР°С‚С‹
                 if (!hasAnchorMenu) {
                     MenuExchange anchorMenu = findMenuExchangeBeforeDateByEqFlag(persistenceSession, idOfSourceOrg,
                             toDate(startDate), MenuExchange.FLAG_ANCHOR_MENU);
@@ -6802,24 +6802,24 @@ public class Processor implements SyncProcessor {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = getOrgReference(persistenceSession, idOfOrg);
-            // Ищем "лишние" предметы
+            // РС‰РµРј "Р»РёС€РЅРёРµ" РїСЂРµРґРјРµС‚С‹
             List<DiaryClass> superfluousDiaryClasses = new LinkedList<DiaryClass>();
             for (DiaryClass diaryClass : organization.getDiaryClasses()) {
                 if (!find(diaryClass, reqDiary)) {
                     superfluousDiaryClasses.add(diaryClass);
                 }
             }
-            // Удаляем "лишние" предметы
+            // РЈРґР°Р»СЏРµРј "Р»РёС€РЅРёРµ" РїСЂРµРґРјРµС‚С‹
             for (DiaryClass diaryClass : superfluousDiaryClasses) {
                 organization.removeDiaryClass(diaryClass);
                 persistenceSession.delete(diaryClass);
             }
-            // Добавляем и обновляем предметы согласно запросу
+            // Р”РѕР±Р°РІР»СЏРµРј Рё РѕР±РЅРѕРІР»СЏРµРј РїСЂРµРґРјРµС‚С‹ СЃРѕРіР»Р°СЃРЅРѕ Р·Р°РїСЂРѕСЃСѓ
             Enumeration<SyncRequest.ReqDiary.ReqDiaryClass> reqDiaryClasses = reqDiary.getReqDiaryClasses();
             while (reqDiaryClasses.hasMoreElements()) {
                 processSyncDiaryClass(persistenceSession, organization, reqDiaryClasses.nextElement());
             }
-            // Добавляем или обновляем расписания и добавляем оценки
+            // Р”РѕР±Р°РІР»СЏРµРј РёР»Рё РѕР±РЅРѕРІР»СЏРµРј СЂР°СЃРїРёСЃР°РЅРёСЏ Рё РґРѕР±Р°РІР»СЏРµРј РѕС†РµРЅРєРё
             Enumeration<SyncRequest.ReqDiary.ReqDiaryTimesheet> reqDiaryTimesheets = reqDiary.getReqDiaryTimesheets();
             while (reqDiaryTimesheets.hasMoreElements()) {
                 processDiaryTimesheet(persistenceSession, organization, reqDiaryTimesheets.nextElement());
@@ -6853,7 +6853,7 @@ public class Processor implements SyncProcessor {
                 final Long idOfClient = e.getIdOfClient();
 
 
-                //  Применяем фильтр оборудования
+                //  РџСЂРёРјРµРЅСЏРµРј С„РёР»СЊС‚СЂ РѕР±РѕСЂСѓРґРѕРІР°РЅРёСЏ
                 idOfOrg = accessories.get(e.getTurnstileAddr());
                 if (idOfOrg == null) {
                     idOfOrg = org.getIdOfOrg();
@@ -6866,7 +6866,7 @@ public class Processor implements SyncProcessor {
                 if (existEnterEvent(persistenceSession, idOfOrg, e.getIdOfEnterEvent())) {
                     EnterEvent ee = findEnterEvent(persistenceSession,
                             new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
-                    // Если ENTER событие существует (может быть последний результат синхронизации не был передан клиенту)
+                    // Р•СЃР»Рё ENTER СЃРѕР±С‹С‚РёРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ (РјРѕР¶РµС‚ Р±С‹С‚СЊ РїРѕСЃР»РµРґРЅРёР№ СЂРµР·СѓР»СЊС‚Р°С‚ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РЅРµ Р±С‹Р» РїРµСЂРµРґР°РЅ РєР»РёРµРЅС‚Сѓ)
                     final boolean checkClient =
                             (ee.getClient() == null && idOfClient == null) || (ee.getClient() != null && ee.getClient()
                                     .getIdOfClient().equals(idOfClient));
@@ -6899,7 +6899,7 @@ public class Processor implements SyncProcessor {
                         }
                     }
 
-                    //Обработка события от внешней системы
+                    //РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РѕС‚ РІРЅРµС€РЅРµР№ СЃРёСЃС‚РµРјС‹
                     if (e.getPassDirection() == EnterEvent.CHECKED_BY_TEACHER_EXT) {
                         String qstr = "delete from EnterEventManual where idOfClient = :idOfClient and evtDateTime <= :evtDateTime";
                         Query query = persistenceSession.createQuery(qstr);
@@ -6918,7 +6918,7 @@ public class Processor implements SyncProcessor {
                     enterEvent.setLongCardId(e.getLongCardId());
                     enterEvent.setClient(clientFromEnterEvent);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
-                    // Проверка корректности времени
+                    // РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІСЂРµРјРµРЅРё
                     if(e.getEvtDateTime().after(now)) {
                         enterEvent.setEvtDateTime(changeTimeByMode(e, mod, now, syncTime));
                     } else {
@@ -6972,7 +6972,7 @@ public class Processor implements SyncProcessor {
                         String[] values = generateNotificationParams(persistenceSession, clientFromEnterEvent, e);
                         values = EventNotificationService.attachTargetIdToValues(e.getIdOfEnterEvent(), values);
                         values = EventNotificationService
-                                .attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
+                                .attachSourceOrgIdToValues(idOfOrg, values); //РѕСЂРіР°РЅРёР·Р°С†РёСЏ РёР· РїР°РєРµС‚Р° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
                         values = EventNotificationService.attachOrgAddressToValues(org.getAddress(), values);
                         values = EventNotificationService
                                 .attachOrgShortNameToValues(org.getShortNameInfoService(), values);
@@ -7043,7 +7043,7 @@ public class Processor implements SyncProcessor {
                         }
                     }
 
-                    /// Формирование журнала транзакции
+                    /// Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ Р¶СѓСЂРЅР°Р»Р° С‚СЂР°РЅР·Р°РєС†РёРё
                     if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS) && (
                             e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT
                                     || e.getPassDirection() == EnterEvent.RE_ENTRY
@@ -7051,7 +7051,7 @@ public class Processor implements SyncProcessor {
 
                         final CompositeIdOfEnterEvent compositeIdOfEnterEvent = enterEvent.getCompositeIdOfEnterEvent();
                         if (card == null) {
-                            final String message = "Не найдена карта по событию прохода: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d";
+                            final String message = "РќРµ РЅР°Р№РґРµРЅР° РєР°СЂС‚Р° РїРѕ СЃРѕР±С‹С‚РёСЋ РїСЂРѕС…РѕРґР°: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d";
                             logger.error(String.format(message, compositeIdOfEnterEvent.getIdOfOrg(),
                                     compositeIdOfEnterEvent.getIdOfEnterEvent(), e.getIdOfCard()));
                         }
@@ -7223,7 +7223,7 @@ public class Processor implements SyncProcessor {
             persistenceSession.update(diaryTimesheet);
         }
 
-        // Заносим в БД все оценки за этот день
+        // Р—Р°РЅРѕСЃРёРј РІ Р‘Р” РІСЃРµ РѕС†РµРЅРєРё Р·Р° СЌС‚РѕС‚ РґРµРЅСЊ
         Enumeration<SyncRequest.ReqDiary.ReqDiaryTimesheet.ReqDiaryValue> reqDiaryValues = reqDiaryTimesheet
                 .getReqDiaryValues();
         while (reqDiaryValues.hasMoreElements()) {
@@ -7379,8 +7379,8 @@ public class Processor implements SyncProcessor {
         final Integer childPassChecker = event.getChildPassChecker();
         final Long childPassCheckerId = event.getChildPassCheckerId();
         final Date eventDate = event.getEvtDateTime();
-        final String enterEvent = "Вход";
-        final String exitEvent = "Выход";
+        final String enterEvent = "Р’С…РѕРґ";
+        final String exitEvent = "Р’С‹С…РѕРґ";
         String eventName = "";
         if (passDirection == EnterEvent.ENTRY) {
             eventName = enterEvent;
@@ -7391,9 +7391,9 @@ public class Processor implements SyncProcessor {
         } else if (passDirection == EnterEvent.RE_EXIT) {
             eventName = exitEvent;
         }
-        // Если представитель не пуст, то значит вход/выход в детский сад. Иначе - в школу.
-        eventName = eventName + (guardianId == null ? (eventName.equals(enterEvent) ? " в школу"
-                : eventName.equals(exitEvent) ? " из школы" : "") : "");
+        // Р•СЃР»Рё РїСЂРµРґСЃС‚Р°РІРёС‚РµР»СЊ РЅРµ РїСѓСЃС‚, С‚Рѕ Р·РЅР°С‡РёС‚ РІС…РѕРґ/РІС‹С…РѕРґ РІ РґРµС‚СЃРєРёР№ СЃР°Рґ. РРЅР°С‡Рµ - РІ С€РєРѕР»Сѓ.
+        eventName = eventName + (guardianId == null ? (eventName.equals(enterEvent) ? " РІ С€РєРѕР»Сѓ"
+                : eventName.equals(exitEvent) ? " РёР· С€РєРѕР»С‹" : "") : "");
         String guardianName = "";
         if (guardianId != null) {
             Person guardPerson = ((Client) session.load(Client.class, guardianId)).getPerson();
@@ -7402,9 +7402,9 @@ public class Processor implements SyncProcessor {
         String childPassCheckerMark = "";
         if (childPassChecker != null) {
             if (childPassChecker.longValue() == 0) {
-                childPassCheckerMark = "восп.";
+                childPassCheckerMark = "РІРѕСЃРї.";
             } else {
-                childPassCheckerMark = "охр.";
+                childPassCheckerMark = "РѕС…СЂ.";
             }
         }
         String childPassCheckerName = "";
@@ -7425,12 +7425,12 @@ public class Processor implements SyncProcessor {
         String enterWithChecker = "0";
         if (event.getIdOfClient() != null) {
             if (childPassChecker != null) {
-                enterWithChecker = "1";//16,17 событие
+                enterWithChecker = "1";//16,17 СЃРѕР±С‹С‚РёРµ
             } else {
                 if (guardianId != null) {
-                    enterWithChecker = "2";//3,4 событие
+                    enterWithChecker = "2";//3,4 СЃРѕР±С‹С‚РёРµ
                 } else {
-                    enterWithChecker = "3";//1,2 событие
+                    enterWithChecker = "3";//1,2 СЃРѕР±С‹С‚РёРµ
                 }
             }
         }
@@ -7543,16 +7543,16 @@ public class Processor implements SyncProcessor {
                         } catch (IOException e) {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_SAVED);
-                            item.setErrorMessage("Не удалось сохранить файл");
+                            item.setErrorMessage("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»");
                         } catch (FileUtils.NotEnoughFreeSpaceException e) {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_OUT_OF_SPACE);
-                            item.setErrorMessage("Не удалось сохранить файл: недостаточно свободного места");
+                            item.setErrorMessage("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»: РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°");
                         } catch (FileUtils.FileIsTooBigException e) {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_FILE_IS_TOO_BIG);
                             item.setErrorMessage(
-                                    "Не удалось сохранить файл: файл слишком большой (максимальный размер файла - 3MB)");
+                                    "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»: С„Р°Р№Р» СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№ (РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р° - 3MB)");
                         }
                     } else {
                         try {
@@ -7570,29 +7570,29 @@ public class Processor implements SyncProcessor {
                         } catch (IOException e) {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_SAVED);
-                            item.setErrorMessage("Не удалось сохранить файл");
+                            item.setErrorMessage("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»");
                         } catch (FileUtils.NotEnoughFreeSpaceException e) {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_OUT_OF_SPACE);
-                            item.setErrorMessage("Не удалось сохранить файл: недостаточно свободного места");
+                            item.setErrorMessage("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»: РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°");
                         } catch (FileUtils.FileIsTooBigException e) {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_FILE_IS_TOO_BIG);
                             item.setErrorMessage(
-                                    "Не удалось сохранить файл: файл слишком большой (максимальный размер файла - 3MB)");
+                                    "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»: С„Р°Р№Р» СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№ (РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р° - 3MB)");
                         }
                     }
                 } else if (OrgFilesRequest.Operation.DELETE == operation) {     // delete
                     if (null == orgFile) {
                         logger.error("Error removing OrgFiles: file not exist");
                         item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_DELETED);
-                        item.setErrorMessage("Не удалось удалить файл: файл не существует");
+                        item.setErrorMessage("РќРµ СѓРґР°Р»РѕСЃСЊ СѓРґР°Р»РёС‚СЊ С„Р°Р№Р»: С„Р°Р№Р» РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚");
                     } else {
                         try {
                             if (!FileUtils.removeFile(org.getIdOfOrg(), orgFile.getName(), orgFile.getExt())) {
                                 logger.error("Error removing OrgFiles: unexpected error");
                                 item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_DELETED);
-                                item.setErrorMessage("Не удалось удалить файл");
+                                item.setErrorMessage("РќРµ СѓРґР°Р»РѕСЃСЊ СѓРґР°Р»РёС‚СЊ С„Р°Р№Р»");
                             }
                             session.delete(orgFile);
                         } catch (SecurityException e) {
@@ -7799,7 +7799,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildHelpRequestsSyncResponse(SyncRequest request) throws Exception {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -8159,7 +8159,7 @@ public class Processor implements SyncProcessor {
         }
     }
 
-    private ResRequestFeeding processRequestFeeding(RequestFeeding requestFeeding) throws Exception {
+    public ResRequestFeeding processRequestFeeding(RequestFeeding requestFeeding) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ResRequestFeeding resRequestFeeding = null;
@@ -8170,9 +8170,16 @@ public class Processor implements SyncProcessor {
             resRequestFeeding = (ResRequestFeeding) processor.process();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            ((RequestFeedingProcessor) processor).processETPStatuses(resRequestFeeding.getStatuses());
-        }
-        finally {
+            long time = System.currentTimeMillis() - RuntimeContext.getAppContext().getBean(ETPMVService.class)
+                    .getPauseValue();
+            for (ResRequestFeedingETPStatuses etpStatus : resRequestFeeding.getStatuses()) {
+                RuntimeContext.getAppContext().getBean(ETPMVService.class)
+                        .sendStatusAsync(time, etpStatus.getApplicationForFood().getServiceNumber(),
+                                etpStatus.getStatus().getApplicationForFoodState(),
+                                etpStatus.getStatus().getDeclineReason());
+                time += RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
+            }
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
@@ -8238,7 +8245,7 @@ public class Processor implements SyncProcessor {
 
         try {
             GoodRequestEZDRequest goodRequestEZDRequest = request.getGoodRequestEZDRequest();
-            //Если такая секция существует в исходном запросе
+            //Р•СЃР»Рё С‚Р°РєР°СЏ СЃРµРєС†РёСЏ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ РёСЃС…РѕРґРЅРѕРј Р·Р°РїСЂРѕСЃРµ
             if (goodRequestEZDRequest != null) {
                 GoodRequestEZDSection goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest,
                         request.getIdOfOrg());
@@ -8339,7 +8346,7 @@ public class Processor implements SyncProcessor {
         if (client == null) {
             return false;
         }
-        //Если новая организация не совпадает ни со старой, ни с дружественными старой, то удаляем льготы
+        //Р•СЃР»Рё РЅРѕРІР°СЏ РѕСЂРіР°РЅРёР·Р°С†РёСЏ РЅРµ СЃРѕРІРїР°РґР°РµС‚ РЅРё СЃРѕ СЃС‚Р°СЂРѕР№, РЅРё СЃ РґСЂСѓР¶РµСЃС‚РІРµРЅРЅС‹РјРё СЃС‚Р°СЂРѕР№, С‚Рѕ СѓРґР°Р»СЏРµРј Р»СЊРіРѕС‚С‹
         if (isReplaceOrg(client, oldOrgs, newIdOfOrg)) {
             DiscountManager.deleteDiscount(client, session);
             return true;
@@ -8361,9 +8368,9 @@ public class Processor implements SyncProcessor {
 
     private boolean isReplaceOrg(Client client, Set<Org> oldOrgs, long newIdOfOrg) {
         Boolean replaceOrg = !client.getOrg().getIdOfOrg()
-                .equals(newIdOfOrg); //сравниваем старую организацию клиента с новой
+                .equals(newIdOfOrg); //СЃСЂР°РІРЅРёРІР°РµРј СЃС‚Р°СЂСѓСЋ РѕСЂРіР°РЅРёР·Р°С†РёСЋ РєР»РёРµРЅС‚Р° СЃ РЅРѕРІРѕР№
         for (Org o : oldOrgs) {
-            if (o.getIdOfOrg().equals(newIdOfOrg)) {                             //и с дружественными организациями
+            if (o.getIdOfOrg().equals(newIdOfOrg)) {                             //Рё СЃ РґСЂСѓР¶РµСЃС‚РІРµРЅРЅС‹РјРё РѕСЂРіР°РЅРёР·Р°С†РёСЏРјРё
                 replaceOrg = false;
                 return replaceOrg;
             }
@@ -8373,7 +8380,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse buildOrgSettingsSectionsResponse(SyncRequest request, Date syncStartTime, int syncResult) {
         SyncHistory syncHistory = null;
-        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        Long idOfPacket = null, idOfSync = null; // СЂРµРіРёСЃС‚РёСЂСѓСЋС‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»РЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
         ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
@@ -8470,7 +8477,7 @@ public class Processor implements SyncProcessor {
 
         try {
             GoodRequestEZDRequest goodRequestEZDRequest = request.getGoodRequestEZDRequest();
-            //Если такая секция существует в исходном запросе
+            //Р•СЃР»Рё С‚Р°РєР°СЏ СЃРµРєС†РёСЏ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ РёСЃС…РѕРґРЅРѕРј Р·Р°РїСЂРѕСЃРµ
             if (goodRequestEZDRequest != null) {
                 goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest, request.getIdOfOrg());
             }
