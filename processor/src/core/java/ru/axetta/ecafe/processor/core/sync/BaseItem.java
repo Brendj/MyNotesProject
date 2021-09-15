@@ -4,12 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,7 +39,7 @@ public class BaseItem {
         if(StringUtils.isNotEmpty(strOrgId)){
             try {
                 orgId =  Long.parseLong(strOrgId);
-                Org o = DAOService.getInstance().getOrg(orgId);
+                Org o = DAOReadonlyService.getInstance().findOrg(orgId);
                 if (o == null) {
                     errorMessage.append(String.format("Org with id=%s not found", orgId));
                 }

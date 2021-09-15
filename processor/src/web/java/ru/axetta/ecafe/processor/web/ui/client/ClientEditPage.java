@@ -4,6 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
@@ -21,15 +29,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -745,8 +744,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
 
-        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
-        this.clientWardItems = loadWardsByClient(session, idOfClient);
+        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
+        this.clientWardItems = loadWardsByClient(session, idOfClient, true);
         this.changePassword = false;
 
         fill(session, client);

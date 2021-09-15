@@ -42,12 +42,13 @@ public class ClientGuardianItem {
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
-            List<NotificationSettingItem> notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
-            ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
-            Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType, Boolean allowedPreorders) {
+                              List<NotificationSettingItem> notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
+                              ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
+                              Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType,
+                              Boolean allowedPreorders, Boolean getFullName){
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
-        this.personName = client.getPerson().getSurnameAndFirstLetters();
+        this.personName = getFullName != null && getFullName ? client.getPerson().getFullName() : client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
         this.relation = relation == null ? null : relation.getCode();
@@ -59,6 +60,14 @@ public class ClientGuardianItem {
         this.informedSpecialMenu = informedSpecialMenu;
         this.representativeType = representativeType == null ? ClientGuardianRepresentType.UNKNOWN.getCode() : representativeType.getCode();
         this.allowedPreorders = allowedPreorders;
+    }
+
+    public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
+            List<NotificationSettingItem> notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
+            ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
+            Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType, Boolean allowedPreorders) {
+        this(client, disabled, relation, notificationSettings, createdWhereClientGuardian, createdWhereGuardian,
+                createdWhereGuardianDesc, informedSpecialMenu, representativeType, allowedPreorders, false);
     }
 
     public String getCreatedWhereClientGuardianStr() {

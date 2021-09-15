@@ -4,6 +4,18 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -2394,6 +2406,11 @@ public class DAOService {
         }
     }
 
+    public void saveSyncRequestInDb(String query_str) {
+        Query query = entityManager.createNativeQuery(query_str);
+        query.executeUpdate();
+    }
+
     public Long getClientGroupByClientId(Long idOfClient) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(Client.class);
@@ -2521,7 +2538,8 @@ public class DAOService {
     }
 
     public String getDefaultSupplierNameByOrg(Long idOfOrg) {
-        Contragent cc = getOrg(idOfOrg).getDefaultSupplier();
+        Session session = entityManager.unwrap(Session.class);
+        Contragent cc = DAOUtils.findDefaultSupplier(session, idOfOrg);
         if (cc != null) {
             return cc.getContragentName();
         } else {
@@ -2530,7 +2548,11 @@ public class DAOService {
     }
 
     public String getConfigurationProviderNameByOrg(Long idOfOrg) {
-        ConfigurationProvider prov = getOrg(idOfOrg).getConfigurationProvider();
+        Org o = entityManager.find(Org.class, idOfOrg);
+        if(o == null){
+            return null;
+        }
+        ConfigurationProvider prov = o.getConfigurationProvider();
         if (prov != null) {
             return prov.getName();
         }
@@ -3191,7 +3213,7 @@ public class DAOService {
     }
     public void updateExemptionVisiting() {
         Query query = entityManager.createQuery(
-                "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate");
+                "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate and archive=false");
         query.setParameter("currentDate", CalendarUtils.startOfDay(new Date()));
         query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
         query.executeUpdate();

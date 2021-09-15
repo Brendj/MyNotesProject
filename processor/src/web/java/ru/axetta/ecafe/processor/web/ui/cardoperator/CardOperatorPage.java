@@ -402,6 +402,10 @@ public class CardOperatorPage extends BasicWorkspacePage implements ClientSelect
     }
 
     public Object applyClient() {
+        if (client == null || client.getIdOfClient() == null) {
+            printError("Для получения списка карт выберите клиента.");
+            return null;
+        }
         cardNo = null;
         return updateCardOperatorPage();
     }

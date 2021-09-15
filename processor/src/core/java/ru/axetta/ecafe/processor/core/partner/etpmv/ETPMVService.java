@@ -6,11 +6,12 @@ package ru.axetta.ecafe.processor.core.partner.etpmv;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import generated.contingent.ispp.*;
-import generated.etp.*;
 import generated.etp.ObjectFactory;
+import generated.etp.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.ApplicationForFoodExistsException;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -154,7 +155,15 @@ public class ETPMVService {
             }
         }
         Long _benefit = yavl_lgot.equals(BENEFIT_INOE) ? null : RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefit);
-        daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber, ApplicationForFoodCreatorType.PORTAL);
+        try {
+            daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber,
+                    ApplicationForFoodCreatorType.PORTAL);
+        } catch (ApplicationForFoodExistsException e) {
+            logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
+            return;
+        }
+
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.TRY_TO_REGISTER, null);
         begin_time = System.currentTimeMillis();
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.REGISTERED, null);
@@ -185,7 +194,7 @@ public class ETPMVService {
         return false;
     }
 
-    private boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
+    public static boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DELIVERY_ERROR)) return true; //103099
         if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED)
@@ -356,7 +365,6 @@ public class ETPMVService {
         for (ApplicationForFood applicationForFood : list) {
             Child child = objectFactory.createChild();
             child.setBenefitCode(applicationForFood.getDtisznCode() == null ? "0" : applicationForFood.getDtisznCode().toString());
-            child.setGuid(applicationForFood.getClient().getClientGUID());
             child.setMeshGUID(applicationForFood.getClient().getMeshGUID());
             children.getChild().add(child);
             sent_counter++;
@@ -385,7 +393,7 @@ public class ETPMVService {
             Long nextVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodNextVersion();
             Long historyVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodHistoryNextVersion();
             for (Child child : response.getResult().getSuccess().getChild()) {
-                List<ApplicationForFood> apps = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(child.getGuid(), child.getMeshGUID(),
+                List<ApplicationForFood> apps = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(child.getMeshGUID(),
                         nextVersion, historyVersion);
                 for (ApplicationForFood applicationForFood : apps) {
                     sendStatus(System.currentTimeMillis() - PAUSE_IN_MILLIS, applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(), null);
@@ -395,7 +403,7 @@ public class ETPMVService {
         if (response != null && response.getResult() != null && response.getResult().getNotFound() != null && response.getResult().getNotFound().getChild().size() > 0) {
             StringBuilder notFoundGuids = new StringBuilder();
             for (Child child : response.getResult().getNotFound().getChild()) {
-                notFoundGuids.append("Guid: " + emptyIfNull(child.getGuid()) + ", MeshGuid: " + emptyIfNull(child.getMeshGUID()));
+                notFoundGuids.append("MeshGuid: " + emptyIfNull(child.getMeshGUID()));
             }
             logger.error("Not found guids from AIS Contingent: " + notFoundGuids.toString());
         }

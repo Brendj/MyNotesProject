@@ -8,15 +8,13 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -95,7 +93,7 @@ public class SmsAddressesReport extends BasicReportForAllOrgJob {
                 }
                 mapGuardians.put(client.getIdOfClient(), guardiansFIO);
 
-                List<ClientGuardianItem> wards = ClientManager.loadWardsByClient(session, client.getIdOfClient());
+                List<ClientGuardianItem> wards = ClientManager.loadWardsByClient(session, client.getIdOfClient(), false);
                 //List<String> wardsFIO = new ArrayList<String>();
                 for (ClientGuardianItem item : wards) {
                     clients.add((Client)session.load(Client.class, item.getIdOfClient()));

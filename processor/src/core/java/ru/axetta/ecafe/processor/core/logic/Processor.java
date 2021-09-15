@@ -5,7 +5,14 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import com.google.common.base.Joiner;
-
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrTokenizer;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.*;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
@@ -26,10 +33,10 @@ import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotifica
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
-import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClient;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestProcessor;
@@ -144,15 +151,6 @@ import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperatio
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrTokenizer;
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -4958,7 +4956,7 @@ public class Processor implements SyncProcessor {
                                     payment.getIdOfOrder()));
                 }
 
-                if (!DAOService.getInstance().isOrgFriendly(idOfOrg, idOfOrgPayment)) {
+                if (!DAOReadonlyService.getInstance().isOrgFriendly(idOfOrg, idOfOrgPayment)) {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 150,
                             String.format("Organization is not friendly, IdOfOrg == %s, IdOfOrder == %s",
                                     idOfOrgPayment, payment.getIdOfOrder()));
@@ -5009,7 +5007,7 @@ public class Processor implements SyncProcessor {
                 Client client = null;
                 Long idOfClient = payment.getIdOfClient();
                 if (null != idOfClient) {
-                    client = findClient(persistenceSession, idOfClient);
+                    client = DAOReadonlyService.getInstance().findClientById(idOfClient);
                     // Check client existance
 
                     if (null == client) {
@@ -5026,7 +5024,7 @@ public class Processor implements SyncProcessor {
                 }
                 // If client is specified - check if client is registered for the specified organization
                 // or for one of friendly organizations of specified one
-                Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, idOfOrg);
+                Set<Long> idOfFriendlyOrgSet = DAOReadonlyService.getInstance().findFriendlyOrgsIdsAsSet(idOfOrg);
                 if (null != client) {
                     Org clientOrg = client.getOrg();
                     if (!clientOrg.getIdOfOrg().equals(idOfOrg) && !idOfFriendlyOrgSet
@@ -5355,7 +5353,7 @@ public class Processor implements SyncProcessor {
 
             List<Long> allocatedClients = ClientManager.getAllocatedClientsIds(persistenceSession, idOfOrg);
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>();
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
             /* совместимость организаций которые не имеют дружественных организаций */
             orgSet.add(org);
@@ -5380,7 +5378,7 @@ public class Processor implements SyncProcessor {
                 SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
 
                 //Проверяем, если у клиента меняется организация, то блокируем ему карты в старой организации
-                Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
+                Client client = DAOReadonlyService.getInstance().findClientById(clientParamItem.getIdOfClient());
                 disableClientCardsIfChangeOrg(client, orgSet, idOfOrg);
                 Boolean isRemoveDiscount = removeClientDiscountIfChangeOrg(client, persistenceSession, orgSet, idOfOrg);
                 if (!isRemoveDiscount) {
@@ -5460,7 +5458,7 @@ public class Processor implements SyncProcessor {
                 boolean changeOrg = false;
                 Org oldOrg = client.getOrg();
                 if (orgOwner != null) {
-                    Org org = (Org) persistenceSession.get(Org.class, orgOwner);
+                    Org org = (Org) persistenceSession.load(Org.class, orgOwner);
                     changeOrg = !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg());
                     client.setOrg(org);
                 }
@@ -5637,7 +5635,7 @@ public class Processor implements SyncProcessor {
             // Если льготы изменились, то сохраняем историю
             if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet
                     .equals(categoryDiscountOfClient))) {
-                Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+                Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
                 DiscountManager.saveDiscountHistory(persistenceSession, client, org, categoryDiscountOfClient, categoryDiscountSet,
                         oldClientDiscountMode, newClientDiscountMode, DiscountChangeHistory.MODIFY_IN_ARM);
                 client.setLastDiscountsUpdate(new Date());
@@ -5834,10 +5832,14 @@ public class Processor implements SyncProcessor {
             }
             ////
             Client client = findClient(persistenceSession, idOfClient);
-            Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
             if (null == client) {
                 logger.info(String.format("Client with IdOfClient == %s not found", idOfClient));
-            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet
+                continue;
+            }
+
+            Set<Long> idOfFriendlyOrgSet = DAOReadonlyService.getInstance()
+                    .findFriendlyOrgsIdsAsSet(client.getOrg().getIdOfOrg());
+            if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet
                     .contains(client.getOrg().getIdOfOrg())) {
                 logger.error(String.format(
                         "Client with IdOfClient == %s belongs to other organization. Client: %s, IdOfOrg by request: %s",
@@ -5944,7 +5946,7 @@ public class Processor implements SyncProcessor {
 
             Set<Long> idOfOrgSet = new HashSet<Long>();
 
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
             /* совместимость организаций которые не имеют дружественных организаций */
             for (Org o : orgSet) {
@@ -5991,7 +5993,7 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
 
             // Добавляем карты временных посетителей (мигрантов)
             List<Client> migrantClients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
@@ -6098,7 +6100,7 @@ public class Processor implements SyncProcessor {
         List<Client> clients;
         Org organization;
         List<Org> orgList;
-        List<Long> activeClientsId;
+        Set<Long> activeClientsId;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -6128,7 +6130,7 @@ public class Processor implements SyncProcessor {
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
                 }
             }
-            activeClientsId = findActiveClientsId(persistenceSession, orgList);
+            activeClientsId = new HashSet<>(findActiveClientsId(persistenceSession, orgList));
             // Получаем чужих клиентов.
             Map<String, Set<Client>> alienClients = ClientManager
                     .findAllocatedClients(persistenceSession, organization);
@@ -6165,7 +6167,7 @@ public class Processor implements SyncProcessor {
                 }
             }
             if (!errorClientIds.isEmpty()) {
-                List errorClients = fetchErrorClientsWithOutFriendlyOrg(persistenceSession,
+                List<Client> errorClients = fetchErrorClientsWithOutFriendlyOrg(persistenceSession,
                         organization.getFriendlyOrg(), errorClientIds);
                 ClientGroup clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
                         organization.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
@@ -6174,8 +6176,7 @@ public class Processor implements SyncProcessor {
                     clientGroup = createClientGroup(persistenceSession, organization.getIdOfOrg(),
                             ClientGroup.Predefined.CLIENT_LEAVING);
                 }
-                for (Object object : errorClients) {
-                    Client client = (Client) object;
+                for (Client client : errorClients) {
                     client.setClientGroup(clientGroup);
                     if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
                         clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
@@ -6229,7 +6230,7 @@ public class Processor implements SyncProcessor {
             if (isAllOrgs) {
                 list = DAOUtils.getOrgsSinceVersion(persistenceSession, version);
             } else {
-                list = DAOUtils.findAllFriendlyOrgs(persistenceSession, org.getIdOfOrg());
+                list = new LinkedList<>(DAOReadonlyService.getInstance().findFriendlyOrgs(org.getIdOfOrg()));
             }
             organizationStructure.addOrganizationStructureInfo(persistenceSession, org, list, isAllOrgs);
             persistenceTransaction.commit();
@@ -6382,7 +6383,7 @@ public class Processor implements SyncProcessor {
                         MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
                                 bFirstMenuItem ? MenuExchange.FLAG_ANCHOR_MENU : MenuExchange.FLAG_NONE);
                         //Удаление объекта из сессии с одинаковым идентификатором
-                        MenuExchange menuExchangeFromSession = (MenuExchange) persistenceSession.get(MenuExchange.class, menuExchange.getCompositeIdOfMenuExchange());
+                        MenuExchange menuExchangeFromSession = (MenuExchange) persistenceSession.load(MenuExchange.class, menuExchange.getCompositeIdOfMenuExchange());
                         if(menuExchangeFromSession != null) {
                             persistenceSession.evict(menuExchangeFromSession);
                         }
@@ -6888,7 +6889,7 @@ public class Processor implements SyncProcessor {
                     // find client by id
                     Client clientFromEnterEvent = null;
                     if (idOfClient != null) {
-                        clientFromEnterEvent = (Client) persistenceSession.get(Client.class, idOfClient);
+                        clientFromEnterEvent = (Client) persistenceSession.load(Client.class, idOfClient);
                         if (clientFromEnterEvent == null) {
                             SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
                                     e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_CLIENT_NOT_FOUND,
@@ -7506,7 +7507,7 @@ public class Processor implements SyncProcessor {
         for (OrgFilesItem item : orgFilesItemList) {
             orgIdList.add(item.getIdOfOrg());
         }
-        List<Org> orgList = DAOUtils.findOrgs(session, orgIdList);
+        List<Org> orgList = DAOReadonlyService.getInstance().findOrgs(orgIdList);
         Map<Long, Org> orgMap = new HashMap<Long, Org>();
         for (Org org : orgList) {
             orgMap.put(org.getIdOfOrg(), org);

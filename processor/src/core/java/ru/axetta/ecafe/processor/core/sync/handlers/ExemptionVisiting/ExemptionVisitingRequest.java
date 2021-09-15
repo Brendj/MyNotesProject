@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 import java.util.LinkedList;
@@ -28,7 +29,7 @@ public class ExemptionVisitingRequest implements SectionRequest {
                 exemptionVisitingSyncFromARMPOJO
                         .setAccepted(Boolean.valueOf(XMLUtils.getAttributeValue(nodeElement, "accepted")));
                 String dateAccept = XMLUtils.getAttributeValue(nodeElement, "acceptedDateTime");
-                if (dateAccept.equals("null"))
+                if (StringUtils.isEmpty(dateAccept) || dateAccept.equals("null"))
                 {
                     exemptionVisitingSyncFromARMPOJO.setAcceptedDateTime(null);
                 }

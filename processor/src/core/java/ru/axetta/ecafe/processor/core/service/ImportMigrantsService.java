@@ -87,7 +87,7 @@ public class ImportMigrantsService {
                         List<Migrant> migrants = MigrantsUtils
                                 .getMigrantRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(),
                                         request.getIdOfServiceClass());
-                        if (migrants.isEmpty() || migrants.size() > 1) {
+                        if (migrants.size() != 1) {
                             migrant = null;
                         } else {
                             migrant = migrants.get(0);
@@ -115,8 +115,8 @@ public class ImportMigrantsService {
 
                     Client client = null;
 
-                    if (null != request.getClientGuid() && !request.getClientGuid().isEmpty()) {
-                        client = DAOUtils.findClientByGuid(session, request.getClientGuid());
+                    if (StringUtils.isNotEmpty(request.getClientGuid())) {
+                        client = DAOUtils.findClientByMeshGuid(session, request.getClientGuid());
                     }
 
                     if (null == client) {
@@ -246,7 +246,7 @@ public class ImportMigrantsService {
                             session.saveOrUpdate(migrant);
                         }
 
-                        VisitReqResolutionHist hist = MigrantsUtils.getLastResolutionForMigrant(session, migrant);
+                        // VisitReqResolutionHist hist = MigrantsUtils.getLastResolutionForMigrant(session, migrant);
                         // if (!resolution.equals(hist.getResolution())
                         if (checkLastDate(request.getDateEnd(), lastDateEnd)) {
                             session.save(createResolutionHistoryInternal(session, client,
@@ -277,7 +277,7 @@ public class ImportMigrantsService {
     }
 
     private Date getLastDateEnd(List<ESZMigrantsRequest> requestList) {
-        // Ищем дату аннулирования: null или максимальную, если все непусты
+        // Ищем дату аннулирования: null или максимальную, если все не пусты
         SortedSet<Date> endDates = new TreeSet<>();
         for (ESZMigrantsRequest request : requestList) {
             Date endDate = request.getDateEnd();

@@ -116,6 +116,9 @@ public class WtComplex {
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
 
+    @Column(name = "idOfOrgGroup", insertable = false, updatable = false)
+    private Long idOfOrgGroup;
+
     public WtComplex(WtComplex complex) {
         this.idOfComplex = complex.idOfComplex;
         this.name = complex.name;
@@ -143,6 +146,7 @@ public class WtComplex {
         this.discountRules = complex.discountRules;
         this.wtComplexesItems = complex.wtComplexesItems;
         this.comment = complex.comment;
+        this.idOfOrgGroup = complex.idOfOrgGroup;
     }
 
     public WtComplex() {
@@ -371,6 +375,14 @@ public class WtComplex {
 
     public void setDiscountRules(Set<WtDiscountRule> discountRules) {
         this.discountRules = discountRules;
+    }
+
+    public Long getIdOfOrgGroup() {
+        return idOfOrgGroup;
+    }
+
+    public void setIdOfOrgGroup(Long idOfOrgGroup) {
+        this.idOfOrgGroup = idOfOrgGroup;
     }
 
     @Override

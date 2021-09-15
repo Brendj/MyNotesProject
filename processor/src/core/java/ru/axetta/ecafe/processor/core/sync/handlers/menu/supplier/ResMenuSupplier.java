@@ -317,7 +317,7 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "ContragentId", dish.getContragent().getIdOfContragent());
 
         Element categories = document.createElement("Categories");
-        List<WtCategoryItem> listCategories = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(dish);
+        List<WtCategoryItem> listCategories = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(dish.getIdOfDish());
         for (WtCategoryItem item : listCategories) {
             Element elem = document.createElement("CGI");
             XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());

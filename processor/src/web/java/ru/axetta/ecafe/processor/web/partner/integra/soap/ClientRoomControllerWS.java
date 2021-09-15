@@ -196,6 +196,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_WRONG_GROUP = 710L;
     private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
     private static final Long RC_REGULAR_ALREADY_DELETED = 712L;
+    private static final Long RC_REGULAR_WRONG_START_DATE = 713L;
+    private static final Long RC_REGULAR_EXISTS = 714L;
     private static final Long RC_INVALID_CREATOR = 720L;
 
 
@@ -252,6 +254,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
     private static final String RC_REGULAR_ALREADY_DELETED_DESC = "Для выбранного комплекса или блюда не настроен повтор заказа";
+    private static final String RC_REGULAR_WRONG_DATE_DESC = "На выбранную дату начала повтора невозможно создать предзаказ";
+    private static final String RC_REGULAR_EXISTS_DESC = "Уже существует повтор заказа с выбранными параметрами";
     private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
     private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
     private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
@@ -1919,6 +1923,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientSummaryExt.setAddress(address);
         }
 
+
+        clientSummaryExt.setLimit(client.getLimit());
+
         Integer freePayCount = client.getFreePayCount();
         if (freePayCount != null) {
             clientSummaryExt.setFreePayCount(client.getFreePayCount());
@@ -2807,23 +2814,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
             menuDateItemExt.setDate(toXmlDateTime(menuDate));
-            Set<WtDish> wtDishSet = new HashSet<>();
+            Set<WtDishInfo> wtDishSet = new HashSet<>();
 
             for (WtMenu menu : menus) {
                 if (nRecs++ > MAX_RECS) {
                     break;
                 }
-                List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                List<WtDishInfo> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .getWtDishesByMenuAndDates(menu, menuDate, menuDate);
                 if (wtDishes != null && wtDishes.size() > 0) {
                     wtDishSet.addAll(wtDishes);
                 }
             }
-
+            Map<Long, Set<String>> menuGroups = DAOReadonlyService.getInstance().getWtMenuGroupsForAllDishes(org.getIdOfOrg());
             if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
-                for (WtDish wtDish : wtDishSet) {
-                    List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDish, false);
+                for (WtDishInfo wtDishInfo : wtDishSet) {
+                    List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDishInfo, false, menuGroups);
                     menuDateItemExt.getE().addAll(menuItemExt);
                 }
             }
@@ -3607,24 +3614,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             WtMenu menu = (WtMenu) currObject;
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
 
-            List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+            List<WtDishInfo> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtDishesByMenuAndDates(menu, startDate, endDate);
 
+            Map<Long, Set<String>> menuGroups = DAOReadonlyService.getInstance().getWtMenuGroupsForAllDishes(client.getOrg().getIdOfOrg());
             if (wtDishes != null && wtDishes.size() > 0) {
                 menuDateItemExt.setDate(toXmlDateTime(startDate));
-                for (WtDish wtDish : wtDishes) {
-                    List<MenuItemExt> menuItemExtList = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(), wtDish, false);
+                for (WtDishInfo wtDishInfo : wtDishes) {
+                    List<MenuItemExt> menuItemExtList = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(),
+                            wtDishInfo, false, menuGroups);
                     // Добавляем блокировки
                     for (MenuItemExt menuItemExt : menuItemExtList) {
                         if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
                             menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
                         } else {
-                            if (ProhibitByName.containsKey(wtDish.getDishName())) {
-                                menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                            if (ProhibitByName.containsKey(wtDishInfo.getDishName())) {
+                                menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDishInfo.getDishName()));
                             } else {
                                 //пробегаться в цикле.
                                 for (String filter : ProhibitByFilter.keySet()) {
-                                    if (wtDish.getDishName().contains(filter)) {
+                                    if (wtDishInfo.getDishName().contains(filter)) {
                                         menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
                                     }
                                 }
@@ -5437,7 +5446,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new ClientNotFoundException("Не удалось найти клиента по л/с " + contractId);
             }
 
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient(), false);
             boolean guardianWithMobileFound = false;
             for (ClientGuardianItem item : guardians) {
                 Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
@@ -5463,7 +5472,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (client.getMobile().equals(guardMobile)) {
                     client.initClientMobileHistory(clientsMobileHistory);
                     client.setMobile("");
-                    logger.info(
+                    logger.debug(
                             "class : ClientRoomControllerWS, method : processSetGuardianship line : 4790, idOfClient : "
                                     + client.getIdOfClient() + " mobile : " + client.getMobile());
                     session.persist(client);
@@ -5473,7 +5482,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (client.getMobile() == null || client.getMobile().isEmpty()) {
                         client.initClientMobileHistory(clientsMobileHistory);
                         client.setMobile(guardMobile);
-                        logger.info(
+                        logger.debug(
                                 "class : ClientRoomControllerWS, method : processSetGuardianship line : 4797, idOfClient : "
                                         + client.getIdOfClient() + " mobile : " + client.getMobile());
                         session.persist(client);
@@ -5563,7 +5572,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         client.getContractId()));
             }
 
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient(), false);
             for (ClientGuardianItem item : guardians) {
                 Client guardian = DAOUtils.findClientByContractId(session, item.getContractId());
                 if (phone.equals(guardian.getMobile())) {
@@ -7080,32 +7089,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDish, true);
+                WtDishInfo wtDishInfo = new WtDishInfo(wtDish);
+                List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDishInfo, true, null);
                 menuItemExtList.addAll(menuItemExt);
             }
         }
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDish wtDish, boolean isGroupByCategory) {
+    private List<MenuItemExt> getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDishInfo wtDishInfo,
+            boolean isGroupByCategory, Map<Long, Set<String>> menuGroups) {
         List<MenuItemExt> result = new ArrayList<>();
         Set<String> menuGroupSet = null;
         if (isGroupByCategory) {
-            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
+            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDishInfo);
         } else {
-            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(idOfOrg, wtDish);
+            menuGroupSet = menuGroups.get(wtDishInfo.getIdOfDish());
         }
         for (String menuGroup : menuGroupSet) {
             MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
             menuItemExt.setGroup(menuGroup);
-            menuItemExt.setName(wtDish.getDishName());
-            menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
-            menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
-            menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+            menuItemExt.setName(wtDishInfo.getDishName());
+            menuItemExt.setPrice(wtDishInfo.getPrice());
+            menuItemExt.setCalories(wtDishInfo.getCalories() == null ? (double) 0 : wtDishInfo.getCalories().doubleValue());
+            menuItemExt.setOutput(wtDishInfo.getQty() == null ? "" : wtDishInfo.getQty());
             menuItemExt.setAvailableNow(1);
-            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
-            menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
-            menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+            menuItemExt.setCarbohydrates(wtDishInfo.getCarbohydrates() == null ? (double) 0 : wtDishInfo.getCarbohydrates().doubleValue());
+            menuItemExt.setFat(wtDishInfo.getFat() == null ? (double) 0 : wtDishInfo.getFat().doubleValue());
+            menuItemExt.setProtein(wtDishInfo.getProtein() == null ? (double) 0 : wtDishInfo.getProtein().doubleValue());
             menuItemExt.setVitB1(0.0);
             menuItemExt.setVitB2(0.0);
             menuItemExt.setVitPp(0.0);
@@ -7116,8 +7127,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             menuItemExt.setMinP(0.0);
             menuItemExt.setMinMg(0.0);
             menuItemExt.setMinFe(0.0);
-            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-            menuItemExt.setFullName(wtDish.getComponentsOfDish());
+            menuItemExt.setIdOfMenuDetail(wtDishInfo.getIdOfDish());
+            menuItemExt.setFullName(wtDishInfo.getComponentsOfDish());
             result.add(menuItemExt);
         }
         return result;
@@ -9430,7 +9441,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), null);
         if (mode.equals("child")) {
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient(), false);
             boolean informed = false;
             for (ClientGuardianItem item : guardians) {
                 if (item.getInformedSpecialMenu()) {
@@ -10214,6 +10225,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } catch (RegularAlreadyDeleted e) {
             result.resultCode = RC_REGULAR_ALREADY_DELETED;
             result.description = RC_REGULAR_ALREADY_DELETED_DESC;
+        } catch (RegularWrongStartDate e) {
+            result.resultCode = RC_REGULAR_WRONG_START_DATE;
+            result.description = RC_REGULAR_WRONG_DATE_DESC;
+        } catch (RegularExistsException e) {
+            result.resultCode = RC_REGULAR_EXISTS;
+            result.description = RC_REGULAR_EXISTS_DESC;
         } catch (Exception e) {
             logger.error("Error in putPreorderComplex", e);
             result.resultCode = RC_INTERNAL_ERROR;

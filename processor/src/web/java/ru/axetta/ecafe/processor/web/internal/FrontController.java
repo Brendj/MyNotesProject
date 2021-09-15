@@ -4,8 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
-import sun.security.provider.X509Factory;
-
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
@@ -31,16 +38,7 @@ import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
-
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import sun.security.provider.X509Factory;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -330,7 +328,7 @@ public class FrontController extends HttpServlet {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItem (фронт)");
         if (orgId != null) {
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org != null) {
                 clientsMobileHistory.setOrg(org);
             }
@@ -368,7 +366,7 @@ public class FrontController extends HttpServlet {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItemInternal (фронт)");
         if (orgId != null) {
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org != null) {
                 clientsMobileHistory.setOrg(org);
             }
@@ -405,7 +403,7 @@ public class FrontController extends HttpServlet {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeEmployeeItem (фронт)");
         if (orgId != null) {
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org != null) {
                 clientsMobileHistory.setOrg(org);
             }
@@ -1328,7 +1326,7 @@ public class FrontController extends HttpServlet {
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
                 if (orgId != null) {
-                    Org org = DAOService.getInstance().getOrg(orgId);
+                    Org org = DAOReadonlyService.getInstance().findOrg(orgId);
                     if (org != null) {
                         clientsMobileHistory.setOrg(org);
                     }
@@ -1567,7 +1565,7 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("В запросе нет валидных сертификатов, idOfOrg: " + orgId);
             }
 
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org == null) {
                 throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
             }

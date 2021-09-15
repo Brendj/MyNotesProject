@@ -131,7 +131,7 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
         private Long idOfClient;
         private OrgItem org;
         private PersonItem person;
-        private PersonItem contractPerson;
+        //private PersonItem contractPerson;
         private Integer flags;
         private Long contractId;
         private Date contractTime;
@@ -164,13 +164,13 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
             this.person = person;
         }
 
-        public PersonItem getContractPerson() {
+        /*public PersonItem getContractPerson() {
             return contractPerson;
         }
 
         public void setContractPerson(PersonItem contractPerson) {
             this.contractPerson = contractPerson;
-        }
+        }*/
 
         public Integer getFlags() {
             return flags;
@@ -216,7 +216,7 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
             this.idOfClient = client.getIdOfClient();
             this.org = new OrgItem(client.getOrg());
             this.person = new PersonItem(client.getPerson());
-            this.contractPerson = new PersonItem(client.getContractPerson());
+            //this.contractPerson = new PersonItem(client.getContractPerson());
             this.flags = client.getFlags();
             this.contractId = client.getContractId();
             this.contractTime = client.getContractTime();
@@ -230,7 +230,7 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
             this.idOfClient = null;
             this.org = new OrgItem();
             this.person = new PersonItem();
-            this.contractPerson = new PersonItem();
+            //this.contractPerson = new PersonItem();
             this.flags = null;
             this.contractId = null;
             this.contractTime = null;
@@ -245,8 +245,7 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
                 return "";
             }
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(ContractIdFormat.format(contractId)).append(" (").append(contractPerson.getCaption())
-                    .append("): ").append(person.getCaption());
+            stringBuilder.append(ContractIdFormat.format(contractId)).append(" : ").append(person.getCaption());
             return stringBuilder.toString();
         }
 

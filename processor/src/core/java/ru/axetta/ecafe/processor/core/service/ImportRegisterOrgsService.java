@@ -4,12 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -17,6 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import javax.persistence.PersistenceContext;
 import java.text.SimpleDateFormat;
@@ -122,7 +122,7 @@ public class ImportRegisterOrgsService {
                 Org org = null;
                 try {
                     if(orgRegistryChange.getIdOfOrg() != null) {
-                        org = DAOService.getInstance().getOrg(orgRegistryChange.getIdOfOrg());
+                        org = DAOReadonlyService.getInstance().findOrg(orgRegistryChange.getIdOfOrg());
                     }
                     if (org == null && orgRegistryChange.getAdditionalId() != null && orgRegistryChange.getAdditionalId() != -1){
                         org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getUniqueAddressId());

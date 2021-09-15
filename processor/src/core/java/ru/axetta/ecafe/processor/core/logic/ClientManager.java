@@ -1206,7 +1206,7 @@ public class ClientManager {
         fc.setValue(FieldId.SECONDNAME, secondName);
         fc.setValue(FieldId.GROUP, "Обучающиеся других ОО"); //todo переделать на новую константу из ClientGroup.Predefined
         fc.setValue(FieldId.EXTERNAL_ID, eszId);
-        fc.setValue(FieldId.CLIENT_GUID, clientGuid);
+        fc.setValue(FieldId.MESH_GUID, clientGuid);
         return ClientManager.registerClient(idOfESZOrg, fc, false, true, clientsMobileHistory);
     }
 
@@ -1563,21 +1563,21 @@ public class ClientManager {
 
 
     /* Загрузить список  */
-    public static List<ClientGuardianItem> loadGuardiansByClient(Session session, Long idOfClient) throws Exception {
+    public static List<ClientGuardianItem> loadGuardiansByClient(Session session, Long idOfClient, Boolean withFullName) throws Exception {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
         criteria.add(Restrictions.eq("deletedState", false));
-        List results = criteria.list();
+        List<ClientGuardian> results = criteria.list();
+
         List<ClientGuardianItem> guardianItems = new ArrayList<ClientGuardianItem>(results.size());
-        for (Object o: results){
-            ClientGuardian clientGuardian = (ClientGuardian) o;
+        for (ClientGuardian clientGuardian : results){
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
-                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient())));
+                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName));
             }
         }
         return guardianItems;
@@ -1649,21 +1649,21 @@ public class ClientManager {
         return criteria.list();
     }*/
 
-    public static List<ClientGuardianItem> loadWardsByClient(Session session, Long idOfClient) throws Exception {
+    public static List<ClientGuardianItem> loadWardsByClient(Session session, Long idOfClient, Boolean withFullName) throws Exception {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
         criteria.add(Restrictions.eq("deletedState", false));
-        List results = criteria.list();
+        List<ClientGuardian> results = criteria.list();
+
         List<ClientGuardianItem> wardItems = new ArrayList<ClientGuardianItem>(results.size());
-        for (Object o: results){
-            ClientGuardian clientWard = (ClientGuardian) o;
+        for (ClientGuardian clientWard : results){
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
-                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient)));
+                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName));
             }
         }
         return wardItems;
