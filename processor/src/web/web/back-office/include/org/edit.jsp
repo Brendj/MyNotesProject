@@ -193,6 +193,8 @@
     </h:panelGroup>
     <h:outputText id="payPlanParamLabel" escape="true" value="Включить использование плана питания" styleClass="output-text" />
     <h:selectBooleanCheckbox id="payPlanParamCheckbox" value="#{mainPage.orgEditPage.usePlanOrders}"/>
+    <h:outputText id="mealSchedule" escape="true" value="Включить использование расписания питания" styleClass="output-text" />
+    <h:selectBooleanCheckbox id="mealScheduleCheckbox" value="#{mainPage.orgEditPage.useMealSchedule}"/>
     <h:outputText id="PaydableSubscriptionFeedingLabel" escape="true" value="Включить функционал платного горячего питания" styleClass="output-text" />
     <h:selectBooleanCheckbox id="PaydableSubscriptionFeedingCheckbox" value="#{mainPage.orgEditPage.usePaydableSubscriptionFeeding}"
                              disabled="#{mainPage.orgEditPage.useWebArm}"/>
