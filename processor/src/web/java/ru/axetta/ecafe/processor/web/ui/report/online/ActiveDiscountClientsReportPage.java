@@ -7,13 +7,11 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.report.ActiveClientsReport;
 import ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -26,7 +24,6 @@ import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -64,9 +61,23 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
         report = new ActiveDiscountClientsReport();
     }
 
-    public void executeReport ()
-    {
-        RuntimeContext.getAppContext().getBean(ActiveDiscountClientsReportPage.class).execute();
+    public void executeReport(){
+        try {
+            if(CalendarUtils.betweenMoreMonth(startDate, endDate)) {
+                printError("Диапазон построения отчета должен быть не больше месяца");
+                RuntimeContext.getAppContext().getBean(ActiveDiscountClientsReportPage.class).clean();
+                return;
+            }
+            if(idOfOrg == null) {
+                printError("Выберите организацию");
+                RuntimeContext.getAppContext().getBean(ActiveDiscountClientsReportPage.class).clean();
+                return;
+            }
+            RuntimeContext.getAppContext().getBean(ActiveDiscountClientsReportPage.class).execute();
+        } catch (Exception e) {
+            super.logAndPrintMessage("Ошибка получения данных", e);
+    }
+
         /*FacesContext facesContext = FacesContext.getCurrentInstance ();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -102,19 +113,29 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
 
     @Transactional
     public void execute() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
             buildReport (session);
         } catch (Exception e) {
             logger.error("Failed to process report " + this.getClass().getSimpleName(), e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             //HibernateUtils.close(session, logger);
         }
     }
 
+    public void clean() {
+        ActiveDiscountClientsReport.Builder reportBuilder = new ActiveDiscountClientsReport.Builder().setExportToObjects(true);
+        this.report = reportBuilder.clean();
+    }
+
     public void buildReport (Session session) throws Exception {
         ActiveDiscountClientsReport.Builder reportBuilder = new ActiveDiscountClientsReport.Builder().setExportToObjects(true);
+
         if (idOfOrg != null) {
             Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
