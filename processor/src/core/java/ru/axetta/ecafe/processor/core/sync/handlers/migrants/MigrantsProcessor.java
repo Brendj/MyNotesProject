@@ -4,14 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
-import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -91,7 +90,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
 
     private void processCurrentActiveIncomeReqs() throws Exception {
         List<Migrant> currentMigrants = MigrantsUtils.getSyncedMigrantsForOrg(session, migrants.getIdOfOrg());
-        List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>();
+        List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>(currentMigrants.size());
         List<CompositeIdOfMigrant> list = new ArrayList<>();
         for(Migrant m : currentMigrants){
             if(!migrants.getCurrentActiveIncome().contains(m.getCompositeIdOfMigrant())){

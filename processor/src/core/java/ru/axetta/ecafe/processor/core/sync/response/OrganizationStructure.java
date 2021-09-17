@@ -4,14 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sync.response;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
-
 import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +53,7 @@ public class OrganizationStructure implements AbstractToElement {
     public void addOrganizationStructureInfo(Session session, Org org, List<Org> orgList, boolean isAllOrgs) {
         List<Long> friendlyOrgsIds = new ArrayList<Long>();
         if (isAllOrgs) {
-            friendlyOrgsIds = DAOUtils.findFriendlyOrgIds(session, org.getIdOfOrg());
+            friendlyOrgsIds = DAOReadonlyService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
         }
         for (Org o : orgList) {
             boolean isFriendly = true;

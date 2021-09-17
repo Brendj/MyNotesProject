@@ -4,17 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.logic.DiscountManager;
-import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
-import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -29,6 +18,17 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
+import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -114,7 +114,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     public StringBuffer runSyncForOrg(long idOfOrg, boolean performChanges) throws Exception {
-        Org org = DAOService.getInstance().getOrg(idOfOrg);
+        Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
         if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
             throw new Exception(
                     "У организации " + idOfOrg + " не установлен тэг синхронизации с Реестрами: " + ORG_SYNC_MARKER);

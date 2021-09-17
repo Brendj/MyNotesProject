@@ -4,17 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
 
 import java.util.*;
 
@@ -222,7 +222,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
             String res = "";
             for (String id : ids) {
                 long idOfOrg = Long.parseLong(id);
-                Org org = DAOService.getInstance().getOrg(idOfOrg);
+                Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
                 if (res.length() > 0) {
                     res = res + ", ";
                 }
