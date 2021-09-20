@@ -3588,7 +3588,11 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                Client client = clientCreatePage.createClient(persistenceSession);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+                clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                clientGuardianHistory.setReason("Создание нового клиента в вкладке Клиенты/регистрация");
+                Client client = clientCreatePage.createClient(persistenceSession, clientGuardianHistory);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 facesContext.addMessage(null,
@@ -3622,7 +3626,11 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Client client = clientRegistrationByCardOperatorPage.createClient(persistenceSession);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason("Создание нового клиента в вкладке Операции по картам/Регистрация клиента");
+            Client client = clientRegistrationByCardOperatorPage.createClient(persistenceSession, clientGuardianHistory);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
@@ -3759,7 +3767,12 @@ public class MainPage implements Serializable {
                 dataSize = data.length;
                 inputStream = new ByteArrayInputStream(data);
             }
-            clientUpdateFileLoadPage.updateClients(inputStream, dataSize);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setAction("обновление из файла");
+            clientGuardianHistory.setReason("Выполнено обновление через вкладку Клиенты/Обновить из файла");
+            clientUpdateFileLoadPage.updateClients(inputStream, dataSize, clientGuardianHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
             clientUpdateFileLoadPage.setErrorText("");
@@ -9690,6 +9703,12 @@ public class MainPage implements Serializable {
         }
         /////
         return currentUser;
+    }
+
+    public String getSourceWebAddress() throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        return request.getRemoteAddr();
     }
 
     public static MainPage getSessionInstance() {

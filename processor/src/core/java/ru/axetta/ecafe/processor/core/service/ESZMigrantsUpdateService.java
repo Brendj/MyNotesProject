@@ -41,7 +41,10 @@ public class ESZMigrantsUpdateService {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Обработка мигрантов (перевод в выбывшие) по расписанию");
         clientsMobileHistory.setShowing("ЕСЗ");
-        updateMigrants(clientsMobileHistory);
+		ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Срабатывание по расписанию");
+        clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
+        updateMigrants(clientsMobileHistory, clientGuardianHistory);
     }
 
     public static boolean isOn() {
@@ -56,7 +59,7 @@ public class ESZMigrantsUpdateService {
         return true;
     }
 
-    public void updateMigrants(ClientsMobileHistory clientsMobileHistory) throws Exception {
+    public void updateMigrants(ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Long idOfESZOrg = PropertyUtils.getIdOfESZOrg();
 
         Date currentDate = new Date();
@@ -107,7 +110,7 @@ public class ESZMigrantsUpdateService {
                     fieldConfig.setValue(ClientManager.FieldId.GROUP,
                             ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session, clientsMobileHistory);
-                    addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                    addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING.getValue(), clientGuardianHistory);
                 }
             }
 
@@ -162,7 +165,8 @@ public class ESZMigrantsUpdateService {
         }
     }
 
-    public static void addGroupHistory(Session session, Client client, Long idOfClientGroup)
+    public static void addGroupHistory(Session session, Client client, Long idOfClientGroup,
+            ClientGuardianHistory clientGuardianHistory)
             throws Exception {
         ClientGroup clientGroup = DAOUtils.findClientGroup(session,
                 new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), idOfClientGroup));
@@ -173,7 +177,7 @@ public class ESZMigrantsUpdateService {
         }
         ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
                 clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                ClientGroupMigrationHistory.MODIFY_IN_ISPP);
+                ClientGroupMigrationHistory.MODIFY_IN_ISPP, clientGuardianHistory);
     }
 
     public void scheduleSync() throws Exception {
