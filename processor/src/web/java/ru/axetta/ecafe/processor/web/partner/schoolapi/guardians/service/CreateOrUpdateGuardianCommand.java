@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianRequest;
@@ -41,12 +42,35 @@ public class CreateOrUpdateGuardianCommand {
             transaction = session.beginTransaction();
             Long newGuardianVersion = DAOUtils.nextVersionBySpecialDate(session);
 
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
+            clientGuardianHistory.setReason("Веб метод createOrUpdateGuardian (АРМ администратора)");
+            clientGuardianHistory.setUser(user);
+            clientGuardianHistory.setChangeDate(new Date());
+
             ClientGuardian guardian = FindExistingGuardianLink(request.getChildClientId(),
                     request.getGuardianClientId(), session);
             if (guardian == null) {
                 guardian = new ClientGuardian(request.getChildClientId(), request.getGuardianClientId(),
                         ClientCreatedFromType.ARM);
+                clientGuardianHistory.setAction("Создание новой связки");
+
             }
+            else {
+                clientGuardianHistory.setAction("Обновление данных связки");
+            }
+            try{
+                clientGuardianHistory.setGuardian(DAOReadonlyService.getInstance().findClientById(request.getGuardianClientId()).getContractId().toString());
+            } catch (Exception e)
+            {
+                clientGuardianHistory.setGuardian("Не удалось получить л/с представителя");
+            }
+            //
+            ClientGuardianHistory clientGuardianHistoryChanged =
+                    clientGuardianHistory.getCopyClientGuardionHistory(clientGuardianHistory);
+            session.persist(clientGuardianHistoryChanged);
+            //
+            guardian.initializateClientGuardianHistory(clientGuardianHistory);
             guardian.setVersion(newGuardianVersion);
             guardian.setLastUpdate(new Date());
             guardian.setDeletedState(false);

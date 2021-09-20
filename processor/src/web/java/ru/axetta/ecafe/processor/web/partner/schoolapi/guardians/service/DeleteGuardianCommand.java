@@ -6,7 +6,9 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.DeleteGuardianResponse;
@@ -17,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class DeleteGuardianCommand {
@@ -41,6 +45,14 @@ public class DeleteGuardianCommand {
                 return DeleteGuardianResponse
                         .error(recordId, 404, "guardian with recordId = " + recordId + " was not found");
             }
+            //
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
+            clientGuardianHistory.setReason("Веб метод deleteGuardian (АРМ администратора)");
+            clientGuardianHistory.setUser(user);
+            clientGuardianHistory.setChangeDate(new Date());
+            guardian.initializateClientGuardianHistory(clientGuardianHistory);
+            //
             Long newGuardianVersion = ClientManager.generateNewClientGuardianVersion(session);
             guardian.delete(newGuardianVersion);
             session.update(guardian);

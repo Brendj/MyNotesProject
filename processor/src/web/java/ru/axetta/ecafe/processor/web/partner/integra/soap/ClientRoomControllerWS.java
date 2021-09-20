@@ -8919,7 +8919,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             CardRequest cardRequest = new CardRequest(guardian, typeCard, creatorMobile, nextVersion);
             session.save(cardRequest);
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-            MessageContext mc = context.getMessageContext();
             clientGuardianHistory.setClientGuardian(clientGuardian);
             clientGuardianHistory.setChangeDate(new Date());
             clientGuardian.setCardRequest(cardRequest);
