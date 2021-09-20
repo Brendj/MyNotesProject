@@ -269,7 +269,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             long l = System.currentTimeMillis();
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
-            List<String> datesStringList = CalendarUtils.datesBetween(startTime, endTime);
+            List<String> datesStringList = CalendarUtils.datesBetween(startTime, endTime, 1);
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
             List<Date> dates = new ArrayList<Date>();
             for (String date : datesStringList) {
@@ -397,11 +397,11 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             for (OrderItem allOrder : allOrdersPaid) {
                 if (!priceAndSumPaidHashMap.isEmpty()) {
-                    if (priceAndSumPaidHashMap.get(allOrder.getSum()) != null && allOrder.getSumDiscount() == 0L) {
-                        Long sum = priceAndSumPaidHashMap.get(allOrder.getSum()).getSum();
+                    if (priceAndSumPaidHashMap.get(allOrder.getSumPay()) != null && allOrder.getSumDiscount() == 0L) {
+                        Long sum = priceAndSumPaidHashMap.get(allOrder.getSumPay()).getSum();
                         sum += handleOrders(totalListMap, allOrder,
-                                priceAndSumPaidHashMap.get(allOrder.getSum()).getTitle(), showAgeGroups);
-                        priceAndSumPaidHashMap.get(allOrder.getSum()).setSum(sum);
+                                priceAndSumPaidHashMap.get(allOrder.getSumPay()).getTitle(), showAgeGroups);
+                        priceAndSumPaidHashMap.get(allOrder.getSumPay()).setSum(sum);
                     }
                     if (priceAndSumPaidHashMap.get(allOrder.getSumPay()) != null && allOrder.getSumDiscount() > 0) {
                         Long sum = priceAndSumPaidHashMap.get(allOrder.getSumPay()).getSum();
@@ -435,7 +435,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                         && totalSalesItem.getAgeGroup().equals(ageGroup)) {
                     totalSalesItem.setSum(totalSalesItem.getSum() + buffetOrder.getSum());
                     totalSalesItem.setSumPay(totalSalesItem.getSumPay() + buffetOrder.getSumPay());
-                    totalSalesItem.setSumDiscount(totalSalesItem.getSumDiscount() + buffetOrder.getSumDiscount());
+                    long realDiscountAdd = buffetOrder.getSumDiscount() > 0 ? buffetOrder.getSumDiscount() : buffetOrder.getKazanDiscount();
+                    totalSalesItem.setSumDiscount(totalSalesItem.getSumDiscount() + realDiscountAdd);
                     if(buffetOrder.getIdOfClient() != null && !totalSalesItem.getIdOfClientList().contains(buffetOrder.getIdOfClient())) {
                         totalSalesItem.getIdOfClientList().add(buffetOrder.getIdOfClient());
                         totalSalesItem.setUniqueClientCount(totalSalesItem.getIdOfClientList().size());

@@ -62,6 +62,10 @@ public class Person implements Serializable, Auditable {
     public Person() {
     }
 
+    @ManyToOne
+    @JoinColumn(name = "idofclass")
+    private ClassEntity classEntity;
+
     public Person(String personGUID, Date birthDate, Integer genderId, String lastName, String firstName,
                   String patronymic, String classUID, String className, Integer parallelID, Boolean deleteState,
                   Long organizationId, Boolean invalidData, Integer educationStageId, String guidNSI) {
@@ -79,6 +83,14 @@ public class Person implements Serializable, Auditable {
         this.invalidData = invalidData;
         this.educationStageId = educationStageId;
         this.guidNSI = guidNSI;
+    }
+
+    public ClassEntity getClassEntity() {
+        return classEntity;
+    }
+
+    public void setClassEntity(ClassEntity classEntity) {
+        this.classEntity = classEntity;
     }
 
     public String getPersonGUID() {

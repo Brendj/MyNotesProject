@@ -67,6 +67,8 @@ import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPag
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 import ru.axetta.ecafe.processor.web.ui.user.UserListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmLoadPage;
+import ru.axetta.ecafe.processor.web.ui.webTechnolog.ComplexListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.webTechnolog.DishListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -157,6 +159,7 @@ public class MainPage implements Serializable {
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
     private Stack<BasicPage> modalPages = new Stack<BasicPage>();
 
+    private Boolean webARMppFilter = false;
     //Journals
     private final BasicWorkspacePage journalGroupPage = new BasicWorkspacePage();
     private final JournalBalancesReportPage journalBalancesReportPage = new JournalBalancesReportPage();
@@ -311,6 +314,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage orgParametersGroup = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistCatalogGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage espHelpdeskGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -328,6 +332,8 @@ public class MainPage implements Serializable {
 
     private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
     private final BlockUnblockReportPage blockUnblockReportPage = new BlockUnblockReportPage();
+	private final EmiasReportPage emiasReportPage = new EmiasReportPage();
+	private final ESPHelpdeskReportPage espHelpdeskReportPage = new ESPHelpdeskReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -336,6 +342,10 @@ public class MainPage implements Serializable {
     private final AllComplexReportPage allComplexReportPage = new AllComplexReportPage();
     private final TotalSalesPage totalSalesPage = new TotalSalesPage();
     private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
+    private final DishMenuWebARMPPReportPage dishMenuReportWebArmPP = new DishMenuWebARMPPReportPage();
+    private final ComplexMenuReportPage complexMenuReportPage = new ComplexMenuReportPage();
+    private final ComplexOrgReportPage complexOrgReportPage = new ComplexOrgReportPage();
+    private final ComplexExtendedReportPage complexExtendedReportPage = new ComplexExtendedReportPage();
 
     //Charts
     private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
@@ -373,6 +383,9 @@ public class MainPage implements Serializable {
     // Rule manipulation
     private final BasicWorkspacePage ruleGroupPage = new BasicWorkspacePage();
 
+    // Code MSP
+    private final BasicWorkspacePage codeMSPGroupPage = new BasicWorkspacePage();
+
     // Event notification manipulation
     private final BasicWorkspacePage eventNotificationGroupPage = new BasicWorkspacePage();
     private final EventNotificationListPage eventNotificationListPage = new EventNotificationListPage();
@@ -388,9 +401,12 @@ public class MainPage implements Serializable {
     private final ContragentSelectPage contragentSelectPage = new ContragentSelectPage();
     private final ContractSelectPage contractSelectPage = new ContractSelectPage();
     private final ContragentListSelectPage contragentListSelectPage = new ContragentListSelectPage();
+    private final ComplexListSelectPage complexWebListSelectPage = new ComplexListSelectPage();
+    private final DishListSelectPage dishWebListSelectPage = new DishListSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
+    private final ClientGroupListSelectPage clientGroupListSelectPage = new ClientGroupListSelectPage();
     private final UserSelectPage userSelectPage = new UserSelectPage();
     private final OrgMainBuildingListSelectPage orgMainBuildingListSelectPage = new OrgMainBuildingListSelectPage();
     private final CardRegistrationConfirm cardRegistrationConfirm = new CardRegistrationConfirm();
@@ -409,6 +425,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage acceptanceActGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage calendarReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage clientReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
 
@@ -445,6 +462,7 @@ public class MainPage implements Serializable {
     private final ContragentCompletionReportPage contragentCompletionReportPage = new ContragentCompletionReportPage();
     private final ContragentPaymentReportPage contragentPaymentReportPage = new ContragentPaymentReportPage();
     private final ContragentPreordersReportPage contragentPreordersReportPage = new ContragentPreordersReportPage();
+    private final FoodDaysCalendarReportPage foodDaysCalendarReportPage = new FoodDaysCalendarReportPage();
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage();
@@ -1442,8 +1460,6 @@ public class MainPage implements Serializable {
             logger.error("Failed to load menu exchange from table", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при выводе данных по мастера меню: " + e.getMessage(), null));
-        } finally {
-
         }
         return null;
     }
@@ -1772,6 +1788,45 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public ClientGroupListSelectPage getClientGroupListSelectPage() {
+        return clientGroupListSelectPage;
+    }
+
+    public Object showClientGroupListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ClientGroupListSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                if (params.get("idOfOrg") != null) {
+                    String idOfOrg = params.get("idOfOrg");
+                    clientGroupListSelectPage.fill(persistenceSession, idOfOrg);
+                } else {
+                    clientGroupListSelectPage.fill(persistenceSession, "");
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                clientGroupListSelectPage.pushCompleteHandler((ClientGroupListSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(clientGroupListSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill client group selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+            }
+        }
+        return null;
+    }
+
     public Object updateClientGroupSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
@@ -1802,6 +1857,36 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object updateClientGroupListSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if (params.get("idOfOrg") != null) {
+                String idOfOrg = params.get("idOfOrg");
+                clientGroupListSelectPage.fill(persistenceSession, idOfOrg);
+            } else {
+                clientGroupListSelectPage.fill(persistenceSession, "");
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill client group selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
     public Object completeClientGroupSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -1816,6 +1901,36 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
             if (!modalPages.empty()) {
                 if (modalPages.peek() == clientGroupSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to fill client group selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
+    public Object completeClientGroupListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            clientGroupListSelectPage.update();
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientGroupListSelectPage.completeClientGroupListSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == clientGroupListSelectPage) {
                     modalPages.pop();
                 }
             }
@@ -1888,50 +2003,13 @@ public class MainPage implements Serializable {
         this.orgFilterPageName = orgFilterPageName;
     }
 
-    private Object showOrgListSelectPage(List<Long> idOfContragentOrgList) {
-        BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                orgListSelectPage.setFilter("");
-                orgListSelectPage.setIdFilter("");
-                orgListSelectPage.setRegion("");
-                orgListSelectPage.updateOrgTypesItems();
-                if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
-                } else {
-                    orgListSelectPage
-                            .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList, this);
-                }
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                orgListSelectPage.pushCompleteHandlerList((OrgListSelectPage.CompleteHandlerList) currentTopMostPage);
-                modalPages.push(orgListSelectPage);
-            } catch (Exception e) {
-                logger.error("Failed to fill org selection page", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора организации", null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-
-
-            }
-        }
-        return null;
+    public Object showOrgListSelectPage(List<Long> idOfContragents) {
+        return showOrgListSelectPageWebArm(idOfContragents, null);
     }
 
-    public Object showOrgListSelectPage(Long idOfContragent) {
-        List<Long> idOfContragentList = new ArrayList<Long>();
-        idOfContragentList.add(idOfContragent);
-
+    public Object showOrgListSelectPageWebArm(List<Long> idOfContragents, Boolean webARM) {
+        webARMppFilter = webARM;
+        this.idOfContragentList = new ArrayList<>(idOfContragents);
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -1940,18 +2018,18 @@ public class MainPage implements Serializable {
             Transaction persistenceTransaction = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList, webARMppFilter);
                 } else {
                     orgListSelectPage
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList, this);
+                                    idOfContragentList, this, webARMppFilter);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1971,6 +2049,12 @@ public class MainPage implements Serializable {
 
 
     public Object showOrgListSelectPage() {
+        return showOrgListSelectPageWebArm(null);
+    }
+
+    public Object showOrgListSelectPageWebArm(Boolean webARM) {
+        webARMppFilter = webARM;
+        idOfContragentList = new ArrayList<>();
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -1986,11 +2070,11 @@ public class MainPage implements Serializable {
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList, webARMppFilter);
                 } else {
                     orgListSelectPage
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList, this);
+                                    idOfContragentList, this, webARMppFilter);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -2123,11 +2207,11 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList, idOfContragentList);
+                orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList, idOfContragentList, webARMppFilter);
             } else {
                 orgListSelectPage
                         .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList,
-                                idOfContragentList, this);
+                                idOfContragentList, this, webARMppFilter);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2173,6 +2257,26 @@ public class MainPage implements Serializable {
 
     public Object clearContragentListSelectedItemsList() {
         contragentListSelectPage.deselectAllItems();
+        return null;
+    }
+
+    public Object clearComplexListSelectedItemsList() {
+        complexWebListSelectPage.deselectAllItems();
+        return null;
+    }
+
+    public Object clearDishListSelectedItemsList() {
+        dishWebListSelectPage.deselectAllItems();
+        return null;
+    }
+
+    public Object clearGroupListItemsList() {
+        clientGroupListSelectPage.clear();
+        return null;
+    }
+
+    public Object clearGroupListSelectedItemsList() {
+        clientGroupListSelectPage.clearSelect();
         return null;
     }
 
@@ -2294,6 +2398,7 @@ public class MainPage implements Serializable {
     }
 
     public Object completeOrgListSelectionOk() {
+        webARMppFilter = false;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             orgListSelectPage.completeOrgListSelection(true);
@@ -2311,6 +2416,7 @@ public class MainPage implements Serializable {
     }
 
     public Object completeOrgListSelectionCancel() {
+        webARMppFilter = false;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             orgListSelectPage.completeOrgListSelection(false);
@@ -2668,7 +2774,22 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object selectAllComplexListSelectedItemsList() {
+        complexWebListSelectPage.selectAllItems();
+        return null;
+    }
+
+    public Object selectAllGroupListSelectedItemsList() {
+        clientGroupListSelectPage.selectAllItems();
+        return null;
+    }
+
+
     public Object showContragentListSelectPage() {
+        return showContragentListSelectPage(null) ;
+    }
+
+    public Object showContragentListSelectPage(List<Long> idOfOrgs) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
                 || currentTopMostPage instanceof ContragentListSelectPage) {
@@ -2683,7 +2804,7 @@ public class MainPage implements Serializable {
                 if(contragentListSelectPage.getClassTypesString() != null){
                     classTypes = contragentListSelectPage.getClassTypesString();
                 }
-                contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes);
+                contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes, idOfOrgs);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
@@ -2695,6 +2816,104 @@ public class MainPage implements Serializable {
                 logger.error("Failed to fill contragents list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Ошибка при подготовке страницы выбора списка контрагентов: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    public Object showComplexListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ComplexListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                complexWebListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler) {
+                    complexWebListSelectPage
+                            .pushCompleteHandler((ComplexListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(complexWebListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill complex list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка комплексов меню для Web-технолога: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
+    }
+
+    public Object showDishListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof DishListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof DishListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                dishWebListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof DishListSelectPage.CompleteHandler) {
+                    dishWebListSelectPage
+                            .pushCompleteHandler((DishListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(dishWebListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill dish list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка блюд: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    public Object showGroupListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ComplexListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                complexWebListSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ComplexListSelectPage.CompleteHandler) {
+                    complexWebListSelectPage
+                            .pushCompleteHandler((ComplexListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(complexWebListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill complex list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка комплексов меню для Web-технолога: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2816,6 +3035,66 @@ public class MainPage implements Serializable {
 
     }
 
+    public Object completeComplexListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            complexWebListSelectPage.completeComplexSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == complexWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            complexWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("Failed to complete complex Web-технолог list selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка комплексов: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+
+    }
+
+    public Object completeDishListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            dishWebListSelectPage.completeDishSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dishWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            dishWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("Failed to complete dish list selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка блюд: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+
+    }
+
     public Object cancelContragentListSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -2830,6 +3109,42 @@ public class MainPage implements Serializable {
             logger.error("{}", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+    public Object cancelComplexListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            complexWebListSelectPage.cancelContragentListSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == complexWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            complexWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("{}", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка комплексов: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+    public Object cancelDishListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            dishWebListSelectPage.cancelContragentListSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dishWebListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            dishWebListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("{}", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка блюд: " + e.getMessage(), null));
         }
         return null;
     }
@@ -3125,12 +3440,12 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         updateSelectedMainMenu();
         return null;
     }
+
+
 
     public ClientEditPage getClientEditPage() {
         return clientEditPage;
@@ -3203,7 +3518,7 @@ public class MainPage implements Serializable {
         return clientOperationListPage;
     }
 
-    public Object showClientOperationListPage() {
+    public Object showClientOperationListPage(boolean full) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -3212,7 +3527,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            clientOperationListPage.fill(persistenceSession, selectedIdOfClient);
+            clientOperationListPage.fill(persistenceSession, selectedIdOfClient, full);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             currentWorkspacePage = clientOperationListPage;
@@ -3421,7 +3736,12 @@ public class MainPage implements Serializable {
                 dataSize = data.length;
                 inputStream = new ByteArrayInputStream(data);
             }
-            clientFileLoadPage.loadClients(inputStream, dataSize);
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Загрузка клиентов из файла");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+            clientFileLoadPage.loadClients(inputStream, dataSize, clientsMobileHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
@@ -3541,7 +3861,11 @@ public class MainPage implements Serializable {
         return clientSelectListPage;
     }
 
-    public Object showClientSelectPage() {
+    public Object showEmptyClientSelectPage() {
+        return showClientSelectPage(true);
+    }
+
+    public Object showClientSelectPage(boolean doClear) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ClientSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -3552,6 +3876,9 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                if (doClear) {
+                    clientSelectPage.getClientFilter().clear();
+                }
                 clientSelectPage.fill(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -3569,6 +3896,10 @@ public class MainPage implements Serializable {
             }
         }
         return null;
+    }
+
+    public Object showClientSelectPage() {
+        return showClientSelectPage(false);
     }
 
     public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {
@@ -6474,6 +6805,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showEspHelpdeskGroupPage(){
+        currentWorkspacePage = espHelpdeskGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public BasicWorkspacePage getDiscountGroupPage() {
         return discountGroupPage;
     }
@@ -6522,6 +6859,10 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getActivityReportsGroupMenu() {
         return activityReportsGroupMenu;
+    }
+
+    public BasicWorkspacePage getCalendarReportsGroupMenu() {
+        return calendarReportsGroupMenu;
     }
 
     public BasicWorkspacePage getClientReportsGroupMenu() {
@@ -6576,6 +6917,12 @@ public class MainPage implements Serializable {
 
     public Object showActivityReportsGroupMenu() {
         currentWorkspacePage = activityReportsGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showCalendarReportsGroupMenu() {
+        currentWorkspacePage = calendarReportsGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
@@ -6716,6 +7063,10 @@ public class MainPage implements Serializable {
 
     public ContragentPreordersReportPage getContragentPreordersReportPage() {
         return contragentPreordersReportPage;
+    }
+
+    public FoodDaysCalendarReportPage getFoodDaysCalendarReportPage() {
+        return foodDaysCalendarReportPage;
     }
 
     public ClientPaymentsPage getClientPaymentsReportPage() {
@@ -7477,6 +7828,31 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showEmiasReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = emiasReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set EMIAS page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+	
+	    public Object showESPHelpDeskReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = espHelpdeskReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set esp report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
 
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;
@@ -7579,6 +7955,7 @@ public class MainPage implements Serializable {
         updateSelectedMainMenu();
         return null;
     }
+
 
     public MigrantsReportPage getMigrantsReportPage() {
         return migrantsReportPage;
@@ -7736,6 +8113,73 @@ public class MainPage implements Serializable {
         } finally {
 
         }
+        return null;
+    }
+
+    public DishMenuWebARMPPReportPage getDishMenuReportWebArmPP() {
+        return dishMenuReportWebArmPP;
+    }
+    public ComplexMenuReportPage getComplexMenuReportPage() {
+        return complexMenuReportPage;
+    }
+
+    public ComplexOrgReportPage getComplexOrgReportPage() {
+        return complexOrgReportPage;
+    }
+
+    public ComplexExtendedReportPage getComplexExtendedReportPage() {
+        return complexExtendedReportPage;
+    }
+
+    public Object showDishMenuWebARMPPReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = dishMenuReportWebArmPP;
+        } catch (Exception e) {
+            logger.error("Failed to set DishMenuWebARMPPReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по блюдам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showComplexMenuReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexMenuReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showComplexExtendedMenuReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexExtendedReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showComplexExtendedReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = complexExtendedReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ComplexMenuReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по комплексам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
         return null;
     }
 
@@ -9199,6 +9643,10 @@ public class MainPage implements Serializable {
         return ruleGroupPage;
     }
 
+    public BasicWorkspacePage getCodeMSPGroupPage(){
+        return codeMSPGroupPage;
+    }
+
     public Object showRuleGroupPage() {
         currentWorkspacePage = ruleGroupPage;
         updateSelectedMainMenu();
@@ -9388,6 +9836,18 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT);
     }
 
+    public boolean isEligibleToWorkOnlineReportDocs() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT_DOCS);
+    }
+
+    public boolean isEligibleToWorkOnlineReportEEReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT);
+    }
+
+    public boolean isEligibleToWorkOnlineReportMenuReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT);
+    }
+
     public boolean isEligibleToMonitor() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_MONITORING);
     }
@@ -9460,6 +9920,10 @@ public class MainPage implements Serializable {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY);
     }
 
+    public boolean isEligibleToViewCalendarReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
+    }
+
     public boolean isEligibleToViewClientsReports() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_CLIENTS);
     }
@@ -9514,6 +9978,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToViewHelpdesk() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_HELPDESK);
+    }
+
+    public boolean isEligibleToViewESPdesk() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_ESP);
     }
 
     public boolean isEligibleToViewTotalServicesReport() throws Exception {
@@ -10470,16 +10938,16 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карта зарегистрирована успешно", null));
-            if (!modalPages.empty()) {
-                if (modalPages.peek() == cardRegistrationConfirm) {
-                    modalPages.pop();
-                }
-            }
         } catch(Exception e){
             logger.error("Failed to re-issue card", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при заказе карты: " + e.getMessage(), null));
         } finally {
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == cardRegistrationConfirm) {
+                    modalPages.pop();
+                }
+            }
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
@@ -10701,7 +11169,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             selectedClientGroupPage.fill(persistenceSession, selectedIdOfClient);
-            clientOperationListPage.fill(persistenceSession, selectedIdOfClient);
+            clientOperationListPage.fill(persistenceSession, selectedIdOfClient, false);
             clientViewPage.fill(persistenceSession, selectedIdOfClient);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -10727,5 +11195,24 @@ public class MainPage implements Serializable {
 
     public BlockUnblockReportPage getBlockUnblockReportPage() {
         return blockUnblockReportPage;
+    }
+
+    public ComplexListSelectPage getComplexWebListSelectPage() {
+        return complexWebListSelectPage;
+    }
+
+    public DishListSelectPage getDishWebListSelectPage() {
+        return dishWebListSelectPage;
+    }
+    public EmiasReportPage getEmiasReportPage() {
+        return emiasReportPage;
+    }
+
+    public ESPHelpdeskReportPage getEspHelpdeskReportPage() {
+        return espHelpdeskReportPage;
+    }
+
+    public BasicWorkspacePage getEspHelpdeskGroupPage() {
+        return espHelpdeskGroupPage;
     }
 }

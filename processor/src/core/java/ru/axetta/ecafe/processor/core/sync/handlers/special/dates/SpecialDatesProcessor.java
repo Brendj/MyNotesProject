@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -74,9 +76,9 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                     SpecialDate specialDate = null;
 
                     if (StringUtils.isEmpty(groupName)) {
-                        specialDate = DAOUtils.findSpecialDate(session, compositeId);
+                        specialDate = DAOReadonlyService.getInstance().findSpecialDate(compositeId);
                     } else {
-                        specialDate = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfClientGroup);
+                        specialDate = DAOReadonlyService.getInstance().findSpecialDateWithGroup(compositeId, idOfClientGroup);
                     }
                     Boolean isWeekend = item.getIsWeekend();
                     Boolean deleted = item.getDelete();
@@ -86,6 +88,7 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                         comment = "";
                     }
 
+                    boolean createHistory = false;
                     if(specialDate == null){
                         specialDate = new SpecialDate(compositeId, isWeekend, comment);
                         specialDate.setIsWeekend(isWeekend);
@@ -94,7 +97,10 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                         specialDate.setIdOfClientGroup(idOfClientGroup);
                         specialDate.setOrgOwner(orgOwner);
                         specialDate.setVersion(nextVersion);
+                        specialDate.setStaffGuid(item.getStaffGuid());
+                        specialDate.setArmLastUpdate(item.getArmLastUpdate());
                         session.save(specialDate);
+                        createHistory = true;
                     } else {
                         boolean wasModified = false;
                         if (!specialDate.getIsWeekend().equals(isWeekend)) {
@@ -129,8 +135,15 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                         }
                         if (wasModified) {
                             specialDate.setVersion(nextVersion);
-                            session.update(specialDate);
+                            specialDate.setLastUpdate(new Date());
+                            specialDate.setStaffGuid(item.getStaffGuid());
+                            specialDate.setArmLastUpdate(item.getArmLastUpdate());
+                            session.merge(specialDate);
+                            createHistory = true;
                         }
+                    }
+                    if (createHistory) {
+                        createSpecialDateHistory(item, nextVersion, idOfClientGroup);
                     }
 
                     resItem = new ResSpecialDatesItem(session, specialDate);
@@ -158,6 +171,12 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
         }
         result.setItems(items);
         return result;
+    }
+
+    private void createSpecialDateHistory(SpecialDatesItem item, Long version, Long idOfClientGroup) {
+        SpecialDateHistory history = new SpecialDateHistory(item.getIdOfOrg(), item.getDate(), item.getIsWeekend(), item.getDelete(), item.getIdOfOrgOwner(),
+                version, item.getComment(), idOfClientGroup, item.getStaffGuid(), item.getArmLastUpdate());
+        session.save(history);
     }
 
     public SpecialDatesData processData() throws Exception {

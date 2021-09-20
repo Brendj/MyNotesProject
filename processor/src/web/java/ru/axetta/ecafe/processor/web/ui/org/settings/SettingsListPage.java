@@ -4,18 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
-
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
@@ -95,7 +95,7 @@ public class SettingsListPage extends BasicWorkspacePage implements OrgSelectPag
     private void extractParams() throws Exception {
         ECafeSettings settings = getEntityFromRequestParam();
         selectedSettingsGroupPage.setSelectSettings(settings);
-        Org currentOrg = daoService.getOrg(settings.getOrgOwner());
+        Org currentOrg = DAOReadonlyService.getInstance().findOrg(settings.getOrgOwner());
         selectedSettingsGroupPage.setCurrentOrg(new OrgItem(currentOrg));
         selectedSettingsGroupPage.onShow();
     }

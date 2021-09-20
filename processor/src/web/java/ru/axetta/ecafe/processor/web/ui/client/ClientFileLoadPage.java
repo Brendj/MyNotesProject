@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -156,7 +157,8 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         // Nothing to do here
     }
 
-    public void loadClients(InputStream inputStream, long dataSize) throws Exception {
+    public void loadClients(InputStream inputStream, long dataSize, ClientsMobileHistory clientsMobileHistory)
+            throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         try {
@@ -197,7 +199,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                             continue;
                         }
                         result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
-                                this.checkFullNameUnique);
+                                this.checkFullNameUnique, clientsMobileHistory);
                         if (result.getResultCode() == 0) {
                             ++successLineNumber;
                         }
@@ -259,7 +261,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
     }
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig, Long idOfOrg, String line, int lineNo,
-            boolean checkFullNameUnique) throws Exception {
+            boolean checkFullNameUnique, ClientsMobileHistory clientsMobileHistory) throws Exception {
         String[] tokens = modifyData(line, lineNo);
         try {
             fieldConfig.setValues(tokens);
@@ -292,11 +294,6 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
         }
 
-        boolean isGroupsFieldEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GROUP);
-        if (isGroupsFieldEmpty) {
-            fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
-        }
-
         boolean isGenderEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GENDER);
         if (isGenderEmpty) {
             fieldConfig.setValue(ClientManager.FieldId.GENDER, 0);
@@ -308,7 +305,8 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
 
         try {
-            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, true);
+            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, true,
+                    clientsMobileHistory);
             ClientManager.updateComment(idOfClient, MskNSIService.COMMENT_MANUAL_IMPORT);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
@@ -320,7 +318,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
     private String[] modifyData(String line, int lineNo) {
         String[] data = line.split(";", -1);
         String[] tokens = new String[34];
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length && i < 11; i++) {
             data[i] = data[i].trim();
             if (i < 11) {
                 if (i == 0 && data[i].equals("")) {     // CONTRACT_ID
@@ -333,14 +331,25 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                     data[i] = "0";
                 }
                 tokens[i] = data[i].trim();
-            } else if (i > 11) {
+            } /*else if (i > 11) {
                 if ((i == 16 || i == 17 || i == 18) && data[i]
                         .equals("")) {        // PAY_FOR_SMS, NOTIFY_BY_PUSH, NOTIFY_BY_EMAIL
                     data[i] = "0";
                 }
                 tokens[i - 1] = data[i];
-            }
+            }*/
         }
+        tokens[11] = data[12]; //документ
+        tokens[12] = data[13]; //адрес
+        tokens[13] = data[14]; //телефон
+        tokens[14] = data[15]; //мобильный
+        tokens[15] = data[16]; //емейл
+        tokens[16] = data[17].equals("") ? "0" : data[17]; //платный смс
+        tokens[17] = data[19].equals("") ? "0" : data[19]; //уведомления по смс
+        //tokens[18] = data[21].equals("") ? "0" : data[21]; //уведомления пуш
+        tokens[18] = data[18].equals("") ? "0" : data[18]; //уведомления емейл
+        tokens[19] = data[20]; //овердрафт
+        tokens[22] = StringUtils.isEmpty(data[22]) ? ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup() : data[22];
         tokens[33] = data[11].equals("0") ? "f" : "m";      // GENDER
         return tokens;
     }

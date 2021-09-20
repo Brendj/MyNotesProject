@@ -53,6 +53,11 @@
         <f:selectItem itemLabel="И" itemValue="false"/>
         <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
     </h:selectOneListbox>
+    <h:outputText value="Код МСП" styleClass="output-text"/>
+    <h:selectOneListbox id="codeMSPCreate" value="#{ruleCreatePage.codeMSP}"  size="1"
+                        styleClass="output-text">
+        <f:selectItems value="#{ruleCreatePage.allMSP}" />
+    </h:selectOneListbox>
 
     <h:outputText value="Комплексы" styleClass="output-text"/>
     <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">

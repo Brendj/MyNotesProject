@@ -360,7 +360,9 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
             idOfContragent = this.contragentFilter.getContragent().getIdOfContragent();
         } catch (Exception e) {
         }
-        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragent);
+        List<Long> idOfContragentList = new ArrayList<>();
+        idOfContragentList.add(idOfContragent);
+        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragentList);
     }
 
 

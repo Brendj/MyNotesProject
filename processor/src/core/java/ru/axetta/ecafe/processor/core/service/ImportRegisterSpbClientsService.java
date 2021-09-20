@@ -169,11 +169,11 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
 
     @Override
     public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation,
-            String groupName, ClientGuardianHistory clientGuardianHistory) throws Exception {
+            String groupName, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         List<RegistryChangeCallback> result = new LinkedList<>();
         for (Long idOfRegistryChange : changesList) {
             try {
-                applyRegistryChange(idOfRegistryChange, fullNameValidation, clientGuardianHistory);
+                applyRegistryChange(idOfRegistryChange, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
                 result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
             } catch (Exception e1) {
                 logger.error("Error when apply RegistryChange: ", e1);
@@ -185,7 +185,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
     }
 
     public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation,
-            ClientGuardianHistory clientGuardianHistory) throws Exception {
+            ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
 
@@ -231,7 +231,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                         createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     }
                     afterSaveClient = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
-                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate), clientsMobileHistory);
                     try {
                         cardNo = Long.parseLong(afterSaveClient.getClientGUID());
                     } catch (Exception e) {
@@ -241,8 +241,9 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                         Org org = DAOUtils.findOrg(session, change.getIdOfOrg());
                         if (org.getAutoCreateCards()) {
                             RuntimeContext.getInstance().getCardManager()
-                                    .createCardTransactionFree(session, afterSaveClient.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
-                                            CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                                    .createCardTransactionFree(session, afterSaveClient.getIdOfClient(), cardNo,
+                                            Card.parseCardType(Card.TYPE_NAMES[1]), CardState.ISSUED.getValue(),
+                                            validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo, null);
                         }
                     }
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
@@ -262,6 +263,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     String dateDelete = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
                     commentsAddsDelete(dbClient, deleteCommentsAdds);
+                    dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
                     break;
                 case MOVE_OPERATION:
@@ -290,6 +292,8 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     }
                     addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), beforeMigrationGroup, dbClient, change);
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
+                    dbClient.setUpdateTime(new Date());
+                    session.save(dbClient);
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
@@ -315,7 +319,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     }
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
                             newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
-                            dbClient, session, true);
+                            dbClient, session, true, clientsMobileHistory);
 
                     if (!migration) {
                         if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {
@@ -331,6 +335,8 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                         }
                     }
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
+                    dbClient.setUpdateTime(new Date());
+                    session.save(dbClient);
                     break;
                 default:
                     logger.error("Unknown update registry change operation " + change.getOperation());
@@ -923,8 +929,9 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
                     try {
                         CardManagerProcessor.lockActiveCards(session, client.getCards());
                         RuntimeContext.getInstance().getCardManager()
-                                .createCardTransactionFree(session, client.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
-                                        CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                                .createCardTransactionFree(session, client.getIdOfClient(), cardNo,
+                                        Card.parseCardType(Card.TYPE_NAMES[1]), CardState.ISSUED.getValue(),
+                                        validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo, null);
                     } catch (Exception e) {
                         logger.error("Error SPb cards creation for client " + client.getContractId(), e);
                         continue;

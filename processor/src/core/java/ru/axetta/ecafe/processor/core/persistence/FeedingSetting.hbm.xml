@@ -12,6 +12,9 @@
         </id>
         <property name="settingName" column="SettingName" type="string" length="128" />
         <property name="limit" column="limitAmount" type="long" not-null="true" />
+        <property name="discount" column="discountAmount" type="long" not-null="true" />
+        <property name="useDiscount" column="useDiscount" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="useDiscountBuffet" column="useDiscountBuffet" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
 

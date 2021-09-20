@@ -20,6 +20,9 @@
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardViewPage.cardNo}" converter="cardNoConverter" readonly="true"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Длинный номер карты" styleClass="output-text" />
+    <h:inputText value="#{mainPage.cardViewPage.longCardNo}" converter="cardNoConverter" readonly="true"
+                 styleClass="input-text" />
     <h:outputText escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardViewPage.cardPrintedNo}" converter="cardPrintedNoConverter" readonly="true"
                  styleClass="input-text" />

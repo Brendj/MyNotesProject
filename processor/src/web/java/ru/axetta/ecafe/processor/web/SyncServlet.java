@@ -4,16 +4,6 @@
 
 package ru.axetta.ecafe.processor.web;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.sync.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.SyncCollector;
-import ru.axetta.ecafe.util.DigitalSignatureUtils;
-
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -23,6 +13,15 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.SyncCollector;
+import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -65,6 +64,7 @@ public class SyncServlet extends HttpServlet {
     private static final AtomicLong threadCounter = new AtomicLong();
     public static final int MAX_SYNCS = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
     public static final int permitsTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
+    public static final int permitsAccIncTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT);
     private static final Semaphore permitsForSync = new Semaphore(MAX_SYNCS, true);
     private final static ThreadLocal<Boolean> currentSyncWasGranted = new ThreadLocal<Boolean>(){
         @Override protected Boolean initialValue() { return false; }
@@ -163,8 +163,10 @@ public class SyncServlet extends HttpServlet {
             }
             ///////
             long currentTime = System.currentTimeMillis();
-            if (syncType != SyncType.TYPE_GET_ACC_INC) {
-                if (permitsForSync.tryAcquire(permitsTimeout, TimeUnit.MINUTES)) {
+            boolean useQueueForAllSyncs = runtimeContext.isUseQueueForAllSyncs();
+            if (useQueueForAllSyncs || syncType != SyncType.TYPE_GET_ACC_INC) {
+                long timeout = (syncType == SyncType.TYPE_GET_ACC_INC) ? permitsAccIncTimeout : permitsTimeout;
+                if (permitsForSync.tryAcquire(timeout, TimeUnit.MINUTES)) {
                     currentSyncWasGranted.set(true);
                 } else {
                     String message = "Failed to perform this sync. Wait timeout is expired. Available permits is " + permitsForSync.availablePermits();
@@ -224,7 +226,7 @@ public class SyncServlet extends HttpServlet {
 
 
             //  Daily logging for sync request
-            syncLogger.registerSyncRequestInDb(idOfOrg, idOfSync);
+            syncLogger.queueSyncRequestAsync(idOfOrg, idOfSync);
 
 
             // Parse XML request
@@ -352,7 +354,7 @@ public class SyncServlet extends HttpServlet {
             // Start data model transaction
             persistenceTransaction = persistenceSession.beginTransaction();
             // Find given org
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             if (null == org) {
                 final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
                 logger.error(message);

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
@@ -80,9 +81,10 @@ public class NSIOrgRegistryEmployeeSynchPage extends NSIOrgRegistrySyncPageBase 
 
     @Override
     protected List<RegistryChangeCallback> proceedRegistryChangeItemInternal(List<Long> list, int operation,
-            boolean fullNameValidation, ClientGuardianHistory clientGuardianHistory) {
-        return frontControllerProcessor.proceedRegistryEmployeeChangeItem(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, null,
-                clientGuardianHistory);
+            boolean fullNameValidation, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) {
+        return frontControllerProcessor.proceedRegistryEmployeeChangeItem(list,
+                ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE,
+                fullNameValidation, null, clientsMobileHistory, clientGuardianHistory);
     }
 
     @Override

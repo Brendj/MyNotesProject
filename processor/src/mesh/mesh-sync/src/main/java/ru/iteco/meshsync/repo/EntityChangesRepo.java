@@ -1,9 +1,10 @@
 package ru.iteco.meshsync.repo;
 
+import ru.iteco.meshsync.enums.EntityType;
+import ru.iteco.meshsync.models.EntityChanges;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.iteco.meshsync.EntityType;
-import ru.iteco.meshsync.models.EntityChanges;
 
 import java.util.List;
 

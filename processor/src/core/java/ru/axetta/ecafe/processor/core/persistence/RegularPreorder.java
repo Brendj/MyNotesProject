@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
 import java.util.Date;
 
 /**
@@ -33,6 +35,7 @@ public class RegularPreorder {
 	private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
 	private Boolean sendeddailynotification;
     private Long idOfDish;
+    private Boolean cancelnotification;
 
     public RegularPreorder() {
 
@@ -41,10 +44,10 @@ public class RegularPreorder {
     public RegularPreorder(Client client, Date startDate, Date endDate, String itemCode, Integer idOfComplex,
             Integer amount, String itemName, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday,
             Boolean friday, Boolean saturday, Long price, String guardianMobile, RegularPreorderState state,
-            PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws Exception {
         this.client = client;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = convertDate(startDate);
+        this.endDate = convertDate(endDate);
         this.itemCode = itemCode;
         this.idOfComplex = idOfComplex;
         this.amount = amount;
@@ -62,6 +65,11 @@ public class RegularPreorder {
         this.mobile = guardianMobile;
         this.state = state;
         this.mobileGroupOnCreate = mobileGroupOnCreate;
+    }
+
+    public static Date convertDate(Date date) throws Exception {
+        String d = CalendarUtils.dateToString(date);
+        return CalendarUtils.parseDate(d);
     }
 
     @Override
@@ -256,5 +264,13 @@ public class RegularPreorder {
 
     public void setIdOfDish(Long idOfDish) {
         this.idOfDish = idOfDish;
+    }
+
+    public Boolean getCancelnotification() {
+        return cancelnotification;
+    }
+
+    public void setCancelnotification(Boolean cancelnotification) {
+        this.cancelnotification = cancelnotification;
     }
 }

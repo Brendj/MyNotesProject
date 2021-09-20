@@ -4,23 +4,26 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.org;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.criterion.Junction;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.infinispan.atomic.AtomicHashMap;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ContractDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.*;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.criterion.*;
-import org.hibernate.transform.Transformers;
-import org.infinispan.atomic.AtomicHashMap;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import java.util.*;
 
@@ -141,7 +144,7 @@ public class Contract extends ContractDistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        Org org = DAOService.getInstance().getOrg(getIdOfSyncOrg());
+        Org org = DAOReadonlyService.getInstance().findOrg(getIdOfSyncOrg());
         XMLUtils.setAttributeIfNotNull(element, "Id", contractNumber);
         XMLUtils.setAttributeIfNotNull(element, "Customer", customer);
         XMLUtils.setAttributeIfNotNull(element, "Responsible", performer);
@@ -199,7 +202,7 @@ public class Contract extends ContractDistributedObject {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null) {
             setOrgOwner(longOrgOwner);
-            setContragent(DAOService.getInstance().getOrg(getOrgOwner()).getDefaultSupplier());
+            setContragent(DAOReadonlyService.getInstance().findDefaultSupplier(getOrgOwner()));
         }
         setContractNumber(XMLUtils.getStringAttributeValue(node, "Id", 255));
         setCustomer(XMLUtils.getStringAttributeValue(node, "Customer", 255));
@@ -207,7 +210,7 @@ public class Contract extends ContractDistributedObject {
         setDateOfConclusion(XMLUtils.getDateAttributeValue(node, "StDate"));
         setDateOfClosing(XMLUtils.getDateAttributeValue(node, "ValidDate"));
         Integer state = XMLUtils.getIntegerAttributeValue(node, "State");
-        Boolean bState = (state == CONTRACT_ACTIVE);
+        Boolean bState = (Objects.equals(state, CONTRACT_ACTIVE));
         setContractState(bState);
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;

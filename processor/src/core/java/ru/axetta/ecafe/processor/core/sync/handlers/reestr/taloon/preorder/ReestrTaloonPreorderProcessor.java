@@ -64,8 +64,9 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                     Integer soldQty = item.getSoldQty();
                     if(ordersCount == null || ordersCount == 0 || soldQty.equals(ordersCount)) {
                         ordersCount = null;
-                    } else {
-                        soldQty = ordersCount;
+                    }
+                    else {
+                        ordersCount = soldQty;
                     }
 
                     Integer requestedQty = item.getRequestedQty();

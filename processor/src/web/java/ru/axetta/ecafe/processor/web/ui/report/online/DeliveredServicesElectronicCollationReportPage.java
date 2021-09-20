@@ -8,7 +8,11 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
-
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -19,11 +23,6 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -86,16 +85,15 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
 
     public void showOrgListSelectPage() {
         Long idOfContragent = null;
-        try {
+        if(this.contragentFilter.getContragent() != null) {
             idOfContragent = this.contragentFilter.getContragent().getIdOfContragent();
-        } catch (Exception e) {
         }
-        Long idOfContract = null;
-        try {
-            idOfContract = this.contractFilter.getContract().getIdOfContract();
-        } catch (Exception e) {
+
+        List<Long> idOfContragents = Collections.emptyList();
+        if(idOfContragent != null){
+            idOfContragents = Collections.singletonList(idOfContragent);
         }
-        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragent);
+        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragents);
     }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
@@ -110,7 +108,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
         resetOrg();
     }
 
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         super.completeOrgListSelection(orgMap);
         if (emptyOrgs()) {
             withoutFriendly = false;
@@ -133,7 +131,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
         contragentFilter.clear();
         region = null;
         otherRegions = false;
-        filter = "Не выбрано";
+        filter = FILTER_SUPER;
         htmlReport = null;
         if(idOfOrgList != null) {
             idOfOrgList.clear();
@@ -209,9 +207,9 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
     }
 
     public void buildReport(Session session) throws Exception {
-        DeliveredServicesReportBuilder reportBuilder = new DeliveredServicesElectronicCollationReportBuilder();
+        DeliveredServicesElectronicCollationReportBuilder reportBuilder = new DeliveredServicesElectronicCollationReportBuilder();
 
-        b = ((DeliveredServicesElectronicCollationReportBuilder)reportBuilder).confirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
+        b = reportBuilder.confirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
                 contragentFilter.getContragent().getIdOfContragent(),
                 contractFilter.getContract().getIdOfContract(), region, otherRegions);
 
@@ -258,19 +256,19 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
     }
 
     public boolean emptyRegion() {
-        return ((region == null) || (region.isEmpty())) ? true : false;
+        return StringUtils.isEmpty(region);
     }
 
     public boolean emptyContragent() {
-        return (contragentFilter.getContragent().getIdOfContragent() == null) ? true : false;
+        return contragentFilter.getContragent().getIdOfContragent() == null;
     }
 
     public boolean emptyContract() {
-        return (contractFilter.getContract().getIdOfContract() == null) ? true : false;
+        return contractFilter.getContract().getIdOfContract() == null;
     }
 
     public boolean emptyOrgs() {
-        return ((idOfOrgList == null) || (idOfOrgList.isEmpty())) ? true : false;
+        return CollectionUtils.isEmpty(idOfOrgList);
     }
 
     public void setRegion(String region) {

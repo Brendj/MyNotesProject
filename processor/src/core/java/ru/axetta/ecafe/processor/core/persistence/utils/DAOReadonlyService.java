@@ -4,20 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
-import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
-import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
@@ -32,8 +18,22 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
@@ -113,14 +113,22 @@ public class DAOReadonlyService {
         return result;
     }
 
-    public Org findOrg(Long idOfOrg) throws Exception {
-        Org org = entityManager.find(Org.class, idOfOrg);
-        if (null == org) {
-            final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
-            logger.error(message);
-            throw new NullPointerException(message);
-        }
-        return org;
+    public List<Card> getActiveCardsWithOverdueValidDate(Date now) {
+        Query query = entityManager.createQuery(
+                "FROM Card " +
+                  " WHERE state = 0 and validTime < :date and client is not null");
+        query.setParameter("date", now);
+
+        return query.getResultList();
+    }
+
+    public Org findOrg(Long idOfOrg) {
+        return entityManager.find(Org.class, idOfOrg);
+    }
+
+    public List<Org> findOrgs(List<Long> ids){
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findOrgs(session, ids);
     }
 
     public Integer getMenuCountDays(Long idOfOrg) {
@@ -150,6 +158,16 @@ public class DAOReadonlyService {
             return new ArrayList<Long>();
         }
         return result;
+    }
+
+    public SpecialDate findSpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findSpecialDate(session, compositeIdOfSpecialDate);
+    }
+
+    public SpecialDate findSpecialDateWithGroup(CompositeIdOfSpecialDate compositeIdOfSpecialDate, Long idOfClientGroup) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findSpecialDateWithGroup(session, compositeIdOfSpecialDate, idOfClientGroup);
     }
 
     public List<EnterEvent> getEnterEventsByOrgAndGroup(long idOfOrg, String groupName, Date beginDate, Date endDate) {
@@ -739,25 +757,68 @@ public class DAOReadonlyService {
         return resultMap;
     }
 
-    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs) {
+    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
         try {
-            Query query = entityManager.createQuery("select ce from EMIAS ce where ce.version > :vers");
-            query.setParameter("vers", maxVersion);
-            List<EMIAS> emias = query.getResultList();
-            //Фильтрация по орг
-            Iterator<EMIAS> emiasIterator = emias.iterator();
-            while (emiasIterator.hasNext()) {
-                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
-                Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
-                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
-                    //Удаляем "чужих" клиентов
-                    emiasIterator.remove();
-                }
-            }
-            return emias;
+            Session session = entityManager.unwrap(Session.class);
+            org.hibernate.Query q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS,"
+                    + " ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate, "
+                    + " ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version, "
+                    + " ce.kafka, ce.archive, ce.hazard_level_id, ce.processed, ce.accepteddatetime from cf_emias ce "
+                    + " left join cf_clients cc on cc.meshguid = ce.guid "
+                    + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and (ce.kafka is null or ce.kafka = false)").addEntity(EMIAS.class);
+            q.setParameterList("orgs", idOfOrgs);
+            q.setParameter("vers", maxVersion);
+            return q.list();
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+
+    public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
+        try {
+            Session session = entityManager.unwrap(Session.class);
+            org.hibernate.Query q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS, ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate,  ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version,  ce.kafka, ce.archive, ce.hazard_level_id, ce.idemias, ce.processed, ce.accepteddatetime   from cf_emias ce "
+                    + " left join cf_clients cc on cc.meshguid = ce.guid "
+                    + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and ce.kafka=true and ce.processed = true").addEntity(EMIAS.class);
+            q.setParameterList("orgs", idOfOrgs);
+            q.setParameter("vers", maxVersion);
+            return q.list();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<EMIAS> getEmiasbyClient(Session session, Client client) {
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("guid", client.getMeshGUID()));
+            criteria.add(Restrictions.eq("kafka", true));
+            criteria.add(Restrictions.eq("processed", true));
+            criteria.add(Restrictions.ne("archive", true));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIAS>();
+        }
+    }
+
+    public List<EMIASbyDay> getEmiasbyDayForClient(Session session, Client client, Long idOfClient) {
+        try {
+            Criteria criteria = session.createCriteria(EMIASbyDay.class);
+            if (idOfClient == null)
+                criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+            if (client == null)
+                criteria.add(Restrictions.eq("idOfClient", idOfClient));
+            return criteria.list();
+        } catch (Exception e) {
+            return new ArrayList<EMIASbyDay>();
+        }
+    }
+
+    public List<EMIASbyDay> getEmiasbyDayForOrgs(Long maxVersion, List<Long> idforgs) {
+        return entityManager.createQuery("select distinct embd from EMIASbyDay embd where embd.version>:maxVersion and"
+                + " embd.idOfOrg in :idforgs")
+                .setParameter("idforgs", idforgs).setParameter("maxVersion", maxVersion)
+                .getResultList();
     }
 
     public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
@@ -786,6 +847,26 @@ public class DAOReadonlyService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public Set<WtOrgGroup> getOfflineOrgGroupsSetFromVersion(Long version, Org org) {
+        Set<WtOrgGroup> offlineOrgGroups = new HashSet<>();
+        Query queryDeletedOrgGroups = entityManager.createNativeQuery("select idoforggroup from cf_wt_org_relation_aud a "
+                + "where a.versionoforggroup > :version and a.deletestate = 1 and a.idoforggroup is not null "
+                + "and a.idofcomplex is null and a.idofmenu is null "
+                + "and a.idoforg = :idoforg");
+        queryDeletedOrgGroups.setParameter("version", version);
+        queryDeletedOrgGroups.setParameter("idoforg", org.getIdOfOrg());
+        List list = queryDeletedOrgGroups.getResultList();
+        for (Object obj : list) {
+            Long idOfOrgGroup = HibernateUtils.getDbLong(obj);
+            Query query = entityManager.createQuery(
+                    "SELECT orgGroup from WtOrgGroup orgGroup left join fetch orgGroup.orgs items "
+                            + "where orgGroup.idOfOrgGroup = :idOfOrgGroup");
+            query.setParameter("idOfOrgGroup", idOfOrgGroup);
+            offlineOrgGroups.add((WtOrgGroup) query.getSingleResult());
+        }
+        return offlineOrgGroups;
     }
 
     public Set<WtCategoryItem> getCategoryItemsSetFromVersion(Long version) {
@@ -903,6 +984,25 @@ public class DAOReadonlyService {
 
     }
 
+    public Set<WtMenu> getOfflineMenusSetFromVersion(Long version, Org org) {
+        Set<WtMenu> offlineMenus = new HashSet<>();
+        Query queryDeletedMenus = entityManager.createNativeQuery("select idofmenu from cf_wt_org_relation_aud a "
+                + "where a.versionofmenu > :version and a.deletestate = 1 and a.idofmenu is not null "
+                + "and (a.idoforg = :idoforg or exists (select * from cf_wt_org_group_relations r where r.idoforggroup = a.idoforggroup and r.idoforg = :idoforg))");
+        queryDeletedMenus.setParameter("version", version);
+        queryDeletedMenus.setParameter("idoforg", org.getIdOfOrg());
+        List list = queryDeletedMenus.getResultList();
+        for (Object obj : list) {
+            Long idOfMenu = HibernateUtils.getDbLong(obj);
+            Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
+                    + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                    + "where menu.idOfMenu = :idOfMenu");
+            query.setParameter("idOfMenu", idOfMenu);
+            offlineMenus.add((WtMenu)query.getSingleResult());
+        }
+        return offlineMenus;
+    }
+
     public Set<WtMenu> getMenusSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
@@ -920,6 +1020,26 @@ public class DAOReadonlyService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public Set<WtComplex> getOfflineComplexesSetFromVersion(Long version, Org org) {
+        Set<WtComplex> offlineComplexes = new HashSet<>();
+        Query queryDeletedComplexes = entityManager.createNativeQuery("select idofcomplex from cf_wt_org_relation_aud a "
+                + "where a.versionofcomplex > :version and a.deletestate = 1 and a.idofcomplex is not null "
+                + "and (a.idoforg = :idoforg or exists (select * from cf_wt_org_group_relations r where r.idoforggroup = a.idoforggroup and r.idoforg = :idoforg))");
+        queryDeletedComplexes.setParameter("version", version);
+        queryDeletedComplexes.setParameter("idoforg", org.getIdOfOrg());
+        List list = queryDeletedComplexes.getResultList();
+        for (Object obj : list) {
+            Long idOfComplex = HibernateUtils.getDbLong(obj);
+            Query query = entityManager.createQuery(
+                    "SELECT complex from WtComplex complex left join fetch complex.wtComplexesItems items "
+                            + "left join fetch complex.orgs orgs "
+                            + "left join fetch items.dishes dishes where complex.idOfComplex = :idOfComplex");
+            query.setParameter("idOfComplex", idOfComplex);
+            offlineComplexes.add((WtComplex)query.getSingleResult());
+        }
+        return offlineComplexes;
     }
 
     public Set<WtComplex> getComplexesSetFromVersion(Long version, Contragent contragent, Org org) {
@@ -974,25 +1094,54 @@ public class DAOReadonlyService {
         List<Long> friendlyOrgIds = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
         Set<Org> result = new HashSet<>();
         for (Long friendlyOrgId : friendlyOrgIds) {
-            result.add(DAOService.getInstance().getOrg(friendlyOrgId));
+            result.add(entityManager.find(Org.class, friendlyOrgId));
         }
         return result;
     }
 
+    public List<Long> findFriendlyOrgsIds(Long idOfOrg) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+    }
+
+    public Set<Long> findFriendlyOrgsIdsAsSet(Long idOfOrg) {
+        Session session = entityManager.unwrap(Session.class);
+        return new HashSet<>(DAOUtils.findFriendlyOrgIds(session, idOfOrg));
+    }
+
+    public Boolean isOrgFriendly(Long targetOrgId, Long testOrgId) {
+        Org testOrg = entityManager.find(Org.class, testOrgId);
+        Set<Org> set = testOrg.getFriendlyOrg();
+        for (Org o : set) {
+            if (targetOrgId.equals(o.getIdOfOrg())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Contragent findDefaultSupplier(Long idOfOrg) {
         Session session = entityManager.unwrap(Session.class);
-        org.hibernate.Query query = session
-                .createQuery("SELECT defaultSupplier FROM Org org where org.idOfOrg = :idOfOrg");
-        query.setParameter("idOfOrg", idOfOrg);
-        return (Contragent) query.uniqueResult();
+        return DAOUtils.findDefaultSupplier(session, idOfOrg);
     }
 
     public List<WtDish> getMenuDishes(WtMenu menu) {
         Session session = entityManager.unwrap(Session.class);
+        org.hibernate.Query q = session.createSQLQuery("select d.idofdish "
+                + "from cf_wt_dishes d left join cf_wt_menu_group_dish_relationships mgd on d.idofdish=mgd.idOfDish "
+                + "left outer join cf_wt_menu_group_relationships mgr on mgd.idOfMenuMenuGroupRelation=mgr.id "
+                + "left outer join cf_wt_menu m on mgr.idOfMenu=m.idofmenu where m.idofmenu=:idOfMenu and d.deletestate = 0 and mgr.deletestate = 0");
+        q.setParameter("idOfMenu", menu.getIdOfMenu());
+        List list = q.list();
+        List<Long> ids = new ArrayList<>();
+        for (Object obj : list) {
+            Long id = HibernateUtils.getDbLong(obj);
+            ids.add(id);
+        }
+        if (ids.size() == 0) return null;
         org.hibernate.Query query = session
-                .createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.menuGroupMenus mgm "
-                        + "LEFT JOIN mgm.menu menu where menu = :menu");
-        query.setParameter("menu", menu);
+                .createQuery("SELECT dish FROM WtDish dish where dish.idOfDish in :list");
+        query.setParameterList("list", ids);
         return query.list();
     }
 
@@ -1002,13 +1151,17 @@ public class DAOReadonlyService {
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE m.idofmenu = :idOfMenu AND d.idofdish = :idOfDish");
+                + "WHERE m.idofmenu = :idOfMenu AND d.idofdish = :idOfDish "
+                + "and mg.deletestate = 0 and m.deletestate = 0 and mgr.deletestate = 0");
 
         query.setParameter("idOfMenu", menuId);
         query.setParameter("idOfDish", dishId);
-
-        Object result = query.getSingleResult();
-        return result != null ? ((BigInteger) result).longValue() : 0L;
+        try {
+            Object result = query.getSingleResult();
+            return ((BigInteger) result).longValue();
+        } catch (NoResultException e) {
+            return 0L;
+        }
     }
 
     public Boolean isMenuItemAvailable (Long menuId) {
@@ -1016,7 +1169,8 @@ public class DAOReadonlyService {
                 + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE m.idofmenu = :idOfMenu AND mgd.idofdish is not null group by mgd.idofdish");
+                + "WHERE m.idofmenu = :idOfMenu AND mgd.idofdish is not null "
+                + "and mg.deletestate = 0 and m.deletestate = 0 and mgr.deletestate = 0 group by mgd.idofdish");
         query.setParameter("idOfMenu", menuId);
         List<BigInteger> temp = query.getResultList();
         for(BigInteger o : temp) {
@@ -1084,21 +1238,55 @@ public class DAOReadonlyService {
         }
     }
 
-    public String getWtMenuGroupByWtDish(WtDish wtDish) {
+    public Map<Long, Set<String>> getWtMenuGroupsForAllDishes(Long idOfOrg) {
+        Map<Long, Set<String>> result = new HashMap<>();
+        Query query = entityManager.createNativeQuery("SELECT mg.name, d.idofdish FROM cf_wt_menu_groups mg "
+                + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
+                + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
+                + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
+                + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
+                + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
+                + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
+                + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
+                + "and mgr.deletestate = 0 and d.idofdish is not null");
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = query.getResultList();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            String dishName = (String) row[0];
+            Long idOfDish = ((BigInteger)row[1]).longValue();
+            Set<String> set = result.get(idOfDish);
+            if (set == null) set = new HashSet<String>();
+            set.add(dishName);
+            result.put(idOfDish, set);
+        }
+        return result;
+    }
+
+    public Set<String> getWtMenuGroupByWtDish(Long idOfOrg, Long idOfDish) {
         Query query = entityManager.createNativeQuery("SELECT mg.name FROM cf_wt_menu_groups mg "
                 + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE d.idofdish = :idOfDish and mgr.deletestate = 0 ");
-        query.setParameter("idOfDish", wtDish.getIdOfDish());
-        Object result = query.getSingleResult();
-        return result != null ? result.toString() : "";
+                + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
+                + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
+                + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
+                + "and d.idofdish = :idOfDish and mgr.deletestate = 0 ");
+        query.setParameter("idOfDish", idOfDish);
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = query.getResultList();
+        Set<String> result = new HashSet<>();
+        if (list.size() == 0) result.add("");
+        for (Object obj : list) {
+            result.add((String)obj);
+        }
+        return result;
     }
 
-    public List<WtCategoryItem> getCategoryItemsByWtDish(WtDish wtDish) {
-        return entityManager.createQuery("select dish.categoryItems from WtDish dish where dish = :dish")
-                .setParameter("dish", wtDish)
+    public List<WtCategoryItem> getCategoryItemsByWtDish(Long idOfDish) {
+        return entityManager.createQuery("select dish.categoryItems from WtDish dish where dish.idOfDish = :idOfDish")
+                .setParameter("idOfDish", idOfDish)
                 .getResultList();
     }
 
@@ -1193,6 +1381,18 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<CategoryOrg> getAllWtCategoryOrgs(List<WtDiscountRule> wtDiscountRules) {
+        return entityManager.createQuery("select distinct rule.categoryOrgs from WtDiscountRule rule where rule in :discountRules")
+                .setParameter("discountRules", wtDiscountRules)
+                .getResultList();
+    }
+
+    public List<CategoryDiscount> getAllWtCategoryDiscounts(List<WtDiscountRule> wtDiscountRules) {
+        return entityManager.createQuery("select distinct rule.categoryDiscounts from WtDiscountRule rule where rule in :discountRules")
+                .setParameter("discountRules", wtDiscountRules)
+                .getResultList();
+    }
+
     public GoodRequestPosition findGoodRequestPositionByGuid(String guid) {
         try {
             Query query = entityManager.createQuery("SELECT grp from GoodRequestPosition grp where grp.guid = :guid");
@@ -1202,6 +1402,7 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
 	public boolean isSixWorkWeekOrgAndGroup(Long orgId, String groupName) {
         boolean resultByOrg = false; //isSixWorkWeek(orgId);
         try {
@@ -1216,5 +1417,13 @@ public class DAOReadonlyService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public Long getClientGroupByClientId(Long idOfClient) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        Client client = (Client) criteria.uniqueResult();
+        return client.getIdOfClientGroup();
     }
 }

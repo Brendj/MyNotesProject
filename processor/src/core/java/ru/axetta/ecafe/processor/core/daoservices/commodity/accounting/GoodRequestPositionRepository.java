@@ -4,17 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +14,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.

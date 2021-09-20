@@ -29,6 +29,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.event.ActionEvent;
 import java.util.*;
 
 /**
@@ -59,6 +60,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<GeoplanerNotificationJournal> geoplanerNotificationJournalList = new LinkedList<>();
     private ApplicationForFoodReportItem currentApplicationForFood;
     private List<BankSubscription> bankSubscriptions;
+    private List<ClientsMobileHistory> clientsMobileHistories = new ArrayList<ClientsMobileHistory>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -144,7 +146,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
 
     @SuppressWarnings("unchecked")
 
-    public void fill(Session session, Long idOfClient) throws Exception {
+    public void fill(Session session, Long idOfClient, boolean full) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         this.idOfClient = client.getIdOfClient();
         this.clientPaymentList.fill(session, client, this.startTime, this.endTime);
@@ -226,6 +228,16 @@ public class ClientOperationListPage extends BasicWorkspacePage {
                 .addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
 
+        clientsMobileHistories = new ArrayList<>();
+        if (full) {
+            criteria = session.createCriteria(ClientsMobileHistory.class);
+            criteria.add(Restrictions.eq("client", client))
+                    .add(Restrictions.ge("createdate", startTime))
+                    .add(Restrictions.le("createdate", endTime))
+                    .addOrder(Order.desc("createdate"));
+            clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
+        }
+
         //// client group migrations
         ClientGroupMigrationHistoryService clientGroupMigrationHistoryService = RuntimeContext.getAppContext()
                 .getBean(ClientGroupMigrationHistoryService.class);
@@ -290,6 +302,27 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return result;
     }
 
+    public void getHistoryMobileChange(ActionEvent event) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(ClientsMobileHistory.class);
+            Client client = (Client) session.load(Client.class, idOfClient);
+            criteria.add(Restrictions.eq("client", client))
+                    //.add(Restrictions.ge("createdate", startTime))
+                    //.add(Restrictions.le("createdate", endTime))
+                    .addOrder(Order.desc("createdate"));
+            clientsMobileHistories = (List<ClientsMobileHistory>) criteria.list();
+        } catch (Exception e) {
+
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     public List<GeoplanerNotificationJournal> getGeoplanerNotificationJournalList() {
         return geoplanerNotificationJournalList;
     }
@@ -305,5 +338,13 @@ public class ClientOperationListPage extends BasicWorkspacePage {
 
     public void setBankSubscriptions(List<BankSubscription> bankSubscriptions) {
         this.bankSubscriptions = bankSubscriptions;
+    }
+
+    public List<ClientsMobileHistory> getClientsMobileHistories() {
+        return clientsMobileHistories;
+    }
+
+    public void setClientsMobileHistories(List<ClientsMobileHistory> clientsMobileHistories) {
+        this.clientsMobileHistories = clientsMobileHistories;
     }
 }

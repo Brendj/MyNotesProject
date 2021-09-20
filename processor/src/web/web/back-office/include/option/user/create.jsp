@@ -253,6 +253,18 @@
             <h:outputText escape="true" value="#{helpdeskItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="ЕСП" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefaultOrAdmin}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.espItems}" var="espdeskItems" rendered="#{mainPage.userCreatePage.isDefaultOrAdmin}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{espdeskItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{espdeskItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{espdeskItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
     <h:outputText escape="true" value="Настройки" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
     <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.optionsItems}" var="optionsItems" rendered="#{mainPage.userCreatePage.isDefault}">
         <rich:column>
@@ -266,7 +278,7 @@
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}">
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItemsAll(mainPage.userCreatePage.isSupplierReport)}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text" />
         </rich:column>

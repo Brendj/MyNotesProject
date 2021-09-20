@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -70,6 +71,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_END_SICK = "endSick";
     public static String NOTIFICATION_CANCEL_END_SICK = "CendSick";
     public static String NOTIFICATION_LIBRARY = "library";
+    public static String NOTIFICATION_CANCEL_PREORDER = "preorderCancelNotification";
     public static String NOTIFICATION_CLIENT_NEWPASSWORD = "clientNewPassword";
     public static String NOTIFICATION_EXPIRED_REGULAR_PAYMENT = "regularPaymentExpired";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
@@ -393,7 +395,8 @@ public class EventNotificationService {
         }
         ClientNotificationSetting.Predefined predefined;
         //Сообщения об окончинии срока льгот имеет тип Служебные
-        if (type.equals(EventNotificationService.NOTIFICATION_END_BENEFIT))
+        if (type.equals(EventNotificationService.NOTIFICATION_END_BENEFIT) ||
+                type.equals(EventNotificationService.NOTIFICATION_CANCEL_PREORDER))
             predefined = ClientNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL;
         else
             predefined = ClientNotificationSetting.Predefined.parseByBinding(type);
@@ -548,6 +551,8 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_END_SICK;
             } else if (type.equals(NOTIFICATION_CANCEL_END_SICK)) {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_CANCEL_END_SICK;
+            } else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
+                clientSMSType = ClientSms.TYPE_PREORDER_CANCEL_NOTIFICATION;
             } else if (type.equals(NOTIFICATION_LIBRARY)) {
                 clientSMSType = ClientSms.TYPE_NOTIFICATION_LIBRARY;
             } else {
@@ -786,7 +791,7 @@ public class EventNotificationService {
         return attachToValues(CLIENT_GENDER_KEY, genderString, values);
     }
 
-    public static final String[] attachAmountBuyAllToValues(Long amountBuyAll, String[] values) {
+    public static final String[] attachMoneyToValues(Long amountBuyAll, String[] values, String nameParam) {
         if (null == amountBuyAll) {
             return values;
         }
@@ -799,7 +804,7 @@ public class EventNotificationService {
         }
         String amountBuyAllString = rub.toString() + "," + cop_str;
 
-        return attachToValues(PARAM_AMOUNT_BUY_ALL, amountBuyAllString, values);
+        return attachToValues(nameParam, amountBuyAllString, values);
     }
 
     public static Long getTargetIdFromValues(String[] values) {
@@ -939,6 +944,11 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
                 }
 
+                if (!findValueInParams(new String[]{PARAM_FRATION}, values).isEmpty())
+                {
+                    String ration = findValueInParams(new String[]{PARAM_FRATION}, values);
+                    empType.getParameters().put(PARAM_FRATION, ration);
+                }
 
                 //  дата только для платного комплекса + льготного комплекса
                 if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
@@ -948,7 +958,6 @@ public class EventNotificationService {
                     String complexName = findValueInParams(new String[]{PARAM_COMPLEX_NAME}, values);
                     empType.getParameters().put(PARAM_COMPLEX_NAME, complexName);
                 }
-
 
                 //  сумма только для буфет + платное
                 String amountPrice = findValueInParams(new String[]{PARAM_AMOUNT_PRICE}, values);
@@ -1040,23 +1049,30 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_LIBRARY, destClient, values);
                 }
             }
+            else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CANCEL_PREORDER, dataClient, destClient, values);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CANCEL_PREORDER, destClient, values);
+                }
+            }
 
-            String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);
-            if (!isTest.equals(""))
-                empType.getParameters().put(ExternalEventNotificationService.TEST, isTest);
-
-            //  Устанавливаем дату
-            String empDateStr = findValueInParams(new String [] {"empTime"}, values);
-            if(empDateStr != null && !StringUtils.isBlank(empDateStr)) {
+            String empDateStr = findValueInParams(new String[]{"empTime"}, values);
+            if (empDateStr != null && !StringUtils.isBlank(empDateStr)) {
                 try {
                     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
                     Date eventDate = df.parse(empDateStr);
-                    empType.setTime(eventDate.getTime());
+                    empType.getParameters().put("time", new SimpleDateFormat("HH:mm").format(new Date(eventDate.getTime())));
                 } catch (Exception e) {
                     logger.error("Failed to parse EMP date", e);
                 }
             }
 
+            String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);
+            if (!isTest.equals(""))
+                empType.getParameters().put(ExternalEventNotificationService.TEST, isTest);
+
+            empType.setTime(new Date().getTime());
             return empType;
         } else {
             return "Not found";

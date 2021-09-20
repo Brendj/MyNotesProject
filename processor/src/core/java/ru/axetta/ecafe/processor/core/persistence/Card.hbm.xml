@@ -8,10 +8,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Card" table="CF_Cards" optimistic-lock="version">
         <id name="idOfCard" column="IdOfCard" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfCard</param>
-                <param name="max_lo">3</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">CF_Cards_Id_Gen_seq</param>
             </generator>
         </id>
         <version name="version" column="Version" type="long"/>
@@ -19,6 +19,7 @@
         <many-to-one name="visitor" class="ru.axetta.ecafe.processor.core.persistence.Visitor" column="IdOfVisitor"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"/>
         <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
+        <property name="longCardNo" column="longCardNo" type="long" not-null="true"/>
         <property name="cardType" column="CardType" type="integer" not-null="true"/>
         <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>

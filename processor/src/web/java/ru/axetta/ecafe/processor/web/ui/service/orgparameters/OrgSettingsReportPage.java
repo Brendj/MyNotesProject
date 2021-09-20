@@ -71,6 +71,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean allNeedVerifyCardSign = true;
     private Boolean allRequestForVisitsToOtherOrg = true;
     private Boolean allIsWorkInSummerTime = true;
+    private Boolean allUseGovernmentContract = true;
 
     private void resetSelectedColumns() {
         allUseWebArm = true;
@@ -85,6 +86,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         allNeedVerifyCardSign = true;
         allRequestForVisitsToOtherOrg = true;
         allIsWorkInSummerTime = true;
+        allUseGovernmentContract = true;
     }
 
     private void processSelectedColumns(List<OrgSettingsReportItem> items) {
@@ -105,6 +107,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             allNeedVerifyCardSign &= item.getNeedVerifyCardSign();
             allRequestForVisitsToOtherOrg &= item.getRequestForVisitsToOtherOrg();
             allIsWorkInSummerTime &= item.getIsWorkInSummerTime();
+            allUseGovernmentContract &= item.getGovernmentContract();
         }
     }
 
@@ -203,6 +206,9 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                 case 11:
                     item.setIsWorkInSummerTime(allIsWorkInSummerTime);
                     break;
+                case 12:
+                    item.setGovernmentContract(allUseGovernmentContract);
+                    break;
             }
             item.change();
         }
@@ -237,7 +243,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                 idOfOrgList.add(Long.parseLong(item));
             }
 
-            items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
+            items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession,
+                    selectedDistricts, allFriendlyOrgs);
             Collections.sort(items);
             processSelectedColumns(items);
 
@@ -343,7 +350,16 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE, item.getReverseMonthOfSale(),
                             session, lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
                     org.setDenyPayPlanForTimeDifference(item.getDenyPayPlanForTimeDifference());
-                    org.setUseWebArm(item.getUseWebArm());
+
+                    if(!item.getUseWebArm().equals(org.getUseWebArm())){
+                        org.setUseWebArm(item.getUseWebArm());
+                        for(Org friendlyOrg : org.getFriendlyOrg()){
+                            if(friendlyOrg.equals(org)){
+                                continue;
+                            }
+                            friendlyOrg.setUseWebArm(item.getUseWebArm());
+                        }
+                    }
 
                     org.setOneActiveCard(item.getOneActiveCard());
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED, item.getEnableDuplicateCard(), session,
@@ -359,6 +375,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
                     org.setOrgStructureVersion(nextOrgVersion);
                     org.setOrgSettingsSyncParam(Boolean.TRUE);
+                    org.setGovernmentContract(item.getGovernmentContract());
                     session.update(org);
 
                     logger.info("Success");
@@ -568,5 +585,13 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setNumOfChangedRecords(Long numOfChangedRecords) {
         this.numOfChangedRecords = numOfChangedRecords;
+    }
+
+    public Boolean getAllUseGovernmentContract() {
+        return allUseGovernmentContract;
+    }
+
+    public void setAllUseGovernmentContract(Boolean allUseGovernmentContract) {
+        this.allUseGovernmentContract = allUseGovernmentContract;
     }
 }

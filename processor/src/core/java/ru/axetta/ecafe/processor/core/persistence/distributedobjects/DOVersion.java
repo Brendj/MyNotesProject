@@ -11,6 +11,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  * Time: 16:37
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class DOVersion {
 
     private Long idOfDOObject;

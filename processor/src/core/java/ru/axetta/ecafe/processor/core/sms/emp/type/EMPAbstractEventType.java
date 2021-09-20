@@ -52,9 +52,6 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     public void setTime(long time) {
         this.time = time;
-        if(params != null && type != EMPEventTypeFactory.ENTER_LIBRARY) {
-            params.put("time", new SimpleDateFormat("HH:mm").format(new Date(time)));
-        }
     }
 
     public int getPreviousId() {
@@ -102,16 +99,18 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     @Override
     public String buildText(boolean buildWithParams) {
-        if(text == null || text.trim().length() < 1) {
-            return "";
+        if(params == null || params.isEmpty()) {
+            return "empty";
         }
 
-        String result = new String(text);
+        StringBuilder result = new StringBuilder();
         for(String k : params.keySet()) {
             String v = params.get(k);
-            result = result.replaceAll("%" + k + "%", v);
+            if (v == null)
+                v = new String(" ");
+            result.append("param:").append(k).append(";value:").append(v).append(";");
         }
-        return result;
+        return result.toString();
     }
 
     protected void parseClientSimpleInfo(Client client, int type) {
@@ -140,10 +139,12 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("name", person.getFirstName());
         params.put("account", "" + client.getContractId());
 
-        if (type == EMPEventTypeFactory.ENTER_LIBRARY)
+        if (type == EMPEventTypeFactory.ENTER_LIBRARY || type == EMPEventTypeFactory.CANCEL_PREORDER)
             params.put("gender", getGender(client));
 
-        if (type != EMPEventTypeFactory.ENTER_LIBRARY) {
+        if (type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
+            //ENTER_LIBRARY - уже лежит Дата и Время
+            //CANCEL_PREORDER - не нужны эти параметры
             params.put("date", DATE_FORMAT.format(currentDate));
             params.put("time", TIME_FORMAT.format(currentDate));
             if (client.getOrg() != null) {
@@ -178,10 +179,12 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
 
-        if (type == EMPEventTypeFactory.ENTER_LIBRARY)
+        if (type == EMPEventTypeFactory.ENTER_LIBRARY || type == EMPEventTypeFactory.CANCEL_PREORDER)
             params.put("gender", getGender(child));
 
-        if (type != EMPEventTypeFactory.ENTER_LIBRARY) {
+        if (type != EMPEventTypeFactory.ENTER_LIBRARY && type != EMPEventTypeFactory.CANCEL_PREORDER) {
+            //ENTER_LIBRARY - уже лежит Дата и Время
+            //CANCEL_PREORDER - не нужны эти параметры
             params.put("date", DATE_FORMAT.format(currentDate));
             params.put("time", TIME_FORMAT.format(currentDate));
             appendOrgParameters(child.getOrg().getIdOfOrg(), params);
@@ -253,6 +256,14 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             }
         }
         return "";
+    }
+
+    protected void saveStringtoMap (String values[]) {
+        for(int i=0; i<values.length-1; i+=2) {
+            String name = values [i];
+            String val = values[i+1];
+            getParameters().put(name, val);
+        }
     }
 
     private String getGender(Client client)

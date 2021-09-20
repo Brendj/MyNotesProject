@@ -57,6 +57,8 @@
         </h:selectOneMenu>
         <h:inputTextarea rows="2" cols="64" value="#{mainPage.orgEditPage.statusTextArea}" styleClass="input-text" />
     </h:panelGrid>
+    <h:outputText escape="true" value="Наличие ГК" styleClass="output-text"/>
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.governmentContract}" styleClass="input-text" />
     <h:outputText escape="true" value="Очередь внедрения" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.introductionQueue}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
@@ -192,7 +194,8 @@
     <h:outputText id="payPlanParamLabel" escape="true" value="Включить использование плана питания" styleClass="output-text" />
     <h:selectBooleanCheckbox id="payPlanParamCheckbox" value="#{mainPage.orgEditPage.usePlanOrders}"/>
     <h:outputText id="PaydableSubscriptionFeedingLabel" escape="true" value="Включить функционал платного горячего питания" styleClass="output-text" />
-    <h:selectBooleanCheckbox id="PaydableSubscriptionFeedingCheckbox" value="#{mainPage.orgEditPage.usePaydableSubscriptionFeeding}"/>
+    <h:selectBooleanCheckbox id="PaydableSubscriptionFeedingCheckbox" value="#{mainPage.orgEditPage.usePaydableSubscriptionFeeding}"
+                             disabled="#{mainPage.orgEditPage.useWebArm}"/>
     <h:outputText escape="true" value="Включить вариативное питание" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.variableFeeding}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
@@ -238,10 +241,6 @@
     <h:inputText value="#{mainPage.orgEditPage.publicKey}" maxlength="1024" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Текущий номер пакета" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.idOfPacket}" maxlength="10" styleClass="input-text" />
-    <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.oneActiveCard}"  styleClass="input-text"  />
-    <h:outputText escape="true" value="Цифровая подпись при регистрации карты" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.needVerifyCardSign}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.orgEditPage.securityLevel}" styleClass="input-text" style="width: 250px;" readonly="true" disabled="true">
         <f:converter converterId="organizationSecurityLevelConverter"/>
@@ -281,19 +280,35 @@
             <h:outputText escape="false" value="&nbsp;&nbsp;" styleClass="output-text" />
         </a4j:repeat>
     </h:panelGrid>
-    <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.workInSummerTime}" styleClass="input-text" />
-    <h:outputText escape="true" value="Заявки на посещение других ОО" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.requestForVisitsToOtherOrg}" styleClass="input-text" />
-    <h:outputText escape="true" value="Использование обучающимися нескольких идентификаторов в ОО" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.multiCardModeEnabled}" styleClass="input-text" />
     <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text">
+        <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" action="#{mainPage.orgEditPage.changeSubscriptionFeeding}" />
+    </h:selectBooleanCheckbox>
+    <h:outputText escape="true" value="Функционал проверки даты в заявке на питание" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.goodDateCheck}" styleClass="input-text"/>
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
+    <br />
+    <rich:separator />
+    <br />
+    <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
+    <h:panelGrid id="orgEditGrid_cards" styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Разрешить один активный ЭИ" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.oneActiveCard}"  styleClass="input-text"  />
+        <h:outputText escape="true" value="Цифровая подпись при регистрации ЭИ" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.needVerifyCardSign}"  styleClass="input-text"  />
+        <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.workInSummerTime}" styleClass="input-text" />
+        <h:outputText escape="true" value="Заявки на посещение других ОО" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.requestForVisitsToOtherOrg}" styleClass="input-text" />
+        <h:outputText escape="true" value="Использование обучающимися нескольких ЭИ в ОО" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.multiCardModeEnabled}" styleClass="input-text" />
+        <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useLongCardNo}" styleClass="input-text"/>
+    </h:panelGrid>
 <br />
 <rich:separator />
 <br />

@@ -7,7 +7,46 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
+<script>
+    function disableButtons(value) {
+        var element = document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clientButtonCardShow");
+        if (element != null) {
+            element.disabled=value;
+        }
+        element = document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:applyButtonCardShow");
+        if (element != null) {
+            element.disabled=value;
+        }
+        element = document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clearButtonCardShow");
+        if (element != null) {
+            element.disabled=value;
+        }
+        element = document.getElementById("clientSelectSubView:modalClientSelectorForm:orgButtonSelectClient");
+        if (element != null) {
+            element.disabled=value;
+        }
+        element = document.getElementById("clientSelectSubView:modalClientSelectorForm:applyButtonSelectClient");
+        if (element != null) {
+            element.disabled=value;
+        }
+        element = document.getElementById("clientSelectSubView:modalClientSelectorForm:clearButtonSelectClient");
+        if (element != null) {
+            element.disabled=value;
+        }
+        for (i = 0; i < 10; i++) {
+            var nameInTableBlock = "workspaceSubView:workspaceForm:workspacePageSubView:cardOperatorTable:".concat(i.toString(), ":blockCardButtonCardShow");
+            var nameInTableCancel = "workspaceSubView:workspaceForm:workspacePageSubView:cardOperatorTable:".concat(i.toString(), ":cancelCardButtonCardShow");
+            element = document.getElementById(nameInTableBlock);
+            if (element != null) {
+                element.disabled = value;
+            }
+            element = document.getElementById(nameInTableCancel);
+            if (element != null) {
+                element.disabled = value;
+            }
+        }
+    }
+</script>
 <rich:modalPanel id="modalClientSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalClientSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
@@ -37,9 +76,10 @@
                                              value="#{mainPage.clientSelectPage.clientFilter.org.shortName}"
                                              readonly="true" styleClass="input-text long-field" style="margin-right: 2px;" />
                                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
-                                                   reRender="modalOrgSelectorPanel"
-                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
-                                                   styleClass="command-link" style="width: 25px;" />
+                                                   reRender="modalOrgSelectorPanel" id="orgButtonSelectClient"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show(); disableButtons(false);"
+                                                   styleClass="command-link" style="width: 25px;"
+                                                   onclick="disableButtons(true);"/>
                             </h:panelGroup>
                             <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
                             <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractId}" maxlength="16"
@@ -56,10 +96,14 @@
                         </h:panelGrid>
                         <h:panelGrid columns="2" styleClass="borderless-grid">
                             <a4j:commandButton value="Применить" action="#{mainPage.updateClientSelectPage}"
-                                               reRender="modalClientSelectorForm" styleClass="command-button" />
+                                               reRender="modalClientSelectorForm" styleClass="command-button"
+                                               onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                                               id="applyButtonSelectClient"/>
                             <a4j:commandButton value="Очистить" action="#{mainPage.clearClientSelectPageFilter}"
                                                reRender="modalClientSelectorForm" ajaxSingle="true"
-                                               styleClass="command-button" />
+                                               styleClass="command-button"
+                                               onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                                               id="clearButtonSelectClient"/>
                         </h:panelGrid>
                     </rich:simpleTogglePanel>
                 </td>

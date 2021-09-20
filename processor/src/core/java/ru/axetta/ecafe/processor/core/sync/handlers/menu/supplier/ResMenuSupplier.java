@@ -38,6 +38,7 @@ public class ResMenuSupplier implements AbstractToElement {
     private final String dateWithoutTimePattern = "dd.MM.yyyy";
 
     private Set<WtOrgGroup> orgGroups;
+    private Set<WtOrgGroup> offlineOrgGroups;
     private Set<WtCategoryItem> categoryItems;
     private Set<WtTypeOfProductionItem> typeProductions;
     private Set<WtAgeGroupItem> ageGroupItems;
@@ -47,7 +48,9 @@ public class ResMenuSupplier implements AbstractToElement {
     private Set<WtDish> dishes;
     private Set<WtMenuGroup> menuGroups;
     private Set<WtMenu> menus;
+    private Set<WtMenu> offlineMenus;
     private Set<WtComplex> complexes;
+    private Set<WtComplex> offlineComplexes;
     private Set<WtComplexExcludeDays> excludeDays;
 
     private Long idOfOrg;
@@ -59,6 +62,7 @@ public class ResMenuSupplier implements AbstractToElement {
 
     public ResMenuSupplier() {
         orgGroups = new HashSet<>();
+        offlineOrgGroups = new HashSet<>();
         categoryItems = new HashSet<>();
         typeProductions = new HashSet<>();
         ageGroupItems = new HashSet<>();
@@ -68,13 +72,16 @@ public class ResMenuSupplier implements AbstractToElement {
         dishes = new HashSet<>();
         menuGroups = new HashSet<>();
         menus = new HashSet<>();
+        offlineMenus = new HashSet<>();
         complexes = new HashSet<>();
+        offlineComplexes = new HashSet<>();
         excludeDays = new HashSet<>();
         idOfOrg = null;
     }
 
     public ResMenuSupplier(MenuSupplier menuSupplier) {
         orgGroups = menuSupplier.getOrgGroups();
+        offlineOrgGroups = menuSupplier.getOfflineOrgGroups();
         categoryItems = menuSupplier.getCategoryItems();
         typeProductions = menuSupplier.getTypeProductions();
         ageGroupItems = menuSupplier.getAgeGroupItems();
@@ -84,7 +91,9 @@ public class ResMenuSupplier implements AbstractToElement {
         dishes = menuSupplier.getDishes();
         menuGroups = menuSupplier.getMenuGroups();
         menus = menuSupplier.getMenus();
+        offlineMenus = menuSupplier.getOfflineMenus();
         complexes = menuSupplier.getComplexes();
+        offlineComplexes = menuSupplier.getOfflineComplexes();
         excludeDays = menuSupplier.getExcludeDays();
         idOfOrg = menuSupplier.getIdOfOrg();
     }
@@ -97,6 +106,12 @@ public class ResMenuSupplier implements AbstractToElement {
         Element orgGroupsElem = document.createElement("OrgGroups");
         for (WtOrgGroup orgGroup : orgGroups) {
             orgGroupsElem.appendChild(orgGroupToElement(document, orgGroup));
+        }
+        for (WtOrgGroup orgGroup : offlineOrgGroups) {
+            if (!orgGroups.contains(orgGroup)) {
+                orgGroup.setDeleteState(1);
+                orgGroupsElem.appendChild(orgGroupToElement(document, orgGroup));
+            }
         }
 
         Element categoryItemsElem = document.createElement("CategoryItems");
@@ -147,10 +162,22 @@ public class ResMenuSupplier implements AbstractToElement {
                 logger.error("В буфетном меню id=" + menu.getIdOfMenu() + " блюда встречаются больше 1 раза");
             }
         }
+        for (WtMenu menu : offlineMenus) {
+            if (!menus.contains(menu)) {
+                menu.setDeleteState(1);
+                menusElem.appendChild(menuToElement(document, menu));
+            }
+        }
 
         Element complexesElem = document.createElement("Complexes");
         for (WtComplex complex : complexes) {
             complexesElem.appendChild(complexToElement(document, complex));
+        }
+        for (WtComplex complex : offlineComplexes) {
+            if (!complexes.contains(complex)) {
+                complex.setDeleteState(1);
+                complexesElem.appendChild(complexToElement(document, complex));
+            }
         }
 
         Element excludeDaysElem = document.createElement("ExcludeDays");
@@ -290,7 +317,7 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "ContragentId", dish.getContragent().getIdOfContragent());
 
         Element categories = document.createElement("Categories");
-        List<WtCategoryItem> listCategories = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(dish);
+        List<WtCategoryItem> listCategories = RuntimeContext.getAppContext().getBean(DAOReadonlyService.class).getCategoryItemsByWtDish(dish.getIdOfDish());
         for (WtCategoryItem item : listCategories) {
             Element elem = document.createElement("CGI");
             XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());

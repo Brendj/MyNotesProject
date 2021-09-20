@@ -4,11 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -18,6 +13,10 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -483,11 +482,12 @@ public class PaymentTotalsReportService {
     private Long getDebtSum(Long idOfOrg, Map<Long, Long> ordersOtherOrgs, boolean friendly) {
         Long res = 0L;
         for (Map.Entry<Long, Long> entry : ordersOtherOrgs.entrySet()) {
-            if (friendly && DAOService.getInstance().isOrgFriendly(entry.getKey(), idOfOrg)) {
+            boolean isFriendlyOrg = DAOReadonlyService.getInstance().isOrgFriendly(entry.getKey(), idOfOrg);
+            if (friendly && isFriendlyOrg) {
                 res += entry.getValue();
                 continue;
             }
-            if (!friendly && !DAOService.getInstance().isOrgFriendly(entry.getKey(), idOfOrg)) {
+            if (!friendly && !isFriendlyOrg) {
                 res += entry.getValue();
             }
         }

@@ -4,14 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
+import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
-
-import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Node;
 
 import java.util.Date;
 
@@ -55,7 +55,7 @@ public class OutcomeMigrationRequestsHistoryItem {
 
         idOfOrgResol = getLongValue(itemNode, "IdOfOrgIssuer", emSetter, true);
         if(idOfOrgResol != null) {
-            Org orgResol = DAOService.getInstance().getOrg(idOfOrgResol);
+            Org orgResol = DAOReadonlyService.getInstance().findOrg(idOfOrgResol);
             if (orgResol == null) {
                 emSetter.setCompositeErrorMessage(String.format("OrgIssuer with id=%s not found", idOfOrgResol));
             }

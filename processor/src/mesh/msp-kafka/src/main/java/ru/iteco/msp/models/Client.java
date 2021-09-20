@@ -1,0 +1,123 @@
+/*
+ * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.iteco.msp.models;
+
+import javax.persistence.*;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Table(name = "cf_clients")
+@NamedEntityGraphs({
+        @NamedEntityGraph(
+                name = "only_client"
+        ),
+        @NamedEntityGraph(
+                name = "client.discount",
+                attributeNodes = {
+                        @NamedAttributeNode(
+                                value = "discounts",
+                                subgraph = "discountWithDTSZNAndCodeMsp"
+                        )
+                },
+                subgraphs = {
+                      @NamedSubgraph(
+                              name = "discountWithDTSZNAndCodeMsp",
+                              attributeNodes = {
+                                      @NamedAttributeNode("categoryDiscountDTSZN"),
+                                      @NamedAttributeNode(value = "codeMSPs", subgraph = "codeMSPs.ageTypeGroupList")
+                              }
+                      ),
+                      @NamedSubgraph(
+                              name = "codeMSPs.ageTypeGroupList",
+                              attributeNodes = {
+                                      @NamedAttributeNode("ageTypeGroupList")
+                              }
+                      )
+                }
+        )
+})
+public class Client {
+
+    @Id
+    @Column(name = "idofclient")
+    private Long idOfClient;
+
+    @Column(name = "meshguid")
+    private String meshGuid;
+
+    @Column(name = "agetypegroup")
+    private String ageGroup;
+
+    @ManyToOne
+    @JoinColumn(name = "idoforg")
+    private Org org;
+
+    @ManyToMany
+    @JoinTable(
+            name = "cf_clients_categorydiscounts",
+            joinColumns = @JoinColumn(name = "idofclient"),
+            inverseJoinColumns = @JoinColumn(name = "idofcategorydiscount")
+    )
+    private List<CategoryDiscount> discounts;
+
+    public String getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(String ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public String getMeshGuid() {
+        return meshGuid;
+    }
+
+    public void setMeshGuid(String meshGuid) {
+        this.meshGuid = meshGuid;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
+    }
+
+    public Org getOrg() {
+        return org;
+    }
+
+    public void setOrg(Org org) {
+        this.org = org;
+    }
+
+    public List<CategoryDiscount> getDiscounts() {
+        return discounts;
+    }
+
+    public void setDiscounts(List<CategoryDiscount> discounts) {
+        this.discounts = discounts;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Client)) {
+            return false;
+        }
+        Client client = (Client) o;
+        return Objects.equals(idOfClient, client.idOfClient);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idOfClient);
+    }
+}
+

@@ -5,13 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
- * User: timur
- * Date: 07.08.12
- * Time: 11:15
- * To change this template use File | Settings | File Templates.
+ * User: a.voinov
  */
 public class EMIAS {
 
@@ -27,6 +25,12 @@ public class EMIAS {
     private Boolean accepted;
     private Long deletedemiasid;
     private Long version;
+    private Boolean kafka;
+    private Boolean archive;
+    private Integer hazard_level_id;
+    private String idemias;
+    private Boolean processed;
+    private Date acceptedDateTime;
 
    public EMIAS(){}
 
@@ -125,5 +129,53 @@ public class EMIAS {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public Boolean getKafka() {
+        return kafka;
+    }
+
+    public void setKafka(Boolean kafka) {
+        this.kafka = kafka;
+    }
+
+    public Boolean getArchive() {
+        return archive;
+    }
+
+    public void setArchive(Boolean archive) {
+        this.archive = archive;
+    }
+
+    public Integer getHazard_level_id() {
+        return hazard_level_id;
+    }
+
+    public void setHazard_level_id(Integer hazard_level_id) {
+        this.hazard_level_id = hazard_level_id;
+    }
+
+    public Boolean getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(Boolean processed) {
+        this.processed = processed;
+    }
+
+    public Date getAcceptedDateTime() {
+        return acceptedDateTime;
+    }
+
+    public void setAcceptedDateTime(Date acceptedDateTime) {
+        this.acceptedDateTime = acceptedDateTime;
+    }
+
+    public String getIdemias() {
+        return idemias;
+    }
+
+    public void setIdemias(String idemias) {
+        this.idemias = idemias;
     }
 }

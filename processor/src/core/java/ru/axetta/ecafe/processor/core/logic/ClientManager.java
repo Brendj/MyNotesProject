@@ -296,12 +296,15 @@ public class ClientManager {
     }
 
     public static long modifyClientTransactionFree(ClientFieldConfigForUpdate fieldConfig, Org org,
-            String registerCommentsAdds, Client client, Session persistenceSession) throws Exception {
-        return modifyClientTransactionFree(fieldConfig, org, registerCommentsAdds, client, persistenceSession, false);
+            String registerCommentsAdds, Client client, Session persistenceSession,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
+        return modifyClientTransactionFree(fieldConfig, org, registerCommentsAdds, client, persistenceSession, false,
+                clientsMobileHistory);
     }
 
     public static long modifyClientTransactionFree(ClientFieldConfigForUpdate fieldConfig, Org org,
-            String registerCommentsAdds, Client client, Session persistenceSession, boolean updateSecondNameAnyway) throws Exception {
+            String registerCommentsAdds, Client client, Session persistenceSession,
+            boolean updateSecondNameAnyway, ClientsMobileHistory clientsMobileHistory) throws Exception {
         try {
             //tokens[2];
             if (fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE) != null) {
@@ -395,10 +398,7 @@ public class ClientManager {
                 if (mobilePhone == null) {
                     throw new Exception("Неправильный формат мобильного телефона");
                 }
-                //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if(client != null && client.getMobile() != null && !client.getMobile().equals(mobilePhone)) {
-                    client.setSsoid("");
-                }
+                client.initClientMobileHistory(clientsMobileHistory);
                 client.setMobile(mobilePhone);
                 logger.info("class : ClientManager, method : modifyClientTransactionFree line : 358, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
             }
@@ -413,10 +413,6 @@ public class ClientManager {
             //tokens[15]);
             String email = fieldConfig.getValue(ClientManager.FieldId.EMAIL);
             if (email != null && StringUtils.isNotEmpty(email) && !RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT)) {
-                //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if(client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
-                    client.setSsoid("");
-                }
                 client.setEmail(email);
             }
             //tokens[16])
@@ -614,12 +610,14 @@ public class ClientManager {
     }
 
 
-    public static long modifyClient(ClientFieldConfigForUpdate fieldConfig) throws Exception {
-        return modifyClient(fieldConfig, null, null);
+    public static long modifyClient(ClientFieldConfigForUpdate fieldConfig,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
+        return modifyClient(fieldConfig, null, null, clientsMobileHistory);
     }
 
 
-    public static long modifyClient(ClientFieldConfigForUpdate fieldConfig, Org org, String registerComentsAdds)
+    public static long modifyClient(ClientFieldConfigForUpdate fieldConfig, Org org, String registerComentsAdds,
+            ClientsMobileHistory clientsMobileHistory)
             throws Exception {
         fieldConfig.checkRequiredFields();
 
@@ -667,7 +665,7 @@ public class ClientManager {
             }
 
             long idOfClient = modifyClientTransactionFree(fieldConfig, org, registerComentsAdds, client,
-                    persistenceSession);
+                    persistenceSession, clientsMobileHistory);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -682,13 +680,16 @@ public class ClientManager {
     }
 
     public static Client registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
-            boolean checkFullNameUnique, Session persistenceSession, String registerCommentsAdds) throws Exception {
-        return registerClientTransactionFree (idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession, null, registerCommentsAdds);
+            boolean checkFullNameUnique, Session persistenceSession, String registerCommentsAdds,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
+        return registerClientTransactionFree (idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
+                null, registerCommentsAdds, clientsMobileHistory);
     }
 
     public static Client registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
                                                       boolean checkFullNameUnique, Session persistenceSession,
-                                                    Transaction persistenceTransaction, String registerCommentsAdds) throws Exception {
+                                                    Transaction persistenceTransaction, String registerCommentsAdds,
+                                                        ClientsMobileHistory clientsMobileHistory) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         try {
@@ -826,6 +827,8 @@ public class ClientManager {
                     //throw new Exception("Неправильный формат факса");
                 }
             }
+            persistenceSession.save(client);
+            client.initClientMobileHistory(clientsMobileHistory);
             client.setMobile(mobilePhone);//tokens[14]);
             client.setFax(fax);//tokens[14]);
             client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
@@ -931,9 +934,10 @@ public class ClientManager {
             }
 
             client.setCreatedFrom(ClientCreatedFromType.values()[fieldConfig.getValueInt(FieldId.CREATED_FROM)]);
+            client.setUpdateTime(new Date());
 
             logger.debug("save client");
-            persistenceSession.save(client);
+            persistenceSession.saveOrUpdate(client);
             Long idOfClient = client.getIdOfClient();
 
             if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, idOfOrg);
@@ -976,7 +980,8 @@ public class ClientManager {
     }
 
     public static void applyClientGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
-            Long idOfOrg, Long idOfClientChild, Iterator<Long> iterator, ClientGuardianHistory clientGuardianHistory) throws Exception {
+            Long idOfOrg, Long idOfClientChild, Iterator<Long> iterator, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory)
+            throws Exception {
         try {
             Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
 
@@ -1044,19 +1049,19 @@ public class ClientManager {
 
                             } else {
                                 applyGuardians(registryChangeGuardians, persistenceSession,
-                                        organization, idOfClientChild, iterator, clientGuardianHistory);
+                                        organization, idOfClientChild, iterator, clientsMobileHistory, clientGuardianHistory);
                             }
                         } else {
                             applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                                    idOfClientChild, iterator, clientGuardianHistory);
+                                    idOfClientChild, iterator, clientsMobileHistory, clientGuardianHistory);
                         }
                     } else {
                         applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                                idOfClientChild, iterator, clientGuardianHistory);
+                                idOfClientChild, iterator, clientsMobileHistory, clientGuardianHistory);
                     }
                 } else {
                     applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                            idOfClientChild, iterator, clientGuardianHistory);
+                            idOfClientChild, iterator, clientsMobileHistory, clientGuardianHistory);
                 }
             }
         } catch (Exception e) {
@@ -1067,7 +1072,7 @@ public class ClientManager {
     public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
             String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
             String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries,
-            String ssoid, String guid) throws Exception {
+            String ssoid, String guid, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
@@ -1108,14 +1113,6 @@ public class ClientManager {
                 throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
             }
         }
-        clientGuardianToSave.setMobile(mobile);
-        if (ssoid != null) clientGuardianToSave.setSsoid(ssoid);
-        if (guid != null) clientGuardianToSave.setClientGUID(guid);
-
-        if (gender != null) {
-            clientGuardianToSave.setGender(gender);
-        }
-        logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         clientGuardianToSave.setAddress("");
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
         clientGuardianToSave.setRemarks(remark);
@@ -1123,7 +1120,31 @@ public class ClientManager {
         clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
         clientGuardianToSave.setPassportNumber(passportNumber);
         clientGuardianToSave.setPassportSeries(passportSeries);
-        session.persist(clientGuardianToSave);
+        session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
+        clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
+        String ssoidOld = clientGuardianToSave.getSsoid();
+        if (ssoidOld == null)
+            ssoidOld = "";
+        if (ssoid == null)
+            ssoid = "";
+        if (ssoidOld.equals(ssoid))
+            clientGuardianToSave.setMobile(mobile);
+        else
+            clientGuardianToSave.setMobileNotClearSsoid(mobile);
+        if (clientGuardianToSave.getClearedSsoid()) {
+            ssoid = "";
+            clientGuardianToSave.setClearedSsoid(false);
+        }
+        if (ssoid != null) {
+            clientGuardianToSave.setSsoid(ssoid);
+        }
+        if (guid != null) clientGuardianToSave.setClientGUID(guid);
+
+        if (gender != null) {
+            clientGuardianToSave.setGender(gender);
+        }
+        logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
+        session.update(clientGuardianToSave);
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
     }
@@ -1173,13 +1194,14 @@ public class ClientManager {
     }
 
     public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
-            Org organization, Long idOfClientChild, Iterator<Long> iterator, ClientGuardianHistory clientGuardianHistory) throws Exception{
+            Org organization, Long idOfClientChild, Iterator<Long> iterator,
+            ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception{
         String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
                 registryChangeGuardians.getSecondName(), registryChangeGuardians.getFamilyName(), registryChangeGuardians.getPhoneNumber(),
                 remark, null, organization, ClientCreatedFromType.REGISTRY, "", iterator, null, null,
-                registryChangeGuardians.getSsoid(), registryChangeGuardians.getGuid());
+                registryChangeGuardians.getSsoid(), registryChangeGuardians.getGuid(), clientsMobileHistory);
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
@@ -1190,7 +1212,7 @@ public class ClientManager {
     }
 
     public static long forceGetClientESZ(Session session, Long eszId, String surname, String firstName, String secondName,
-            String clientGuid) throws Exception {
+            String clientGuid, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Long idOfESZOrg = PropertyUtils.getIdOfESZOrg();
         Query query = session.createQuery("select c.idOfClient from Client c where c.externalId = :externalId");
         query.setParameter("externalId", eszId);
@@ -1203,11 +1225,12 @@ public class ClientManager {
         fc.setValue(FieldId.SECONDNAME, secondName);
         fc.setValue(FieldId.GROUP, "Обучающиеся других ОО"); //todo переделать на новую константу из ClientGroup.Predefined
         fc.setValue(FieldId.EXTERNAL_ID, eszId);
-        fc.setValue(FieldId.CLIENT_GUID, clientGuid);
-        return ClientManager.registerClient(idOfESZOrg, fc, false, true);
+        fc.setValue(FieldId.MESH_GUID, clientGuid);
+        return ClientManager.registerClient(idOfESZOrg, fc, false, true, clientsMobileHistory);
     }
 
-    public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig, boolean checkFullNameUnique, boolean noComment)
+    public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig,
+            boolean checkFullNameUnique, boolean noComment, ClientsMobileHistory clientsMobileHistory)
             throws Exception {
         logger.debug("checkRequiredFields");
         fieldConfig.checkRequiredFields();
@@ -1226,7 +1249,8 @@ public class ClientManager {
             Client client;
 
             client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
-                persistenceTransaction, noComment ? null : String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+                persistenceTransaction, noComment ? null : String.format(MskNSIService.COMMENT_AUTO_CREATE,
+                            dateCreate), clientsMobileHistory);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -1304,7 +1328,7 @@ public class ClientManager {
         try {
             return runtimeContext.getCardManager()
                     .createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state,
-                            validTime, lifeState, lockReason, issueTime, cardPrintedNo);
+                            validTime, lifeState, lockReason, issueTime, cardPrintedNo, null);
         } catch (Exception e) {
             throw new Exception("Ошибка при создании карты: " + e);
         }
@@ -1558,21 +1582,21 @@ public class ClientManager {
 
 
     /* Загрузить список  */
-    public static List<ClientGuardianItem> loadGuardiansByClient(Session session, Long idOfClient) throws Exception {
+    public static List<ClientGuardianItem> loadGuardiansByClient(Session session, Long idOfClient, Boolean withFullName) throws Exception {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
         criteria.add(Restrictions.eq("deletedState", false));
-        List results = criteria.list();
+        List<ClientGuardian> results = criteria.list();
+
         List<ClientGuardianItem> guardianItems = new ArrayList<ClientGuardianItem>(results.size());
-        for (Object o: results){
-            ClientGuardian clientGuardian = (ClientGuardian) o;
+        for (ClientGuardian clientGuardian : results){
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
-                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient())));
+                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName));
             }
         }
         return guardianItems;
@@ -1626,7 +1650,11 @@ public class ClientManager {
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("allowedPreorder", true));
-        if (idOfGuardian != null) criteria.add(Restrictions.eq("guardianAllowedPreorder.idOfClient", idOfGuardian));
+        if (idOfGuardian != null) {
+            criteria.add(Restrictions.eq("guardianAllowedPreorder.idOfClient", idOfGuardian));
+        } else {
+            criteria.add(Restrictions.isNull("guardianAllowedPreorder"));
+        }
 
         List<PreorderFlag> list = criteria.list(); //getPreorderFlagByClient(session, idOfClient, null);
         if (list.size() == 0) return false;
@@ -1640,21 +1668,21 @@ public class ClientManager {
         return criteria.list();
     }*/
 
-    public static List<ClientGuardianItem> loadWardsByClient(Session session, Long idOfClient) throws Exception {
+    public static List<ClientGuardianItem> loadWardsByClient(Session session, Long idOfClient, Boolean withFullName) throws Exception {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
         criteria.add(Restrictions.eq("deletedState", false));
-        List results = criteria.list();
+        List<ClientGuardian> results = criteria.list();
+
         List<ClientGuardianItem> wardItems = new ArrayList<ClientGuardianItem>(results.size());
-        for (Object o: results){
-            ClientGuardian clientWard = (ClientGuardian) o;
+        for (ClientGuardian clientWard : results){
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
-                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient)));
+                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName));
             }
         }
         return wardItems;
@@ -1943,6 +1971,25 @@ public class ClientManager {
         }
     }
 
+    public static void setInformedSpecialMenu(Session session, Client client, Boolean isStudent) {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client", client));
+        List<PreorderFlag> preorderFlagList = criteria.list();
+        PreorderFlag preorderFlag;
+        if (preorderFlagList.size() == 0) {
+            preorderFlag = new PreorderFlag(client);
+        } else {
+            preorderFlag = preorderFlagList.get(0);
+        }
+        if (isStudent) {
+            preorderFlag.setAllowedPreorder(true);
+        } else {
+            preorderFlag.setInformedSpecialMenu(true);
+        }
+        preorderFlag.setLastUpdate(new Date());
+        session.saveOrUpdate(preorderFlag);
+    }
+
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion,
             ClientGuardianHistory clientGuardianHistory) {
@@ -1985,7 +2032,7 @@ public class ClientManager {
 
     /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
     public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile,
-            Boolean value, Long newVersion, ClientGuardianHistory clientGuardianHistory) throws Exception {
+            Boolean value, Long newVersion, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         if (guardian != null) {
             Criteria cr = session.createCriteria(ClientGuardian.class);
             cr.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
@@ -2008,6 +2055,7 @@ public class ClientManager {
         preorderFlag.setLastUpdate(new Date());
         session.update(preorderFlag);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        child.initClientMobileHistory(clientsMobileHistory);
         child.setMobile(childMobile);
         child.setClientRegistryVersion(clientRegistryVersion);
         child.getNotificationSettings().clear();
@@ -2018,8 +2066,21 @@ public class ClientManager {
         if (notificationItems == null) return;
         Set<ClientGuardianNotificationSetting> dbSettings = clientGuardian.getNotificationSettings();
         for (NotificationSettingItem item : notificationItems) {
+            //Для 17 типа мы не можем менять напрямую, только через 11
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
+            {
+                continue;
+            }
+
             ClientGuardianNotificationSetting newSetting = new ClientGuardianNotificationSetting(clientGuardian, item.getNotifyType());
             createOrRemoveSetting(dbSettings, newSetting, item.isEnabled());
+
+            //Если поменяли 11, то меняем и 17 событие
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
+            {
+                ClientGuardianNotificationSetting culture = new ClientGuardianNotificationSetting(clientGuardian, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
+                createOrRemoveSetting(dbSettings, culture, item.isEnabled());
+            }
         }
         boolean defaultPredefineFound = false;
         for (ClientGuardianNotificationSetting dbSetting : dbSettings) {
@@ -2277,7 +2338,8 @@ public class ClientManager {
         }
     }
 
-    public static void removeExternalIdFromClients(Session session, Long externalId) throws Exception {
+    public static void removeExternalIdFromClients(Session session, Long externalId,
+            ClientsMobileHistory clientsMobileHistory) throws Exception {
         Criteria criteria = session.createCriteria(Client.class);
         criteria.add(Restrictions.eq("externalId", externalId));
         List<Client> clientList = criteria.list();
@@ -2287,7 +2349,7 @@ public class ClientManager {
                 ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientFieldConfigForUpdate();
                 fieldConfig.setValue(FieldId.CONTRACT_ID, client.getContractId());
                 fieldConfig.setValue(FieldId.EXTERNAL_ID, "");
-                modifyClient(fieldConfig);
+                modifyClient(fieldConfig, clientsMobileHistory);
             } catch (Exception e) {
                 logger.error(String.format("Unable to remove externalId for client with id = %d", client.getIdOfClient()));
             }
@@ -2413,6 +2475,7 @@ public class ClientManager {
 
     public static void resetFlagsOfAllClients(Org org, Session session) throws Exception {
         List<Client> clientList = DAOUtils.findClientsByOrg(session, org.getIdOfOrg());
+        if (clientList.size() == 0) return;
         Query q = session.createQuery("update PreorderFlag set informedSpecialMenu = false, allowedPreorder = false, "
                 + "lastUpdate = :date where client in :clientList");
         q.setParameter("date", new Date());

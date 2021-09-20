@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import org.ajax4jsf.component.html.HtmlAjaxCommandLink;
 import org.hibernate.Session;
 import org.richfaces.component.html.HtmlPanelMenuGroup;
 import org.richfaces.component.html.HtmlPanelMenuItem;
@@ -66,7 +67,11 @@ public class BasicWorkspacePage extends BasicPage {
             } else if (menuComponent instanceof HtmlPanelMenuGroup) {
                 HtmlPanelMenuGroup currentMenuGroup = (HtmlPanelMenuGroup) menuComponent;
                 itemTitle = currentMenuGroup.getLabel();
-            } else {
+            } else if (menuComponent instanceof HtmlAjaxCommandLink){ //for complexExtendedReport
+                HtmlAjaxCommandLink currentCommandLink = (HtmlAjaxCommandLink) menuComponent;
+                itemTitle = currentCommandLink.getTitle();
+            }
+            else {
                 done = true;
                 continue;
             }

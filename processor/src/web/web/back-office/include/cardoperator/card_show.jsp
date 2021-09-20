@@ -7,7 +7,6 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
 <script>
     var socket = new WebSocket("ws://localhost:8001");
     socket.onmessage = function(event) {
@@ -37,22 +36,30 @@
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Клиент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
-            <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showEmptyClientSelectPage}" reRender="modalClientSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();disableButtons(false);"
+                               styleClass="command-link" style="width: 25px;" id="clientButtonCardShow"
+                               onclick="disableButtons(true);"/>
             <h:inputText value="#{cardOperatorPage.client.shortNameContractId}" readonly="true" styleClass="input-text long-field"
                          style="margin-right: 2px;" id="cardOperatorPageClient" />
         </h:panelGroup>
 
 
-        <a4j:commandButton value="Применить" action="#{cardOperatorPage.applyClient}"
-                           reRender="workspaceTogglePanel" styleClass="command-button" />
-        <a4j:commandButton value="Очистить" action="#{cardOperatorPage.clearCardOperatorPage}"
-                           reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+        <a4j:commandButton value="Применить" action="#{cardOperatorPage.applyClient}" id="applyButtonCardShow"
+                           reRender="workspaceTogglePanel" styleClass="command-button"
+                           onclick="disableButtons(true);" oncomplete="disableButtons(false)"/>
+        <a4j:commandButton value="Очистить" action="#{cardOperatorPage.clearCardOperatorPage}" id="clearButtonCardShow"
+                           reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"
+                           onclick="disableButtons(true);" oncomplete="disableButtons(false)"/>
 
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+    <a4j:status id="cardShowStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
     <rich:dataTable id="cardOperatorTable" value="#{cardOperatorPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
                     left-aligned-column, center-aligned-column, center-aligned-column"
@@ -115,11 +122,14 @@
                     <f:selectItems value="#{cardOperatorPage.cardLockReasonMenu.items}" />
                 </h:selectOneMenu>
                 <a4j:commandButton value="Заблокировать" action="#{cardOperatorPage.blockCard}"
-                                   reRender="cardOperatorTable" styleClass="command-button">
+                                   reRender="cardOperatorTable" styleClass="command-button"
+                                   onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                                   id="blockCardButtonCardShow">
                     <f:setPropertyActionListener value="#{item}" target="#{cardOperatorPage.selectedItem}" />
                 </a4j:commandButton>
                 <a4j:commandButton value="Отмена" action="#{cardOperatorPage.hideBlockCardPanel}"
-                                   reRender="cardOperatorTable" styleClass="command-button">
+                                   reRender="cardOperatorTable" styleClass="command-button"
+                                   id="cancelCardButtonCardShow">
                     <f:setPropertyActionListener value="#{item}" target="#{cardOperatorPage.selectedItem}" />
                 </a4j:commandButton>
             </h:panelGrid>

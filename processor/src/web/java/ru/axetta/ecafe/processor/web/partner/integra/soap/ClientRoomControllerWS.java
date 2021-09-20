@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -52,6 +52,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEvent
 import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.service.*;
+import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -61,6 +62,9 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.iac.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventItem;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.AllEventList;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.allEnterEvents.DataAllEvents;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
@@ -77,9 +81,11 @@ import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.message.Message;
 import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
@@ -111,8 +117,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -190,11 +196,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_WRONG_GROUP = 710L;
     private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
     private static final Long RC_REGULAR_ALREADY_DELETED = 712L;
+    private static final Long RC_REGULAR_WRONG_START_DATE = 713L;
+    private static final Long RC_REGULAR_EXISTS = 714L;
     private static final Long RC_INVALID_CREATOR = 720L;
 
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
+    private static final String RC_NOT_ALL_ARG = "Не заполнены обязательные поля";
     private static final String RC_CLIENT_NO_LONGER_ACTIVE = "Клиент не активен в ИС ПП";
     private static final String RC_CLIENT_DOU = "Клиент является обучающимся дошкольной группы.";
     private static final String RC_SEVERAL_CLIENTS_WERE_FOUND_DESC = "По условиям найден более одного клиента";
@@ -245,6 +254,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
     private static final String RC_REGULAR_ALREADY_DELETED_DESC = "Для выбранного комплекса или блюда не настроен повтор заказа";
+    private static final String RC_REGULAR_WRONG_DATE_DESC = "На выбранную дату начала повтора невозможно создать предзаказ";
+    private static final String RC_REGULAR_EXISTS_DESC = "Уже существует повтор заказа с выбранными параметрами";
     private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
     private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
     private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
@@ -1673,6 +1684,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     } catch (NullPointerException e) {
                         data.setResultCode(RC_CLIENT_NOT_FOUND);
                         data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+                    } catch (DatatypeConfigurationException e)
+                    {
+                        data.setResultCode(RC_INVALID_DATA);
+                        data.setDescription(RC_NOT_ALL_ARG);
                     }
                 }
                 persistenceTransaction.commit();
@@ -2649,11 +2664,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (nRecs++ > MAX_RECS) {
                 break;
             }
-            ClientPayment cp = (ClientPayment) o;
+            Object[] row = (Object[]) o;
             Payment payment = new Payment();
-            payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, cp));
-            payment.setSum(cp.getPaySum());
-            payment.setTime(toXmlDateTime(cp.getCreateTime()));
+            payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, (String) row[6], (Integer) row[3], (String) row[4], (String) row[5]));
+            payment.setSum(HibernateUtils.getDbLong(row[1]));
+            payment.setTime(toXmlDateTime(new Date(((BigInteger) row[2]).longValue())));
             paymentList.getP().add(payment);
         }
         data.setPaymentList(paymentList);
@@ -2799,24 +2814,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
             menuDateItemExt.setDate(toXmlDateTime(menuDate));
-            Set<WtDish> wtDishSet = new HashSet<>();
+            Set<WtDishInfo> wtDishSet = new HashSet<>();
 
             for (WtMenu menu : menus) {
                 if (nRecs++ > MAX_RECS) {
                     break;
                 }
-                List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                List<WtDishInfo> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .getWtDishesByMenuAndDates(menu, menuDate, menuDate);
                 if (wtDishes != null && wtDishes.size() > 0) {
                     wtDishSet.addAll(wtDishes);
                 }
             }
-
+            Map<Long, Set<String>> menuGroups = DAOReadonlyService.getInstance().getWtMenuGroupsForAllDishes(org.getIdOfOrg());
             if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
-                for (WtDish wtDish : wtDishSet) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
-                    menuDateItemExt.getE().add(menuItemExt);
+                for (WtDishInfo wtDishInfo : wtDishSet) {
+                    List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, org.getIdOfOrg(), wtDishInfo, false, menuGroups);
+                    menuDateItemExt.getE().addAll(menuItemExt);
                 }
             }
             menuListExt.getM().add(menuDateItemExt);
@@ -2949,7 +2964,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Transaction transaction = null;
         MenuListWithComplexesResult result = new MenuListWithComplexesResult();
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             Client client = findClientByContractId(session, contractId, result);
@@ -3036,7 +3051,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     .getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
                             resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, discRules);
+                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, discRules, org);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -3108,7 +3123,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 // комплекс не выводим
                                 continue;
                             }
-                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
+                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, org.getIdOfOrg(), wtDishes);
                             // Проверка типа питания
                             int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()
                                     .intValue();
@@ -3149,7 +3164,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
 
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             Client client = findClientByContractId(session, contractId, groupResult);
@@ -3599,29 +3614,33 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             WtMenu menu = (WtMenu) currObject;
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
 
-            List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+            List<WtDishInfo> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtDishesByMenuAndDates(menu, startDate, endDate);
 
+            Map<Long, Set<String>> menuGroups = DAOReadonlyService.getInstance().getWtMenuGroupsForAllDishes(client.getOrg().getIdOfOrg());
             if (wtDishes != null && wtDishes.size() > 0) {
                 menuDateItemExt.setDate(toXmlDateTime(startDate));
-                for (WtDish wtDish : wtDishes) {
-                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, false);
+                for (WtDishInfo wtDishInfo : wtDishes) {
+                    List<MenuItemExt> menuItemExtList = getMenuItemExt(objectFactory, client.getOrg().getIdOfOrg(),
+                            wtDishInfo, false, menuGroups);
                     // Добавляем блокировки
-                    if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
-                        menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
-                    } else {
-                        if (ProhibitByName.containsKey(wtDish.getDishName())) {
-                            menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                    for (MenuItemExt menuItemExt : menuItemExtList) {
+                        if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
+                            menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
                         } else {
-                            //пробегаться в цикле.
-                            for (String filter : ProhibitByFilter.keySet()) {
-                                if (wtDish.getDishName().contains(filter)) {
-                                    menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                            if (ProhibitByName.containsKey(wtDishInfo.getDishName())) {
+                                menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDishInfo.getDishName()));
+                            } else {
+                                //пробегаться в цикле.
+                                for (String filter : ProhibitByFilter.keySet()) {
+                                    if (wtDishInfo.getDishName().contains(filter)) {
+                                        menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                                    }
                                 }
                             }
                         }
+                        menuDateItemExt.getE().add(menuItemExt);
                     }
-                    menuDateItemExt.getE().add(menuItemExt);
                 }
             }
             menuListExt.getM().add(menuDateItemExt);
@@ -3865,21 +3884,42 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public EnterEventListResult getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
+    public DataAllEvents getEnterEventList(Long contractId, final Date startDate, final Date endDate) {
         authenticateRequest(contractId);
+        DataAllEvents dataAllEvents = new DataAllEvents();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createExternalServicesPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
 
-        Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                    Session session, Transaction transaction) throws Exception {
-                processEnterEventList(client, data, objectFactory, session, endDate, startDate, false);
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+            clientCriteria.add(Restrictions.eq("contractId", contractId));
+            List<Client> clients = clientCriteria.list();
+
+            if (clients.isEmpty()) {
+                dataAllEvents.setResultCode(RC_CLIENT_NOT_FOUND);
+                dataAllEvents.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+            } else if (clients.size() > 1) {
+                dataAllEvents.setResultCode(RC_SEVERAL_CLIENTS_WERE_FOUND);
+                dataAllEvents.setDescription(RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
+            } else {
+                Client client = clients.get(0);
+                dataAllEvents.setEnterEventList(processAllEventList(client, persistenceSession, endDate, startDate));
+                dataAllEvents.setResultCode(RC_OK);
+                dataAllEvents.setDescription(RC_OK_DESC);
             }
-        });
 
-        EnterEventListResult enterEventListResult = new EnterEventListResult();
-        enterEventListResult.enterEventList = data.getEnterEventList();
-        enterEventListResult.resultCode = data.getResultCode();
-        enterEventListResult.description = data.getDescription();
-        return enterEventListResult;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            dataAllEvents.setResultCode(RC_INTERNAL_ERROR);
+            dataAllEvents.setDescription(e.toString());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return dataAllEvents;
     }
 
     @Override
@@ -4008,6 +4048,121 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventWithRepList.getE().add(enterEventWithRepItem);
         }
         data.setEnterEventWithRepList(enterEventWithRepList);
+    }
+
+    private AllEventList processAllEventList(Client client, Session session,
+            Date endDate, Date startDate) throws Exception {
+        Date nextToEndDate = DateUtils.addDays(endDate, 1);
+        /*Запрос на получение данных из таблицы EnterEvents*/
+        Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
+        enterEventCriteria.add(Restrictions.eq("client", client));
+        enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<EnterEvent> enterEvents = enterEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы EnterEvents -- */
+
+        /*Запрос на получение данных из таблицы EnterEventsManual*/
+        Criteria manualEventCriteria = session.createCriteria(EnterEventManual.class);
+        manualEventCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        manualEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        manualEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        manualEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<EnterEventManual> manualEvents = manualEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы EnterEventsManual -- */
+
+        /*Запрос на получение данных из таблицы ExternalEventsManual*/
+        List<ExternalEventType> externalType = new ArrayList();
+        externalType.add(ExternalEventType.CULTURE);
+        externalType.add(ExternalEventType.MUSEUM);
+        externalType.add(ExternalEventType.LIBRARY);
+        Criteria externalEventCriteria = session.createCriteria(ExternalEvent.class);
+        externalEventCriteria.add(Restrictions.eq("client", client));
+        externalEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        externalEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        externalEventCriteria.add(Restrictions.in("evtType", externalType));
+        externalEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<ExternalEvent> externalEvents = externalEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы ExternalEventsManual -- */
+
+        Locale locale = new Locale("ru", "RU");
+        Calendar calendar = Calendar.getInstance(locale);
+
+        AllEventList enterEventList = new AllEventList();
+        int nRecs = 0;
+
+        for (EnterEvent enterEvent : enterEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(enterEvent.getEvtDateTime()));
+            calendar.setTime(enterEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setDirection(enterEvent.getPassDirection());
+            enterEventItem.setAddress(enterEvent.getOrg().getAddress());
+            enterEventItem.setShortNameInfoService(enterEvent.getOrg().getShortNameInfoService());
+            enterEventItem.setChildPassCheckerMethod(enterEvent.getChildPassChecker());
+            final Long checkerId = enterEvent.getChildPassCheckerId();
+            if (checkerId != null) {
+                Client checker = DAOUtils.findClient(session, checkerId);
+                enterEventItem.setChildPassChecker(checker.getPerson().getFullName());
+            }
+            enterEventList.getE().add(enterEventItem);
+        }
+
+        for (EnterEventManual manualEvent : manualEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(manualEvent.getEvtDateTime()));
+            calendar.setTime(manualEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setDirection(EnterEvent.CHECKED_BY_TEACHER_EXT);
+            Org org = (Org) session.load(Org.class, manualEvent.getIdOfOrg());
+            enterEventItem.setAddress(org.getAddress());
+            enterEventItem.setShortNameInfoService(org.getShortNameInfoService());
+            enterEventList.getE().add(enterEventItem);
+        }
+        for (ExternalEvent externalEvent : externalEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            AllEventItem enterEventItem = new AllEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(externalEvent.getEvtDateTime()));
+            calendar.setTime(externalEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+
+            if (externalEvent.getEvtType().equals(ExternalEventType.MUSEUM)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                enterEventItem.setDirection(1000);
+                enterEventItem.setDirectionText("выдан билет в музее");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.MUSEUM)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                enterEventItem.setDirection(1001);
+                enterEventItem.setDirectionText("возврат билета в музей");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.CULTURE)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                enterEventItem.setDirection(2000);
+                enterEventItem.setDirectionText("вход в здание учреждения культуры");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.CULTURE)
+                    && externalEvent.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                enterEventItem.setDirection(2001);
+                enterEventItem.setDirectionText("выход из здания учреждения культуры");
+            }
+            if (externalEvent.getEvtType().equals(ExternalEventType.LIBRARY)) {
+                enterEventItem.setDirection(3000);
+                enterEventItem.setDirectionText("вход в библтотеку");
+            }
+            enterEventItem.setAddress(externalEvent.getAddress());
+            enterEventItem.setShortNameInfoService(externalEvent.getOrgShortName());
+            enterEventList.getE().add(enterEventItem);
+        }
+        return enterEventList;
     }
 
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -4343,6 +4498,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
 
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getSummaryByGuardMobile");
+        clientsMobileHistory.setShowing("Портал");
+
+        changeSsoid(guardMobile, clientsMobileHistory);
+
         Session session = null;
         try {
             LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
@@ -4368,12 +4529,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     dataProcess.getClientSummaryExt()
                             .setRoleRepresentative(entry.getValue().getRepresentType().getCode());
                     //////////////////////
-                    Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
-                    temp = temp - 1;
-                    if (temp == -1) {
-                        temp = 2;
-                    }
-                    dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    try {
+                        Integer temp = dataProcess.getClientSummaryExt().getRoleRepresentative();
+                        temp = temp - 1;
+                        if (temp == -1) {
+                            temp = 2;
+                        }
+                        dataProcess.getClientSummaryExt().setRoleRepresentative(temp);
+                    } catch (Exception e){}
                     /////////////////////
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
@@ -4410,19 +4573,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         });
         //////////////////////
-        for (ClientRepresentative clientRepresentative : data.getClientRepresentativesList().getRep()) {
-            Integer temp = clientRepresentative.getRoleRepresentative();
-            temp = temp - 1;
-            if (temp == -1) {
-                temp = 2;
+        if (data.getClientRepresentativesList() != null ) {
+            for (ClientRepresentative clientRepresentative : data.getClientRepresentativesList().getRep()) {
+                if (clientRepresentative.getRoleRepresentative() != null) {
+                    Integer temp = clientRepresentative.getRoleRepresentative();
+                    temp = temp - 1;
+                    if (temp == -1) {
+                        temp = 2;
+                    }
+                    clientRepresentative.setRoleRepresentative(temp);
+                }
             }
-            clientRepresentative.setRoleRepresentative(temp);
         }
         /////////////////////
         ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
         clientRepresentativesResult.clientRepresentativesList = data.getClientRepresentativesList();
-        clientRepresentativesResult.resultCode = RC_OK;
-        clientRepresentativesResult.description = RC_OK_DESC;
+        clientRepresentativesResult.resultCode = data.getResultCode();
+        clientRepresentativesResult.description = data.getDescription();
 
         return clientRepresentativesResult;
     }
@@ -4463,11 +4630,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientRepresentativesList.getRep().add(clientRepresentative);
                 }
             }
-
             data.setClientRepresentativesList(clientRepresentativesList);
-
+            data.setResultCode(RC_OK);
+            data.setDescription(RC_OK_DESC);
         } catch (Exception e) {
             e.printStackTrace();
+            data.setResultCode(RC_INTERNAL_ERROR);
+            data.setDescription(RC_INTERNAL_ERROR_DESC);
         }
     }
 
@@ -4568,7 +4737,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r.description = RC_INVALID_MOBILE;
             return r;
         }
-        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm)) {
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод changeMobilePhone");
+        clientsMobileHistory.setShowing("Портал");
+        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm, clientsMobileHistory)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
@@ -4607,14 +4779,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
         }
-        if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit)) {
-            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-        } else {
-            Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
-            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                    idOfClient, handler.getData().getOperationType());
+        try {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit, version)) {
+                r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            } else {
+                Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+                handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                        idOfClient, handler.getData().getOperationType());
+            }
+            return r;
+        } catch (Exception e) {
+            logger.error("Error in changeExpenditureLimit: ", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         }
-        return r;
     }
 
     @Override
@@ -4735,12 +4913,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String author, String title, String title2, String publicationDate, String publisher, String isbn,
             int limit, int offset) throws DatatypeConfigurationException {
 
-        if (author.isEmpty() && title.isEmpty() && title2.isEmpty() && publicationDate.isEmpty() && publisher.isEmpty()
-                && isbn.isEmpty()) {
-            data.setPublicationItemList(new PublicationItemList());
-            data.setAmountForCondition(0);
-            return;
+        if ((author == null || author.isEmpty()) && (title == null || title.isEmpty()) &&
+                (title2 == null || title2.isEmpty()) && (publicationDate == null || publicationDate.isEmpty())
+                && (publisher == null || publisher.isEmpty()) && (isbn == null || isbn.isEmpty())) {
+            //data.setPublicationItemList(new PublicationItemList());
+            //data.setAmountForCondition(0);
+            throw new DatatypeConfigurationException();
         }
+        if (limit < 0 )
+            limit = 0;
         Long org = client.getOrg().getIdOfOrg();
 
         StringBuilder bquery = new StringBuilder();
@@ -5250,6 +5431,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session session = null;
         Transaction persistenceTransaction = null;
+
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод setGuardianshipDisabled");
+        clientsMobileHistory.setShowing("Портал");
         try {
             if (StringUtils.isEmpty(guardMobile)) {
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
@@ -5267,7 +5452,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new ClientNotFoundException("Не удалось найти клиента по л/с " + contractId);
             }
 
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient(), false);
             boolean guardianWithMobileFound = false;
             for (ClientGuardianItem item : guardians) {
                 Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
@@ -5293,8 +5478,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (value) {
                 if (client.getMobile().equals(guardMobile)) {
+                    client.initClientMobileHistory(clientsMobileHistory);
                     client.setMobile("");
-                    logger.info(
+                    logger.debug(
                             "class : ClientRoomControllerWS, method : processSetGuardianship line : 4790, idOfClient : "
                                     + client.getIdOfClient() + " mobile : " + client.getMobile());
                     session.persist(client);
@@ -5302,8 +5488,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 if (!guardianWithMobileFound) {
                     if (client.getMobile() == null || client.getMobile().isEmpty()) {
+                        client.initClientMobileHistory(clientsMobileHistory);
                         client.setMobile(guardMobile);
-                        logger.info(
+                        logger.debug(
                                 "class : ClientRoomControllerWS, method : processSetGuardianship line : 4797, idOfClient : "
                                         + client.getIdOfClient() + " mobile : " + client.getMobile());
                         session.persist(client);
@@ -5368,6 +5555,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session session = null;
         Transaction persistenceTransaction = null;
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод clearMobileByContractId");
+        clientsMobileHistory.setShowing("Портал");
         try {
             session = runtimeContext.createPersistenceSession();
             persistenceTransaction = session.beginTransaction();
@@ -5381,6 +5571,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String currentMobile = client.getMobile();
 
             if (phone.equals(currentMobile)) {
+                client.initClientMobileHistory(clientsMobileHistory);
                 client.setMobile("");
                 logger.debug("class : ClientRoomControllerWS, method : processClearMobile line : 4860, idOfClient : "
                         + client.getIdOfClient() + " mobile : " + client.getMobile());
@@ -5389,10 +5580,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         client.getContractId()));
             }
 
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient(), false);
             for (ClientGuardianItem item : guardians) {
                 Client guardian = DAOUtils.findClientByContractId(session, item.getContractId());
                 if (phone.equals(guardian.getMobile())) {
+                    guardian.initClientMobileHistory(clientsMobileHistory);
                     guardian.setMobile("");
                     logger.debug(
                             "class : ClientRoomControllerWS, method : processClearMobile line : 4870, idOfClient : "
@@ -6194,7 +6386,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
                 return r;
             }
-            if (!daoService.setClientExpenditureLimit(contractId, limit)) {
+            long version = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            if (!daoService.setClientExpenditureLimit(contractId, limit, version)) {
                 r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
@@ -6211,7 +6404,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r.description = RC_INVALID_MOBILE;
                 return r;
             }
-            if (!daoService.setClientMobilePhone(contractId, mobilePhone, null)) {
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("soap метод changePersonalInfo");
+            clientsMobileHistory.setShowing("Портал");
+            if (!daoService.setClientMobilePhone(contractId, mobilePhone, null, clientsMobileHistory)) {
                 r.resultCode = RC_CLIENT_NOT_FOUND;
                 r.description = RC_CLIENT_NOT_FOUND_DESC;
             }
@@ -6897,48 +7093,53 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, List<WtDish> wtDishes) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfOrg, List<WtDish> wtDishes) {
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish, true);
-                menuItemExtList.add(menuItemExt);
+                WtDishInfo wtDishInfo = new WtDishInfo(wtDish);
+                List<MenuItemExt> menuItemExt = getMenuItemExt(objectFactory, idOfOrg, wtDishInfo, true, null);
+                menuItemExtList.addAll(menuItemExt);
             }
         }
         return menuItemExtList;
     }
 
-    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish, boolean isGroupByCategory) {
-        MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-        String menuGroup = "";
+    private List<MenuItemExt> getMenuItemExt(ObjectFactory objectFactory, Long idOfOrg, WtDishInfo wtDishInfo,
+            boolean isGroupByCategory, Map<Long, Set<String>> menuGroups) {
+        List<MenuItemExt> result = new ArrayList<>();
+        Set<String> menuGroupSet = null;
         if (isGroupByCategory) {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDish);
+            menuGroupSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDishAndCategories(wtDishInfo);
         } else {
-            menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtMenuGroupByWtDish(wtDish);
+            menuGroupSet = menuGroups.get(wtDishInfo.getIdOfDish());
         }
-        menuItemExt.setGroup(menuGroup);
-        menuItemExt.setName(wtDish.getDishName());
-        menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
-        menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
-        menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
-        menuItemExt.setAvailableNow(1);
-        menuItemExt.setCarbohydrates(
-                wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
-        menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
-        menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
-        menuItemExt.setVitB1(0.0);
-        menuItemExt.setVitB2(0.0);
-        menuItemExt.setVitPp(0.0);
-        menuItemExt.setVitC(0.0);
-        menuItemExt.setVitA(0.0);
-        menuItemExt.setVitE(0.0);
-        menuItemExt.setMinCa(0.0);
-        menuItemExt.setMinP(0.0);
-        menuItemExt.setMinMg(0.0);
-        menuItemExt.setMinFe(0.0);
-        menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-        menuItemExt.setFullName(wtDish.getComponentsOfDish());
-        return menuItemExt;
+        for (String menuGroup : menuGroupSet) {
+            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+            menuItemExt.setGroup(menuGroup);
+            menuItemExt.setName(wtDishInfo.getDishName());
+            menuItemExt.setPrice(wtDishInfo.getPrice());
+            menuItemExt.setCalories(wtDishInfo.getCalories() == null ? (double) 0 : wtDishInfo.getCalories().doubleValue());
+            menuItemExt.setOutput(wtDishInfo.getQty() == null ? "" : wtDishInfo.getQty());
+            menuItemExt.setAvailableNow(1);
+            menuItemExt.setCarbohydrates(wtDishInfo.getCarbohydrates() == null ? (double) 0 : wtDishInfo.getCarbohydrates().doubleValue());
+            menuItemExt.setFat(wtDishInfo.getFat() == null ? (double) 0 : wtDishInfo.getFat().doubleValue());
+            menuItemExt.setProtein(wtDishInfo.getProtein() == null ? (double) 0 : wtDishInfo.getProtein().doubleValue());
+            menuItemExt.setVitB1(0.0);
+            menuItemExt.setVitB2(0.0);
+            menuItemExt.setVitPp(0.0);
+            menuItemExt.setVitC(0.0);
+            menuItemExt.setVitA(0.0);
+            menuItemExt.setVitE(0.0);
+            menuItemExt.setMinCa(0.0);
+            menuItemExt.setMinP(0.0);
+            menuItemExt.setMinMg(0.0);
+            menuItemExt.setMinFe(0.0);
+            menuItemExt.setIdOfMenuDetail(wtDishInfo.getIdOfDish());
+            menuItemExt.setFullName(wtDishInfo.getComponentsOfDish());
+            result.add(menuItemExt);
+        }
+        return result;
     }
 
 
@@ -8561,7 +8762,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         String mobilePhone = Client.checkAndConvertMobile(mobile);
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
                 || childContractId == null || StringUtils.isEmpty(mobilePhoneCreator)) {
-            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+            return new Result(RC_INVALID_DATA, RC_NOT_ALL_ARG);
         }
         if (StringUtils.isEmpty(mobilePhone)) {
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
@@ -8640,10 +8841,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else {
                     gender = 1;
                 }
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("soap метод addGuardian");
+                clientsMobileHistory.setShowing("Портал");
                 guardian = ClientManager
                         .createGuardianTransactionFree(session, firstName, secondName, surname, mobile, remark, gender,
                                 org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries,
-                                null, null);
+                                null, null, clientsMobileHistory);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
@@ -8744,7 +8948,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || contracts == null
                 || gender == null || CollectionUtils.isEmpty(contracts.getContractIds())) {
-            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+            return new Result(RC_INVALID_DATA, RC_NOT_ALL_ARG);
         }
 
         Result result = new Result();
@@ -8914,6 +9118,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             String guid = client.getClientGUID();
+            String meshGuid = client.getMeshGUID();
+            if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(meshGuid)) {
+                return new MuseumEnterInfo(RC_CLIENT_GUID_NOT_FOUND, RC_CLIENT_GUID_NOT_FOUND_DESC);
+            }
             Date currentDate = new Date();
             boolean clientPredefined = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
                     >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
@@ -8921,11 +9129,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     <= ClientGroup.Predefined.CLIENT_DELETED.getValue();
             if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
                     && card.getValidTime().after(currentDate) && !clientPredefined) {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 0L, "Карта активна");
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 0L, "Карта активна");
             } else if (!clientPredefined) {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 2L, "Карта не активна");
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 2L, "Карта не активна");
             } else {
-                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 1L,
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, meshGuid, 1L,
                         "Карта принадлежит другой группе держателей «Москвенка»");
             }
         } catch (Exception e) {
@@ -8954,14 +9162,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
-            if (client.getAgeTypeGroup() != null && client.getAgeTypeGroup()
-                    .equals(Client.GROUP_NAME[Client.GROUP_SCHOOL])) {
+            if (client.getAgeTypeGroup() != null && ArrayUtils.contains(Client.GROUP_NAME_SCHOOL, client.getAgeTypeGroup())) {
                 //Если клиент школьник
-                if (StringUtils.isEmpty(client.getClientGUID())) {
+                if (StringUtils.isEmpty(client.getClientGUID()) && StringUtils.isEmpty(client.getMeshGUID())) {
                     return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
                 }
                 cultureEnterInfo.setFullAge(getFullAge(client));
                 cultureEnterInfo.setGuid(client.getClientGUID());
+                cultureEnterInfo.setMesId(client.getMeshGUID());
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
             } else {
                 List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
@@ -8988,6 +9196,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (clientPredefined) {
                             CultureEnterInfo cultureEnterInfoChield = new CultureEnterInfo();
                             cultureEnterInfoChield.setGuid(child.getClientGUID());
+                            cultureEnterInfoChield.setMesId(child.getMeshGUID());
                             cultureEnterInfoChield.setGroupName(child.getClientGroup().getGroupName());
                             cultureEnterInfoChield.setFullAge(getFullAge(child));
                             cultureEnterInfo.getChildrens().get(0).getChild().add(cultureEnterInfoChield);
@@ -9018,12 +9227,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
+    public Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "museumCode") String museumCode,
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus) {
         authenticateRequest(null);
-        if (StringUtils.isEmpty(guid)) {
+        if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(mesId)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+        if (!StringUtils.isEmpty(guid) && !StringUtils.isEmpty(mesId)) {
+            return new Result(RC_INVALID_DATA, "В запросе должен быть указан только один идентификатор - guid или mesId");
         }
         if (accessTime == null) {
             return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
@@ -9034,7 +9247,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, guid);
+            Client cl = null;
+            if (!StringUtils.isEmpty(guid)) {
+                cl = DAOUtils.findClientByGuid(session, guid);
+            }
+            if (!StringUtils.isEmpty(mesId)) {
+                cl = DAOUtils.findClientByMeshGuid(session, mesId);
+            }
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
@@ -9075,15 +9294,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "orgCode") String orgCode,
             @WebParam(name = "CultureName") String cultureName,
             @WebParam(name = "CultureShortName") String cultureShortName,
             @WebParam(name = "CultureAddress") String cultureAddress, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
-        if (StringUtils.isEmpty(guid)) {
+        if (StringUtils.isEmpty(guid) && StringUtils.isEmpty(mesId)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+
+        if (!StringUtils.isEmpty(guid) && !StringUtils.isEmpty(mesId)) {
+            return new Result(RC_INVALID_DATA, "В запросе должен быть указан только один идентификатор - guid или mesId");
         }
 
         if (StringUtils.isEmpty(orgCode)) {
@@ -9115,7 +9339,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, guid);
+            Client cl = null;
+            if (!StringUtils.isEmpty(guid)) {
+                cl = DAOUtils.findClientByGuid(session, guid);
+            }
+            if (!StringUtils.isEmpty(mesId)) {
+                cl = DAOUtils.findClientByMeshGuid(session, mesId);
+            }
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
@@ -9237,7 +9467,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), null);
         if (mode.equals("child")) {
-            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient());
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient(), false);
             boolean informed = false;
             for (ClientGuardianItem item : guardians) {
                 if (item.getInformedSpecialMenu()) {
@@ -9278,6 +9508,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<ClientSummaryBase> list = new ArrayList<>();
         list.add(summaryBase);
         result.setClientSummary(list);
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
         return result;
     }
 
@@ -9287,6 +9519,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         HTTPDataHandler handler = new HTTPDataHandler(data);
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
+
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getSummaryByGuardMobileMin");
+        clientsMobileHistory.setShowing("Портал");
+        changeSsoid(guardMobile, clientsMobileHistory);
 
         Session session = null;
         Transaction transaction = null;
@@ -9644,14 +9881,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile()
                             .equals(Client.checkAndConvertMobile(guardianMobile))) {
                         guardianWithMobileFound = true;
-                        MessageContext mc = context.getMessageContext();
+                        ClientsMobileHistory clientsMobileHistory =
+                                new ClientsMobileHistory("soap метод setPreorderAllowed");
+                        clientsMobileHistory.setShowing("Портал");
+						MessageContext mc = context.getMessageContext();
                         HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
                         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                         clientGuardianHistory.setReason("Веб метод setPreorderAllowed");
                         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
                         clientGuardianHistory.setGuardian(guardianMobile);
-                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value,
-                                version, clientGuardianHistory);
+                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value, version,
+                                clientsMobileHistory, clientGuardianHistory);
                     }
                 }
 
@@ -9671,6 +9911,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
         } catch (Exception e) {
             logger.error("Error in setPreorderAllowed", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result setInformedSpecialMenuForClient(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            ClientManager.setInformedSpecialMenu(session, client, client.isStudent());
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setInformedSpecialMenu", e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -9838,6 +10112,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (mobilePhone == null) {
             return new ClientGroupResult(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
+
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("soap метод getTypeClients");
+        clientsMobileHistory.setShowing("Портал");
+
+        changeSsoid(mobile, clientsMobileHistory);
+
         Session session = null;
         Transaction transaction = null;
         try {
@@ -9982,6 +10263,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } catch (RegularAlreadyDeleted e) {
             result.resultCode = RC_REGULAR_ALREADY_DELETED;
             result.description = RC_REGULAR_ALREADY_DELETED_DESC;
+        } catch (RegularWrongStartDate e) {
+            result.resultCode = RC_REGULAR_WRONG_START_DATE;
+            result.description = RC_REGULAR_WRONG_DATE_DESC;
+        } catch (RegularExistsException e) {
+            result.resultCode = RC_REGULAR_EXISTS;
+            result.description = RC_REGULAR_EXISTS_DESC;
         } catch (Exception e) {
             logger.error("Error in putPreorderComplex", e);
             result.resultCode = RC_INTERNAL_ERROR;
@@ -10057,8 +10344,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (clientByContractId != null) {
                     throw new Exception("Client already found by contract Id");
                 }
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("web метод addRegistrationCard");
+                clientsMobileHistory.setShowing("Портал");
                 client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
-                        organizationSuid, grade, codeBenefit, contractId);
+                        organizationSuid, grade, codeBenefit, contractId, clientsMobileHistory);
             } else {
                 if (clientByContractId != null && !client.equals(clientByContractId)) {
                     throw new Exception("Client already found by contract Id - 2");
@@ -10510,7 +10800,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         String mobilePhone = Client.checkAndConvertMobile(guardianMobile);
         if (StringUtils.isEmpty(clientGuid) || (null == categoryDiscount && !otherDiscount) || StringUtils
                 .isEmpty(mobilePhone) || StringUtils.isEmpty(guardianName) || StringUtils.isEmpty(guardianSurname)) {
-            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+            return new Result(RC_INVALID_DATA, RC_NOT_ALL_ARG);
         }
         if (StringUtils.isEmpty(mobilePhone)) {
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
@@ -10814,5 +11104,49 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(persistenceSession, logger);
         }
         return result;
+    }
+
+    private void changeSsoid(String clientMobile, ClientsMobileHistory clientsMobileHistory)
+    {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            String cientMobile =Client.checkAndConvertMobile(clientMobile);
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Map<String, List> headers = (Map<String, List>) context.getMessageContext().get(Message.PROTOCOL_HEADERS);
+            List<String> ssoids = headers.get("User_ssoid");
+            String ssoid = "";
+            if (ssoids != null && !ssoids.isEmpty()) {
+                ssoid = ssoids.get(0).trim();
+                if (!ssoid.isEmpty()) {
+                    List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
+                    List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
+                    for (Client client : clients) {
+                        if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
+                            client.setSsoid(ssoid);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
+                    }
+                    for (Client client : clientsSsoid) {
+                        if (client.getMobile() == null || !client.getMobile().equals(cientMobile)) {
+                            client.initClientMobileHistory(clientsMobileHistory);
+                            client.setMobileNotClearSsoid(cientMobile);
+                            client.setUpdateTime(new Date());
+                            session.update(client);
+                        }
+                    }
+                }
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error(String.format("Error work with ssoid. guardMobile = %s",
+                    clientMobile), e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 }

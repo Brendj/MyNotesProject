@@ -201,6 +201,14 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                     String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
                             PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
                             payment.getContractId(), payment.getClientId()), null);
+        } else if(payment.isCheckOnly() && isTestSupplier(client.getOrg().getDefaultSupplier())){
+            SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false,
+                    "Клиент привязан к тестовому поставщику", null);
+            return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
+                    PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
+                    String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
+                            PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
+                            payment.getContractId(), payment.getClientId()), null);
         }
 
         if (subBalanceNum != null && subBalanceNum > 1 && enableSubBalanceOperation) {
@@ -296,6 +304,11 @@ public class PaymentProcessorImpl implements PaymentProcessor {
 
         return result;
 
+    }
+
+    private boolean isTestSupplier(Contragent defaultSupplier) {
+        return defaultSupplier.getContragentName().toLowerCase().contains("test")
+                || defaultSupplier.getContragentName().toLowerCase().contains("тест");
     }
 
     private static Client findPaymentClient(Contragent contragent, Long contractId,

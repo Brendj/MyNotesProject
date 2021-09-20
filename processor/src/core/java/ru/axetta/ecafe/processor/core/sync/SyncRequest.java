@@ -8,9 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldBuilder;
@@ -1319,7 +1322,7 @@ public class SyncRequest {
 
                 public static class Builder {
 
-                    public ReqMenuDetail build(Node menuDetailNode, MenuGroups menuGroups) throws Exception {
+                    public ReqMenuDetail build(Node menuDetailNode, MenuGroups menuGroups, Map<String, Long> idofGoodsMap) throws Exception {
                         NamedNodeMap namedNodeMap = menuDetailNode.getAttributes();
                         String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 256);
                         String shortName = name;
@@ -1388,22 +1391,26 @@ public class SyncRequest {
                         if (null != guidOfGoodNode) {
                             guidOfGood = getTextContent(guidOfGoodNode);
                             if (null != guidOfGood) {
-                                RuntimeContext runtimeContext = RuntimeContext.getInstance();
-                                Session session = null;
-                                Transaction transaction = null;
-                                try {
-                                    session = runtimeContext.createReportPersistenceSession();
-                                    transaction = session.beginTransaction();
-                                    Good good = DAOUtils.findGoodByGuid(session, guidOfGood);
-                                    if (null != good)
-                                        idOfGood = good.getGlobalId();
-                                    transaction.commit();
-                                    transaction = null;
-                                } catch (Exception e) {
-                                    logger.error("Failed build MenuDetail section ", e);
-                                } finally {
-                                    HibernateUtils.rollback(transaction, logger);
-                                    HibernateUtils.close(session, logger);
+                                Long idFromMap = idofGoodsMap.get(guidOfGood);
+                                if (idFromMap != null) {
+                                    idOfGood = idFromMap;
+                                } else {
+                                    RuntimeContext runtimeContext = RuntimeContext.getInstance();
+                                    Session session = null;
+                                    Transaction transaction = null;
+                                    try {
+                                        session = runtimeContext.createReportPersistenceSession();
+                                        transaction = session.beginTransaction();
+                                        idOfGood = DAOUtils.findIdOfGoodByGuid(session, guidOfGood);
+                                        idofGoodsMap.put(guidOfGood, idOfGood);
+                                        transaction.commit();
+                                        transaction = null;
+                                    } catch (Exception e) {
+                                        logger.error("Failed build MenuDetail section ", e);
+                                    } finally {
+                                        HibernateUtils.rollback(transaction, logger);
+                                        HibernateUtils.close(session, logger);
+                                    }
                                 }
                             }
                         }
@@ -2104,7 +2111,7 @@ public class SyncRequest {
                     this.reqAssortmentBuilder = new ReqAssortment.Builder();
                 }
 
-                public Item build(Node itemNode, LoadContext loadContext) throws Exception {
+                public Item build(Node itemNode, LoadContext loadContext, Map<String, Long> idofGoodsMap) throws Exception {
                     NamedNodeMap namedNodeMap = itemNode.getAttributes();
 
                     Date date = loadContext.getDateOnlyFormat().parse(namedNodeMap.getNamedItem("Value").getTextContent());
@@ -2115,7 +2122,7 @@ public class SyncRequest {
                     Node childNode = itemNode.getFirstChild();
                     while (null != childNode) {
                         if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName().equals("ML")) {
-                            ReqMenuDetail reqMenuDetail = reqMenuDetailBuilder.build(childNode, loadContext.getMenuGroups());
+                            ReqMenuDetail reqMenuDetail = reqMenuDetailBuilder.build(childNode, loadContext.getMenuGroups(), idofGoodsMap);
                             reqMenuDetails.add(reqMenuDetail);
                             if (reqMenuDetail.idOfMenu != null) {
                                 reqMenuDetailMap.put(reqMenuDetail.idOfMenu, reqMenuDetail);
@@ -2280,11 +2287,12 @@ public class SyncRequest {
                 List<Item> items = new LinkedList<Item>();
                 Node itemNode = menuNode.getFirstChild();
                 String settingsSectionRawXML = null;
+                Map<String, Long> idofGoodsMap = new HashMap<>();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Settings")) {
                         settingsSectionRawXML = ru.axetta.ecafe.processor.core.utils.XMLUtils.nodeToString(itemNode);
                     } else if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("Date")) {
-                        items.add(itemBuilder.build(itemNode, loadContext));
+                        items.add(itemBuilder.build(itemNode, loadContext, idofGoodsMap));
                     }
                     itemNode = itemNode.getNextSibling();
                 }
@@ -2798,10 +2806,12 @@ public class SyncRequest {
 			builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
 			builders.add(new EmiasBuilder());
+            builders.add(new ExemptionVisitingBuilder());
             builders.add(new MenuSupplierBuilder(idOfOrg));
             builders.add(new RequestsSupplierBuilder(idOfOrg));
             builders.add(new HardwareSettingsRequestBuilder(idOfOrg));
             builders.add(new TurnstileSettingsRequestBuilder(idOfOrg));
+            builders.add(new ExemptionVisitingClientBuilder());
             return builders;
         }
 
@@ -3108,6 +3118,14 @@ public class SyncRequest {
 
 	public EmiasRequest getEmiasRequest(){
         return this.<EmiasRequest>findSection(EmiasRequest.class);
+    }
+
+    public ExemptionVisitingRequest getExemptionVisitingRequest(){
+        return this.<ExemptionVisitingRequest>findSection(ExemptionVisitingRequest.class);
+    }
+
+    public ExemptionVisitingClientRequest getExemptionVisitingClientRequest(){
+        return this.<ExemptionVisitingClientRequest>findSection(ExemptionVisitingClientRequest.class);
     }
 
     public MenuSupplier getMenuSupplier() {

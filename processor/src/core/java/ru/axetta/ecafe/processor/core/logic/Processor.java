@@ -5,7 +5,14 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import com.google.common.base.Joiner;
-
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrTokenizer;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.*;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
@@ -21,12 +28,16 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
-import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotificationManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClient;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClientRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestProcessor;
@@ -139,15 +150,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrTokenizer;
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -167,6 +169,8 @@ public class Processor implements SyncProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private static final int RESPONSE_MENU_PERIOD_IN_DAYS = 7;
+    private static final String SYNC_CONFIG_EMIAS = "ecafe.processor.sync.emias";
+    private static final String SYNC_CONFIG_EXEMPTION_CLIENT = "ecafe.processor.sync.exemptionvisitingclient";
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS =
@@ -175,7 +179,8 @@ public class Processor implements SyncProcessor {
 
     private ProcessorUtils processorUtils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
 
-    public Processor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
+    public Processor(SessionFactory persistenceSessionFactory,
+            EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
         this.eventNotificator = eventNotificator;
     }
@@ -428,11 +433,14 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         StringBuilder performanceLogger = new StringBuilder();
@@ -482,13 +490,17 @@ public class Processor implements SyncProcessor {
         // Process ClientParamRegistry
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Полная синхронизация");
+            clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
             clientGuardianHistory.setWebAdress(request.getRemoteAddr());
             clientGuardianHistory.setOrg(request.getOrg());
             clientGuardianHistory.setReason("Полная синхронизация");
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion, clientGuardianHistory);
+                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
         } catch (Exception e) {
             String message = String
                     .format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -1132,6 +1144,51 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
         fullProcessingPreorderFeedingStatus(request, responseSections);
@@ -1141,7 +1198,6 @@ public class Processor implements SyncProcessor {
         ProcessingTurnstileSettingsRequest(request, syncHistory, responseSections);
 
         logger.info("Full sync performance info: " + performanceLogger.toString());
-
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "",
                 accRegistry, resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry,
@@ -1154,8 +1210,9 @@ public class Processor implements SyncProcessor {
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
                 cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -1239,8 +1296,7 @@ public class Processor implements SyncProcessor {
         fullProcessingTempCardsOperationsAndData(request, syncHistory, responseSections);
 
         // Process ResCategoriesDiscountsAndRules
-        //Временно убираем
-        //fullProcessingCategoriesDiscountaAndRules(request, syncHistory, responseSections);
+        fullProcessingCategoriesDiscountaAndRules(request, syncHistory, responseSections);
 
         // Process CorrectingNumbersOrdersRegistry
         fullProcessingCorrectingNumbersSection(request, syncHistory, responseSections);
@@ -1333,6 +1389,16 @@ public class Processor implements SyncProcessor {
 
         fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            //Секция обработки заявок от ЕМИАС
+            fullProcessingEMIAS(request, responseSections);
+
+            //Секция обработки заявок от ЕМИАС (от Кафки)
+            fullProcessingExemptionVisiting(request, responseSections);
+        }
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            fullProcessingExemptionVisitingClient(request, responseSections);
+        }
         // время окончания обработки
         Date syncEndTime = new Date();
 
@@ -2093,13 +2159,17 @@ public class Processor implements SyncProcessor {
         try {
             SyncRequest.ClientParamRegistry clientParamRegistry = request.getClientParamRegistry();
             if (clientParamRegistry != null) {
-                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("Синхронизация по секциям (ConstructedSections)");
+                clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+                clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
                 clientGuardianHistory.setWebAdress(request.getRemoteAddr());
                 clientGuardianHistory.setOrg(request.getOrg());
                 clientGuardianHistory.setReason("Синхронизация по секциям");
                 processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds,
-                        clientsWithWrongVersion, clientGuardianHistory);
+                        clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
             }
         } catch (Exception e) {
             String message = String
@@ -2191,7 +2261,6 @@ public class Processor implements SyncProcessor {
         processMigrantsSections(request, syncHistory, responseSections, null);
         if (request.getClientRegistryRequest() == null)
             processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
-        processAccRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccountRegistrySectionsForMigrants(request, syncHistory, responseSections);
         if (request.getClientGuardianRequest() == null)
             processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
@@ -2226,22 +2295,6 @@ public class Processor implements SyncProcessor {
             String message = String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }
-    }
-
-    private void processAccRegistrySectionsForMigrants(SyncRequest request, SyncHistory syncHistory,
-            List<AbstractToElement> responseSections) {
-        SyncResponse.AccRegistry accRegistryForMigrants;
-        try {
-            accRegistryForMigrants = getAccRegistryForMigrants(request.getIdOfOrg());
-            addToResponseSections(accRegistryForMigrants, responseSections);
-        } catch (Exception e) {
-            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            if (syncHistory != null) {
-                processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory,
-                        message);
-            }
             logger.error(message, e);
         }
     }
@@ -2411,12 +2464,15 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2450,6 +2506,52 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+
         Date syncEndTime = new Date();
 
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
@@ -2466,8 +2568,9 @@ public class Processor implements SyncProcessor {
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
 				resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -2526,12 +2629,15 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2549,6 +2655,51 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2563,8 +2714,10 @@ public class Processor implements SyncProcessor {
                  specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
+                exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildReestrTaloonsPreorderSyncResponse(SyncRequest request) throws Exception {
@@ -2623,11 +2776,14 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2644,6 +2800,51 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2658,8 +2859,10 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
+                exemptionVisitingSectionForARMAnswer, resMenuSupplier,
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildRequestsSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -2718,12 +2921,14 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
-
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<>();
 
@@ -2741,6 +2946,51 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2755,8 +3005,9 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -2815,12 +3066,15 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2838,6 +3092,51 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2852,8 +3151,10 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
+                exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -2912,12 +3213,15 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2973,8 +3277,52 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        Date syncEndTime = new Date();
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
 
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        Date syncEndTime = new Date();
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure,
@@ -2987,8 +3335,9 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -3071,12 +3420,15 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3111,13 +3463,18 @@ public class Processor implements SyncProcessor {
         }
         List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Синхронизация типа GetClientParams (синхра клиентов)");
+            clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
             clientGuardianHistory.setWebAdress(request.getRemoteAddr());
             clientGuardianHistory.setOrg(request.getOrg());
             clientGuardianHistory.setReason("Синхронизации параметров клиента");
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion, clientGuardianHistory);
+                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
         } catch (Exception e) {
             logger.error(String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -3156,6 +3513,50 @@ public class Processor implements SyncProcessor {
                     e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
 
         Date syncEndTime = new Date();
 
@@ -3171,8 +3572,10 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
+                exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -3235,12 +3638,15 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3312,6 +3718,51 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -3326,8 +3777,10 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
+                exemptionVisitingSectionForARMAnswer, resMenuSupplier,
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -3387,11 +3840,14 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3403,20 +3859,54 @@ public class Processor implements SyncProcessor {
 
         //info messages
         processInfoMessageSections(request, responseSections);
-
-        try {
-            EmiasRequest emiasRequest = request.getEmiasRequest();
-            if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
-                emiasSection = new EmiasSection();
-                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
-                emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
-                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
-                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emias.accinc", "1").equals("1")) {
+                if (SyncRequest.versionIsAfter(request.getClientVersion(), "2.7.96")) {
+                    try {
+                        EmiasRequest emiasRequest = request.getEmiasRequest();
+                        if (emiasRequest != null) {
+                            FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                            emiasSection = new EmiasSection();
+                            emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                            emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                            emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                            emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                        }
+                    } catch (Exception e) {
+                        String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                        logger.error(message, e);
+                    }
+                }
+                try {
+                    ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                    if (exemptionVisitingRequest != null) {
+                        FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                                exemptionVisitingRequest, request.getIdOfOrg());
+                        exemptionVisitingSection = new ExemptionVisitingSection();
+                        exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                        exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                        exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                        exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                    }
+                } catch (Exception e) {
+                    String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                    logger.error(message, e);
+                }
             }
-        } catch (Exception e) {
-            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
-            logger.error(message, e);
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.exemptionvisitingclient.accinc", "1").equals("1")) {
+                try {
+                    if (request.getExemptionVisitingClientRequest() != null) {
+                        exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                                request.getIdOfOrg());
+                    }
+                } catch (Exception e) {
+                    String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                    logger.error(message, e);
+                }
+            }
         }
 
         try {
@@ -3526,7 +4016,6 @@ public class Processor implements SyncProcessor {
         }
 
         updateOrgSyncDate(request.getIdOfOrg());
-
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure,
@@ -3539,8 +4028,9 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private SyncResponse buildMenuSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -3599,11 +4089,14 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3617,6 +4110,51 @@ public class Processor implements SyncProcessor {
             String message = String.format("processMenuSupplier(): %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
         }
 
         Date syncEndTime = new Date();
@@ -3633,8 +4171,9 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier,
-                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
+                resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -3794,6 +4333,26 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private ExemptionVisitingClient processExemptionVisitingClient(ExemptionVisitingClientRequest exemptionVisitingClientRequest, Long idOfOrg)
+            throws Exception
+    {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ExemptionVisitingClientProcessor(persistenceSession, exemptionVisitingClientRequest,
+                    idOfOrg);
+            exemptionVisitingClient = (ExemptionVisitingClient) processor.process();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return exemptionVisitingClient;
     }
 
     private PlanOrdersRestrictions processPlanOrdersRestrictions(PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest) {
@@ -4428,7 +4987,7 @@ public class Processor implements SyncProcessor {
                                     payment.getIdOfOrder()));
                 }
 
-                if (!DAOService.getInstance().isOrgFriendly(idOfOrg, idOfOrgPayment)) {
+                if (!DAOReadonlyService.getInstance().isOrgFriendly(idOfOrg, idOfOrgPayment)) {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 150,
                             String.format("Organization is not friendly, IdOfOrg == %s, IdOfOrder == %s",
                                     idOfOrgPayment, payment.getIdOfOrder()));
@@ -4459,10 +5018,16 @@ public class Processor implements SyncProcessor {
                 // If cardNo specified - load card from data model
                 Card card = null;
                 Long cardNo = payment.getCardNo();
-                if (null != cardNo) {
-                    card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                Long longCardNo = payment.getLongCardNo();
+                if (null != cardNo || null != longCardNo) {
+                    if (longCardNo != null) {
+                        card = DAOUtils.findCardByLongCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                    } else {
+                        card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
+                    }
                     if (null == card) {
-                        logger.info(String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
+                        logger.info(
+                                String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
                                         payment.getIdOfOrder(), cardNo));
                     } else {
                         RuntimeContext.getAppContext().getBean(CardBlockService.class)
@@ -4473,7 +5038,7 @@ public class Processor implements SyncProcessor {
                 Client client = null;
                 Long idOfClient = payment.getIdOfClient();
                 if (null != idOfClient) {
-                    client = findClient(persistenceSession, idOfClient);
+                    client = DAOReadonlyService.getInstance().findClientById(idOfClient);
                     // Check client existance
 
                     if (null == client) {
@@ -4490,7 +5055,7 @@ public class Processor implements SyncProcessor {
                 }
                 // If client is specified - check if client is registered for the specified organization
                 // or for one of friendly organizations of specified one
-                Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, idOfOrg);
+                Set<Long> idOfFriendlyOrgSet = DAOReadonlyService.getInstance().findFriendlyOrgsIdsAsSet(idOfOrg);
                 if (null != client) {
                     Org clientOrg = client.getOrg();
                     if (!clientOrg.getIdOfOrg().equals(idOfOrg) && !idOfFriendlyOrgSet
@@ -4656,13 +5221,10 @@ public class Processor implements SyncProcessor {
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     long totalRSum = totalBuffetRSum + totalLunchRSum;
                     long totalAmountBuyAll = totalBuffetRSum + totalLunchRSum;
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_PRICE,
-                            Long.toString(totalBuffetRSum / 100) + ',' + Long.toString(totalBuffetRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_LUNCH,
-                            Long.toString(totalLunchRSum / 100) + ',' + Long.toString(totalLunchRSum % 100), values);
-                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT,
-                            Long.toString(totalRSum / 100) + ',' + Long.toString(totalRSum % 100), values);
-                    values = EventNotificationService.attachAmountBuyAllToValues(totalAmountBuyAll, values);
+                    values = EventNotificationService.attachMoneyToValues(totalBuffetRSum, values, EventNotificationService.PARAM_AMOUNT_PRICE);
+                    values = EventNotificationService.attachMoneyToValues(totalLunchRSum, values, EventNotificationService.PARAM_AMOUNT_LUNCH);
+                    values = EventNotificationService.attachMoneyToValues(totalRSum, values, EventNotificationService.PARAM_AMOUNT);
+                    values = EventNotificationService.attachMoneyToValues(totalAmountBuyAll, values, EventNotificationService.PARAM_AMOUNT_BUY_ALL);
                     if (client.getBalance() != null) {
                         values = EventNotificationService.attachToValues("balance",
                                 Long.toString(client.getBalance() / 100) + ',' + Long
@@ -4811,7 +5373,7 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
             SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds,
-            List<Long> clientsWithWrongVersion, ClientGuardianHistory clientGuardianHistory) throws Exception {
+            List<Long> clientsWithWrongVersion, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -4822,7 +5384,7 @@ public class Processor implements SyncProcessor {
 
             List<Long> allocatedClients = ClientManager.getAllocatedClientsIds(persistenceSession, idOfOrg);
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>();
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
             /* совместимость организаций которые не имеют дружественных организаций */
             orgSet.add(org);
@@ -4847,7 +5409,7 @@ public class Processor implements SyncProcessor {
                 SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
 
                 //Проверяем, если у клиента меняется организация, то блокируем ему карты в старой организации
-                Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
+                Client client = DAOReadonlyService.getInstance().findClientById(clientParamItem.getIdOfClient());
                 disableClientCardsIfChangeOrg(client, orgSet, idOfOrg);
                 Boolean isRemoveDiscount = removeClientDiscountIfChangeOrg(client, persistenceSession, orgSet, idOfOrg);
                 if (!isRemoveDiscount) {
@@ -4864,7 +5426,7 @@ public class Processor implements SyncProcessor {
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
                     processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg,
-                            allocatedClients, orgSet, clientsWithWrongVersion, clientGuardianHistory);
+                            allocatedClients, orgSet, clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -4896,7 +5458,7 @@ public class Processor implements SyncProcessor {
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg,
             List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion,
-            ClientGuardianHistory clientGuardianHistory) throws Exception {
+            ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -4911,7 +5473,7 @@ public class Processor implements SyncProcessor {
                 return;
             }
 
-            if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
+            if (!orgMap.containsKey(client.getOrg().getIdOfOrg())) {
                 if (!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient())
                         .size() > 0)) {
                     if (!allocatedClients.contains(clientParamItem.getIdOfClient())) {
@@ -4925,8 +5487,9 @@ public class Processor implements SyncProcessor {
             } else {
                 Long orgOwner = clientParamItem.getOrgOwner();
                 boolean changeOrg = false;
+                Org oldOrg = client.getOrg();
                 if (orgOwner != null) {
-                    Org org = (Org) persistenceSession.get(Org.class, orgOwner);
+                    Org org = (Org) persistenceSession.load(Org.class, orgOwner);
                     changeOrg = !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg());
                     client.setOrg(org);
                 }
@@ -4945,10 +5508,6 @@ public class Processor implements SyncProcessor {
                 if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT)
                         && clientParamItem.getEmail() != null) {
                     String email = clientParamItem.getEmail();
-                    //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                    if (client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
-                        client.setSsoid("");
-                    }
                     client.setEmail(email);
                     if (!StringUtils.isEmpty(clientParamItem.getEmail())
                             && clientParamItem.getNotifyViaEmail() == null) {
@@ -4957,10 +5516,7 @@ public class Processor implements SyncProcessor {
                 }
                 if (clientParamItem.getMobilePhone() != null) {
                     String mobile = Client.checkAndConvertMobile(clientParamItem.getMobilePhone());
-                    //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                    if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
-                        client.setSsoid("");
-                    }
+                    client.initClientMobileHistory(clientsMobileHistory);
                     client.setMobile(mobile);
                     logger.info("class : ClientManager, method : modifyClientTransactionFree line : 344, idOfClient : "
                             + client.getIdOfClient() + " mobile : " + client.getPhone());
@@ -5030,7 +5586,7 @@ public class Processor implements SyncProcessor {
 
                 /* заносим клиента в группу */
                 if (StringUtils.isNotEmpty(clientParamItem.getGroupName())) {
-                    ClientGroup clientGroup;
+                    ClientGroup  clientGroup;
                     if (changeOrg) {
                         clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
                                 client.getOrg().getIdOfOrg(), clientParamItem.getGroupName());
@@ -5045,12 +5601,18 @@ public class Processor implements SyncProcessor {
                         orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                     }
 
-                    if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
-                        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
-                        ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
-                                clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
-                                ClientGroupMigrationHistory.MODIFY_IN_ARM
-                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGuardianHistory);
+                    if (changeOrg) {
+                        ClientManager.addClientMigrationEntry(persistenceSession, oldOrg, client.getClientGroup(),
+                                client.getOrg(), client, ClientGroupMigrationHistory.MODIFY_IN_ARM
+                                        .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGroup.getGroupName());
+                    } else {
+                        if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
+							clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
+                            ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
+                                    clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
+                                    ClientGroupMigrationHistory.MODIFY_IN_ARM
+                                            .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGuardianHistory);
+                        }
                     }
                     client.setClientGroup(clientGroup);
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -5105,7 +5667,7 @@ public class Processor implements SyncProcessor {
             // Если льготы изменились, то сохраняем историю
             if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet
                     .equals(categoryDiscountOfClient))) {
-                Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+                Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
                 DiscountManager.saveDiscountHistory(persistenceSession, client, org, categoryDiscountOfClient, categoryDiscountSet,
                         oldClientDiscountMode, newClientDiscountMode, DiscountChangeHistory.MODIFY_IN_ARM);
                 client.setLastDiscountsUpdate(new Date());
@@ -5115,7 +5677,7 @@ public class Processor implements SyncProcessor {
             DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
             client.setClientRegistryVersion(version);
-
+            client.setUpdateTime(new Date());
             persistenceSession.update(client);
 
             persistenceSession.flush();
@@ -5302,10 +5864,14 @@ public class Processor implements SyncProcessor {
             }
             ////
             Client client = findClient(persistenceSession, idOfClient);
-            Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
             if (null == client) {
                 logger.info(String.format("Client with IdOfClient == %s not found", idOfClient));
-            } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet
+                continue;
+            }
+
+            Set<Long> idOfFriendlyOrgSet = DAOReadonlyService.getInstance()
+                    .findFriendlyOrgsIdsAsSet(client.getOrg().getIdOfOrg());
+            if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet
                     .contains(client.getOrg().getIdOfOrg())) {
                 logger.error(String.format(
                         "Client with IdOfClient == %s belongs to other organization. Client: %s, IdOfOrg by request: %s",
@@ -5412,7 +5978,7 @@ public class Processor implements SyncProcessor {
 
             Set<Long> idOfOrgSet = new HashSet<Long>();
 
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
             /* совместимость организаций которые не имеют дружественных организаций */
             for (Org o : orgSet) {
@@ -5459,7 +6025,7 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
 
             // Добавляем карты временных посетителей (мигрантов)
             List<Client> migrantClients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
@@ -5566,7 +6132,7 @@ public class Processor implements SyncProcessor {
         List<Client> clients;
         Org organization;
         List<Org> orgList;
-        List<Long> activeClientsId;
+        Set<Long> activeClientsId;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -5596,7 +6162,7 @@ public class Processor implements SyncProcessor {
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
                 }
             }
-            activeClientsId = findActiveClientsId(persistenceSession, orgList);
+            activeClientsId = new HashSet<>(findActiveClientsId(persistenceSession, orgList));
             // Получаем чужих клиентов.
             Map<String, Set<Client>> alienClients = ClientManager
                     .findAllocatedClients(persistenceSession, organization);
@@ -5633,7 +6199,7 @@ public class Processor implements SyncProcessor {
                 }
             }
             if (!errorClientIds.isEmpty()) {
-                List errorClients = fetchErrorClientsWithOutFriendlyOrg(persistenceSession,
+                List<Client> errorClients = fetchErrorClientsWithOutFriendlyOrg(persistenceSession,
                         organization.getFriendlyOrg(), errorClientIds);
                 ClientGroup clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
                         organization.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
@@ -5642,8 +6208,7 @@ public class Processor implements SyncProcessor {
                     clientGroup = createClientGroup(persistenceSession, organization.getIdOfOrg(),
                             ClientGroup.Predefined.CLIENT_LEAVING);
                 }
-                for (Object object : errorClients) {
-                    Client client = (Client) object;
+                for (Client client : errorClients) {
                     client.setClientGroup(clientGroup);
                     if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
                         clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
@@ -5697,7 +6262,7 @@ public class Processor implements SyncProcessor {
             if (isAllOrgs) {
                 list = DAOUtils.getOrgsSinceVersion(persistenceSession, version);
             } else {
-                list = DAOUtils.findAllFriendlyOrgs(persistenceSession, org.getIdOfOrg());
+                list = new LinkedList<>(DAOReadonlyService.getInstance().findFriendlyOrgs(org.getIdOfOrg()));
             }
             organizationStructure.addOrganizationStructureInfo(persistenceSession, org, list, isAllOrgs);
             persistenceTransaction.commit();
@@ -5797,9 +6362,8 @@ public class Processor implements SyncProcessor {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            persistenceSession.refresh(org);
             List<ProhibitionMenu> prohibitionMenuList;
             prohibitionMenuList = getProhibitionMenuForOrgSinceVersion(persistenceSession, org, version);
             for (ProhibitionMenu prohibitionMenu : prohibitionMenuList) {
@@ -5851,7 +6415,7 @@ public class Processor implements SyncProcessor {
                         MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
                                 bFirstMenuItem ? MenuExchange.FLAG_ANCHOR_MENU : MenuExchange.FLAG_NONE);
                         //Удаление объекта из сессии с одинаковым идентификатором
-                        MenuExchange menuExchangeFromSession = (MenuExchange) persistenceSession.get(MenuExchange.class, menuExchange.getCompositeIdOfMenuExchange());
+                        MenuExchange menuExchangeFromSession = (MenuExchange) persistenceSession.load(MenuExchange.class, menuExchange.getCompositeIdOfMenuExchange());
                         if(menuExchangeFromSession != null) {
                             persistenceSession.evict(menuExchangeFromSession);
                         }
@@ -6357,7 +6921,7 @@ public class Processor implements SyncProcessor {
                     // find client by id
                     Client clientFromEnterEvent = null;
                     if (idOfClient != null) {
-                        clientFromEnterEvent = (Client) persistenceSession.get(Client.class, idOfClient);
+                        clientFromEnterEvent = (Client) persistenceSession.load(Client.class, idOfClient);
                         if (clientFromEnterEvent == null) {
                             SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
                                     e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_CLIENT_NOT_FOUND,
@@ -6383,6 +6947,7 @@ public class Processor implements SyncProcessor {
                     enterEvent.setPassDirection(e.getPassDirection());
                     enterEvent.setEventCode(e.getEventCode());
                     enterEvent.setIdOfCard(e.getIdOfCard());
+                    enterEvent.setLongCardId(e.getLongCardId());
                     enterEvent.setClient(clientFromEnterEvent);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
                     // Проверка корректности времени
@@ -6822,13 +7387,13 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Org organization = getOrgReference(persistenceSession, idOfOrg);
+            //Org organization = getOrgReference(persistenceSession, idOfOrg);
             OrgSync orgSync = (OrgSync) persistenceSession.load(OrgSync.class, idOfOrg);
             Long result = orgSync.getIdOfPacket();
             orgSync.setIdOfPacket(++result);
             //organization.setIdOfPacket(result + 1);
-            organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
-            persistenceSession.update(organization);
+            //organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
+            //persistenceSession.update(organization);
             persistenceSession.update(orgSync);
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -6929,11 +7494,22 @@ public class Processor implements SyncProcessor {
         if (payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
             contractId = contractId + "01";
         }
+        String ratation = "";
+        for (Purchase purchase : payment.getPurchases()) {
+            if (purchase.getType() != null && purchase.getType() > 0 && purchase.getType() < 100) {
+                ratation = OrderDetailFRationType.fromInteger(purchase.getfRation()).toString();
+                break;
+            }
+        }
+
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(payment.getTime());
-        return new String[]{
+        String[] values = new String[]{
                 "date", date, "contractId", contractId, "others", CurrencyStringUtils.copecksToRubles(others),
                 "complexes", CurrencyStringUtils.copecksToRubles(complexes), "empTime", empTime};
+        if (!ratation.isEmpty())
+            return EventNotificationService.attachToValues(EventNotificationService.PARAM_FRATION, ratation, values);
+        return values;
     }
 
     public void runRegularPaymentsIfEnabled(SyncRequest request) {
@@ -6963,7 +7539,7 @@ public class Processor implements SyncProcessor {
         for (OrgFilesItem item : orgFilesItemList) {
             orgIdList.add(item.getIdOfOrg());
         }
-        List<Org> orgList = DAOUtils.findOrgs(session, orgIdList);
+        List<Org> orgList = DAOReadonlyService.getInstance().findOrgs(orgIdList);
         Map<Long, Org> orgMap = new HashMap<Long, Org>();
         for (Org org : orgList) {
             orgMap.put(org.getIdOfOrg(), org);
@@ -7308,12 +7884,15 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
 
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -7330,6 +7909,51 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -7344,8 +7968,10 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
+                exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory,
@@ -7509,6 +8135,58 @@ public class Processor implements SyncProcessor {
             String message = String.format("fullProcessingPlanOrdersRestrictionsData: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingEMIAS(SyncRequest request, List<AbstractToElement> responseSections) {
+        try {
+            EmiasRequest emiasRequest = request.getEmiasRequest();
+            if (emiasRequest != null) {
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                EmiasSection emiasSection = new EmiasSection();
+                emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                addToResponseSections(emiasSection, responseSections);
+                EmiasSectionForARMAnswer emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                addToResponseSections(emiasSectionForARMAnswer, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingExemptionVisiting(SyncRequest request, List<AbstractToElement> responseSections) {
+        try {
+            ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+            if (exemptionVisitingRequest != null) {
+                FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(exemptionVisitingRequest, request.getIdOfOrg());
+                ExemptionVisitingSection exemptionVisitingSection = new ExemptionVisitingSection();
+                exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                addToResponseSections(exemptionVisitingSection, responseSections);
+                ExemptionVisitingSectionForARMAnswer exemptionVisitingForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                exemptionVisitingForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                exemptionVisitingForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                addToResponseSections(exemptionVisitingForARMAnswer, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingExemptionVisitingClient(SyncRequest request, List<AbstractToElement> responseSections) {
+        ExemptionVisitingClient exemptionVisitingClient = null;
+        try {
+            if (request.getExemptionVisitingClientRequest() != null) {
+                exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                        request.getIdOfOrg());
+                addToResponseSections(exemptionVisitingClient,responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
             logger.error(message, e);
         }
     }
@@ -7787,11 +8465,14 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ExemptionVisitingSection exemptionVisitingSection = null;
+        ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
         ResRequestsSupplier resRequestsSupplier = null;
         RequestsSupplierData requestsSupplierData = null;
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        ExemptionVisitingClient exemptionVisitingClient = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -7840,6 +8521,52 @@ public class Processor implements SyncProcessor {
         }
         discardOrgSettingsSyncParam(request.getIdOfOrg());
 
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EMIAS, "1").equals("1")) {
+            try {
+                EmiasRequest emiasRequest = request.getEmiasRequest();
+                if (emiasRequest != null) {
+                    FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
+                    emiasSection = new EmiasSection();
+                    emiasSection.setItems(fullEmiasAnswerForARM.getItems());
+                    emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
+                    emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());
+                    emiasSectionForARMAnswer.setItems(fullEmiasAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process EmiasRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+
+            try {
+                ExemptionVisitingRequest exemptionVisitingRequest = request.getExemptionVisitingRequest();
+                if (exemptionVisitingRequest != null) {
+                    FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = processExemptionVisiting(
+                            exemptionVisitingRequest, request.getIdOfOrg());
+                    exemptionVisitingSection = new ExemptionVisitingSection();
+                    exemptionVisitingSection.setItems(fullExemptionVisitingAnswerForARM.getItems());
+                    exemptionVisitingSectionForARMAnswer = new ExemptionVisitingSectionForARMAnswer();
+                    exemptionVisitingSectionForARMAnswer.setMaxVersion(fullExemptionVisitingAnswerForARM.getMaxVersionArm());
+                    exemptionVisitingSectionForARMAnswer.setItems(fullExemptionVisitingAnswerForARM.getItemsArm());
+                }
+            } catch (Exception e) {
+                String message = String.format("Error when process ExemptionVisitingRequest: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty(SYNC_CONFIG_EXEMPTION_CLIENT, "1").equals("1")) {
+            try {
+                if (request.getExemptionVisitingClientRequest() != null) {
+                    exemptionVisitingClient = processExemptionVisitingClient(request.getExemptionVisitingClientRequest(),
+                            request.getIdOfOrg());
+                }
+            } catch (Exception e) {
+                String message = String.format("processExemptionVisitingClient: %s", e.getMessage());
+                logger.error(message, e);
+            }
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -7854,8 +8581,10 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSetting, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
+                exemptionVisitingSectionForARMAnswer,
+                resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
+                exemptionVisitingClient);
     }
 
     private OrgSettingSection processOrgSettings(OrgSettingsRequest orgSettingsRequest) throws Exception {
@@ -7932,6 +8661,24 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return fullEmiasAnswerForARM;
+    }
+
+    private FullExemptionVisitingAnswerForARM processExemptionVisiting(ExemptionVisitingRequest exemptionVisitingRequest, Long idOfOrg) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        FullExemptionVisitingAnswerForARM fullExemptionVisitingAnswerForARM = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ExemptionVisitingProcessor(persistenceSession, exemptionVisitingRequest, idOfOrg);
+            fullExemptionVisitingAnswerForARM = (FullExemptionVisitingAnswerForARM) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return fullExemptionVisitingAnswerForARM;
     }
 
     private ResHardwareSettingsRequest processResHardwareSettingsRequest(HardwareSettingsRequest orgEquipmentRequest) throws Exception{

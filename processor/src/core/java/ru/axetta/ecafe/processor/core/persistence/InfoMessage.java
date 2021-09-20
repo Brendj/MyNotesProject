@@ -12,6 +12,7 @@ import java.util.Set;
  */
 public class InfoMessage {
     private Long idOfInfoMessage;
+    private InfoMessageType mtype;
     private String header;
     private String content;
     private Date createdDate;
@@ -77,5 +78,13 @@ public class InfoMessage {
 
     public void setInfoMessageDetails(Set<InfoMessageDetail> infoMessageDetails) {
         this.infoMessageDetails = infoMessageDetails;
+    }
+
+    public InfoMessageType getMtype() {
+        return mtype;
+    }
+
+    public void setMtype(InfoMessageType mtype) {
+        this.mtype = mtype;
     }
 }

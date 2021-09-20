@@ -42,7 +42,7 @@ public class CryptoSign {
         return pair;
     }
 
-    private static byte[] sign(byte[] data, PrivateKey priv) throws Exception {
+    public static byte[] sign(byte[] data, PrivateKey priv) throws Exception {
         Signature dsa = Signature.getInstance(ALGORITHM, BC_PROV);
         dsa.initSign(priv);
         dsa.update(data);

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
+
 import org.w3c.dom.Node;
 
 import java.util.Date;
@@ -12,13 +14,13 @@ public class HardwareSettingsRequestRAMItem extends HardwareSettingsRequestItem 
 
     private String value;
 
-    public HardwareSettingsRequestRAMItem(String value, Date lastUpdate, String type, String errorMessage) {
+    public HardwareSettingsRequestRAMItem(String value, Date lastUpdate, HardwareSettingsRequest.ModuleType type, String errorMessage) {
         super(lastUpdate, type, errorMessage);
         this.value = value;
     }
 
     public static HardwareSettingsRequestRAMItem build(Node itemNode) {
-        String type = "RAM";
+        HardwareSettingsRequest.ModuleType type = HardwareSettingsRequest.ModuleType.RAM;
 
         StringBuilder errorMessage = new StringBuilder();
 

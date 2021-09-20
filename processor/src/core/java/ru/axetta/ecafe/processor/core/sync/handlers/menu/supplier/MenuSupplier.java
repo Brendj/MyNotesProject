@@ -4,16 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
+import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
-
-import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Node;
 
 import java.util.*;
 
@@ -42,6 +40,7 @@ public class MenuSupplier implements SectionRequest {
     private Long idOfOrg;
 
     private Set<WtOrgGroup> orgGroups = new HashSet<>();
+    private Set<WtOrgGroup> offlineOrgGroups = new HashSet<>();
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
     private Set<WtTypeOfProductionItem> typeProductions = new HashSet<>();
     private Set<WtAgeGroupItem> ageGroupItems = new HashSet<>();
@@ -51,7 +50,9 @@ public class MenuSupplier implements SectionRequest {
     private Set<WtDish> dishes = new HashSet<>();
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
     private Set<WtMenu> menus = new HashSet<>();
+    private Set<WtMenu> offlineMenus = new HashSet<>();
     private Set<WtComplex> complexes = new HashSet<>();
+    private Set<WtComplex> offlineComplexes = new HashSet<>();
     private Set<WtComplexExcludeDays> excludeDays = new HashSet<>();
 
     private Integer resCode;
@@ -97,9 +98,11 @@ public class MenuSupplier implements SectionRequest {
             this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
         }
 
-        Org org = DAOService.getInstance().getOrg(idOfOrg);
-        Set<Org> friendlyOrgs = DAOReadonlyService.getInstance().findFriendlyOrgs(idOfOrg);
-        Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(idOfOrg);
+        DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+
+        Org org = daoReadonlyService.findOrg(idOfOrg);
+        Set<Org> friendlyOrgs = daoReadonlyService.findFriendlyOrgs(idOfOrg);
+        Contragent contragent = daoReadonlyService.findDefaultSupplier(idOfOrg);
 
         Iterator<Map.Entry<String, Long>> iter = versions.entrySet().iterator();
 
@@ -108,80 +111,78 @@ public class MenuSupplier implements SectionRequest {
 
             switch (entry.getKey()) {
                 case "OrgGroupsRequest": {
-                    orgGroups = DAOReadonlyService.getInstance()
-                            .getOrgGroupsSetFromVersion(entry.getValue(), contragent, org);
+                    orgGroups = daoReadonlyService.getOrgGroupsSetFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = DAOReadonlyService.getInstance()
-                                .findDefaultSupplier(item.getIdOfOrg());
-                        Set<WtOrgGroup> friendlyItems = DAOReadonlyService.getInstance()
+                        Contragent itemContragent = daoReadonlyService.findDefaultSupplier(item.getIdOfOrg());
+                        Set<WtOrgGroup> friendlyItems = daoReadonlyService
                                 .getOrgGroupsSetFromVersion(entry.getValue(), itemContragent, item);
                         orgGroups.addAll(friendlyItems);
                     }
+                    offlineOrgGroups = DAOReadonlyService.getInstance()
+                            .getOfflineOrgGroupsSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "CategoryItemsRequest": {
-                    categoryItems = DAOReadonlyService.getInstance().getCategoryItemsSetFromVersion(entry.getValue());
+                    categoryItems = daoReadonlyService.getCategoryItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "TypeProductionsRequest": {
-                    typeProductions = DAOReadonlyService.getInstance()
+                    typeProductions = daoReadonlyService
                             .getTypeProductionsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "AgeGroupItemsRequest": {
-                    ageGroupItems = DAOReadonlyService.getInstance().getAgeGroupItemsSetFromVersion(entry.getValue());
+                    ageGroupItems = daoReadonlyService.getAgeGroupItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "DietTypesRequest": {
-                    dietTypes = DAOReadonlyService.getInstance().getDietTypesSetFromVersion(entry.getValue());
+                    dietTypes = daoReadonlyService.getDietTypesSetFromVersion(entry.getValue());
                     break;
                 }
                 case "ComplexGroupItemsRequest": {
-                    complexGroupItems = DAOReadonlyService.getInstance()
-                            .getComplexGroupItemsSetFromVersion(entry.getValue());
+                    complexGroupItems = daoReadonlyService.getComplexGroupItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "GroupItemsRequest": {
-                    groupItems = DAOReadonlyService.getInstance().getGroupItemsSetFromVersion(entry.getValue());
+                    groupItems = daoReadonlyService.getGroupItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "DishesRequest": {
-                    dishes = DAOReadonlyService.getInstance().getDishesListFromVersion(entry.getValue(), contragent);
+                    Set<Long> contragents = new HashSet<>();
+                    contragents.add(contragent.getIdOfContragent());
+                    dishes = daoReadonlyService.getDishesListFromVersion(entry.getValue(), contragent);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = DAOReadonlyService.getInstance()
-                                .findDefaultSupplier(item.getIdOfOrg());
-                        Set<WtDish> friendlyItems = DAOReadonlyService.getInstance()
+                        Contragent itemContragent = daoReadonlyService.findDefaultSupplier(item.getIdOfOrg());
+                        if (contragents.contains(itemContragent.getIdOfContragent())) continue;
+
+                        Set<WtDish> friendlyItems = daoReadonlyService
                                 .getDishesListFromVersion(entry.getValue(), itemContragent);
                         dishes.addAll(friendlyItems);
+                        contragents.add(itemContragent.getIdOfContragent());
                     }
                     break;
                 }
                 case "MenuGroupsRequest": {
-                    //menuGroups = DAOReadonlyService.getInstance()
-                    //        .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
-                    menuGroups = DAOReadonlyService.getInstance()
-                            .getMenuGroupsSetFromVersion(entry.getValue(), contragent);
+                    menuGroups = daoReadonlyService.getMenuGroupsSetFromVersion(entry.getValue(), contragent);
                     break;
                 }
                 case "MenusRequest": {
-                    menus = DAOReadonlyService.getInstance().getMenusSetFromVersion(entry.getValue(), contragent, org);
+                    menus = daoReadonlyService.getMenusSetFromVersion(entry.getValue(), contragent, org);
+                    offlineMenus = daoReadonlyService.getOfflineMenusSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "ComplexesRequest": {
-                    complexes = DAOReadonlyService.getInstance()
-                            .getComplexesSetFromVersion(entry.getValue(), contragent, org);
+                    complexes = daoReadonlyService.getComplexesSetFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = DAOReadonlyService.getInstance()
-                                .findDefaultSupplier(item.getIdOfOrg());
-                        Set<WtComplex> friendlyItems = DAOReadonlyService.getInstance()
-                                .getComplexesSetFromVersion(entry.getValue(), itemContragent, item);
+                        Contragent itemContragent = daoReadonlyService.findDefaultSupplier(item.getIdOfOrg());
+                        Set<WtComplex> friendlyItems = daoReadonlyService.getComplexesSetFromVersion(entry.getValue(), itemContragent, item);
                         complexes.addAll(friendlyItems);
                     }
+                    offlineComplexes = daoReadonlyService.getOfflineComplexesSetFromVersion(entry.getValue(), org);
                     break;
                 }
                 case "ExcludeDaysRequest": {
-                    excludeDays = DAOReadonlyService.getInstance().getExcludeDaysSetFromVersion(entry.getValue(),
-                            contragent, org);
+                    excludeDays = daoReadonlyService.getExcludeDaysSetFromVersion(entry.getValue(), contragent, org);
                     break;
                 }
             }
@@ -321,4 +322,27 @@ public class MenuSupplier implements SectionRequest {
         this.resCode = resCode;
     }
 
+    public Set<WtComplex> getOfflineComplexes() {
+        return offlineComplexes;
+    }
+
+    public void setOfflineComplexes(Set<WtComplex> offlineComplexes) {
+        this.offlineComplexes = offlineComplexes;
+    }
+
+    public Set<WtMenu> getOfflineMenus() {
+        return offlineMenus;
+    }
+
+    public void setOfflineMenus(Set<WtMenu> offlineMenus) {
+        this.offlineMenus = offlineMenus;
+    }
+
+    public Set<WtOrgGroup> getOfflineOrgGroups() {
+        return offlineOrgGroups;
+    }
+
+    public void setOfflineOrgGroups(Set<WtOrgGroup> offlineOrgGroups) {
+        this.offlineOrgGroups = offlineOrgGroups;
+    }
 }

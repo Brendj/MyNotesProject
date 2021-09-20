@@ -223,12 +223,17 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         if (list.size() < 1) {
             return;
         }
-        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("интерактивная сверка (Синхронизация организации с Реестрами)");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+		ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
         clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
         clientGuardianHistory.setReason("Проведена сверка");
         List<RegistryChangeCallback> result = proceedRegistryChangeItemInternal(list,
-                RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, clientGuardianHistory);
+                RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
         doUpdate();
         if (result != null) {
             //  Ошибка
@@ -248,8 +253,8 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
     }
 
     protected List<RegistryChangeCallback> proceedRegistryChangeItemInternal(List<Long> list, int operation,
-            boolean fullNameValidation, ClientGuardianHistory clientGuardianHistory) {
-        return frontControllerProcessor.proceedRegistryChangeItem(list, operation, fullNameValidation, clientGuardianHistory);
+            boolean fullNameValidation, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) {
+        return frontControllerProcessor.proceedRegistryChangeItem(list, operation, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
     }
 
     public void doRefresh() {
@@ -277,7 +282,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
 
     public void loadMeshRest(long idOfOrg) {
         try {
-            RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class).loadPersons(idOfOrg, lastName, firstName, patronymic);
+            RuntimeContext.getAppContext().getBean("meshPersonsSyncService", MeshPersonsSyncService.class).loadPersons(idOfOrg, "null", lastName, firstName, patronymic);
         } catch (Exception e) {
             errorMessages = e.getMessage();
             return;

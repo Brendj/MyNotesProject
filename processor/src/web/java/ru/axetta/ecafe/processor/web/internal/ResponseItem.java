@@ -35,11 +35,13 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_REQUIRED_FIELDS_NOT_FILLED = 430;
     public static final int ERROR_ORGANIZATION_NOT_FOUND = 440;
     public static final int ERROR_CLIENT_ALREADY_EXIST = 450;
+    public static final int ERROR_GUARDIAN = 460;
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";
     public static final String ERROR_WRONG_KEY_MESSAGE_EMIAS = "Доступ запрещен";
     public static final String ERROR_ORG_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_EVENT_NOT_FOUND_MESSAGE = "Некорректный тип события";
+    public static final String ERROR_CANCEL_EVENT_NOT_FOUND_MESSAGE = "Некорректный идентификатор отменяемого события";
     public static final String ERROR_ARGUMENT_NOT_FOUND_MESSAGE = "Не заполнены обязательные поля";
     public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS = "Клиент не найден";
     public static final String ERROR_ID_EVENT_EMIAS = "Некорректные данные";
@@ -62,6 +64,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_CLIENT_ALREADY_EXIST_MESSAGE = "Клиент уже существует";
     public static final String ERROR_INCORRECT_FORMAT = "Некорректный формат";
     public static final String USED_IN_ANOTHER_ORG = "Используется в другой ОО";
+    public static final String ERROR_GUARDIAN_MESSAGE = "Связка опекуна с опекаемым не найдена";
     public int code;
     public String message;
 

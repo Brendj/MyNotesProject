@@ -41,6 +41,7 @@ public class TransactionsReportPage extends OnlineReportPage {
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
+    private Boolean allFriendlyOrgs = false;
 
     public String getPageFilename() {
         return "report/online/transactions_report";
@@ -51,10 +52,18 @@ public class TransactionsReportPage extends OnlineReportPage {
     }
 
     public void doGenerate() {
+        if(this.idOfOrg==null){
+            printError("Не выбрана организация");
+            return;
+        }
         RuntimeContext.getAppContext().getBean(TransactionsReportPage.class).generate();
     }
 
     public void doGenerateXLS(ActionEvent actionEvent) {
+        if(this.idOfOrg==null){
+            printError("Не выбрана организация");
+            return;
+        }
         RuntimeContext.getAppContext().getBean(TransactionsReportPage.class).generateXLS();
     }
 
@@ -65,6 +74,7 @@ public class TransactionsReportPage extends OnlineReportPage {
             session = (Session) entityManager.getDelegate();
             generateReport(session, null);
         } catch (Exception e) {
+            printError(e.getMessage());
             logger.error("Failed to load clients data", e);
         } finally {
             //HibernateUtils.close(session, logger);
@@ -88,9 +98,9 @@ public class TransactionsReportPage extends OnlineReportPage {
         //this.transactionsReport = new TransactionsReport();
         TransactionsReport.Builder reportBuilder = null;
         if(templateFile != null) {
-            reportBuilder = new TransactionsReport.Builder(templateFile);
+            reportBuilder = new TransactionsReport.Builder(templateFile, idOfOrg, allFriendlyOrgs);
         } else {
-            reportBuilder = new TransactionsReport.Builder();
+            reportBuilder = new TransactionsReport.Builder(idOfOrg, allFriendlyOrgs);
         }
         this.report= reportBuilder.build(session, startDate, endDate, new GregorianCalendar());
     }
@@ -135,4 +145,11 @@ public class TransactionsReportPage extends OnlineReportPage {
         }
     }
 
+    public Boolean getAllFriendlyOrgs() {
+        return allFriendlyOrgs;
+    }
+
+    public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
+        this.allFriendlyOrgs = allFriendlyOrgs;
+    }
 }

@@ -81,7 +81,7 @@ public class GoodRequestsChangeAsyncNotificationService {
 
     @Async
     public void notifyOrg(final Long idOfOrg, final Date beginGenerateTime, final Date endGenerateTime,
-            final Date lastCreateOrUpdateDate, List<String> guids, boolean isROSection) {
+            final Date lastCreateOrUpdateDate, List<String> guids, boolean isWtMenu) {
         if (!enableNotify) {
             return;
         }
@@ -254,7 +254,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                             persistenceSession = runtimeContext.createPersistenceSession();
                             persistenceTransaction = persistenceSession.beginTransaction();
                             reportJob = builder
-                                    .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar, isROSection);
+                                    .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar,
+                                            isWtMenu, true);
                             //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                             persistenceTransaction.commit();
                             persistenceTransaction = null;
@@ -622,7 +623,11 @@ public class GoodRequestsChangeAsyncNotificationService {
         Map<Long, OrgItem> items = new HashMap<Long, OrgItem>();
         String str_query = "select o.idOfOrg, o.shortName, o.officialName, o.defaultSupplier.id, o.address, sm.idOfOrg from Org o join o.sourceMenuOrgs sm";
         if (onlyWithPreorders) str_query += " where o.preordersEnabled = true";
-        str_query += params.getOrgJPACondition("o");
+        if (!onlyWithPreorders && !params.getOrgJPACondition("o").isEmpty()) {
+            str_query += " where" + params.getOrgJPACondition("o").substring(4);
+        } else {
+            str_query += params.getOrgJPACondition("o");
+        }
         str_query += " order by o.idOfOrg";
         Query query = entityManager.createQuery(str_query);
         List res = query.getResultList();
@@ -647,6 +652,26 @@ public class GoodRequestsChangeAsyncNotificationService {
         return items;
     }
 
+    @Transactional(readOnly = true)
+    public Map<Long, Set<Long>> findOrgSetForContragent(PreorderRequestsReportServiceParam params) {
+        Map<Long, Set<Long>> contragentMap = new HashMap<>();
+        String strQuery = "select o.idOfOrg, o.defaultSupplier.id from Org o where o.useWebArm = true "
+                + params.getWtMenuJPACondition() + " order by o.idOfOrg";
+        Query query = entityManager.createQuery(strQuery);
+        List data = query.getResultList();
+        for (Object entry : data) {
+            Object[] row = (Object[]) entry;
+            Long idOfOrg = (null != row[0]) ? Long.valueOf(row[0].toString()) : null;
+            Long idOfContragent = (null != row[1]) ? Long.valueOf(row[1].toString()) : null;
+            if (idOfOrg != null && idOfContragent != null) {
+                if (!contragentMap.containsKey(idOfContragent)) {
+                    contragentMap.put(idOfContragent, new HashSet<Long>());
+                }
+                contragentMap.get(idOfContragent).add(idOfOrg);
+            }
+        }
+        return contragentMap;
+    }
 
     public List<Date> getProductionCalendarDates(Date date) {
         return entityManager.createQuery("select pc.day from ProductionCalendar pc where pc.day between :date1 and :date2")

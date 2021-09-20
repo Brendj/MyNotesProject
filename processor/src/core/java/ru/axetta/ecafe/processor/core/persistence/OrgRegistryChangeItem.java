@@ -57,6 +57,8 @@ public class OrgRegistryChangeItem {
     protected String founderFrom;
     protected String subordination;
     protected String subordinationFrom;
+    protected Long globalId;
+    protected Long globalIdFrom;
 
     private OrgRegistryChange orgRegistryChange;
 
@@ -91,7 +93,8 @@ public class OrgRegistryChangeItem {
             String director, String directorFrom, Long ekisId, Long ekisIdFrom,
             String egissoId, String egissoIdFrom, String shortAddress, String shortAddressFrom,
             String municipalDistrict, String municipalDistrictFrom,
-            String founder, String founderFrom, String subordination, String subordinationFrom) {
+            String founder, String founderFrom, String subordination, String subordinationFrom,
+            Long globalId, Long globalIdFrom) {
         this.idOfOrg = idOfOrg;
         this.state = state;
 
@@ -142,6 +145,8 @@ public class OrgRegistryChangeItem {
         this.founderFrom = founderFrom;
         this.subordination = subordination;
         this.subordinationFrom = subordinationFrom;
+        this.setGlobalId(globalId);
+        this.setGlobalIdFrom(globalIdFrom);
     }
 
     public Long getAdditionalId() {
@@ -502,5 +507,21 @@ public class OrgRegistryChangeItem {
 
     public void setSubordinationFrom(String subordinationFrom) {
         this.subordinationFrom = subordinationFrom;
+    }
+
+    public Long getGlobalId() {
+        return globalId;
+    }
+
+    public void setGlobalId(Long globalId) {
+        this.globalId = globalId;
+    }
+
+    public Long getGlobalIdFrom() {
+        return globalIdFrom;
+    }
+
+    public void setGlobalIdFrom(Long globalIdFrom) {
+        this.globalIdFrom = globalIdFrom;
     }
 }

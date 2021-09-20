@@ -4,18 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.client.request;
 
-import ru.axetta.ecafe.processor.core.persistence.CardTemp;
+import org.hibernate.Session;
 import ru.axetta.ecafe.processor.core.persistence.CardTempOperation;
-import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleItem;
-import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 
-import org.hibernate.Session;
-
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -36,7 +30,7 @@ public class TempCardRequestProcessor extends AbstractProcessor<TempCardOperatio
 
     @Override
     public TempCardOperationData process() throws Exception {
-        List<TempCardOperationElement> tempCardOperationElements = new ArrayList<TempCardOperationElement>();
+        List<TempCardOperationElement> tempCardOperationElements = new LinkedList<>();
         List<CardTempOperation> cardTempList = DAOUtils.getRegistrationTempCardOperationByOrg(session, idOfOrg);
         for (CardTempOperation operation: cardTempList){
             tempCardOperationElements.add(new TempCardOperationElement(operation));

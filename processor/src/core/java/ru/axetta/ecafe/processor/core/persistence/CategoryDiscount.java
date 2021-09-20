@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +35,7 @@ public class CategoryDiscount {
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
     private Set<CategoryDiscountDSZN> categoriesDiscountDSZN = new HashSet<CategoryDiscountDSZN>();
+    private Set<WtDiscountRule> wtDiscountRules = new HashSet<>();
 
     public final static String SCHOOL_KINDERGARTEN_STRING = "ОУ + ДОУ";
     public final static Integer SCHOOL_KINDERGARTEN_ID = -1;
@@ -250,5 +253,13 @@ public class CategoryDiscount {
 
     public void setDeleteDate(Date deleteDate) {
         this.deleteDate = deleteDate;
+    }
+
+    public Set<WtDiscountRule> getWtDiscountRules() {
+        return wtDiscountRules;
+    }
+
+    public void setWtDiscountRules(Set<WtDiscountRule> wtDiscountRules) {
+        this.wtDiscountRules = wtDiscountRules;
     }
 }

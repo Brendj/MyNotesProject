@@ -1,6 +1,8 @@
 package ru.axetta.ecafe.processor.core.sync;
 
+import ru.axetta.ecafe.processor.core.logic.GoodDateForOrders;
 import org.hibernate.Session;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +11,7 @@ import org.hibernate.Session;
  * Time: 19:22
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractProcessor<RES extends AbstractToElement> {
+public abstract class AbstractProcessor<RES extends AbstractToElement> extends GoodDateForOrders{
 
     protected final Session session;
 
@@ -18,5 +20,4 @@ public abstract class AbstractProcessor<RES extends AbstractToElement> {
     }
 
     public abstract <RES> RES  process() throws Exception;
-
 }

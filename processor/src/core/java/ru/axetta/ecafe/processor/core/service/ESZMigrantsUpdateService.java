@@ -38,11 +38,13 @@ public class ESZMigrantsUpdateService {
         if (!isOn()) {
             return;
         }
-
-        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("Обработка мигрантов (перевод в выбывшие) по расписанию");
+        clientsMobileHistory.setShowing("ЕСЗ");
+		ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Срабатывание по расписанию");
         clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
-        updateMigrants(clientGuardianHistory);
+        updateMigrants(clientsMobileHistory, clientGuardianHistory);
     }
 
     public static boolean isOn() {
@@ -57,7 +59,7 @@ public class ESZMigrantsUpdateService {
         return true;
     }
 
-    public void updateMigrants(ClientGuardianHistory clientGuardianHistory) throws Exception {
+    public void updateMigrants(ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Long idOfESZOrg = PropertyUtils.getIdOfESZOrg();
 
         Date currentDate = new Date();
@@ -107,7 +109,7 @@ public class ESZMigrantsUpdateService {
                     ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
                     fieldConfig.setValue(ClientManager.FieldId.GROUP,
                             ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                    ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
+                    ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session, clientsMobileHistory);
                     addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING.getValue(), clientGuardianHistory);
                 }
             }

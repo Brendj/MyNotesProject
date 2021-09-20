@@ -52,6 +52,7 @@ public class Card {
     private Visitor visitor;
     private Org org;
     private Long cardNo;
+    private Long longCardNo;
     private Integer cardType;
     private Date createTime;
     private Date updateTime;
@@ -115,6 +116,14 @@ public class Card {
         return state.equals(CardState.ISSUED.getValue()) || state.equals(CardState.TEMPISSUED.getValue());
     }
 
+    public Long getLongCardNo() {
+        return longCardNo;
+    }
+
+    public void setLongCardNo(Long longCardNo) {
+        this.longCardNo = longCardNo;
+    }
+
     public static boolean isSocial(int type) {
         return (type == 7 || type == 8);
     }
@@ -171,7 +180,6 @@ public class Card {
     }
 
     private void setCardNo(Long cardNo) {
-        // For Hibernate only
         this.cardNo = cardNo;
     }
 
@@ -362,7 +370,7 @@ public class Card {
         this.meshCardClientRef = meshCardClientRef;
     }
 
-    public boolean refNotExistsOrNotSending() {
-        return  getMeshCardClientRef() == null || !getMeshCardClientRef().getSend();
+    public boolean refNotExists() {
+        return  getMeshCardClientRef() == null;
     }
 }

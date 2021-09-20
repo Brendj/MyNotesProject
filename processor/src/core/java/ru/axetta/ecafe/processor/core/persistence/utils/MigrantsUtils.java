@@ -158,7 +158,8 @@ public class MigrantsUtils {
                 + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1 order by v.resolutionDateTime desc");*/
         Query query = session.createQuery("select distinct m.clientMigrate from Migrant m join m.visitReqResolutionHists v "
                 + "where m.orgVisit.idOfOrg = :idOfOrg and "
-                + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1");
+                + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1 and "
+                + "v.resolutionDateTime = (select max(v2.resolutionDateTime) from VisitReqResolutionHist v2 where v2.migrant = m)");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("date", new Date());
         List<Client> list = query.list();
@@ -250,7 +251,7 @@ public class MigrantsUtils {
     public static long nextIdOfProcessorMigrantResolutions(Session session, Long idOfOrg){
         long id = -1L;
         Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idofrecord < 0 and " +
-                "v.idoforgresol=:idoforgresol order by v.idofrecord asc limit 1 for update");
+                "v.idoforgresol=:idoforgresol order by v.idofrecord asc limit 1");
         query.setParameter("idoforgresol", idOfOrg);
         Object o = query.uniqueResult();
         if(o!=null){
@@ -262,7 +263,7 @@ public class MigrantsUtils {
     public static long nextIdOfProcessorMigrantRequest(Session session, Long idOfOrg){
         long id = -1L;
         Query query = session.createSQLQuery("select m.idofrequest from cf_migrants as m where m.idofrequest < 0 and " +
-                "m.idoforgregistry=:idoforgregistry order by m.idofrequest asc limit 1 for update");
+                "m.idoforgregistry=:idoforgregistry order by m.idofrequest asc limit 1");
         query.setParameter("idoforgregistry", idOfOrg);
         Object o = query.uniqueResult();
         if(o!=null){

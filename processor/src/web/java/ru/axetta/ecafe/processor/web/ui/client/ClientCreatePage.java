@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -591,6 +592,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
         client.setAddress(this.address);
         client.setPhone(this.phone);
+        persistenceSession.save(client);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("Регистрация клиента через Клиенты/Регистрация");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+        client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile(this.mobile);
         client.setEmail(this.email);
         client.setFax(this.fax);
@@ -640,7 +648,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         client.setSpecialMenu(this.specialMenu);
 
-        persistenceSession.save(client);
+        persistenceSession.update(client);
         if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
 
         ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);

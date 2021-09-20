@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -46,7 +47,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
         if(!workWithKafka) {
             innerServices.fillOrgGuids(query, orgGuids);
         } else {
-            query.setParameterList("guids", orgGuids.getOrgEkisIdsLong());
+            query.setParameterList("guids", orgGuids.getOrgNSIIdsLong());
         }
     }
 
@@ -68,17 +69,19 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              to_char(p.birthdate, 'DD.MM.YYYY') AS birthdate,\n"
                     + "              g.title AS gender,\n"
                     + "              prll.title AS parallel,\n"
-                    + "              p.classname AS group,\n"
+                    + "              case when p.classname = :classNameOutOrg then p.classname when cl.id is not null then cl.name\n"
+                    + "                  else p.classname end AS group,\n"
                     + "              p.deletestate AS deleted,\n"
                     + "              el.title AS ageTypeGroup,\n"
                     + "              o.organizationidfromnsi,\n"
                     + "              p.personguid\n"
                     + "       FROM cf_mh_persons AS p\n"
                     + "                   JOIN cf_orgs AS o ON p.organizationid = o.organizationIdFromNSI\n"
-                    + "                   LEFT JOIN cf_kf_ct_educationlevel AS el ON p.educationstageid = el.id\n"
+                    + "                   LEFT JOIN cf_mh_classes cl ON p.idofclass = cl.id\n"
+                    + "                   LEFT JOIN cf_kf_ct_educationlevel AS el ON cl.educationstageid = el.id\n"
                     + "                   LEFT JOIN cf_kf_ct_gender AS g ON p.genderid = g.id\n"
-                    + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON p.parallelid = prll.id\n"
-                    + "  WHERE p.invaliddata IS FALSE and o.ekisId IN :guids";
+                    + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON cl.parallelid = prll.id\n"
+                    + "  WHERE p.invaliddata IS FALSE and o.organizationidfromnsi IN :guids";
         }
     }
 
@@ -118,6 +121,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
             Query query = session.createSQLQuery(str_query);
             fillOrgGuids(query, orgGuids);
 
+            query.setParameter("classNameOutOrg", ClientGroup.Predefined.CLIENT_OUT_ORG.getNameOfGroup());
             if (StringUtils.isNotBlank(familyName))
                 query.setParameter("surname", familyName);
             if (StringUtils.isNotBlank(firstName))

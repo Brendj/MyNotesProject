@@ -4,12 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -17,6 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import javax.persistence.PersistenceContext;
 import java.text.SimpleDateFormat;
@@ -46,6 +46,7 @@ public class ImportRegisterOrgsService {
     public static final int MOVE_OPERATION = 4;
 
     public static final String VALUE_GUID = "Guid";
+    public static final String VALUE_NSI_ID = "Ид НСИ-3";
     public static final String VALUE_EKIS_ID = "ЕКИС Id";
     public static final String VALUE_EGISSO_ID = "ЕГИССО Id";
     public static final String VALUE_UNIQUE_ADDRESS_ID = "№ здания";
@@ -121,7 +122,7 @@ public class ImportRegisterOrgsService {
                 Org org = null;
                 try {
                     if(orgRegistryChange.getIdOfOrg() != null) {
-                        org = DAOService.getInstance().getOrg(orgRegistryChange.getIdOfOrg());
+                        org = DAOReadonlyService.getInstance().findOrg(orgRegistryChange.getIdOfOrg());
                     }
                     if (org == null && orgRegistryChange.getAdditionalId() != null && orgRegistryChange.getAdditionalId() != -1){
                         org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getUniqueAddressId());
@@ -248,6 +249,7 @@ public class ImportRegisterOrgsService {
         org.setGuid(orgRegistryChange.getGuid());
         org.setEkisId(orgRegistryChange.getEkisId());
         org.setEgissoId(orgRegistryChange.getEgissoId());
+        org.setOrgIdFromNsi(orgRegistryChange.getGlobalId());
         org.setPhone("");
         org.setSmsSender("");
         org.setTag("");
@@ -290,6 +292,8 @@ public class ImportRegisterOrgsService {
                         if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
                             org.setGuid(orgRegistryChange.getGuid());
                     }
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_NSI_ID)))
+                        org.setOrgIdFromNsi(orgRegistryChange.getGlobalId());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EKIS_ID)))
                         org.setEkisId(orgRegistryChange.getEkisId());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EGISSO_ID)))
@@ -398,7 +402,8 @@ public class ImportRegisterOrgsService {
                         safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom) &&
                         safeCompare(orgInfo.director, orgInfo.directorFrom) && safeCompare(orgInfo.egissoId, orgInfo.egissoIdFrom) &&
                         safeCompare(orgInfo.shortAddress, orgInfo.shortAddressFrom) && safeCompare(orgInfo.municipalDistrict, orgInfo.municipalDistrictFrom) &&
-                        safeCompare(orgInfo.getFounder(), orgInfo.founderFrom) && safeCompare(orgInfo.getSubordination(), orgInfo.getSubordinationFrom())) {
+                        safeCompare(orgInfo.getFounder(), orgInfo.founderFrom) && safeCompare(orgInfo.getSubordination(), orgInfo.getSubordinationFrom()) &&
+                        safeCompare(orgInfo.ekisId, orgInfo.ekisIdFrom)) {
                     //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
                 } else {
                     if(orgRegistryChange.getOrgs() == null){
@@ -464,7 +469,8 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
                         solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom()),
                         solveString(oi.getFounder()), solveString(oi.getFounderFrom()),
-                        solveString(oi.getSubordination()), solveString(oi.getSubordinationFrom())
+                        solveString(oi.getSubordination()), solveString(oi.getSubordinationFrom()),
+                        oi.getGlobalId(), oi.globalIdFrom
                 );
     }
 
@@ -498,7 +504,8 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
                         solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom()),
                         solveString(oi.getFounder()), solveString(oi.getFounderFrom()),
-                        solveString(oi.getSubordination()), solveString(oi.getSubordinationFrom())
+                        solveString(oi.getSubordination()), solveString(oi.getSubordinationFrom()),
+                        oi.getGlobalId(), oi.getGlobalIdFrom()
                 );
     }
 
@@ -576,6 +583,8 @@ public class ImportRegisterOrgsService {
         private String founderFrom;
         private String subordination;
         private String subordinationFrom;
+        private Long globalId;
+        private Long globalIdFrom;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
         private Boolean mainBuilding;
@@ -979,6 +988,22 @@ public class ImportRegisterOrgsService {
 
         public void setSubordinationFrom(String subordinationFrom) {
             this.subordinationFrom = subordinationFrom;
+        }
+
+        public Long getGlobalId() {
+            return globalId;
+        }
+
+        public void setGlobalId(Long globalId) {
+            this.globalId = globalId;
+        }
+
+        public Long getGlobalIdFrom() {
+            return globalIdFrom;
+        }
+
+        public void setGlobalIdFrom(Long globalIdFrom) {
+            this.globalIdFrom = globalIdFrom;
         }
     }
 }

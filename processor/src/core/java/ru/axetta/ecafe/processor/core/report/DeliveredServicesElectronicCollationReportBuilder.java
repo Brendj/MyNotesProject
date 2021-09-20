@@ -117,16 +117,22 @@ public class DeliveredServicesElectronicCollationReportBuilder extends Delivered
         String sqlTaloon = "SELECT cf_orgs.shortnameinfoservice, "
                 + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 1) ELSE split_part(cft.goodsname, '/', 1) END AS level1, "
                 + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 2) ELSE split_part(cft.goodsname, '/', 2) END AS level2, "
-                + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 3) ELSE split_part(cft.goodsname, '/', 3) END AS level3, "
-                + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 4) ELSE split_part(cft.goodsname, '/', 4) END AS level4, "
+                + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 3) "
+                     + "WHEN split_part(cft.goodsname, '/', 3) = '' THEN cf_wt_agegroup_items.description ELSE split_part(cft.goodsname, '/', 3) END AS level3, "
+                + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 4) "
+                     + "WHEN split_part(cft.goodsname, '/', 4) = '' THEN cf_wt_diet_type.description ELSE split_part(cft.goodsname, '/', 4) END AS level4, "
                 + "sum(cft.soldedqty) AS cnt, "
                 + "cft.price AS price, sum(cft.soldedqty) * cft.price AS sum, cf_orgs.shortaddress, "
                 + "substring(cf_orgs.officialname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                 + "cf_orgs.idoforg, CASE WHEN cft.taloonname ILIKE '%вода%' THEN 1 ELSE 0 END AS orderType, cft.taloondate "
-                + "FROM cf_taloon_approval cft JOIN cf_orgs ON cft.idoforg = cf_orgs.idoforg WHERE cft.deletedstate = FALSE  AND "
+                + "FROM cf_taloon_approval cft JOIN cf_orgs ON cft.idoforg = cf_orgs.idoforg "
+                + "left join cf_wt_complexes on cf_wt_complexes.idofcomplex = cft.complexid "
+                + "left join cf_wt_agegroup_items on cf_wt_agegroup_items.idofagegroupitem = cf_wt_complexes.idofagegroupitem "
+                + "left join cf_wt_diet_type on cf_wt_diet_type.idofdiettype = cf_wt_complexes.idofdiettype "
+                + "WHERE cft.deletedstate = FALSE AND "
                 + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                 + "cft.taloondate BETWEEN :start AND :end"
-                + " GROUP BY cf_orgs.idoforg, cf_orgs.officialname, price, shortaddress, cft.soldedqty, level1, level2, level3, level4, price, shortaddress, cft.taloonname, cft.taloondate";
+                + " GROUP BY cf_orgs.idoforg, cf_orgs.officialname, shortaddress, cft.soldedqty, level1, level2, level3, level4, cft.price, shortaddress, cft.taloonname, cft.taloondate";
         Query queryTaloon = session.createSQLQuery(sqlTaloon);
         queryTaloon.setParameter("start", start.getTime());
         queryTaloon.setParameter("end", end.getTime());

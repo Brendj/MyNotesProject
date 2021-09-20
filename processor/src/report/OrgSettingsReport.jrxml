@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="2915" pageHeight="30000" columnWidth="2875" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="1.210000000000003"/>
-	<property name="ireport.x" value="1824"/>
+	<property name="ireport.x" value="2386"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -67,6 +67,9 @@
 	<field name="officialName" class="java.lang.String"/>
 	<field name="shortNameInfoService" class="java.lang.String"/>
 	<field name="useWebArm" class="java.lang.Boolean"/>
+	<field name="organizationStatus" class="java.lang.String"/>
+	<field name="statusDetailing" class="java.lang.String"/>
+	<field name="governmentContract" class="java.lang.Boolean"/>
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
@@ -190,7 +193,7 @@
 				<textFieldExpression><![CDATA["Организация"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="800" y="25" width="100" height="110" backcolor="#C5D9F1"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="997" y="25" width="74" height="110" backcolor="#C5D9F1"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -217,7 +220,7 @@
 				<textFieldExpression><![CDATA["Общие реквизиты ОУ"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="900" y="25" width="100" height="110" backcolor="#C5D9F1"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1071" y="25" width="62" height="110" backcolor="#C5D9F1"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -230,7 +233,7 @@
 				<text><![CDATA[Доп.ИД здания]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1000" y="25" width="100" height="110" backcolor="#C5D9F1"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1133" y="25" width="80" height="110" backcolor="#C5D9F1"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -243,7 +246,7 @@
 				<text><![CDATA[УНОМ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1100" y="25" width="100" height="110" backcolor="#C5D9F1"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1213" y="25" width="74" height="110" backcolor="#C5D9F1"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -256,7 +259,7 @@
 				<text><![CDATA[УНАД]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1200" y="25" width="100" height="110" backcolor="#C5D9F1"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1287" y="25" width="76" height="110" backcolor="#C5D9F1"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -269,7 +272,7 @@
 				<text><![CDATA[ИНН]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1300" y="25" width="100" height="110" backcolor="#C5D9F1"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1363" y="25" width="77" height="110" backcolor="#C5D9F1"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -282,7 +285,7 @@
 				<text><![CDATA[Тип ОУ при внедрении]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1400" y="25" width="100" height="110" backcolor="#C5D9F1"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1440" y="25" width="60" height="110" backcolor="#C5D9F1"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -517,7 +520,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Дрогое"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Другое"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="2705" y="25" width="87" height="110" backcolor="#D7E4BC"/>
@@ -600,6 +603,45 @@
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Использовать Web-АРМ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="800" y="25" width="84" height="110" backcolor="#C5D9F1"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Детализация статуса]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="884" y="25" width="55" height="110" backcolor="#C5D9F1"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Комментарий к статусу]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="939" y="25" width="58" height="110" backcolor="#C5D9F1"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Наличие ГК]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -697,7 +739,7 @@
 				<textFieldExpression><![CDATA[$F{shortAddress}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="800" y="0" width="100" height="27">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="997" y="0" width="74" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -710,7 +752,7 @@
 				<textFieldExpression><![CDATA[$F{GUID}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="900" y="0" width="100" height="27">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1071" y="0" width="62" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -723,7 +765,7 @@
 				<textFieldExpression><![CDATA[$F{additionalIdBuilding}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1000" y="0" width="100" height="27">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1133" y="0" width="80" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -736,7 +778,7 @@
 				<textFieldExpression><![CDATA[$F{btiUnom}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1100" y="0" width="100" height="27">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1213" y="0" width="74" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -749,7 +791,7 @@
 				<textFieldExpression><![CDATA[$F{btiUnad}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1200" y="0" width="100" height="27">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1287" y="0" width="76" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -762,7 +804,7 @@
 				<textFieldExpression><![CDATA[$F{INN}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1300" y="0" width="100" height="27">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1363" y="0" width="77" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -775,7 +817,7 @@
 				<textFieldExpression><![CDATA[$F{typeInternal}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1400" y="0" width="100" height="27">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="1440" y="0" width="60" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -1035,6 +1077,45 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{useWebArm}? "\u2713":"\u2717"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="800" y="0" width="84" height="27">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{organizationStatus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="884" y="0" width="55" height="27">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{statusDetailing}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" positionType="Float" stretchType="RelativeToBandHeight" x="939" y="0" width="58" height="27">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{governmentContract}? "\u2713":"\u2717"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

@@ -4,10 +4,21 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
@@ -326,28 +337,27 @@ public class DAOService {
         return entityManager.find(ConfigurationProvider.class, idOfConfigurationProvider);
     }
 
+    public long getDistributedObjectVersion(String name) {
+        return getDistributedObjectVersionFromSequence(name);
+    }
+
+    public String getDistributedObjectSequenceName(String name) {
+        return "DO_VERSION_" + name.toUpperCase() + "_SEQ";
+    }
+
+    private long getDistributedObjectVersionFromSequence(String name) {
+        long version = 0L;
+        Query query = entityManager.createNativeQuery(String.format("select nextval('%s')", getDistributedObjectSequenceName(name)));
+        Object o = query.getSingleResult();
+        if (o != null) {
+            version = HibernateUtils.getDbLong(o);
+        }
+        return version;
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long updateVersionByDistributedObjects(String name) {
-        TypedQuery<DOVersion> query = entityManager
-                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
-                        DOVersion.class);
-        query.setParameter("distributedObjectClassName", name.toUpperCase());
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName(name);
-        entityManager.persist(doVersion);
-        entityManager.flush();
-        return version;
+        return getDistributedObjectVersion(name);
     }
 
     public void removeTechnologicalMap(Long idOfTechnologicalMaps) {
@@ -476,7 +486,8 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
-    public boolean setClientMobilePhone(Long contractId, String mobile, Date dateConfirm) {
+    public boolean setClientMobilePhone(Long contractId, String mobile, Date dateConfirm,
+            ClientsMobileHistory clientsMobileHistory) {
         Query q = entityManager.createQuery(
                 "update Client set mobile=:mobile, lastConfirmMobile = :lastConfirmMobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
@@ -484,6 +495,13 @@ public class DAOService {
         q.setParameter("lastConfirmMobile", dateConfirm);
         logger.info("class : DAOService, method : setClientMobilePhone line : 382, contractId : " + contractId
                 + " mobile : " + mobile);
+        //Сохраняем историю изменения клиента
+        Client client = DAOUtils.findClientByContractId(entityManager, contractId);
+        if (client != null) {
+            client.initClientMobileHistory(clientsMobileHistory);
+            client.setMobile(mobile);
+        }
+        //
         return q.executeUpdate() != 0;
     }
 
@@ -518,10 +536,11 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
-    public boolean setClientExpenditureLimit(Long contractId, long limit) {
+    public boolean setClientExpenditureLimit(Long contractId, long limit, long version) {
         Query q = entityManager
-                .createQuery("update Client set expenditureLimit=:expenditureLimit where contractId=:contractId");
+                .createQuery("update Client set expenditureLimit=:expenditureLimit, clientRegistryVersion = :version where contractId=:contractId");
         q.setParameter("expenditureLimit", limit);
+        q.setParameter("version", version);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
@@ -535,13 +554,20 @@ public class DAOService {
     }
 
     public Org getOrg(Long idOfOrg) {
-        Query q = entityManager.createQuery("from Org where idOfOrg = :idOfOrg");
+        /*Query q = entityManager.createQuery("from Org where idOfOrg = :idOfOrg");
         q.setParameter("idOfOrg", idOfOrg);
         List l = q.getResultList();
         if (l.size() == 0) {
             return null;
         }
-        return (Org) l.get(0);
+        return (Org) l.get(0);*/
+        Session session = entityManager.unwrap(Session.class);
+        return getOrg(session, idOfOrg);
+    }
+
+    public Org getOrg(Session session, Long idOfOrg) {
+        Org org = (Org)session.get(Org.class, idOfOrg);
+        return org;
     }
 
     public Client getClientByContractId(long contractId) {
@@ -1000,9 +1026,9 @@ public class DAOService {
         return findOrgByRegistryDataByMainField(uniqueAddressId, "guid", guid, inn, unom, unad, skipThirdPart);
     }
 
-    public List<Org> findOrgsByEkisId(Long ekisId) {
-        Query q = entityManager.createQuery("select org from Org org where org.ekisId = :ekisId");
-        q.setParameter("ekisId", ekisId);
+    public List<Org> findOrgsByNSIId(Long nsiId) {
+        Query q = entityManager.createQuery("select org from Org org where org.orgIdFromNsi = :nsiId");
+        q.setParameter("nsiId", nsiId);
         return q.getResultList();
     }
 
@@ -1671,16 +1697,13 @@ public class DAOService {
         return clients;
     }
 
-    public void applyFullSyncOperationByOrgList(List<Long> idOfOrgList) throws Exception {
-        Query query = entityManager.createQuery("update Org set fullSyncParam=1 where idOfOrg in :idOfOrgList");
-        query.setParameter("idOfOrgList", idOfOrgList);
-        query.executeUpdate();
-    }
-
     public void applyUsePlanOrdersOperationByOrgList(List<Long> idOfOrgList) throws Exception {
         Query query = entityManager.createQuery("update Org set usePlanOrders=1 where idOfOrg in :idOfOrgList");
         query.setParameter("idOfOrgList", idOfOrgList);
         query.executeUpdate();
+        for (Long idOfOrg : idOfOrgList) {
+            Org.sendInvalidateCache(idOfOrg);
+        }
     }
 
     public void applyHaveNewLPForOrg(Long idOfOrg, boolean value) throws Exception {
@@ -1688,6 +1711,7 @@ public class DAOService {
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("valueB", value);
         query.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public List<ComplexRole> findComplexRoles() {
@@ -2382,6 +2406,11 @@ public class DAOService {
         }
     }
 
+    public void saveSyncRequestInDb(String query_str) {
+        Query query = entityManager.createNativeQuery(query_str);
+        query.executeUpdate();
+    }
+
     public Long getClientGroupByClientId(Long idOfClient) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(Client.class);
@@ -2407,6 +2436,68 @@ public class DAOService {
         criteria.addOrder(org.hibernate.criterion.Order.desc("createTime"));
         return !criteria.list().isEmpty();
         //return DAOUtils.existClientPayment(session, null, idOfPayment);
+    }
+
+    public List getClientBalanceInfosWithMigrations(String where, String where2, Date begDate, Date endDate, String clientWhere, List<Long> idOfOrgList) {
+        //Находим клиентов с историей перемещений между ОО или по группам
+        String str_query = "select c.idofclient, h.idoforg from cf_clientmigrationhistory h join cf_clients c on h.idofclient = c.idofclient "
+                + "join cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                + "where exists (select * from cf_clientmigrationhistory hhh where hhh.idofclient = h.idofclient and hhh.registrationdate between :begDate and :endDate) and "
+                + "h.registrationdate = (select max(registrationdate) from cf_clientmigrationhistory hh where hh.idofclient = h.idofclient and hh.registrationdate < :begDate) "
+                + "and h.idoforg in (" + where + ") " + where2
+                + " union "
+                + "select c.idofclient, h.idoforg from cf_clientgroup_migrationhistory h join cf_clients c on h.idofclient = c.idofclient "
+                + "join cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                + "where exists (select * from cf_clientgroup_migrationhistory hhh where hhh.idofclient = h.idofclient and hhh.registrationdate between :begDate and :endDate) and "
+                + "h.registrationdate = (select max(registrationdate) from cf_clientgroup_migrationhistory hh where hh.idofclient = h.idofclient and hh.registrationdate < :begDate) "
+                + "and h.idoforg in (" + where + ") " + where2;
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("begDate", begDate.getTime());
+        q.setParameter("endDate", endDate.getTime());
+        List list =  q.getResultList();
+        Map<Long, Long> clients = new HashMap();
+        for (Object obj : list) {
+            //Определяем, находился ли клиент в одной из нужных организаций на дату отчета
+            Object[] row = (Object[]) obj;
+            Long idOfClient = HibernateUtils.getDbLong(row[0]);
+            Long idOfOrg = HibernateUtils.getDbLong(row[1]);
+            if (idOfOrgList.contains(idOfOrg)) clients.put(idOfClient, idOfOrg);
+        }
+        str_query = "SELECT :idOfClient, (select o.shortname from cf_orgs o where idoforg = :idOfOrg) as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+                + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
+                + "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
+                + ":idOfOrg as idoforg "
+                + "FROM cf_clients c INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                + where2 + " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idofclient = :idOfClient";
+        List result = new ArrayList();
+        for (Map.Entry<Long, Long> entry : clients.entrySet()) {
+            q = entityManager.createNativeQuery(str_query);
+            q.setParameter("begDate", begDate.getTime());
+            q.setParameter("endDate", endDate.getTime());
+            q.setParameter("idOfClient", entry.getKey());
+            q.setParameter("idOfOrg", entry.getValue());
+            result.addAll(q.getResultList());
+        }
+        return result;
+    }
+
+    public List getClientBalanceInfosWithoutMigrations(String where, String where2, Date begDate, Date endDate, String clientWhere) {
+        String str_query =
+                "SELECT c.idofclient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+                        + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
+                        + "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
+                        + "o.idoforg as idoforg "
+                        + "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                        + where2 + " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where
+                        + ") " + clientWhere
+                        + " and c.idofclient not in (select idofclient from cf_clientmigrationhistory where registrationdate between :begDate and :endDate and (idoforg in("
+                        + where + ") or idofoldorg in (" + where + "))) "
+                        + "and c.idofclient not in (select idofclient from cf_clientgroup_migrationhistory where registrationdate between :begDate and :endDate and idoforg in("
+                        + where + "))";
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("begDate", begDate.getTime());
+        q.setParameter("endDate", endDate.getTime());
+        return q.getResultList();
     }
 
     public List getClientBalanceInfos(String where, String where2, Date begDate, Date endDate, String clientWhere) {
@@ -2447,7 +2538,8 @@ public class DAOService {
     }
 
     public String getDefaultSupplierNameByOrg(Long idOfOrg) {
-        Contragent cc = getOrg(idOfOrg).getDefaultSupplier();
+        Session session = entityManager.unwrap(Session.class);
+        Contragent cc = DAOUtils.findDefaultSupplier(session, idOfOrg);
         if (cc != null) {
             return cc.getContragentName();
         } else {
@@ -2456,7 +2548,11 @@ public class DAOService {
     }
 
     public String getConfigurationProviderNameByOrg(Long idOfOrg) {
-        ConfigurationProvider prov = getOrg(idOfOrg).getConfigurationProvider();
+        Org o = entityManager.find(Org.class, idOfOrg);
+        if(o == null){
+            return null;
+        }
+        ConfigurationProvider prov = o.getConfigurationProvider();
         if (prov != null) {
             return prov.getName();
         }
@@ -2503,6 +2599,7 @@ public class DAOService {
             query.executeUpdate();
             transaction.commit();
             transaction = null;
+            Org.sendInvalidateCache(idOfOrg);
         } catch (Exception e) {
             logger.error("e", e);
         } finally {
@@ -2570,6 +2667,14 @@ public class DAOService {
         return (String) list.get(0);
     }
 
+    public Integer getWtDaysForbid() {
+        try {
+            return new Integer(getOnlineOptionValue(Option.OPTION_WT_DAYS_FORBID));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     @Transactional
     public String getReviseLastDate() {
         try {
@@ -2592,6 +2697,15 @@ public class DAOService {
     public String getDeletedLastedDateMenu() {
         try {
             return getOnlineOptionValue(Option.OPTION_LAST_DELATED_DATE_MENU);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Transactional
+    public String getLastProcessedWtComplex() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_LAST_PROCESSED_WT_COMPLEX);
         } catch (Exception e) {
             return "";
         }
@@ -2637,6 +2751,7 @@ public class DAOService {
         q.setParameter("value", TradeAccountConfigChange.NOT_CHANGED.getCode());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public void saveDirective(Long idOfOrg, String directiveName, Integer directiveValue) {
@@ -2650,6 +2765,7 @@ public class DAOService {
         q.setParameter("lastUpdate", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
+        Org.sendInvalidateCache(idOfOrg);
     }
 
     public Org findOrgById(Long idOfOrg) {
@@ -2783,8 +2899,8 @@ public class DAOService {
                 .setParameter("idOfOption", new Long(Option.OPTION_LAST_ORG_CHANGE_PROCESS)).executeUpdate();
     }
 
-    public void saveLogServiceMessage(String message, LogServiceType type) {
-        LogService logService = new LogService(type, message);
+    public void saveLogServiceMessage(String message, String response, LogServiceType type) {
+        LogService logService = new LogService(type, message, response);
         entityManager.merge(logService);
     }
 
@@ -2802,7 +2918,7 @@ public class DAOService {
 
     public List findEMIASbyClientandBeetwenDates(Client client, Date startDate, Date endDate) {
         Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
-                + "and em.dateLiberate between :begDate and :endDate ");
+                + "and em.dateLiberate between :begDate and :endDate and em.kafka<>true");
         query.setParameter("guid", client.getClientGUID());
         query.setParameter("begDate", startDate);
         query.setParameter("endDate", endDate);
@@ -2848,71 +2964,38 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public List<Contragent> getSupplierList() {
-        TypedQuery<Contragent> q = entityManager
-                .createQuery("from Contragent where classId = 2 order by idOfContragent", Contragent.class);
+    public List<WtDietType> getWtDietTypeList() {
+        TypedQuery<WtDietType> q = entityManager
+                .createQuery("from WtDietType order by idOfDietType", WtDietType.class);
         return q.getResultList();
     }
 
-    public List<WtDiscountRule> getWtDiscountRulesList() {
-        TypedQuery<WtDiscountRule> q = entityManager
-                .createQuery("from WtDiscountRule order by idOfRule", WtDiscountRule.class);
-        return q.getResultList();
-    }
-
-    public List<WtDiscountRule> getWtDiscountRulesList(WtComplexGroupItem selectedComplexType,
-            WtAgeGroupItem selectedAgeGroup) {
-        Query query = entityManager.createQuery("select dr from WtDiscountRule dr inner join dr.complexes c "
-                + "where c.wtComplexGroupItem = :selectedComplexType and c.wtAgeGroupItem = :selectedAgeGroup");
-        query.setParameter("selectedComplexType", selectedComplexType);
-        query.setParameter("selectedAgeGroup", selectedAgeGroup);
+    public Long getWtComplexGroupIdByDescription(String description) {
         try {
-            return query.getResultList();
+            return (Long) entityManager.createQuery("select cg.idOfComplexGroupItem from WtComplexGroupItem cg"
+                    + " where lower(cg.description) like '%" + description + "%'").getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return 0L;
         }
     }
 
-    public List<WtComplexGroupItem> getWtComplexGroupItemById(Long idOfComplexType) {
-        Query query = entityManager.createQuery("select cg from WtComplexGroupItem cg "
-                + "where cg.idOfComplexGroupItem = :idOfComplexType or cg.idOfComplexGroupItem = 3");
-        query.setParameter("idOfComplexType", idOfComplexType);
+    public Long getWtAgeGroupIdByDescription(String description) {
         try {
-            return query.getResultList();
+            return (Long) entityManager.createQuery("select ag.idOfAgeGroupItem from WtAgeGroupItem ag"
+                    + " where lower(ag.description) like '%" + description + "%'").getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return 0L;
         }
     }
 
-    public List<WtAgeGroupItem> getWtAgeGroupItemById(Long idOfAgeGroup) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("select ag from WtAgeGroupItem ag where ag.idOfAgeGroupItem = :idOfAgeGroup");
-        if (idOfAgeGroup == 3) { // 1-4
-            sb.append(" or ag.idOfAgeGroupItem = 6"); // Все
-        }
-        Query query = entityManager.createQuery(sb.toString());
-        query.setParameter("idOfAgeGroup", idOfAgeGroup);
-        try {
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public List<Contragent> getSupplierItemById(Long idOfSupplier) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("select c from Contragent c where c.idOfContragent = :idOfSupplier");
-        Query query = entityManager.createQuery(sb.toString());
-        query.setParameter("idOfSupplier", idOfSupplier);
-        try {
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public List<CategoryDiscount> getCategoryDiscountListByWtRule(WtDiscountRule wtRule) {
+        Query query = entityManager.createQuery("select cd from CategoryDiscount cd "
+                + "inner join fetch cd.wtDiscountRules where cd.deletedState = false "
+                + "and :wtRule in elements(cd.wtDiscountRules)");
+        query.setParameter("wtRule", wtRule);
+        return query.getResultList();
     }
 
     public List<WtComplex> getWtComplexesList() {
@@ -2920,93 +3003,49 @@ public class DAOService {
                 .createQuery("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
                         + "left join fetch wc.wtAgeGroupItem ageItem "
                         + "left join fetch wc.wtDietType dietType "
+                        + "left join fetch wc.contragent contragent "
                         + "where wc.deleteState = 0 order by wc.idOfComplex",
                         WtComplex.class);
         return q.getResultList();
     }
 
-    public List<WtComplex> getWtComplexesListByDiscountRule(WtDiscountRule wtRule) {
-        TypedQuery<WtComplex> q = entityManager
-                .createQuery("select wc from WtComplex wc left join fetch wc.discountRules discountRules "
-                                + "where :wtRule in elements(wc.discountRules)",
-                        WtComplex.class).setParameter("wtRule", wtRule);
-        return q.getResultList();
-    }
-
-    public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem,
-            Contragent contragent, WtDiscountRule rule) {
-        StringBuilder sb = new StringBuilder();
-        List<WtComplex> results = new ArrayList<>();
-
-        sb.append("select wc from WtComplex wc left join fetch wc.wtComplexGroupItem complexItem "
-                + "left join fetch wc.wtAgeGroupItem ageItem "
-                + "left join fetch wc.wtDietType dietType "
-                + "where wc.deleteState = 0");
-        if (wtComplexGroupItem != null) {
-            sb.append(" and wc.wtComplexGroupItem = :wtComplexGroupItem");
+    public List<WtComplex> getWtComplexListByFilter(List<Long> wtComplexGroupIds, List<Long> wtAgeGroupIds, Long wtDietTypeId,
+            List<Long> contragentIds, List<Long> orgIds, WtDiscountRule wtRule) {
+        Query query = entityManager.createNativeQuery("select distinct wc.idofcomplex from cf_wt_complexes wc "
+                + "left join cf_wt_org_group_relations wogr on wc.idoforggroup = wogr.idoforggroup "
+                + "left join cf_wt_complexes_org wco on wco.idofcomplex = wc.idofcomplex "
+                + "left join cf_wt_discountrules_complexes drc on drc.idofcomplex = wc.idofcomplex "
+                + (wtRule == null ? "where wc.deleteState = 0" : "where drc.idofrule = :idOfRule")
+                + (wtComplexGroupIds.size() == 0 ? "" : " and wc.idofcomplexgroupitem in (:wtComplexGroupIds)")
+                + (wtAgeGroupIds.size() == 0 ? "" : " and wc.idofagegroupitem in (:wtAgeGroupIds)")
+                + (wtDietTypeId == 0 ? "" : " and wc.idofdiettype = :wtDietTypeId")
+                + (contragentIds.size() == 0 ? "" : " and wc.idofcontragent in (:contragentIds)")
+                + (orgIds.size() == 0 ? "" : " and (wco.idoforg in (:orgIds) or wogr.idoforg in (:orgIds))"));
+        if (wtComplexGroupIds.size() > 0) {
+            query.setParameter("wtComplexGroupIds", wtComplexGroupIds);
         }
-        if (wtAgeGroupItem != null) {
-            sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
+        if (wtAgeGroupIds.size() > 0) {
+            query.setParameter("wtAgeGroupIds", wtAgeGroupIds);
         }
-        if (contragent != null) {
-            sb.append(" and wc.contragent = :contragent");
+        if (wtDietTypeId > 0) {
+            query.setParameter("wtDietTypeId", wtDietTypeId);
         }
-
-        Query query = entityManager.createQuery(sb.toString());
-        if (wtComplexGroupItem != null) {
-            query.setParameter("wtComplexGroupItem", wtComplexGroupItem);
+        if (contragentIds.size() > 0) {
+            query.setParameter("contragentIds", contragentIds);
         }
-        if (wtAgeGroupItem != null) {
-            query.setParameter("wtAgeGroupItem", wtAgeGroupItem);
+        if (orgIds.size() > 0) {
+            query.setParameter("orgIds", orgIds);
         }
-        if (contragent != null) {
-            query.setParameter("contragent", contragent);
+        if (wtRule != null) {
+            query.setParameter("idOfRule", wtRule.getIdOfRule());
         }
-        try {
-            results = query.getResultList();
-            if (rule != null) {
-                List<WtComplex> complexList = getWtComplexesListByDiscountRule(rule);
-                if (complexList != null) {
-                    results.addAll(complexList);
-                }
-            }
-            return results;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        List list = query.getResultList();
+        List<WtComplex> result = new ArrayList<>();
+        for (Object obj : list) {
+            Long idOfComplex = ((BigInteger) obj).longValue();
+            result.add(getWtComplexById(idOfComplex));
         }
-    }
-
-    public String getSupplierName(WtComplex wtComplex) {
-        Query query = entityManager.createQuery(
-                "select c.contragentName from WtComplex complex left join complex.contragent c "
-                        + "where complex = :complex");
-        query.setParameter("complex", wtComplex);
-        return (String) query.getSingleResult();
-    }
-
-    public Long getIdOfSupplier(WtComplex wtComplex) {
-        Query query = entityManager.createQuery(
-                "select c.idOfContragent from WtComplex complex left join complex.contragent c "
-                        + "where complex = :complex");
-        query.setParameter("complex", wtComplex);
-        return (Long) query.getSingleResult();
-    }
-
-    public Long getIdOfComplexGroupItem(WtComplex wtComplex) {
-        Query query = entityManager.createQuery(
-                "select cg.idOfComplexGroupItem from WtComplex complex left join complex.wtComplexGroupItem cg "
-                        + "where complex = :complex");
-        query.setParameter("complex", wtComplex);
-        return (Long) query.getSingleResult();
-    }
-
-    public Long getIdOfAgeGroup(WtComplex wtComplex) {
-        Query query = entityManager.createQuery(
-                "select ag.idOfAgeGroupItem from WtComplex complex left join complex.wtAgeGroupItem ag "
-                        + "where complex = :complex");
-        query.setParameter("complex", wtComplex);
-        return (Long) query.getSingleResult();
+        return result;
     }
 	
     public void setSendedNotificationforDTISZNDiscount(Long idofclientdtiszndiscountinfo, Boolean sendnotification) {
@@ -3040,8 +3079,12 @@ public class DAOService {
     }
 
     public WtComplex getWtComplexById(Long idOfComplex) {
-        Query query = entityManager.createQuery("select complex from WtComplex complex "
-                + "where complex.idOfComplex = :idOfComplex");
+        Query query = entityManager.createQuery("select wc from WtComplex wc "
+                + "left join fetch wc.wtComplexGroupItem complexItem "
+                + "left join fetch wc.wtAgeGroupItem ageItem "
+                + "left join fetch wc.wtDietType dietType "
+                + "left join fetch wc.contragent contragent "
+                + "where wc.idOfComplex = :idOfComplex");
         query.setParameter("idOfComplex", idOfComplex);
         try {
             return (WtComplex) query.getSingleResult();
@@ -3062,7 +3105,12 @@ public class DAOService {
             return null;
         }
     }
-	
+
+    public List<WtDish> getWtDish() {
+        Query q = entityManager.createQuery("SELECT dish FROM WtDish dish");
+        return q.getResultList();
+    }
+
 	//Список союзов организаций, кужа входит данная организация
     public List<Long> getOrgGroupsbyOrgForWEBARM(Long idOforg) throws Exception {
         Session session = (Session) entityManager.getDelegate();
@@ -3119,11 +3167,81 @@ public class DAOService {
         return DAOUtils.getComplexesByWtDiscountRule(entityManager, discountRule);
     }
 
-    public List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryDiscountsByWtDiscountRule(entityManager, discountRule);
+    public CodeMSP findCodeNSPByCode(Integer code) {
+        if(code == null){
+            return null;
+        }
+        Session session = (Session) entityManager.getDelegate();
+
+        Criteria criteria = session.createCriteria(CodeMSP.class);
+        criteria.add(Restrictions.eq("code", code));
+
+        return (CodeMSP) criteria.uniqueResult();
     }
 
-    public List<CategoryOrg> getCategoryOrgsByWtDiscountRule(WtDiscountRule discountRule) {
-        return DAOUtils.getCategoryOrgsByWtDiscountRule(entityManager, discountRule);
+    public List<CategoryDiscount> getCategoryDiscountListNotDeletedTypeDiscount() {
+        TypedQuery<CategoryDiscount> q = entityManager
+                .createQuery("from CategoryDiscount where deletedState = false"
+                                + " and categoryType = 0 "
+                                + " and idOfCategoryDiscount >= 0"
+                                + " order by categoryName",
+                        CategoryDiscount.class);
+        return q.getResultList();
+    }
+    public List<Client> getClientsBySoid(String ssoid) {
+        return DAOUtils.getClientsBySsoid(entityManager, ssoid);
+    }
+
+    public List<WtGroupItem> getMapTypeFoods() {
+        Query q = entityManager.createQuery("SELECT wtGroup from WtGroupItem wtGroup");
+        return q.getResultList();
+    }
+
+    public List<WtComplexGroupItem> getTypeComplexFood() {
+        Query q = entityManager.createQuery("SELECT wtComplex from WtComplexGroupItem wtComplex");
+        return q.getResultList();
+    }
+
+    public List<WtDietType> getMapDiet() {
+        Query q = entityManager.createQuery("SELECT wtDiet from WtDietType wtDiet");
+        return q.getResultList();
+    }
+
+    public List<WtAgeGroupItem> getAgeGroups() {
+        Query q = entityManager.createQuery("SELECT wtAge FROM WtAgeGroupItem wtAge");
+        return q.getResultList();
+    }
+    public void updateExemptionVisiting() {
+        Query query = entityManager.createQuery(
+                "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate and archive=false");
+        query.setParameter("currentDate", CalendarUtils.startOfDay(new Date()));
+        query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
+        query.executeUpdate();
+    }
+
+    public void saveQRinfo(ClientEnterQR clientEnterQR) {
+        entityManager.persist(clientEnterQR);
+        entityManager.flush();
+    }
+
+    @Transactional
+    public void setCardSignID(CardSign cardSign, int newID) {
+        String str_query = "update cf_card_signs set idofcardsign=:newID where idofcardsign=:oldID";
+        Query q = entityManager.createNativeQuery(str_query);
+        q = entityManager.createNativeQuery(str_query);
+        q.setParameter("newID", newID);
+        q.setParameter("oldID", cardSign.getIdOfCardSign());
+        q.executeUpdate();
+    }
+
+    public MeshClass getMeshClassByUID(String uid){
+        try {
+            Query q = entityManager.createQuery("SELECT c FROM MeshClass AS c WHERE c.uid = :uid");
+            q.setParameter("uid", uid);
+            return (MeshClass) q.getSingleResult();
+        } catch (NoResultException e){
+            return null;
+        }
     }
 }
+

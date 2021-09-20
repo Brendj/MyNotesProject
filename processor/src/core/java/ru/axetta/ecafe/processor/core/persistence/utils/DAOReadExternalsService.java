@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.*;
 
 /***
@@ -119,7 +121,9 @@ public class DAOReadExternalsService {
         if ((idOfClient != null && contractId != null) || (idOfClient == null && contractId == null))
             throw new Exception("Invalid arguments");
         try {
-            String query_str = (idOfClient != null ? "select c from Client c where c.idOfClient = :parameter" : "select c from Client c where c.contractId = :parameter");
+            String query_str = (idOfClient != null ?
+                    "select c from Client c join fetch c.org o join fetch o.defaultSupplier where c.idOfClient = :parameter"
+                    : "select c from Client c join fetch c.org o join fetch o.defaultSupplier where c.contractId = :parameter");
             Query query = entityManager.createQuery(query_str);
             query.setParameter("parameter", idOfClient != null ? idOfClient : contractId);
             return (Client) query.getSingleResult();
@@ -163,12 +167,32 @@ public class DAOReadExternalsService {
     }
 
     public List<Order> getClientOrdersByPeriod(Client client, Date startTime, Date endTime) {
-        Query query = entityManager.createQuery("select order from Order order where order.client = :client and order.createTime between "
+        /*Query query = entityManager.createQuery("select order from Order order where order.client = :client and order.createTime between "
                 + ":startTime and :endTime order by createTime");
         query.setParameter("client", client);
         query.setParameter("startTime", startTime);
         query.setParameter("endTime", endTime);
-        return query.getResultList();
+        return query.getResultList();*/
+        Query query = entityManager.createNativeQuery("SELECT idoforg, idoforder FROM (SELECT idoforg, idoforder, createddate FROM CF_Orders order0_ WHERE order0_.IdOfClient = :client) qq "
+                + "WHERE (cast(CreatedDate AS NUMERIC) BETWEEN :startTime AND :endTime)");
+        query.setParameter("client", client.getIdOfClient());
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        List list = query.getResultList();
+
+        List<Order> result = new ArrayList<>();
+        if (list.size() == 0) return result;
+
+        List<CompositeIdOfOrder> list2 = new ArrayList<>();
+        for (Object obj : list) {
+            Object[] row = (Object[]) obj;
+            long idOfOrg = HibernateUtils.getDbLong(row[0]);
+            long idOfOrder = HibernateUtils.getDbLong(row[1]);
+            list2.add(new CompositeIdOfOrder(idOfOrg, idOfOrder));
+        }
+        Query q = entityManager.createQuery("select order from Order order where order.compositeIdOfOrder in :list order by createTime");
+        q.setParameter("list", list2);
+        return q.getResultList();
     }
 
     public List<OrderDetail> getOrderDetailsByOrders(List<Order> orders) {
@@ -219,11 +243,20 @@ public class DAOReadExternalsService {
 
     public List getPaymentsList(Client client, Integer subBalanceNum, Date endDate, Date startDate) {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
-        Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "
+        /*Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "
                 + "cp.createTime >= :startDate and cp.createTime < :endDate and tr.client.idOfClient = :idOfClient order by cp.createTime asc");
         query.setParameter("payType", subBalanceNum != null && subBalanceNum.equals(1) ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", nextToEndDate);
+        query.setParameter("idOfClient", client.getIdOfClient());
+        return query.getResultList();*/
+        Query query = entityManager.createNativeQuery("select cp.idofclientpayment, cp.paysum, cp.createddate, cp.paymentmethod, cp.addpaymentmethod, cp.addidofpayment, cg.contragentname "
+                + "from CF_ClientPayments cp join CF_Transactions tt on cp.IdOfTransaction=tt.IdOfTransaction "
+                + "left join cf_contragents cg on cp.idofcontragent = cg.idofcontragent "
+                + "where cp.PayType = :payType and cast(cp.CreatedDate as numeric) >= :startDate and cast(cp.CreatedDate as numeric) < :endDate and tt.IdOfClient = :idOfClient");
+        query.setParameter("payType", subBalanceNum != null && subBalanceNum.equals(1) ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
+        query.setParameter("startDate", startDate.getTime());
+        query.setParameter("endDate", nextToEndDate.getTime());
         query.setParameter("idOfClient", client.getIdOfClient());
         return query.getResultList();
     }
@@ -326,9 +359,23 @@ public class DAOReadExternalsService {
         return (List<WtDish>) query.getResultList();
     }
 
+    public Set<Long> getDishesRepeatable(WtComplex wtComplex) {
+        Set<Long> result = new HashSet<>();
+        if (!wtComplex.getComposite()) return result;
+        Query query = entityManager.createNativeQuery("select t.idofdish from cf_wt_complexes_dishes_repeatable t "
+                + "where t.idofcomplex = :idOfComplex and t.deletestate = 0");
+        query.setParameter("idOfComplex", wtComplex.getIdOfComplex());
+        List list = query.getResultList();
+        for (Object entry : list) {
+            Long id = ((BigInteger)entry).longValue ();
+            result.add(id);
+        }
+        return result;
+    }
+
     public List<WtDish> getWtDishesByComplexItemAndDates(WtComplexesItem complexItem, Date startDate, Date endDate) {
-        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish "
-                + "WHERE :complexItem IN ELEMENTS(dish.complexItems) "
+        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish join dish.complexItems complex "
+                + "WHERE complex = :complexItem "
                 + "AND dish.deleteState = 0 "
                 + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "

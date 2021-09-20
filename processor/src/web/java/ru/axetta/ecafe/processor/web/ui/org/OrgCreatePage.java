@@ -97,6 +97,8 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean preordersEnabled = false;
     private Boolean preorderlp = false;
     private Long orgIdFromNsi = null;
+    private Boolean governmentContract = false;
+    private Boolean useLongCardId = false;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -694,6 +696,8 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         org.setPreorderlp(preorderlp);
         org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
+        org.setGovernmentContract(governmentContract);
+        org.setUseLongCardNo(useLongCardId);
         session.save(org);
         OrgSync orgSync = new OrgSync();
         orgSync.setIdOfPacket(0L);
@@ -880,4 +884,20 @@ public class OrgCreatePage extends BasicWorkspacePage
     public Long getOrgIdFromNsi() { return orgIdFromNsi; }
 
     public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
+
+    public Boolean getGovernmentContract() {
+        return governmentContract;
+    }
+
+    public void setGovernmentContract(Boolean governmentContract) {
+        this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseLongCardId() {
+        return useLongCardId;
+    }
+
+    public void setUseLongCardId(Boolean useLongCardId) {
+        this.useLongCardId = useLongCardId;
+    }
 }

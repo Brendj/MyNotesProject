@@ -4,32 +4,19 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
-import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingItemSyncPOJO;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSyncPOJO;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
-
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 public class GoodRequestEZDProcessor extends AbstractProcessor<OrgSettingSection> {
     private final GoodRequestEZDRequest goodRequestEZDRequest;
@@ -50,7 +37,7 @@ public class GoodRequestEZDProcessor extends AbstractProcessor<OrgSettingSection
         GoodRequestEZDSection section = new GoodRequestEZDSection();
 
         Org sourceOrg = (Org) session.load(Org.class, idOfOrg);
-        Set<Long> friendlyOrgsid = OrgUtils.getFriendlyOrgIds(sourceOrg);
+        Set<Long> friendlyOrgsid = DAOReadonlyService.getInstance().findFriendlyOrgsIdsAsSet(idOfOrg);
         friendlyOrgsid.add(sourceOrg.getIdOfOrg());
 
         //Проставляем флаг, что последние заявки по ЛП отправлены

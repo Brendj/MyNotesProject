@@ -4,16 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -110,6 +109,11 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                         new ApplicationForFoodStatus(status.getApplicationForFoodState(),
                                                 status.getDeclineReason())));
                             }
+                        } catch (ApplicationForFoorStatusExistsException e) {
+                            logger.error("Error in processing entity: " + e.getMessage());
+                            resItem = new ResRequestFeedingItem(applicationForFood, item.getResCode());
+                            items.add(resItem);
+                            continue;
                         } catch (Exception e) {
                             resItem = new ResRequestFeedingItem();
                             resItem.setCode(RequestFeedingItem.ERROR_CODE_INTERNAL_ERROR);

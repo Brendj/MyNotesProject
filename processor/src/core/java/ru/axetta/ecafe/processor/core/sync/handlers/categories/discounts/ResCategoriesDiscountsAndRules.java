@@ -4,12 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
-import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -17,11 +11,14 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: akmukov
@@ -44,10 +41,10 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
     }
 
     private void addDiscountRules(Session session, Long idOfOrg, boolean manyOrgs) {
-        List discountRules = getAllDiscountRules(session);
+        List<DiscountRule> discountRules = getAllDiscountRules(session);
 
         List<WtDiscountRule> wtDiscountRules = getAllWtDiscountRules(session);
-        Org mainOrg = DAOService.getInstance().getOrg(idOfOrg);
+        Org mainOrg = DAOReadonlyService.getInstance().findOrg(idOfOrg);
 
         Set<Org> orgs = getProcessedOrgs(session, idOfOrg, manyOrgs);
         existOrgWithEmptyCategoryOrgSet = false;
@@ -68,22 +65,21 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         }
     }
 
-    private List getAllDiscountRules(Session session) {
+    private List<DiscountRule> getAllDiscountRules(Session session) {
         Criteria criteriaDiscountRule = session.createCriteria(DiscountRule.class);
-        criteriaDiscountRule.setFetchMode("categoryOrgs", FetchMode.SELECT);
+        criteriaDiscountRule.setFetchMode("categoryOrgs", FetchMode.JOIN);
         return criteriaDiscountRule.list();
     }
 
     private List<WtDiscountRule> getAllWtDiscountRules(Session session) {
         Criteria criteriaWtDiscountRule = session.createCriteria(WtDiscountRule.class);
-        criteriaWtDiscountRule.setFetchMode("categoryOrgs", FetchMode.SELECT);
+        criteriaWtDiscountRule.setFetchMode("categoryOrgs", FetchMode.JOIN);
         return criteriaWtDiscountRule.list();
     }
 
-    private void addRulesWithEmptyCategoryOrgSet(List discountRules, Long idOfOrg) {
-        List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(idOfOrg);
-        for (Object object : discountRules) {
-            DiscountRule discountRule = (DiscountRule) object;
+    private void addRulesWithEmptyCategoryOrgSet(List<DiscountRule> discountRules, Long idOfOrg) {
+        List<Long> fOrgs = DAOReadonlyService.getInstance().findFriendlyOrgsIds(idOfOrg);
+        for (DiscountRule discountRule : discountRules) {
             if (containRule(discountRule.getIdOfRule())) {
                 continue;
             }
@@ -96,27 +92,28 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
 
     //wt
     private void addWtRulesWithEmptyCategoryOrgSet(List<WtDiscountRule> wtDiscountRules, Long idOfOrg) {
-        List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(idOfOrg);
+        List<Long> fOrgs = DAOReadonlyService.getInstance().findFriendlyOrgsIds(idOfOrg);
+        List<CategoryOrg> allCategoryOrgs = DAOReadonlyService.getInstance().getAllWtCategoryOrgs(wtDiscountRules);
+        List<CategoryDiscount> allCategoryDisounts = DAOReadonlyService.getInstance().getAllWtCategoryDiscounts(wtDiscountRules);
         for (WtDiscountRule rule : wtDiscountRules) {
             if (containWtRule(rule.getIdOfRule())) {
                 continue;
             }
-            if (DAOService.getInstance().getCategoryOrgsByWtDiscountRule(rule).isEmpty()) {
-                addWtDCRI(new DiscountCategoryWtRuleItem(rule, idOfOrg, fOrgs));
+            if (getCategoryOrgsByWtDiscountRule(allCategoryOrgs, rule).isEmpty()) {
+                addWtDCRI(new DiscountCategoryWtRuleItem(allCategoryOrgs, allCategoryDisounts, rule, fOrgs));
             }
         }
     }
 
-    private void addRulesForOrgWithCategoryOrgSet(List discountRules, Org org) {
+    private void addRulesForOrgWithCategoryOrgSet(List<DiscountRule> discountRules, Org org) {
         Set<CategoryOrg> categoryOrgSet = org.getCategories();
         if (categoryOrgSet.isEmpty()) {
             /* Организация не пренадлежит ни к одной категории*/
             existOrgWithEmptyCategoryOrgSet = true;
             return;
         }
-        List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
-        for (Object object : discountRules) {
-            DiscountRule discountRule = (DiscountRule) object;
+        List<Long> fOrgs = DAOReadonlyService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
+        for (DiscountRule discountRule : discountRules) {
             if (containRule(discountRule.getIdOfRule())) {
                 continue;
             }
@@ -147,22 +144,40 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             existOrgWithEmptyCategoryOrgSet = true;
             return;
         }
-        List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
+        List<Long> fOrgs = DAOReadonlyService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
+        List<CategoryOrg> allCategoryOrgs = DAOReadonlyService.getInstance().getAllWtCategoryOrgs(wtDiscountRules);
+        List<CategoryDiscount> allCategoryDiscounts = DAOReadonlyService.getInstance().getAllWtCategoryDiscounts(wtDiscountRules);
         for (WtDiscountRule rule : wtDiscountRules) {
             if (containWtRule(rule.getIdOfRule())) {
                 continue;
             }
             boolean bIncludeRule = false;
-            List<CategoryOrg> categoryOrgs = DAOService.getInstance().getCategoryOrgsByWtDiscountRule(rule);
+            List<CategoryOrg> categoryOrgs = getCategoryOrgsByWtDiscountRule(allCategoryOrgs, rule);
             if (categoryOrgs.isEmpty()) {
                 bIncludeRule = true;
             } else if (categoryOrgSet.containsAll(categoryOrgs)) {
                 bIncludeRule = true;
             }
             if (bIncludeRule) {
-                addWtDCRI(new DiscountCategoryWtRuleItem(rule, org.getIdOfOrg(), fOrgs));
+                addWtDCRI(new DiscountCategoryWtRuleItem(allCategoryOrgs, allCategoryDiscounts, rule, fOrgs));
             }
         }
+    }
+
+    private static List<CategoryOrg> getCategoryOrgsByWtDiscountRule(List<CategoryOrg> allCategoryOrgs, WtDiscountRule rule) {
+        List<CategoryOrg> list = new ArrayList<>();
+        for (CategoryOrg categoryOrg : allCategoryOrgs) {
+            if (rule.getCategoryOrgs().contains(categoryOrg)) list.add(categoryOrg);
+        }
+        return list;
+    }
+
+    private static List<CategoryDiscount> getCategoryDiscountsByWtDiscountRule(List<CategoryDiscount> allCategoryDiscounts, WtDiscountRule rule) {
+        List<CategoryDiscount> list = new ArrayList<>();
+        for (CategoryDiscount categoryDiscount : allCategoryDiscounts) {
+            if (rule.getCategoryDiscounts().contains(categoryDiscount)) list.add(categoryDiscount);
+        }
+        return list;
     }
 
     private Set<Org> getProcessedOrgs(Session session, Long idOfOrg, boolean manyOrgs) {
@@ -178,6 +193,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
     @SuppressWarnings("unchecked")
     private void addCategoryDiscounts(Session session) {
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.setFetchMode("categoriesDiscountDSZN", FetchMode.JOIN);
         List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
         for (CategoryDiscount categoryDiscount : categoryDiscounts) {
             DiscountCategoryItem dci = new DiscountCategoryItem(categoryDiscount.getIdOfCategoryDiscount(),
@@ -517,11 +533,11 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.deletedState = deletedState;
         }
 
-        public DiscountCategoryWtRuleItem(WtDiscountRule wtDiscountRule, Long idOfOrg, List<Long> fOrgs) {
+        public DiscountCategoryWtRuleItem(List<CategoryOrg> allCategoryOrgs, List<CategoryDiscount> allCategoryDiscounts, WtDiscountRule wtDiscountRule, List<Long> fOrgs) {
             this.idOfRule = wtDiscountRule.getIdOfRule();
             this.description = wtDiscountRule.getDescription();
 
-            this.categoryDiscounts = buildCategoryDiscounts(wtDiscountRule);
+            this.categoryDiscounts = buildCategoryDiscounts(allCategoryDiscounts, wtDiscountRule);
 
             this.priority = wtDiscountRule.getPriority();
             this.operationOr = wtDiscountRule.isOperationOr();
@@ -531,7 +547,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.subCategory = wtDiscountRule.getSubCategory();
             Set<Long> orgs = new HashSet<>();
 
-            List<CategoryOrg> categoryOrgs = DAOService.getInstance().getCategoryOrgsByWtDiscountRule(wtDiscountRule);
+            List<CategoryOrg> categoryOrgs = getCategoryOrgsByWtDiscountRule(allCategoryOrgs, wtDiscountRule);
             for (CategoryOrg categoryOrg : categoryOrgs) {
                 for (Org org : categoryOrg.getOrgs()) {
                     if (fOrgs.contains(org.getIdOfOrg())) {
@@ -552,9 +568,8 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             return sb.toString();
         }
 
-        private String buildCategoryDiscounts(WtDiscountRule wtDiscountRule) {
-            List<CategoryDiscount> categoryDiscounts = DAOService.getInstance()
-                    .getCategoryDiscountsByWtDiscountRule(wtDiscountRule);
+        private String buildCategoryDiscounts(List<CategoryDiscount> allCategoryDiscounts, WtDiscountRule wtDiscountRule) {
+            List<CategoryDiscount> categoryDiscounts = getCategoryDiscountsByWtDiscountRule(allCategoryDiscounts, wtDiscountRule);
             StringBuilder sb = new StringBuilder();
             int counter = categoryDiscounts.size();
             for (CategoryDiscount category : categoryDiscounts) {

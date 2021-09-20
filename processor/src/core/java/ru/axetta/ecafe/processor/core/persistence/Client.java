@@ -54,12 +54,12 @@ public class Client {
     public static final String[] DISCOUNT_MODE_NAMES = {"Отсутствует", "Дотация", "Бесплатно", "Льгота по категориям"};
     public static final String DOU_STRING = "дошкол";
 
-    public static final int GROUP_SCHOOL = 0;
-    public static final int GROUP_BEFORE_SCHOOL_OUT = 1;
-    public static final int GROUP_BEFORE_SCHOOL_STEP = 2;
-    public static final int GROUP_BEFORE_SCHOOL = 3;
-    public static final String[] GROUP_NAME = {"Средняя школа", "Дошкольное (из внешней системы для записи в школу)", "Дошкольная ступень", "Дошкольное"};
-
+    public static final int GROUP_BEFORE_SCHOOL_OUT = 0;
+    public static final int GROUP_BEFORE_SCHOOL_STEP = 1;
+    public static final int GROUP_BEFORE_SCHOOL = 2;
+    public static final String[] GROUP_NAME = {"Дошкольное (из внешней системы для записи в школу)", "Дошкольная ступень", "Дошкольное"};
+    public static final String[] GROUP_NAME_SCHOOL = {"Средняя школа","Основное общее образование","Начальное общее образование",
+                                               "Среднее общее образование"};
 
     private Long idOfClient;
     private long version;
@@ -152,6 +152,7 @@ public class Client {
     private String parallel;
 
     private Boolean userOP;
+    private ClientsMobileHistory clientsMobileHistory = null;
 
     protected Client() {
         // For Hibernate only
@@ -218,6 +219,12 @@ public class Client {
             }
         }
         return hasDiscount;
+    }
+
+    public void initClientMobileHistory (ClientsMobileHistory clientsMobileHistory)
+    {
+        this.clientsMobileHistory = clientsMobileHistory;
+        clientsMobileHistory.setClient(this);
     }
 
     public boolean isDeletedOrLeaving() {
@@ -574,8 +581,43 @@ public class Client {
         return mobile;
     }
 
+    private Boolean clearSsoid = true;
+    private Boolean clearedSsoid = false;
     public void setMobile(String mobile) {
+        if (clientsMobileHistory != null)
+        {
+            if (this.mobile == null)
+                this.mobile = "";
+            if (mobile == null)
+                mobile = "";
+            if (!mobile.equals(this.mobile)) { //Для отсечения операции чтения
+                clientsMobileHistory.setCreatedate(new Date());
+                clientsMobileHistory.setOldmobile(this.mobile);
+                clientsMobileHistory.setNewmobile(mobile);
+                if (!this.mobile.isEmpty() || !mobile.isEmpty()) {
+                    if (clearSsoid) {
+                        clientsMobileHistory.setOldssoid(this.ssoid);
+                        this.ssoid = "";
+                        clearedSsoid = true;
+                    }
+                    if (this.mobile.isEmpty())
+                        clientsMobileHistory.setAction("Добавление");
+                    else {
+                        if (mobile.isEmpty())
+                            clientsMobileHistory.setAction("Удаление");
+                        else
+                            clientsMobileHistory.setAction("Изменение");
+                    }
+                    clientsMobileHistory.saveClientMobileHistoryInDB();
+                }
+            }
+        }
         this.mobile = mobile;
+    }
+    public void setMobileNotClearSsoid(String mobile) {
+        clearSsoid = true;
+        this.setMobile(mobile);
+        clearSsoid = false;
     }
 
     public String getEmail() {
@@ -1241,5 +1283,13 @@ public class Client {
 
     public void setVendor(SmartWatchVendor vendor) {
         this.vendor = vendor;
+    }
+
+    public Boolean getClearedSsoid() {
+        return clearedSsoid;
+    }
+
+    public void setClearedSsoid(Boolean clearedSsoid) {
+        this.clearedSsoid = clearedSsoid;
     }
 }

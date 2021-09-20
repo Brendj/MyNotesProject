@@ -13,6 +13,9 @@
         <h:outputText value="Сообщение в АРМ администратора" />
     </f:facet>
     <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:outputText escape="true" value="Тип" styleClass="output-text" />
+        <h:inputText value="#{mainPage.infoMessagePage.itemToShow.type}" style="width:400px;" styleClass="input-text" readonly="true" />
+
         <h:outputText escape="true" value="Заголовок" styleClass="output-text" />
         <h:inputText value="#{mainPage.infoMessagePage.itemToShow.header}" style="width:400px;" styleClass="input-text" readonly="true" />
 
@@ -91,6 +94,9 @@
                         <h:outputText styleClass="column-header" escape="true" value="Дата" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="1">
+                        <h:outputText styleClass="column-header" escape="true" value="Тип сообщения" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="1">
                         <h:outputText styleClass="column-header" escape="true" value="Заголовок" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="1">
@@ -103,6 +109,9 @@
             </f:facet>
             <rich:column styleClass="center-aligned-column">
                 <h:outputText value="#{line.createdDate}" converter="timeMinuteConverter" />
+            </rich:column>
+            <rich:column styleClass="center-aligned-column">
+                <h:outputText value="#{line.type}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
                 <h:outputText value="#{line.header}" />

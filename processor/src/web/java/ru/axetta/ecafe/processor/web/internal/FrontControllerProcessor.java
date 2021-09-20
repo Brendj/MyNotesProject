@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
@@ -315,7 +316,7 @@ public class FrontControllerProcessor {
     }
 
     public List<RegistryChangeCallback> proceedRegistryChangeItem(List<Long> changesList, int operation,
-            boolean fullNameValidation, ClientGuardianHistory clientGuardianHistory) {
+            boolean fullNameValidation, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) {
         if (operation != RegistryChangeItem.APPLY_REGISTRY_CHANGE || CollectionUtils.isEmpty(changesList)) {
             return Collections.EMPTY_LIST;
         }
@@ -323,7 +324,7 @@ public class FrontControllerProcessor {
         List<RegistryChangeCallback> result = Collections.EMPTY_LIST;
         try {
             result = importClientRegisterService.applyRegistryChangeBatch(changesList, fullNameValidation,
-                    null, clientGuardianHistory);
+                    null, clientsMobileHistory, clientGuardianHistory);
         } catch (Exception e) {
             logger.error("Failed to commit registry change item", e);
         }
@@ -331,15 +332,15 @@ public class FrontControllerProcessor {
     }
 
     public List<RegistryChangeCallback> proceedRegistryEmployeeChangeItem(List<Long> changesList, int operation,
-            boolean fullNameValidation, String groupName, ClientGuardianHistory clientGuardianHistory) {
+            boolean fullNameValidation, String groupName, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) {
         if (operation != RegistryChangeItem.APPLY_REGISTRY_CHANGE || CollectionUtils.isEmpty(changesList)) {
             return Collections.EMPTY_LIST;
         }
 
         List<RegistryChangeCallback> result = Collections.EMPTY_LIST;
         try {
-            result = importClientRegisterService.applyRegistryChangeBatch(changesList, fullNameValidation,
-                    groupName, clientGuardianHistory);
+            result = importClientRegisterService.applyRegistryChangeBatch(changesList, fullNameValidation, groupName,
+                    clientsMobileHistory, clientGuardianHistory);
         } catch (Exception e) {
             logger.error("Failed to commit registry change item", e);
         }

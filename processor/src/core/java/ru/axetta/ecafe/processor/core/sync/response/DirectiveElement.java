@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TradeAccountConfigChange;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.FeedingSettingOrgItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -68,9 +69,14 @@ public class DirectiveElement implements AbstractToElement{
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
 
-        Long feedingSettingLimit = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
-        if (feedingSettingLimit != null) {
-            directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
+        FeedingSettingOrgItem feedingSettingOrgItem = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
+        if (feedingSettingOrgItem != null) {
+            if (feedingSettingOrgItem.getLimit() != null)
+              directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingOrgItem.getLimit().toString()));
+            if (feedingSettingOrgItem.getDiscount() != null)
+                directiveItemList.add(new DirectiveItem("FeedingSettingDiscount", feedingSettingOrgItem.getDiscount().toString()));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscount", feedingSettingOrgItem.getUseDiscount() ? "1" : "0"));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscountBuffet", feedingSettingOrgItem.getUseDiscountBuffet() ? "1" : "0"));
         }
 
         directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getHaveNewLP())?"1":"0"));
@@ -123,9 +129,14 @@ public class DirectiveElement implements AbstractToElement{
         Boolean allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
         directiveItemList.add(new DirectiveItem("REGISTRY_CHANGE_EMPLOYEE", allowRegistryChangeEmployee ? "1" : "0"));
 
-        Long feedingSettingLimit = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
-        if (feedingSettingLimit != null) {
-            directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
+        FeedingSettingOrgItem feedingSettingOrgItem = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
+        if (feedingSettingOrgItem != null) {
+            if (feedingSettingOrgItem.getLimit() != null)
+                directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingOrgItem.getLimit().toString()));
+            if (feedingSettingOrgItem.getDiscount() != null)
+                directiveItemList.add(new DirectiveItem("FeedingSettingDiscount", feedingSettingOrgItem.getDiscount().toString()));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscount", feedingSettingOrgItem.getUseDiscount() ? "1" : "0"));
+            directiveItemList.add(new DirectiveItem("FeedingSettingUseDiscountBuffet", feedingSettingOrgItem.getUseDiscountBuffet() ? "1" : "0"));
         }
 
         boolean cardDoublesAllowed = VersionUtils.doublesOnlyAllowed();
@@ -172,25 +183,55 @@ public class DirectiveElement implements AbstractToElement{
         Boolean disEditServicesInfoFlag = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         directiveItemList.add(new DirectiveItem("DISABLE_EDIT_INFORMATION_SERVICES_FOR_CLIENTS", disEditServicesInfoFlag ? "1":"0"));
 
-        Integer loginUniqControlPeriod = RuntimeContext.getInstance().getOptionValueInt(
-                Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_LOGIN_REUSE);
-        directiveItemList.add(new DirectiveItem("IS_LOGIN_UNIQ_CONTROL_PERIOD", loginUniqControlPeriod.toString()));
+        if (securityModeFlag.equals(1)) {
+            Integer loginUniqControlPeriod = RuntimeContext.getInstance().getOptionValueInt(
+                    Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_LOGIN_REUSE);
+            directiveItemList.add(new DirectiveItem("IS_LOGIN_UNIQ_CONTROL_PERIOD", loginUniqControlPeriod.toString()));
 
-        Integer maxInactiveTime = RuntimeContext.getInstance().getOptionValueInt(
-                Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
-        directiveItemList.add(new DirectiveItem("IS_MAX_INACTIVITY_TIME", maxInactiveTime.toString()));
+            Integer maxInactiveTime = RuntimeContext.getInstance().getOptionValueInt(
+                    Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
+            directiveItemList.add(new DirectiveItem("IS_MAX_INACTIVITY_TIME", maxInactiveTime.toString()));
 
-        Integer passwordChangePeriod = RuntimeContext.getInstance().getOptionValueInt(
-                Option.OPTION_SECURITY_CLIENT_PERIOD_PASSWORD_CHANGE);
-        directiveItemList.add(new DirectiveItem("IS_PASSWORD_CHANGE_PERIOD", passwordChangePeriod.toString()));
+            Integer passwordChangePeriod = RuntimeContext.getInstance().getOptionValueInt(
+                    Option.OPTION_SECURITY_CLIENT_PERIOD_PASSWORD_CHANGE);
+            directiveItemList.add(new DirectiveItem("IS_PASSWORD_CHANGE_PERIOD", passwordChangePeriod.toString()));
 
-        Integer maxAuthFaultCount = RuntimeContext.getInstance().getOptionValueInt(
-                Option.OPTION_SECURITY_CLIENT_MAX_AUTH_FAULT_COUNT);
-        directiveItemList.add(new DirectiveItem("IS_MAX_AUTH_FAULT_COUNT", maxAuthFaultCount.toString()));
+            Integer maxAuthFaultCount = RuntimeContext.getInstance().getOptionValueInt(
+                    Option.OPTION_SECURITY_CLIENT_MAX_AUTH_FAULT_COUNT);
+            directiveItemList.add(new DirectiveItem("IS_MAX_AUTH_FAULT_COUNT", maxAuthFaultCount.toString()));
 
-        Integer tmpBlockAccTime = RuntimeContext.getInstance().getOptionValueInt(
-                Option.OPTION_SECURITY_CLIENT_TMP_BLOCK_ACC_TIME);
-        directiveItemList.add(new DirectiveItem("IS_TMP_BLOCK_ACC_TIME", tmpBlockAccTime.toString()));
+            Integer tmpBlockAccTime = RuntimeContext.getInstance().getOptionValueInt(
+                    Option.OPTION_SECURITY_CLIENT_TMP_BLOCK_ACC_TIME);
+            directiveItemList.add(new DirectiveItem("IS_TMP_BLOCK_ACC_TIME", tmpBlockAccTime.toString()));
+
+            Integer armAdminUserIdleTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_ADMIN);
+            Integer armCashierUserIdleTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_CASHIER);
+            Integer armSecurityUserIdleTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_SECURITY);
+            Integer armLibraryUserIdleTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_LIBRARY);
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_ADMIN",
+                    armAdminUserIdleTimeout.toString()));
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_CASHIER",
+                    armCashierUserIdleTimeout.toString()));
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_SECURITY",
+                    armSecurityUserIdleTimeout.toString()));
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_USER_IDLE_TIMEOUT_ARM_LIBRARY",
+                    armLibraryUserIdleTimeout.toString()));
+            Integer armAdminAuthWithoutCardForAdmin = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_ADMIN_FOR_ADMIN);
+            Integer armAdminAuthWithoutCardForOther = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_ADMIN_FOR_OTHER);
+            Integer armCashierAuthWithoutCard = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_CASHIER);
+            Integer armSecurityAuthWithoutCard = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_SECURITY);
+            Integer armLibraryAuthWithoutCard = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_LIBRARY);
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_ADMIN_FOR_ADMIN",
+                    armAdminAuthWithoutCardForAdmin.toString()));
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_ADMIN_FOR_OTHER",
+                    armAdminAuthWithoutCardForOther.toString()));
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_CASHIER",
+                    armCashierAuthWithoutCard.toString()));
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_SECURITY",
+                    armSecurityAuthWithoutCard.toString()));
+            directiveItemList.add(new DirectiveItem("SECURITY_CLIENT_AUTH_WITHOUT_CARD_ARM_LIBRARY",
+                    armLibraryAuthWithoutCard.toString()));
+        }
 
         Integer disableEmailEdit = RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_DISABLE_EMAIL_EDIT);

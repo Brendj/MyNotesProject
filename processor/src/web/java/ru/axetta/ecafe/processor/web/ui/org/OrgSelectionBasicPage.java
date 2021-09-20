@@ -75,9 +75,12 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, List<OrganizationTypeItem> orgTypes,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
-            Long idOfContragent, Long idOfContract, boolean onlySupplier, Long ekisId, Long orgIdFromNsi) throws Exception {
+            Long idOfContragent, Long idOfContract, boolean onlySupplier, Long ekisId, Long orgIdFromNsi,
+            Boolean webARM) throws Exception {
         Criteria orgCriteria = session.createCriteria(Org.class);
-
+        if (webARM != null) {
+            orgCriteria.add(Restrictions.eq("useWebArm", webARM));
+        }
         Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
         if (idOfUser == null) {
             throw new Exception("Не удалось получить ID пользователя");
@@ -357,11 +360,16 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList,
             List<Long> idOfSupplierList) throws Exception {
+        return retrieveOrgs(session, idOfSourceMenuOrgList, idOfSupplierList, null);
+    }
+
+    protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList,
+            List<Long> idOfSupplierList, Boolean webARM) throws Exception {
         deselectAllItems();
         Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, idOfSupplierList, idOfContragent, null, getFilterMode().equals(2),
-                getEkisId(), getOrgIdFromNsi());
+                getEkisId(), getOrgIdFromNsi(), webARM);
     }
 
     @SuppressWarnings("unchecked")
@@ -371,7 +379,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, Collections.EMPTY_LIST, idOfContragent, null, getFilterMode().equals(2),
-                getEkisId(), getOrgIdFromNsi());
+                getEkisId(), getOrgIdFromNsi(), null);
     }
 
     public List<SelectItem> getContragentsList() {

@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
@@ -16,11 +20,6 @@ import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -124,12 +123,12 @@ public class ClientViewPage extends BasicWorkspacePage {
         return confirmVisualRecognition;
     }
 
-    public Boolean getInformedSpecialMenu() {
-        return informedSpecialMenu;
+    public Boolean getAllowedPreorder() {
+        return allowedPreorder;
     }
 
-    public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
-        this.informedSpecialMenu = informedSpecialMenu;
+    public void setAllowedPreorder(Boolean allowedPreorder) {
+        this.allowedPreorder = allowedPreorder;
     }
 
     public static class PersonData {
@@ -220,7 +219,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
-    private Boolean informedSpecialMenu;
+    private Boolean allowedPreorder;
     private String passportNumber;
     private String passportSeries;
     private String cardRequest;
@@ -559,9 +558,9 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.wasSuspended = DAOUtils.wasSuspendedLastSubscriptionFeedingByClient(session, idOfClient);
 
-        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
+        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
 
-        this.clientWardItems = loadWardsByClient(session, idOfClient);
+        this.clientWardItems = loadWardsByClient(session, idOfClient, true);
 
         List<Migrant> migrants = MigrantsUtils.getAllMigrantsByIdOfClient(session, idOfClient);
         clientSectionsItems = buildClientSectionsItem(session, migrants);
@@ -575,7 +574,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
 
         this.specialMenu = client.getSpecialMenu();
-        this.informedSpecialMenu = ClientManager.getInformedSpecialMenu(session, client.getIdOfClient(), null);
+        this.allowedPreorder = ClientManager.getAllowedPreorderByClient(session, client.getIdOfClient(), null);
         this.passportNumber = client.getPassportNumber();
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);

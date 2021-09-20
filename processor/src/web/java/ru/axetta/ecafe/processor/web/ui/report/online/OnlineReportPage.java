@@ -129,7 +129,7 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
         filterClient = getStringClientList();
     }
 
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException, Exception {
         if (orgMap != null) {
             idOfOrgList = new ArrayList<Long>();
             if (orgMap.isEmpty())

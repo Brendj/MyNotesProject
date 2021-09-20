@@ -128,6 +128,7 @@
         <task:scheduled ref="smsDeliveryCalculationService" method="run" cron="0 45 3 ? * *"/>
         <task:scheduled ref="enterEventsMonitoring" method="calculateEnterEvents" cron="0 0/10 * * * ?"/>
         <task:scheduled ref="clientMigrationHistoryService" method="processOrgChange" fixed-delay="60000"/>
+        <task:scheduled ref="wtComplexCopyService" method="run" cron="0 4 4 * * ?"/>
     </task:scheduled-tasks>
     <task:scheduler id="myScheduler" pool-size="5"/>
 
@@ -149,6 +150,11 @@
         <task:scheduled ref="BIDataExportService" method="run" fixed-delay="86400000" />
     </task:scheduled-tasks>
     <task:scheduler id="biDataExportSchedule" pool-size="5"/>-->
+
+    <task:scheduler id="syncLogSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="syncLogSchedule">
+        <task:scheduled ref="processLogSaver" method="run" fixed-delay="60000"/>
+    </task:scheduled-tasks>
 
     <task:scheduler id="threadDump" pool-size="5"/>
     <task:scheduled-tasks scheduler="threadDump">
@@ -189,11 +195,11 @@
         <task:scheduled ref="smsSubscriptionFeeService" method="smsSubscriptionFeeWithdraw" cron="0 0 16 1-4 * ?"/>
     </task:scheduled-tasks>
 
-    <task:scheduler id="regularPaymentSchedule"/>
-    <task:scheduled-tasks scheduler="regularPaymentSchedule">
-        <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"
-                        cron="0 10 11,17 * * ?"/>
-    </task:scheduled-tasks>
+<!--    <task:scheduler id="regularPaymentSchedule"/>-->
+<!--    <task:scheduled-tasks scheduler="regularPaymentSchedule">-->
+<!--        <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"-->
+<!--                        cron="0 10 11,17 * * ?"/>-->
+<!--    </task:scheduled-tasks>-->
 
     <task:scheduler id="regularPaymentExpireNotificationSchedule"/>
     <task:scheduled-tasks scheduler="regularPaymentExpireNotificationSchedule">

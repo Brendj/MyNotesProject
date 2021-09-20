@@ -8,12 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic.MeshClientCardRefService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.CardBlockService;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -32,7 +32,6 @@ public class CardServicesPage extends BasicWorkspacePage implements OrgListSelec
     private static final Logger log = LoggerFactory.getLogger(CardServicesPage.class);
     private List<Long> idOfOrgList;
     private String filter = "";
-    private Boolean allFriendlyOrgs = false;
     private MeshClientCardRefService meshClientCardRefService;
 
     public CardServicesPage(){
@@ -70,14 +69,6 @@ public class CardServicesPage extends BasicWorkspacePage implements OrgListSelec
         this.filter = filter;
     }
 
-    public Boolean getAllFriendlyOrgs() {
-        return allFriendlyOrgs;
-    }
-
-    public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
-        this.allFriendlyOrgs = allFriendlyOrgs;
-    }
-
     public void sendCardsToMESH() {
         if(CollectionUtils.isEmpty(idOfOrgList)){
             printError("Не выбраны организации для отправки");
@@ -90,11 +81,7 @@ public class CardServicesPage extends BasicWorkspacePage implements OrgListSelec
 
             Set<Org> targetOrgs = new HashSet<>();
             for (Long idOfOrg : idOfOrgList) {
-                if (allFriendlyOrgs) {
-                    targetOrgs.addAll(DAOUtils.findAllFriendlyOrgs(session, idOfOrg));
-                } else {
-                    targetOrgs.add(DAOUtils.findOrg(session, idOfOrg));
-                }
+                targetOrgs.addAll(DAOUtils.findAllFriendlyOrgs(session, idOfOrg));
             }
             session.close();
 

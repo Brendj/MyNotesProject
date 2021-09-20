@@ -8,13 +8,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" table="cf_wt_complexes">
-        <id name="idOfComplex" column="idOfComplex" type="long">
-            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfRule</param>
-                <param name="max_lo">3</param>
-            </generator>
-        </id>
+        <id name="idOfComplex" column="idOfComplex" type="long"/>
         <property name="name">
             <column name="name" sql-type="varchar(256)" length="256"/>
         </property>
@@ -58,6 +52,10 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
+        <property name="idOfParentComplex">
+            <column name="idOfParentComplex" sql-type="long"/>
+        </property>
+
         <many-to-one name="wtComplexGroupItem" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem">
             <column name="idOfComplexGroupItem"/>
         </many-to-one>
@@ -70,11 +68,11 @@
             <column name="idOfDietType"/>
         </many-to-one>
 
-        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
             <column name="idOfContragent"/>
         </many-to-one>
 
-        <many-to-one name="wtOrgGroup" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
+        <many-to-one name="wtOrgGroup" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
             <column name="idOfOrgGroup"/>
         </many-to-one>
 
@@ -110,6 +108,10 @@
             <key column="idOfComplex"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" column="idOfRule"/>
         </set>
+
+        <property name="idOfOrgGroup">
+            <column name="idoforggroup" sql-type="long"/>
+        </property>
 
     </class>
 </hibernate-mapping>

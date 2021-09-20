@@ -23,6 +23,7 @@ import java.util.*;
 public class FunctionSelector {
 
     private List<Item> onlineReportItems = Collections.emptyList();
+    private List<Item> onlineReportItemsSupplierReport = Collections.emptyList();
     private List<Item> organizationItems = Collections.emptyList();
     private List<Item> contragentItems = Collections.emptyList();
     private List<Item> clientItems = Collections.emptyList();
@@ -33,6 +34,7 @@ public class FunctionSelector {
     private List<Item> monitorItems = Collections.emptyList();
     private List<Item> repositoryItems = Collections.emptyList();
     private List<Item> helpdeskItems = Collections.emptyList();
+    private List<Item> espItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
 
     private static final List<String> userFunctions = Arrays
@@ -47,46 +49,39 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
                     Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SALES_REPORTS,
                     Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
-                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT
-            );
+                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     private static final List<String> securityAdminFunctions = Arrays
             .asList(Function.FUNC_USER_VIEW, Function.FUNC_USER_EDIT, Function.FUNC_USER_DELETE,
-                    Function.FUNC_WORK_OPTION
-            );
-    private static final List<String> organizationFuncs = Arrays
-            .asList(Function.FUNC_ORG_EDIT, Function.FUNC_ORG_VIEW
-            );
+                    Function.FUNC_WORK_OPTION);
+    private static final List<String> organizationFuncs = Arrays.asList(Function.FUNC_ORG_EDIT, Function.FUNC_ORG_VIEW);
     private static final List<String> contragentFuncs = Arrays
             .asList(Function.FUNC_CONTRAGENT_EDIT, Function.FUNC_CONTRAGENT_VIEW, Function.FUNC_PAY_PROCESS,
                     Function.FUNC_PAYMENT_EDIT, Function.FUNC_PAYMENT_VIEW, Function.FUNC_POS_EDIT,
-                    Function.FUNC_POS_VIEW
-            );
+                    Function.FUNC_POS_VIEW);
     private static final List<String> clientFuncs = Arrays
             .asList(Function.FUNC_CLIENT_REMOVE, Function.FUNC_CLIENT_EDIT, Function.FUNC_CLIENT_VIEW,
-                    Function.FUNC_RESTRICT_ONLINE_REPORT_CLIENTS
-            );
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_CLIENTS);
     private static final List<String> visitorFuncs = Collections.singletonList(Function.FUNC_VISITORDOGM_EDIT);
     private static final List<String> cardFuncs = Arrays
-            .asList(Function.FUNC_CARD_EDIT, Function.FUNC_CARD_VIEW, Function.FUNC_RESTRICT_CARD_SIGNS
-            );
+            .asList(Function.FUNC_CARD_EDIT, Function.FUNC_CARD_VIEW, Function.FUNC_RESTRICT_CARD_SIGNS);
     private static final List<String> wayBillFuncs = Collections.singletonList(Function.FUNC_COMMODITY_ACCOUNTING);
     private static final List<String> serviceFuncs = Arrays
-            .asList(
-                Function.FUNC_SERVICE_ADMIN, Function.FUNC_SERVICE_CLIENTS, Function.FUNC_SERVICE_SUPPORT
-            );
+            .asList(Function.FUNC_SERVICE_ADMIN, Function.FUNC_SERVICE_CLIENTS, Function.FUNC_SERVICE_SUPPORT);
     private static final List<String> monitorFuncs = Collections.singletonList(Function.FUNC_MONITORING);
-    private static final List<String> repositoryFuncs = Collections.singletonList(Function.FUNC_SHOW_REPORTS_REPOSITORY);
+    private static final List<String> repositoryFuncs = Collections
+            .singletonList(Function.FUNC_SHOW_REPORTS_REPOSITORY);
     private static final List<String> helpdeskFuncs = Collections.singletonList(Function.FUNC_HELPDESK);
+    private static final List<String> espFuncs = Collections.singletonList(Function.FUNC_ESP);
     private static final List<String> optionsFuncs = Arrays
-            .asList(
-                    Function.FUNC_WORK_OPTION, Function.FUNC_CATEGORY_EDIT, Function.FUNC_CATEGORY_VIEW,
+            .asList(Function.FUNC_WORK_OPTION, Function.FUNC_CATEGORY_EDIT, Function.FUNC_CATEGORY_VIEW,
                     Function.FUNC_RULE_VIEW, Function.FUNC_RULE_EDIT, Function.FUNC_REPORT_EDIT,
-                    Function.FUNC_REPORT_VIEW, Function.FUNC_SUPPLIER
-            );
+                    Function.FUNC_REPORT_VIEW, Function.FUNC_SUPPLIER);
     private static final List<String> onlineReportFuncs = Arrays
-            .asList(
-                    Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX,
-                    Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
+            .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
+                    Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX, Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
                     Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS,
                     Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
                     Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL, Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY,
@@ -97,12 +92,37 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT,
                     Function.FUNC_RESTRICT_CARD_REPORTS, Function.FUNC_COUNT_CURRENT_POSITIONS,
                     Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_FEEDING_SETTINGS_ADMIN,
-                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT
-            );
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
+    private static final List<String> onlineReportFuncsForSupplierReport = Arrays
+            .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
+                    Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
+                    Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS,
+                    Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL, Function.FUNC_RESTRICT_CLIENT_REPORTS,
+                    Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_SALES_REPORTS,
+                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_COVERAGENUTRITION,
+                    Function.FUNC_RESTRICT_TRANSACTIONS_REPORT, Function.FUNC_COUNT_CURRENT_POSITIONS,
+                    Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_FEEDING_SETTINGS_ADMIN);
+    private static final List<String> blockedForSupplierReport = Arrays
+            .asList(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT, Function.FUNC_RESTRICT_FINANCIAL_CONTROL,
+                    Function.FUNC_RESTRICT_INFORM_REPORTS, Function.FUNC_RESTRICT_CARD_REPORTS,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT, Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY,
+                    Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_MANUAL_REPORT,
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
     }
+
+    public List<Item> onlineReportItemsAll(Boolean supplierReport) {
+        if (supplierReport) {
+            return onlineReportItemsSupplierReport;
+        }
+        return onlineReportItems;
+    }
+
 
     public List<Item> getOrganizationItems() {
         return organizationItems;
@@ -144,6 +164,10 @@ public class FunctionSelector {
         return helpdeskItems;
     }
 
+    public List<Item> getEspItems() {
+        return espItems;
+    }
+
     public List<Item> getOptionsItems() {
         return optionsItems;
     }
@@ -183,6 +207,9 @@ public class FunctionSelector {
                     .equalsIgnoreCase(Function.FUNC_CLIENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_REPORT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_DOCS) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
@@ -238,9 +265,14 @@ public class FunctionSelector {
             if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
                 supplierReportFunctions.add(function);
             }
+            //Добавляем функции, которые должны быть у Отчетность поставщика питания (911)
+            if (blockedForSupplierReport.contains(function.getFunctionName()))
+            {
+                supplierReportFunctions.add(function);
+            }
         }
 
-        for (Item item : onlineReportItems) {
+        for (Item item : onlineReportItemsSupplierReport) {
             if (item.isSelected()) {
                 Function function = (Function) session.load(Function.class, item.getIdOfFunction());
                 supplierReportFunctions.add(function);
@@ -269,6 +301,7 @@ public class FunctionSelector {
         List<Function> allFunctions = (List<Function>) allFunctionsCriteria.list();
 
         List<Item> onlineReportItems = new LinkedList<>();
+        List<Item> onlineReportItemsSupplierReport = new LinkedList<>();
         List<Item> organizationItems = new LinkedList<>();
         List<Item> contragentItems = new LinkedList<>();
         List<Item> clientItems = new LinkedList<>();
@@ -279,6 +312,7 @@ public class FunctionSelector {
         List<Item> monitorItems = new LinkedList<>();
         List<Item> repositoryItems = new LinkedList<>();
         List<Item> helpdeskItems = new LinkedList<>();
+        List<Item> espItems = new LinkedList<>();
         List<Item> optionsItems = new LinkedList<>();
 
         for (Function function : allFunctions) {
@@ -303,14 +337,23 @@ public class FunctionSelector {
                 repositoryItems.add(item);
             } else if (helpdeskFuncs.contains(item.getFunctionName())) {
                 helpdeskItems.add(item);
+            } else if (espFuncs.contains(item.getFunctionName())) {
+                espItems.add(item);
             } else if (optionsFuncs.contains(item.getFunctionName())) {
                 optionsItems.add(item);
-            } else if (onlineReportFuncs.contains(item.getFunctionName())) {
-                onlineReportItems.add(item);
+            } else {
+                if (onlineReportFuncs.contains(item.getFunctionName())) {
+                    onlineReportItems.add(item);
+                }
+                if (onlineReportFuncsForSupplierReport.contains(item.getFunctionName())) {
+                    onlineReportItemsSupplierReport.add(item);
+                }
             }
+
         }
 
         Collections.sort(onlineReportItems);
+        Collections.sort(onlineReportItemsSupplierReport);
         Collections.sort(organizationItems);
         Collections.sort(contragentItems);
         Collections.sort(clientItems);
@@ -319,6 +362,7 @@ public class FunctionSelector {
         Collections.sort(optionsItems);
 
         this.onlineReportItems = onlineReportItems;
+        this.onlineReportItemsSupplierReport = onlineReportItemsSupplierReport;
         this.organizationItems = organizationItems;
         this.contragentItems = contragentItems;
         this.clientItems = clientItems;
@@ -329,11 +373,13 @@ public class FunctionSelector {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
+        this.espItems = espItems;
         this.optionsItems = optionsItems;
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
         List<Item> onlineReportItems = new LinkedList<>();
+        List<Item> onlineReportItemsSupplierReport = new LinkedList<>();
         List<Item> organizationItems = new LinkedList<>();
         List<Item> contragentItems = new LinkedList<>();
         List<Item> clientItems = new LinkedList<>();
@@ -344,6 +390,7 @@ public class FunctionSelector {
         List<Item> monitorItems = new LinkedList<>();
         List<Item> repositoryItems = new LinkedList<>();
         List<Item> helpdeskItems = new LinkedList<>();
+        List<Item> espItems = new LinkedList<>();
         List<Item> optionsItems = new LinkedList<>();
 
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
@@ -402,19 +449,32 @@ public class FunctionSelector {
                     item.setSelected(true);
                 }
                 helpdeskItems.add(item);
+            } else if (espFuncs.contains(item.getFunctionName())) {
+                if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                    item.setSelected(true);
+                }
+                espItems.add(item);
             } else if (optionsFuncs.contains(item.getFunctionName())) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }
                 optionsItems.add(item);
-            } else if (onlineReportFuncs.contains(item.getFunctionName())) {
-                if (selectedFunctions != null && selectedFunctions.contains(function)) {
-                    item.setSelected(true);
+            } else {
+                if (onlineReportFuncs.contains(item.getFunctionName())) {
+                    if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                        item.setSelected(true);
+                    }
+                    onlineReportItems.add(item);
                 }
-                onlineReportItems.add(item);
+                if (onlineReportFuncsForSupplierReport.contains(item.getFunctionName())) {
+                    if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                        item.setSelected(true);
+                    }
+                    onlineReportItemsSupplierReport.add(item);
+                }
             }
-        }
-        Collections.sort(onlineReportItems);
+
+        } Collections.sort(onlineReportItems);
         Collections.sort(organizationItems);
         Collections.sort(contragentItems);
         Collections.sort(clientItems);
@@ -423,6 +483,7 @@ public class FunctionSelector {
         Collections.sort(optionsItems);
 
         this.onlineReportItems = onlineReportItems;
+        this.onlineReportItemsSupplierReport = onlineReportItemsSupplierReport;
         this.organizationItems = organizationItems;
         this.contragentItems = contragentItems;
         this.clientItems = clientItems;
@@ -433,7 +494,24 @@ public class FunctionSelector {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
+        this.espItems=espItems;
         this.optionsItems = optionsItems;
+    }
+
+    public Set<Function> getSelectedForForSupplierReportFunction(Session session)
+    {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List<Function> allFunctions = allFunctionsCriteria.list();
+        Set<Function> supplierReportFunctions = new HashSet<Function>();
+        for (Function function : allFunctions) {
+            //Добавляем функции, которые должны быть у Отчетность поставщика питания (911)
+            if (blockedForSupplierReport.contains(function.getFunctionName()))
+            {
+                supplierReportFunctions.add(function);
+            }
+        }
+        supplierReportFunctions.addAll(getSelected(session));
+        return supplierReportFunctions;
     }
 
     public Set<Function> getSelected(Session session) throws HibernateException {
@@ -445,6 +523,14 @@ public class FunctionSelector {
                 selectedFunctions.add(function);
             }
         }
+
+        for (Item item : onlineReportItemsSupplierReport) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
         for (Item item : organizationItems) {
             if (item.isSelected()) {
                 Function function = (Function) session.load(Function.class, item.getIdOfFunction());
@@ -515,6 +601,13 @@ public class FunctionSelector {
             }
         }
 
+        for (Item item : espItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
         for (Item item : optionsItems) {
             if (item.isSelected()) {
                 Function function = (Function) session.load(Function.class, item.getIdOfFunction());
@@ -523,6 +616,14 @@ public class FunctionSelector {
         }
 
         return selectedFunctions;
+    }
+
+    public List<Item> getOnlineReportItemsSupplierReport() {
+        return onlineReportItemsSupplierReport;
+    }
+
+    public void setOnlineReportItemsSupplierReport(List<Item> onlineReportItemsSupplierReport) {
+        this.onlineReportItemsSupplierReport = onlineReportItemsSupplierReport;
     }
 
     public static class Item implements Comparable<Item> {

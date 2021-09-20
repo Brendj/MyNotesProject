@@ -273,6 +273,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         private List<CategoryDiscount> categoryDiscountList;
         private List<CategoryOrg> categoryOrgList;
         private String subCategory;
+        private Integer codeMSP;
         //
 
 
@@ -340,6 +341,14 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.priority = priority;
         }
 
+        public Integer getCodeMSP() {
+            return codeMSP;
+        }
+
+        public void setCodeMSP(Integer codeMSP) {
+            this.codeMSP = codeMSP;
+        }
+
         private int priority;
         //
 
@@ -359,6 +368,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.priority = discountRule.getPriority();
             this.operationor = discountRule.getOperationOr();
             this.categoryDiscountList = new LinkedList<CategoryDiscount>();
+            this.codeMSP = discountRule.getCodeMSP() == null ? null : discountRule.getCodeMSP().getCode();
             if(!discountRule.getCategoriesDiscounts().isEmpty()){
                 StringBuilder stringBuilder = new StringBuilder();
                 for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.CommonTaskService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
@@ -87,6 +88,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean disableEditingClientsFromAISReestr;
     private Boolean usePaydableSubscriptionFeeding;
     private Boolean workInSummerTime;
+    private Boolean governmentContract;
+    private Boolean useLongCardNo;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -139,6 +142,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean preorderlp;
 
     private Boolean useWebArm;
+    private Boolean goodDateCheck;
     private Long orgIdFromNsi = null;
 
     public String getDefaultSupplierMode() {
@@ -323,6 +327,15 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        for (Org fOrg : friendlyOrg) {
+            if (!fOrg.getIdOfOrg().equals(org.getIdOfOrg())) {
+                fOrg.setUseWebArm(useWebArm);
+                if (useWebArm) {
+                    fOrg.setUsePaydableSubscriptionFeeding(false);
+                }
+            }
+        }
+
         for (Org o : selectOrg) {
             o.setParticipantOP(participantOP);
             o.setPreorderlp(preorderlp);
@@ -424,10 +437,14 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         org.setPreorderlp(preorderlp);
         org.setUseWebArm(useWebArm);
+        org.setGooddatecheck(goodDateCheck);
         org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
+        org.setGovernmentContract(governmentContract);
+        org.setUseLongCardNo(useLongCardNo);
 
         session.update(org);
         fill(org);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
 
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
 
@@ -480,6 +497,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.workInSummerTime = org.getIsWorkInSummerTime();
+        this.useLongCardNo = org.getUseLongCardNo() == null ? false : org.getUseLongCardNo();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -581,7 +599,9 @@ public class OrgEditPage extends BasicWorkspacePage
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
         this.useWebArm = org.getUseWebArm();
+        this.goodDateCheck = org.getGooddatecheck();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
+        this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -676,6 +696,12 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
             menuExchangeSourceOrgName = org.getShortName();
+        }
+    }
+
+    public void changeSubscriptionFeeding() {
+        if (useWebArm) {
+            usePaydableSubscriptionFeeding = false;
         }
     }
 
@@ -1250,6 +1276,14 @@ public class OrgEditPage extends BasicWorkspacePage
         this.subordination = subordination;
     }
 
+    public Boolean getGoodDateCheck() {
+        return goodDateCheck;
+    }
+
+    public void setGoodDateCheck(Boolean goodDateCheck) {
+        this.goodDateCheck = goodDateCheck;
+    }
+
     public static class ContragentItem {
         private final Long idOfContragent;
 
@@ -1441,4 +1475,20 @@ public class OrgEditPage extends BasicWorkspacePage
     public Long getOrgIdFromNsi() { return orgIdFromNsi; }
 
     public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
+
+    public Boolean getGovernmentContract() {
+        return governmentContract;
+    }
+
+    public void setGovernmentContract(Boolean governmentContract) {
+        this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseLongCardNo() {
+        return useLongCardNo;
+    }
+
+    public void setUseLongCardNo(Boolean useLongCardNo) {
+        this.useLongCardNo = useLongCardNo;
+    }
 }

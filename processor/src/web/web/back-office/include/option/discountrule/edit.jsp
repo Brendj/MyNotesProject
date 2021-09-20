@@ -63,6 +63,11 @@
         <f:selectItem itemLabel="И" itemValue="false" />
         <f:selectItem itemLabel="ИЛИ" itemValue="true" />
     </h:selectOneListbox>
+    <h:outputText value="Код МСП" styleClass="output-text"/>
+    <h:selectOneListbox id="codeMSPEdit" value="#{ruleEditPage.codeMSP}" size="1"
+                        styleClass="output-text" >
+        <f:selectItems value="#{ruleEditPage.allMSP}" />
+    </h:selectOneListbox>
 
     <h:outputText value="Комплексы" styleClass="output-text"/>
     <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
@@ -71,7 +76,6 @@
             <f:selectItems value="#{ruleEditPage.availableComplexs}" />
         </h:selectManyCheckbox>
     </h:panelGroup>
-
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{ruleEditPage.updateRule}" reRender="workspaceTogglePanel"

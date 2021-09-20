@@ -444,7 +444,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
 
             Criteria reportCrit = session.createCriteria(EnterEvent.class);
-            reportCrit.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
+            reportCrit.createAlias("client", "c", JoinType.INNER_JOIN);
+            reportCrit.createAlias("c.clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
             reportCrit.add(Restrictions.in("org.idOfOrg", ids));
             reportCrit.add(Restrictions.in("passDirection", Arrays.asList(0, 1, 6, 7)));
             reportCrit.add(Restrictions.in("client.idOfClient", map.keySet()));

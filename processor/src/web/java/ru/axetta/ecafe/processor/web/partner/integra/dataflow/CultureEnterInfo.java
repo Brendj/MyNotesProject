@@ -15,6 +15,7 @@ public class CultureEnterInfo extends Result {
     private ArrayList<CultureEnterInfo> child;
     private ArrayList<CultureEnterInfo> childrens;
     private String guid;
+    private String mesId;
     private Boolean fullAge;
     private String groupName;
 
@@ -76,5 +77,13 @@ public class CultureEnterInfo extends Result {
 
     public void setChildrens(ArrayList<CultureEnterInfo> childrens) {
         this.childrens = childrens;
+    }
+
+    public String getMesId() {
+        return mesId;
+    }
+
+    public void setMesId(String mesId) {
+        this.mesId = mesId;
     }
 }

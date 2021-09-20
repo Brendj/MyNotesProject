@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
+import ru.axetta.ecafe.processor.core.persistence.service.menu.WtComplexCopyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -113,6 +114,16 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Генерация данных ключевых показателей выполнена");
     }
 
+    public void cancelPreorder() throws Exception {
+       PreorderCancelNotificationService.sendNotification.manualStart();
+        printMessage("Отправка уведомлений об отмене предзаказа выполнена");
+    }
+
+    public void archvedExeption() throws Exception {
+        ArchivedExeptionService.archivedExeption.manualStart();
+        printMessage("Архивирование событий выполнено");
+    }
+
     public void runImportRegisterClients() throws Exception {
         RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                 .run(); //DEF
@@ -145,7 +156,12 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runReceiveEMPUpdates() throws Exception {
-        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(); //DEF
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("кнопка \"Запустить загрузку обновления из ЕМП\" в Сервис/Другое");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(clientsMobileHistory); //DEF
         printMessage("Загрузка обновление из ЕМП завершена");
     }
 
@@ -300,11 +316,16 @@ public class OtherActionsPage extends OnlineReportPage {
             int count = 0;
             try {
                 orgs = getOrgsForGenGuardians();
-                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("кнопка \"Генерировать представителей\" в Сервис/Другое");
+                User user = MainPage.getSessionInstance().getCurrentUser();
+                clientsMobileHistory.setUser(user);
+                clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
                 clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
                 clientGuardianHistory.setReason("Нажата кнопка \"Генерировать представителей\" в Сервис/Другое");
-                count = ClientService.getInstance().generateGuardians(orgs, clientGuardianHistory);
+                count = ClientService.getInstance().generateGuardians(orgs, clientsMobileHistory, clientGuardianHistory);
             } catch (Exception e) {
                 printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
                 return;
@@ -504,12 +525,17 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void loadESZMigrants() throws Exception {
         try {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("кнопка \"Обработка мигрантов\" в Сервис/Другое");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов\" в Сервис/Другое");
             clientGuardianHistory.setAction("Обработка мигрантов");
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants(clientGuardianHistory);
+            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants(clientsMobileHistory, clientGuardianHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run load ESZ migrants: ", e);
@@ -604,6 +630,18 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    public void checkPreorderClientGroups() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .checkPreorderClientGroups(new PreorderRequestsReportServiceParam(new Date()));
+            printMessage("Проверка групп клиентов завершена");
+        } catch (Exception e) {
+            getLogger().error("Error create checkPreorderClientGroups: ", e);
+            printError("Во время проверки групп клиентов произошла ошибка с текстом " + e
+                    .getMessage());
+        }
+    }
+
     public void relevancePreordersToMenu() throws Exception {
         try {
             RuntimeContext.getAppContext().getBean(PreorderOperationsService.class)
@@ -642,6 +680,12 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void sendToAtol() {
         RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
+        printMessage("Отправка платежей в Атол выполнена");
+    }
+
+    public void processWtComplexes() {
+        RuntimeContext.getAppContext().getBean(WtComplexCopyService.class).runTask();
+        printMessage("Обработка копий комплексов веб арма ПП выполнена");
     }
 
     public void preorderRequestsManualGenerate() throws Exception {
@@ -787,13 +831,18 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void updateESZMigrants() throws Exception {
         try {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("нажата кнопка \"Обработка мигрантов (перевод в выбывшие)\" в Сервис/Другое");
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            clientsMobileHistory.setUser(user);
+            clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов (перевод в выбывшие)\" в Сервис/Другое");
             clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class)
-                    .updateMigrants(clientGuardianHistory);
+                    .updateMigrants(clientsMobileHistory, clientGuardianHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run update ESZ migrants: ", e);

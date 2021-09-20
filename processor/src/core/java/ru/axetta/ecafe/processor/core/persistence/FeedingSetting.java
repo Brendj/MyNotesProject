@@ -21,6 +21,9 @@ public class FeedingSetting {
     private Long idOfSetting;
     private String settingName;
     private Long limit;
+    private Long discount;
+    private Boolean useDiscount;
+    private Boolean useDiscountBuffet;
     private Date lastUpdate;
     private Set<Org> orgsInternal = new HashSet<Org>();
     private User user;
@@ -29,9 +32,12 @@ public class FeedingSetting {
 
     }
 
-    public FeedingSetting(String settingName, Long limit, Set<Org> orgs) {
+    public FeedingSetting(String settingName, Long limit, Long discount, Boolean useDiscount, Boolean useDiscountBuffet, Set<Org> orgs) {
         this.settingName = settingName;
         this.limit = limit;
+        this.discount = discount;
+        this.useDiscountBuffet = useDiscountBuffet;
+        this.useDiscount = useDiscount;
         this.orgsInternal = orgs;
         this.lastUpdate = new Date();
         this.user = DAOReadonlyService.getInstance().getUserFromSession();
@@ -52,6 +58,7 @@ public class FeedingSetting {
                 "idOfSetting=" + idOfSetting +
                 ", settingName='" + settingName + '\'' +
                 ", limit=" + limit +
+                ", discount=" + discount +
                 ", lastUpdate=" + CalendarUtils.dateTimeToString(lastUpdate) +
                 '}';
     }
@@ -127,5 +134,29 @@ public class FeedingSetting {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Long getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Long discount) {
+        this.discount = discount;
+    }
+
+    public Boolean getUseDiscount() {
+        return useDiscount;
+    }
+
+    public void setUseDiscount(Boolean useDiscount) {
+        this.useDiscount = useDiscount;
+    }
+
+    public Boolean getUseDiscountBuffet() {
+        return useDiscountBuffet;
+    }
+
+    public void setUseDiscountBuffet(Boolean useDiscountBuffet) {
+        this.useDiscountBuffet = useDiscountBuffet;
     }
 }
