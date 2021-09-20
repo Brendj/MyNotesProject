@@ -44,7 +44,7 @@ public class CreateOrUpdateGuardianCommand {
 
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
-            clientGuardianHistory.setReason("Веб метод createOrUpdateGuardian (АРМ администратора)");
+            clientGuardianHistory.setReason("Rest метод createOrUpdateGuardian (АРМ администратора)");
             clientGuardianHistory.setUser(user);
             clientGuardianHistory.setChangeDate(new Date());
 

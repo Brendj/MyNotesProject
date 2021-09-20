@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.updateClientRegistryVersion;
@@ -58,7 +59,13 @@ class UpdateGroupCommand {
             }
             response = GroupClientsUpdateResponse.from(clientGroup);
             updateBindingOrg(request, clientGroup, response, session);
-            updateBindingClients(request.getBindingOrgId(), clientGroup, session, user);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
+            clientGuardianHistory.setReason("Rest метод (АРМ администратора)");
+            clientGuardianHistory.setAction("Обновить группу клиента");
+            clientGuardianHistory.setUser(user);
+            clientGuardianHistory.setChangeDate(new Date());
+            updateBindingClients(request.getBindingOrgId(), clientGroup, session, user, clientGuardianHistory);
             session.flush();
             transaction.commit();
             transaction = null;
@@ -76,7 +83,7 @@ class UpdateGroupCommand {
 
     }
 
-    private void updateBindingClients(Long bindingOrg, ClientGroup clientGroup, Session session, User user)
+    private void updateBindingClients(Long bindingOrg, ClientGroup clientGroup, Session session, User user, ClientGuardianHistory clientGuardianHistory)
             throws Exception {
         if (bindingOrg == null) {
             return;
@@ -108,7 +115,7 @@ class UpdateGroupCommand {
         for (Client client : clients) {
             ClientUpdateItem clientUpdateItem = ClientUpdateItem.from(client, foundNewGroup);
             String error = moveClientsCommand
-                    .executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, false);
+                    .executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, false, clientGuardianHistory);
             if (StringUtils.isNotEmpty(error)) {
                 throw new WebApplicationException(
                         String.format("Ошибка при смене привязки у клинета c ID='%d', ", client.getIdOfClient()));

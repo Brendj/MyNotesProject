@@ -59,7 +59,13 @@ class UpdateClientCommand {
             setConfirmVideo(request.getConfirmVisualRecognition(), client);
             setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(),
                     request.getUseLastEEModeForPlan(), client);
-            setGroupAndMiddleGroup(request, client, session, user);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
+            clientGuardianHistory.setReason("Rest метод (АРМ администратора)");
+            clientGuardianHistory.setAction("Обновить данные клиента");
+            clientGuardianHistory.setUser(user);
+            clientGuardianHistory.setChangeDate(new Date());
+            setGroupAndMiddleGroup(request, client, session, user, clientGuardianHistory);
             setPersonName(request, client);
             client.setUpdateTime(new Date());
             client.setClientRegistryVersion(version);
@@ -117,7 +123,7 @@ class UpdateClientCommand {
         }
     }
 
-    private void setGroupAndMiddleGroup(ClientUpdateItem request, Client client, Session session, User user) {
+    private void setGroupAndMiddleGroup(ClientUpdateItem request, Client client, Session session, User user, ClientGuardianHistory clientGuardianHistory) {
         if (request.getIdOfClientGroup() == null) {
             return;
         }
@@ -132,7 +138,8 @@ class UpdateClientCommand {
                         String.format("Group of client with ID='%d' not found", request.getIdOfClientGroup()));
             }
             // обновляем группу
-            String result = moveClientsCommand.updateClientGroupOrGetError(session, moveToGroup, client, user, false);
+            String result = moveClientsCommand.updateClientGroupOrGetError(session, moveToGroup, client, user,
+                    false, clientGuardianHistory);
             if (StringUtils.isNotEmpty(result)) {
                 throw new WebApplicationException(result);
             }

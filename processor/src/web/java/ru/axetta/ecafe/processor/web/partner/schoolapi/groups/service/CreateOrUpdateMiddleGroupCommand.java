@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -105,7 +106,13 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
                 GroupNamesToOrgs foundGroupWithNewName = foundMiddleGroupByName(session, mainBuildingOrgId, request);
                 if (foundGroupWithNewName == null || foundGroupWithNewName.getIdOfGroupNameToOrg()
                         .equals(foundCurrentGroup.getIdOfGroupNameToOrg())) {
-                    GroupNamesToOrgs middleGroup = updateMiddleGroup(request, foundCurrentGroup, user, session);
+                    ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                    clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
+                    clientGuardianHistory.setReason("Rest метод subgroups (АРМ администратора)");
+                    clientGuardianHistory.setAction("Обновить подгруппу клиента");
+                    clientGuardianHistory.setUser(user);
+                    clientGuardianHistory.setChangeDate(new Date());
+                    GroupNamesToOrgs middleGroup = updateMiddleGroup(request, foundCurrentGroup, user, session, clientGuardianHistory);
                     response = MiddleGroupResponse.from(middleGroup);
                 } else {
                     throw WebApplicationException.badRequest(DUPLICATE_GROUP_NAME,
@@ -135,7 +142,7 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
     }
 
     private GroupNamesToOrgs updateMiddleGroup(MiddleGroupRequest request, GroupNamesToOrgs groupNamesToOrgs, User user,
-            Session session) throws Exception {
+            Session session, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Long oldBindingOrg = groupNamesToOrgs.getIdOfOrg();
         List<Client> clientListWithMiddleGroup = getClientListWithMiddleGroup(session, groupNamesToOrgs);
         // обновить саму подгруппу
@@ -153,14 +160,14 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
             } else {
                 // смена группы, подгруппы для клиента
                 updateGroupAndMiddleGroupForClients(request, clientListWithMiddleGroup,
-                        groupNamesToOrgs.getIdOfGroupNameToOrg(), user, session);
+                        groupNamesToOrgs.getIdOfGroupNameToOrg(), user, session, clientGuardianHistory);
             }
         }
         return groupNamesToOrgs;
     }
 
     private void updateGroupAndMiddleGroupForClients(MiddleGroupRequest request, List<Client> clientListWithMiddleGroup,
-            Long idOfGroupNamesToOrg, User user, Session session) throws Exception {
+            Long idOfGroupNamesToOrg, User user, Session session, ClientGuardianHistory clientGuardianHistory) throws Exception {
         if (!clientListWithMiddleGroup.isEmpty()) {
             ClientGroup foundNewGroup = DAOUtils
                     .findClientGroupByGroupNameAndIdOfOrg(session, request.getBindingOrgId(),
@@ -176,7 +183,7 @@ class CreateOrUpdateMiddleGroupCommand extends BaseMiddleGroupCommand {
                 clientUpdateItem.setIdOfMiddleGroup(idOfGroupNamesToOrg);
 
                 String error = moveClientsCommand
-                        .executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, true);
+                        .executeMoveOrError(session, clientUpdateItem, client, foundNewGroup, version, user, true, clientGuardianHistory);
                 if (StringUtils.isNotEmpty(error)) {
                     throw new WebApplicationException(
                             String.format("Ошибка при обновлении клиентов для подгруппы с ID='%d'",
