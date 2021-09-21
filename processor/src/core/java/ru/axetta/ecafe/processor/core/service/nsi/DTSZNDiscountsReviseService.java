@@ -606,7 +606,7 @@ public class DTSZNDiscountsReviseService {
         if (StringUtils.isEmpty(guid)) {
             Date deltaDate = null;
             try {
-                deltaDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getReviseLastDate());
+                deltaDate = CalendarUtils.parseDateWithDayTime(DAOReadonlyService.getInstance().getReviseLastDate());
             } catch (Exception ignore) {
             }
             if (deltaDate == null) {

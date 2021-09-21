@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.card.sign;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CryptoSign;
 import ru.axetta.ecafe.processor.core.persistence.CardSign;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -55,7 +55,7 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
         }
         //Только для нового типа поставщика
         if (newProvider) {
-            List<CardSign> cardsignList = DAOService.getInstance().findCardsignByManufactureCodeForNewTypeProvider(manufacturerCode);
+            List<CardSign> cardsignList = DAOReadonlyService.getInstance().findCardsignByManufactureCodeForNewTypeProvider(manufacturerCode);
             //Если есть хоть одна запись....
             if (!cardsignList.isEmpty()) {
                 printError("Поставщик с данным кодом производителя уже зарегистрирован");

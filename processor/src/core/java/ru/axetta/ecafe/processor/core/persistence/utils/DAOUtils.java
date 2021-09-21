@@ -4,15 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
-import org.hibernate.criterion.*;
-import org.hibernate.exception.SQLGrammarException;
-import org.hibernate.sql.JoinType;
-import org.hibernate.transform.Transformers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
@@ -55,6 +46,16 @@ import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.*;
+import org.hibernate.criterion.*;
+import org.hibernate.exception.SQLGrammarException;
+import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -248,10 +249,10 @@ public class DAOUtils {
         return ((Client) l.get(0));
     }
 
-    public static List getClientsListByMobilePhone(EntityManager em, String mobile) {
+    public static List<Client> getClientsListByMobilePhone(EntityManager em, String mobile) {
         javax.persistence.Query q = em.createQuery("from Client where mobile=:mobile");
         q.setParameter("mobile", mobile);
-        List l = q.getResultList();
+        List<Client> l = q.getResultList();
         if (l.size() == 0) {
             return null;
         }
@@ -675,7 +676,7 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List findClientPaymentsForCorrectionOperation(Session persistenceSession, Contragent contragent,
+    public static List<ClientPayment> findClientPaymentsForCorrectionOperation(Session persistenceSession, Contragent contragent,
             String idOfPayment) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ClientPayment.class);
         criteria.add(Restrictions.like("idOfPayment", idOfPayment,

@@ -5,14 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import com.google.common.base.Joiner;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrTokenizer;
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
@@ -149,6 +142,15 @@ import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperatio
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrTokenizer;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.*;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -859,7 +861,7 @@ public class Processor implements SyncProcessor {
 
         runRegularPaymentsIfEnabled(request);
 
-        String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
+        String fullName = DAOReadonlyService.getInstance().getPersonNameByOrg(request.getOrg());
 
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "Service funcs", timeForDelta);
 
@@ -1397,7 +1399,7 @@ public class Processor implements SyncProcessor {
             updateFullSyncParam(request.getIdOfOrg());
         }
 
-        String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
+        String fullName = DAOReadonlyService.getInstance().getPersonNameByOrg(request.getOrg());
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime,
                 responseSections);
@@ -2534,7 +2536,7 @@ public class Processor implements SyncProcessor {
 
         Date syncEndTime = new Date();
 
-        String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
+        String fullName = DAOReadonlyService.getInstance().getPersonNameByOrg(request.getOrg());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "",
@@ -5222,7 +5224,7 @@ public class Processor implements SyncProcessor {
                 // отмена заказа
                 if (null != order) {
                     if (payment.getIdOfClient() != null) {
-                        Client client = DAOService.getInstance().findClientById(payment.getIdOfClient());
+                        Client client = DAOReadonlyService.getInstance().findClientById(payment.getIdOfClient());
                         SecurityJournalBalance journalBalance = SecurityJournalBalance
                                 .getSecurityJournalBalanceDataFromOrder(payment, client,
                                         SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT,
@@ -7007,7 +7009,7 @@ public class Processor implements SyncProcessor {
                                 if (guardianId != null) {
                                     List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient,
                                             null);//guardianId);
-                                    Client guardianFromEnterEvent = DAOService.getInstance().findClientById(guardianId);
+                                    Client guardianFromEnterEvent = DAOReadonlyService.getInstance().findClientById(guardianId);
                                     values = EventNotificationService
                                             .attachGuardianIdToValues(guardianFromEnterEvent.getIdOfClient(), values);
                                     values = EventNotificationService

@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Query;
@@ -69,7 +69,7 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
                 }
                 if (!guidOK) {
                     String badGuidString = "";
-                    List<Org> orgs = DAOService.getInstance().findOrgsByNSIId(Long.parseLong(nsiId));
+                    List<Org> orgs = DAOReadonlyService.getInstance().findOrgsByNSIId(Long.parseLong(nsiId));
                     for (Org o : orgs) {
                         badGuidString += String.format("НСИ-3 Ид: %s, Ид. организации: %s, Название организации: %s;\n", nsiId, o.getIdOfOrg(), o.getShortNameInfoService());
                     }

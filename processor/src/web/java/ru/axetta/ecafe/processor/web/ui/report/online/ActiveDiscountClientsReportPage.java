@@ -6,27 +6,21 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.report.ActiveClientsReport;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -118,7 +112,7 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
         if (idOfOrg != null) {
             Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
+                org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
             }
             reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
         }
@@ -140,7 +134,7 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
 
     public SelectItem[] getDistricts() {
         List<SelectItem> items = new ArrayList<SelectItem>();
-        String districts [] = DAOService.getInstance().getDistricts();
+        String[] districts = DAOReadonlyService.getInstance().getDistricts();
         for(String d : districts) {
             items.add(new SelectItem(d, d));
         }

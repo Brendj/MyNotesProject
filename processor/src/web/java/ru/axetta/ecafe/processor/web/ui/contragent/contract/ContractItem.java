@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
@@ -94,7 +95,7 @@ public class ContractItem extends AbstractEntityItem<Contract> {
         dateOfConclusion = contract.getDateOfConclusion();
         contractState = contract.getContractState();
         try {
-            contragent = DAOService.getInstance().getContragentById(contract.getContragent().getIdOfContragent());
+            contragent = DAOReadonlyService.getInstance().getContragentById(contract.getContragent().getIdOfContragent());
         } catch (Exception e) {
             contragent = contract.getContragent();
         }

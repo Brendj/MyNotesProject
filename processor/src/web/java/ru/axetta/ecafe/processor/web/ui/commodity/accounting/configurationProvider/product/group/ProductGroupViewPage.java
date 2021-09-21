@@ -4,18 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.ProductListPage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.ProductListPage;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,7 +38,7 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
     @Autowired
     private ProductListPage productListPage;
     @Autowired
-    private DAOService service;
+    private DAOReadonlyService service;
 
 
     @Override

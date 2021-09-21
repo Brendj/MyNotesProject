@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.cardoperator;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
@@ -160,14 +160,13 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
 
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
-        List history = cardOperatorFilter.retrieveCards(session);
-        for (Object object : history) {
-            HistoryCard hist = (HistoryCard) object;
+        List<HistoryCard> history = cardOperatorFilter.retrieveCards(session);
+        for (HistoryCard hist : history) {
             Card card = hist.getCard();
             Org org = card.getOrg();
             String personName = "";
             if (card.getClient() != null) {
-                Person person = DAOService.getInstance().getPersonByClient(card.getClient());
+                Person person = DAOReadonlyService.getInstance().getPersonByClient(card.getClient());
                 personName = person.getFullName();
             }
             items.add(new Item(org, hist, personName));

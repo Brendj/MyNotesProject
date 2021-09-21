@@ -4,6 +4,18 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
+import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -18,17 +30,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.logic.DiscountManager;
-import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
-import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -1188,7 +1189,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         private String nsiInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
-            Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
+            Set<Org> orgs = DAOReadonlyService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
             orgGuids = new HashSet<String>();
             guidInfo = "";
             orgNSIIds = new HashSet<>();
@@ -1643,7 +1644,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     @Transactional
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
             boolean manualCheckout) throws Exception {
-        if (!DAOService.getInstance().isSverkaEnabled()) {
+        if (!DAOReadonlyService.getInstance().isSverkaEnabled()) {
             throw new ServiceTemporaryUnavailableException("Service temporary unavailable");
         } else if(!RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3)
                 && !ImportRegisterNSI3ServiceKafkaWrapper.workWithKafka()){

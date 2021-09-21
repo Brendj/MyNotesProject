@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.card.sign;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CardSign;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -67,7 +67,7 @@ public class CardSignEditPage extends CardSignDataBasicPage {
         }
         //Только для нового типа поставщика
         if (newProvider) {
-            List<CardSign> cardsignList = DAOService.getInstance().findCardsignByManufactureCodeForNewTypeProvider(manufacturerCode);
+            List<CardSign> cardsignList = DAOReadonlyService.getInstance().findCardsignByManufactureCodeForNewTypeProvider(manufacturerCode);
             if (!cardsignList.isEmpty()) {
                 for (CardSign cardSign : cardsignList) {
                     //Если среди найденных записей есть другие кроме редактируемого

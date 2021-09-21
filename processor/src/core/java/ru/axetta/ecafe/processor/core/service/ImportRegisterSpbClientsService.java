@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.partner.spb.SpbClientService;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -119,7 +119,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
             boolean manualCheckout) throws Exception {
         logBuffer = new StringBuffer();
-        if (!DAOService.getInstance().isSverkaEnabled()) {
+        if (!DAOReadonlyService.getInstance().isSverkaEnabled()) {
             throw new Exception("Service temporary unavailable");
         }
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));

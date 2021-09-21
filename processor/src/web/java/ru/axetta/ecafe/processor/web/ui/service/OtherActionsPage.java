@@ -167,7 +167,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void runSendEMPEvent() throws Exception {
         //Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
-        Client client = DAOService.getInstance().findClientById(1069L);
+        Client client = DAOReadonlyService.getInstance().findClientById(1069L);
 
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(new Date(System.currentTimeMillis()));
@@ -211,7 +211,7 @@ public class OtherActionsPage extends OnlineReportPage {
                 printMessage("Клиент не найден");
                 return;
             }
-            List<EMIAS> emias = DAOService.getInstance()
+            List<EMIAS> emias = DAOReadonlyService.getInstance()
                     .findEMIASbyClientandBeetwenDates(client, getStartDateEMP(), getEndDateEMP());
             for (EMIAS emias1 : emias) {
                 Integer eventsStatus = -1;
@@ -230,7 +230,7 @@ public class OtherActionsPage extends OnlineReportPage {
                         break;
                 }
 
-                ExternalEvent event = DAOService.getInstance()
+                ExternalEvent event = DAOReadonlyService.getInstance()
                         .getExternalEvent(client, client.getOrg().getShortNameInfoService(), client.getOrg().getOfficialName(),
                                 ExternalEventType.SPECIAL, emias1.getDateLiberate(),
                                 ExternalEventStatus.fromInteger(eventsStatus));
@@ -354,7 +354,7 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void loadNSIFile() throws Exception {
-        if (!DAOService.getInstance().isSverkaEnabled()) {
+        if (!DAOReadonlyService.getInstance().isSverkaEnabled()) {
             printError("Сверка отключена в настройках. Загрузка файла не будет выполнена");
             return;
         }

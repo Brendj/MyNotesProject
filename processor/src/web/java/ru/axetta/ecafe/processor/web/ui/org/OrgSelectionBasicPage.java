@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -166,7 +165,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     public List<SelectItem> getRegions() {
         if(CollectionUtils.isEmpty(regions)) {
-            List<String> regionsFromDB = DAOService.getInstance().getRegions();
+            List<String> regionsFromDB = DAOReadonlyService.getInstance().getRegions();
             regions = new LinkedList<>();
             regions.add(new SelectItem(""));
             for (String reg : regionsFromDB) {
@@ -390,7 +389,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                     return Collections.emptyList();
                 }
 
-                List<Contragent> contragents = DAOService.getInstance().contragentsListByUser(user.getIdOfUser());
+                List<Contragent> contragents = DAOReadonlyService.getInstance().contragentsListByUser(user.getIdOfUser());
                 contragentsList = new LinkedList<>();
 
                 contragentsList.add(new SelectItem(-1L, ""));

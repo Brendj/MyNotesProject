@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
@@ -72,7 +73,7 @@ public class FrontControllerProcessor {
                                                             Integer actionFilter, String nameFilter, String className) {
         try {
             List<RegistryChangeItem> items = new ArrayList<RegistryChangeItem>();
-            List<RegistryChange> changes = DAOService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter, className);
+            List<RegistryChange> changes = DAOReadonlyService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter, className);
             for (RegistryChange c : changes) {
                 RegistryChangeItem i = new RegistryChangeItem(c.getIdOfOrg(),
                         c.getIdOfMigrateOrgTo() == null ? -1L : c.getIdOfMigrateOrgTo(),
@@ -125,7 +126,7 @@ public class FrontControllerProcessor {
         try {
             List<RegistryChangeItemV2> itemParams = new LinkedList<>();
 
-            List<RegistryChange> changes = DAOService.getInstance()
+            List<RegistryChange> changes = DAOReadonlyService.getInstance()
                     .getLastRegistryChanges_WithFullFIO(idOfOrg, revisionDate, actionFilter, lastName, firstName, patronymic, className);
 
             RegistryChangeItemV2 registryChangeItemV2;
@@ -251,7 +252,7 @@ public class FrontControllerProcessor {
 
     private List<RegistryChangeRevisionItem> loadRegistryChangeRevisionsByClassName(long idOfOrg, String className) {
         try {
-            List<Object[]> queryResult = DAOService.getInstance().getRegistryChangeRevisions(idOfOrg, className);
+            List<Object[]> queryResult = DAOReadonlyService.getInstance().getRegistryChangeRevisions(idOfOrg, className);
             if(CollectionUtils.isEmpty(queryResult)) {
                 return Collections.EMPTY_LIST;
             }
@@ -353,10 +354,10 @@ public class FrontControllerProcessor {
     public List<RegistryChangeErrorItem> loadRegistryChangeErrorItems(long idOfOrg) {
         try {
             List<RegistryChangeErrorItem> items = new LinkedList<>();
-            List<RegistryChangeError> errors = DAOService.getInstance().getRegistryChangeErrors(idOfOrg);
+            List<RegistryChangeError> errors = DAOReadonlyService.getInstance().getRegistryChangeErrors(idOfOrg);
 
             for (RegistryChangeError e : errors) {
-                String orgName = DAOService.getInstance().findOrById(e.getIdOfOrg()).getOfficialName();
+                String orgName = DAOReadonlyService.getInstance().findOrById(e.getIdOfOrg()).getOfficialName();
                 RegistryChangeErrorItem i = new RegistryChangeErrorItem(e.getIdOfRegistryChangeError(), e.getIdOfOrg(),
                         e.getRevisionCreateDate(), e.getCreateDate(),
                         e.getCommentCreateDate(), e.getError(),

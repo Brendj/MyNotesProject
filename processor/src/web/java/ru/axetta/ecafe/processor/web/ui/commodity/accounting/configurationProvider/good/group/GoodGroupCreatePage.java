@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
@@ -21,7 +22,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,7 +79,7 @@ public class GoodGroupCreatePage extends BasicWorkspacePage implements Configura
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
-            org = daoService.findOrById(idOfOrg);
+            org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
         }
     }
 

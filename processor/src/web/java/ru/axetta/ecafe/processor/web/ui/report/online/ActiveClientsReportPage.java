@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.ActiveClientsReport;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -68,7 +68,7 @@ public class ActiveClientsReportPage extends OnlineReportPage {
             List<BasicReportJob.OrgShortItem> orgShortItemList = new ArrayList<BasicReportJob.OrgShortItem>();
 
             for (Long idOfOrg : idOfOrgList) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
+                org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
                 orgShortItemList.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(),
                         org.getOfficialName()));
             }
@@ -147,7 +147,7 @@ public class ActiveClientsReportPage extends OnlineReportPage {
                         List<BasicReportJob.OrgShortItem> orgShortItemList = new ArrayList<BasicReportJob.OrgShortItem>();
 
                         for (Long idOfOrg : idOfOrgList) {
-                            org = DAOService.getInstance().findOrById(idOfOrg);
+                            org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
                             orgShortItemList.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(),
                                     org.getOfficialName()));
                         }

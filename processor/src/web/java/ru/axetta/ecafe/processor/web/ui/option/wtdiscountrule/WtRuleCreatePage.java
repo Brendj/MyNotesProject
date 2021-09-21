@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
@@ -71,6 +72,8 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private int subCategory = -1;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
 
     private long complexType = -1L;
     private long ageGroup = -1L;
@@ -141,8 +144,8 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         List<SelectItem> res = new ArrayList<>();
         List<WtComplexGroupItem> complexGroupItems;
         res.add(new SelectItem(0, " "));
-        complexGroupItems = daoService.getWtComplexGroupList();
-        Long valueAllId = daoService.getWtComplexGroupIdByDescription("все");
+        complexGroupItems = daoReadonlyService.getWtComplexGroupList();
+        Long valueAllId = daoReadonlyService.getWtComplexGroupIdByDescription("все");
         for (WtComplexGroupItem item : complexGroupItems) {
             if (valueAllId > 0 && !item.getIdOfComplexGroupItem().equals(valueAllId)) {
                 res.add(new SelectItem(item.getIdOfComplexGroupItem(), item.getDescription()));
@@ -155,8 +158,8 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         List<SelectItem> res = new ArrayList<>();
         List<WtAgeGroupItem> ageGroupItems;
         res.add(new SelectItem(0, " "));
-        ageGroupItems = daoService.getWtAgeGroupList();
-        Long valueAllId = daoService.getWtAgeGroupIdByDescription("все");
+        ageGroupItems = daoReadonlyService.getWtAgeGroupList();
+        Long valueAllId = daoReadonlyService.getWtAgeGroupIdByDescription("все");
         int i = 0;
         for (WtAgeGroupItem item : ageGroupItems) {
             if (valueAllId > 0 && !item.getIdOfAgeGroupItem().equals(valueAllId)) {
@@ -170,7 +173,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         List<SelectItem> res = new ArrayList<>();
         List<WtDietType> dietTypeItems;
         res.add(new SelectItem(0, " "));
-        dietTypeItems = daoService.getWtDietTypeList();
+        dietTypeItems = daoReadonlyService.getWtDietTypeList();
         for (WtDietType item : dietTypeItems) {
             res.add(new SelectItem(item.getIdOfDietType(), item.getDescription()));
         }
@@ -266,7 +269,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     public void fillWtSelectedComplexes() {
         wtSelectedComplexes.clear();
         if (isComplexFilterEmpty()) {
-            List<WtComplex> wtComplexes = daoService.getWtComplexesList();
+            List<WtComplex> wtComplexes = daoReadonlyService.getWtComplexesList();
             for (WtComplex wtComplex : wtComplexes) {
                 wtSelectedComplexes.add(new WtSelectedComplex(wtComplex, false));
             }
@@ -283,20 +286,20 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
             if (complexType > 0) {
                 wtComplexGroupIds.add(complexType);
-                Long valueAllId = daoService.getWtComplexGroupIdByDescription("все");
+                Long valueAllId = daoReadonlyService.getWtComplexGroupIdByDescription("все");
                 if (valueAllId > 0) {
                     wtComplexGroupIds.add(valueAllId);
                 }
             }
             if (ageGroup > 0) {
                 wtAgeGroupIds.add(ageGroup);
-                Long valueAllId = daoService.getWtAgeGroupIdByDescription("все");
+                Long valueAllId = daoReadonlyService.getWtAgeGroupIdByDescription("все");
                 if (valueAllId > 0) {
                     wtAgeGroupIds.add(valueAllId);
                 }
             }
 
-            List<WtComplex> wtComplexes = daoService.getWtComplexListByFilter(wtComplexGroupIds, wtAgeGroupIds,
+            List<WtComplex> wtComplexes = daoReadonlyService.getWtComplexListByFilter(wtComplexGroupIds, wtAgeGroupIds,
                     dietType, contragentIdList, idOfOrgList, null);
 
             for (WtComplex wtComplex : wtComplexes) {
@@ -353,16 +356,16 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
 
-        wtDiscountRule.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
+        wtDiscountRule.setCodeMSP(daoReadonlyService.findCodeNSPByCode(codeMSP));
 
         if (!this.idOfCategoryList.isEmpty()) {
-            List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);
+            List<CategoryDiscount> categoryList = daoReadonlyService.getCategoryDiscountListWithIds(this.idOfCategoryList);
             categoryDiscountSet.addAll(categoryList);
             wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
         }
 
         if (!this.idOfCategoryOrgList.isEmpty()) {
-            List<CategoryOrg> categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
+            List<CategoryOrg> categoryOrgList = daoReadonlyService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
             wtDiscountRule.getCategoryOrgs().addAll(categoryOrgList);
         }
 

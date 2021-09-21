@@ -360,17 +360,17 @@ public class EzdController {
                         if (idCurrentOrg == null || !idCurrentOrg.equals(idOforg)) {
                             idCurrentOrg = idOforg;
                             complexes = null;
-                            List<Long> groupsOrgs = DAOService.getInstance().getOrgGroupsbyOrgForWEBARM(idOforg);
+                            List<Long> groupsOrgs = DAOReadonlyService.getInstance().getOrgGroupsbyOrgForWEBARM(idOforg);
                             if (groupsOrgs.isEmpty()) {
                                 //7.2
-                                List<Long> complexesTemp = DAOService.getInstance().getComplexesByOrgForWEBARM(idOforg);
+                                List<Long> complexesTemp = DAOReadonlyService.getInstance().getComplexesByOrgForWEBARM(idOforg);
                                 if (!complexesTemp.isEmpty()) {
                                     //7.4
-                                    complexes = DAOService.getInstance().getComplexesByComplexForWEBARM(complexesTemp);
+                                    complexes = DAOReadonlyService.getInstance().getComplexesByComplexForWEBARM(complexesTemp);
                                 }
                             } else {
                                 //7.3
-                                complexes = DAOService.getInstance().getComplexesByGroupForWEBARM(groupsOrgs);
+                                complexes = DAOReadonlyService.getInstance().getComplexesByGroupForWEBARM(groupsOrgs);
                             }
                         }
 
