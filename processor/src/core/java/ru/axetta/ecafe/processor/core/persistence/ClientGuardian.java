@@ -142,7 +142,9 @@ public class ClientGuardian {
 
     public void setDisabled(Boolean disabled) {
         if (clientGuardianHistory != null) {
-            if (this.isDisabled() == null || !this.isDisabled()) {
+            if ((this.disabled != null || disabled != null))
+                if ((this.disabled == null || disabled == null) || !disabled.equals(this.disabled))
+            {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.DISABLED.getNativedescription(),
                         ClientGuardionHistoryAction.DISABLED.getDescription(),
                         this.isDisabled() == null ? null : this.isDisabled().toString(), "true");
@@ -161,14 +163,13 @@ public class ClientGuardian {
 
     public void setDeletedState(Boolean deletedState) {
         if (clientGuardianHistory != null) {
-            if ((this.getDeletedState() == null && deletedState != null) ||
-                    (this.getDeletedState() != null && deletedState == null) ||
-                    !(this.getDeletedState() == null && deletedState == null) ||
-                    (this.getDeletedState() != null && !this.getDeletedState())) {
+            if ((this.deletedState != null || deletedState != null))
+                if ((this.deletedState == null || deletedState == null) || !deletedState.equals(this.deletedState))
+                {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.DELETED.getNativedescription(),
                         ClientGuardionHistoryAction.DELETED.getDescription(),
                         this.getDeletedState() == null ? null : this.getDeletedState().toString(), "false");
-            }
+                }
         }
         this.deletedState = deletedState;
     }
@@ -179,11 +180,13 @@ public class ClientGuardian {
 
     public void setDeleteDate(Date deleteDate) {
         if (clientGuardianHistory != null) {
-            if (this.getDeleteDate() != null) {
+            if ((this.deleteDate != null || deleteDate != null))
+                if ((this.deleteDate == null || deleteDate == null) || !deleteDate.equals(this.deleteDate))
+                {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.DELETED_DATE.getNativedescription(),
                         ClientGuardionHistoryAction.DELETED_DATE.getDescription(),
                         this.getDeleteDate() == null ? null : this.getDeleteDate().toString(), null);
-            }
+                }
         }
         this.deleteDate = deleteDate;
     }
@@ -194,11 +197,13 @@ public class ClientGuardian {
 
     public void setRelation(ClientGuardianRelationType relation) {
         if (clientGuardianHistory != null) {
-            if (this.relation == null || relation == null || !relation.equals(this.relation)) {
+            if ((this.relation != null || relation != null))
+                if ((this.relation == null || relation == null) || !relation.equals(this.relation))
+                {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.RELATION.nativedescription,
                         ClientGuardionHistoryAction.RELATION.description, this.relation == null ? null : String.valueOf(this.relation.getCode()),
                         relation == null ? null : String.valueOf(relation.getCode()));
-            }
+                }
         }
         this.relation = relation;
     }
@@ -230,11 +235,13 @@ public class ClientGuardian {
 
     public void setCreatedFrom(ClientCreatedFromType createdFrom) {
         if (clientGuardianHistory != null) {
-            if (this.createdFrom == null || createdFrom == null || !createdFrom.equals(this.createdFrom)) {
+            if ((this.createdFrom != null || createdFrom != null))
+                if ((this.createdFrom == null || createdFrom == null) || !createdFrom.equals(this.createdFrom))
+                {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.RELATION.nativedescription,
                         ClientGuardionHistoryAction.RELATION.description, this.createdFrom == null ? null : String.valueOf(this.createdFrom.getValue()),
                         createdFrom == null ? null : String.valueOf(createdFrom.getValue()));
-            }
+                }
         }
         this.createdFrom = createdFrom;
     }
@@ -245,7 +252,9 @@ public class ClientGuardian {
 
     public void setCardRequest(CardRequest cardRequest) {
         if (clientGuardianHistory != null) {
-            if (this.cardRequest == null || cardRequest == null || !cardRequest.equals(this.cardRequest)) {
+            if ((this.cardRequest != null || cardRequest != null))
+                if ((this.cardRequest == null || cardRequest == null) || !cardRequest.equals(this.cardRequest))
+            {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.CARD_REQUEST.nativedescription,
                         ClientGuardionHistoryAction.CARD_REQUEST.description, this.cardRequest == null ? null :
                                 this.cardRequest.getIdOfCardRequest().toString(),
@@ -261,12 +270,14 @@ public class ClientGuardian {
 
     public void setRepresentType(ClientGuardianRepresentType representType) {
         if (clientGuardianHistory != null) {
-            if (this.representType == null || representType == null || !representType.equals(this.representType)) {
+            if ((this.representType != null || representType != null))
+                if ((this.representType == null || representType == null) || !representType.equals(this.representType))
+                {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.REPRESENT_TYPE.nativedescription,
                         ClientGuardionHistoryAction.REPRESENT_TYPE.description, this.representType == null ? null :
                                 this.representType.getDescription(),
                         representType == null ? null : representType.getDescription());
-            }
+                }
         }
         this.representType = representType;
     }
@@ -299,12 +310,12 @@ public class ClientGuardian {
 
     public enum ClientGuardionHistoryAction {
         //VERSION(0,"version", "Изменение версии"),
-        DISABLED(1, "disabled", "Изменение флага \"показывать/не показывать\" опекуна внешним системам"),
-        DELETED(2, "deletedState", "Изменение флага \"Статус удаления записи\""),
-        REPRESENT_TYPE(3, "representType", "Изменение флага \"Законный представитель\""),
-        RELATION(4, "relation", "Изменение типа родственной связи"),
-        DELETED_DATE(5, "deleteDate", "Изменение Даты удаления"),
-        CARD_REQUEST(6, "idofcardrequest", "Изменение идентификатора Заявления на выдачу карты");
+        DISABLED(0, "disabled", "Изменение флага \"показывать/не показывать\" опекуна внешним системам"),
+        DELETED(1, "deletedState", "Изменение флага \"Статус удаления записи\""),
+        REPRESENT_TYPE(2, "representType", "Изменение флага \"Законный представитель\""),
+        RELATION(3, "relation", "Изменение типа родственной связи"),
+        DELETED_DATE(4, "deleteDate", "Изменение Даты удаления"),
+        CARD_REQUEST(5, "idofcardrequest", "Изменение идентификатора Заявления на выдачу карты");
 
         private final int code;
         private final String description;
