@@ -71,13 +71,13 @@ public class ClientGuardian {
     }
 
     public void setVersion(Long version) {
-         if (clientGuardianHistory != null) {
-             if (this.version == null || version == null || !version.equals(this.version)) {
-                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.VERSION.getNativedescription(),
-                         ClientGuardionHistoryAction.VERSION.getDescription(), this.version == null ? null : this.version.toString(),
-                         version == null ? null : version.toString());
-             }
-         }
+         //if (clientGuardianHistory != null) {
+         //    if (this.version == null || version == null || !version.equals(this.version)) {
+         //        createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.VERSION.getNativedescription(),
+         //                ClientGuardionHistoryAction.VERSION.getDescription(), this.version == null ? null : this.version.toString(),
+         //                version == null ? null : version.toString());
+         //    }
+         //}
         this.version = version;
     }
 
@@ -161,7 +161,10 @@ public class ClientGuardian {
 
     public void setDeletedState(Boolean deletedState) {
         if (clientGuardianHistory != null) {
-            if (this.getDeletedState() == null || this.getDeletedState()) {
+            if ((this.getDeletedState() == null && deletedState != null) ||
+                    (this.getDeletedState() != null && deletedState == null) ||
+                    !(this.getDeletedState() == null && deletedState == null) ||
+                    (this.getDeletedState() != null && !this.getDeletedState())) {
                 createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.DELETED.getNativedescription(),
                         ClientGuardionHistoryAction.DELETED.getDescription(),
                         this.getDeletedState() == null ? null : this.getDeletedState().toString(), "false");
@@ -295,7 +298,7 @@ public class ClientGuardian {
     }
 
     public enum ClientGuardionHistoryAction {
-        VERSION(0,"version", "Изменение версии"),
+        //VERSION(0,"version", "Изменение версии"),
         DISABLED(1, "disabled", "Изменение флага \"показывать/не показывать\" опекуна внешним системам"),
         DELETED(2, "deletedState", "Изменение флага \"Статус удаления записи\""),
         REPRESENT_TYPE(3, "representType", "Изменение флага \"Законный представитель\""),
