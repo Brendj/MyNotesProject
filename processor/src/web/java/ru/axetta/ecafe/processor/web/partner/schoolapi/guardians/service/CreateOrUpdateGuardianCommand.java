@@ -50,14 +50,16 @@ public class CreateOrUpdateGuardianCommand {
 
             ClientGuardian guardian = FindExistingGuardianLink(request.getChildClientId(),
                     request.getGuardianClientId(), session);
+            Integer typeOperation = 0;
             if (guardian == null) {
                 guardian = new ClientGuardian(request.getChildClientId(), request.getGuardianClientId(),
                         ClientCreatedFromType.ARM);
                 clientGuardianHistory.setAction("Создание новой связки");
-
+                typeOperation = 0;
             }
             else {
                 clientGuardianHistory.setAction("Обновление данных связки");
+                typeOperation = 1;
             }
             try{
                 clientGuardianHistory.setGuardian(DAOReadonlyService.getInstance().findClientById(request.getGuardianClientId()).getContractId().toString());
@@ -65,12 +67,8 @@ public class CreateOrUpdateGuardianCommand {
             {
                 clientGuardianHistory.setGuardian("Не удалось получить л/с представителя");
             }
-            //
-            ClientGuardianHistory clientGuardianHistoryChanged =
-                    clientGuardianHistory.getCopyClientGuardionHistory(clientGuardianHistory);
-            session.persist(clientGuardianHistoryChanged);
-            //
-            guardian.initializateClientGuardianHistory(clientGuardianHistory);
+            if (typeOperation == 1)
+                guardian.initializateClientGuardianHistory(clientGuardianHistory);
             guardian.setVersion(newGuardianVersion);
             guardian.setLastUpdate(new Date());
             guardian.setDeletedState(false);
@@ -81,6 +79,12 @@ public class CreateOrUpdateGuardianCommand {
             session.saveOrUpdate(guardian);
             ClientGuardian reloadedGuardian = FindExistingGuardianLink(request.getChildClientId(),
                     request.getGuardianClientId(), session);
+            //
+            if (typeOperation == 0) {
+                clientGuardianHistory.setClientGuardian(guardian);
+                session.persist(clientGuardianHistory);
+            }
+            //
             session.flush();
             transaction.commit();
             transaction = null;
