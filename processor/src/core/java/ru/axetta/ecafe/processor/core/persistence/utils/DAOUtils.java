@@ -1996,6 +1996,7 @@ public class DAOUtils {
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
         emias.setVersion(version);
+        emias.setArchive(false);
         session.save(emias);
     }
 
@@ -2012,6 +2013,7 @@ public class DAOUtils {
         emias.setCreateDate(new Date());
         emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
         emias.setVersion(version);
+        emias.setArchive(false);
         session.save(emias);
     }
 
@@ -2038,6 +2040,7 @@ public class DAOUtils {
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
         emias.setVersion(version);
+        emias.setArchive(false);
         session.save(emias);
     }
 
