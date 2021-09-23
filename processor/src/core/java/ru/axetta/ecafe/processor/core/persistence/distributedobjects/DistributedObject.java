@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -221,6 +222,12 @@ public abstract class DistributedObject extends GoodDateForOrders{
         buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
         //criteria.add(Restrictions.gt("globalVersion",currentMaxVersion));
         createProjections(criteria);
+        if (getClass().getSimpleName().equals("GoodRequestPosition")) {
+            criteria.add(Restrictions.gt("gr.doneDate", new Date()));
+        }
+        if (getClass().getSimpleName().equals("GoodRequest")) {
+            criteria.add(Restrictions.gt("doneDate", new Date()));
+        }
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();
     }
@@ -233,6 +240,12 @@ public abstract class DistributedObject extends GoodDateForOrders{
         criteria.add(Restrictions.in("orgOwner", friendlyOrgIds));
         buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
         createProjections(criteria);
+        if (getClass().getSimpleName().equals("GoodRequestPosition")) {
+            criteria.add(Restrictions.gt("gr.doneDate", new Date()));
+        }
+        if (getClass().getSimpleName().equals("GoodRequest")) {
+            criteria.add(Restrictions.gt("doneDate", new Date()));
+        }
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();
     }
