@@ -204,6 +204,9 @@
                 <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" rowspan="2">
                     <h:outputText escape="true" value="Возможность ухода в минус при оплате Платного плана / Абонементного питания" />
                 </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                    <h:outputText escape="true" value="Использовать расписание питания" />
+                </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showCardSettings}" colspan="1">
                     <h:outputText escape="true" value="Запрет на выдачу временной карты" />
                 </rich:column>
@@ -255,6 +258,11 @@
                 <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allDenyPayPlanForTimeDifference}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(5)}"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseMealSchedule}" disabled="false">
+                        <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(13)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
@@ -406,6 +414,11 @@
             <h:panelGrid columnClasses="center-aligned-column" columns="1" rendered="#{item.idOfSetting == -1}">
                 <h:outputText escape="true" styleClass="output-text" value="#{item.settingName}" />
             </h:panelGrid>
+        </rich:column>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+            <h:selectBooleanCheckbox value="#{item.useMealSchedule}" styleClass="checkboxes">
+                <a4j:support event="onchange" action="#{item.change()}" />
+            </h:selectBooleanCheckbox>
         </rich:column>
         <!-- Cards Settings -->
         <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">

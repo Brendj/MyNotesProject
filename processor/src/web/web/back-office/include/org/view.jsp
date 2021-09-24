@@ -147,6 +147,8 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Использование плана питания" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.usePlanOrders?'Включен':'Выключен'}" styleClass="input-text" />
+    <h:outputText escape="true" value="Использование расписания питания" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.useMealSchedule?'Включен':'Выключен'}" styleClass="input-text" />
     <h:outputText escape="true" value="Включить функционал платного горячего питания" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.usePaydableSubscriptionFeeding}"  styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Включить вариативное питание" styleClass="output-text" />
