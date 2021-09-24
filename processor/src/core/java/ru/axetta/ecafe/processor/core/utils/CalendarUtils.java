@@ -115,6 +115,10 @@ public class CalendarUtils {
                 (createDate.getTime() == generateBeginTime.getTime()));
     }
 
+    public static boolean betweenMoreMonth(Date startDate, Date endDate) {
+        return 31 < getDifferenceInDays(startDate, endDate);
+    }
+
     public static String toStringFullDateTimeWithUTCTimeZone(Date dateTime) throws ParseException {
         SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
         safeDateTimeFormat.setTimeZone(utcTimeZone);
