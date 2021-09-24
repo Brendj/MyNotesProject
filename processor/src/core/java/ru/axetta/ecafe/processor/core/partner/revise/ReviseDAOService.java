@@ -31,7 +31,7 @@ public class ReviseDAOService {
 
     public DiscountItemsWithTimestamp getDiscountsUpdatedSinceDate(Date updated) {
         String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del, mesh_guid "
-                + " from benefits_for_ispp where updated_at > :updatedDate and registry_guid is not null order by updated_at asc limit :lim";
+                + " from benefits_for_ispp where updated_at > :updatedDate and mesh_guid is not null order by updated_at asc limit :lim";
         Query query = entityManager.createNativeQuery(sqlString);
         query.setParameter("updatedDate", updated);
         query.setParameter("lim", RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_LIMIT));
