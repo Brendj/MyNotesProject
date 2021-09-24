@@ -14,6 +14,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
 import java.util.*;
@@ -39,6 +40,12 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
             Criteria criteria = session.createCriteria(getClass());
             criteria.add(Restrictions.in("orgOwner", orgOwners));
             buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
+            if (getClass().getSimpleName().equals("GoodRequestPosition")) {
+                criteria.add(Restrictions.gt("gr.doneDate", new Date()));
+            }
+            if (getClass().getSimpleName().equals("GoodRequest")) {
+                criteria.add(Restrictions.gt("doneDate", new Date()));
+            }
             //criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
             createProjections(criteria);
             criteria.setCacheable(false);
