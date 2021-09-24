@@ -5415,11 +5415,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "guardMobile") String guardMobile, @WebParam(name = "value") Boolean value,
             @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal) {
         authenticateRequest(contractId);
-        return processSetGuardianship(contractId, guardMobile, value, roleRepresentativePrincipal);
+        MessageContext mc = context.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод setGuardianshipDisabled");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(guardMobile);
+        return processSetGuardianship(contractId, guardMobile, value, roleRepresentativePrincipal, clientGuardianHistory);
     }
 
     private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value,
-            Integer roleRepresentativePrincipal) {
+            Integer roleRepresentativePrincipal, ClientGuardianHistory clientGuardianHistory) {
         Result result = new Result();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -5460,6 +5466,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         continue;
                     }
                     for (ClientGuardian cg : listOfClientGuardian) {
+                        clientGuardianHistory.setClientGuardian(cg);
+                        clientGuardianHistory.setChangeDate(new Date());
                         cg.setDisabled(value);
                         cg.setVersion(getClientGuardiansResultVersion(session));
                         cg.setLastUpdate(new Date());
@@ -8743,6 +8751,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         authenticateRequest(null);
 
+        MessageContext mc = context.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод addGuardian");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(mobile);
+
         String mobilePhoneCreator = Client.checkAndConvertMobile(creatorMobile);
         String mobilePhone = Client.checkAndConvertMobile(mobile);
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
@@ -8851,17 +8866,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
                 clientGuardian = ClientManager
                         .createClientGuardianInfoTransactionFree(session, guardian, description, false,
-                                client.getIdOfClient(), ClientCreatedFromType.MPGU, roleRepresentative);
+                                client.getIdOfClient(), ClientCreatedFromType.MPGU, roleRepresentative, clientGuardianHistory);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.MPGU);
                 clientGuardian.restore(newGuardiansVersions, enableSpecialNotification);
                 clientGuardian.setCreatedFrom(ClientCreatedFromType.MPGU);
                 session.update(clientGuardian);
             }
             session.flush();
             result = addCardRequest(session, typeCard, passportNumber, passportSeries, guardian, creatorMobile,
-                    clientGuardian);
+                    clientGuardian, clientGuardianHistory);
 
             transaction.commit();
             transaction = null;
@@ -8878,7 +8894,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private Result addCardRequest(Session session, Integer typeCard, String passportNumber, String passportSeries,
-            Client guardian, String creatorMobile, ClientGuardian clientGuardian) {
+            Client guardian, String creatorMobile, ClientGuardian clientGuardian, ClientGuardianHistory clientGuardianHistory) {
         if (typeCard != null) {
             if (StringUtils.isEmpty(passportNumber) || StringUtils.isEmpty(passportSeries)) {
                 return new Result(RC_INVALID_DATA, "Не указаны серия и номер паспорта для создания заявки на карту");
@@ -8903,6 +8919,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             CardRequest cardRequest = new CardRequest(guardian, typeCard, creatorMobile, nextVersion);
             session.save(cardRequest);
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+            MessageContext mc = context.getMessageContext();
+            clientGuardianHistory.setClientGuardian(clientGuardian);
+            clientGuardianHistory.setChangeDate(new Date());
             clientGuardian.setCardRequest(cardRequest);
             clientGuardian.setVersion(newGuardiansVersions);
             session.update(clientGuardian);
@@ -9024,7 +9043,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result removeGuardian(@WebParam(name = "guardianContractId") Long guardianContractId,
             @WebParam(name = "childContractId") Long childContractId) {
         authenticateRequest(guardianContractId);
-
+        MessageContext mc = context.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод removeGuardian");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(guardianContractId.toString());
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -9051,6 +9075,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+            clientGuardianHistory.setClientGuardian(cg);
+            clientGuardianHistory.setChangeDate(new Date());
             cg.setDisabled(true);
             cg.setVersion(newGuardiansVersions);
             session.update(cg);
@@ -9858,8 +9884,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         ClientsMobileHistory clientsMobileHistory =
                                 new ClientsMobileHistory("soap метод setPreorderAllowed");
                         clientsMobileHistory.setShowing("Портал");
+						MessageContext mc = context.getMessageContext();
+                        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+                        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                        clientGuardianHistory.setReason("Веб метод setPreorderAllowed");
+                        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+                        clientGuardianHistory.setGuardian(guardianMobile);
                         ClientManager.setPreorderAllowed(session, client, guardian, mobile, value, version,
-                                clientsMobileHistory);
+                                clientsMobileHistory, clientGuardianHistory);
                     }
                 }
 
@@ -9929,6 +9961,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
+        MessageContext mc = context.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод setInformedSpecialMenu");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setGuardian(guardianMobile);
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -9948,7 +9986,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile()
                             .equals(Client.checkAndConvertMobile(guardianMobile))) {
                         guardianWithMobileFound = true;
-                        ClientManager.setInformSpecialMenu(session, client, guardian, version);
+                        ClientManager.setInformSpecialMenu(session, client, guardian, version, clientGuardianHistory);
                     }
                 }
                 if (!guardianWithMobileFound) {
@@ -9957,10 +9995,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
             } else if (client.isSotrudnikMsk() && StringUtils.isEmpty(guardianMobile)) {
-                ClientManager.setInformSpecialMenu(session, client, null, version);
+                ClientManager.setInformSpecialMenu(session, client, null, version, clientGuardianHistory);
             } else if ((client.isSotrudnikMsk() || client.isSotrudnik()) && !StringUtils.isEmpty(guardianMobile)) {
                 if (client.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
-                    ClientManager.setInformSpecialMenu(session, client, null, version);
+                    ClientManager.setInformSpecialMenu(session, client, null, version, clientGuardianHistory);
                 } else {
                     result.resultCode = RC_INVALID_DATA;
                     result.description = RC_INVALID_MOBILE;

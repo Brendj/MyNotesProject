@@ -494,8 +494,13 @@ public class Processor implements SyncProcessor {
                     new ClientsMobileHistory("Полная синхронизация");
             clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
             clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+            clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+            clientGuardianHistory.setOrg(request.getOrg());
+            clientGuardianHistory.setReason("Полная синхронизация");
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
+                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
         } catch (Exception e) {
             String message = String
                     .format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -513,8 +518,13 @@ public class Processor implements SyncProcessor {
                 final List<ClientGuardianItem> clientGuardianResponseElement = clientGuardianRequest
                         .getClientGuardianResponseElement();
                 if (clientGuardianResponseElement != null) {
+                    ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                    clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+                    clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+                    clientGuardianHistory.setOrg(request.getOrg());
+                    clientGuardianHistory.setReason("Полная синхронизация");
                     resultClientGuardian = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),
-                            syncHistory);
+                            syncHistory, clientGuardianHistory);
                 }
                 final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
                 if (responseClientGuardian != null) {
@@ -2153,8 +2163,13 @@ public class Processor implements SyncProcessor {
                         new ClientsMobileHistory("Синхронизация по секциям (ConstructedSections)");
                 clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
                 clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+                clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+                clientGuardianHistory.setOrg(request.getOrg());
+                clientGuardianHistory.setReason("Синхронизация по секциям");
                 processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds,
-                        clientsWithWrongVersion, clientsMobileHistory);
+                        clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
             }
         } catch (Exception e) {
             String message = String
@@ -2196,8 +2211,13 @@ public class Processor implements SyncProcessor {
                 final List<ClientGuardianItem> clientGuardianResponseElement = clientGuardianRequest
                         .getClientGuardianResponseElement();
                 if (clientGuardianResponseElement != null) {
+                    ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                    clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+                    clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+                    clientGuardianHistory.setOrg(request.getOrg());
+                    clientGuardianHistory.setReason("Синхронизация по секциям");
                     ResultClientGuardian resultClientGuardian = processClientGuardian(clientGuardianResponseElement,
-                            request.getIdOfOrg(), syncHistory);
+                            request.getIdOfOrg(), syncHistory, clientGuardianHistory);
                     addToResponseSections(resultClientGuardian, responseSections);
                 }
                 final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
@@ -3448,8 +3468,13 @@ public class Processor implements SyncProcessor {
                     new ClientsMobileHistory("Синхронизация типа GetClientParams (синхра клиентов)");
             clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
             clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
+            clientGuardianHistory.setWebAdress(request.getRemoteAddr());
+            clientGuardianHistory.setOrg(request.getOrg());
+            clientGuardianHistory.setReason("Синхронизации параметров клиента");
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory);
+                    errorClientIds, clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
         } catch (Exception e) {
             logger.error(String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -4757,7 +4782,7 @@ public class Processor implements SyncProcessor {
     }
 
     private ResultClientGuardian processClientGuardian(List<ClientGuardianItem> items, Long idOfOrg,
-            SyncHistory syncHistory) {
+            SyncHistory syncHistory, ClientGuardianHistory clientGuardianHistory) {
         ResultClientGuardian resultClientGuardian = new ResultClientGuardian();
         Long resultClientGuardianVersion = 0L;
         if (items.size() > 0) {
@@ -4804,8 +4829,16 @@ public class Processor implements SyncProcessor {
                         }
                         clientGuardian.setLastUpdate(new Date());
                         persistenceSession.save(clientGuardian);
+                        //
+                        clientGuardianHistory.setClientGuardian(clientGuardian);
+                        clientGuardianHistory.setChangeDate(new Date());
+                        clientGuardianHistory.setAction("Создание новой связки");
+                        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+                        persistenceSession.persist(clientGuardianHistory);
+                        //
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
+                        dbClientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
                         if (dbClientGuardian.getDeletedState() && !item.isDeleted()) {
                             dbClientGuardian.restore(resultClientGuardianVersion, enableNotificationSpecial);
                         } else if (item.isDeleted()) {
@@ -5340,7 +5373,7 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
             SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds,
-            List<Long> clientsWithWrongVersion, ClientsMobileHistory clientsMobileHistory) throws Exception {
+            List<Long> clientsWithWrongVersion, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -5393,7 +5426,7 @@ public class Processor implements SyncProcessor {
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
                     processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg,
-                            allocatedClients, orgSet, clientsWithWrongVersion, clientsMobileHistory);
+                            allocatedClients, orgSet, clientsWithWrongVersion, clientsMobileHistory, clientGuardianHistory);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -5425,7 +5458,7 @@ public class Processor implements SyncProcessor {
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg,
             List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion,
-            ClientsMobileHistory clientsMobileHistory) throws Exception {
+            ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -5574,10 +5607,11 @@ public class Processor implements SyncProcessor {
                                         .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGroup.getGroupName());
                     } else {
                         if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
+							clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
                             ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(),
                                     clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
                                     ClientGroupMigrationHistory.MODIFY_IN_ARM
-                                            .concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                                            .concat(String.format(" (ид. ОО=%s)", idOfOrg)), clientGuardianHistory);
                         }
                     }
                     client.setClientGroup(clientGroup);

@@ -159,7 +159,7 @@ public class ClientDao extends WritableJpaDao {
         return (String) criteria.uniqueResult();
     }
 
-    public int runGenerateGuardians(List idOfOrgs, ClientsMobileHistory clientsMobileHistory ) throws Exception {
+    public int runGenerateGuardians(List idOfOrgs, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         logger.info("Start generate guardians");
         List<ClientContactInfo> clientsGenerate = new ArrayList<ClientContactInfo>();
         int result = 0;
@@ -219,7 +219,7 @@ public class ClientDao extends WritableJpaDao {
                                 mobileFound = true;
                                 Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
                                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
-                                refreshClientGuadianData(child, cg, session);
+                                refreshClientGuadianData(child, cg, session, clientGuardianHistory);
                                 clearClientContacts(child, session, clientRegistryVersion, clientsMobileHistory);
                                 refreshGuardianData(guardian, session, clientRegistryVersion);
                                 logger.info(String.format("Cleared contacts from client id=%s", child.getIdOfClient()));
@@ -248,7 +248,7 @@ public class ClientDao extends WritableJpaDao {
         } finally {
             HibernateUtils.close(session, logger);
         }
-        createParentAndGuardianship(clientsGenerate, clientsMobileHistory);
+        createParentAndGuardianship(clientsGenerate, clientsMobileHistory, clientGuardianHistory);
         logger.info("End generate guardians");
         return result;
     }
@@ -272,15 +272,12 @@ public class ClientDao extends WritableJpaDao {
     }
 
     private void createParentAndGuardianship(List<ClientContactInfo> clientInfos,
-            ClientsMobileHistory clientsMobileHistory) throws Exception {
+            ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             session.setFlushMode(FlushMode.MANUAL);
-
-
-
             Map<Long, List<ClientContactInfo>> clientContactInfoMap = getClientContactInfoMap(clientInfos);
             for (Map.Entry<Long, List<ClientContactInfo>> entry : clientContactInfoMap.entrySet()) {
                 Long idOfOrg = entry.getKey();
@@ -326,7 +323,8 @@ public class ClientDao extends WritableJpaDao {
                         //Создаем опекунскую связь
                         Long version = generateNewClientGuardianVersion(session);
                         ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(),
-                                version, false, null, null, ClientCreatedFromType.DEFAULT, null);
+                                version, false, null, null, ClientCreatedFromType.DEFAULT, null,
+                                clientGuardianHistory);
                         session.flush();
 
                         //Устанавливаем правила оповещения для опекуна
@@ -415,7 +413,8 @@ public class ClientDao extends WritableJpaDao {
         }
     }
 
-    private void refreshClientGuadianData(Client client, ClientGuardian clientGuardian, Session session) {
+    private void refreshClientGuadianData(Client client, ClientGuardian clientGuardian, Session session,
+            ClientGuardianHistory clientGuardianHistory) {
         if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
             clientGuardian.setDeletedState(false);
             clientGuardian.setDisabled(false);

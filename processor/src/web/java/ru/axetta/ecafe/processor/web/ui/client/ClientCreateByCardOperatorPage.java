@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 
 import org.hibernate.Session;
@@ -24,7 +25,7 @@ public class ClientCreateByCardOperatorPage extends ClientCreatePage {
     }
     public Long BALANCE_TO_NOTIFY_DEFAULT = 15000L;
 
-    public Client createClient(Session persistenceSession) throws Exception {
+    public Client createClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory) throws Exception {
         if (getIdOfClientGroup() == null) {
             throw new Exception("Выберите группу!");
         }
@@ -35,7 +36,7 @@ public class ClientCreateByCardOperatorPage extends ClientCreatePage {
         setAddress("");
         setBalanceToNotify(BALANCE_TO_NOTIFY_DEFAULT);
         getPerson().setIdDocument("");
-        Client client = super.createClient(persistenceSession);
+        Client client = super.createClient(persistenceSession, clientGuardianHistory);
         client.setCypheredPasswordByCardOperator(Client.encryptPassword("" + client.getContractId()));
         newContractId = client.getContractId();
         return client;
