@@ -2,6 +2,7 @@
  * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
  */
 
+
 --770
 CREATE SEQUENCE public.cf_guardian_history_id
     INCREMENT BY 1
@@ -25,3 +26,7 @@ CREATE TABLE public.cf_client_guardian_history (
                                                    newvalue varchar NULL,
                                                    reason varchar NULL
 );
+
+-- Пакет обновлений v 275
+
+--! ФИНАЛИЗИРОВАН 24.09.2021, НЕ МЕНЯТЬ
