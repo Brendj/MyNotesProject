@@ -1997,11 +1997,12 @@ public class DAOUtils {
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
         emias.setVersion(version);
+        emias.setArchive(false);
         session.save(emias);
     }
 
-    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = getMaxVersionEMIAS(session, false);
+    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList, boolean kafka) {
+        Long version = getMaxVersionEMIAS(session, kafka);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -2013,11 +2014,12 @@ public class DAOUtils {
         emias.setCreateDate(new Date());
         emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
         emias.setVersion(version);
+        emias.setArchive(false);
         session.save(emias);
     }
 
     public static void archivedEMIAS(Session session, EMIAS emias) {
-        Long version = getMaxVersionEMIAS(session, false);
+        Long version = getMaxVersionEMIASByAllTable(session);
         emias.setArchive(true);
         emias.setVersion(version);
         emias.setUpdateDate(new Date());
@@ -2039,6 +2041,7 @@ public class DAOUtils {
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
         emias.setVersion(version);
+        emias.setArchive(false);
         session.save(emias);
     }
 
@@ -2051,6 +2054,23 @@ public class DAOUtils {
                 criteria.add(Restrictions.eq("kafka", true));
             else
                 criteria.add(Restrictions.or((Restrictions.eq("kafka", false)), (Restrictions.isNull("kafka"))));
+            Object result = criteria.uniqueResult();
+            if (result != null) {
+                Long currentMaxVersion = (Long) result;
+                version = currentMaxVersion + 1;
+            }
+        } catch (Exception ex) {
+            logger.error("Failed get max emias version, ", ex);
+            version = 0L;
+        }
+        return version;
+    }
+
+    public static Long getMaxVersionEMIASByAllTable(Session session) {
+        Long version = 0L;
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.setProjection(Projections.max("version"));
             Object result = criteria.uniqueResult();
             if (result != null) {
                 Long currentMaxVersion = (Long) result;

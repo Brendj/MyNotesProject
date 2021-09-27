@@ -350,8 +350,6 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 i.beautifyCategories(categories);
                 i.beautifyGoods(goods);
             }
-
-
             return result;
         }
 
@@ -503,6 +501,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             }
             return columnId;
         }
+
+        public ActiveDiscountClientsReport clean() {
+            List<ActiveDiscountClientsItem> items = new ArrayList<>();
+            return new ActiveDiscountClientsReport(items);
+        }
     }
 
 
@@ -518,6 +521,10 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
 
     public ActiveDiscountClientsReport(Date startTime,
             Date endTime, List<ActiveDiscountClientsItem> items) {
+        this.items = items;
+    }
+
+    public ActiveDiscountClientsReport(List<ActiveDiscountClientsItem> items) {
         this.items = items;
     }
 

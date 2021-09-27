@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -121,6 +124,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean governmentContract;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
+
+    private Boolean useMealSchedule;
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
         SelectItem[] items = new SelectItem[5];
@@ -307,6 +312,9 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.goodDateCheck = org.getGooddatecheck();
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
         this.useLongCardNo = org.getUseLongCardNo();
+
+        OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
+        this.useMealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
     }
 
     public String getFilterOrgs() {
@@ -874,5 +882,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setUseLongCardNo(Boolean useLongCardNo) {
         this.useLongCardNo = useLongCardNo;
+    }
+
+    public Boolean getUseMealSchedule() {
+        return useMealSchedule;
+    }
+
+    public void setUseMealSchedule(Boolean useMealSchedule) {
+        this.useMealSchedule = useMealSchedule;
     }
 }

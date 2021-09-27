@@ -1249,7 +1249,7 @@ public class DAOReadonlyService {
                 + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
                 + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
                 + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
-                + "and mgr.deletestate = 0 ");
+                + "and mgr.deletestate = 0 and d.idofdish is not null");
         query.setParameter("idOfOrg", idOfOrg);
         List list = query.getResultList();
         for (Object o : list) {

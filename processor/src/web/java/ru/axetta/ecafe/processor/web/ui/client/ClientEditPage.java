@@ -1108,17 +1108,38 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
-            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
+                    idOfClient));
+            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems,
+                    clientGuardianHistory);
         }
         if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
-            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекун",
+                    idOfClient));
+            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems, clientGuardianHistory);
         }
 
         if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
         }
         if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
-            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
         }
 
         if (isReplaceOrg) {
@@ -1159,9 +1180,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) || (this.idOfClientGroup == null
                     && client.getIdOfClientGroup() != null) || (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
+				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+                clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                clientGuardianHistory.setReason(String.format("Обновление данных клиента через карточку клиента id = %s",
+                        idOfClient));
                 ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, this.idOfClientGroup,
                         this.clientGroupName, ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
-                                .getExternalContext().getRemoteUser());
+                                .getExternalContext().getRemoteUser(), clientGuardianHistory);
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }

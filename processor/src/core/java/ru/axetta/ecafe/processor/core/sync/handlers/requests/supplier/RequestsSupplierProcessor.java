@@ -263,12 +263,15 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                 requestsSupplier.getIdOfOrgOwner(), requestsSupplier.getMaxVersion());
         for (GoodRequest goodRequest : list) {
             if (goodRequest != null) {
-                resItem = new ResRequestsSupplierItem(goodRequest);
-                List<GoodRequestPosition> details = DAOUtils.getGoodRequestPositionsByGoodRequest(session, goodRequest);
-                if (!details.isEmpty()) {
-                    resItem.addDetails(details);
+                if (goodRequest.getDoneDate() == null || goodRequest.getDoneDate().after(new Date())) {
+                    resItem = new ResRequestsSupplierItem(goodRequest);
+                    List<GoodRequestPosition> details = DAOUtils
+                            .getGoodRequestPositionsByGoodRequest(session, goodRequest);
+                    if (!details.isEmpty()) {
+                        resItem.addDetails(details);
+                    }
+                    items.add(resItem);
                 }
-                items.add(resItem);
             }
         }
 

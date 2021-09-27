@@ -6,12 +6,14 @@ package ru.axetta.ecafe.processor.core;
 
 import ru.axetta.ecafe.processor.core.payment.PaymentLogger;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.SyncLogInfo;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.Transformer;
@@ -23,7 +25,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,6 +47,10 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
     private final String intgeroRequestLogPath;
     private final String intgeroResponseLogPath;
     private final SimpleDateFormat dateFormat;
+    private final List<SyncLogInfo> logInfoList;
+    private final Object syncObject;
+
+    private final int SYNC_LOG_COUNT = 100;
 
     public ProcessLogger(String syncRequestLogPath, String syncResponseLogPath, String paymentRequestLogPath,
             String paymentResponseLogPath, String intgeroRequestLogPath, String intgeroResponseLogPath) {
@@ -52,6 +61,8 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
         this.intgeroRequestLogPath = intgeroRequestLogPath;
         this.intgeroResponseLogPath = intgeroResponseLogPath;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        this.logInfoList = new ArrayList<>();
+        this.syncObject = new Object();
     }
 
     @Override
@@ -121,6 +132,36 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
 
     public void registerSyncRequestInDb(long idOfOrg, String idOfSync) {
         DAOService.getInstance().registerSyncRequest(idOfOrg, idOfSync);
+    }
+
+    @Async
+    public void queueSyncRequestAsync(long idOfOrg, String idOfSync) {
+        synchronized (syncObject) {
+            logInfoList.add(new SyncLogInfo(idOfOrg, idOfSync));
+        }
+    }
+
+    public void runRegisterSyncRequestInDb() {
+        String query = "INSERT INTO cf_synchistory_daily (idofsync, idoforg, syncdate) VALUES ";
+        synchronized (syncObject) {
+            if (logInfoList.size() == 0) return;
+            logger.info(String.format("Start runRegisterSyncRequestInDb. Current count = %s", logInfoList.size()));
+            int counter = 0;
+            Iterator<SyncLogInfo> iterator = logInfoList.iterator();
+            while (iterator.hasNext()) {
+                SyncLogInfo info = iterator.next();
+                query += String.format("('%s', %s, %s), ", info.getIdOfSync(), info.getIdOfOrg(), info.getSyncTime());
+                iterator.remove();
+                counter++;
+                if (counter > SYNC_LOG_COUNT) break;
+            }
+            query = query.substring(0, query.length()-2);
+        }
+        try {
+            DAOService.getInstance().saveSyncRequestInDb(query);
+        } catch (Exception e) {
+            logger.error("Error in runRegisterSyncRequestInDb: ", e);
+        }
     }
 
     public void registerSyncResponse(Document responseDocument, long idOfOrg, String idOfSync) {

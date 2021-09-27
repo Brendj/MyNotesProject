@@ -295,17 +295,14 @@ public class EMIASController extends HttpServlet {
                         eventsStatus = 2;
                         break;
                     case 2:
-                        if (liberateClientsList.getIdEventCancelEMIAS() == null)
-                        {
+                        if (liberateClientsList.getIdEventCancelEMIAS() == null) {
                             orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_EVENT_NOT_FOUND,
                                     ResponseItem.ERROR_CANCEL_EVENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
                             goodIdEmias = false;
-                        } else
-                        {
-                            if (usedOld)
-                                DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
-                            else
-                            {
+                        } else {
+                            if(usedOld) {
+                                DAOUtils.updateEMIAS(persistenceSession, liberateClientsList, true);
+                            } else {
                                 emias = DAOUtils.getEmiasbyMeshGuid(cl.getMeshGUID(), persistenceSession);
                                 for (EMIAS emias1: emias)
                                 {
@@ -334,7 +331,7 @@ public class EMIASController extends HttpServlet {
                         }
                         else {
                             if (usedOld)
-                                DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                                DAOUtils.updateEMIAS(persistenceSession, liberateClientsList, false);
                             else
                             {
                                 emias = DAOUtils.getEmiasbyMeshGuid(cl.getMeshGUID(), persistenceSession);

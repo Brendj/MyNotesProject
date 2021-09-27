@@ -22,6 +22,12 @@
         socket.send(mes);
         return false;
     }
+    function onstartloading(){
+        jQuery(".command-button").attr('disabled', 'disabled');
+    }
+    function onstoploading(){
+        jQuery(".command-button").attr('disabled', '');
+    }
 </script>
 
 <h:panelGrid id="cardOperationListGrid" binding="#{mainPage.cardOperatorListPage.pageComponent}"
@@ -88,7 +94,7 @@
 
     </rich:simpleTogglePanel>
 
-    <a4j:status id="cardTableGenerateStatus">
+    <a4j:status id="cardTableGenerateStatus" onstart="onstartloading()" onstop="onstoploading()">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>

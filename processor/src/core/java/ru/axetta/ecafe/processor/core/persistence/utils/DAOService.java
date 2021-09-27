@@ -1014,6 +1014,11 @@ public class DAOService {
         }
     }
 
+    public void saveSyncRequestInDb(String query_str) {
+        Query query = entityManager.createNativeQuery(query_str);
+        query.executeUpdate();
+    }
+
     public void saveCancelPayment(ClientPayment payment) {
         entityManager.persist(payment);
         entityManager.flush();

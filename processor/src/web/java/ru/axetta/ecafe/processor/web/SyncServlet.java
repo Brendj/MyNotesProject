@@ -226,7 +226,7 @@ public class SyncServlet extends HttpServlet {
 
 
             //  Daily logging for sync request
-            syncLogger.registerSyncRequestInDb(idOfOrg, idOfSync);
+            syncLogger.queueSyncRequestAsync(idOfOrg, idOfSync);
 
 
             // Parse XML request
