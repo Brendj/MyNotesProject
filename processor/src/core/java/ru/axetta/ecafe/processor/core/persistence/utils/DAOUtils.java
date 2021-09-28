@@ -4,15 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.*;
-import org.hibernate.criterion.*;
-import org.hibernate.exception.SQLGrammarException;
-import org.hibernate.sql.JoinType;
-import org.hibernate.transform.Transformers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
@@ -55,6 +46,16 @@ import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.*;
+import org.hibernate.criterion.*;
+import org.hibernate.exception.SQLGrammarException;
+import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -337,12 +338,13 @@ public class DAOUtils {
     }
 
     public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
-        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
+        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo order by updateTime desc");
         q.setParameter("cardNo", cardNo);
         List l = q.getResultList();
         if (l.size() == 0) {
             return null;
         }
+        if (l.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", cardNo));
         return ((Card) l.get(0)).getClient();
     }
 
@@ -585,6 +587,15 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
+    }
+
+    public static Card findCardByCardNoWithUniqueCheck(Session persistenceSession, Long cardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        List<Card> list = criteria.list();
+        if (list.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", cardNo));
+        return (list.size() == 0) ? null : list.get(0);
     }
 
     public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {

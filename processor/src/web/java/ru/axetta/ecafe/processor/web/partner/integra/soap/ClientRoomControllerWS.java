@@ -4456,14 +4456,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (mode == 1) {
                 contractId = getContractIdByCardNoInternal_NEWWAY(lCardId);
             }
+        } catch (NoUniqueCardNoException e) {
+            logger.error("getContractIdByCardNo NoUniqueCardNoException");
         } catch (Exception e) {
-            logger.error("ClientRoomController failed", e);
+            logger.error("getContractIdByCardNo failed", e);
         }
         return contractId;
     }
 
     private Long getContractIdByCardNoInternal_OLDWAY(long cardId) throws Exception {
-        Long contractId = DAOService.getInstance().getContractIdByCardNo(cardId);
+        Long contractId = DAOReadonlyService.getInstance().getContractIdByCardNo(cardId);
         if (contractId == null) {
             int days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_TEMP_CARD_VALID_DAYS);
             contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(cardId, days);
@@ -4478,8 +4480,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            Card card = DAOUtils.findCardByCardNo(session, cardId);
-            if (card.getState() == Card.ACTIVE_STATE) {
+            Card card = DAOUtils.findCardByCardNoWithUniqueCheck(session, cardId);
+            if (card != null && card.getState() == Card.ACTIVE_STATE) {
                 contractId = card.getClient().getContractId();
             }
             transaction.commit();

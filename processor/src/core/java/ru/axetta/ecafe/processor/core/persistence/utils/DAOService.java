@@ -4,18 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -436,14 +424,6 @@ public class DAOService {
     public Object detachEntity(Object entity) throws Exception {
         entityManager.detach(entity);
         return entity;
-    }
-
-    public Long getContractIdByCardNo(long lCardId) throws Exception {
-        Client client = DAOUtils.findClientByCardNo(entityManager, lCardId);
-        if (client != null) {
-            return client.getContractId();
-        }
-        return null;
     }
 
     public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId, int days) throws Exception {

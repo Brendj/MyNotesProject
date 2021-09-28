@@ -4,6 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
@@ -18,19 +32,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
-import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
-import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -111,6 +112,14 @@ public class DAOReadonlyService {
             result.add(card);
         }
         return result;
+    }
+
+    public Long getContractIdByCardNo(long lCardId) throws Exception {
+        Client client = DAOUtils.findClientByCardNo(entityManager, lCardId);
+        if (client != null) {
+            return client.getContractId();
+        }
+        return null;
     }
 
     public List<Card> getActiveCardsWithOverdueValidDate(Date now) {
