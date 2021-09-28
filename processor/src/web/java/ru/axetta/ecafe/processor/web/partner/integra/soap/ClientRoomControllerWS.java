@@ -9161,7 +9161,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             Long lCardId = Long.parseLong(cardId);
             lCardId = SummaryCardsMSRService.convertCardId(lCardId);
-            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            Card card = null;
+            try {
+                card = DAOUtils.findCardByCardNoWithUniqueCheck(session, lCardId);
+            } catch (NoUniqueCardNoException e) {
+                lCardId = SummaryCardsMSRService.convertCardIdForLongCardNo(Long.parseLong(cardId));
+                card = DAOUtils.findCardByLongCardNo(session, lCardId);
+            }
             if (card == null || !card.isActive()) {
                 return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
