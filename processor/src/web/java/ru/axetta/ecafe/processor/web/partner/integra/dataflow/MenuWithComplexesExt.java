@@ -75,7 +75,7 @@ public class MenuWithComplexesExt {
     public MenuWithComplexesExt(WtComplex wtComplex, Org org, Date date, int isDiscountComplex) {
         this.idOfComplexInfo = wtComplex.getIdOfComplex();
         this.idOfComplex = wtComplex.getIdOfComplex().intValue();
-        this.complexName = wtComplex.getName();
+        this.complexName = wtComplex.getWtDietType().getDescription();
         this.menuDate = date;
         this.currentPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice()
                 .multiply(new BigDecimal(100)).longValue();
