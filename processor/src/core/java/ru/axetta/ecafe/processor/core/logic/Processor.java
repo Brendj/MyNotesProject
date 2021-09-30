@@ -5120,7 +5120,7 @@ public class Processor implements SyncProcessor {
                             purchase.getMenuGroup(), purchase.getMenuOrigin(), purchase.getMenuOutput(),
                             purchase.getType(), purchase.getIdOfMenu(), purchase.getManufacturer(),
                             payment.getIdOfClient() == null || !MealManager.isSendToExternal, purchase.getItemCode(),
-                            purchase.getIdOfRule(), OrderDetailFRationType.fromInteger(purchase.getfRation()));
+                            purchase.getIdOfRule(), purchase.getfRation());
                     if (purchase.getGuidOfGoods() != null) {
                         Good good = findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
                         if (good != null) {
@@ -5147,8 +5147,8 @@ public class Processor implements SyncProcessor {
                     if (orderDetail.isComplex() || orderDetail.isComplexItem()) {
                         totalLunchRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
                     }
-                    if (purchase.getfRation() != null && OrderDetailFRationType.fromInteger(purchase.getfRation()) != OrderDetailFRationType.NOT_SPECIFIED) {
-                        rations.add(OrderDetailFRationType.fromInteger(purchase.getfRation()).toString());
+                    if (purchase.getfRation() != null && OrderDetailFRationTypeWTdiet.getValues().get(purchase.getfRation()) != null) {
+                        rations.add(OrderDetailFRationTypeWTdiet.getDescription(purchase.getfRation()));
                     }
                 }
                 // Check payment sums
@@ -7499,7 +7499,7 @@ public class Processor implements SyncProcessor {
         String ratation = "";
         for (Purchase purchase : payment.getPurchases()) {
             if (purchase.getType() != null && purchase.getType() > 0 && purchase.getType() < 100) {
-                ratation = OrderDetailFRationType.fromInteger(purchase.getfRation()).toString();
+                ratation = OrderDetailFRationTypeWTdiet.getDescription(purchase.getfRation());
                 break;
             }
         }
