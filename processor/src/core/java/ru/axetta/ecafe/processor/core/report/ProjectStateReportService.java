@@ -15,7 +15,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -643,7 +643,7 @@ public class ProjectStateReportService {
         }
 
 
-        List<Contragent> contragents = DAOService.getInstance().getContragentsListFromOrders();//.getContragentsList(Contragent.TSP);
+        List<Contragent> contragents = DAOReadonlyService.getInstance().getContragentsListFromOrders();//.getContragentsList(Contragent.TSP);
         if(contragents != null) {
             Type [] types = new Type[contragents.size()];
             for(int i=0; i<contragents.size(); i++) {

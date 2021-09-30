@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BlockUnblockItem;
@@ -132,7 +133,7 @@ public class CardBlockUnblockService {
         List rListOld = queryOld.list();
         Integer count;
         try {
-            count = Integer.valueOf(DAOService.getInstance().getLastCountBlocked());
+            count = Integer.valueOf(DAOReadonlyService.getInstance().getLastCountBlocked());
         } catch (Exception e) {
             count = 0;
         }

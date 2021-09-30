@@ -4,6 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.org;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ContractDistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -16,14 +24,6 @@ import org.hibernate.transform.Transformers;
 import org.infinispan.atomic.AtomicHashMap;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ContractDistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import java.util.*;
 
@@ -149,9 +149,9 @@ public class Contract extends ContractDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "Customer", customer);
         XMLUtils.setAttributeIfNotNull(element, "Responsible", performer);
         if (org != null) {
-            XMLUtils.setAttributeIfNotNull(element, "Provider", DAOService.getInstance().getDefaultSupplierNameByOrg(org.getIdOfOrg()));
-            XMLUtils.setAttributeIfNotNull(element, "OrgSourceMenu", DAOService.getInstance().getMenuSourceOrgName(org.getIdOfOrg()));
-            XMLUtils.setAttributeIfNotNull(element, "ProductionConf", DAOService.getInstance().getConfigurationProviderNameByOrg(org.getIdOfOrg()));
+            XMLUtils.setAttributeIfNotNull(element, "Provider", DAOReadonlyService.getInstance().getDefaultSupplierNameByOrg(org.getIdOfOrg()));
+            XMLUtils.setAttributeIfNotNull(element, "OrgSourceMenu", DAOReadonlyService.getInstance().getMenuSourceOrgName(org.getIdOfOrg()));
+            XMLUtils.setAttributeIfNotNull(element, "ProductionConf", DAOReadonlyService.getInstance().getConfigurationProviderNameByOrg(org.getIdOfOrg()));
         }
         XMLUtils.setAttributeIfNotNull(element, "StDate", getDateOfConclusion());
         XMLUtils.setAttributeIfNotNull(element, "ValidDate", getDateOfClosing());

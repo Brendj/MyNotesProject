@@ -5,14 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JasperPrint;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -28,6 +21,15 @@ import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.Hint;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleEditPage;
+
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
@@ -428,7 +430,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             contragentFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -441,7 +443,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             contragentPayAgentFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -454,7 +456,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             contragentReceiverFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -468,7 +470,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContract = Long.parseLong(hint.getConditionConstant());
-            String contractName = DAOService.getInstance().getContractNameById(idOfContract);
+            String contractName = DAOReadonlyService.getInstance().getContractNameById(idOfContract);
             contractFilter.completeContractSelection(idOfContract, contractName);
         } catch (Exception e) {
             logger.error("Failed to parse contract hint " + hint.getConditionConstant(), e);
@@ -480,7 +482,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
             return;
         }
         try {
-            String ids[] = hint.getConditionConstant().split(",");
+            String[] ids = hint.getConditionConstant().split(",");
             Map<Long, String> res = new HashMap<Long, String>();
             for (String id : ids) {
                 long idOfOrg = Long.parseLong(id);
@@ -644,7 +646,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
 
     public void buildReport(Map<String, List<String>> values, Org org) throws Exception {
         //  Строим отчет
-        ReportHandleRule rule = DAOService.getInstance().getReportHandleRule(ruleId);
+        ReportHandleRule rule = DAOReadonlyService.getInstance().getReportHandleRule(ruleId);
         if (rule == null) {
             return;
         }
@@ -656,7 +658,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         if (values.get("idOfContragent") != null) {
             List<String> idOfContragentList = values.get("idOfContragent");
             if (idOfContragentList != null && idOfContragentList.size() > 0) {
-                Contragent contragent = DAOService.getInstance()
+                Contragent contragent = DAOReadonlyService.getInstance()
                         .getContragentById(Long.parseLong(idOfContragentList.get(0)));
                 builder.setContragent(contragent);
             }
@@ -709,7 +711,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 if (tmpList != null && tmpList.size() > 0) {
                     try {
                         long idOfContragentReceiver = Long.parseLong(tmpList.get(0));
-                        contragentReceiver = DAOService.getInstance().getContragentById(idOfContragentReceiver);
+                        contragentReceiver = DAOReadonlyService.getInstance().getContragentById(idOfContragentReceiver);
                     } catch (Exception e) {
                         contragentReceiver = null;
                     }
@@ -721,7 +723,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 if (tmpList != null && tmpList.size() > 0) {
                     try {
                         long idOfContragentPayer = Long.parseLong(tmpList.get(0));
-                        contragentPayer = DAOService.getInstance().getContragentById(idOfContragentPayer);
+                        contragentPayer = DAOReadonlyService.getInstance().getContragentById(idOfContragentPayer);
                     } catch (Exception e) {
                         contragentPayer = null;
                     }
@@ -733,7 +735,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 if (tmpList != null && tmpList.size() > 0) {
                     try {
                         long idOfContragent = Long.parseLong(tmpList.get(0));
-                        contragent = DAOService.getInstance().getContragentById(idOfContragent);
+                        contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
                     } catch (Exception e) {
                         contragent = null;
                     }

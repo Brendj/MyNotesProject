@@ -1672,7 +1672,7 @@ public class PreorderDAOService {
         if (!isWeekend) isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class)
                 .isHolidayByProductionCalendar(preorderComplex.getPreorderDate(), productionCalendar);
         if (isWeekend) {
-            if (preorderComplex.getIdOfGoodsRequestPosition() == null) {
+            if (!isGoodRequestExists(preorderComplex)) {
                 logger.info(String.format("Delete preorderComplex %s by change of calendar", preorderComplex.toString()));
                 long nextVersion = nextVersionByPreorderComplex();
                 deletePreorderComplex(preorderComplex, nextVersion, PreorderState.CHANGED_CALENDAR);

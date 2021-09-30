@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 
@@ -197,7 +198,7 @@ public class OrgMskNSIService extends MskNSIService {
                     item.setGuid(info.getGuid());
                     item.setInn(info.getInn());
 
-                    Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
+                    Org fOrg = DAOReadonlyService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
                             item.getInn(), item.getUnom(), item.getUnad(), false);
                     if (fOrg != null) {
                         fillInfOWithOrg(item, fOrg);
@@ -244,7 +245,7 @@ public class OrgMskNSIService extends MskNSIService {
     }
 
     private void addSimilarOrgs(ImportRegisterOrgsService.OrgInfo infoMain) {
-        List<Org> orgs = DAOService.getInstance().findOrgsByGuidAddressINNOrNumber(infoMain.getGuid(), infoMain.getAddress(),
+        List<Org> orgs = DAOReadonlyService.getInstance().findOrgsByGuidAddressINNOrNumber(infoMain.getGuid(), infoMain.getAddress(),
                 infoMain.getInn(), Org.extractOrgNumberFromName(infoMain.getShortName()));
         if (orgs == null || orgs.size() == 0) {
             return;

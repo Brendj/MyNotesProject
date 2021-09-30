@@ -4,17 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 
 import java.util.*;
 
@@ -191,7 +191,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             return contragent.getContragentName();
         } catch (Exception e) {
             //logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -205,8 +205,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         }
         try {
             long idOfContract = Long.parseLong(hint.getConditionConstant());
-            String contractName = DAOService.getInstance().getContractNameById (idOfContract);
-            return contractName;
+            return DAOReadonlyService.getInstance().getContractNameById (idOfContract);
         } catch (Exception e) {
             //logger.error("Failed to parse contract hint " + hint.getConditionConstant(), e);
         }

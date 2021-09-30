@@ -8,6 +8,14 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -15,13 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.*;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -100,7 +101,7 @@ public class ReferReportPage extends OnlineReportPage {
     }
 
     public List<SelectItem> getRegions() {
-        List<String> regions = DAOService.getInstance().getRegions();
+        List<String> regions = DAOReadonlyService.getInstance().getRegions();
         List<SelectItem> items = new ArrayList<SelectItem>();
         items.add(new SelectItem(""));
         for(String reg : regions) {
@@ -431,7 +432,7 @@ public class ReferReportPage extends OnlineReportPage {
         if (idOfOrg != null) {
             Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
+                org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
             }
             return new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName());
         } else {

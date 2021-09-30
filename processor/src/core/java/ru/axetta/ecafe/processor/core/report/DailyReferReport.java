@@ -16,7 +16,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -168,7 +168,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             }
             Org orgObj = null;
             if(org != null) {
-                orgObj = DAOService.getInstance().findOrById(org.getIdOfOrg());
+                orgObj = DAOReadonlyService.getInstance().findOrById(org.getIdOfOrg());
                 String totalCaption = "Общая стоимость за 1-11 классы, руб.";
                 if(orgObj.getType().equals(OrganizationType.KINDERGARTEN)) {
                     totalCaption = "Общая стоимость, руб.";

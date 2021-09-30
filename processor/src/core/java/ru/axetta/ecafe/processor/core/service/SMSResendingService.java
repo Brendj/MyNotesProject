@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 
 import org.apache.commons.lang.StringUtils;
@@ -295,8 +295,7 @@ public class SMSResendingService {
     }
 
     protected Integer getEventDirection(ClientSmsResending clientSmsResending, String[] params) {
-        Integer direction = EventNotificationService.getEventDirectionFromValues(params);
-        return direction;
+        return EventNotificationService.getEventDirectionFromValues(params);
     }
 
     protected Client getEventGuardian(ClientSmsResending clientSmsResending, String[] params) {
@@ -305,7 +304,6 @@ public class SMSResendingService {
             return null;
         }
 
-        Client cl = DAOService.getInstance().findClientById(idOfGuardian);
-        return cl;
+        return DAOReadonlyService.getInstance().findClientById(idOfGuardian);
     }
 }

@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ElectronicReconciliationStatisticsBuilder;
@@ -70,7 +70,7 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
     }
 
     public List<SelectItem> getRegions() {
-        List<String> regions = DAOService.getInstance().getRegions();
+        List<String> regions = DAOReadonlyService.getInstance().getRegions();
         List<SelectItem> items = new ArrayList<SelectItem>();
         items.add(new SelectItem(""));
         for(String reg : regions) {

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -46,6 +47,8 @@ public class ProductPanel extends BasicPage {
     private DAOService daoService;
     @Autowired
     private ContextDAOServices contextDAOServices;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
 
     public void pushCompleteHandler(ProductSelect handler) {
         completeHandlerLists.add(handler);
@@ -94,7 +97,7 @@ public class ProductPanel extends BasicPage {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if (!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()))
-            productList = daoService.findProductByConfigurationProvider(orgOwners, true, filter);
+            productList = daoReadonlyService.findProductByConfigurationProvider(orgOwners, true, filter);
     }
 
     public String getFilter() {

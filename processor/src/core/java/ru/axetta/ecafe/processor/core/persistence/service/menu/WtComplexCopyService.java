@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.service.menu;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -33,7 +34,7 @@ public class WtComplexCopyService {
     }
 
     public void runTask() {
-        String lastProcessedFromOptions = DAOService.getInstance().getLastProcessedWtComplex();
+        String lastProcessedFromOptions = DAOReadonlyService.getInstance().getLastProcessedWtComplex();
         if (StringUtils.isEmpty(lastProcessedFromOptions)) lastProcessedFromOptions = "0";
         Long idOfComplex = new Long(lastProcessedFromOptions);
         logger.info("Start process WT menu complexes copies");

@@ -188,6 +188,7 @@ public class Person {
     }
 
     public String getSurnameAndFirstLetters() {
+
         String n = getSurname();
         String fn = getFirstName();
         if (fn.length()==0) return n;

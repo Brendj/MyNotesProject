@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -354,7 +355,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             List<Long> buildingsList = new LinkedList<Long>();
             Long itemId = orgForEdit.getIdOfOrgRegistryChange();
             buildingsList.add(itemId);
-            Long mainRegistryId = DAOService.getInstance().getMainRegistryByItemId(itemId);
+            Long mainRegistryId = DAOReadonlyService.getInstance().getMainRegistryByItemId(itemId);
             if (mainRegistryId == null) {
                 errorMessages = "Не удается применить операцию к выбранной организации.";
                 return;

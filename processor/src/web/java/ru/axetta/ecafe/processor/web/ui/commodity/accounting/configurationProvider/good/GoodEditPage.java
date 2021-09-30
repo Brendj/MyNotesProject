@@ -5,7 +5,11 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -57,6 +61,8 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
     private SelectedGoodGroupPage selectedGoodGroupPage;
     @Autowired
     private GoodListPage goodListPage;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
     private Integer unitScale;
 
     @Override
@@ -85,7 +91,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
                 printWarn("Поле 'Полное наименование пищевого продукта' обязательное.");
                 return null;
             }
-            Good g = daoService.getGood(currentGood.getGlobalId());
+            Good g = daoReadonlyService.getGood(currentGood.getGlobalId());
             currentGood.setUnitsScale(UnitScale.fromInteger(unitScale));
             g.fill(currentGood);
             g.setLastUpdate(new Date());
@@ -102,7 +108,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
             g.setIdOfConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
             g.setGlobalVersion(daoService.updateVersionByDistributedObjects(Good.class.getSimpleName()));
             daoService.mergeDistributedObject(g, g.getGlobalVersion()+1);
-            currentGood = daoService.getGood(currentGood.getGlobalId());
+            currentGood = daoReadonlyService.getGood(currentGood.getGlobalId());
             selectedGoodGroupPage.setCurrentGood(currentGood);
             printMessage("Товар сохранен успешно.");
         } catch (Exception e) {

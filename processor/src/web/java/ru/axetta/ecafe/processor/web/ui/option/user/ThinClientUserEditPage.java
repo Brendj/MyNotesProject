@@ -4,6 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -11,14 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
 import javax.faces.event.ActionEvent;
 import javax.persistence.EntityManager;
@@ -164,7 +164,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
             cl = (Client) session.load(Client.class, idOfClient);
             person = cl.getPerson();
             String fullName = person.getFullName();
-            org = DAOService.getInstance().findOrById(cl.getOrg().getIdOfOrg()); // почему-то LazyInit если напрямую
+            org = DAOReadonlyService.getInstance().findOrById(cl.getOrg().getIdOfOrg()); // почему-то LazyInit если напрямую
         }
     }
 
@@ -299,7 +299,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
             role            = ((Integer) entry [2]).intValue();
             username        = ((String) entry [3]).trim();
 
-            cl = DAOService.getInstance().findClientById(idOfClient); cl = (Client) session.merge(cl);
+            cl = DAOReadonlyService.getInstance().findClientById(idOfClient); cl = (Client) session.merge(cl);
             person = cl.getPerson();
             String fullName = person.getFullName();
             org = DAOReadonlyService.getInstance().findOrg(idOfOrg);

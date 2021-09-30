@@ -12,7 +12,7 @@ import generated.etp.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.ApplicationForFoodExistsException;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Hex;
@@ -135,9 +135,9 @@ public class ETPMVService {
         }
         Client client;
         if (useMeshGuid) {
-            client = DAOService.getInstance().getClientByMeshGuid(guid);
+            client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
         } else {
-            client = DAOService.getInstance().getClientByGuid(guid);
+            client = DAOReadonlyService.getInstance().getClientByGuid(guid);
         }
 
         if (client == null) {

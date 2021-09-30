@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 
 import org.apache.commons.lang.StringUtils;
@@ -92,7 +92,7 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
 
             ImportRegisterOrgsService.OrgInfo info;
 
-            Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
+            Org fOrg = DAOReadonlyService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
                     item.getInn(), item.getUnom(), item.getUnad(), true);
 
             if (fOrg != null) {

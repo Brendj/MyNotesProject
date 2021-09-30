@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -759,14 +759,14 @@ public class GoodRequestsNewReportService {
         Integer complexId = position.getComplexId();
         Long dishId = position.getIdOfDish();
         if (complexId != null && dishId == null) {
-            wtComplex = DAOService.getInstance().getWtComplexById(complexId.longValue());
+            wtComplex = DAOReadonlyService.getInstance().getWtComplexById(complexId.longValue());
             if (wtComplex != null) {
                 name = wtComplex.getName();
                 price = wtComplex.getPrice() == null ? 0L : wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
             }
         }
         if (dishId != null) {
-            WtDish wtDish = DAOService.getInstance().getWtDishById(dishId);
+            WtDish wtDish = DAOReadonlyService.getInstance().getWtDishById(dishId);
             name = wtDish.getDishName();
             price = wtDish.getPrice() == null ? 0L : wtDish.getPrice().multiply(new BigDecimal(100)).longValue();
             dishCode = wtDish.getCode();
@@ -1012,7 +1012,7 @@ public class GoodRequestsNewReportService {
     private List<WtComplex> getWtComplexListByIds(List<BigInteger> list) {
         List<WtComplex> result = new ArrayList<>();
         for (BigInteger complexId : list) {
-            WtComplex wtComplex = DAOService.getInstance().getWtComplexById(complexId.longValue());
+            WtComplex wtComplex = DAOReadonlyService.getInstance().getWtComplexById(complexId.longValue());
             if (wtComplex != null) {
                 result.add(wtComplex);
             }

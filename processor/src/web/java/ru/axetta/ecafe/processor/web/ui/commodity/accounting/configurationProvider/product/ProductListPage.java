@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -72,7 +73,8 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
     public void reload() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        productList = daoService.findProduct(selectedProductGroup, selectedConfigurationProvider, null, orgOwners, deletedStatusSelected);
+        productList = DAOReadonlyService.getInstance()
+                .findProduct(selectedProductGroup, selectedConfigurationProvider, null, orgOwners, deletedStatusSelected);
     }
 
     public Object selectConfigurationProvider() throws Exception {

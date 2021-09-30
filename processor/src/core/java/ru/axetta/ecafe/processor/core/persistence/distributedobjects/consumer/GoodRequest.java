@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentSta
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.StateChange;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -20,7 +20,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -110,7 +109,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
     protected GoodRequest parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null) {
-            if (DAOService.getInstance().isMenuExchange(getIdOfSyncOrg())) {
+            if (DAOReadonlyService.getInstance().isMenuExchange(getIdOfSyncOrg())) {
                 /* случай когда требование создает поставщик */
                 throw new DistributedObjectException("NOT_HAVE_RIGHTS_TO_CREATE_OR_MODIFY_A_GOOD_REQUEST");
             }

@@ -14,7 +14,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -262,9 +262,9 @@ public class ClientBalanceByOrgReport extends BasicReportForContragentJob {
                 }
             }
 
-            List infos = DAOService.getInstance().getClientBalanceInfosWithoutMigrations(orgs_str, groupWhere, endTime,
+            List infos = DAOReadonlyService.getInstance().getClientBalanceInfosWithoutMigrations(orgs_str, groupWhere, endTime,
                     new Date(System.currentTimeMillis()), "");
-            infos.addAll(DAOService.getInstance().getClientBalanceInfosWithMigrations(orgs_str, groupWhere, endTime,
+            infos.addAll(DAOReadonlyService.getInstance().getClientBalanceInfosWithMigrations(orgs_str, groupWhere, endTime,
                     new Date(System.currentTimeMillis()), "", idOfOrgList));
             for (Org org : orgs) {
                 OrgBalanceInfo orgItem = new OrgBalanceInfo();

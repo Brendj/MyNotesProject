@@ -11,15 +11,12 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.OrgSmsStatsReport;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -121,7 +118,7 @@ public class OrgSmsStatsReportPage extends OnlineReportPage {
         if (idOfOrg != null) {
             Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
+                org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
             }
             reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
         }
