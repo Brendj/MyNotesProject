@@ -2265,10 +2265,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private String getReadableComplexName(OrderDetail orderDetail) {
         if (orderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_MIN && orderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_MAX) {
-            if (orderDetail.getfRation() == null || orderDetail.getfRation() == OrderDetailFRationType.NOT_SPECIFIED) {
+            if (!orderDetail.isFRationSpecified()) {
                 return orderDetail.getMenuDetailName();
             } else {
-                return orderDetail.getfRation().toString();
+                return orderDetail.getfRation().toStrin(); //todo переделать на новый класс
             }
         }
         return orderDetail.getMenuDetailName();
