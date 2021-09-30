@@ -2253,7 +2253,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     purchaseElementExt.setType(0);
                 }
                 if (od.isFRationSpecified()) {
-                    purchaseElementExt.setfRation(od.getfRation().getCode());
+                    purchaseElementExt.setfRation(od.getfRation());
                 }
                 purchaseExt.getE().add(purchaseElementExt);
             }
@@ -2357,7 +2357,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         purchaseWithDetailsElementExt.setType(0);
                     }
                     if (od.isFRationSpecified()) {
-                        purchaseWithDetailsElementExt.setfRation(od.getfRation().getCode());
+                        purchaseWithDetailsElementExt.setfRation(od.getfRation());
                     }
                     if (od.getIdOfMenuFromSync() != null) {
 
@@ -2479,7 +2479,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         purchaseWithDetailsElementExt.setType(0);
                     }
                     if (od.isFRationSpecified()) {
-                        purchaseWithDetailsElementExt.setfRation(od.getfRation().getCode());
+                        purchaseWithDetailsElementExt.setfRation(od.getfRation());
                     }
                     // если пришли с синхронизацией - od.idOfDish должно быть заполнено (od.idOfComplex?)
                     if (od.getIdOfDish() != null) {
