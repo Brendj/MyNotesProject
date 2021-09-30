@@ -66,18 +66,9 @@ class ExcludeFromPlanCommand {
                 return ClientUpdateResult.error(item.getIdOfClient(),
                         String.format("Client with ID='%d' not found", item.getIdOfClient()));
             }
-            client.setDisablePlanEndDate(item.getEndExcludedDate());
-            if (item.getEndExcludedDate() != null) {
-                client.setUseLastEEModeForPlan(item.getUseLastEEModeForPlan());
-                client.setDisablePlanCreationDate(item.getStartExcludeDate());
-            }
-            else {
-                client.setUseLastEEModeForPlan(false);
-                client.setDisablePlanCreationDate(null);
-            }
+            setDisableFromPlan(item.getStartExcludeDate(), item.getEndExcludedDate(), item.getUseLastEEModeForPlan(), client);
             client.setUpdateTime(new Date());
             client.setClientRegistryVersion(version);
-
             session.update(client);
             session.flush();
             transaction.commit();
@@ -93,5 +84,21 @@ class ExcludeFromPlanCommand {
         }
     }
 
+    static void setDisableFromPlan(Date startExcludeDate, Date endExcludedDate, Boolean useLastEEModeForPlan, Client client) {
+        if (startExcludeDate != null) {
+            client.setDisablePlanCreationDate(startExcludeDate);
+        }
+        if (endExcludedDate != null) {
+            client.setDisablePlanEndDate(endExcludedDate);
+        }
+        if (useLastEEModeForPlan != null) {
+            client.setUseLastEEModeForPlan(useLastEEModeForPlan);
+            // если опция выключена сбрасываем даты
+            if (!useLastEEModeForPlan) {
+                client.setDisablePlanCreationDate(null);
+                client.setDisablePlanEndDate(null);
+            }
+        }
+    }
 
 }

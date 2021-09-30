@@ -32,7 +32,7 @@ class UpdateClientCommand {
     private final MoveClientsCommand moveClientsCommand;
     private static final int NOT_FOUND = 404, BAD_PARAMS = 400;
     private final Pattern namePattern = Pattern.compile("[a-zA-Zа-яА-Я\\s-]+");
-    private final Pattern secondNamePattern = Pattern.compile("[a-zA-Zа-яА-Я\\s-]*");
+    //private final Pattern secondNamePattern = Pattern.compile("[a-zA-Zа-яА-Я\\s-]*");
 
     @Autowired
     public UpdateClientCommand(RuntimeContext runtimeContext, MoveClientsCommand moveClientsCommand) {
@@ -57,8 +57,7 @@ class UpdateClientCommand {
             setBirthDate(request.getBirthDate(), client);
             setGender(request.getGender(), client);
             setConfirmVideo(request.getConfirmVisualRecognition(), client);
-            setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(),
-                    request.getUseLastEEModeForPlan(), client);
+            ExcludeFromPlanCommand.setDisableFromPlan(request.getStartExcludeDate(), request.getEndExcludedDate(), request.getUseLastEEModeForPlan(), client);
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
             clientGuardianHistory.setReason("Rest метод (АРМ администратора)");
@@ -149,19 +148,6 @@ class UpdateClientCommand {
             if (StringUtils.isNotEmpty(result)) {
                 throw new WebApplicationException(result);
             }
-        }
-    }
-
-    private void setDisableFromPlan(Date startExcludeDate, Date endExcludedDate, Boolean useLastEEModeForPlan,
-            Client client) {
-        if (useLastEEModeForPlan != null) {
-            client.setUseLastEEModeForPlan(useLastEEModeForPlan);
-        }
-        if (startExcludeDate != null) {
-            client.setDisablePlanCreationDate(startExcludeDate);
-        }
-        if (endExcludedDate != null) {
-            client.setDisablePlanEndDate(endExcludedDate);
         }
     }
 

@@ -73,16 +73,24 @@ class UpdateClientCategoriesCommand {
             Set<CategoryDiscount> oldCategoriesDiscounts = client.getCategories();
             Set<CategoryDiscount> newCategoriesDiscounts = getNewCategoryDiscounts(item, session);
 
+            boolean wasUpdates = false;
             if (!newCategoriesDiscounts.equals(oldCategoriesDiscounts)) {
+                wasUpdates = true;
                 client.setCategories(newCategoriesDiscounts);
+                client.setLastDiscountsUpdate(new Date());
                 DiscountManager.saveDiscountHistory(session, client, client.getOrg(), oldCategoriesDiscounts,
                         newCategoriesDiscounts, client.getDiscountMode(), client.getDiscountMode(),
                         DiscountChangeHistory.MODIFY_IN_WEB_ARM.concat(user != null ? user.getUserName() : ""));
-                client.setLastDiscountsUpdate(new Date());
+            }
+            if (item.getUseLastEEModeForPlan() != null || item.getStartExcludeDate() != null
+                    || item.getEndExcludedDate() != null) {
+                wasUpdates = true;
+                ExcludeFromPlanCommand.setDisableFromPlan(item.getStartExcludeDate(), item.getEndExcludedDate(), item.getUseLastEEModeForPlan(), client);
+            }
+            if (wasUpdates) {
                 client.setUpdateTime(new Date());
                 client.setClientRegistryVersion(version);
             }
-
             session.update(client);
             session.flush();
             transaction.commit();
@@ -106,9 +114,8 @@ class UpdateClientCategoriesCommand {
                             .setParameterList("categoryIds", categoriesIds).list());
 
         } else {
-            return new HashSet<CategoryDiscount>();
+            return new HashSet<>();
         }
     }
-
 
 }
