@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
 
@@ -53,7 +54,7 @@ public class OrderDetailFRationTypeWTdiet {
    private static void initvalues()
    {
        if (values == null || values.isEmpty()) {
-           List<WtDietType> dietGroupItems = DAOService.getInstance().getMapDiet();
+           List<WtDietType> dietGroupItems = DAOReadonlyService.getInstance().getMapDiet();
            for (WtDietType wtDietType : dietGroupItems) {
                values.put(wtDietType.getIdOfDietType(), wtDietType.getDescription());
            }
