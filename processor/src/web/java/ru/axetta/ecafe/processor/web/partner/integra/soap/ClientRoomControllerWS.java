@@ -2268,7 +2268,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (!orderDetail.isFRationSpecified()) {
                 return orderDetail.getMenuDetailName();
             } else {
-                return orderDetail.getfRation().toStrin(); //todo переделать на новый класс
+                return OrderDetailFRationTypeWTdiet.getDescription(orderDetail.getfRation());
             }
         }
         return orderDetail.getMenuDetailName();
