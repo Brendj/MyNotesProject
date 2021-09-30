@@ -28,6 +28,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintPossibleCauses;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -320,6 +321,8 @@ public class RuntimeContext implements ApplicationContextAware {
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
     @Autowired
     private DBUpdater updater;
     public final static int TYPE_S = 0, TYPE_P = 1, TYPE_B = 2;
@@ -912,7 +915,7 @@ public class RuntimeContext implements ApplicationContextAware {
                 boolean budgetExists = false;
                 boolean clientExists = false;
                 final List<Integer> classId = Arrays.asList(Contragent.OPERATOR, Contragent.BUDGET, Contragent.CLIENT);
-                List<Contragent> contragentList = daoService.getContragentsWithClassIds(classId);
+                List<Contragent> contragentList = daoReadonlyService.getContragentsWithClassIds(classId);
                 // Create if not
                 for (Contragent contragent : contragentList) {
                     if (contragent.getClassId().equals(Contragent.OPERATOR)) {

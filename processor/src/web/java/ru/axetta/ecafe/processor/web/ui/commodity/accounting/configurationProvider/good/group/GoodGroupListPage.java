@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 
 /**
@@ -77,7 +79,8 @@ public class GoodGroupListPage extends BasicWorkspacePage implements Configurati
     public void reload() throws Exception{
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        goodGroupList = daoService.findGoodGroup(selectedConfigurationProvider, null, orgOwners, deletedStatusSelected);
+        goodGroupList = DAOReadonlyService.getInstance()
+                .findGoodGroup(selectedConfigurationProvider, null, orgOwners, deletedStatusSelected);
     }
 
     public String getPageFilename() {

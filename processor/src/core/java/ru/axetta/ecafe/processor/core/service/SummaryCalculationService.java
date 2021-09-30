@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -727,7 +728,7 @@ public class SummaryCalculationService {
                         notifyPreorderDailyDetail.setComplexName(currPreorderRegularData.itemname);
                     } else {
                         try {
-                            ComplexInfo complexInfo = DAOService.getInstance()
+                            ComplexInfo complexInfo = DAOReadonlyService.getInstance()
                                     .getComplexInfo(entityManager.find(Client.class, clientEE.getIdOfClient()),
                                             currPreorderRegularData.getComplexId().intValue(), currPreorderRegularData.getCreateDate());
                             notifyPreorderDailyDetail.setComplexName(complexInfo.getComplexName());

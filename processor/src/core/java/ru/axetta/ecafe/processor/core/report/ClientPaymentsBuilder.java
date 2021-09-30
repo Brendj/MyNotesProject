@@ -8,16 +8,17 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.Session;
+
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
+import org.hibernate.Session;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -351,7 +352,7 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
     }
 
     protected void addContragentOrgs(Set<Long> idOfOrgList, Contragent contragent) {
-        List<Org> orgs = DAOService.getInstance().getOrgsByDefaultSupplier(contragent);
+        List<Org> orgs = DAOReadonlyService.getInstance().getOrgsByDefaultSupplier(contragent);
         for (Org o : orgs) {
             idOfOrgList.add(o.getIdOfOrg());
         }

@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEditPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
@@ -120,7 +120,7 @@ public class ContractEditPage extends AbstractEditPage<ContractItem> implements 
             throws Exception {
         contragentFilter.completeContragentSelection(session, idOfContragent);
         if(idOfContragent!=null){
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             if(contragent!=null){
                 currentItem.setContragent(contragent);
                 currentItem.setPerformer(contragent.getContragentName());

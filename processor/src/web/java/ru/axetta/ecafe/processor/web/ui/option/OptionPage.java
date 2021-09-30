@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.RNIPVersion;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -1056,7 +1057,7 @@ public class OptionPage extends BasicWorkspacePage {
         reviseSourceType = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
         reviseDelta = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DELTA);
         reviseLimit = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_LIMIT);
-        reviseLastDate = DAOService.getInstance().getReviseLastDate();
+        reviseLastDate = DAOReadonlyService.getInstance().getReviseLastDate();
 
         cardAutoBlockCron = runtimeContext.getOptionValueString(Option.OPTION_CARD_AUTOBLOCK);
         cardAutoBlockNode = runtimeContext.getOptionValueString(Option.OPTION_CARD_AUTOBLOCK_NODE);
@@ -1304,11 +1305,11 @@ public class OptionPage extends BasicWorkspacePage {
     }
 
     public Boolean isSverkaEnabled() {
-        return DAOService.getInstance().isSverkaEnabled();
+        return DAOReadonlyService.getInstance().isSverkaEnabled();
     }
 
     public String isSverkaEnabledString() {
-        return DAOService.getInstance().isSverkaEnabled() ? "Включено" : "Выключено";
+        return DAOReadonlyService.getInstance().isSverkaEnabled() ? "Включено" : "Выключено";
     }
 
     public void turnOnSverka() {

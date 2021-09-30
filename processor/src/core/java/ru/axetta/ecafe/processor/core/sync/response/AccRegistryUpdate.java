@@ -6,10 +6,11 @@ package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.sync.ResultOperation;
-import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,7 +67,7 @@ public class AccRegistryUpdate implements AbstractToElement{
 
     public void addAccountTransactionInfoV2(AccountTransactionExtended accountTransaction) {
         final Long idOfClient = accountTransaction.getIdofclient();
-        final Client client = DAOService.getInstance().findClientById(idOfClient);
+        final Client client = DAOReadonlyService.getInstance().findClientById(idOfClient);
         AccItem accItem = accItemMap.get(client.getIdOfClient());
         if(accItem==null){
             accItem = new AccItem();

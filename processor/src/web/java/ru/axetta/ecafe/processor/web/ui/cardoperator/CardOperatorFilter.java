@@ -199,7 +199,7 @@ public class CardOperatorFilter extends OnlineReportPage {
         balanceCompareCondition = CompareFilterMenu.NO_CONDITION;
     }
 
-    public List retrieveCards(Session session) throws Exception {
+    public List<HistoryCard> retrieveCards(Session session) throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         Criteria cr = session.createCriteria(HistoryCard.class);
         cr.createAlias("card", "card", JoinType.LEFT_OUTER_JOIN);

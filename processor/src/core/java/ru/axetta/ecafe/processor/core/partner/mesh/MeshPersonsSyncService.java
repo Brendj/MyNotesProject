@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Class;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -178,7 +178,7 @@ public class MeshPersonsSyncService {
                 Class class_ = education.getClass_();
                 meshClass = (MeshClass) session.get(MeshClass.class, class_.getId().longValue());
                 if(meshClass == null){
-                    meshClass = DAOService.getInstance().getMeshClassByUID(class_.getUid());
+                    meshClass = DAOReadonlyService.getInstance().getMeshClassByUID(class_.getUid());
                 }
                 if(meshClass == null){
                     meshClass = new MeshClass(class_.getId(), classuid);
@@ -219,7 +219,7 @@ public class MeshPersonsSyncService {
     }
     protected String searchByMeshGuid(String guid){
         try {
-            Client client = RuntimeContext.getAppContext().getBean(DAOService.class).getClientByGuid(guid);
+            Client client = DAOReadonlyService.getInstance().getClientByGuid(guid);
             return client.getIdOfClient().toString();
         }catch (NullPointerException e){
             logger.error("idOfClient not found");
@@ -270,7 +270,7 @@ public class MeshPersonsSyncService {
         MeshJsonFilter filter = new MeshJsonFilter();
 
         if (meshIds.equals("null")){
-            Long meshId = DAOService.getInstance().getMeshIdByOrg(idOfOrg);
+            Long meshId = DAOReadonlyService.getInstance().getMeshIdByOrg(idOfOrg);
             if (meshId == null)
                 throw new Exception("У организации не указан МЭШ ид.");
             And andOrg = new And();

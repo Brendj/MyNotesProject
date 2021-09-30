@@ -16,7 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -624,7 +624,7 @@ public class ReportRepository extends BaseJpaDao {
             }
 
             if(reportParameters.getIdOfContract() != null){
-                Client client = DAOService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
+                Client client = DAOReadonlyService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
                 properties.setProperty(AutoEnterEventByDaysReport.P_ID_CLIENT, client.getIdOfClient().toString());
             }
 
@@ -667,7 +667,7 @@ public class ReportRepository extends BaseJpaDao {
             }
 
             if (reportParameters.getIdOfContract() != null) {
-                Client client =  DAOService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
+                Client client =  DAOReadonlyService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
                 properties.setProperty(DetailedEnterEventReport.P_ID_OF_CLIENTS, client.getIdOfClient().toString());
             }
 
@@ -717,7 +717,7 @@ public class ReportRepository extends BaseJpaDao {
                 properties.setProperty("sortedBySections", reportParameters.getSortedBySections());
             }
             if(reportParameters.getIdOfContract() != null){
-                Client client = DAOService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
+                Client client = DAOReadonlyService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
                 properties.setProperty(EnterEventJournalReport.P_ID_CLIENT, client.getIdOfClient().toString());
             }
             builder.setReportProperties(properties);

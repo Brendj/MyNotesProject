@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -175,7 +175,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
             return null;
         }
 
-        List<CategoryDiscount> categoryDiscounts = DAOService.getInstance().getCategoryDiscountListByCategoryName(categoryName);
+        List<CategoryDiscount> categoryDiscounts = DAOReadonlyService.getInstance().getCategoryDiscountListByCategoryName(categoryName);
         for (CategoryDiscount categoryDiscount: categoryDiscounts)
         {
             if (categoryDiscount.getIdOfCategoryDiscount() != idOfCategoryDiscount) {

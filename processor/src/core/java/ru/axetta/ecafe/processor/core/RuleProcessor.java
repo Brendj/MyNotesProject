@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -295,7 +296,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                 if (basicReport instanceof BasicReportForContragentJob) {
                                     BasicReportForContragentJob contragentJob = (BasicReportForContragentJob) basicReport;
                                     idOfContragent = contragentJob.getIdOfContragent();
-                                    contragent = DAOService.getInstance().getContragentById(idOfContragent)
+                                    contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent)
                                             .getContragentName();
                                 }
                                 Long idOfContragentReceiver = null;
@@ -305,7 +306,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                             .getProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID);
                                     if (StringUtils.isNotEmpty(property)) {
                                         idOfContragentReceiver = Long.valueOf(property);
-                                        contragentReceiver = DAOService.getInstance()
+                                        contragentReceiver = DAOReadonlyService.getInstance()
                                                 .getContragentById(idOfContragentReceiver).getContragentName();
                                     }
                                 }

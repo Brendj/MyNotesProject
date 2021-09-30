@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
@@ -56,8 +57,9 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
         selectedProductGroupGroupPage.onShow();
         currentProductGroup = selectedProductGroupGroupPage.getCurrentProductGroup();
         currentProductGroup = entityManager.merge(currentProductGroup);
-        org = daoService.findOrById(currentProductGroup.getOrgOwner());
-        currentConfigurationProvider = daoService.getConfigurationProvider(currentProductGroup.getIdOfConfigurationProvider());
+        org = DAOReadonlyService.getInstance().findOrById(currentProductGroup.getOrgOwner());
+        currentConfigurationProvider = DAOReadonlyService.getInstance()
+                .getConfigurationProvider(currentProductGroup.getIdOfConfigurationProvider());
     }
 
     public Object onSave(){
@@ -127,7 +129,7 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
-            org = daoService.findOrById(idOfOrg);
+            org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
         }
     }
 

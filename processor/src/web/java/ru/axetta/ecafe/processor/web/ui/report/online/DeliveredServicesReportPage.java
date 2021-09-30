@@ -8,14 +8,10 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
@@ -26,6 +22,12 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -149,7 +151,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
                 for(Long idOfOrg : idOfOrgList) {
                     Org org = null;
                     if (idOfOrg > -1) {
-                        org = DAOService.getInstance().findOrById(idOfOrg);
+                        org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
                         list.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
                     }
                 }
@@ -202,7 +204,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             for(Long idOfOrg : idOfOrgList) {
                 Org org = null;
                 if (idOfOrg > -1) {
-                    org = DAOService.getInstance().findOrById(idOfOrg);
+                    org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
                     list.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
                 }
             }
@@ -226,7 +228,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     }
 
     public List<SelectItem> getRegions() {
-        List<String> regions = DAOService.getInstance().getRegions();
+        List<String> regions = DAOReadonlyService.getInstance().getRegions();
         List<SelectItem> items = new ArrayList<SelectItem>();
         items.add(new SelectItem(""));
         for(String reg : regions) {

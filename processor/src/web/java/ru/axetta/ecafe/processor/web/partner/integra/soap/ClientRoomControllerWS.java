@@ -328,7 +328,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (enableSubBalanceOperation) {
 
             Client client;
-            final DAOService instance = DAOService.getInstance();
+            final DAOReadonlyService instance = DAOReadonlyService.getInstance();
             try {
                 client = instance.getClientByContractId(contractId);
             } catch (Exception e) {
@@ -378,7 +378,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
         if (enableSubBalanceOperation) {
             List<Client> clients = new ArrayList<Client>();
-            final DAOService instance = DAOService.getInstance();
+            final DAOReadonlyService instance = DAOReadonlyService.getInstance();
             try {
                 clients = instance.findClientsBySan(san);
             } catch (Exception e) {
@@ -4463,10 +4463,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private Long getContractIdByCardNoInternal_OLDWAY(long cardId) throws Exception {
-        Long contractId = DAOService.getInstance().getContractIdByCardNo(cardId);
+        Long contractId = DAOReadonlyService.getInstance().getContractIdByCardNo(cardId);
         if (contractId == null) {
             int days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_TEMP_CARD_VALID_DAYS);
-            contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(cardId, days);
+            contractId = DAOReadonlyService.getInstance().getContractIdByTempCardNoAndCheckValidDate(cardId, days);
         }
         return contractId;
     }
@@ -4784,7 +4784,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit, version)) {
                 r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             } else {
-                Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+                Long idOfClient = DAOReadonlyService.getInstance().getClientByContractId(contractId).getIdOfClient();
                 handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                         idOfClient, handler.getData().getOperationType());
             }
@@ -5677,27 +5677,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
 
             DAOService daoService = DAOService.getInstance();
-            //logger.info("begin get Client");
-            Client client = daoService.getClientByContractId(contractId);
-            //logger.info("find client");
+            DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+            Client client = daoReadonlyService.getClientByContractId(contractId);
             if (client == null) {
-                //logger.info("find client == null");
                 if (logger.isDebugEnabled()) {
                     logger.debug("Client not found");
                 }
                 return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
-            //logger.info("find client != null");
             boolean authorized = false;
             if (partnerLinkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_NAME) {
-                //logger.info("MD5");
                 String fullNameUpCase = client.getPerson().getFullName().replaceAll("\\s", "").toUpperCase();
                 fullNameUpCase = fullNameUpCase + "Nb37wwZWufB";
                 byte[] bytesOfMessage = fullNameUpCase.getBytes("UTF-8");
                 MessageDigest md = MessageDigest.getInstance("MD5");
                 byte[] hash = md.digest(bytesOfMessage);
                 BigInteger bigInt = new BigInteger(1, hash);
-                //String md5HashString = bigInt.toString(16);
                 String md5HashString = String.format("%0" + (hash.length << 1) + "X", bigInt);
                 if (logger.isDebugEnabled()) {
                     logger.info("token    md5: " + token.toUpperCase());
@@ -5781,7 +5776,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         GenerateLinkingTokenResult result = new GenerateLinkingTokenResult();
         try {
             DAOService daoService = DAOService.getInstance();
-            Client client = daoService.getClientByContractId(contractId);
+            DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+            Client client = daoReadonlyService.getClientByContractId(contractId);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -5807,7 +5803,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             Result result = new Result();
             DAOService daoService = DAOService.getInstance();
-            Client client = daoService.getClientByContractId(contractId);
+            DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+            Client client = daoReadonlyService.getClientByContractId(contractId);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -5855,7 +5852,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             DAOService daoService = DAOService.getInstance();
-            List<Client> clientList = daoService.findClientsByMobilePhone(mobilePhone);
+            DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+            List<Client> clientList = daoReadonlyService.findClientsByMobilePhone(mobilePhone);
             if (clientList.size() == 0) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -8673,7 +8671,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         ClientGuidResult result = new ClientGuidResult();
         try {
-            DAOService daoService = DAOService.getInstance();
+            DAOReadonlyService daoService = DAOReadonlyService.getInstance();
             Client client = daoService.getClientByContractId(contractId);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
@@ -8700,7 +8698,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public ClientContractIdResult getContractIdByGUID(@WebParam(name = "GUID") String guid) {
         ClientContractIdResult result = new ClientContractIdResult();
         try {
-            DAOService daoService = DAOService.getInstance();
+            DAOReadonlyService daoService = DAOReadonlyService.getInstance();
 
             Client client = daoService.getClientByGuid(guid);
             if (client == null) {
@@ -8779,7 +8777,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         //}
 
         //Проверка на возможность создания
-        Client clientChild = DAOService.getInstance().getClientByContractId(childContractId);
+        Client clientChild = DAOReadonlyService.getInstance().getClientByContractId(childContractId);
         if (clientChild == null) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_NOT_FOUND_DESC);
         }
@@ -11120,8 +11118,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (ssoids != null && !ssoids.isEmpty()) {
                 ssoid = ssoids.get(0).trim();
                 if (!ssoid.isEmpty()) {
-                    List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(cientMobile);
-                    List<Client> clientsSsoid = DAOService.getInstance().getClientsBySoid(ssoid);
+                    List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(cientMobile);
+                    List<Client> clientsSsoid = DAOReadonlyService.getInstance().getClientsBySoid(ssoid);
                     for (Client client : clients) {
                         if (client.getSsoid() == null || !client.getSsoid().equals(ssoid)) {
                             client.setSsoid(ssoid);

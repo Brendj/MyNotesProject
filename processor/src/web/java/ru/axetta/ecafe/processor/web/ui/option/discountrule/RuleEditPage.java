@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -94,7 +95,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     }
 
     public List<SelectItem> getAvailableComplexs() {
-        final List<ComplexRole> complexRoles = daoService.findComplexRoles();
+        final List<ComplexRole> complexRoles = DAOReadonlyService.getInstance().findComplexRoles();
         final int size = complexRoles.size();
         List<SelectItem> list = new ArrayList<SelectItem>(size);
         for (int i=0;i<size;i++) {
@@ -352,7 +353,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                 entity.getCategoryOrgs().add((CategoryOrg) object);
             }
         }
-        entity.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
+        entity.setCodeMSP(DAOReadonlyService.getInstance().findCodeNSPByCode(codeMSP));
 
         em.persist(entity);
         fill(entity);

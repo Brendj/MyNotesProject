@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -125,7 +125,7 @@ public class SupportInfoMailingPage extends BasicWorkspacePage {
         final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
                 EventNotificationService.class);
         for (Long contractId : clients) {
-            Client client = DAOService.getInstance().getClientByContractId(contractId);
+            Client client = DAOReadonlyService.getInstance().getClientByContractId(contractId);
             String[] values = generateInfoMailingNotificationParams();
             notificationService.sendNotificationInfoMailingAsync(client, values, new Date());
         }

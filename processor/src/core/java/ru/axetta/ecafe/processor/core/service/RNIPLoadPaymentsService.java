@@ -19,7 +19,7 @@ import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.contragent.ContragentService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -804,7 +804,7 @@ public class RNIPLoadPaymentsService {
 
     public void addPaymentsToDb(List<Map<String, String>> payments, Boolean isAutoRun) throws Exception {
 
-        List<Contragent> contragents = DAOService.getInstance().getContragentsList();
+        List<Contragent> contragents = DAOReadonlyService.getInstance().getContragentsList();
         FileWriter errorWriter = openErrorFile(getErrorFile());
 
         for (Map<String, String> p : payments) {
@@ -889,7 +889,7 @@ public class RNIPLoadPaymentsService {
         if (changeStatus.equals(CHANGE_STATUS_CHANGE) || changeStatus.equals(CHANGE_STATUS_CANCEL)) {
             doRegiserPayment = false;
             //Если этот платеж - изменение, пробуем зарегистрировать корректировку
-            List<ClientPayment> exPayments = DAOService.getInstance().findClientPaymentsByPaymentId(null, paymentID);
+            List<ClientPayment> exPayments = DAOReadonlyService.getInstance().findClientPaymentsByPaymentId(null, paymentID);
             if (exPayments != null && !exPayments.isEmpty()) {
                 //Найден 1 или более платежей по идентификатору, делаем корректировку
                 ClientPayment payment = exPayments.get(0); //берем последний по дате платеж
@@ -956,7 +956,7 @@ public class RNIPLoadPaymentsService {
         String contractId = p.get(PAYMENT_TO_KEY);
         if(!StringUtils.isBlank(contractId)){
             contractId = contractId.trim();
-            Client client = DAOService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
+            Client client = DAOReadonlyService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
             info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, PAYMENT_TO=%s, Amount=%s ..",
                     paymentID, paymentDate, contragentKey, bic, contractId, amount);
             if (client == null) {
@@ -971,7 +971,7 @@ public class RNIPLoadPaymentsService {
             return false;
         }
         Long idOfPaymentContragent = null;
-        Contragent payContragent = DAOService.getInstance().getContragentByBIC(bic);
+        Contragent payContragent = DAOReadonlyService.getInstance().getContragentByBIC(bic);
 
         if (payContragent != null) {
             idOfPaymentContragent = payContragent.getIdOfContragent();
@@ -979,7 +979,7 @@ public class RNIPLoadPaymentsService {
         else {
             logger.error("По полученному БИК " + bic + " от РНИП, не найдено ни одного контрагента");
             errorWriter.write(String.format("%s: По полученному БИК %s от РНИП, не найдено ни одного контрагента\r\n", workDate, bic));
-            Contragent rnipContragent = DAOService.getInstance().getRNIPContragent();
+            Contragent rnipContragent = DAOReadonlyService.getInstance().getRNIPContragent();
             if (rnipContragent != null) {
                 //idOfContragent = rnipContragent.getIdOfContragent();
                 idOfPaymentContragent = rnipContragent.getIdOfContragent();
@@ -1044,7 +1044,7 @@ public class RNIPLoadPaymentsService {
                 baseIdOfPayment = idOfPayment.substring(0, nextNumbers[1]);
             }
             String newIdOfPayment = baseIdOfPayment + ClientPayment.CANCEL_SUBSTRING + nextNumber.toString();
-            if (DAOService.getInstance().isCancelPaymentExists(newIdOfPayment)) {
+            if (DAOReadonlyService.getInstance().isCancelPaymentExists(newIdOfPayment)) {
                 return false;
             }
             Long cancelSum = - payment.getPaySum();
@@ -1078,7 +1078,7 @@ public class RNIPLoadPaymentsService {
                 baseIdOfPayment = idOfPayment.substring(0, nextNumbers[1]);
             }
             String newIdOfPayment = baseIdOfPayment + ClientPayment.CANCEL_SUBSTRING + nextNumber.toString();
-            if (DAOService.getInstance().isCancelPaymentExists(newIdOfPayment)) {
+            if (DAOReadonlyService.getInstance().isCancelPaymentExists(newIdOfPayment)) {
                 return null;
             }
             Long cancelSum = - payment.getPaySum();

@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
@@ -314,7 +314,7 @@ public class ReportPage extends BasicWorkspacePage {
 
     public void buildReport(Map<String, List<String>> values, Org org, Contragent contragent, Contract contract, Session session) throws Exception {
         //  Строим отчет
-        ReportHandleRule rule = DAOService.getInstance().getReportHandleRule(ruleId);
+        ReportHandleRule rule = DAOReadonlyService.getInstance().getReportHandleRule(ruleId);
         if (rule == null) {
             return;
         }

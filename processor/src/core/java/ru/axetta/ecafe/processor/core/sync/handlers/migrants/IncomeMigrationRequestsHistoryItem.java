@@ -4,14 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
-import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+
+import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Node;
 
 import java.util.Date;
 
@@ -88,7 +88,7 @@ public class IncomeMigrationRequestsHistoryItem {
 
         idOfClientResol = getLongValue(itemNode, "IdOfClientResol", emSetter, true);
         if(idOfClientResol != null) {
-            Client client = DAOService.getInstance().findClientById(idOfClientResol);
+            Client client = DAOReadonlyService.getInstance().findClientById(idOfClientResol);
             if (client == null && idOfClientResol != -1L) {
                 emSetter.setCompositeErrorMessage(String.format("Client with id=%s not found", idOfClientResol));
             }

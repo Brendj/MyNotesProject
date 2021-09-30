@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscountdszn;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -14,7 +14,6 @@ import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +28,6 @@ import java.util.List;
 public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
-
-    @Autowired
-    private DAOService service;
 
     private List<CategoryDiscountDSZNItem> items = Collections.emptyList();
 
@@ -75,7 +71,7 @@ public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements 
 
     private void reload() {
         items = new ArrayList<CategoryDiscountDSZNItem>();
-        List<CategoryDiscountDSZN> list = service.getCategoryDiscountDSZNList();
+        List<CategoryDiscountDSZN> list = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
         for(CategoryDiscountDSZN discountDSZN : list) {
             items.add(new CategoryDiscountDSZNItem(discountDSZN));
         }

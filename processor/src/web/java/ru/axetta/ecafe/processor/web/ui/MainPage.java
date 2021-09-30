@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
@@ -10374,7 +10375,7 @@ public class MainPage implements Serializable {
     public Object checkUserSmsCode() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         String reqCode = user.getLastSmsCode();
         if (reqCode != null && smsCode != null && reqCode.equals(smsCode)) {
             user.setSmsCodeEnterDate(new Date(System.currentTimeMillis()));
@@ -10409,7 +10410,7 @@ public class MainPage implements Serializable {
     public Object doChangeUserPassword() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
         try {

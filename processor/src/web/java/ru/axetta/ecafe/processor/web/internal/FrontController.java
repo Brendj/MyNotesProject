@@ -4,15 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import sun.security.provider.X509Factory;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
@@ -38,7 +31,16 @@ import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
-import sun.security.provider.X509Factory;
+
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -1631,15 +1633,15 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "idOfClient") Long idOfClient) throws Exception {
         checkRequestValidity(orgId);
 
-        DAOService daoService = DAOService.getInstance();
-        Client client = daoService.findClientById(idOfClient);
+        DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+        Client client = daoReadonlyService.findClientById(idOfClient);
         if (client == null) {
             throw new FrontControllerException(String.format("Клиент не найден: %d", idOfClient));
         }
-        if (!daoService.doesClientBelongToFriendlyOrgs(orgId, idOfClient)) {
+        if (!daoReadonlyService.doesClientBelongToFriendlyOrgs(orgId, idOfClient)) {
             throw new FrontControllerException(String.format("Клиент %d не принадлежит организации", idOfClient));
         }
-        LinkingToken linkingToken = daoService.generateLinkingToken(client);
+        LinkingToken linkingToken = DAOService.getInstance().generateLinkingToken(client);
         return linkingToken.getToken();
     }
 

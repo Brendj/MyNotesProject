@@ -11,7 +11,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
@@ -84,9 +84,9 @@ public class ComplexMenuReport extends BasicReportForContragentJob {
         public List<ComplexMenuReportItem> createDataSource(Session session, Contragent contragent, List<Long> idOfOrgList, Long typeFood, Long diet,
                 Long ageGroup, Long archived, Date date, Long dishIds, Boolean showCycle) throws Exception {
             List<ComplexMenuReportItem> result = new LinkedList<>();
-            List<WtComplexGroupItem> wtGroupComplex = DAOService.getInstance().getTypeComplexFood();
-            List<WtDietType> dietGroupItems = DAOService.getInstance().getMapDiet();
-            List<WtAgeGroupItem> ageGroups = DAOService.getInstance().getAgeGroups();
+            List<WtComplexGroupItem> wtGroupComplex = DAOReadonlyService.getInstance().getTypeComplexFood();
+            List<WtDietType> dietGroupItems = DAOReadonlyService.getInstance().getMapDiet();
+            List<WtAgeGroupItem> ageGroups = DAOReadonlyService.getInstance().getAgeGroups();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Timestamp ts = date == null ? null : Timestamp.valueOf(formatter.format(date));
             String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;

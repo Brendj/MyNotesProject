@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.faces.model.SelectItem;
 import java.util.List;
 
 /**
@@ -28,7 +28,7 @@ public class ComplexRuleEditPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        complexRoles = daoService.findComplexRoles();
+        complexRoles = DAOReadonlyService.getInstance().findComplexRoles();
     }
 
     public Object updateRule(){

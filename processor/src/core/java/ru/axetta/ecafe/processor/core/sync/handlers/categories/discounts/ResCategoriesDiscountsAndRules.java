@@ -4,6 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts;
 
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -11,12 +17,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
-import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import java.util.*;
 
@@ -560,7 +560,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         }
 
         private String buildComplexesMap(WtDiscountRule wtDiscountRule) {
-            List<WtComplex> complexes = DAOService.getInstance().getComplexesByWtDiscountRule(wtDiscountRule);
+            List<WtComplex> complexes = DAOReadonlyService.getInstance().getComplexesByWtDiscountRule(wtDiscountRule);
             StringBuilder sb = new StringBuilder();
             for (WtComplex complex : complexes) {
                 sb.append(complex.getIdOfComplex()).append("=1;");

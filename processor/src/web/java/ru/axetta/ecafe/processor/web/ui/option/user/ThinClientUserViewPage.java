@@ -124,7 +124,7 @@ public class ThinClientUserViewPage extends BasicWorkspacePage {
             role            = ((Integer) entry [2]).intValue();
             username        = ((String) entry [3]).trim();
 
-            cl = DAOService.getInstance().findClientById(idOfClient); cl = (Client) session.merge(cl);
+            cl = DAOReadonlyService.getInstance().findClientById(idOfClient); cl = (Client) session.merge(cl);
             person = cl.getPerson();
             String fullName = person.getFullName();
             org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
