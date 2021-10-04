@@ -588,6 +588,15 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardByCardNoWithUniqueCheck(Session persistenceSession, Long cardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        List<Card> list = criteria.list();
+        if (list.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", cardNo));
+        return (list.size() == 0) ? null : list.get(0);
+    }
+
     public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));

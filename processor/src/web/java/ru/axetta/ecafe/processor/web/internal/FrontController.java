@@ -17,10 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardUidGivenAwayException;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardWrongStateException;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
@@ -1702,8 +1699,9 @@ public class FrontController extends HttpServlet {
             longCardNo = null;
         }
         logger.info(String.format(
-                "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s",
-                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid));
+                "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, "
+                        + "cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s, longCardNo=%s",
+                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid, longCardNo));
         CardService cardService = CardService.getInstance();
         if (!(type >= 0 && type < Card.TYPE_NAMES.length)) {
             return new CardResponseItem(CardResponseItem.ERROR_INVALID_TYPE,
@@ -1720,13 +1718,19 @@ public class FrontController extends HttpServlet {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Org org = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            if (org.longCardNoIsOn() && longCardNo == null) {
+                throw new CardResponseItem.LongCardNoNotSpecified(CardResponseItem.ERROR_LONG_CARDNO_MATCH_ORG_MESSAGE);
+            }
             Card exCard = null;
-            if (VersionUtils.doublesAllowed(persistenceSession, idOfOrg) && org.getNeedVerifyCardSign()) {
-                exCard = DAOUtils
-                        .findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum,
-                                type);
+            if (!org.longCardNoIsOn()) {
+                if (VersionUtils.doublesAllowed(persistenceSession, idOfOrg) && org.getNeedVerifyCardSign()) {
+                    exCard = DAOUtils.findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo,
+                            cardSignCertNum, type);
+                } else {
+                    exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+                }
             } else {
-                exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+                exCard = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
             }
             if (null == exCard) {
                 card = cardService
@@ -1770,13 +1774,19 @@ public class FrontController extends HttpServlet {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (CardResponseItem.CardAlreadyExist e) {
-            logger.error("CardAlreadyExistException", e);
+            logger.error("CardAlreadyExistException: ", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
+        } catch (CardResponseItem.LongCardNoNotSpecified e) {
+            logger.error("LongCardNoNotSpecified: ", e);
+            return new CardResponseItem(CardResponseItem.ERROR_LONG_CARDNO_MATCH_ORG, e.getMessage());
+        } catch(NoUniqueCardNoException e) {
+            logger.error("NoUniqueCardNoException: ", e);
+            return new CardResponseItem(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE, CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
         } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
-            logger.error("CardAlreadyExistInYourOrgException", e);
+            logger.error("CardAlreadyExistInYourOrgException: ", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
         } catch (CardResponseItem.CardAlreadyExistSecondRegisterAllowed e) {
-            logger.error("CardAlreadyExistSecondRegisterAllowed", e);
+            logger.error("CardAlreadyExistSecondRegisterAllowed: ", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE_FOR_SECOND_REGISTER, e.getMessage());
         } catch (Exception e) {
             if (e.getMessage() == null) {
