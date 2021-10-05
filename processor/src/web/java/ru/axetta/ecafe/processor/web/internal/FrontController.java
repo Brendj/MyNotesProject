@@ -1730,7 +1730,7 @@ public class FrontController extends HttpServlet {
                     exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
                 }
             } else {
-                exCard = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
+                exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
             }
             if (null == exCard) {
                 card = cardService
