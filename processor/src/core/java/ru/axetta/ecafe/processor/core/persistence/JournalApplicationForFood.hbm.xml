@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.JournalApplicationForFood" table="cf_wa_journal_applicationsforfood" optimistic-lock="version">
+        <id name="idofoperation" column="idofoperation" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">8</param>
+                <param name="sequence_name">cf_wa_journal_applicationsforfood_idofoperation_seq</param>
+            </generator>
+        </id>
+        <property name="idofapplicationforfood" column="idofapplicationforfood" type="long"/>
+        <property name="operationtype" column="operationtype">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OperationtypeForJournalApplication</param>
+            </type>
+        </property>
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofuser"
+                     update="false"/>
+        <property name="createddate" column="createddate" type="date"/>
+    </class>
+</hibernate-mapping>
+
+
