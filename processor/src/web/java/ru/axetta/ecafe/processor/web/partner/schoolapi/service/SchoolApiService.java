@@ -967,7 +967,7 @@ public class SchoolApiService implements ISchoolApiService {
         int rPrice = 0;
         int qty = 1;
         int menuType = 150;
-        OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
+        Integer FRationType = 0;
         Good menuDetailsGood = null;
         if (menuDetail.getIdOfGood() != null) {
             menuDetailsGood = getGoodById(menuDetail.getIdOfGood());
@@ -975,7 +975,7 @@ public class SchoolApiService implements ISchoolApiService {
         if (menuDetailsGood != null) {
             itemCode = StringUtils.substring(menuDetailsGood.getGoodsCode(), 0, itemCodeMaxLength);
             if (menuDetailsGood.getGoodType() != null) {
-                FRationType = OrderDetailFRationType.fromInteger(menuDetailsGood.getGoodType().getCode());
+                FRationType = menuDetailsGood.getGoodType().getCode();
             }
         }
         return new OrderDetail(compositeIdOfOrderDetail, idOfOrder, qty, discount, socDiscount, rPrice, menuDetailName,
@@ -1007,12 +1007,12 @@ public class SchoolApiService implements ISchoolApiService {
         int rPrice = 0;
         int qty = 1;
         int menuType = 50;
-        OrderDetailFRationType FRationType = OrderDetailFRationType.NOT_SPECIFIED;
+        Integer FRationType = 0;
         Good complexInfoGood = complexInfo.getGood();
         if (complexInfoGood != null) {
             itemCode = StringUtils.substring(complexInfoGood.getGoodsCode(), 0, itemCodeMaxLength);
             if (complexInfoGood.getGoodType() != null) {
-                FRationType = OrderDetailFRationType.fromInteger(complexInfoGood.getGoodType().getCode());
+                FRationType = complexInfoGood.getGoodType().getCode();
             }
         }
         return new OrderDetail(compositeIdOfOrderDetail, idOfOrder, qty, discount, socDiscount, rPrice, menuDetailName,

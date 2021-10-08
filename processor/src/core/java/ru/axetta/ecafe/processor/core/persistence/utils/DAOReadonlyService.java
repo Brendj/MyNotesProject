@@ -1504,15 +1504,6 @@ public class DAOReadonlyService {
         return entityManager.find(ConfigurationProvider.class, idOfConfigurationProvider);
     }
 
-
-    public Long getContractIdByCardNo(long lCardId) throws Exception {
-        Client client = DAOUtils.findClientByCardNo(entityManager, lCardId);
-        if (client != null) {
-            return client.getContractId();
-        }
-        return null;
-    }
-
     public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId, int days) throws Exception {
         /* так как в поле хранится дата на 00:00 ночи текущего дня вычтем из текущего дня 24 часа в милисекудах */
         Session session = entityManager.unwrap(Session.class);

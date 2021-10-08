@@ -101,7 +101,7 @@ public class User {
     }
 
     public static void changePasswordExternal(String userName, String newPassword, String newPasswordConfirm, String remoteAddr) throws Exception {
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         try {
             if (!newPassword.equals(newPasswordConfirm)) {
                 throw new CredentialException("Неверный ввод пароля: введенные значения не совпадают");
@@ -130,7 +130,7 @@ public class User {
     }
 
     public static void checkSmsCode(String userName, String smsCode) throws Exception {
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         String reqCode = user.getLastSmsCode();
         if (reqCode != null && smsCode != null && reqCode.equals(smsCode)) {
             user.setSmsCodeEnterDate(new Date(System.currentTimeMillis()));

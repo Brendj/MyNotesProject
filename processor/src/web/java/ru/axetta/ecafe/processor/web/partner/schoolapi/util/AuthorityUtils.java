@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.util;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
 
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class AuthorityUtils {
         if (authentication != null) {
             JwtUserDetailsImpl principal = (JwtUserDetailsImpl) authentication.getPrincipal();
             try {
-                return DAOService.getInstance().findUserById(principal.getIdOfUser());
+                return DAOReadonlyService.getInstance().findUserById(principal.getIdOfUser());
             } catch (Exception e) {
                 logger.error("Error when find user, not set idOfUser, ", e);
             }
