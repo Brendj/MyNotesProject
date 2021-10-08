@@ -21,6 +21,7 @@ public class AssignEvent {
     private String action_code;
     private String begin_at;
     private String end_at;
+    private Long organization_id;
 
     public static AssignEvent build(CategoryDiscount categoryDiscount, Client client,
             AssignOperationType type, ClientDTSZNDiscountInfo info, String beginDate){
@@ -44,8 +45,17 @@ public class AssignEvent {
             event.setEnd_at(info.getDateEnd().toString());
         }
         event.setAction_code(type.getCode());
+        event.setOrganization_id(client.getOrg().getOrganizationIdFromNSI());
 
         return event;
+    }
+
+    public Long getOrganization_id() {
+        return organization_id;
+    }
+
+    public void setOrganization_id(Long organization_id) {
+        this.organization_id = organization_id;
     }
 
     public String getPerson_id() {

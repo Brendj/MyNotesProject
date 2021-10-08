@@ -10,6 +10,13 @@
 
 <h:panelGrid id="infoMessagePageCreateControls" binding="#{mainPage.infoMessageCreatePage.pageComponent}" >
     <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:outputText escape="true" value="Тип сообщения" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:selectOneMenu id="regionsList" value="#{mainPage.infoMessageCreatePage.type}" style="width:250px;" >
+                <f:selectItems value="#{mainPage.infoMessageCreatePage.types}"/>
+            </h:selectOneMenu>
+        </h:panelGroup>
+
         <h:outputText escape="true" value="Заголовок сообщения" styleClass="output-text" />
         <h:inputText value="#{mainPage.infoMessageCreatePage.header}" style="width:350px;" styleClass="input-text" />
 

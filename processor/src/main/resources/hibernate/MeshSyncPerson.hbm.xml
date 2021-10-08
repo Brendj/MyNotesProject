@@ -33,6 +33,7 @@
         <property name="lastupdateRest">
             <column name="lastupdate_rest" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" />
         </property>
+        <many-to-one name="meshClass" column="idofclass" class="ru.axetta.ecafe.processor.core.persistence.MeshClass" cascade="merge"/>
 
     </class>
 </hibernate-mapping>

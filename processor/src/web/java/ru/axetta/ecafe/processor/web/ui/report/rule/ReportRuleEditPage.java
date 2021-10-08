@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -560,7 +560,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             contragentFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -573,7 +573,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             contragentPayAgentFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -586,7 +586,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = DAOReadonlyService.getInstance().getContragentById(idOfContragent);
             contragentReceiverFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -599,7 +599,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         }
         try {
             long idOfContract = Long.parseLong(hint.getConditionConstant());
-            String contractName = DAOService.getInstance().getContractNameById (idOfContract);
+            String contractName = DAOReadonlyService.getInstance().getContractNameById (idOfContract);
             contractFilter.completeContractSelection(idOfContract, contractName);
         } catch (Exception e) {
             logger.error("Failed to parse contract hint " + hint.getConditionConstant(), e);
@@ -615,7 +615,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
             Map <Long, String> res = new HashMap <Long, String> ();
             for (String id : ids) {
                 long idOfOrg = Long.parseLong(id);
-                Org org = DAOService.getInstance().getOrg(idOfOrg);
+                Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
                 res.put(org.getIdOfOrg(), org.getOfficialName());
             }
             completeOrgListSelection(res);

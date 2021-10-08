@@ -4,14 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.card.CardManager;
-import ru.axetta.ecafe.processor.core.event.EventNotificator;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -21,6 +13,13 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.event.EventNotificator;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -116,6 +115,7 @@ public class CardManagerProcessor implements CardManager {
             for (Card card : client.getCards()) {
                 if (CardState.ISSUED.getValue() == card.getState()) {
                     haveActiveCard = true;
+                    break;
                 }
             }
             if (haveActiveCard && client.getOrg().getOneActiveCard()) {
@@ -338,7 +338,7 @@ public class CardManagerProcessor implements CardManager {
             historyCard.setCard(updatedCard);
             historyCard.setUpDatetime(new Date());
             if (state == CardState.BLOCKED.getValue()) {
-                historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo());
+                historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo() + ". Причина: " + lockReason);
             } else {
                 historyCard.setInformationAboutCard("Редактирование данных карты №: " + updatedCard.getCardNo()
                         + additionalInfoAboutCard);
@@ -716,6 +716,7 @@ public class CardManagerProcessor implements CardManager {
         card.setCreateTime(new Date());
         card.setTransitionState(CardTransitionState.OWN.getCode());
         card.setCardSignCertNum(cardSignCertNum);
+        card.setLongCardNo(calculateLongCardNoByShortCardNo(trackerUidAsCardNo));
         session.save(card);
 
         HistoryCard historyCard = new HistoryCard();
@@ -737,5 +738,13 @@ public class CardManagerProcessor implements CardManager {
                 persistenceSession.update(card);
             }
         }
+    }
+
+    public static Long calculateLongCardNoByShortCardNo(Long cardNo){
+        if(cardNo == null){
+            return null;
+        }
+        return  (cardNo % 0x100) * 0x1000000 + ((cardNo / 0x100) % 0x100)*0x10000
+                + ((cardNo / 0x10000) % 0x100)*0x100 + cardNo / 0x1000000;
     }
 }

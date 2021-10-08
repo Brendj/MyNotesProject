@@ -39,6 +39,7 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -533,6 +534,12 @@ public class Manager implements AbstractToElement {
                 criteria.add(Restrictions.eq("orgOwner", idOfOrg));
                 criteria.addOrder(Order.asc("globalVersion"));
                 criteria.addOrder(Order.asc("guid"));
+                if (doClass.getSimpleName().equals("GoodRequestPosition")) {
+                    criteria.add(Restrictions.gt("gr.doneDate", new Date()));
+                }
+                if (doClass.getSimpleName().equals("GoodRequest")) {
+                    criteria.add(Restrictions.gt("doneDate", new Date()));
+                }
                 criteria.setMaxResults(currentLimit);
                 criteria.setResultTransformer(Transformers.aliasToBean(doClass));
                 currentConfirmDOList = (List<DistributedObject>) criteria.list();

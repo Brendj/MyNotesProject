@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -161,7 +161,7 @@ public class NSIDeltaProcessor {
         Map<Org, List<ImportRegisterMSKClientsService.ExpandedPupilInfo>> res = new HashMap<Org, List<ImportRegisterMSKClientsService.ExpandedPupilInfo>>();
         for(Item i : items) {
             DeltaItem deltaItem = new DeltaItem(i);
-            Org org = DAOService.getInstance().getOrgByGuid(deltaItem.getOrgGuid());
+            Org org = DAOReadonlyService.getInstance().getOrgByGuid(deltaItem.getOrgGuid());
 
             List<ImportRegisterMSKClientsService.ExpandedPupilInfo> orgItems = res.get(org);
             if(orgItems == null) {
@@ -192,7 +192,7 @@ public class NSIDeltaProcessor {
                                                StringBuffer logBuffer, DeltaItem item) throws NSIDeltaException {
         ImportRegisterMSKClientsService service = RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class);
         if(item.getAction() == Action.ADDED.ordinal()) {
-            Org org = DAOService.getInstance().getOrgByGuid(item.getOrgGuid());
+            Org org = DAOReadonlyService.getInstance().getOrgByGuid(item.getOrgGuid());
             if(org == null) {
                 ImportRegisterMSKClientsService.log(synchDate + "Добавление " + item.getGuid() + ", " +
                         item.getFamilyName() + " " + item.getFirstName() + " " +
@@ -232,7 +232,7 @@ public class NSIDeltaProcessor {
             try {
                 FieldProcessor.Config fieldConfig = buildFieldConfig(item, new ClientManager.ClientFieldConfig(), cl);
                 if(!StringUtils.isBlank(emptyIfNull(item.getOrgGuid())) && !cl.getOrg().getGuid().equals(emptyIfNull(item.getOrgGuid()))) {
-                    Org newOrg = DAOService.getInstance().getOrgByGuid(item.getOrgGuid());
+                    Org newOrg = DAOReadonlyService.getInstance().getOrgByGuid(item.getOrgGuid());
                     if(newOrg == null) {
                         ImportRegisterMSKClientsService
                                 .log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(

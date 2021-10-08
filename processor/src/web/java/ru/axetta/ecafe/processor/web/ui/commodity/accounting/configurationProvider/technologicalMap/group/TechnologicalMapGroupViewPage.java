@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.SelectedProductGroupGroupPage;
@@ -19,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
 /**
@@ -45,23 +44,23 @@ public class TechnologicalMapGroupViewPage extends BasicWorkspacePage {
     private SelectedTechnologicalMapGroupGroupPage selectedTechnologicalMapGroupGroupPage;
     @Autowired
     private TechnologicalMapListPage technologicalMapListPage;
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager entityManager;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
 
     @Override
     public void onShow() throws Exception {
         selectedTechnologicalMapGroupGroupPage.onShow();
         currentTechnologicalMapGroup = selectedTechnologicalMapGroupGroupPage.getCurrentTechnologicalMapGroup();
-        List<TechnologicalMap> technologicalMapList = daoService.findTechnologicalMapByTechnologicalMapGroup(currentTechnologicalMapGroup);
+        List<TechnologicalMap> technologicalMapList = daoReadonlyService.findTechnologicalMapByTechnologicalMapGroup(currentTechnologicalMapGroup);
         if(technologicalMapList==null || technologicalMapList.isEmpty()){
             countTechnologicalMaps = 0;
         }else {
             countTechnologicalMaps = technologicalMapList.size();
         }
-        currentOrg = daoService.findOrById(currentTechnologicalMapGroup.getOrgOwner());
-        currentConfigurationProvider = daoService.getConfigurationProvider(currentTechnologicalMapGroup.getIdOfConfigurationProvider());
+        currentOrg = daoReadonlyService.findOrById(currentTechnologicalMapGroup.getOrgOwner());
+        currentConfigurationProvider = daoReadonlyService.getConfigurationProvider(currentTechnologicalMapGroup.getIdOfConfigurationProvider());
     }
 
     public Object showTechnologicalMaps() throws Exception{

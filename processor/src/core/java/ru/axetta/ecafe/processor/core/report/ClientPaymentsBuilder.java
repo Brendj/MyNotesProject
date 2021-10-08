@@ -12,7 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -335,7 +335,7 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
     protected List<Long> receiveOrgList(List<Long> idOfOrgList) {
         Set<Long> result = new TreeSet<Long>();
         for (Long idOfOrg : idOfOrgList) {
-            Org o = DAOService.getInstance().getOrg(idOfOrg);
+            Org o = DAOReadonlyService.getInstance().findOrg(idOfOrg);
             if (o == null) {
                 continue;
             }
@@ -352,7 +352,7 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
     }
 
     protected void addContragentOrgs(Set<Long> idOfOrgList, Contragent contragent) {
-        List<Org> orgs = DAOService.getInstance().getOrgsByDefaultSupplier(contragent);
+        List<Org> orgs = DAOReadonlyService.getInstance().getOrgsByDefaultSupplier(contragent);
         for (Org o : orgs) {
             idOfOrgList.add(o.getIdOfOrg());
         }
@@ -417,10 +417,9 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
             if (payments == null) {
                 continue;
             }
-            String orgName = orgFullName;//orgNumber == null ? orgFullName : orgNumber;
             ClientPaymentItem item = lookupOrgById(items, idOfOrg);
             if (item == null) {
-                item = new ClientPaymentItem(idOfOrg, orgName, agent, payments, 0L, 0L);
+                item = new ClientPaymentItem(idOfOrg, orgFullName, agent, payments, 0L, 0L);
                 items.add(item);
             }
             item.setPayments(payments);

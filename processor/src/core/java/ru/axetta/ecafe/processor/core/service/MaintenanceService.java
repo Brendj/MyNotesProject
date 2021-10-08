@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -298,7 +299,7 @@ public class MaintenanceService {
 
         Date maxDate = null;
         try {
-            maxDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getDeletedLastedDateMenu());
+            maxDate = CalendarUtils.parseDateWithDayTime(DAOReadonlyService.getInstance().getDeletedLastedDateMenu());
             if (maxDate == null) {
                 maxDate = new Date(0L);
             }

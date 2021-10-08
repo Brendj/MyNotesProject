@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -44,7 +44,7 @@ public class TechnologicalMapGroupItemsPanel extends BasicPage {
     private TechnologicalMapGroup selectTechnologicalMapGroup;
     private String filter;
     @Autowired
-    private DAOService daoService;
+    private DAOReadonlyService daoService;
     @Autowired
     private ContextDAOServices contextDAOServices;
 

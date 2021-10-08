@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
@@ -314,6 +315,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage orgParametersGroup = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistCatalogGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage espHelpdeskGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -331,6 +333,8 @@ public class MainPage implements Serializable {
 
     private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
     private final BlockUnblockReportPage blockUnblockReportPage = new BlockUnblockReportPage();
+	private final EmiasReportPage emiasReportPage = new EmiasReportPage();
+	private final ESPHelpdeskReportPage espHelpdeskReportPage = new ESPHelpdeskReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -2003,9 +2007,10 @@ public class MainPage implements Serializable {
     public Object showOrgListSelectPage(List<Long> idOfContragents) {
         return showOrgListSelectPageWebArm(idOfContragents, null);
     }
+
     public Object showOrgListSelectPageWebArm(List<Long> idOfContragents, Boolean webARM) {
         webARMppFilter = webARM;
-        this.idOfContragentList = new ArrayList<Long>(idOfContragents);
+        this.idOfContragentList = new ArrayList<>(idOfContragents);
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -2014,7 +2019,7 @@ public class MainPage implements Serializable {
             Transaction persistenceTransaction = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setIdFilter("");
@@ -3585,7 +3590,11 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                Client client = clientCreatePage.createClient(persistenceSession);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+                clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                clientGuardianHistory.setReason("Создание нового клиента в вкладке Клиенты/регистрация");
+                Client client = clientCreatePage.createClient(persistenceSession, clientGuardianHistory);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 facesContext.addMessage(null,
@@ -3619,7 +3628,11 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Client client = clientRegistrationByCardOperatorPage.createClient(persistenceSession);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason("Создание нового клиента в вкладке Операции по картам/Регистрация клиента");
+            Client client = clientRegistrationByCardOperatorPage.createClient(persistenceSession, clientGuardianHistory);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
@@ -3756,7 +3769,12 @@ public class MainPage implements Serializable {
                 dataSize = data.length;
                 inputStream = new ByteArrayInputStream(data);
             }
-            clientUpdateFileLoadPage.updateClients(inputStream, dataSize);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setAction("обновление из файла");
+            clientGuardianHistory.setReason("Выполнено обновление через вкладку Клиенты/Обновить из файла");
+            clientUpdateFileLoadPage.updateClients(inputStream, dataSize, clientGuardianHistory);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
             clientUpdateFileLoadPage.setErrorText("");
@@ -3844,7 +3862,11 @@ public class MainPage implements Serializable {
         return clientSelectListPage;
     }
 
-    public Object showClientSelectPage() {
+    public Object showEmptyClientSelectPage() {
+        return showClientSelectPage(true);
+    }
+
+    public Object showClientSelectPage(boolean doClear) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ClientSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -3855,6 +3877,9 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                if (doClear) {
+                    clientSelectPage.getClientFilter().clear();
+                }
                 clientSelectPage.fill(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -3872,6 +3897,10 @@ public class MainPage implements Serializable {
             }
         }
         return null;
+    }
+
+    public Object showClientSelectPage() {
+        return showClientSelectPage(false);
     }
 
     public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {
@@ -6777,6 +6806,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showEspHelpdeskGroupPage(){
+        currentWorkspacePage = espHelpdeskGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public BasicWorkspacePage getDiscountGroupPage() {
         return discountGroupPage;
     }
@@ -7794,6 +7829,31 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showEmiasReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = emiasReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set EMIAS page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+	
+	    public Object showESPHelpDeskReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = espHelpdeskReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set esp report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчет: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
 
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;
@@ -9647,6 +9707,12 @@ public class MainPage implements Serializable {
         return currentUser;
     }
 
+    public String getSourceWebAddress() throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        return request.getRemoteAddr();
+    }
+
     public static MainPage getSessionInstance() {
         FacesContext context = FacesContext.getCurrentInstance();
         return (MainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);
@@ -9913,6 +9979,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToViewHelpdesk() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_HELPDESK);
+    }
+
+    public boolean isEligibleToViewESPdesk() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_ESP);
     }
 
     public boolean isEligibleToViewTotalServicesReport() throws Exception {
@@ -10305,7 +10375,7 @@ public class MainPage implements Serializable {
     public Object checkUserSmsCode() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         String reqCode = user.getLastSmsCode();
         if (reqCode != null && smsCode != null && reqCode.equals(smsCode)) {
             user.setSmsCodeEnterDate(new Date(System.currentTimeMillis()));
@@ -10340,7 +10410,7 @@ public class MainPage implements Serializable {
     public Object doChangeUserPassword() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         try {
@@ -10869,16 +10939,16 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карта зарегистрирована успешно", null));
-            if (!modalPages.empty()) {
-                if (modalPages.peek() == cardRegistrationConfirm) {
-                    modalPages.pop();
-                }
-            }
         } catch(Exception e){
             logger.error("Failed to re-issue card", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при заказе карты: " + e.getMessage(), null));
         } finally {
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == cardRegistrationConfirm) {
+                    modalPages.pop();
+                }
+            }
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
@@ -11134,5 +11204,16 @@ public class MainPage implements Serializable {
 
     public DishListSelectPage getDishWebListSelectPage() {
         return dishWebListSelectPage;
+    }
+    public EmiasReportPage getEmiasReportPage() {
+        return emiasReportPage;
+    }
+
+    public ESPHelpdeskReportPage getEspHelpdeskReportPage() {
+        return espHelpdeskReportPage;
+    }
+
+    public BasicWorkspacePage getEspHelpdeskGroupPage() {
+        return espHelpdeskGroupPage;
     }
 }

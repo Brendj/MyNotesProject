@@ -51,7 +51,7 @@ public class Client {
     @Column(name = "agetypegroup")
     private String ageGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "idoforg")
     private Org org;
 

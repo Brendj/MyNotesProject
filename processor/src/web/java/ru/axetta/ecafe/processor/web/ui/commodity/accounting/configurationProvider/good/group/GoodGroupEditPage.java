@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
@@ -41,6 +42,8 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements Configurati
     @Autowired
     private DAOService daoService;
     @Autowired
+    private DAOReadonlyService daoReadonlyService;
+    @Autowired
     private SelectedGoodGroupGroupPage selectedGoodGroupGroupPage;
     @Autowired
     private GoodGroupListPage goodGroupListPage;
@@ -52,9 +55,9 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements Configurati
         selectedGoodGroupGroupPage.onShow();
         currentGoodGroup = selectedGoodGroupGroupPage.getCurrentGoodGroup();
         currentGoodGroup = daoService.saveEntity(currentGoodGroup);
-        org = daoService.findOrById(currentGoodGroup.getOrgOwner());
+        org = daoReadonlyService.findOrById(currentGoodGroup.getOrgOwner());
         if(currentGoodGroup.getIdOfConfigurationProvider()!=null){
-            currentConfigurationProvider = daoService.getConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
+            currentConfigurationProvider = daoReadonlyService.getConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
         }
     }
 
@@ -109,7 +112,7 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements Configurati
             printError("Группа не может быть удалена.");
             return;
         }
-        List<Good> goodList = daoService.findGoodsByGoodGroup(currentGoodGroup, true);
+        List<Good> goodList = daoReadonlyService.findGoodsByGoodGroup(currentGoodGroup, true);
         if(!(goodList==null || goodList.isEmpty())){
             printError("В группе имеются зарегистрированные товары.");
             return;
@@ -127,7 +130,7 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements Configurati
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
-            org = daoService.findOrById(idOfOrg);
+            org = daoReadonlyService.findOrById(idOfOrg);
         }
     }
 

@@ -13,6 +13,9 @@ import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +58,7 @@ public class OrganizationStructure implements AbstractToElement {
     public void addOrganizationStructureInfo(Session session, Org org, List<Org> orgList, boolean isAllOrgs) {
         List<Long> friendlyOrgsIds = new ArrayList<Long>();
         if (isAllOrgs) {
-            friendlyOrgsIds = DAOUtils.findFriendlyOrgIds(session, org.getIdOfOrg());
+            friendlyOrgsIds = DAOReadonlyService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
         }
         for (Org o : orgList) {
             boolean isFriendly = true;
@@ -73,12 +76,10 @@ public class OrganizationStructure implements AbstractToElement {
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
             //session.refresh(org);
-            //session.refresh(org.getOfficialPerson());
-            Person person = DAOUtils.findPerson(session, org.getOfficialPerson().getIdOfPerson());
-            String personName = person == null ? "" : person.getFullName();
+            session.refresh(org.getOfficialPerson());
             OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(),
                     org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
-                    personName, org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
+                    org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
                     org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(),
                     org.getShortAddress(), org.getOrgStructureVersion(), org.multiCardModeIsEnabled(),

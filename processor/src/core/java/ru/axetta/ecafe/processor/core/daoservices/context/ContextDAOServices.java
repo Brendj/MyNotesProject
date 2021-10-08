@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -179,7 +179,7 @@ public class ContextDAOServices {
 
     public void buildRegionsRestriction(long idOfUser, String field, Criteria criteria) {
         try {
-            User user = DAOService.getInstance().findUserById(idOfUser);
+            User user = DAOReadonlyService.getInstance().findUserById(idOfUser);
             if (user.getRegion() != null && user.getRegion().length() > 0) {
                 criteria.add(Restrictions.eq(field, user.getRegion()));
             }

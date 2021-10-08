@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepositor
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
@@ -316,7 +316,7 @@ public class CardService {
         }
         else
         {
-            for (Long friendlyOrgid : DAOService.getInstance().findFriendlyOrgsIds(idOfOrg)) {
+            for (Long friendlyOrgid : DAOReadonlyService.getInstance().findFriendlyOrgsIds(idOfOrg)) {
                 CardWritableRepository.getInstance().updateCardSync(friendlyOrgid, card, changeState);
             }
         }

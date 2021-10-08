@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
@@ -109,7 +110,7 @@ public class SmartWatchRestController extends Application {
             transaction = session.beginTransaction();
 
             mobilePhone = checkAndConvertPhone(mobilePhone);
-            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+            List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(mobilePhone);
             if(clients.isEmpty()){
                 throw new IllegalArgumentException("No clients found for this mobilePhone number: " + mobilePhone);
             }
@@ -292,7 +293,7 @@ public class SmartWatchRestController extends Application {
 
             mobilePhone = inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
 
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
+            Client parent = DAOReadonlyService.getInstance().getClientByMobilePhone(mobilePhone);
             Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid,
                     CARD_TYPE_SMARTWATCH);
             if(card == null){
@@ -1290,7 +1291,7 @@ public class SmartWatchRestController extends Application {
     }
 
     private List<Client> findParentsByMobile(String mobilePhone) throws Exception {
-        List<Client> parents = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+        List<Client> parents = DAOReadonlyService.getInstance().getClientsListByMobilePhone(mobilePhone);
         if(parents.isEmpty()){
             throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                     + ", but passed the TokenValidator");

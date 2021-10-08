@@ -12,7 +12,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
 
@@ -101,7 +101,7 @@ public class ReferReportPage extends OnlineReportPage {
     }
 
     public List<SelectItem> getRegions() {
-        List<String> regions = DAOService.getInstance().getRegions();
+        List<String> regions = DAOReadonlyService.getInstance().getRegions();
         List<SelectItem> items = new ArrayList<SelectItem>();
         items.add(new SelectItem(""));
         for(String reg : regions) {
@@ -132,7 +132,7 @@ public class ReferReportPage extends OnlineReportPage {
 
             boolean useSchoolTypes = false;
             boolean useKindergartenTypes = false;
-            Org org = DAOService.getInstance().getOrg(idOfOrg);
+            Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
             if(org.getType().ordinal() == OrganizationType.SCHOOL.ordinal()) {
                 useSchoolTypes = true;
             } else if(org.getType().ordinal() == OrganizationType.KINDERGARTEN.ordinal()) {
@@ -432,7 +432,7 @@ public class ReferReportPage extends OnlineReportPage {
         if (idOfOrg != null) {
             Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
+                org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
             }
             return new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName());
         } else {

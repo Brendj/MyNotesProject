@@ -1,16 +1,20 @@
 package ru.iteco.meshsync.mesh.service.logic;
 
 import ru.iteco.client.ApiException;
+import ru.iteco.client.model.ModelClass;
 import ru.iteco.client.model.PersonCategory;
 import ru.iteco.client.model.PersonEducation;
 import ru.iteco.client.model.PersonInfo;
-import ru.iteco.meshsync.EntityType;
+import ru.iteco.meshsync.enums.EntityType;
+import ru.iteco.meshsync.enums.ServiceType;
 import ru.iteco.meshsync.error.EducationNotFoundException;
 import ru.iteco.meshsync.error.NoRequiredDataException;
 import ru.iteco.meshsync.error.UnknownActionTypeException;
 import ru.iteco.meshsync.mesh.service.DAO.CatalogService;
+import ru.iteco.meshsync.mesh.service.DAO.ClassService;
 import ru.iteco.meshsync.mesh.service.DAO.EntityChangesService;
 import ru.iteco.meshsync.mesh.service.DAO.ServiceJournalService;
+import ru.iteco.meshsync.models.ClassEntity;
 import ru.iteco.meshsync.models.EntityChanges;
 import ru.iteco.meshsync.models.Person;
 import ru.iteco.meshsync.repo.PersonRepo;
@@ -25,33 +29,82 @@ import javax.transaction.Transactional;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MeshService {
     private static final Logger log = LoggerFactory.getLogger(MeshService.class);
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     private static final List<String> INNER_OBJ_FOR_INIT = Arrays.asList(
-            EntityType.person_education.getApiField(),
-            EntityType.category.getApiField()
+            EntityType.PERSON_EDUCATION.getApiField(),
+            EntityType.CATEGORY.getApiField()
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
+
+    private static final List<Integer> notInOrganization = Arrays.asList(
+            ServiceType.ATTESTATION.getCode(),
+            ServiceType.ACADEMIC_LEAVE.getCode()
+    );
+
+    private static final List<Integer> enabledServiceTypeIds = Arrays.asList(
+            ServiceType.EDUCATION.getCode(),
+            ServiceType.ATTESTATION.getCode(),
+            ServiceType.ACADEMIC_LEAVE.getCode()
+    );
 
     private final PersonRepo personRepo;
     private final RestService restService;
     private final EntityChangesService entityChangesService;
     private final CatalogService catalogService;
     private final ServiceJournalService serviceJournalService;
+    private final ClassService classService;
 
     public MeshService(PersonRepo personRepo,
                        RestService restService,
                        EntityChangesService entityChangesService,
                        CatalogService catalogService,
-                       ServiceJournalService serviceJournalService){
+                       ServiceJournalService serviceJournalService,
+                       ClassService classService){
         this.personRepo = personRepo;
         this.restService = restService;
         this.entityChangesService = entityChangesService;
         this.catalogService = catalogService;
         this.serviceJournalService = serviceJournalService;
+        this.classService = classService;
+    }
+
+    @Transactional
+    public boolean processClassChanges(EntityChanges entityChanges) {
+        if(entityChanges == null){
+            log.warn("Get entityChanges param as NULL");
+            return false;
+        }
+        ClassEntity classEntity = classService.getByUid(entityChanges.getUid());
+        try {
+            switch (entityChanges.getAction()) {
+                case create:
+                case update:
+                case merge:
+                    ModelClass modelClass = restService.getClassById(UUID.fromString(entityChanges.getUid()));
+                    if(modelClass == null){
+                        throw new NoRequiredDataException("MESH-REST return NULL");
+                    }
+                    classEntity = changeEntityClass(classEntity, modelClass);
+                    classService.save(classEntity);
+                    break;
+                case delete:
+                    if(classEntity != null){
+                        classService.remove(classEntity);
+                    }
+                    break;
+                default:
+                    throw new UnknownActionTypeException();
+            }
+        } catch (Exception e) {
+            log.error("Cant process ModelClass change", e);
+            return false;
+        }
+        return true;
     }
 
     @Transactional
@@ -91,10 +144,10 @@ public class MeshService {
                             if (actualEdu.getEducationForm() == null && actualEdu.getEducationFormId() == null) {
                                 throw new NoRequiredDataException(String.format("Person %s have no info about Class and EducationForm",
                                         entityChanges.getPersonGUID()));
-                            } else {
-                                homeStudy = catalogService.isHomeStudy(actualEdu.getEducationForm(), actualEdu.getEducationFormId());
                             }
                         }
+
+                        homeStudy = notInOrganization.contains(actualEdu.getServiceTypeId());
                         inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
 
                         if (person == null && !inSupportedOrg) {
@@ -166,6 +219,20 @@ public class MeshService {
         return !invalidData;
     }
 
+    private ClassEntity changeEntityClass(ClassEntity classEntity, ModelClass modelClass) {
+        if(classEntity == null){
+            classEntity = new ClassEntity();
+            classEntity.setId(modelClass.getId());
+            classEntity.setUid(modelClass.getUid().toString());
+        }
+        classEntity.setName(modelClass.getName());
+        classEntity.setOrganizationId(modelClass.getOrganizationId());
+        classEntity.setParallelId(modelClass.getParallelId());
+        classEntity.setEducationStageId(modelClass.getEducationStageId());
+
+        return classEntity;
+    }
+
     private Person changePerson(Person person, PersonInfo info, Boolean inSupportedOrg, PersonEducation actualEdu,
                                 boolean homeStudy, String lastGuid) throws Exception {
         if(person == null) {
@@ -186,6 +253,8 @@ public class MeshService {
         }
 
         if(!homeStudy) {
+            ClassEntity classEntity = classService.getAndChange(actualEdu.getPropertyClass());
+            person.setClassEntity(classEntity);
             person.setClassName(actualEdu.getPropertyClass().getName());
             person.setParallelID(actualEdu.getPropertyClass().getParallelId());
             person.setEducationStageId(actualEdu.getPropertyClass().getEducationStageId());
@@ -195,6 +264,7 @@ public class MeshService {
             person.setParallelID(null);
             person.setEducationStageId(null);
             person.setClassUID(null);
+            person.setClassEntity(null);
         }
 
         if(!inSupportedOrg) {
@@ -237,6 +307,11 @@ public class MeshService {
         if(CollectionUtils.isEmpty(allEdu)){
             return null;
         }
+
+        allEdu = allEdu
+                .stream()
+                .filter((e) -> enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null)
+                .collect(Collectors.toList());
         allEdu.sort(Comparator.comparing(PersonEducation::getTrainingEndAt));
         return allEdu.get(allEdu.size() - 1);
     }

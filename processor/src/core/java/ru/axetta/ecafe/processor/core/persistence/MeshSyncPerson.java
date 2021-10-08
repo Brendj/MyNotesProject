@@ -28,6 +28,7 @@ public class MeshSyncPerson {
     private String guidnsi;
     private String training_end_at;
     private String idIsPp;
+    private MeshClass meshClass;
 
     public MeshSyncPerson() {
 
@@ -38,6 +39,14 @@ public class MeshSyncPerson {
         createdate = new Date();
         lastupdate = new Date();
         invaliddata = false;
+    }
+
+    public MeshClass getMeshClass() {
+        return meshClass;
+    }
+
+    public void setMeshClass(MeshClass meshClass) {
+        this.meshClass = meshClass;
     }
 
     public String getPersonguid() {

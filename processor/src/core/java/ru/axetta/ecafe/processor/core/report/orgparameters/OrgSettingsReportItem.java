@@ -53,6 +53,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     private Boolean reverseMonthOfSale;
     private Boolean denyPayPlanForTimeDifference;
     private Boolean useWebArm;
+    private Boolean useMealSchedule;
 
     //FeedingSetting Info
     private Long idOfSetting = -1L;
@@ -97,8 +98,8 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.shortAddress = org.getShortAddress();
         this.type = org.getType().getShortType();
         this.status = Org.STATE_NAMES[org.getState()];
-        this.organizationStatus = org.getStatus().toString();
-        this.statusDetailing = org.getStatusDetailing();
+        this.organizationStatus = StringUtils.substringBefore(org.getStatusDetailing(), "/");
+        this.statusDetailing = StringUtils.substringAfter(org.getStatusDetailing(), "/");
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
 
         this.GUID = org.getGuid();
@@ -122,6 +123,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
             this.limit = setting.getLimit();
         }
         this.useWebArm = org.getUseWebArm();
+        this.useMealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
 
         this.oneActiveCard = org.getOneActiveCard();
         this.enableDuplicateCard = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED);
@@ -494,5 +496,13 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     public void setGovernmentContract(Boolean governmentContract) {
         this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseMealSchedule() {
+        return useMealSchedule == null ? false : useMealSchedule;
+    }
+
+    public void setUseMealSchedule(Boolean useMealSchedule) {
+        this.useMealSchedule = useMealSchedule;
     }
 }

@@ -8,7 +8,9 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.EMIAS" table="cf_emias">
         <id name="idOfEMIAS" column="id" type="long">
-            <generator class="identity"/>
+            <generator class="sequence">
+                <param name="sequence">cf_emias_id_seq</param>
+            </generator>
         </id>
         <property name="guid" column="guid" type="string" length="128"/>
         <property name="idEventEMIAS" column="idEventEMIAS" type="long"/>
@@ -26,7 +28,9 @@
         <property name="kafka" column="kafka" type="boolean"/>
         <property name="archive" column="archive" type="boolean"/>
         <property name="hazard_level_id" column="hazard_level_id" type="integer"/>
+        <property name="idemias" column="idemias" type="string"/>
         <property name="processed" column="processed" type="boolean"/>
+        <property name="acceptedDateTime" column="acceptedDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>
 </hibernate-mapping>
 

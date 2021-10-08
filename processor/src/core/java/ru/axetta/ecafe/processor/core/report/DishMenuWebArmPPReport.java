@@ -4,34 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.CardState;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
-import ru.axetta.ecafe.processor.core.report.model.autoenterevent.MapKeyModel;
-import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
-import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
-import ru.axetta.ecafe.processor.core.service.CardBlockUnblockService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
@@ -48,10 +34,10 @@ public class DishMenuWebArmPPReport extends BasicReportForMainBuildingOrgJob {
      *
      * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
      */
-    public static final String REPORT_NAME = "Детализированный отчет по посещению";
-    public static final String[] TEMPLATE_FILE_NAMES = {"DetailedEnterEventReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = true;
-    public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
+    //public static final String REPORT_NAME = "Детализированный отчет по посещению";
+    //public static final String[] TEMPLATE_FILE_NAMES = {"DetailedEnterEventReport.jasper"};
+    //public static final boolean IS_TEMPLATE_REPORT = true;
+    //public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
     final public static String P_ID_OF_CLIENTS = "idOfClients";
 
     private final static Logger logger = LoggerFactory.getLogger(DishMenuWebArmPPReport.class);

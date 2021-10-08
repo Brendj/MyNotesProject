@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.sms.emp.type;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -128,7 +128,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             person = null;
         }
         if(person == null) {
-            person = DAOService.getInstance().getPersonByClient(client);
+            person = DAOReadonlyService.getInstance().getPersonByClient(client);
         }
         Map<String, String> params = getParameters();
 
@@ -169,7 +169,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             person = null;
         }
         if(person == null) {
-            person = DAOService.getInstance().getPersonByClient(child);
+            person = DAOReadonlyService.getInstance().getPersonByClient(child);
         }
         Map<String, String> params = getParameters();
 
@@ -193,7 +193,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
     }
 
     protected void appendOrgParameters(Long idOfOrg, Map<String, String> params) {
-        Org org = DAOService.getInstance().findOrById(idOfOrg);
+        Org org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
         params.put("OrgName", getOrgName(org));
         params.put("OrgType", getOrgType(org));
         params.put("OrgId", getOrgId(org));

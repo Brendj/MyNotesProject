@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfInfoMessageDetail;
 import ru.axetta.ecafe.processor.core.persistence.InfoMessage;
 import ru.axetta.ecafe.processor.core.persistence.InfoMessageDetail;
+import ru.axetta.ecafe.processor.core.persistence.InfoMessageType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +41,7 @@ public class InfoMessageCreatePage extends BasicWorkspacePage implements OrgList
 
     private String header;
     private String content;
+    private Integer type;
 
     public String getPageFilename() {
         return "service/info_message_create";
@@ -53,7 +56,7 @@ public class InfoMessageCreatePage extends BasicWorkspacePage implements OrgList
 
     public void doSave() {
         if (StringUtils.isEmpty(header) || StringUtils.isEmpty(content) || idOfOrgList.isEmpty()) {
-            printError("Все поля явлются обязательными и должны быть заполнены. Необходимо выбрать хотя бы одну организацию.");
+            printError("Все поля являются обязательными и должны быть заполнены. Необходимо выбрать хотя бы одну организацию.");
             return;
         }
         InfoMessage infoMessage = new InfoMessage();
@@ -62,6 +65,7 @@ public class InfoMessageCreatePage extends BasicWorkspacePage implements OrgList
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             transaction = persistenceSession.beginTransaction();
+            infoMessage.setMtype(InfoMessageType.fromInteger(type));
             infoMessage.setHeader(header);
             infoMessage.setContent(content);
             infoMessage.setCreatedDate(new Date());
@@ -106,6 +110,14 @@ public class InfoMessageCreatePage extends BasicWorkspacePage implements OrgList
         }
     }
 
+    public List<SelectItem> getTypes() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        for (InfoMessageType statusEnumType : InfoMessageType.values()) {
+            items.add(new SelectItem(statusEnumType.ordinal(), statusEnumType.toString()));
+        }
+        return items;
+    }
+
     public String getGetStringIdOfOrgList() {
         return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
@@ -134,4 +146,11 @@ public class InfoMessageCreatePage extends BasicWorkspacePage implements OrgList
         this.filter = filter;
     }
 
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 }

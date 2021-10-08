@@ -50,6 +50,7 @@
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
+
     </h:panelGrid>
     <%--<h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${not empty activeDiscountClientsReportPage.report && not empty activeDiscountClientsReportPage.report.htmlReport}" >
@@ -69,6 +70,10 @@
         </c:if>
     </h:panelGrid>--%>
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
         <c:if test="${!empty activeDiscountClientsReportPage.report && !empty activeDiscountClientsReportPage.report.items && !empty activeDiscountClientsReportPage.report.columnNames}" >
             <h:outputText escape="true" value="Отчет по питающимся льготникам" styleClass="output-text" />
             <rich:dataTable id="itemsReportTable" value="#{activeDiscountClientsReportPage.report.items}"
@@ -107,6 +112,5 @@
         </c:if>
         <%--<h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />--%>
     </h:panelGrid>
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
+
 </h:panelGrid>

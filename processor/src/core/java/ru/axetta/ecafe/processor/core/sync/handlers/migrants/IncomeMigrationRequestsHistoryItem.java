@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -55,7 +55,7 @@ public class IncomeMigrationRequestsHistoryItem {
 
         idOfOrgRequestIssuer = getLongValue(itemNode, "IdOfOrgRequestIssuer", emSetter, true);
         if(idOfOrgRequestIssuer != null) {
-            Org orgRequestIssuer = DAOService.getInstance().getOrg(idOfOrgRequestIssuer);
+            Org orgRequestIssuer = DAOReadonlyService.getInstance().findOrg(idOfOrgRequestIssuer);
             if (orgRequestIssuer == null) {
                 emSetter.setCompositeErrorMessage(String.format("OrgRequestIssuer with id=%s not found", idOfOrgRequestIssuer));
             }
@@ -88,7 +88,7 @@ public class IncomeMigrationRequestsHistoryItem {
 
         idOfClientResol = getLongValue(itemNode, "IdOfClientResol", emSetter, true);
         if(idOfClientResol != null) {
-            Client client = DAOService.getInstance().findClientById(idOfClientResol);
+            Client client = DAOReadonlyService.getInstance().findClientById(idOfClientResol);
             if (client == null && idOfClientResol != -1L) {
                 emSetter.setCompositeErrorMessage(String.format("Client with id=%s not found", idOfClientResol));
             }

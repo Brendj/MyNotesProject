@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting;
 
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.persistence.EMIAS;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -11,12 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSection> {
@@ -51,6 +50,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
                         version = DAOUtils.getMaxVersionOfExemptionVisiting(session) + 1;
                         emias.setAccepted(pojo.getAccepted());
                         emias.setUpdateDate(new Date());
+                        emias.setAcceptedDateTime(pojo.getAcceptedDateTime());
                         emias.setVersion(version);
                         session.persist(emias);
                     }
@@ -68,7 +68,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
 
 
         //Build section for response
-        List<Long> friendlyOrg = new ArrayList<>();
+        List<Long> friendlyOrg = new LinkedList<>();
         friendlyOrg.add(idOfOrg);
         Org org = (Org) session.load(Org.class, idOfOrg);
         for (Org friendlyOrgs : org.getFriendlyOrg()) {
@@ -91,6 +91,7 @@ public class ExemptionVisitingProcessor extends AbstractProcessor<OrgSettingSect
             exemptionVisitingSyncPOJO.setVersion(emias.getVersion());
             exemptionVisitingSyncPOJO.setCreateDate(emias.getCreateDate());
             exemptionVisitingSyncPOJO.setUpdateDate(emias.getUpdateDate());
+            exemptionVisitingSyncPOJO.setAcceptedDateTime(emias.getAcceptedDateTime());
             fullExemptionVisitingAnswerForARM.getItems().add(exemptionVisitingSyncPOJO);
         }
         return fullExemptionVisitingAnswerForARM;

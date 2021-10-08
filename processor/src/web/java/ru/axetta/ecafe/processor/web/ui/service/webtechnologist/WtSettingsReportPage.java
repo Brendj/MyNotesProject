@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.webtechnologist;
 
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -25,7 +26,7 @@ public class WtSettingsReportPage extends BasicWorkspacePage {
     }
 
     public void onShow() throws Exception {
-        daysForbid = DAOService.getInstance().getWtDaysForbid();
+        daysForbid = DAOReadonlyService.getInstance().getWtDaysForbid();
     }
 
     public void save() {

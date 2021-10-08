@@ -4,15 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.help.request;
 
+import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.persistence.HelpRequestStatusEnumType;
 import ru.axetta.ecafe.processor.core.persistence.HelpRequestThemeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
-
-import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Node;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -75,12 +73,11 @@ public class HelpRequestItem {
         if(StringUtils.isNotEmpty(strOrgId)){
             try {
                 orgId =  Long.parseLong(strOrgId);
-                Org o = DAOService.getInstance().getOrg(orgId);
+                Org o = DAOReadonlyService.getInstance().findOrg(orgId);
                 if (o == null) {
                     errorMessage.append(String.format("Org with id=%s not found", orgId));
                 } else {
-                    DAOService daoService = DAOService.getInstance();
-                    if (!daoService.isOrgFriendly(orgId, orgOwner)) {
+                    if (!DAOReadonlyService.getInstance().isOrgFriendly(orgId, orgOwner)) {
                         errorMessage.append(String.format("Org id=%s is not friendly to Org id=%s", orgId, orgOwner));
                     }
                 }

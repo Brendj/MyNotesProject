@@ -4,18 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -65,10 +64,10 @@ public class RequestsSupplierItem {
         if (StringUtils.isNotEmpty(strOrgId)) {
             try {
                 orgId = Long.parseLong(strOrgId);
-                Org o = DAOService.getInstance().getOrg(orgId);
+                Org o = DAOReadonlyService.getInstance().findOrg(orgId);
                 if (o == null) {
                     errorMessage.append(String.format("Org with id=%s was not found", orgId));
-                } else if (!DAOService.getInstance().isOrgFriendly(orgId, idOfOrgOwner)) {
+                } else if (!DAOReadonlyService.getInstance().isOrgFriendly(orgId, idOfOrgOwner)) {
                     errorMessage.append(String.format("Org id=%s is not friendly one to Org id=%s", orgId, idOfOrgOwner));
                 }
             } catch (NumberFormatException e) {

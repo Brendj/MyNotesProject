@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -96,7 +96,7 @@ public class ImportRegisterOrgsService {
 
         Contragent defaultSupplier = null;
         try {
-            defaultSupplier = DAOService.getInstance().getContragentById(DEFAULT_SUPPLIER_ID);
+            defaultSupplier = DAOReadonlyService.getInstance().getContragentById(DEFAULT_SUPPLIER_ID);
         } catch (Exception e) { }
 
         switch(orgRegistryChange.getOperationType()) {
@@ -122,7 +122,7 @@ public class ImportRegisterOrgsService {
                 Org org = null;
                 try {
                     if(orgRegistryChange.getIdOfOrg() != null) {
-                        org = DAOService.getInstance().getOrg(orgRegistryChange.getIdOfOrg());
+                        org = DAOReadonlyService.getInstance().findOrg(orgRegistryChange.getIdOfOrg());
                     }
                     if (org == null && orgRegistryChange.getAdditionalId() != null && orgRegistryChange.getAdditionalId() != -1){
                         org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getUniqueAddressId());

@@ -167,7 +167,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void runSendEMPEvent() throws Exception {
         //Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
-        Client client = DAOService.getInstance().findClientById(1069L);
+        Client client = DAOReadonlyService.getInstance().findClientById(1069L);
 
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(new Date(System.currentTimeMillis()));
@@ -211,7 +211,7 @@ public class OtherActionsPage extends OnlineReportPage {
                 printMessage("Клиент не найден");
                 return;
             }
-            List<EMIAS> emias = DAOService.getInstance()
+            List<EMIAS> emias = DAOReadonlyService.getInstance()
                     .findEMIASbyClientandBeetwenDates(client, getStartDateEMP(), getEndDateEMP());
             for (EMIAS emias1 : emias) {
                 Integer eventsStatus = -1;
@@ -230,7 +230,7 @@ public class OtherActionsPage extends OnlineReportPage {
                         break;
                 }
 
-                ExternalEvent event = DAOService.getInstance()
+                ExternalEvent event = DAOReadonlyService.getInstance()
                         .getExternalEvent(client, client.getOrg().getShortNameInfoService(), client.getOrg().getOfficialName(),
                                 ExternalEventType.SPECIAL, emias1.getDateLiberate(),
                                 ExternalEventStatus.fromInteger(eventsStatus));
@@ -321,7 +321,11 @@ public class OtherActionsPage extends OnlineReportPage {
                 User user = MainPage.getSessionInstance().getCurrentUser();
                 clientsMobileHistory.setUser(user);
                 clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
-                count = ClientService.getInstance().generateGuardians(orgs, clientsMobileHistory);
+				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+                clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                clientGuardianHistory.setReason("Нажата кнопка \"Генерировать представителей\" в Сервис/Другое");
+                count = ClientService.getInstance().generateGuardians(orgs, clientsMobileHistory, clientGuardianHistory);
             } catch (Exception e) {
                 printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
                 return;
@@ -354,7 +358,7 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void loadNSIFile() throws Exception {
-        if (!DAOService.getInstance().isSverkaEnabled()) {
+        if (!DAOReadonlyService.getInstance().isSverkaEnabled()) {
             printError("Сверка отключена в настройках. Загрузка файла не будет выполнена");
             return;
         }
@@ -526,7 +530,12 @@ public class OtherActionsPage extends OnlineReportPage {
             User user = MainPage.getSessionInstance().getCurrentUser();
             clientsMobileHistory.setUser(user);
             clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
-            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants(clientsMobileHistory);
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов\" в Сервис/Другое");
+            clientGuardianHistory.setAction("Обработка мигрантов");
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants(clientsMobileHistory, clientGuardianHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run load ESZ migrants: ", e);
@@ -799,7 +808,12 @@ public class OtherActionsPage extends OnlineReportPage {
     public void runProcessClientDoubles() throws Exception {
         try {
             Long idOfOrg = Long.parseLong(updateSpbClientDoubles);
-            RuntimeContext.getAppContext().getBean(CardsUidUpdateService.class).processClientDoubles(idOfOrg);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("Нажата кнопка \"Обработка дублей клиентов\" в Сервис/Другое");
+            clientGuardianHistory.setAction("Обработка дублей клиентов");
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            RuntimeContext.getAppContext().getBean(CardsUidUpdateService.class).processClientDoubles(idOfOrg, clientGuardianHistory);
             printMessage("Обработка дублей клиентов завершена");
         } catch (Exception e) {
             getLogger().error("Error update card uids: ", e);
@@ -822,8 +836,13 @@ public class OtherActionsPage extends OnlineReportPage {
             User user = MainPage.getSessionInstance().getCurrentUser();
             clientsMobileHistory.setUser(user);
             clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов (перевод в выбывшие)\" в Сервис/Другое");
+            clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class)
-                    .updateMigrants(clientsMobileHistory);
+                    .updateMigrants(clientsMobileHistory, clientGuardianHistory);
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run update ESZ migrants: ", e);

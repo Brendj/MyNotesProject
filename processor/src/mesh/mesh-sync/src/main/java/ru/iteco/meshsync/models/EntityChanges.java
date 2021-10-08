@@ -1,10 +1,10 @@
 package ru.iteco.meshsync.models;
 
-import ru.iteco.meshsync.ActionType;
-import ru.iteco.meshsync.EntityType;
 import ru.iteco.meshsync.audit.AuditEntity;
 import ru.iteco.meshsync.audit.AuditEntityListener;
 import ru.iteco.meshsync.audit.Auditable;
+import ru.iteco.meshsync.enums.ActionType;
+import ru.iteco.meshsync.enums.EntityType;
 import ru.iteco.meshsync.kafka.dto.EntityChangeEventDTO;
 
 import org.apache.logging.log4j.util.Strings;
@@ -13,6 +13,7 @@ import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @EntityListeners(AuditEntityListener.class)
@@ -54,16 +55,21 @@ public class EntityChanges implements Serializable, Auditable { // legacy code
     @Enumerated(EnumType.ORDINAL)
     private ActionType action;
 
+    @Column(name = "uid", length = 36)
+    private String uid;
+
     @Embedded
     private AuditEntity audit;
 
-    public EntityChanges(String entityId, String personGUID, String mergedPersonIds, EntityType entity, ActionType action, AuditEntity audit) {
+    public EntityChanges(String entityId, String personGUID, String mergedPersonIds, EntityType entity, ActionType action,
+            AuditEntity audit, String uid) {
         this.entityId = entityId;
         this.personGUID = personGUID;
         this.mergedPersonIds = mergedPersonIds;
         this.entity = entity;
         this.action = action;
         this.audit = audit;
+        this.uid = uid;
     }
 
     public EntityChanges() {
@@ -75,7 +81,8 @@ public class EntityChanges implements Serializable, Auditable { // legacy code
         String mergedPersonIds = Strings.join(dto.getMerged_person_ids(), ',');
         EntityType entity = dto.getEntity_name();
         ActionType action = dto.getAction();
-        return new EntityChanges(entityId, personGUID, mergedPersonIds, entity, action, null);
+        String uid = dto.getUid();
+        return new EntityChanges(entityId, personGUID, mergedPersonIds, entity, action, null, uid);
     }
 
     @Override
@@ -134,5 +141,30 @@ public class EntityChanges implements Serializable, Auditable { // legacy code
 
     public void setAction(ActionType action) {
         this.action = action;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        EntityChanges that = (EntityChanges) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

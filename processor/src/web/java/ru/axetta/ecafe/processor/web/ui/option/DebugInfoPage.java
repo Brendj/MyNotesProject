@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.ApplicationForFoodProcessingService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -254,7 +254,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
         EntityManager em = entityManager.getEntityManagerFactory().createEntityManager();
         Session session = em.unwrap(Session.class);
 
-        List<Client> clients = DAOService.getInstance().findClientsForOrgAndFriendly(20L, false);
+        List<Client> clients = DAOReadonlyService.getInstance().findClientsForOrgAndFriendly(20L, false);
         for (Client cc : clients) {
             //Client client = (Client)session.load(Client.class, cc.getIdOfClient());
             /*Set<ClientNotificationSetting> settings = client.getNotificationSettings();

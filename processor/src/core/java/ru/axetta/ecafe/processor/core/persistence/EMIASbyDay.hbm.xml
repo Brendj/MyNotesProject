@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.EMIASbyDay" table="cf_emias_days">
+        <id name="idOfEmiasDay" column="idOfEmiasDay" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOfClient" column="idOfClient" type="long"/>
+        <property name="date" column="date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="eat" column="eat" type="boolean"/>
+        <property name="version" column="version" type="long"/>
+        <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="updateDate" column="updateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="idOfOrg" column="idOfOrg" type="long"/>
+    </class>
+</hibernate-mapping>
+
+

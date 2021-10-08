@@ -30,7 +30,7 @@ public class CacheService {
         runInvalidateCache(cacheMaster, id);
         runInvalidateCache(cacheReports, id);
 
-        logger.info("Invalidated cache for org id = " + id);
+        logger.debug("Invalidated cache for org id = " + id);
     }
 
     private void runInvalidateCache(Cache cache, long id) {

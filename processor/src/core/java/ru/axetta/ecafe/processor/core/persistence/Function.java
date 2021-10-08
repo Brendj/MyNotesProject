@@ -151,6 +151,8 @@ public class Function {
     public static final String FUNCD_WORK_ONLINE_REPORT_EE_REPORT = "Онлайн отчеты - Отчеты по проходам";
     public static final String FUNC_WORK_ONLINE_REPORT_MENU_REPORT = "onlineRprtMenuReport";
     public static final String FUNCD_WORK_ONLINE_REPORT_MENU_REPORT = "Онлайн отчеты - Отчет по меню";
+    public static final String FUNC_ESP = "espdesk";
+    public static final String FUNCD_ESP = "Список обращений в ЕСП";
 
     private Long idOfFunction;
     private String functionName;

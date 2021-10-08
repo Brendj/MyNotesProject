@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
@@ -28,7 +28,6 @@ import javax.annotation.Resource;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -1117,7 +1116,7 @@ public class EventNotificationService {
                 sn = guardian.getPerson().getSurname();
                 n = guardian.getPerson().getFirstName();
             } catch (Exception e) {
-                Person p = DAOService.getInstance().getPersonByClient(guardian);
+                Person p = DAOReadonlyService.getInstance().getPersonByClient(guardian);
                 sn = p.getSurname();
                 n = p.getFirstName();
             }

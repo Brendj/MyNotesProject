@@ -1370,6 +1370,10 @@
         <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
         <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
                             label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="emiasReport" type="ru.axetta.ecafe.processor.web.ui.report.online.EmiasReportPage"--%>
+        <rich:panelMenuItem id="emiasReport" binding="#{mainPage.emiasReportPage.mainMenuComponent}"
+                            label="Отчет по данным от ЕМИАС" action="#{mainPage.showEmiasReportPage()}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="calendarReportsGroupMenu" binding="#{mainPage.calendarReportsGroupMenu.mainMenuComponent}"
@@ -1605,6 +1609,15 @@
         <rich:panelMenuItem id="helpdeskMenuItem" binding="#{helpdeskReportPage.mainMenuComponent}"
                             label="Заявки в службу помощи" action="#{helpdeskReportPage.show}"
                             reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="esp" label="ЕСП" binding="#{mainPage.espHelpdeskGroupPage.mainMenuComponent}" rendered="#{mainPage.eligibleToViewESPdesk}">
+        <a4j:support event="onclick" action="#{mainPage.showEspHelpdeskGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="espItem"
+                            binding="#{mainPage.espHelpdeskReportPage.mainMenuComponent}"
+                            label="Список обращений в ЕСП"
+                            action="#{mainPage.showESPHelpDeskReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>

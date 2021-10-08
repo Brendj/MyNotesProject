@@ -330,7 +330,7 @@ public class FrontController extends HttpServlet {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItem (фронт)");
         if (orgId != null) {
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org != null) {
                 clientsMobileHistory.setOrg(org);
             }
@@ -344,8 +344,13 @@ public class FrontController extends HttpServlet {
         {
             clientsMobileHistory.setStaffguid(guidStaff);
         }
+		MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод proceedRegitryChangeItem (front)");
+		clientGuardianHistory.setWebAdress(req.getRemoteAddr());
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
@@ -368,7 +373,7 @@ public class FrontController extends HttpServlet {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeItemInternal (фронт)");
         if (orgId != null) {
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org != null) {
                 clientsMobileHistory.setOrg(org);
             }
@@ -383,8 +388,15 @@ public class FrontController extends HttpServlet {
             clientsMobileHistory.setStaffguid(guidStaff);
         }
         clientsMobileHistory.setStaffguid(guidStaff);
+		        //
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод proceedRegitryChangeItemInternal (front)");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        //
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeEmployeeItem")
@@ -405,7 +417,7 @@ public class FrontController extends HttpServlet {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("soap метод proceedRegitryChangeEmployeeItem (фронт)");
         if (orgId != null) {
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org != null) {
                 clientsMobileHistory.setOrg(org);
             }
@@ -420,8 +432,15 @@ public class FrontController extends HttpServlet {
             clientsMobileHistory.setStaffguid(guidStaff);
         }
         clientsMobileHistory.setStaffguid(guidStaff);
+		//
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setReason("Веб метод proceedRegitryChangeEmployeeItem (front)");
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        //
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName, clientsMobileHistory);
+                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName, clientsMobileHistory, clientGuardianHistory);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
@@ -1328,7 +1347,7 @@ public class FrontController extends HttpServlet {
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
                 if (orgId != null) {
-                    Org org = DAOService.getInstance().getOrg(orgId);
+                    Org org = DAOReadonlyService.getInstance().findOrg(orgId);
                     if (org != null) {
                         clientsMobileHistory.setOrg(org);
                     }
@@ -1567,7 +1586,7 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("В запросе нет валидных сертификатов, idOfOrg: " + orgId);
             }
 
-            Org org = DAOService.getInstance().getOrg(orgId);
+            Org org = DAOReadonlyService.getInstance().findOrg(orgId);
             if (org == null) {
                 throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
             }
@@ -1614,15 +1633,15 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "idOfClient") Long idOfClient) throws Exception {
         checkRequestValidity(orgId);
 
-        DAOService daoService = DAOService.getInstance();
-        Client client = daoService.findClientById(idOfClient);
+        DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+        Client client = daoReadonlyService.findClientById(idOfClient);
         if (client == null) {
             throw new FrontControllerException(String.format("Клиент не найден: %d", idOfClient));
         }
-        if (!daoService.doesClientBelongToFriendlyOrgs(orgId, idOfClient)) {
+        if (!daoReadonlyService.doesClientBelongToFriendlyOrgs(orgId, idOfClient)) {
             throw new FrontControllerException(String.format("Клиент %d не принадлежит организации", idOfClient));
         }
-        LinkingToken linkingToken = daoService.generateLinkingToken(client);
+        LinkingToken linkingToken = DAOService.getInstance().generateLinkingToken(client);
         return linkingToken.getToken();
     }
 
@@ -2533,10 +2552,18 @@ public class FrontController extends HttpServlet {
                     clientsMobileHistory);
 
             Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
+            //
+            MessageContext mc = wsContext.getMessageContext();
+            HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setOrg(org);
+            clientGuardianHistory.setReason("Веб метод registerGuardian (front)");
+            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
 
+            //
             ClientGuardian clientGuardian = ClientManager
                     .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
-                            clientId, ClientCreatedFromType.ARM, null);
+                            clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
             clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
             persistenceSession.merge(clientGuardian);
@@ -2660,9 +2687,17 @@ public class FrontController extends HttpServlet {
 
             ClientGuardian existingRef = DAOUtils.findClientGuardian(persistenceSession, clientId, guardianId);
             if (existingRef == null) {
+                //
+                MessageContext mc = wsContext.getMessageContext();
+                HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setOrg(org);
+                clientGuardianHistory.setReason("Веб метод registerGuardianMigrantRequest (front)");
+                clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+                //
                 ClientGuardian clientGuardian = ClientManager
                         .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
-                                clientId, ClientCreatedFromType.ARM, null);
+                                clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
                 clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
                 persistenceSession.merge(clientGuardian);

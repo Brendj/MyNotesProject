@@ -102,7 +102,7 @@ public class ETPMVDaoService {
 
     @Transactional(readOnly = true)
     public ApplicationForFood findApplicationForFood(String guid) {
-        Query query = entityManager.createQuery("select a from ApplicationForFood a where a.client.clientGUID = :guid order by a.createdDate desc");
+        Query query = entityManager.createQuery("select a from ApplicationForFood a where a.client.meshGUID = :guid order by a.createdDate desc");
         query.setParameter("guid", guid);
         query.setMaxResults(1);
         try {
@@ -115,7 +115,7 @@ public class ETPMVDaoService {
     @Transactional
     public void createApplicationForGood(Client client, Long dtisznCode, String mobile,
             String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
-            ApplicationForFoodCreatorType creatorType) {
+            ApplicationForFoodCreatorType creatorType) throws Exception {
         Session session = entityManager.unwrap(Session.class);
         DAOUtils.createApplicationForFood(session, client, dtisznCode, mobile,
                 guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType);
@@ -197,20 +197,12 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public List<ApplicationForFood> confirmFromAISContingent(String guid, String meshGuid, Long nextVersion, Long historyVersion) {
+    public List<ApplicationForFood> confirmFromAISContingent(String meshGuid, Long nextVersion, Long historyVersion) {
         List<ApplicationForFood> result = new ArrayList<ApplicationForFood>();
         Session session = entityManager.unwrap(Session.class);
-        String condition = "";
-        if (!StringUtils.isEmpty(guid)) {
-            condition = "c.clientGUID = :guid";
-        } else if (!StringUtils.isEmpty(meshGuid)) {
-            condition = "c.meshGUID = :guid";
-        }
         Query query = entityManager.createQuery("select app from ApplicationForFood app "
-                + "where app.client.idOfClient in (select c.idOfClient from Client c where " + condition + ") and app.sendToAISContingent = false");
-        if (!StringUtils.isEmpty(guid)) {
-            query.setParameter("guid", guid);
-        } else if (!StringUtils.isEmpty(meshGuid)) {
+                + "where app.client.idOfClient in (select c.idOfClient from Client c where c.meshGUID = :guid) and app.sendToAISContingent = false");
+        if (!StringUtils.isEmpty(meshGuid)) {
             query.setParameter("guid", meshGuid);
         }
         List<ApplicationForFood> apps = query.getResultList();

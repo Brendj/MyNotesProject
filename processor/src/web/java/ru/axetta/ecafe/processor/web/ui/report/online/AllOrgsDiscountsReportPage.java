@@ -4,8 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.AllOrgsDiscountsReport;
 
 import org.hibernate.Session;
@@ -47,7 +46,7 @@ public class AllOrgsDiscountsReportPage extends OnlineReportPage {
     }
 
     public List<SelectItem> getRegions() {
-        List<String> regions = DAOService.getInstance().getRegions();
+        List<String> regions = DAOReadonlyService.getInstance().getRegions();
         List<SelectItem> items = new ArrayList<SelectItem>();
         items.add(new SelectItem(""));
         for(String reg : regions) {

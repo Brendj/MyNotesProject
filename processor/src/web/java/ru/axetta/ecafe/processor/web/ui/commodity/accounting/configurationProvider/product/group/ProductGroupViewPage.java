@@ -6,9 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.ProductListPage;
 
@@ -17,10 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,7 +38,7 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
     @Autowired
     private ProductListPage productListPage;
     @Autowired
-    private DAOService service;
+    private DAOReadonlyService service;
 
 
     @Override
@@ -51,7 +46,7 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
         selectedProductGroupGroupPage.onShow();
         currentProductGroup = selectedProductGroupGroupPage.getCurrentProductGroup();
         countProducts = service.countProductsByProductGroup(currentProductGroup);
-        currentOrg = service.getOrg(currentProductGroup.getOrgOwner());
+        currentOrg = DAOReadonlyService.getInstance().findOrg(currentProductGroup.getOrgOwner());
         currentConfigurationProvider = service.getConfigurationProvider(currentProductGroup.getIdOfConfigurationProvider());
     }
 
