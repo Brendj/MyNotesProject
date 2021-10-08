@@ -385,7 +385,7 @@ public class PreorderDAOService {
                 for (WtComplex wtComplex : wtComplexes) {
 
                     Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
-                    String complexName = wtComplex.getName();
+                    String complexName = wtComplex.getWtDietType().getDescription();
                     // Режим добавления блюд: если комплекс составной - режим составного комплекса,
                     // если нет - режим фиксированной цены
                     Integer complexType = wtComplex.getComposite() ? INTEGRAL_COMPLEX : FIXED_PRICE_COMPLEX;
@@ -3375,6 +3375,7 @@ public class PreorderDAOService {
         if (ageGroupIds != null && ageGroupIds.size() > 0) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
+                        + "join fetch complex.wtDietType dietType "
                         + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "WHERE complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId AND complex.deleteState = 0 "
                         + "AND complex.beginDate <= :startDate AND complex.endDate >= :endDate "
@@ -3401,6 +3402,7 @@ public class PreorderDAOService {
         if (ageGroupIds != null && ageGroupIds.size() > 0) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
+                        + "join fetch complex.wtDietType dietType "
                         + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "WHERE complex.isPortal = true AND complex.deleteState = 0 "
                         + "AND complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
@@ -3427,7 +3429,8 @@ public class PreorderDAOService {
             Set<WtDiscountRule> wtDiscountRuleSet, Org org) {
         Set<WtComplex> wtComplexes = new HashSet<>();
         for (WtDiscountRule rule : wtDiscountRuleSet) {
-            Query query = emReport.createQuery("select complex from WtComplex complex LEFT JOIN complex.wtOrgGroup orgGroup "
+            Query query = emReport.createQuery("select complex from WtComplex complex join fetch complex.wtDietType dietType "
+                    + "LEFT JOIN complex.wtOrgGroup orgGroup "
                     + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                     + "and :rule in elements(complex.discountRules) and (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs))");
             query.setParameter("rule", rule);
@@ -3448,6 +3451,7 @@ public class PreorderDAOService {
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("select complex from WtComplex complex "
+                        + "join fetch complex.wtDietType dietType "
                         + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "and complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
@@ -3657,6 +3661,7 @@ public class PreorderDAOService {
 
     public List<WtComplex> getWtComplexesByDates(Date beginDate, Date endDate, Org org) {
         Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
+                + "join fetch complex.wtDietType dietType "
                 + "LEFT JOIN complex.wtOrgGroup orgGroup "
                 + "WHERE complex.beginDate <= :beginDate AND complex.endDate >= :endDate "
                 + "AND complex.deleteState = 0 "

@@ -2242,7 +2242,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 PurchaseElementExt purchaseElementExt = objectFactory.createPurchaseElementExt();
                 purchaseElementExt.setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                 purchaseElementExt.setAmount(od.getQty());
-                purchaseElementExt.setName(od.getMenuDetailName());
+                purchaseElementExt.setName(getReadableComplexName(od));
                 purchaseElementExt.setSum(od.getRPrice() * od.getQty());
                 purchaseElementExt.setMenuType(od.getMenuType());
                 if (od.isComplex()) {
@@ -2261,6 +2261,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             purchaseListExt.getP().add(purchaseExt);
         }
         data.setPurchaseListExt(purchaseListExt);
+    }
+
+    private String getReadableComplexName(OrderDetail orderDetail) {
+        if (orderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_MIN && orderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_MAX) {
+            if (!orderDetail.isFRationSpecified()) {
+                return orderDetail.getMenuDetailName();
+            } else {
+                return OrderDetailFRationTypeWTdiet.getDescription(orderDetail.getfRation());
+            }
+        }
+        return orderDetail.getMenuDetailName();
     }
 
     @Override
@@ -2466,7 +2477,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     purchaseWithDetailsElementExt
                             .setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                     purchaseWithDetailsElementExt.setAmount(od.getQty());
-                    purchaseWithDetailsElementExt.setName(od.getMenuDetailName());
+                    purchaseWithDetailsElementExt.setName(getReadableComplexName(od));
                     purchaseWithDetailsElementExt.setSum(od.getRPrice() * od.getQty());
                     purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
                     purchaseWithDetailsElementExt.setLastUpdateDate(
@@ -3811,7 +3822,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         complexDetail.setName(dish.getDishName());
                         complex.getE().add(complexDetail);
                     }
-                    complex.setName(wtComplex.getName());
+                    complex.setName(wtComplex.getWtDietType().getDescription());
                     complexDate.getE().add(complex);
                     complexDate.setDate(toXmlDateTime(menuDate));
 
