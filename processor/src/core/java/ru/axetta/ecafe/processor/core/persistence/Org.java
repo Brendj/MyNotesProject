@@ -1362,4 +1362,8 @@ public class Org implements Serializable {
     public void setUseLongCardNo(Boolean useLongCardNo) {
         this.useLongCardNo = useLongCardNo;
     }
+
+    public boolean longCardNoIsOn() {
+        return useLongCardNo != null && useLongCardNo;
+    }
 }

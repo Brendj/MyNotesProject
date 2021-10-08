@@ -121,6 +121,16 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         }
     }
 
+    public Boolean getIsWebArmUser(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.WA_ADMIN_SECURITY);
+    }
+
+    public Boolean getRenderContragent() {
+        return !getIsSecurityAdmin() && !getIsWebArmUser() && !getIsDirector();
+    }
+
     public void setFunctionSelector(FunctionSelector functionSelector) {
         this.functionSelector = functionSelector;
     }
@@ -228,7 +238,8 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             }
             if(role != null && (role.equals(User.DefaultRole.CLASSROOM_TEACHER)
                     || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT)
-                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR))) {
+                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR)
+                    || role.equals(User.DefaultRole.WA_ADMIN_SECURITY))) {
                 user.setRoleName(role.toString());
                 if(user.getClient() == null){
                     this.printError("Выберите клиента.");

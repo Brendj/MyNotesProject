@@ -4,15 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -103,7 +104,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                             item.getServNumber(), client, item.getDtisznCode(), status,
                                             item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(), nextVersion,
-                                            nextHistoryVersion);
+                                            nextHistoryVersion, item.getDocOrderDate(), item.getIdOfDocOrder());
                             if (!oldStatus.equals(status)) {
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                         new ApplicationForFoodStatus(status.getApplicationForFoodState(),

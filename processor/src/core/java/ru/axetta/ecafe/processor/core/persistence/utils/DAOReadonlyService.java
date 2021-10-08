@@ -119,6 +119,14 @@ public class DAOReadonlyService {
         return result;
     }
 
+    public Long getContractIdByCardNo(long lCardId) throws Exception {
+        Client client = DAOUtils.findClientByCardNo(entityManager, lCardId);
+        if (client != null) {
+            return client.getContractId();
+        }
+        return null;
+    }
+
     public List<Card> getActiveCardsWithOverdueValidDate(Date now) {
         Query query = entityManager.createQuery(
                 "FROM Card " +
@@ -1494,15 +1502,6 @@ public class DAOReadonlyService {
 
     public ConfigurationProvider getConfigurationProvider(Long idOfConfigurationProvider) throws Exception {
         return entityManager.find(ConfigurationProvider.class, idOfConfigurationProvider);
-    }
-
-
-    public Long getContractIdByCardNo(long lCardId) throws Exception {
-        Client client = DAOUtils.findClientByCardNo(entityManager, lCardId);
-        if (client != null) {
-            return client.getContractId();
-        }
-        return null;
     }
 
     public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId, int days) throws Exception {

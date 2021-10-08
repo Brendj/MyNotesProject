@@ -7,8 +7,8 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.RequestDTO;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationException;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.GroupManagementErrors;
-import ru.axetta.ecafe.processor.web.partner.schoolapi.util.RequestProcessingException;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.Session;
@@ -126,12 +126,12 @@ public class CreateClientRequestDTO {
         this.passportNumber = passportNumber;
     }
 
-    public void validateRequest() throws RequestProcessingException {
+    public void validateRequest() throws WebApplicationException {
         String errorMessage = "Поля GroupName, Surname, Name, Gender обязательные для заполнения.";
         if(isEmpty(this.groupName) || isEmpty(this.surname) || isEmpty(this.name) || this.gender == null )
-            throw new RequestProcessingException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(), errorMessage);
+            throw WebApplicationException.badRequest(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(), errorMessage);
         if(this.gender.intValue() != 0 && this.gender.intValue() != 1)
-            throw new RequestProcessingException(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(),
+            throw WebApplicationException.badRequest(GroupManagementErrors.VALIDATION_ERROR.getErrorCode(),
                     "Значение поля Gender должно быть 0 или 1.");
     }
 

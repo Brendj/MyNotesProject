@@ -90,8 +90,8 @@
         <h:inputText value="#{mainPage.userEditPage.department}" maxlength="128" styleClass="input-text" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}"/>
-    <h:panelGroup styleClass="borderless-div" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
+    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" rendered="#{mainPage.userEditPage.renderContragent}"/>
+    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userEditPage.renderContragent}">
         <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
                            reRender="modalContragentListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
@@ -105,14 +105,14 @@
     </h:panelGroup>
     <h:outputText escape="true" value="Организация" styleClass="output-text"/>
     <h:panelGroup>
-        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
+        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" disabled="#{mainPage.userEditPage.isWebArmUser}"
                            reRender="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
                            styleClass="command-link" style="width: 25px;" />
         <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userEditPage.userOrgName}}" />
     </h:panelGroup>
-    <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}" />
-    <h:panelGroup rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
+    <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text" rendered="#{mainPage.userEditPage.renderContragent}" />
+    <h:panelGroup rendered="#{mainPage.userEditPage.renderContragent}">
         <a4j:commandButton value="..." action="#{mainPage.userEditPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
@@ -122,8 +122,8 @@
         <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userEditPage.orgFilter}}" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Список организаций отмены (заказов)" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}" />
-    <h:panelGroup rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
+    <h:outputText escape="true" value="Список организаций отмены (заказов)" styleClass="output-text" rendered="#{mainPage.userEditPage.renderContragent}" />
+    <h:panelGroup rendered="#{mainPage.userEditPage.renderContragent}">
         <a4j:commandButton value="..." action="#{mainPage.userEditPage.showOrgListSelectCancelPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px">

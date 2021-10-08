@@ -310,13 +310,14 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setFunctions(functionSelector.getSupplierReportFunctions(session));
                 user.setRoleName(role.toString());
                 if (contragentItems.isEmpty()) {
-                    this.printError("Список контрагенотов пуст.");
+                    this.printError("Список контрагентов пуст.");
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
             if(role != null && (role.equals(User.DefaultRole.CLASSROOM_TEACHER)
                     || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT)
-                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR))) {
+                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR)
+                    || role.equals(User.DefaultRole.WA_ADMIN_SECURITY))) {
                 user.setRoleName(role.toString());
                 if(user.getClient() == null){
                     this.printError("Выберите клиента.");
@@ -448,6 +449,16 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.ADMIN_SECURITY);
+    }
+
+    public Boolean getIsWebArmUser(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.WA_ADMIN_SECURITY);
+    }
+
+    public Boolean getRenderContragent() {
+        return !getIsSecurityAdmin() && !getIsWebArmUser() && !getIsDirector();
     }
 
     public Boolean getIsSupplier() {

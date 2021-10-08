@@ -12,7 +12,8 @@ public enum ClientCreatedFromType {
     MPGU(1,"МПГУ"),//Создание клиента в МПГУ (создание представителей в методе сервиса информирования)
     BACK_OFFICE(2,"Бэк-офис"),
     REGISTRY(3,"АИС Реестры"),
-    ARM(4,"АРМ");
+    ARM(4,"АРМ"),
+    WEB_ARM(5, "Веб АРМ");
 
     private final int value;
     private final String description;

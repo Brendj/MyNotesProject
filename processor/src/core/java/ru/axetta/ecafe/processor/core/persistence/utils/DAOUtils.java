@@ -338,12 +338,13 @@ public class DAOUtils {
     }
 
     public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
-        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
+        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo order by updateTime desc");
         q.setParameter("cardNo", cardNo);
         List l = q.getResultList();
         if (l.size() == 0) {
             return null;
         }
+        if (l.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", cardNo));
         return ((Card) l.get(0)).getClient();
     }
 
@@ -592,12 +593,30 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardByCardNoWithUniqueCheck(Session persistenceSession, Long cardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        List<Card> list = criteria.list();
+        if (list.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", cardNo));
+        return (list.size() == 0) ? null : list.get(0);
+    }
+
     public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
+    }
+
+    public static Card findCardByLongCardNoWithUniqueCheck(Session persistenceSession, Long longCardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("longCardNo", longCardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        List<Card> list = criteria.list();
+        if (list.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", longCardNo));
+        return (list.size() == 0) ? null : list.get(0);
     }
 
     public static Card findCardByCardNoExtended(Session session, Long cardNo, Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
@@ -4754,6 +4773,13 @@ public class DAOUtils {
         return (ApplicationForFood) criteria.uniqueResult();
     }
 
+    public static ApplicationForFood getApplicationForFoodByRecordId(Session persistanceSession, long recordId)
+    {
+        Criteria criteria = persistanceSession.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("idOfApplicationForFood", recordId));
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
     public static List<ApplicationForFood> getApplicationsForFoodForOrgsSinceVersion(Session session,
             List<Long> idOfOrgs, long version) throws Exception {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
@@ -4892,7 +4918,7 @@ public class DAOUtils {
     public static ApplicationForFood updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession,
             String serviceNumber, Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile,
             String applicantName, String applicantSecondName, String applicantSurname, Long version,
-            Long historyVersion) throws Exception {
+            Long historyVersion, Date docOrderDate, String idOfDocOrder) throws Exception {
         ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession,
                 serviceNumber);
         if (applicationForFood == null) {
@@ -4906,6 +4932,8 @@ public class DAOUtils {
         applicationForFood.setApplicantName(applicantName);
         applicationForFood.setApplicantSecondName(applicantSecondName);
         applicationForFood.setApplicantSurname(applicantSurname);
+        applicationForFood.setDocOrderDate(docOrderDate);
+        applicationForFood.setIdOfDocOrder(idOfDocOrder);
         applicationForFood.setVersion(version);
         applicationForFood.setLastUpdate(new Date());
         persistenceSession.update(applicationForFood);

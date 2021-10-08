@@ -2243,7 +2243,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 PurchaseElementExt purchaseElementExt = objectFactory.createPurchaseElementExt();
                 purchaseElementExt.setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                 purchaseElementExt.setAmount(od.getQty());
-                purchaseElementExt.setName(od.getMenuDetailName());
+                purchaseElementExt.setName(getReadableComplexName(od));
                 purchaseElementExt.setSum(od.getRPrice() * od.getQty());
                 purchaseElementExt.setMenuType(od.getMenuType());
                 if (od.isComplex()) {
@@ -2262,6 +2262,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             purchaseListExt.getP().add(purchaseExt);
         }
         data.setPurchaseListExt(purchaseListExt);
+    }
+
+    private String getReadableComplexName(OrderDetail orderDetail) {
+        if (orderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_MIN && orderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_MAX) {
+            if (!orderDetail.isFRationSpecified()) {
+                return orderDetail.getMenuDetailName();
+            } else {
+                return OrderDetailFRationTypeWTdiet.getDescription(orderDetail.getfRation());
+            }
+        }
+        return orderDetail.getMenuDetailName();
     }
 
     @Override
@@ -2467,7 +2478,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     purchaseWithDetailsElementExt
                             .setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                     purchaseWithDetailsElementExt.setAmount(od.getQty());
-                    purchaseWithDetailsElementExt.setName(od.getMenuDetailName());
+                    purchaseWithDetailsElementExt.setName(getReadableComplexName(od));
                     purchaseWithDetailsElementExt.setSum(od.getRPrice() * od.getQty());
                     purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
                     purchaseWithDetailsElementExt.setLastUpdateDate(
@@ -3812,7 +3823,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         complexDetail.setName(dish.getDishName());
                         complex.getE().add(complexDetail);
                     }
-                    complex.setName(wtComplex.getName());
+                    complex.setName(wtComplex.getWtDietType().getDescription());
                     complexDate.getE().add(complex);
                     complexDate.setDate(toXmlDateTime(menuDate));
 
@@ -4457,8 +4468,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (mode == 1) {
                 contractId = getContractIdByCardNoInternal_NEWWAY(lCardId);
             }
+        } catch (NoUniqueCardNoException e) {
+            logger.error("getContractIdByCardNo NoUniqueCardNoException");
         } catch (Exception e) {
-            logger.error("ClientRoomController failed", e);
+            logger.error("getContractIdByCardNo failed", e);
         }
         return contractId;
     }
@@ -4479,8 +4492,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            Card card = DAOUtils.findCardByCardNo(session, cardId);
-            if (card.getState() == Card.ACTIVE_STATE) {
+            Card card = DAOUtils.findCardByCardNoWithUniqueCheck(session, cardId);
+            if (card != null && card.getState() == Card.ACTIVE_STATE) {
                 contractId = card.getClient().getContractId();
             }
             transaction.commit();
@@ -8918,7 +8931,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             CardRequest cardRequest = new CardRequest(guardian, typeCard, creatorMobile, nextVersion);
             session.save(cardRequest);
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-            MessageContext mc = context.getMessageContext();
             clientGuardianHistory.setClientGuardian(clientGuardian);
             clientGuardianHistory.setChangeDate(new Date());
             clientGuardian.setCardRequest(cardRequest);
@@ -9107,7 +9119,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             Long lCardId = Long.parseLong(cardId);
             lCardId = SummaryCardsMSRService.convertCardId(lCardId);
-            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            Card card = null;
+            try {
+                card = DAOUtils.findCardByCardNoWithUniqueCheck(session, lCardId);
+            } catch (NoUniqueCardNoException e) {
+                lCardId = SummaryCardsMSRService.convertCardIdForLongCardNo(Long.parseLong(cardId));
+                card = DAOUtils.findCardByLongCardNo(session, lCardId);
+            }
             if (card == null) {
                 return new MuseumEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
@@ -9152,7 +9170,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             Long lCardId = Long.parseLong(cardId);
             lCardId = SummaryCardsMSRService.convertCardId(lCardId);
-            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            Card card = null;
+            try {
+                card = DAOUtils.findCardByCardNoWithUniqueCheck(session, lCardId);
+            } catch (NoUniqueCardNoException e) {
+                lCardId = SummaryCardsMSRService.convertCardIdForLongCardNo(Long.parseLong(cardId));
+                card = DAOUtils.findCardByLongCardNo(session, lCardId);
+            }
             if (card == null || !card.isActive()) {
                 return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }

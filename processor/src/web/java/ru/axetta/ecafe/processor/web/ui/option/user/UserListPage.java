@@ -127,6 +127,10 @@ public class UserListPage extends BasicWorkspacePage {
         userFilter.addFilter(criteria);
         criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Restrictions.eq("isGroup", false));
+        List<Integer> list = Arrays.asList(User.WebArmRole.WA_OPP.getIdentification(),
+                User.WebArmRole.WA_OEE.getIdentification(),
+                User.WebArmRole.WA_OPP_OEE.getIdentification());
+        criteria.add(Restrictions.not(Restrictions.in("idOfRole", list)));
         List users = criteria.list();
         for (Object object : users) {
             User user = (User) object;

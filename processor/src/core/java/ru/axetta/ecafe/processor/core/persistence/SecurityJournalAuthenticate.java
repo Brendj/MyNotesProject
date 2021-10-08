@@ -196,7 +196,8 @@ public class SecurityJournalAuthenticate implements Serializable {
         ADMIN(1, "АРМ администратора"),
         SUPPLIER(2, "АРМ оператора поставщика питания"),
         MONITORING(3, "АРМ мониторинга"),
-        ADMIN_SECURITY(4, "АРМ администратора ИБ");
+        ADMIN_SECURITY(4, "АРМ администратора ИБ"),
+        WEB_ARM_ADMIN(5, "Веб АРМ администратора ОУ");
 
         private Integer identification;
         private String description;
