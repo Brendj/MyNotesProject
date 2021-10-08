@@ -240,4 +240,11 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             return Long.decode(hex);
         }
     }
+
+    public static Long convertCardIdForLongCardNo(Long cardId) {
+        if (cardId > 0xFFFFFFFFL) {     // 7 byte cards
+            return Long.reverseBytes(cardId*256);
+        }
+        return cardId;
+    }
 }

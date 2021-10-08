@@ -338,12 +338,13 @@ public class DAOUtils {
     }
 
     public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
-        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
+        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo order by updateTime desc");
         q.setParameter("cardNo", cardNo);
         List l = q.getResultList();
         if (l.size() == 0) {
             return null;
         }
+        if (l.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", cardNo));
         return ((Card) l.get(0)).getClient();
     }
 
@@ -586,6 +587,15 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
+    }
+
+    public static Card findCardByCardNoWithUniqueCheck(Session persistenceSession, Long cardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        List<Card> list = criteria.list();
+        if (list.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", cardNo));
+        return (list.size() == 0) ? null : list.get(0);
     }
 
     public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {

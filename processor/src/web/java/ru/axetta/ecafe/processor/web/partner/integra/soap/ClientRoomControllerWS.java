@@ -4456,8 +4456,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (mode == 1) {
                 contractId = getContractIdByCardNoInternal_NEWWAY(lCardId);
             }
+        } catch (NoUniqueCardNoException e) {
+            logger.error("getContractIdByCardNo NoUniqueCardNoException");
         } catch (Exception e) {
-            logger.error("ClientRoomController failed", e);
+            logger.error("getContractIdByCardNo failed", e);
         }
         return contractId;
     }
@@ -4478,8 +4480,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            Card card = DAOUtils.findCardByCardNo(session, cardId);
-            if (card.getState() == Card.ACTIVE_STATE) {
+            Card card = DAOUtils.findCardByCardNoWithUniqueCheck(session, cardId);
+            if (card != null && card.getState() == Card.ACTIVE_STATE) {
                 contractId = card.getClient().getContractId();
             }
             transaction.commit();
@@ -9105,7 +9107,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             Long lCardId = Long.parseLong(cardId);
             lCardId = SummaryCardsMSRService.convertCardId(lCardId);
-            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            Card card = null;
+            try {
+                card = DAOUtils.findCardByCardNoWithUniqueCheck(session, lCardId);
+            } catch (NoUniqueCardNoException e) {
+                lCardId = SummaryCardsMSRService.convertCardIdForLongCardNo(Long.parseLong(cardId));
+                card = DAOUtils.findCardByLongCardNo(session, lCardId);
+            }
             if (card == null) {
                 return new MuseumEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
@@ -9150,7 +9158,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             Long lCardId = Long.parseLong(cardId);
             lCardId = SummaryCardsMSRService.convertCardId(lCardId);
-            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            Card card = null;
+            try {
+                card = DAOUtils.findCardByCardNoWithUniqueCheck(session, lCardId);
+            } catch (NoUniqueCardNoException e) {
+                lCardId = SummaryCardsMSRService.convertCardIdForLongCardNo(Long.parseLong(cardId));
+                card = DAOUtils.findCardByLongCardNo(session, lCardId);
+            }
             if (card == null || !card.isActive()) {
                 return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
