@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -139,7 +139,7 @@ public class RegularPaymentEasyCheck {
     private boolean checkSubscriptionContractId(BankSubscription bs, Long contractId,
             RequestResultEasyCheck requestResult) {
         if (contractId != null) {
-            Client c = DAOService.getInstance().getClientByContractId(contractId);
+            Client c = DAOReadonlyService.getInstance().getClientByContractId(contractId);
             if (c == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, contractId));

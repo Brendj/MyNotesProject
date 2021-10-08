@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentSta
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Criteria;
@@ -266,7 +267,7 @@ public class GoodRequestRepository {
         number = number + "-" + new SimpleDateFormat("yyMMdd").format(now);
         number = number + "-ЗВК-1";
 
-        Good good = DAOService.getInstance().getGood(idofgood);
+        Good good = DAOReadonlyService.getInstance().getGood(idofgood);
 
         //  Создание GoodRequest
         GoodRequest goodRequest = new GoodRequest();

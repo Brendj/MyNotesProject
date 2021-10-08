@@ -7,15 +7,12 @@ package ru.axetta.ecafe.processor.web.ui.report.repository;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
-import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +62,7 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
     }
 
     public SelectItem[] getRuleNameItems() {
-        List<String> l = DAOService.getInstance().getReportHandleRuleNames();
+        List<String> l = DAOReadonlyService.getInstance().getReportHandleRuleNames();
         SelectItem[] items = new SelectItem[l.size()];
         int n=0;
         for (String s : l) {

@@ -628,13 +628,13 @@ public class User {
     }
 
     public static boolean isNeedChangePassword(String userName) throws Exception {
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         return user.getNeedChangePassword();
     }
 
     public static boolean needEnterSmsCode(String userName) throws Exception {
         if (RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.enabled", "true").equals("false")) return false;
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         if (StringUtils.isEmpty(user.getPhone()) || user.getPhone().equals("''")) {
             return false; //если не указан номер телефона, то и смс отправить некуда.
         }
@@ -666,7 +666,7 @@ public class User {
     }
 
     public static boolean requestSmsCode(String userName) throws Exception {
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         if (user == null) {
             logger.error(String.format("Cannot find user %s", userName));
             throw new Exception(String.format("Cannot find user %s", userName));
@@ -694,7 +694,7 @@ public class User {
     //todo Временная заглушка. В продакшене должен использоваться метод серверного обращения к сервису смс ниже - sendServiceSMSRequest
     public static String getStubSMS(String userName) {
         try {
-            User user = DAOService.getInstance().findUserByUserName(userName);
+            User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
             if (user == null) {
                 return "#";
             }

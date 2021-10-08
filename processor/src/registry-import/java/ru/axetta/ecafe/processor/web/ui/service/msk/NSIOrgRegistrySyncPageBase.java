@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.FrontController.FrontControllerException;
@@ -818,7 +818,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
 
         public String getMigrateFromOrgName() {
             return operation == ImportRegisterMSKClientsService.MOVE_OPERATION ?
-                        DAOService.getInstance().findOrById(getIdOfMigrateOrgFrom()).getOfficialName() : "";
+                    DAOReadonlyService.getInstance().findOrById(getIdOfMigrateOrgFrom()).getOfficialName() : "";
         }
 
         public boolean isApplied() {

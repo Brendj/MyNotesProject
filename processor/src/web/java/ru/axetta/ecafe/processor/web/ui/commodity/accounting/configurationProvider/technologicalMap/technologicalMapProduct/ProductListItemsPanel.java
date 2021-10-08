@@ -5,6 +5,7 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -46,6 +47,8 @@ public class ProductListItemsPanel extends BasicPage {
     private DAOService daoService;
     @Autowired
     private ContextDAOServices contextDAOServices;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
 
     public void pushCompleteHandlerList(ProductListSelect handlerList) {
         completeHandlerLists.add(handlerList);
@@ -115,7 +118,7 @@ public class ProductListItemsPanel extends BasicPage {
         //return entityManager.createQuery(query, Product.class).getResultList();
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        return daoService.findProductByConfigurationProvider(orgOwners, filter);
+        return daoReadonlyService.findProductByConfigurationProvider(orgOwners, filter);
     }
 
     public TechnologicalMap getTechnologicalMap() {

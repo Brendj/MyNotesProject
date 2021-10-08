@@ -69,7 +69,7 @@ public class OrderDetail {
     private Long idOfMenuFromSync;
     private String manufacturer;
     private boolean sendToExternal;
-    private OrderDetailFRationType fRation;
+    private Integer fRation;
     //private Long idOfComplex;
     private Long idOfDish;
     private WtComplex wtComplex;
@@ -145,7 +145,7 @@ public class OrderDetail {
     public OrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail, long idOfOrder, long qty, long discount,
             long socDiscount, long rPrice, String menuDetailName, String rootMenu, String menuGroup, int menuOrigin,
             String menuOutput, int menuType, Long idOfMenuFromSync, String manufacturer, boolean sendToExternal,
-            String itemCode, Long idOfRule, OrderDetailFRationType fRation) {
+            String itemCode, Long idOfRule, Integer fRation) {
         this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
         this.idOfOrder = idOfOrder;
         this.qty = qty;
@@ -167,7 +167,7 @@ public class OrderDetail {
     }
 
     public boolean isFRationSpecified() {
-        return fRation != null && !fRation.equals(OrderDetailFRationType.NOT_SPECIFIED);
+        return fRation != null && OrderDetailFRationTypeWTdiet.getValues().get(fRation) == null;
     }
 
     public CompositeIdOfOrderDetail getCompositeIdOfOrderDetail() {
@@ -375,11 +375,11 @@ public class OrderDetail {
         return menuType>=TYPE_COMPLEX_ITEM_MIN && menuType<=TYPE_COMPLEX_ITEM_MAX;
     }
 
-    public OrderDetailFRationType getfRation() {
+    public Integer getfRation() {
         return fRation;
     }
 
-    public void setfRation(OrderDetailFRationType fRation) {
+    public void setfRation(Integer fRation) {
         this.fRation = fRation;
     }
 }

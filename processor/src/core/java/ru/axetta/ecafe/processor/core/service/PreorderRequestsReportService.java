@@ -673,7 +673,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         Good good = null;
         Org org = DAOUtils.getOrgById(session, preorderItem.getIdOfOrg());
         if (!org.getUseWebArm()) {
-            good = DAOService.getInstance().getGood(preorderItem.getIdOfGood());
+            good = DAOReadonlyService.getInstance().getGood(preorderItem.getIdOfGood());
             if (null == good) {
                 logger.info(String.format("Not found good for preorder id = %s", preorderItem.getIdOfPreorderComplex()));
                 return null;

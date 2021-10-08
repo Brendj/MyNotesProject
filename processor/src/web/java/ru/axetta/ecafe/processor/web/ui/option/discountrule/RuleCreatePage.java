@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -74,7 +75,7 @@ public class RuleCreatePage extends BasicWorkspacePage
     private DAOService daoService;
 
     public List<SelectItem> getAvailableComplexs() {
-        final List<ComplexRole> complexRoles = daoService.findComplexRoles();
+        final List<ComplexRole> complexRoles = DAOReadonlyService.getInstance().findComplexRoles();
         final int size = complexRoles.size();
         List<SelectItem> list = new ArrayList<SelectItem>(size);
         for (int i=0;i<size;i++) {
@@ -310,15 +311,15 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setOperationOr(operationOr);
         discountRule.setDeletedState(false);
         discountRule.setCategoryDiscounts(categoryDiscounts);
-        discountRule.setCodeMSP(DAOService.getInstance().findCodeNSPByCode(codeMSP));
+        discountRule.setCodeMSP(DAOReadonlyService.getInstance().findCodeNSPByCode(codeMSP));
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (!this.idOfCategoryList.isEmpty()) {
-            List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);
+            List<CategoryDiscount> categoryList = DAOReadonlyService.getInstance().getCategoryDiscountListWithIds(this.idOfCategoryList);
             categoryDiscountSet.addAll(categoryList);
             discountRule.setCategoriesDiscounts(categoryDiscountSet);
         }
         if (!this.idOfCategoryOrgList.isEmpty()) {
-            List<CategoryOrg> categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
+            List<CategoryOrg> categoryOrgList = DAOReadonlyService.getInstance().getCategoryOrgWithIds(this.idOfCategoryOrgList);
             discountRule.getCategoryOrgs().addAll(categoryOrgList);
         }
         daoService.persistEntity(discountRule);

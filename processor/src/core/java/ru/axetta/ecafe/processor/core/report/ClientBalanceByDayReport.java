@@ -10,8 +10,11 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -20,9 +23,8 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
-import org.hibernate.sql.JoinType;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,7 +286,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
             String clientWhere = "";
 
-            List infos = DAOService.getInstance().getClientBalanceInfos(orgs_str, groupWhere, endTime, new Date(System.currentTimeMillis()), clientWhere);
+            List infos = DAOReadonlyService.getInstance().getClientBalanceInfos(orgs_str, groupWhere, endTime, new Date(System.currentTimeMillis()), clientWhere);
             for (Object obj : infos) {
                 Object[] row = (Object[]) obj;
                 ClientBalanceInfo clientItem = new ClientBalanceInfo();

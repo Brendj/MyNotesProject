@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Pr
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
@@ -21,9 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,7 +65,7 @@ public class TechnologicalMapViewPage extends BasicWorkspacePage{
         currentTechnologicalMap = selectedTechnologicalMapGroupPage.getCurrentTechnologicalMap();
         currentTechnologicalMap = daoService.saveEntity(currentTechnologicalMap);
         if(currentTechnologicalMap.getIdOfConfigurationProvider() !=null){
-            currentConfigurationProvider = daoService.getConfigurationProvider(currentTechnologicalMap.getIdOfConfigurationProvider());
+            currentConfigurationProvider = DAOReadonlyService.getInstance().getConfigurationProvider(currentTechnologicalMap.getIdOfConfigurationProvider());
         }
         currentTechnologicalMapGroup = daoService.findTechnologicalMapGroupByTechnologicalMap(currentTechnologicalMap);
         reload();
@@ -75,7 +73,7 @@ public class TechnologicalMapViewPage extends BasicWorkspacePage{
 
     public void reload() throws Exception {
         List<TechnologicalMapProduct> technologicalMapProducts =
-                daoService.findTechnologicalMapProductByTechnologicalMap(currentTechnologicalMap.getGlobalId());
+                DAOReadonlyService.getInstance().findTechnologicalMapProductByTechnologicalMap(currentTechnologicalMap.getGlobalId());
         for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
             pr.add(technologicalMapProduct.getProduct());
         }

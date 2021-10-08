@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Pr
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -30,7 +31,6 @@ import javax.persistence.TypedQuery;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -169,7 +169,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
             tm.setOrgOwner(orgOwner);
             tm.setTechnologicalMapGroup(currentTechnologicalMapGroup);
 
-            List<TechnologicalMapProduct> technologicalMapProductList = daoService.getTechnologicalMapProducts(tm);
+            List<TechnologicalMapProduct> technologicalMapProductList = DAOReadonlyService.getInstance().getTechnologicalMapProducts(tm);
             for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProductList){
                 daoService.deleteEntity(technologicalMapProduct);
             }

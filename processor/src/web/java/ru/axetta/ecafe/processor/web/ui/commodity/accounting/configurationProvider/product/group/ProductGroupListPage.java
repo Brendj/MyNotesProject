@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
     private Boolean deletedStatusSelected = Boolean.FALSE;
     private ConfigurationProvider selectedConfigurationProvider;
     @Autowired
-    private DAOService daoService;
+    private DAOReadonlyService daoService;
     @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired

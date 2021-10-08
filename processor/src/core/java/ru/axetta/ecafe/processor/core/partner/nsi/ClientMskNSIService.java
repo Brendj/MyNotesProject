@@ -12,7 +12,7 @@ import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -85,7 +85,7 @@ public class ClientMskNSIService extends MskNSIService {
             if (!guidOK) {
                 service.setOrgSyncErrorCode(guid, OrgSync.ERROR_STATE_BAD_GUID_CODE);
                 String badGuidString = "";
-                List<Org> orgs = DAOService.getInstance().findOrgsByGuidAddressINNOrNumber(guid, "", "", "");
+                List<Org> orgs = DAOReadonlyService.getInstance().findOrgsByGuidAddressINNOrNumber(guid, "", "", "");
                 for (Org o : orgs) {
                     badGuidString += String.format("Guid: %s, Ид. организации: %s, Название организации: %s;\n", guid, o.getIdOfOrg(), o.getShortNameInfoService());
                 }

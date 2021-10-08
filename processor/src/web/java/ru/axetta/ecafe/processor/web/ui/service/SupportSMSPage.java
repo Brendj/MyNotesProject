@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -51,7 +51,7 @@ public class SupportSMSPage extends BasicWorkspacePage {
                 return;
             }
             long contractId = NumberUtils.toLong(address);
-            Client client = DAOService.getInstance().getClientByContractId(contractId);
+            Client client = DAOReadonlyService.getInstance().getClientByContractId(contractId);
             if(client == null) {
                 printError("Клиент с номером лицевого счета " + contractId + " не найден");
                 return;

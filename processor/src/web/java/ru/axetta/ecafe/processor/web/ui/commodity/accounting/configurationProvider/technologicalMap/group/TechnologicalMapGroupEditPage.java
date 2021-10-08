@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
@@ -55,8 +56,8 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage implements
         selectedTechnologicalMapGroupGroupPage.onShow();
         currentTechnologicalMapGroup = selectedTechnologicalMapGroupGroupPage.getCurrentTechnologicalMapGroup();
         currentTechnologicalMapGroup = entityManager.merge(currentTechnologicalMapGroup);
-        org = daoService.findOrById(currentTechnologicalMapGroup.getOrgOwner());
-        currentConfigurationProvider = daoService.getConfigurationProvider(currentTechnologicalMapGroup.getIdOfConfigurationProvider());
+        org = DAOReadonlyService.getInstance().findOrById(currentTechnologicalMapGroup.getOrgOwner());
+        currentConfigurationProvider = DAOReadonlyService.getInstance().getConfigurationProvider(currentTechnologicalMapGroup.getIdOfConfigurationProvider());
     }
 
     public Object onSave(){
@@ -125,7 +126,7 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage implements
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
-            org = daoService.findOrById(idOfOrg);
+            org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
         }
     }
 

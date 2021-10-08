@@ -8,16 +8,13 @@ package ru.axetta.ecafe.processor.web.ui.feed;
 //import generated.payments.processing.POSPaymentControllerWSService;
 //import generated.payments.processing.PosPayment;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import generated.pos.*;
 
-import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
-//import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
-import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -27,9 +24,6 @@ import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
 
-//import org.apache.cxf.frontend.ClientProxy;
-//import org.apache.cxf.transport.http.HTTPConduit;
-//import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -486,8 +480,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             client.getIdofrule();
 
 
-            ru.axetta.ecafe.processor.core.persistence.Client dbClient = DAOService.getInstance().findClientById(client.getIdofclient());
-            long fullPrice = DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex());
+            ru.axetta.ecafe.processor.core.persistence.Client dbClient = DAOReadonlyService.getInstance().findClientById(client.getIdofclient());
+            long fullPrice = DAOReadonlyService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex());
             long discountPrice = 0L;
             long rsumPrice = 0L;
             if(client.getDiscountRate() != 100) {

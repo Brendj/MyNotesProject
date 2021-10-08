@@ -5,8 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.complex.roles;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
@@ -30,7 +29,7 @@ public class ComplexRoleProcessor extends AbstractProcessor<ComplexRoles> {
     @Override
     public ComplexRoles process() throws Exception {
         List<ComplexRoleItem> complexRoleItemList = new ArrayList<ComplexRoleItem>();
-        List<ComplexRole> complexRoleList = DAOService.getInstance().findComplexRoles();
+        List<ComplexRole> complexRoleList = DAOReadonlyService.getInstance().findComplexRoles();
         for (ComplexRole complexRole: complexRoleList){
             complexRoleItemList.add(new ComplexRoleItem(complexRole));
         }

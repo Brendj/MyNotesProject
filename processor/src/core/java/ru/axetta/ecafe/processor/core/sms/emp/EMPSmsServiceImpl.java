@@ -8,8 +8,8 @@ import generated.emp_events.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.BenefitService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
@@ -171,7 +171,7 @@ public class EMPSmsServiceImpl extends ISmsService {
     public void updateStats(int type, int inc) {
         String instance = RuntimeContext.getInstance().getNodeName();
         if (stats == null) {
-            stats = DAOService.getInstance().getAllPreviousStatsForExternalSystem("emp_event", instance);
+            stats = DAOReadonlyService.getInstance().getAllPreviousStatsForExternalSystem("emp_event", instance);
         }
 
         stats.setValue(type, stats.getValue(type) + inc);

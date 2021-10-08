@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Ban
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPaymentStatus;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
@@ -235,7 +235,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             logRequest(handler);
             Long idOfClient = null;
             if (contractId != null) {
-                idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+                idOfClient = DAOReadonlyService.getInstance().getClientByContractId(contractId).getIdOfClient();
             } else if (bs.getClient() != null) {
                 idOfClient = bs.getClient().getIdOfClient();
             }
@@ -284,7 +284,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
 
     private boolean checkSubscriptionContractId(BankSubscription bs, Long contractId, RequestResult requestResult) {
         if (contractId != null) {
-            Client c = DAOService.getInstance().getClientByContractId(contractId);
+            Client c = DAOReadonlyService.getInstance().getClientByContractId(contractId);
             if (c == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, "contractId", contractId));

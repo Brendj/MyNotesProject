@@ -11,7 +11,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
@@ -190,7 +190,8 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
 
     public void showOrgListSelectPage(){
         if(contragent != null){
-            MainPage.getSessionInstance().setIdOfContragentList(Arrays.asList(contragent.getIdOfContragent()));
+            MainPage.getSessionInstance().setIdOfContragentList(
+                    Collections.singletonList(contragent.getIdOfContragent()));
         }
         MainPage.getSessionInstance().showOrgListSelectPage();
     }
@@ -205,7 +206,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     }
 
     public SelectItem[] getTypesOfComplexFood() {
-        List<WtComplexGroupItem> wtGroupComplex = DAOService.getInstance().getTypeComplexFood();
+        List<WtComplexGroupItem> wtGroupComplex = DAOReadonlyService.getInstance().getTypeComplexFood();
         SelectItem[] items = new SelectItem[wtGroupComplex.size() + 1];
         items[0] = new SelectItem(-1, "Не выбрано");
         int n = 1;
@@ -218,7 +219,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
 
 
     public SelectItem[] getTypesOfDiet() {
-        List<WtDietType> dietGroupItems = DAOService.getInstance().getMapDiet();
+        List<WtDietType> dietGroupItems = DAOReadonlyService.getInstance().getMapDiet();
         SelectItem[] items = new SelectItem[dietGroupItems.size() + 1];
         items[0] = new SelectItem(-1, "Не выбрано");
         int n = 1;
@@ -230,7 +231,7 @@ public class ComplexMenuReportPage  extends OnlineReportPage implements OrgListS
     }
 
     public SelectItem[] getAgeGroup() {
-        List<WtAgeGroupItem> ageGroups = DAOService.getInstance().getAgeGroups();
+        List<WtAgeGroupItem> ageGroups = DAOReadonlyService.getInstance().getAgeGroups();
         SelectItem[] items = new SelectItem[ageGroups.size() + 1];
         items[0] = new SelectItem(-1, "Не выбрано");
         int n = 1;
