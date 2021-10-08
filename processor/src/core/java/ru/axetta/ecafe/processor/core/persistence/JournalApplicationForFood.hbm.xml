@@ -22,7 +22,7 @@
         </property>
         <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofuser"
                      update="false"/>
-        <property name="createddate" column="createddate" type="date"/>
+        <property name="createddate" column="createddate" type="timestamp"/>
     </class>
 </hibernate-mapping>
 
