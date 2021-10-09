@@ -63,7 +63,7 @@ public class AuthorityUtils {
         return null;
     }
 
-    private boolean anyRolePresent(Collection<GrantedAuthority> authorities, Collection<String> roles) {
+    private boolean anyRolePresent(Collection<? extends GrantedAuthority> authorities, Collection<String> roles) {
         if (authorities == null) return false;
         for (GrantedAuthority grantedAuthority : authorities) {
             for (String role : roles) {

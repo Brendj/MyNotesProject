@@ -23,6 +23,7 @@ import java.util.Date;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/applicationForFood")
 @Controller
+@ApplicationPath("/school/api/v1")
 public class ApplicationForFoodRestController extends BaseSchoolApiController{
 
     @PUT

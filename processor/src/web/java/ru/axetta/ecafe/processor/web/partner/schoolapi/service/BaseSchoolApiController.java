@@ -8,7 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.util.AuthorityUtils;
 
-public class BaseSchoolApiController {
+import javax.ws.rs.core.Application;
+
+public class BaseSchoolApiController extends Application {
     protected User getUser() {
         AuthorityUtils authorityUtils = RuntimeContext.getAppContext().getBean(AuthorityUtils.class);
         return authorityUtils.findCurrentUser();

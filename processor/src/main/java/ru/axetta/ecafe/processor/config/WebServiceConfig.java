@@ -12,7 +12,7 @@ import org.springframework.context.annotation.ImportResource;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.dashboard.DashboardServiceWS;
 import ru.axetta.ecafe.processor.web.internal.CardSignature;
-import ru.axetta.ecafe.processor.web.internal.EMIASController;
+import ru.axetta.ecafe.processor.web.partner.emias.EMIASController;
 import ru.axetta.ecafe.processor.web.internal.FrontController;
 import ru.axetta.ecafe.processor.web.internal.report.ReportControllerWS;
 import ru.axetta.ecafe.processor.web.partner.acquiropay.soap.RegularPaymentWS;

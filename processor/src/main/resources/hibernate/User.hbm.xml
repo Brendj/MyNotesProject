@@ -43,7 +43,7 @@
         <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="idofperson" fetch="select" lazy="false"/>
         <property name="idOfGroup" column="IdOfGroup" type="long" />
         <property name="isGroup" column="isGroup" type="boolean" not-null="true"/>
-        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg" fetch="select" lazy="false"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg" fetch="select" lazy="proxy"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient" fetch="select"/>
 
         <set name="contragents" table="CF_UserContragents">

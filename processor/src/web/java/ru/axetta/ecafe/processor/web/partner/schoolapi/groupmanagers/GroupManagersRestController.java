@@ -22,6 +22,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/groupmanagers")
 @Controller
+@ApplicationPath("/school/api/v1")
 public class GroupManagersRestController extends BaseSchoolApiController {
 
     @POST

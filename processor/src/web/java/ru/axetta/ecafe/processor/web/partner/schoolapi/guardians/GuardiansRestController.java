@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/guardians")
 @Controller
+@ApplicationPath("/school/api/v1")
 public class GuardiansRestController extends BaseSchoolApiController {
 
     @DELETE

@@ -20,6 +20,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/payments")
 @Controller
+@ApplicationPath("/school/api/v1")
 public class PaymentRestConroller extends BaseSchoolApiController {
 
     @POST

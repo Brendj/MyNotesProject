@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/clients")
 @Controller
+@ApplicationPath("/school/api/v1")
 public class ClientsRestController extends BaseSchoolApiController {
 
     @PUT

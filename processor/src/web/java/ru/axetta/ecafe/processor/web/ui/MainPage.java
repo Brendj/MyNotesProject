@@ -9709,8 +9709,8 @@ public class MainPage implements Serializable {
 
     public String getSourceWebAddress() throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
-        return request.getRemoteAddr();
+        //HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        return ""; //request.getRemoteAddr();
     }
 
     public static MainPage getSessionInstance() {

@@ -20,13 +20,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 
 @Path(value = "")
 @Controller
-public class EmiasInternal {
+@ApplicationPath("/emias_internal/")
+public class EmiasInternal extends Application {
     private Logger logger = LoggerFactory.getLogger(EmiasInternal.class);
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

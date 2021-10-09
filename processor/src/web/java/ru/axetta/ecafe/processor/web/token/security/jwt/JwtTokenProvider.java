@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -27,7 +28,6 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -184,7 +184,7 @@ public class JwtTokenProvider {
                 else if (item instanceof Map){
                     for (Object o : ((Map) item).values()) {
                         if (o instanceof String) {
-                            grantedAuthorities.add(new GrantedAuthorityImpl((String) o));
+                            grantedAuthorities.add(new SimpleGrantedAuthority((String) o));
                         }
                     }
                 }
