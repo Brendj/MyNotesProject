@@ -232,6 +232,8 @@ public class User {
         public Integer getIdentification() {
             return identification;
         }
+
+        public String getDescription() { return description; }
     }
 
     public enum DefaultRole{

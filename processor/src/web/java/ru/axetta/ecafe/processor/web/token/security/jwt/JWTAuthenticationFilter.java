@@ -86,15 +86,13 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     @Override
     protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
         String uri = request.getRequestURI();
-        if ("".equals(request.getContextPath()) ? uri.startsWith(getFilterProcessesUrl() + "authorization")
-                : uri.startsWith(request.getContextPath() + getFilterProcessesUrl() + "authorization")) {
+        if (uri.startsWith("/processor/school/api/v1/authorization")) {
             return false;
         }
         if (uri.contains("payments/")){
             return false;
         }
-        return "".equals(request.getContextPath()) ? uri.startsWith(getFilterProcessesUrl())
-                : uri.startsWith(request.getContextPath() + getFilterProcessesUrl());
+        return uri.startsWith("/processor/school/api/v1");
     }
 
     @Override

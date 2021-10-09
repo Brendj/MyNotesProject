@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.schoolapi.RequestDTO;
 
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.Result;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JwtLoginDTO extends Result {
 
