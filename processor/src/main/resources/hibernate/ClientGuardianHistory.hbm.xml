@@ -9,7 +9,11 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory" table="cf_client_guardian_history">
         <id name="guardHistory" column="ifofclientguardianhistory" type="long">
-            <generator class="identity"/>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_guardian_history_id</param>
+            </generator>
         </id>
         <many-to-one name="clientGuardian" class="ru.axetta.ecafe.processor.core.persistence.ClientGuardian"
                      column="idofclientguardian" update="false" />
