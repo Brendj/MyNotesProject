@@ -82,6 +82,7 @@ create table cf_wa_journal_requests
     operationType integer not null default 0,
     idofuser bigint,
     createddate timestamp without time zone not null,
+    idofdish bigint,
     CONSTRAINT cf_wa_journal_requests_idofuser_fk FOREIGN KEY (idofuser)
         REFERENCES cf_users (idofuser) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION,
