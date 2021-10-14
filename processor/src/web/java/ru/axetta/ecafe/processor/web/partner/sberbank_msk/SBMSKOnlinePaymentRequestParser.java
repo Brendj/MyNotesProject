@@ -5,10 +5,13 @@
 package ru.axetta.ecafe.processor.web.partner.sberbank_msk;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
+
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +29,7 @@ import java.util.Locale;
 public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
     public static final String ACTION_CHECK = "check";
     public static final String ACTION_PAYMENT = "payment";
+    public static final String ACTION_SUMMARY = "summary";
     private String date;
     private String action;
 
@@ -52,6 +56,8 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         }
         else if(action.equals(ACTION_PAYMENT)){
             return parseForPayment(defaultContragentId, parseResult);
+        } else if (action.equals(ACTION_SUMMARY)) {
+            return parseForSummary(defaultContragentId, parseResult);
         }
         return null;
     }
@@ -178,5 +184,20 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             throw new InvalidDateException("Invalid value in PAY_DATE: " + date);
         }
         return payRequest;
+    }
+
+    private OnlinePaymentProcessor.PayRequest parseForSummary(long defaultContragentId, ParseResult parseResult) throws Exception {
+        String mobile = parseResult.getParam("MOBILE");
+        mobile = Client.checkAndConvertMobile(mobile);
+        if (StringUtils.isEmpty(mobile)) {
+            throw new InvalidMobileException("Invalid mobile number");
+        }
+        int paymentMethod = ClientPayment.ATM_PAYMENT_METHOD;
+        Long contractId = 0L;
+        Long sum = 0L;
+        String receipt = "CHECK_ONLY";
+        String source = action;
+        return new SBMSKSummaryRequest(OnlinePaymentProcessor.PayRequest.V_0,
+                defaultContragentId, null, paymentMethod, contractId, receipt, source, sum, false, mobile);
     }
 }
