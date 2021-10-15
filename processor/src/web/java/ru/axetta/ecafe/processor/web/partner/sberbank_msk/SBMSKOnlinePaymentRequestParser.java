@@ -86,11 +86,20 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
                 BigDecimal balance = new BigDecimal(response.getBalance() / 100.0); //  rounding error if use double
                 stringBuilder.append(String.format(Locale.US, "<BALANCE>%.2f</BALANCE>", balance));
             }
-        }
-        if (action.equals(ACTION_PAYMENT) && response.getIdOfClientPayment() != null) {
+        } else if (action.equals(ACTION_PAYMENT) && response.getIdOfClientPayment() != null) {
             stringBuilder.append(String.format("<EXT_ID>%s</EXT_ID>", response.getIdOfClientPayment()));
+        } else if (action.equals(ACTION_SUMMARY)){
+            SBMSKSummaryResponse summaryResponse = (SBMSKSummaryResponse) response;
+            for(SBMSKClientSummaryBase c : summaryResponse.getClientList()){
+                stringBuilder.append("<clientSummary>");
+                stringBuilder.append(String.format("<CONTRACTID>%d</CONTRACTID>", c.getContractId()));
+                stringBuilder.append(String.format("<BALANCE>%s</BALANCE>", c.getBalance()));
+                stringBuilder.append(String.format("<FIO>%s</FIO>", c.getFio()));
+                stringBuilder.append(String.format("<NAZN>%s</NAZN>", c.getNazn()));
+                stringBuilder.append(String.format("<INN>%s</INN>", c.getInn()));
+                stringBuilder.append("</clientSummary>");
+            }
         }
-
         stringBuilder.append("</response>");
         printToStream(stringBuilder.toString(), httpResponse);
     }

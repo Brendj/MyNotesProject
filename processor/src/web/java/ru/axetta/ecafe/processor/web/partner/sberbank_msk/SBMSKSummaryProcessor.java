@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +32,7 @@ public class SBMSKSummaryProcessor {
         Session session = null;
         Transaction transaction = null;
         try {
-            List<SBMSKClientSummaryBase> clientSummaries = new ArrayList<>();
+            List<SBMSKClientSummaryBase> clientSummaries = new LinkedList<>();
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             transaction = session.beginTransaction();
             ClientsWithResultCode cd = RuntimeContext.getAppContext().getBean(CommonMethodUtil.class)

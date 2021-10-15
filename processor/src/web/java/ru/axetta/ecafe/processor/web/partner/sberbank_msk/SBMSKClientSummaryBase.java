@@ -6,19 +6,15 @@ package ru.axetta.ecafe.processor.web.partner.sberbank_msk;
 
 public class SBMSKClientSummaryBase {
     private Long contractId;
-    private Long balance;
-    private String firstName;
-    private String lastName;
-    private String middleName;
+    private String balance;
+    private String fio;
     private String nazn;
     private String inn;
 
     public SBMSKClientSummaryBase(Long contractId, Long balance, String firstName, String lastName, String middleName) {
         this.contractId = contractId;
-        this.balance = balance;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.middleName = middleName;
+        this.balance = String.format("%d.%02d",balance / 100, balance % 100);
+        this.fio = firstName + " " + middleName + " " + lastName.charAt(0) + ".";
     }
 
     public Long getContractId() {
@@ -29,36 +25,20 @@ public class SBMSKClientSummaryBase {
         this.contractId = contractId;
     }
 
-    public Long getBalance() {
+    public String getBalance() {
         return balance;
     }
 
-    public void setBalance(Long balance) {
+    public void setBalance(String balance) {
         this.balance = balance;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFio() {
+        return fio;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
+    public void setFio(String fio) {
+        this.fio = fio;
     }
 
     public String getNazn() {
