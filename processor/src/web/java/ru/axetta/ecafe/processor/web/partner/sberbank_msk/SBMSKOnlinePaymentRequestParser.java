@@ -196,7 +196,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
     }
 
     private OnlinePaymentProcessor.PayRequest parseForSummary(long defaultContragentId, ParseResult parseResult) throws Exception {
-        String mobile = parseResult.getParam("MOBILE");
+        String mobile = parseResult.getParam("ACCOUNT");
         mobile = Client.checkAndConvertMobile(mobile);
         if (StringUtils.isEmpty(mobile)) {
             throw new InvalidMobileException("Invalid mobile number");
