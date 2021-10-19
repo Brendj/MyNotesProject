@@ -25,15 +25,15 @@ import java.util.Map;
 public class CommonMethodUtil {
     private Logger logger = LoggerFactory.getLogger(CommonMethodUtil.class);
 
-    public ClientsWithResultCode getClientsByGuardMobile(String mobile, Session session, Long RC_OK, Long RC_CLIENT_NOT_FOUND,
-            Long RC_INTERNAL_ERROR) {
+    public ClientsWithResultCode getClientsByGuardMobile(String mobile, Session session, Integer RC_OK, Integer RC_CLIENT_NOT_FOUND,
+            Integer RC_INTERNAL_ERROR) {
 
         ClientsWithResultCode data = new ClientsWithResultCode();
         try {
             Map<Client, ClientWithAddInfo> clients = extractClientsFromGuardByGuardMobile(
                     Client.checkAndConvertMobile(mobile), session);
             if (clients.isEmpty()) {
-                data.resultCode = RC_CLIENT_NOT_FOUND;
+                data.resultCode = RC_CLIENT_NOT_FOUND.longValue();
                 data.description = "Клиент не найден";
             } else {
                 boolean onlyNotActiveCG = true;
@@ -44,17 +44,17 @@ public class CommonMethodUtil {
                     }
                 }
                 if (onlyNotActiveCG) {
-                    data.resultCode = RC_CLIENT_NOT_FOUND;
+                    data.resultCode = RC_CLIENT_NOT_FOUND.longValue();
                     data.description = "Связка не активна";
                 } else {
                     data.setClients(clients);
-                    data.resultCode = RC_OK;
+                    data.resultCode = RC_OK.longValue();
                     data.description = "OK";
                 }
             }
         } catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
-            data.resultCode = RC_INTERNAL_ERROR;
+            data.resultCode = RC_INTERNAL_ERROR.longValue();
             data.description = e.toString();
         }
         return data;

@@ -23,7 +23,7 @@ public enum SBMSKPaymentsCodes {
     TOO_SMALL_AMOUNT_ERROR(10, "Сумма слишком мала"),
     TOO_LARGE_AMOUNT_ERROR(11,	"Сумма слишком велика"),
     INVALID_DATE_VALUE_ERROR(12, "Неверное значение даты"),
-    INVALID_MOBILE_ERROR(13, "Неверное номера телефона"),
+    INVALID_MOBILE_ERROR(13, "Неверный номер телефона"),
     INTERNAL_ERROR(300, "Внутренняя ошибка Организации");
 
     private Integer code;

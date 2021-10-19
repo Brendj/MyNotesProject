@@ -24,9 +24,6 @@ import java.util.Map;
 @Component
 public class SBMSKSummaryProcessor {
     private Logger logger = LoggerFactory.getLogger(SBMSKSummaryProcessor.class);
-    private static final Long RC_OK = 0L;
-    private static final Long RC_INTERNAL_ERROR = 100L;
-    private static final Long RC_CLIENT_NOT_FOUND = 110L;
 
     public SBMSKClientSummaryBaseListResult processByGuardMobile(String guardMobile) {
         Session session = null;
@@ -36,7 +33,8 @@ public class SBMSKSummaryProcessor {
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             transaction = session.beginTransaction();
             ClientsWithResultCode cd = RuntimeContext.getAppContext().getBean(CommonMethodUtil.class)
-                    .getClientsByGuardMobile(guardMobile, session, RC_OK, RC_CLIENT_NOT_FOUND, RC_INTERNAL_ERROR);
+                    .getClientsByGuardMobile(guardMobile, session, SBMSKPaymentsCodes.OK.getCode(),
+                            SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode(), SBMSKPaymentsCodes.INTERNAL_ERROR.getCode());
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
