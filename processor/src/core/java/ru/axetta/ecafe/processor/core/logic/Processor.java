@@ -4349,6 +4349,7 @@ public class Processor implements SyncProcessor {
             AbstractProcessor processor = new ExemptionVisitingClientProcessor(persistenceSession, exemptionVisitingClientRequest,
                     idOfOrg);
             exemptionVisitingClient = (ExemptionVisitingClient) processor.process();
+            persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
