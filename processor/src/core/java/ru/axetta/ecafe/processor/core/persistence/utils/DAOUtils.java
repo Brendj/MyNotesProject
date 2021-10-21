@@ -5684,6 +5684,13 @@ public class DAOUtils {
         }
     }
 
+    public static Person getOrgOfficialPerson(Session session, long idOfPerson) {
+        Query query = session
+                .createQuery("SELECT p FROM Person p where p.idOfPerson = :idOfPerson");
+        query.setParameter("idOfPerson", idOfPerson);
+        return (Person) query.uniqueResult();
+    }
+
     public static Contragent findDefaultSupplier(Session session, Long idOfOrg) {
         Query query = session
                 .createQuery("SELECT defaultSupplier FROM Org org where org.idOfOrg = :idOfOrg");

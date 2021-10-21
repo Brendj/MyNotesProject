@@ -75,11 +75,10 @@ public class OrganizationStructure implements AbstractToElement {
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
-            //session.refresh(org);
-            session.refresh(org.getOfficialPerson());
+            Person officialPerson = DAOUtils.getOrgOfficialPerson(session, org.getOfficialPerson().getIdOfPerson());
             OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(),
                     org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
-                    org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
+                    officialPerson.getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
                     org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(),
                     org.getShortAddress(), org.getOrgStructureVersion(), org.multiCardModeIsEnabled(),

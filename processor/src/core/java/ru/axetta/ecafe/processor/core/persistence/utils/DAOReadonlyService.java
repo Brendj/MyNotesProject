@@ -2668,10 +2668,10 @@ public class DAOReadonlyService {
     }
 
     public Person getPersonByClient(Client client) {
-        Client cl = (Client) entityManager.merge(client);
-        Person p = cl.getPerson();
-        p.getFirstName();
-        return p;
+        Query query = entityManager.createQuery("select c.person from Client c where c = :client");
+        query.setParameter("client", client);
+        List<Person> list = query.getResultList();
+        return list.get(0);
     }
 
     public long getNotBindedEMPClientsCount() {
