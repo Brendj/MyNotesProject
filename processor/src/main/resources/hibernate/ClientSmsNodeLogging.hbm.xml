@@ -8,7 +8,11 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientSmsNodeLogging" table="cf_clientsms_node_logging">
         <id name="id" column="id" type="long">
-            <generator class="identity"/>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_clientsms_node_id</param>
+            </generator>
         </id>
         <property name="idOfSms" column="idOfSms" type="string"/>
         <property name="params" column="params" type="string"/>
