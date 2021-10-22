@@ -1,6 +1,8 @@
 
 package generated.ru.mos.rnip.xsd.payment._2_4;
 
+import generated.ru.mos.rnip.xsd.charge._2_4.Payer;
+
 import javax.xml.bind.annotation.XmlRegistry;
 
 
@@ -38,19 +40,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PaymentType.Payer }
+     * Create an instance of {@link Payer }
      * 
      */
-    public PaymentType.Payer createPaymentTypePayer() {
-        return new PaymentType.Payer();
+    public Payer createPaymentTypePayer() {
+        return new Payer();
     }
 
     /**
-     * Create an instance of {@link PaymentType.PartialPayt }
+     * Create an instance of {@link generated.ru.mos.rnip.xsd.payment._2_1.PaymentType.PartialPayt }
      * 
      */
-    public PaymentType.PartialPayt createPaymentTypePartialPayt() {
-        return new PaymentType.PartialPayt();
+    public generated.ru.mos.rnip.xsd.payment._2_1.PaymentType.PartialPayt createPaymentTypePartialPayt() {
+        return new generated.ru.mos.rnip.xsd.payment._2_1.PaymentType.PartialPayt();
     }
 
 }
