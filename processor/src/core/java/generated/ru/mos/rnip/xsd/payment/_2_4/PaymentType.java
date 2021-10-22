@@ -31,7 +31,7 @@ import java.util.List;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="PaymentOrg" type="{http://rnip.mos.ru/xsd/Organization/2.4.0}PaymentOrgType"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Payment/2.4.0}Payer1" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Payment/2.4.0}Payer" minOccurs="0"/>
  *         &lt;element ref="{http://rnip.mos.ru/xsd/Organization/2.4.0}Payee"/>
  *         &lt;element name="BudgetIndex" type="{http://rnip.mos.ru/xsd/Common/2.4.0}BudgetIndexType" minOccurs="0"/>
  *         &lt;element name="AccDoc" type="{http://rnip.mos.ru/xsd/Common/2.4.0}AccDocType" minOccurs="0"/>
