@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
         generated.ru.mos.rnip.xsd.services.export_quittances._2_1.ObjectFactory.class,
         generated.ru.gov.smev.artefacts.x.services.message_exchange.types.faults._1.ObjectFactory.class,
         generated.ru.mos.rnip.xsd.payment._2_4.ObjectFactory.class,
-        generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory.class,
+        generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory.class,
         generated.ru.mos.rnip.xsd.refund._2_1.ObjectFactory.class,
         generated.ru.mos.rnip.xsd.quittance._2_4.ObjectFactory.class,
         generated.ru.mos.rnip.xsd.charge._2_4.ObjectFactory.class,

@@ -77,7 +77,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
 
     @Override
     public String getRNIPUrl() {
-        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V22);
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V24);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         exportPaymentsRequest.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(new Date()));
         exportPaymentsRequest.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
 
-        generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory commonObjectFactory = new generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory();
+        generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory commonObjectFactory = new generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory();
         PagingType pagingObject = commonObjectFactory.createPagingType();
         pagingObject.setPageLength(BigInteger.valueOf(PAGING_VALUE));
         pagingObject.setPageNumber(BigInteger.valueOf(paging));
@@ -347,7 +347,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         payee.setOktmo(getMacroPart(contragent, "OKTMO"));
         payee.setName(getMacroPart(contragent, "CONTRAGENT_NAME"));
 
-        generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory orgAccountObjectFactory = new generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory();
+        generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory orgAccountObjectFactory = new generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory();
         OrgAccount orgAccount = orgAccountObjectFactory.createOrgAccount();
         orgAccount.setAccountNumber(getMacroPart(contragent, "FINANCE_ACCOUNT"));
         BankType bankType = orgAccountObjectFactory.createBankType();
@@ -359,7 +359,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         serviceType.setPayee(payee);
         serviceType.setPaymentKind(BigInteger.valueOf(1L));
 
-        generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory moneyObjectFactory = new generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory();
+        generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory moneyObjectFactory = new generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory();
         Money minMoney = moneyObjectFactory.createMoney();
         minMoney.setCurrency(CurrencyCodeType.RUR);
         minMoney.setExponent(BigInteger.valueOf(2L));
