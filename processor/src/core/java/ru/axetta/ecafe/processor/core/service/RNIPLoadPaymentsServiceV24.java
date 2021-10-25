@@ -94,6 +94,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         exportPaymentsRequest.setId(String.format("N_%s", UUID.randomUUID().toString()));
         exportPaymentsRequest.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(new Date()));
         exportPaymentsRequest.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
+        exportPaymentsRequest.setSenderRole("1");
 
         generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory commonObjectFactory = new generated.ru.mos.rnip.xsd.common._2_4.ObjectFactory();
         PagingType pagingObject = commonObjectFactory.createPagingType();
@@ -143,7 +144,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
             response = port24.sendRequest(sendRequestRequest);
             hasError.set(null);
         } catch (Exception e) {
-            logger.error("Error in request to rnip 2.1", e);
+            logger.error("Error in request to rnip 2.4", e);
             hasError.set(e.getMessage());
         }
         return response;
