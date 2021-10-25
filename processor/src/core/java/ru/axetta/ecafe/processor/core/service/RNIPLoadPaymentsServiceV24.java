@@ -426,10 +426,10 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
                     RnipDAOService.getInstance().saveAsAckSent(rnipMessage);
                 }
             } catch (Exception ee) {
-                loggerSendAck.error("Error in process Ack response rnip 2.1: ", ee);
+                loggerSendAck.error("Error in process Ack response rnip 2.4: ", ee);
             }
         } catch (Exception e) {
-            loggerSendAck.error("Error in request to rnip 2.1", e);
+            loggerSendAck.error("Error in request to rnip 2.4", e);
             return;
         }
     }
@@ -486,7 +486,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
             }
         } catch (Exception e) {
             responseMessageToSave[0] = "100 - Internal Error";
-            loggerGetResponse.error("Error in GetResponseRequest to rnip 2.1", e);
+            loggerGetResponse.error("Error in GetResponseRequest to rnip 2.4", e);
             throw e;
         }
         RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());

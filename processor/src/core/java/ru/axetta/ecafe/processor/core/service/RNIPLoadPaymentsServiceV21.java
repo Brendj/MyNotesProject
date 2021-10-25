@@ -23,10 +23,7 @@ import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogReque
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogResponse;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
-import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -543,9 +540,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         loggerGetResponse.info("Start processing rnip GetResponses in thread pool");
         List<RnipMessage> messages = RnipDAOService.getInstance().getRnipMessages();
+        RNIPLoadPaymentsServiceV21 rnipLoadPaymentsServiceV21 = getRNIPServiceBean();
         for (RnipMessage rnipMessage : messages) {
             try {
-                RuntimeContext.getAppContext().getBean(RNIPGetPaymentsServiceV21.class).processRnipMessage(rnipMessage);
+                rnipLoadPaymentsServiceV21.processRnipMessage(rnipMessage);
             } catch (Exception e) {
                 loggerGetResponse.error("Error in processing rnip message async", e);
             }
@@ -559,14 +557,25 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         loggerSendAck.info("Start processing rnip SendAck");
         List<RnipMessage> messages = RnipDAOService.getInstance().getProcessedRnipMessages();
+        RNIPLoadPaymentsServiceV21 rnipLoadPaymentsServiceV21 = getRNIPServiceBean();
         for (RnipMessage rnipMessage : messages) {
             try {
-                sendAckRnipMessage(rnipMessage);
+                rnipLoadPaymentsServiceV21.sendAckRnipMessage(rnipMessage);
             } catch (Exception e) {
                 loggerSendAck.error("Error in sending ack message async", e);
             }
         }
         loggerSendAck.info("End processing rnip SendAck");
+    }
+
+    public static RNIPLoadPaymentsServiceV21 getRNIPServiceBean() {
+        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
+        switch (version) {
+            case RNIP_V24:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV24", RNIPLoadPaymentsServiceV24.class);
+            default:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class);
+        }
     }
 
     protected void sendAckRnipMessage(RnipMessage rnipMessage) throws Exception {
