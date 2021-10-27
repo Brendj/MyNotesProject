@@ -68,7 +68,8 @@ public class CommonTaskService {
 
     @Async
     public void invalidateOrgMulticast(Long idOfOrg) {
-        if (cacheMulticastList == null) {
+        return;
+        /*if (cacheMulticastList == null) {
             cacheMulticastList = getCacheMulticastAddresses();
         }
         String port = RuntimeContext.getInstance().getPropertiesValue(PORT_PROPERTY, "8080");
@@ -80,7 +81,7 @@ public class CommonTaskService {
             httpMethod.addParameter(OPERATION_IDOFORG, idOfOrg.toString());
 
             int statusCode = getStatus(httpMethod);
-        }
+        }*/
     }
 
     private List<String> getCacheMulticastAddresses() {
