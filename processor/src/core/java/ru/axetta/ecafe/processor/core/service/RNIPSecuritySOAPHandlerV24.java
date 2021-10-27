@@ -76,7 +76,12 @@ public class RNIPSecuritySOAPHandlerV24 extends RNIPSecuritySOAPHandlerV22 {
         for (int i = 0; i < map.getLength(); i++) {
             AttrNSImpl node = (AttrNSImpl) map.item(i);
             if (node.getLocalName().startsWith("ns")) {
-                node.setValue(node.getValue().replace("2.4.0", "2.1.1"));
+                {
+                    String name = node.getValue();
+                    if (!(name.contains("/forced_acknowledgement/") || name.contains("/export_charges/") || name.contains("/payment/") ||
+                            name.contains("/common/") || name.contains("/quittance/") || name.contains("/charge/")))
+                        node.setValue(node.getValue().replace("2.4.0", "2.1.1"));
+                }
             }
         }
     }
