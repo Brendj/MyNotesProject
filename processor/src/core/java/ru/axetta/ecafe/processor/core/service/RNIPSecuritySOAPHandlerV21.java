@@ -101,7 +101,14 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
                         assertionNode.setIdAttribute("Id", true);
                     } catch (NullPointerException npe2) {
                         assertionNode = (Element)doc.getElementsByTagName("AckTargetMessage").item(0);
-                        assertionNode.setIdAttribute("Id", true);
+                        try {
+                            assertionNode.setIdAttribute("Id", true);
+                        }
+                        catch (NullPointerException npe3)
+                        {
+                            assertionNode = (Element)doc.getElementsByTagNameNS("*", "AckTargetMessage").item(0);
+                            assertionNode.setIdAttribute("Id", true);
+                        }
                     }
                 }
 
