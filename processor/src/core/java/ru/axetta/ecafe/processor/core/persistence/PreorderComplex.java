@@ -45,6 +45,7 @@ public class PreorderComplex {
     private String mobile;
     private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
     private Boolean cancelnotification;
+    private PreorderExternalSystemCode externalSystem;
 
     public static Integer getDaysOfRegularPreorders() {
         return Integer.parseInt(RuntimeContext
@@ -303,5 +304,13 @@ public class PreorderComplex {
 
     public void setCancelnotification(Boolean cancelnotification) {
         this.cancelnotification = cancelnotification;
+    }
+
+    public PreorderExternalSystemCode getExternalSystem() {
+        return externalSystem;
+    }
+
+    public void setExternalSystem(PreorderExternalSystemCode externalSystem) {
+        this.externalSystem = externalSystem;
     }
 }

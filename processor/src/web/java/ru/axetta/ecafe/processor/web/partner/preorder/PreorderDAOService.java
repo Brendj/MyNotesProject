@@ -807,7 +807,8 @@ public class PreorderDAOService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void savePreorderComplexes(PreorderSaveListParam list, String guardianMobile) throws Exception {
+    public void savePreorderComplexes(PreorderSaveListParam list, String guardianMobile,
+            Integer externalSystem) throws Exception {
         //Собираем коллекцию в нужном виде
         Map<Integer, ComplexListParam> map = new HashMap<Integer, ComplexListParam>();
         for (ComplexListParam complex : list.getComplexes()) {
@@ -850,7 +851,7 @@ public class PreorderDAOService {
         Org org = getOrgByContractId(contractId);
         boolean isWtMenu = org.getUseWebArm();  // меню веб-технолога
 
-        Session session = (Session)emReport.getDelegate();
+        Session session = (Session) emReport.getDelegate();
         if (guardianMobile != null && guardianMobile.equals("")) guardianMobile = null;
         List<Client> clientsByMobile = PreorderUtils.getClientsByMobile(session, client.getIdOfClient(), guardianMobile);
         Integer value = PreorderUtils.getClientGroupResult(session, clientsByMobile);
@@ -1043,6 +1044,10 @@ public class PreorderDAOService {
                 } else if (menuDetailChanged) {
                     preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setVersion(nextVersion);
+                }
+                if(externalSystem != null){
+                    PreorderExternalSystemCode code = PreorderExternalSystemCode.getExternalSystemCode(externalSystem);
+                    preorderComplex.setExternalSystem(code);
                 }
 
                 /*if (set.size() > 0) {
