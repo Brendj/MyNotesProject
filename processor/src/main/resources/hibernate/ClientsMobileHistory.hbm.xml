@@ -8,7 +8,11 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory" table="cf_clients_mobile_history">
         <id name="ifofclientsmobilehistory" column="ifofclientsmobilehistory" type="long">
-            <generator class="identity"/>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_clients_mobile_history_id</param>
+            </generator>
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient"
                      update="false"/>

@@ -286,16 +286,16 @@ public class EventNotificationService {
     }
 
     @Async
-    public boolean sendEmailAsync(String email, String type, String[] values) {
+    public void sendEmailAsync(String email, String type, String[] values) {
         if (StringUtils.isEmpty(email)) {
-            return false;
+            return;
         }  else {
 
             String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
                     TYPE_EMAIL_SUBJECT);
             if (emailText == null || emailSubject == null) {
                 logger.info(String.format("No email text is specified for type '%s'. Email is not sent", type));
-                return false;
+                return;
             } else {
                 emailText = formatMessage(emailText, values);
                 emailSubject = formatMessage(emailSubject, values);
@@ -304,12 +304,11 @@ public class EventNotificationService {
                         RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
                     } catch (Exception e) {
                         logger.error("Failed to send email notification", e);
-                        return false;
+                        return;
                     }
                 }
             }
         }
-        return true;
     }
 
     @Async
