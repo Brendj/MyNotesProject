@@ -4,12 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
+import org.richfaces.model.UploadedFile;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.richfaces.model.UploadItem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,7 +30,7 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
     public Long successLineNumber;
     public Long paymentAmount;
     public Long lowerLimitAmount;
-    public UploadItem uploadItem;
+    public UploadedFile uploadItem;
     private ArrayList<ru.axetta.ecafe.processor.core.mail.File> files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
 
     private List<GroupControlSubscriptionsItem> groupControlSubscriptionsItems;
@@ -71,7 +71,7 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
         this.lowerLimitAmount = lowerLimitAmount;
     }
 
-    public void groupControlGenerate(UploadItem item, RuntimeContext runtimeContext, BufferedReader bufferedReader)
+    public void groupControlGenerate(UploadedFile item, RuntimeContext runtimeContext, BufferedReader bufferedReader)
             throws Exception {
 
         if (this.lowerLimitAmount != null && this.paymentAmount != null) {
@@ -82,9 +82,8 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
             String cvsSplitBy = ";";
 
             if (item != null) {
-                File file = item.getFile();
                 bufferedReader = new BufferedReader(
-                        new InputStreamReader(new FileInputStream(file.getAbsolutePath()), Charset.forName("UTF-8")));
+                        new InputStreamReader(item.getInputStream(), Charset.forName("UTF-8")));
 
                 groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
                 files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
@@ -150,11 +149,11 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
         this.groupControlSubscriptionsItems = groupControlSubscriptionsItems;
     }
 
-    public UploadItem getUploadItem() {
+    public UploadedFile getUploadItem() {
         return uploadItem;
     }
 
-    public void setUploadItem(UploadItem uploadItem) {
+    public void setUploadItem(UploadedFile uploadItem) {
         this.uploadItem = uploadItem;
     }
 

@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
 @Scope("session")
 public class ReconciliationPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
     final static String FIELD_ID_OF_PAYMENT="idOfPayment", FIELD_ID_OF_CONTRACT="idOfContract", FIELD_SUM="sum",
-        FIELD_SEPARATORS="separators", FIELD_DATE="date", PAYMENT_TRANSFORM="paymentTransform", SKIP_LINE="skipLine",
-        FIELD_ID_SIZE="idSize", FIELD_ID_SKIP_PATTERN="idSkipPattern";
-    
+            FIELD_SEPARATORS="separators", FIELD_DATE="date", PAYMENT_TRANSFORM="paymentTransform", SKIP_LINE="skipLine",
+            FIELD_ID_SIZE="idSize", FIELD_ID_SKIP_PATTERN="idSkipPattern";
+
     private Long caAgent;
     private Long caReceiver;
     private String caAgentName;
@@ -43,7 +43,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private List<PaymentReconciliationManager.Difference> differencesList;
     private String differencesInfo;
     private String settings;
-    private List<UploadItem> fileItems = new ArrayList<UploadItem>();
+    private List<UploadedFile> fileItems = new ArrayList<UploadedFile>();
     private int exportType = 0;
     private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal();
     private LineConfig defaultLineConfig;
@@ -76,7 +76,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         if (defaultLineConfig == null) {
             return null;
         }
-        for (UploadItem item : fileItems) {
+        for (UploadedFile item : fileItems) {
             readFile(item);
         }
         if (registryProcessingError != null) {
@@ -133,28 +133,22 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         boolean skipFirst, skipLast;
     }
 
-    public void uploadFileListener(UploadEvent event) {
-        fileItems.add(event.getUploadItem());
+    public void uploadFileListener(FileUploadEvent event) {
+        fileItems.add(event.getUploadedFile());
     }
 
-    private void readFile(UploadItem item) {
+    private void readFile(UploadedFile item) {
         InputStream inputStream = null;
         long dataSize;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             loadRegistry(inputStream, dataSize);
             registryProcessingError = null;
         } catch (Exception e) {
             registryProcessingError = String
-                    .format("Ошибка при обработке файла реестра %s: %s", item.getFileName(), e.getMessage());
+                    .format("Ошибка при обработке файла реестра %s: %s", item.getName(), e.getMessage());
             logAndPrintMessage("Ошибка при обработке файла реестра", e);
         } finally {
             if (inputStream != null) {

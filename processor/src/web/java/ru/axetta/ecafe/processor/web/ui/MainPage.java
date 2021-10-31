@@ -77,9 +77,9 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.richfaces.component.html.HtmlPanelMenu;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.component.UIPanelMenu;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +156,7 @@ public class MainPage implements Serializable {
     private boolean eligibleToViewUsers;
     private Boolean canSendAgain = false;
 
-    private HtmlPanelMenu mainMenu;
+    private UIPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
     private Stack<BasicPage> modalPages = new Stack<BasicPage>();
 
@@ -333,8 +333,8 @@ public class MainPage implements Serializable {
 
     private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
     private final BlockUnblockReportPage blockUnblockReportPage = new BlockUnblockReportPage();
-	private final EmiasReportPage emiasReportPage = new EmiasReportPage();
-	private final ESPHelpdeskReportPage espHelpdeskReportPage = new ESPHelpdeskReportPage();
+    private final EmiasReportPage emiasReportPage = new EmiasReportPage();
+    private final ESPHelpdeskReportPage espHelpdeskReportPage = new ESPHelpdeskReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -705,11 +705,11 @@ public class MainPage implements Serializable {
         }
     }
 
-    public HtmlPanelMenu getMainMenu() {
+    public UIPanelMenu getMainMenu() {
         return mainMenu;
     }
 
-    public void setMainMenu(HtmlPanelMenu mainMenu) {
+    public void setMainMenu(UIPanelMenu mainMenu) {
         this.mainMenu = mainMenu;
     }
 
@@ -2608,7 +2608,7 @@ public class MainPage implements Serializable {
                                 null));
             }
         } catch (IllegalArgumentException ise) {
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));
         } catch (IllegalStateException ise) {
             logger.error("Failed to update contragent catalog in RNIP", ise);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));
@@ -3717,9 +3717,9 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public synchronized void clientLoadFileListener(UploadEvent event) {
+    public synchronized void clientLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         long dataSize = 0;
         try {
@@ -3728,15 +3728,9 @@ public class MainPage implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не указана организация", null));
                 return;
             }
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("Загрузка клиентов из файла");
             User user = MainPage.getSessionInstance().getCurrentUser();
@@ -3754,21 +3748,15 @@ public class MainPage implements Serializable {
         }
     }
 
-    public void clientUpdateLoadFileListener(UploadEvent event) {
+    public void clientUpdateLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
@@ -4943,21 +4931,15 @@ public class MainPage implements Serializable {
     }
 
 
-    public synchronized void cardLoadFileListener(UploadEvent event) {
+    public synchronized void cardLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             cardFileLoadPage.loadCards(inputStream, dataSize);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карты загружены и зарегистрированы успешно", null));
@@ -5001,21 +4983,15 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public synchronized void newCardLoadFileListener(UploadEvent event) {
+    public synchronized void newCardLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             newCardFileLoadPage.loadCards(inputStream, dataSize);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карты загружены и зарегистрированы успешно", null));
@@ -5059,21 +5035,15 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public void newVisitorLoadFileListener(UploadEvent event) {
+    public void newVisitorLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             visitorDogmLoadPage.loadVisitors(inputStream, dataSize);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Сотрудники загружены и зарегистрированы успешно", null));
@@ -5362,16 +5332,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public void ccAccountLoadFileListener(UploadEvent event) {
+    public void ccAccountLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         try {
-            if (item.isTempFile()) {
-                inputStream = new FileInputStream(item.getFile());
-            } else {
-                inputStream = new ByteArrayInputStream(item.getData());
-            }
+            inputStream = new ByteArrayInputStream(item.getData());
             ccAccountFileLoadPage.loadCCAccounts(inputStream);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Счета загружены и зарегистрированы успешно", null));
@@ -5384,19 +5350,15 @@ public class MainPage implements Serializable {
         }
     }
 
-    public void mailLoadFileListener(UploadEvent event) {
+    public void mailLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         try {
-            if (item.isTempFile()) {
-                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
-                file.setFile(item.getFile());
-                file.setFileName(item.getFileName());
-                file.setContentType(item.getContentType());
-                supportEmailPage.loadFiles(file);
-            } else {
-                throw new Exception("Invalid file");
-            }
+            ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+            file.setFile(new File(item.getName()));
+            file.setFileName(item.getName());
+            file.setContentType(item.getContentType());
+            supportEmailPage.loadFiles(file);
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
@@ -5405,20 +5367,16 @@ public class MainPage implements Serializable {
         }
     }
 
-    public void subscriptionLoadFileListener(UploadEvent event) {
+    public void subscriptionLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         try {
-            if (item.isTempFile()) {
-                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
-                file.setFile(item.getFile());
-                file.setFileName(item.getFileName());
-                file.setContentType(item.getContentType());
-                groupControlSubscriptionsPage.setUploadItem(item);
-                groupControlSubscriptionsPage.getFiles().add(file);
-            } else {
-                throw new Exception("Invalid file");
-            }
+            ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+            file.setFile(new File(item.getName()));
+            file.setFileName(item.getName());
+            file.setContentType(item.getContentType());
+            groupControlSubscriptionsPage.setUploadItem(item);
+            groupControlSubscriptionsPage.getFiles().add(file);
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
@@ -5463,20 +5421,16 @@ public class MainPage implements Serializable {
         }
     }
 
-    public void benefitsLoadFileListener(UploadEvent event) {
+    public void benefitsLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         try {
-            if (item.isTempFile()) {
-                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
-                file.setFile(item.getFile());
-                file.setFileName(item.getFileName());
-                file.setContentType(item.getContentType());
-                groupControlBenefitsPage.setUploadItem(item);
-                groupControlBenefitsPage.getFiles().add(file);
-            } else {
-                throw new Exception("Invalid file");
-            }
+            ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+            file.setFile(new File(item.getName()));
+            file.setFileName(item.getName());
+            file.setContentType(item.getContentType());
+            groupControlBenefitsPage.setUploadItem(item);
+            groupControlBenefitsPage.getFiles().add(file);
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
@@ -5485,20 +5439,16 @@ public class MainPage implements Serializable {
         }
     }
 
-    public void basicGoodsLoadFileListener(UploadEvent event) {
+    public void basicGoodsLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         try {
-            if (item.isTempFile()) {
-                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
-                file.setFile(item.getFile());
-                file.setFileName(item.getFileName());
-                file.setContentType(item.getContentType());
-                loadingElementsOfBasicGoodsPage.setUploadItem(item);
-                loadingElementsOfBasicGoodsPage.getFiles().add(file);
-            } else {
-                throw new Exception("Invalid file");
-            }
+            ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+            file.setFile(new File(item.getName()));
+            file.setFileName(item.getName());
+            file.setContentType(item.getContentType());
+            loadingElementsOfBasicGoodsPage.setUploadItem(item);
+            loadingElementsOfBasicGoodsPage.getFiles().add(file);
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
@@ -5527,15 +5477,11 @@ public class MainPage implements Serializable {
         loadingElementsOfBasicGoodsPage.loadingElementsOfBasicGoodsGenerate(loadingElementsOfBasicGoodsPage.getUploadItem(), runtimeContext);
     }
 
-    public void reportTemplateLoadFileListener(UploadEvent event) {
+    public void reportTemplateLoadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         try {
-            if (item.isTempFile()) {
-                reportTemplateManagerPage.checkAndSaveFile(item);
-            } else {
-                throw new Exception("Invalid file");
-            }
+            reportTemplateManagerPage.checkAndSaveFile(item);
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
@@ -7841,8 +7787,8 @@ public class MainPage implements Serializable {
         updateSelectedMainMenu();
         return null;
     }
-	
-	    public Object showESPHelpDeskReportPage() {
+
+    public Object showESPHelpDeskReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = espHelpdeskReportPage;

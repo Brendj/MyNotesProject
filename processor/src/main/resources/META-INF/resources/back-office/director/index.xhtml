@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:h="http://xmlns.jcp.org/jsf/html"
+xmlns:f="http://xmlns.jcp.org/jsf/core"
+xmlns:rich="http://richfaces.org/rich"
+xmlns:a4j="http://richfaces.org/a4j"
+xmlns:ui="http://java.sun.com/jsf/facelets">
+
+
+<f:view>
+
+
+    <h:head>
+        <title><h:outputText value="Новая школа#{runtimeContext.instanceNameDecorated}"/></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta http-equiv="Content-Language" content="ru"/>
+        <link rel="icon" href="/images/ecafe-favicon.png" type="image/x-icon"/>
+        <link rel="shortcut icon" href="/images/ecafe-favicon.png" type="image/x-icon"/>
+        <link rel="stylesheet" href="/back-office/styles.css" type="text/css"/>
+    </h:head>
+    <h:body>
+    <f:subview id="orgListSelectSubView">
+        <ui:include src="select_orgs.xhtml" />
+    </f:subview>
+    <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
+        <tr>
+            <td style="min-width: 210px; vertical-align: top;" width="215px">
+                    <!-- Главное меню -->
+                <f:subview id="directorMenuSubView">
+                    <ui:include src="/back-office/director/director_main_menu.xhtml" />
+                </f:subview>
+            </td>
+            <td style="vertical-align: top;" width="*">
+                    <!-- Рабочая область -->
+                <f:subview id="workspaceSubView">
+                    <ui:include src="/back-office/director/workspace.xhtml" />
+                </f:subview>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                    <!-- Нижний колонтитул -->
+                <h:panelGrid width="100%" cellspacing="4px" cellpadding="0" styleClass="borderless-grid"
+                             columnClasses="right-aligned-column">
+                </h:panelGrid> <!-- Нижний колонтитул -->
+            </td>
+        </tr>
+    </table>
+    </h:body>
+</f:view>
+</html>

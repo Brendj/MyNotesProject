@@ -11,8 +11,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.hibernate.HibernateException;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +44,11 @@ public class QuestionaryLoadPage extends BasicWorkspacePage implements OrgListSe
     @Autowired
     private QuestionaryService questionaryService;
 
-    public void questionaryLoadFileListener(UploadEvent event) {
-        UploadItem item = event.getUploadItem();
+    public void questionaryLoadFileListener(FileUploadEvent event) {
+        UploadedFile item = event.getUploadedFile();
         QuestionariesRootElement questionariesRootElement = null;
         try {
-            File file = item.getFile();
+            File file = new File(item.getName());
             questionariesRootElement = questionaryService.parseQuestionaryByXML(file);
         } catch (Exception e){
             registrationItems.add(new RegistrationItem("Ошибка при загрузке данных: " + e));

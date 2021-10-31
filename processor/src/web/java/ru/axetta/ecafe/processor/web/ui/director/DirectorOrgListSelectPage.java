@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.director;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.DirectorPage;
@@ -25,6 +27,8 @@ import java.util.*;
  * User: rumil
  * Date: 02.11.11
  */
+@Component
+@Scope("session")
 public class DirectorOrgListSelectPage extends OrgSelectionBasicPage {
 
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();

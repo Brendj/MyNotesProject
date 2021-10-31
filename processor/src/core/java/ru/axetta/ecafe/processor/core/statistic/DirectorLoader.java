@@ -24,7 +24,7 @@ public class DirectorLoader {
     public List<DirectorLoader.OrgItem> loadOrganizations(Session session) {
         List<DirectorLoader.OrgItem> resultList = new ArrayList<DirectorLoader.OrgItem>();
 
-        User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
+        User currentUser = DAOReadonlyService.getInstance().getUserFromSessionFake();
 
         String sqlQuery =
                 "SELECT o.idoforg, o.shortname, o.shortAddress, o.mainbuilding "

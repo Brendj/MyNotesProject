@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -79,20 +79,14 @@ public class MenuLoadPage extends BasicWorkspacePage {
     }
 
 
-    public void menuLoadFileListener(UploadEvent event) {
-        UploadItem item = event.getUploadItem();
+    public void menuLoadFileListener(FileUploadEvent event) {
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             loadMenu(inputStream, dataSize);
             printMessage("Меню загружено");
         } catch (Exception e) {
@@ -159,41 +153,41 @@ public class MenuLoadPage extends BasicWorkspacePage {
     @Transactional
     protected void processSyncMenu(Long idOfOrg, SyncRequest.ReqMenu reqMenu) throws Exception {
         if (null != reqMenu) {
-                Org organization = entityManager.getReference(Org.class, idOfOrg);
+            Org organization = entityManager.getReference(Org.class, idOfOrg);
 
-                boolean bOrgIsMenuExchangeSource = isOrgMenuExchangeSource(idOfOrg);
+            boolean bOrgIsMenuExchangeSource = isOrgMenuExchangeSource(idOfOrg);
 
-                /// сохраняем секцию Settings
-                if (bOrgIsMenuExchangeSource && (reqMenu.getSettingsSectionRawXML() != null)) {
-                    MenuExchange menuExchangeSettings = new MenuExchange(new Date(0), idOfOrg,
-                            reqMenu.getSettingsSectionRawXML(), MenuExchange.FLAG_SETTINGS);
-                   // persistenceSession.saveOrUpdate(menuExchangeSettings);
-                    daoService.persistEntity(menuExchangeSettings);
+            /// сохраняем секцию Settings
+            if (bOrgIsMenuExchangeSource && (reqMenu.getSettingsSectionRawXML() != null)) {
+                MenuExchange menuExchangeSettings = new MenuExchange(new Date(0), idOfOrg,
+                        reqMenu.getSettingsSectionRawXML(), MenuExchange.FLAG_SETTINGS);
+                // persistenceSession.saveOrUpdate(menuExchangeSettings);
+                daoService.persistEntity(menuExchangeSettings);
+            }
+
+            Iterator<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
+            boolean bFirstMenuItem = true;
+            while (menuItems.hasNext()) {
+                SyncRequest.ReqMenu.Item item = menuItems.next();
+                /// сохраняем данные меню для распространения
+                if (bOrgIsMenuExchangeSource) {
+                    MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
+                            bFirstMenuItem ? MenuExchange.FLAG_ANCHOR_MENU : MenuExchange.FLAG_NONE);
+                    daoService.persistEntity(menuExchange);
                 }
+                Date menuDate = item.getDate();
 
-                Iterator<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
-                boolean bFirstMenuItem = true;
-                while (menuItems.hasNext()) {
-                    SyncRequest.ReqMenu.Item item = menuItems.next();
-                    /// сохраняем данные меню для распространения
-                    if (bOrgIsMenuExchangeSource) {
-                        MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
-                                bFirstMenuItem ? MenuExchange.FLAG_ANCHOR_MENU : MenuExchange.FLAG_NONE);
-                        daoService.persistEntity(menuExchange);
-                    }
-                    Date menuDate = item.getDate();
-
-                    Menu menu = findMenu(organization, Menu.ORG_MENU_SOURCE, menuDate);
-                    if (null == menu) {
-                        menu = new Menu(organization, menuDate, new Date(), Menu.ORG_MENU_SOURCE,
-                                bFirstMenuItem ? Menu.FLAG_ANCHOR_MENU : Menu.FLAG_NONE, item.hashCode());
-                        daoService.persistEntity(menu);
-                    }
-                    processReqAssortment(organization, menuDate, item.getReqAssortments());
-                    processReqMenuDetails(organization, menuDate, menu, item, item.getReqMenuDetails());
-                    processReqComplexInfos(organization, menuDate, menu, item.getReqComplexInfos());
-                    bFirstMenuItem = false;
+                Menu menu = findMenu(organization, Menu.ORG_MENU_SOURCE, menuDate);
+                if (null == menu) {
+                    menu = new Menu(organization, menuDate, new Date(), Menu.ORG_MENU_SOURCE,
+                            bFirstMenuItem ? Menu.FLAG_ANCHOR_MENU : Menu.FLAG_NONE, item.hashCode());
+                    daoService.persistEntity(menu);
                 }
+                processReqAssortment(organization, menuDate, item.getReqAssortments());
+                processReqMenuDetails(organization, menuDate, menu, item, item.getReqMenuDetails());
+                processReqComplexInfos(organization, menuDate, menu, item.getReqComplexInfos());
+                bFirstMenuItem = false;
+            }
 
         }
     }
@@ -206,7 +200,7 @@ public class MenuLoadPage extends BasicWorkspacePage {
         q.setParameter("localIdOfMenu", localIdOfMenu);
         List<MenuDetail> menuDetailList = q.getResultList();
         if(!(menuDetailList==null || menuDetailList.isEmpty())){
-           menuDetail = menuDetailList.get(0);
+            menuDetail = menuDetailList.get(0);
         }
         return menuDetail;
     }
@@ -228,7 +222,7 @@ public class MenuLoadPage extends BasicWorkspacePage {
 
     @Transactional
     protected void processReqComplexInfos(Org organization, Date menuDate, Menu menu,
-            List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos) throws Exception {
+                                          List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos) throws Exception {
         deleteComplexInfoForDate(organization, menuDate);
 
         for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
@@ -316,7 +310,7 @@ public class MenuLoadPage extends BasicWorkspacePage {
 
     @Transactional
     protected void processReqAssortment(Org organization, Date menuDate,
-            List<SyncRequest.ReqMenu.Item.ReqAssortment> reqAssortments)  throws Exception{
+                                        List<SyncRequest.ReqMenu.Item.ReqAssortment> reqAssortments)  throws Exception{
         deleteAssortmentForDate(organization, menuDate);
         for (SyncRequest.ReqMenu.Item.ReqAssortment reqAssortment : reqAssortments) {
             Assortment assortment = new Assortment(organization, menuDate, reqAssortment.getName(),
@@ -332,13 +326,13 @@ public class MenuLoadPage extends BasicWorkspacePage {
 
     @Transactional
     protected void processReqMenuDetails(Org organization, Date menuDate, Menu menu,
-            SyncRequest.ReqMenu.Item item, Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails)
+                                         SyncRequest.ReqMenu.Item item, Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails)
             throws Exception {
         while (reqMenuDetails.hasNext()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
-                if (null == findMenuDetailByLocalId(menu, reqMenuDetail.getIdOfMenu())) {
-                    MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
-                            reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
+            if (null == findMenuDetailByLocalId(menu, reqMenuDetail.getIdOfMenu())) {
+                MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
+                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
                         reqMenuDetail.getFlags());
                 menuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
                 menuDetail.setGroupName(reqMenuDetail.getGroup());

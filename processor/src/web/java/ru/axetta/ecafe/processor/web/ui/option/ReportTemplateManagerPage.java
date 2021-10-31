@@ -4,13 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.option;
 
+import org.richfaces.model.UploadedFile;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTemplateFileNameMenu;
 
 import org.apache.commons.lang.StringUtils;
-import org.richfaces.model.UploadItem;
 
 import javax.faces.model.SelectItem;
 import java.io.File;
@@ -170,19 +170,19 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
     }
 
 
-    public void checkAndSaveFile(UploadItem item) throws Exception {
+    public void checkAndSaveFile(UploadedFile item) throws Exception {
         checkPath();
 
         if (StringUtils.isNotEmpty(relativePath) && !relativePath.endsWith("/") && !relativePath.endsWith("\\")) relativePath+='/';
         String path = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + (relativePath==null?"":relativePath);
-        File file = new File(path + item.getFileName());
+        File file = new File(path + item.getName());
         if (!file.exists()) {
             File dir = new File(path);
             if (!dir.exists())
                 if (!dir.mkdirs())
                     throw new Exception(String.format("Ошибка при создании директории %s.", dir.getAbsolutePath()));
-            if (!item.getFile().renameTo(new File(path, item.getFileName())))
-                throw new Exception(String.format("Ошибка перемеинования файла %s%s.", path, item.getFileName()));
+            //if (!item.getFile().renameTo(new File(path, item.getName())))
+            //    throw new Exception(String.format("Ошибка перемеинования файла %s%s.", path, item.getFileName()));
             load();
         } else {
             throw new Exception("Шаблон уже существует.");

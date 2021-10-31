@@ -209,6 +209,16 @@ public class DAOReadonlyService {
         }
     }
 
+    //todo убрать после реализации авторизации
+    public User getUserFromSessionFake() {
+        try {
+            Long idOfUser = 448L;
+            return findUserById(idOfUser);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public User findUserById(long idOfUser) throws Exception {
         return entityManager.find(User.class, idOfUser);
     }

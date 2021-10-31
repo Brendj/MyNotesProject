@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
+import org.richfaces.model.UploadedFile;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
@@ -15,7 +16,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.richfaces.model.UploadItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(GroupControlBenefitsPage.class);
 
     private Boolean clientCancelBenefits = false;
-    public UploadItem uploadItem;
+    public UploadedFile uploadItem;
     private ArrayList<ru.axetta.ecafe.processor.core.mail.File> files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
 
     private List<GroupControlBenefitsItems> groupControlBenefitsItems;
@@ -78,11 +78,11 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
         this.clientCancelBenefits = clientCancelBenefits;
     }
 
-    public UploadItem getUploadItem() {
+    public UploadedFile getUploadItem() {
         return uploadItem;
     }
 
-    public void setUploadItem(UploadItem uploadItem) {
+    public void setUploadItem(UploadedFile uploadItem) {
         this.uploadItem = uploadItem;
     }
 
@@ -90,7 +90,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
         clientCancelBenefits = true;
     }
 
-    public void groupBenefitsGenerate(UploadItem item, RuntimeContext runtimeContext) throws Exception {
+    public void groupBenefitsGenerate(UploadedFile item, RuntimeContext runtimeContext) throws Exception {
 
         GroupControlBenefitService groupControlBenefitService = new GroupControlBenefitService();
 
@@ -100,9 +100,8 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
         String benefitsSplitBy = ",";
 
         if (item != null) {
-            File file = item.getFile();
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(file.getAbsolutePath()), Charset.forName("UTF-8")));
+                    new InputStreamReader(item.getInputStream(), Charset.forName("UTF-8")));
 
             groupControlBenefitsItems = new ArrayList<GroupControlBenefitsItems>();
             files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();

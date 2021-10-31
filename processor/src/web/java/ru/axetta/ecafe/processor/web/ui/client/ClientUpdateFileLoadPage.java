@@ -20,8 +20,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -296,26 +296,20 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
         return successLineNumber;
     }
 
-    public void uploadGroupChange(UploadEvent event) {
+    public void uploadGroupChange(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         errorTextGroups = "";
         if (org.getIdOfOrg() == null) {
             errorTextGroups = "Выберите организацию";
             return;
         }
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         long dataSize = 0;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                dataSize = file.length();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                dataSize = data.length;
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            dataSize = data.length;
+            inputStream = new ByteArrayInputStream(data);
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
@@ -406,7 +400,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
     }
 
     private List<LineResult> moveToLeaving(Session session, Org org, List<LineResult> lineResults,
-            ClientGuardianHistory clientGuardianHistory) throws Exception {
+                                           ClientGuardianHistory clientGuardianHistory) throws Exception {
         List<Long> ids = new ArrayList<>();
         for (LineResult lineResult : lineResults) {
             if (lineResult.getInvolvedClients() == null) continue;
@@ -446,7 +440,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
     }
 
     private LineResult updateClientGroup(Session session, String line, int lineNo, Org orga,
-            ClientGuardianHistory clientGuardianHistory) throws Exception {
+                                         ClientGuardianHistory clientGuardianHistory) throws Exception {
         String[] tokens = line.split(";");
         if (tokens.length != 4 && tokens.length != 5) throw new Exception("Неправильная структура файла. Ошибка в строке " + lineNo);
         try {
