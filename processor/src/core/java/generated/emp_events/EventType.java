@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -24,6 +25,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="streamId" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="typeId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="sendFlags" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *         &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="filters" minOccurs="0">
  *           &lt;complexType>
@@ -52,6 +54,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "id",
     "streamId",
     "typeId",
+    "sendFlags",
     "description",
     "filters",
     "message",
@@ -63,11 +66,13 @@ public class EventType {
     protected String id;
     protected int streamId;
     protected int typeId;
+    protected Integer sendFlags;
     protected String description;
     protected EventType.Filters filters;
     @XmlElement(required = true)
     protected EventMessageType message;
     @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar datetime;
 
     /**
@@ -124,6 +129,30 @@ public class EventType {
      */
     public void setTypeId(int value) {
         this.typeId = value;
+    }
+
+    /**
+     * Gets the value of the sendFlags property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getSendFlags() {
+        return sendFlags;
+    }
+
+    /**
+     * Sets the value of the sendFlags property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setSendFlags(Integer value) {
+        this.sendFlags = value;
     }
 
     /**
@@ -251,7 +280,7 @@ public class EventType {
 
         @XmlElement(required = true)
         protected List<EventFilterType> filter;
-        @XmlAttribute
+        @XmlAttribute(name = "operator")
         protected OperatorType operator;
 
         /**

@@ -30,13 +30,24 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="setting" type="{urn://subscription.api.emp.altarix.ru}StreamSetting_Type" maxOccurs="unbounded"/>
+ *                   &lt;element name="setting" type="{urn://subscription.api.emp.altarix.ru}StreamSetting_Type" maxOccurs="unbounded" minOccurs="0"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="registerTime" type="{http://www.w3.org/2001/XMLSchema}date"/>
+ *         &lt;element name="options" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="optionType" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
+ *         &lt;element name="registerTime" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -52,6 +63,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "name",
     "description",
     "settings",
+    "options",
     "registerTime"
 })
 public class StreamType {
@@ -63,8 +75,9 @@ public class StreamType {
     protected String description;
     @XmlElement(required = true)
     protected StreamType.Settings settings;
+    protected StreamType.Options options;
     @XmlElement(required = true)
-    @XmlSchemaType(name = "date")
+    @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar registerTime;
 
     /**
@@ -180,6 +193,30 @@ public class StreamType {
     }
 
     /**
+     * Gets the value of the options property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link StreamType.Options }
+     *     
+     */
+    public StreamType.Options getOptions() {
+        return options;
+    }
+
+    /**
+     * Sets the value of the options property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link StreamType.Options }
+     *     
+     */
+    public void setOptions(StreamType.Options value) {
+        this.options = value;
+    }
+
+    /**
      * Gets the value of the registerTime property.
      * 
      * @return
@@ -214,7 +251,67 @@ public class StreamType {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="setting" type="{urn://subscription.api.emp.altarix.ru}StreamSetting_Type" maxOccurs="unbounded"/>
+     *         &lt;element name="optionType" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "optionType"
+    })
+    public static class Options {
+
+        @XmlElement(required = true)
+        protected List<String> optionType;
+
+        /**
+         * Gets the value of the optionType property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the optionType property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getOptionType().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link String }
+         * 
+         * 
+         */
+        public List<String> getOptionType() {
+            if (optionType == null) {
+                optionType = new ArrayList<String>();
+            }
+            return this.optionType;
+        }
+
+    }
+
+
+    /**
+     * <p>Java class for anonymous complex type.
+     * 
+     * <p>The following schema fragment specifies the expected content contained within this class.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="setting" type="{urn://subscription.api.emp.altarix.ru}StreamSetting_Type" maxOccurs="unbounded" minOccurs="0"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -229,7 +326,6 @@ public class StreamType {
     })
     public static class Settings {
 
-        @XmlElement(required = true)
         protected List<StreamSettingType> setting;
 
         /**

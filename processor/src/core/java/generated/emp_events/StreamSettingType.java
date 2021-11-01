@@ -20,8 +20,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="kind" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="sendStartTime" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/>
- *         &lt;element name="sendStopTime" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/>
+ *         &lt;element name="sendStartTime" type="{http://www.w3.org/2001/XMLSchema}time" minOccurs="0"/>
+ *         &lt;element name="sendStopTime" type="{http://www.w3.org/2001/XMLSchema}time" minOccurs="0"/>
  *         &lt;element name="sendExcludeDays" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -42,9 +42,9 @@ public class StreamSettingType {
 
     @XmlElement(required = true)
     protected String kind;
-    @XmlSchemaType(name = "date")
+    @XmlSchemaType(name = "time")
     protected XMLGregorianCalendar sendStartTime;
-    @XmlSchemaType(name = "date")
+    @XmlSchemaType(name = "time")
     protected XMLGregorianCalendar sendStopTime;
     protected Integer sendExcludeDays;
 

@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlType;
  *                             &lt;element name="SSOID" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                             &lt;element name="citizenId" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                             &lt;element name="MSISDN" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *                             &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                             &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                           &lt;/choice>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -81,6 +81,30 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
+ *         &lt;element name="option_group" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="option" maxOccurs="unbounded">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                             &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                             &lt;element name="rule" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                 &lt;/sequence>
+ *                 &lt;attribute name="operator" type="{urn://subscription.api.emp.altarix.ru}OperatorType" default="OR" />
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="operator" type="{urn://subscription.api.emp.altarix.ru}OperatorType" default="AND" />
  *     &lt;/restriction>
@@ -94,14 +118,17 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "EventFilter_Type", propOrder = {
     "persons",
     "groups",
-    "options"
+    "options",
+    "optionGroup"
 })
 public class EventFilterType {
 
     protected EventFilterType.Persons persons;
     protected EventFilterType.Groups groups;
     protected EventFilterType.Options options;
-    @XmlAttribute
+    @XmlElement(name = "option_group")
+    protected EventFilterType.OptionGroup optionGroup;
+    @XmlAttribute(name = "operator")
     protected OperatorType operator;
 
     /**
@@ -177,6 +204,30 @@ public class EventFilterType {
     }
 
     /**
+     * Gets the value of the optionGroup property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link EventFilterType.OptionGroup }
+     *     
+     */
+    public EventFilterType.OptionGroup getOptionGroup() {
+        return optionGroup;
+    }
+
+    /**
+     * Sets the value of the optionGroup property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link EventFilterType.OptionGroup }
+     *     
+     */
+    public void setOptionGroup(EventFilterType.OptionGroup value) {
+        this.optionGroup = value;
+    }
+
+    /**
      * Gets the value of the operator property.
      * 
      * @return
@@ -233,7 +284,7 @@ public class EventFilterType {
 
         @XmlElement(type = Integer.class)
         protected List<Integer> groupId;
-        @XmlAttribute
+        @XmlAttribute(name = "operator")
         protected OperatorType operator;
 
         /**
@@ -332,11 +383,224 @@ public class EventFilterType {
     @XmlType(name = "", propOrder = {
         "option"
     })
+    public static class OptionGroup {
+
+        @XmlElement(required = true)
+        protected List<EventFilterType.OptionGroup.Option> option;
+        @XmlAttribute(name = "operator")
+        protected OperatorType operator;
+
+        /**
+         * Gets the value of the option property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the option property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getOption().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link EventFilterType.OptionGroup.Option }
+         * 
+         * 
+         */
+        public List<EventFilterType.OptionGroup.Option> getOption() {
+            if (option == null) {
+                option = new ArrayList<EventFilterType.OptionGroup.Option>();
+            }
+            return this.option;
+        }
+
+        /**
+         * Gets the value of the operator property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link OperatorType }
+         *     
+         */
+        public OperatorType getOperator() {
+            if (operator == null) {
+                return OperatorType.OR;
+            } else {
+                return operator;
+            }
+        }
+
+        /**
+         * Sets the value of the operator property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link OperatorType }
+         *     
+         */
+        public void setOperator(OperatorType value) {
+            this.operator = value;
+        }
+
+
+        /**
+         * <p>Java class for anonymous complex type.
+         * 
+         * <p>The following schema fragment specifies the expected content contained within this class.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}string"/>
+         *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+         *         &lt;element name="rule" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "type",
+            "value",
+            "rule"
+        })
+        public static class Option {
+
+            @XmlElement(required = true)
+            protected String type;
+            @XmlElement(required = true)
+            protected String value;
+            protected String rule;
+
+            /**
+             * Gets the value of the type property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getType() {
+                return type;
+            }
+
+            /**
+             * Sets the value of the type property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setType(String value) {
+                this.type = value;
+            }
+
+            /**
+             * Gets the value of the value property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getValue() {
+                return value;
+            }
+
+            /**
+             * Sets the value of the value property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setValue(String value) {
+                this.value = value;
+            }
+
+            /**
+             * Gets the value of the rule property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getRule() {
+                return rule;
+            }
+
+            /**
+             * Sets the value of the rule property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setRule(String value) {
+                this.rule = value;
+            }
+
+        }
+
+    }
+
+
+    /**
+     * <p>Java class for anonymous complex type.
+     * 
+     * <p>The following schema fragment specifies the expected content contained within this class.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="option" maxOccurs="unbounded">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *                   &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *                   &lt;element name="rule" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *       &lt;attribute name="operator" type="{urn://subscription.api.emp.altarix.ru}OperatorType" default="OR" />
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "option"
+    })
     public static class Options {
 
         @XmlElement(required = true)
         protected List<EventFilterType.Options.Option> option;
-        @XmlAttribute
+        @XmlAttribute(name = "operator")
         protected OperatorType operator;
 
         /**
@@ -527,7 +791,7 @@ public class EventFilterType {
      *                   &lt;element name="SSOID" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                   &lt;element name="citizenId" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *                   &lt;element name="MSISDN" type="{http://www.w3.org/2001/XMLSchema}long"/>
-     *                   &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *                   &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                 &lt;/choice>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -550,7 +814,7 @@ public class EventFilterType {
 
         @XmlElement(required = true)
         protected List<EventFilterType.Persons.Person> person;
-        @XmlAttribute
+        @XmlAttribute(name = "operator")
         protected OperatorType operator;
 
         /**
@@ -624,7 +888,7 @@ public class EventFilterType {
          *         &lt;element name="SSOID" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *         &lt;element name="citizenId" type="{http://www.w3.org/2001/XMLSchema}int"/>
          *         &lt;element name="MSISDN" type="{http://www.w3.org/2001/XMLSchema}long"/>
-         *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+         *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *       &lt;/choice>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -647,7 +911,7 @@ public class EventFilterType {
             protected Integer citizenId;
             @XmlElement(name = "MSISDN")
             protected Long msisdn;
-            protected Object email;
+            protected String email;
 
             /**
              * Gets the value of the ssoid property.
@@ -726,10 +990,10 @@ public class EventFilterType {
              * 
              * @return
              *     possible object is
-             *     {@link Object }
+             *     {@link String }
              *     
              */
-            public Object getEmail() {
+            public String getEmail() {
                 return email;
             }
 
@@ -738,10 +1002,10 @@ public class EventFilterType {
              * 
              * @param value
              *     allowed object is
-             *     {@link Object }
+             *     {@link String }
              *     
              */
-            public void setEmail(Object value) {
+            public void setEmail(String value) {
                 this.email = value;
             }
 
