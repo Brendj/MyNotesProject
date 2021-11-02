@@ -209,7 +209,7 @@ public class DAOReadonlyService {
         }
     }
 
-    //todo убрать после реализации авторизации
+    //todo todo todo убрать после реализации авторизации
     public User getUserFromSessionFake() {
         try {
             Long idOfUser = 448L;

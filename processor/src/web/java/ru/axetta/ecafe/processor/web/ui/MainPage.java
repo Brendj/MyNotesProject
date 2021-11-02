@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.ui;
 
 import net.sf.jasperreports.engine.JRException;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
@@ -103,6 +105,8 @@ import java.util.*;
  * Time: 14:49:47
  * To change this template use File | Settings | File Templates.
  */
+@Component
+@Scope("session")
 public class MainPage implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
@@ -9625,7 +9629,8 @@ public class MainPage implements Serializable {
     public User getCurrentUser() throws Exception {
         if (currentUser == null) {
             FacesContext context = FacesContext.getCurrentInstance();
-            String userName = context.getExternalContext().getRemoteUser();
+            //todo todo todo фейковый юзер
+            String userName = "admin"; //context.getExternalContext().getRemoteUser();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             RuntimeContext runtimeContext = null;

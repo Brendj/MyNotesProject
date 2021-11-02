@@ -1,13 +1,12 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
-  --%>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.User" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="javax.faces.application.FacesMessage" %>
-<%@ page import="javax.faces.context.FacesContext" %>
-<%
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<!--<%
     try {
         if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
             String mainPage;
@@ -35,258 +34,251 @@
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 e.getMessage(), null));
     }
-%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
+%>-->
 <f:view>
 
-<html>
-<head>
+<h:head>
     <title><h:outputText value="Новая школа#{runtimeContext.instanceNameDecorated}: #{mainPage.userRole}"/></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="Content-Language" content="ru">
-    <link rel="icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
-    <link rel="shortcut icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
-    <link rel="stylesheet" href="<c:url value="/back-office/styles.css"/>" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Content-Language" content="ru"/>
+    <link rel="icon" href="/processor/images/ecafe-favicon.png" type="image/x-icon"/>
+    <link rel="shortcut icon" href="/processor/images/ecafe-favicon.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="/processor/back-office/styles.css" type="text/css"/>
     <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>-->
-</head>
+</h:head>
 
-<body style="margin: 4px; padding: 0;">
+<h:body style="margin: 4px; padding: 0;">
 
-    <rich:simpleTogglePanel rendered="false" />
+    <rich:togglePanel rendered="false" />
 
     <rich:fileUpload rendered="false" />
 
     <rich:calendar rendered="false" />
 
-    <f:subview id="employeeSelectSubView">
-        <c:import url="include/option/employees/employee/select.jsp" />
+    <!--<f:subview id="employeeSelectSubView">
+        <ui:include src="include/option/employees/employee/select.xhtml" />
     </f:subview>
 
     <f:subview id="dogmSelectSubView">
-        <c:import url="include/visitorsdogm/visitordogm/select.jsp" />
+        <ui:include src="include/visitorsdogm/visitordogm/select.xhtml" />
     </f:subview>
 
     <f:subview id="bankDeleteSubView">
-        <c:import url="include/option/confirm_delete_bank.jsp" />
+        <ui:include src="include/option/confirm_delete_bank.xhtml" />
     </f:subview>
 
     <f:subview id="abstractConfirmDeletePageSubView">
-        <c:import url="include/abstractpage/confirm_delete.jsp" />
+        <ui:include src="include/abstractpage/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="confirmDeletePageSubView">
-        <c:import url="include/confirm_delete.jsp" />
+        <ui:include src="include/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="technologicalMapSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/select.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/select.xhtml" />
     </f:subview>
 
     <f:subview id="productSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/product/select.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/product/select.xhtml" />
     </f:subview>
 
     <f:subview id="cardRegistrationConfirmSubView">
-        <c:import url="include/cardoperator/card_create_confirm.jsp" />
+        <ui:include src="include/cardoperator/card_create_confirm.xhtml" />
     </f:subview>
 
     <f:subview id="technologicalMapGroupSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/group/select.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/group/select.xhtml" />
     </f:subview>
 
     <f:subview id="productGroupSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/product/group/select.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/product/group/select.xhtml" />
     </f:subview>
 
     <f:subview id="goodGroupSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/good/group/select.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/good/group/select.xhtml" />
     </f:subview>
 
 
     <f:subview id="configurationProviderSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/select.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/select.xhtml" />
     </f:subview>
 
     <f:subview id="configurationProviderSelectListSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/select_list.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="basicGoodSelectListSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/basicGood/select_list.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/basicGood/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="goodSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/good/confirm_delete.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/good/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="goodGroupsSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/good/group/confirm_delete.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/good/group/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="productDeleteSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/product/confirm_delete.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/product/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="productGroupsSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/product/group/confirm_delete.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/product/group/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="technologicalMapGroupsSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/group/confirm_delete.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/group/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="technologicalMapProductsSelectSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/product/select.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/product/select.xhtml" />
     </f:subview>
 
     <f:subview id="orgSelectSubView">
-        <c:import url="include/org/select.jsp" />
+        <ui:include src="include/org/select.xhtml" />
     </f:subview>
 
     <f:subview id="orgListSelectSubView">
-        <c:import url="include/org/select_list.jsp" />
+        <ui:include src="include/org/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="contragentSelectSubView">
-        <c:import url="include/contragent/select.jsp" />
+        <ui:include src="include/contragent/select.xhtml" />
     </f:subview>
 
     <f:subview id="contragentListSelectSubView">
-        <c:import url="include/contragent/select_list.jsp" />
+        <ui:include src="include/contragent/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="complexListSelectSubView">
-        <c:import url="include/webtechnolog/complex/select_list.jsp" />
+        <ui:include src="include/webtechnolog/complex/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="dishListSelectSubView">
-        <c:import url="include/webtechnolog/dish/select_list.jsp" />
+        <ui:include src="include/webtechnolog/dish/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="contractSelectSubView">
-        <c:import url="include/contragent/contract/select.jsp" />
+        <ui:include src="include/contragent/contract/select.xhtml" />
     </f:subview>
 
     <f:subview id="clientSelectSubView">
-        <c:import url="include/client/select.jsp" />
+        <ui:include src="include/client/select.xhtml" />
     </f:subview>
 
     <f:subview id="clientSelectListSubView">
-        <c:import url="include/client/select_list.jsp" />
+        <ui:include src="include/client/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="clientGroupListSelectSubView">
-        <c:import url="include/client/select_group_list.jsp" />
+        <ui:include src="include/client/select_group_list.xhtml" />
     </f:subview>
 
     <f:subview id="clientGroupSelectSubView">
-        <c:import url="include/client/select_group.jsp" />
+        <ui:include src="include/client/select_group.xhtml" />
     </f:subview>
 
     <f:subview id="categorySelectSubView">
-        <c:import url="include/option/categorydiscount/select.jsp" />
+        <ui:include src="include/option/categorydiscount/select.xhtml" />
     </f:subview>
 
     <f:subview id="categoryListSelectSubView">
-        <c:import url="include/option/categorydiscount/select_list.jsp" />
+        <ui:include src="include/option/categorydiscount/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="categoryOrgListSelectSubView">
-        <c:import url="include/option/categoryorg/select_list.jsp" />
+        <ui:include src="include/option/categoryorg/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="ruleListSelectSubView">
-        <c:import url="include/option/discountrule/select_list.jsp" />
+        <ui:include src="include/option/discountrule/select_list.xhtml" />
     </f:subview>
 
     <f:subview id="ccAccountDeleteSubView">
-        <c:import url="include/contragent/ccaccount/confirm_delete.jsp" />
+        <ui:include src="include/contragent/ccaccount/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="reportJobDeleteSubView">
-        <c:import url="include/report/job/confirm_delete.jsp" />
+        <ui:include src="include/report/job/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="reportRuleDeleteSubView">
-        <c:import url="include/report/rule/confirm_delete.jsp" />
+        <ui:include src="include/report/rule/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="eventNotificationDeleteSubView">
-        <c:import url="include/event_notification/confirm_delete.jsp" />
+        <ui:include src="include/event_notification/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="PosDeleteSubView">
-        <c:import url="include/contragent/pos/confirm_delete.jsp" />
+        <ui:include src="include/contragent/pos/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="settlementDeleteSubView">
-        <c:import url="include/contragent/settlement/confirm_delete.jsp" />
+        <ui:include src="include/contragent/settlement/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="addPaymentDeleteSubView">
-        <c:import url="include/contragent/addpayment/confirm_delete.jsp" />
+        <ui:include src="include/contragent/addpayment/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="categoryDeleteSubView">
-        <c:import url="include/option/confirm_delete.jsp" />
+        <ui:include src="include/option/confirm_delete.xhtml" />
     </f:subview>
 	
 	<f:subview id="templateDeleteSubView">
-        <c:import url="include/option/confirm_delete.jsp" />
+        <ui:include src="include/option/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="configurationProviderItemDeleteSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/confirm_delete.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="technologicalMapItemDeleteSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/confirm_delete.jsp" />
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/confirm_delete.xhtml" />
     </f:subview>
 
     <f:subview id="syncErrorsSubView">
-        <c:import url="include/monitoring/sync_errors_window.jsp" />
+        <ui:include src="include/monitoring/sync_errors_window.xhtml" />
     </f:subview>
 
     <f:subview id="userSelectSubView">
-        <c:import url="include/option/user/select.jsp" />
+        <ui:include src="include/option/user/select.xhtml" />
     </f:subview>
 
     <f:subview id="orgMainBuildingListSelectSubView">
-        <c:import url="include/org/select_mainbuilding_list.jsp" />
+        <ui:include src="include/org/select_mainbuilding_list.xhtml" />
     </f:subview>
 
     <f:subview id="userListSelectSubView">
-        <c:import url="include/option/user/select_list.jsp" />
-    </f:subview>
+        <ui:include src="include/option/user/select_list.xhtml" />
+    </f:subview>-->
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td colspan="2">
-                    <%-- Заголовок страницы --%>
-                <a4j:form id="headerForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
+                    <!-- Заголовок страницы -->
+                <h:form id="headerForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
                     <a4j:jsFunction name="sayHello" action="#{mainPage.userSaidHello}"/>
                     <a4j:jsFunction name="sayGoodbye" action="#{mainPage.userSaidGoodbye}"/>
                     <rich:panel styleClass="header-panel" bodyClass="header-panel-body">
                         <h:panelGroup style="text-align: right; float: right;">
                             <h:outputText escape="true" value="Версия #{runtimeContext.currentDBSchemaVersion}"
                                           styleClass="output-text" /><br />
-                            <a4j:commandLink value="Мои настройки" binding="#{userSettings.mainMenuComponent}"
-                                           action="#{userSettings.show}" styleClass="command-link" reRender="workspaceForm"/>
+                            <a4j:commandLink value="Мои настройки"
+                                           action="#{userSettings.show}" styleClass="command-link" render="workspaceForm"/>
                             &nbsp;&nbsp;&nbsp;
                             <h:outputText id="sysuser" escape="true" value="#{request.remoteUser}" styleClass="output-text" />
-                            <rich:toolTip for="sysuser" followMouse="true" direction="top-right" showDelay="500" styleClass="tooltip" rendered="#{not empty mainPage.userContragentsList}">
+                            <rich:tooltip for="sysuser" followMouse="true" showDelay="500" styleClass="tooltip" rendered="#{not empty mainPage.userContragentsList}">
                                 <span  style="white-space:nowrap">
                                     <h:outputText styleClass="output-text" style="font-weight: bold" value="Доступные контрагенты:" /><br />
                                     <h:outputText escape="false" value="#{mainPage.userContragentsList}" /><br /><br />
                                     <h:outputText styleClass="output-text" style="font-weight: bold" value="Доступные регионы:" /><br />
                                     <h:outputText escape="false" value="#{mainPage.userRegionsList}" />
                                 </span>
-                            </rich:toolTip>
+                            </rich:tooltip>
                             <h:outputText value=" - " styleClass="output-text"/>
                             <a4j:commandLink value="Выход" action="#{mainPage.logout}" styleClass="command-link" />
                         </h:panelGroup>
@@ -297,36 +289,35 @@
                                           styleClass="page-header-text" />
                         </h:panelGroup>
                     </rich:panel>
-                </a4j:form>
+                </h:form>
             </td>
         </tr>
-            <%-- Центральная область --%>
+            <!-- Центральная область -->
         <tr>
             <td style="min-width: 210px; vertical-align: top;" width="215px">
-                    <%-- Главное меню --%>
+                    <!-- Главное меню -->
                 <f:subview id="mainMenuSubView">
-                    <c:import url="/back-office/include/main_menu.jsp" />
+                    <ui:include src="/back-office/include/main_menu.xhtml" />
                 </f:subview>
             </td>
             <td style="vertical-align: top;" width="*">
-                    <%-- Рабочая область --%>
+                    <!-- Рабочая область -->
                 <f:subview id="workspaceSubView">
-                    <c:import url="/back-office/include/workspace.jsp" />
+                    <ui:include src="/back-office/include/workspace.xhtml" />
                 </f:subview>
             </td>
         </tr>
         <tr>
             <td colspan="2">
-                    <%-- Нижний колонтитул --%>
+                    <!-- Нижний колонтитул -->
                 <h:panelGrid width="100%" cellspacing="4px" cellpadding="0" styleClass="borderless-grid"
                              columnClasses="right-aligned-column">
-                </h:panelGrid> <%-- Нижний колонтитул --%>
+                </h:panelGrid> <!-- Нижний колонтитул -->
             </td>
         </tr>
     </table>
 
-</body>
-
-</html>
+</h:body>
 
 </f:view>
+</html>
