@@ -602,6 +602,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
@@ -649,8 +650,13 @@ public class EventNotificationService {
                 Date eventDate = df.parse(empDateStr);
                 empType.setTime(eventDate.getTime());
             } catch (Exception e) {
+                empType.setTime(new Date().getTime());
                 logger.error("Failed to parse EMP date", e);
             }
+        }
+        else
+        {
+            empType.setTime(new Date().getTime());
         }
         return empType;
     }
@@ -696,6 +702,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
@@ -704,6 +711,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
