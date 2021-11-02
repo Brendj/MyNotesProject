@@ -699,7 +699,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return eventType.equals(RnipEventType.CONTRAGENT_CREATE) || eventType.equals(RnipEventType.CONTRAGENT_EDIT);
     }
 
-    private RNIPPaymentsResponse parsePayments(Response internalResponse) {
+    public RNIPPaymentsResponse parsePayments(Response internalResponse) {
         ExportPaymentsResponse exportPaymentsResponse = internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse();
         List<ExportPaymentsResponse.PaymentInfo> paymentInfos = exportPaymentsResponse.getPaymentInfo();
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
