@@ -1014,6 +1014,7 @@ public class DAOService {
         }
     }
 
+    @Transactional
     public void saveSyncRequestInDb(String query_str) {
         Query query = entityManager.createNativeQuery(query_str);
         query.executeUpdate();
