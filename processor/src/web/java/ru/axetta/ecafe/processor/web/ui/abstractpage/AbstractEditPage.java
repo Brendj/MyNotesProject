@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.abstractpage;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -22,7 +23,8 @@ import javax.servlet.http.HttpSession;
 public abstract class AbstractEditPage<I extends AbstractEntityItem> extends BasicWorkspacePage {
     @PersistenceContext(unitName = "processorPU")
     protected EntityManager entityManager;
-    @Resource(name = "txManager")
+    @Autowired
+    @Qualifier(value = "txManager")
     protected PlatformTransactionManager transactionManager;
 
     @Autowired

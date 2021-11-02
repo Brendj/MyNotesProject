@@ -22,9 +22,9 @@
     <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
     <h:selectManyCheckbox value="#{directorPage.directorUseCardsPage.selectedOrgs}" id="directorUseCardsGridSelectionPanel" styleClass="output-text" layout="pageDirection">
         <f:selectItem itemValue="-1" itemLabel="весь комплекс ОО"/>
-        <ui:repeat value="#{directorPage.directorUseCardsPage.organizations}" var="item">
+        <a4j:repeat value="#{directorPage.directorUseCardsPage.organizations}" var="item">
             <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName} - #{item.shortAddress}" itemDisabled="#{directorPage.directorUseCardsPage.selectedOrgs.contains('-1')}"/>
-        </ui:repeat>
+        </a4j:repeat>
         <a4j:ajax event="change" render="directorUseCardsGridSelectionPanel"/>
     </h:selectManyCheckbox>
 

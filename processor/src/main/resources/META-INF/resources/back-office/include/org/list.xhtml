@@ -1,20 +1,19 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<!-- Панель просмотра списка организаций -->
+<h:panelGrid id="orgListPanelGrid" styleClass="borderless-grid">
 
-<%-- Панель просмотра списка организаций --%>
-<h:panelGrid id="orgListPanelGrid" binding="#{mainPage.orgListPage.pageComponent}" styleClass="borderless-grid">
+    <!-- Панель фильтрации организации:
+     фильтр производится по идентификатору и по имени организации -->
 
-    <%-- Панель фильтрации организации:
-     фильтр производится по идентификатору и по имени организации --%>
-
-    <rich:simpleTogglePanel label="Фильтр (#{mainPage.orgListPage.orgFilter.status})" switchType="client"
+    <rich:togglePanel label="Фильтр (#{mainPage.orgListPage.orgFilter.status})" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="false" headerClass="filter-panel-header">
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -57,12 +56,12 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
 
             <a4j:commandButton value="Применить" action="#{mainPage.updateOrgListPage}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
+                               render="workspaceTogglePanel" styleClass="command-button" />
 
             <a4j:commandButton value="Очистить" action="#{mainPage.clearOrgListPageFilter}"
-                               reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                               render="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
         </h:panelGrid>
-    </rich:simpleTogglePanel>
+    </rich:togglePanel>
 
 
     <rich:dataTable id="orgListTable" value="#{mainPage.orgListPage.items}"
@@ -102,25 +101,13 @@
                 <rich:column rowspan="2" headerClass="column-header">
                     <h:outputText value="Редактировать" />
                 </rich:column>
-                <rich:column breakBefore="true" headerClass="column-header">
-                    <h:outputText value="ИД" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText value="Наименование" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText value="ИД" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText value="Наименование" />
-                </rich:column>
             </rich:columnGroup>
         </f:facet>
         <rich:column styleClass="right-aligned-column">
             <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
         </rich:column>
         <rich:column styleClass="left-aligned-column">
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
@@ -128,7 +115,7 @@
             <h:outputText escape="true" value="#{item.idOfOrgMain}" styleClass="output-text" />
         </rich:column>
         <rich:column styleClass="left-aligned-column">
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.shortNameMain}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.shortNameMain}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.idOfOrgMain}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
@@ -157,14 +144,14 @@
             <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
         </rich:column>
         <rich:column styleClass="center-aligned-column">
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showOrgEditPage}" styleClass="command-link">
+            <a4j:commandLink render="mainMenu, workspaceForm" action="#{mainPage.showOrgEditPage}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
 
         <f:facet name="footer">
-            <rich:datascroller for="orgListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:dataScroller for="orgListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -172,9 +159,8 @@
                 <f:facet name="next">
                     <h:graphicImage value="/images/16x16/right-arrow.png" />
                 </f:facet>
-            </rich:datascroller>
+            </rich:dataScroller>
         </f:facet>
     </rich:dataTable>
 </h:panelGrid>
-
-
+</ui:composition>

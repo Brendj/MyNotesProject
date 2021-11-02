@@ -1,18 +1,18 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditOrgs())
-      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
-
-<%-- Панель редактирования организации --%>
-<h:panelGrid id="orgEditGrid" binding="#{mainPage.orgEditPage.pageComponent}" styleClass="borderless-grid" columns="1">
+<!-- Панель редактирования организации -->
+<h:panelGrid rendered="#{!mainPage.isEligibleToEditOrgs()}">
+    <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
+</h:panelGrid>
+<h:panelGrid id="orgEditGrid" binding="#{mainPage.orgEditPage.pageComponent}" styleClass="borderless-grid" columns="1"
+rendered="#{mainPage.isEligibleToEditOrgs()}">
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
@@ -41,7 +41,7 @@
     <h:inputText value="#{mainPage.orgEditPage.tag}" maxlength="256" styleClass="input-text long-field" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Реквизиты:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_requisites" styleClass="borderless-grid" columns="2">
@@ -52,7 +52,7 @@
     <h:outputText escape="true" value="Детализация статуса" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:selectOneMenu value="#{mainPage.orgEditPage.statusDetail}" styleClass="input-text">
-            <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
+            <a4j:ajax event="change" render="userEditGrid" />
             <f:selectItems value="#{mainPage.orgEditPage.statusDetails}" />
         </h:selectOneMenu>
         <h:inputTextarea rows="2" cols="64" value="#{mainPage.orgEditPage.statusTextArea}" styleClass="input-text" />
@@ -92,7 +92,7 @@
                    inputClass="input-text" showWeeksBar="false" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Местоположение:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_placement" styleClass="borderless-grid" columns="2">
@@ -110,7 +110,7 @@
     <h:inputText value="#{mainPage.orgEditPage.longitude}" maxlength="12" styleClass="input-text long-field" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Поставщик питания:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_supplier" styleClass="borderless-grid" columns="2">
@@ -121,7 +121,7 @@
         <h:inputText value="#{mainPage.orgEditPage.defaultSupplier.contragentName}" readonly="true"
                      styleClass="input-text long-field" style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                           reRender="modalContragentSelectorPanel"
+                           render="modalContragentSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
             <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
@@ -134,7 +134,7 @@
         <h:inputText value="#{mainPage.orgEditPage.coSupplier.contragentName}" readonly="true"
                      styleClass="input-text long-field" style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                           reRender="modalContragentSelectorPanel"
+                           render="modalContragentSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                            rendered="#{mainPage.orgEditPage.defaultSupplier != null}"
                            styleClass="command-link" style="width: 25px;" >
@@ -158,10 +158,10 @@
         <f:selectItems value="#{mainPage.orgEditPage.refectoryTypeComboMenuItems}" />
     </h:selectOneMenu>
 
-    <%-- Список категорий к которым пренадлежит организация --%>
+    <!-- Список категорий к которым пренадлежит организация -->
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
     <h:panelGroup>
-        <a4j:commandButton id="categoryOrgAjaxButton1" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" reRender="modalCategoryOrgListSelectorPanel"
+        <a4j:commandButton id="categoryOrgAjaxButton1" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" render="modalCategoryOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
             <f:setPropertyActionListener value="#{mainPage.orgEditPage.idOfCategoryOrgList}" target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}"/>
@@ -170,14 +170,14 @@
     </h:panelGroup>
     <h:outputText escape="true" value="Включить товарный учет" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeCommodityAccounting}" styleClass="output-text">
-        <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" />
+        <a4j:ajax event="click" render="orgEditGrid" />
     </h:selectBooleanCheckbox>
 
     <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" rendered="#{mainPage.orgEditPage.changeCommodityAccounting}"/>
     <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.orgEditPage.changeCommodityAccounting}">
         <h:inputText value="#{mainPage.orgEditPage.configurationProviderName}" readonly="true" styleClass="input-text"
                      style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.orgEditPage.showConfigurationProviderSelection}" reRender="configurationProviderSelectModalPanel"
+        <a4j:commandButton value="..." action="#{mainPage.orgEditPage.showConfigurationProviderSelection}" render="configurationProviderSelectModalPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
@@ -185,7 +185,7 @@
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.orgEditPage.menuExchangeSourceOrgName}" readonly="true" styleClass="input-text long-field"
                      style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
             <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}" />
@@ -214,7 +214,7 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.preorderlp}" styleClass="input-text"/>
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Настройка рассылки и уведомлений:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_notifications" styleClass="borderless-grid" columns="2">
@@ -235,7 +235,7 @@
     <h:inputText value="#{mainPage.orgEditPage.mailingListReports2}" styleClass="input-text long-field" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Параметры синхронизации:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_sync" styleClass="borderless-grid" columns="2">
@@ -265,15 +265,15 @@
 
     <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-div" columns="2">
-        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" render="modalOrgListSelectorPanel"
                            rendered="#{mainPage.orgEditPage.mainBuilding}"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
             <f:setPropertyActionListener value="#{mainPage.orgEditPage.idOfFriendlyOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
         </a4j:commandButton>
-        <%--<h:outputText value="{#{mainPage.orgEditPage.friendlyFilterOrgs}}" styleClass="output-text"/>--%>
+        
         <a4j:repeat value="#{mainPage.orgEditPage.friendlyOrganisation}" var="key">
-            <a4j:commandLink action="#{mainPage.showOrgEditPage}" reRender="mainMenu, workspaceForm" rendered="#{!mainPage.orgEditPage.isCurrentOrg(key.idOfOrg)}">
+            <a4j:commandLink action="#{mainPage.showOrgEditPage}" render="mainMenu, workspaceForm" rendered="#{!mainPage.orgEditPage.isCurrentOrg(key.idOfOrg)}">
                 <h:outputText escape="true" value="#{key.shortName}" styleClass="#{mainPage.orgEditPage.getStyleClassLink(key.isMainBuilding())}" />
                 <f:setPropertyActionListener value="#{key.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
@@ -284,7 +284,7 @@
     </h:panelGrid>
     <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text">
-        <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" action="#{mainPage.orgEditPage.changeSubscriptionFeeding}" />
+        <a4j:ajax event="click" render="orgEditGrid" action="#{mainPage.orgEditPage.changeSubscriptionFeeding}" />
     </h:selectBooleanCheckbox>
     <h:outputText escape="true" value="Функционал проверки даты в заявке на питание" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.goodDateCheck}" styleClass="input-text"/>
@@ -294,7 +294,7 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
     <br />
-    <rich:separator />
+    
     <br />
     <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
     <h:panelGrid id="orgEditGrid_cards" styleClass="borderless-grid" columns="2">
@@ -312,12 +312,12 @@
         <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useLongCardNo}" styleClass="input-text"/>
     </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:panelGrid id="orgEditGrid_password" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Сменить пароль для единого входа" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeSsoPassword}" styleClass="output-text">
-        <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" />
+        <a4j:ajax event="click" render="orgEditGrid" />
     </h:selectBooleanCheckbox>
     <h:outputText escape="true" value="Пароль для единого входа" rendered="#{mainPage.orgEditPage.changeSsoPassword}"
                   styleClass="output-text" />
@@ -332,10 +332,10 @@
 </h:panelGrid>
 
 <h:panelGrid columns="2" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="mainMenu, workspaceTogglePanel"
+    <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" render="mainMenu, workspaceTogglePanel"
                        styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{mainPage.showOrgEditPage}"
-                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                       render="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
 <a4j:status id="sOrgCreateStatus">
     <f:facet name="start">
@@ -347,3 +347,4 @@
                    warnClass="warn-messages" />
 </h:panelGrid>
 </h:panelGrid>
+</ui:composition>
