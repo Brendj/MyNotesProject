@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!-- Панель просмотра отчет Организации по контрактам -->
+    <!--@elvariable id="orgOfContractsReportPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.OrgOfContractsReportPage"-->
+    <h:panelGrid id="orgOfContractsReportPanelGrid" binding="#{orgOfContractsReportPage.pageComponent}"
+                 styleClass="borderless-grid">
+        <rich:togglePanel label="Фильтр" switchType="client"
+                          opened="true" headerClass="filter-panel-header">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText styleClass="output-text" escape="true" value="Отобразить на дату"/>
+                <rich:calendar value="#{orgOfContractsReportPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
+                <h:outputText styleClass="output-text" escape="true"
+                              value="Вывести организации без привязанного контракта"/>
+                <h:selectBooleanCheckbox value="#{orgOfContractsReportPage.selectBindContract}"/>
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid">
+                <a4j:commandButton value="Генерировать отчет" action="#{orgOfContractsReportPage.build}"
+                                   render="workspaceTogglePanel, orgOfContractsReportTable"
+                                   styleClass="command-button" status="reportGenerateStatus"/>
+                <a4j:status id="reportGenerateStatus">
+                    <f:facet name="start">
+                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                    </f:facet>
+                </a4j:status>
+            </h:panelGrid>
+        </rich:togglePanel>
+
+        <h:panelGrid styleClass="borderless-grid" rendered="#{orgOfContractsReportPage.contractsReport!=null}">
+            <h:outputText escape="true" value="Организации по контрактам" styleClass="output-text"/>
+            <rich:dataTable id="orgOfContractsReportTable" value="#{orgOfContractsReportPage.contractsReport.items}"
+                            var="item" rowKeyVar="row" rows="50" render="menuViewListScroller"
+                            footerClass="data-table-footer"
+                            columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText escape="true" value="Организация" styleClass="column-header"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText escape="true" value="Контракт" styleClass="column-header"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText escape="true" value="Контрагент" styleClass="column-header"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText escape="true" value="Поставщик" styleClass="column-header"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="right-aligned-column">
+                    <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.shortName}"
+                                     action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                        <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}"/>
+                    </a4j:commandLink>
+                </rich:column>
+                <rich:column styleClass="right-aligned-column">
+                    <a4j:commandLink value="#{item.contractNumber}" action="#{contractViewPage.show}"
+                                     styleClass="command-link"
+                                     render="mainMenu, workspaceForm">
+                        <f:setPropertyActionListener value="#{item.idOfContract}"
+                                                     target="#{contractEditPage.selectedEntityGroupPage.currentEntityItemId}"/>
+                    </a4j:commandLink>
+                </rich:column>
+                <rich:column styleClass="right-aligned-column">
+                    <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.contragentName}"
+                                     action="#{mainPage.showContragentViewPage}"
+                                     styleClass="command-link">
+                        <f:setPropertyActionListener value="#{item.idOfContragent}"
+                                                     target="#{mainPage.selectedIdOfContragent}"/>
+                    </a4j:commandLink>
+                </rich:column>
+                <rich:column styleClass="right-aligned-column">
+                    <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.supplierName}"
+                                     action="#{mainPage.showContragentViewPage}"
+                                     styleClass="command-link">
+                        <f:setPropertyActionListener value="#{item.idOfSupplier}"
+                                                     target="#{mainPage.selectedIdOfContragent}"/>
+                    </a4j:commandLink>
+                </rich:column>
+                <f:facet name="footer">
+                    <rich:dataScroller for="orgOfContractsReportTable" renderIfSinglePage="false" maxPages="10"
+                                       fastControls="hide"
+                                       stepControls="auto" boundaryControls="hide">
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                        </f:facet>
+                    </rich:dataScroller>
+                </f:facet>
+            </rich:dataTable>
+        </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

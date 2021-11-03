@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!-- Справочник платежей между контрагентами -->
+    <h:panelGrid id="settlementListPanel" binding="#{mainPage.settlementListPage.pageComponent}"
+                 styleClass="borderless-grid">
+        <rich:togglePanel label="Фильтр (#{mainPage.settlementListPage.filter.status})" switchType="client"
+                          eventsQueue="mainFormEventsQueue" opened="false" headerClass="filter-panel-header">
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Плательщик" styleClass="output-text"/>
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{mainPage.settlementListPage.filter.contragentPayer.contragentName}"
+                                 readonly="true"
+                                 styleClass="input-text" style="margin-right: 2px;"/>
+                    <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                                       render="modalContragentSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="0"
+                                                     target="#{mainPage.multiContrFlag}"/>
+                        <f:setPropertyActionListener value="1,2,3,4"
+                                                     target="#{mainPage.classTypes}"/>
+                    </a4j:commandButton>
+                </h:panelGroup>
+                <h:outputText escape="true" value="Получатель" styleClass="output-text"/>
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{mainPage.settlementListPage.filter.contragentReceiver.contragentName}"
+                                 readonly="true"
+                                 styleClass="input-text" style="margin-right: 2px;"/>
+                    <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                                       render="modalContragentSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="1"
+                                                     target="#{mainPage.multiContrFlag}"/>
+                        <f:setPropertyActionListener value="1,2,3,4"
+                                                     target="#{mainPage.classTypes}"/>
+                    </a4j:commandButton>
+                </h:panelGroup>
+            </h:panelGrid>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <a4j:commandButton value="Применить" action="#{mainPage.showSettlementListPage}"
+                                   render="workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Очистить" action="#{mainPage.clearSettlementListPageFilter}"
+                                   render="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
+            </h:panelGrid>
+        </rich:togglePanel>
+
+        <a4j:status id="settlementTableGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+            </f:facet>
+        </a4j:status>
+
+        <rich:dataTable id="settlementTable" value="#{mainPage.settlementListPage.items}" var="item" rows="20"
+                        columnClasses="left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column"
+                        footerClass="data-table-footer">
+            <rich:column headerClass="column-header" style="text-align:right">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Идентификатор"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.idOfSettlement}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header" style="text-align:left">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Плательщик"/>
+                </f:facet>
+                <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.contragentPayer.contragentName}"
+                                 action="#{mainPage.showContragentViewPage}"
+                                 styleClass="command-link">
+                    <f:setPropertyActionListener value="#{item.contragentPayer.idOfContragent}"
+                                                 target="#{mainPage.selectedIdOfContragent}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header" style="text-align:left">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Получатель"/>
+                </f:facet>
+                <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.contragentReceiver.contragentName}"
+                                 action="#{mainPage.showContragentViewPage}"
+                                 styleClass="command-link">
+                    <f:setPropertyActionListener value="#{item.contragentReceiver.idOfContragent}"
+                                                 target="#{mainPage.selectedIdOfContragent}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="center-aligned-column" style="text-align:right">
+                <f:facet name="header">
+                    <h:panelGroup>
+                        <h:outputText styleClass="output-text" escape="true" value="Дата создания"/>
+                    </h:panelGroup>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{item.createdDate}" converter="timeConverter"/>
+            </rich:column>
+            <rich:column headerClass="center-aligned-column" style="text-align:right">
+                <f:facet name="header">
+                    <h:panelGroup>
+                        <h:outputText styleClass="output-text" escape="true" value="Дата платежа"/>
+                    </h:panelGroup>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{item.paymentDate}" converter="timeConverter"/>
+            </rich:column>
+            <rich:column headerClass="center-aligned-column" style="text-align:left">
+                <f:facet name="header">
+                    <h:panelGroup>
+                        <h:outputText styleClass="output-text" escape="true" value="Платежный документ"/>
+                    </h:panelGroup>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{item.paymentDoc}"/>
+            </rich:column>
+            <rich:column headerClass="center-aligned-column" style="text-align:center">
+                <f:facet name="header">
+                    <h:panelGroup>
+                        <h:outputText styleClass="output-text" escape="true" value="Сумма"/>
+                    </h:panelGroup>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{item.summa}"/>
+            </rich:column>
+            <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditContragents}"
+                         style="text-align:center">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Редактировать"/>
+                </f:facet>
+                <a4j:commandLink render="mainMenu, workspaceForm" action="#{mainPage.showSettlementEditPage}"
+                                 styleClass="command-link">
+                    <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
+                    <f:setPropertyActionListener value="#{item.idOfSettlement}"
+                                                 target="#{mainPage.selectedIdOfSettlement}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditContragents}"
+                         style="text-align:center">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Удалить"/>
+                </f:facet>
+                <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                                 oncomplete="#{rich:component('settlementDeletePanel')}.show();">
+                    <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                    <f:setPropertyActionListener value="#{item.idOfSettlement}"
+                                                 target="#{mainPage.selectedIdOfSettlement}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <f:facet name="footer">
+                <rich:dataScroller for="settlementTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                    </f:facet>
+                </rich:dataScroller>
+            </f:facet>
+        </rich:dataTable>
+        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSettlementCSVList}"
+                         styleClass="command-button"/>
+    </h:panelGrid>
+</ui:composition>
