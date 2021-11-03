@@ -394,21 +394,23 @@ public class SummaryCalculationService {
         //Подсчет значений для детализации меню в случае уведомления по итогам дня
         Map menuMap = new TreeMap<Long, String>();
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+            //Сначала собираем данные для НЕ комплексов
             String query_menu = "SELECT DISTINCT c.idofclient, od.qty, od.rprice, od.menudetailname, o.idoforder "
                     + "FROM cf_clients c INNER JOIN cf_orders o ON c.idofclient = o.idofclient "
                     + "INNER JOIN cf_orderdetails od ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg "
                     + "WHERE (exists(SELECT * FROM cf_clientsnotificationsettings n WHERE c.idofclient = n.idofclient AND n.notifytype = :notifyType) OR exists (SELECT * FROM cf_client_guardian cg "
                     + "INNER JOIN cf_client_guardian_notificationsettings nn ON cg.idofclientguardian = nn.idofclientguardian AND nn.notifytype = :notifyType WHERE cg.idofchildren = c.idofclient)) "
-                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced";
+                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced and (od.menutype < :mintype or od.menutype > :maxtype)";
             Query mquery = entityManager.createNativeQuery(query_menu);
             mquery.setParameter("notifyType", notifyType);
             mquery.setParameter("startTime", startDate.getTime());
             mquery.setParameter("endTime", endDate.getTime());
             mquery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             mquery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+            mquery.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+            mquery.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
             List mlist = mquery.getResultList();
 
-            //String menu_name = "";
             for (Object obj : mlist) {
                 Object[] row = (Object[]) obj;
                 Long id = ((BigInteger) row[0]).longValue();
@@ -419,6 +421,39 @@ public class SummaryCalculationService {
                 String menu_name = (String) menuMap.get(id);
                 menu_name = (menu_name == null ? "" : menu_name);
                 menu_name += "%" + menu + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
+                if (sum % 100 != 0) {
+                    menu_name += " " + sum % 100 + " коп.";
+                }
+                menu_name += "%";
+                menuMap.put(id, menu_name);
+            }
+
+
+            //Собираем данные для  комплексов
+            String query_menu_complex = "SELECT DISTINCT c.idofclient, od.qty, od.rprice, od.fration, o.idoforder "
+                    + "FROM cf_clients c INNER JOIN cf_orders o ON c.idofclient = o.idofclient "
+                    + "INNER JOIN cf_orderdetails od ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg "
+                    + "WHERE (exists(SELECT * FROM cf_clientsnotificationsettings n WHERE c.idofclient = n.idofclient AND n.notifytype = :notifyType) OR exists (SELECT * FROM cf_client_guardian cg "
+                    + "INNER JOIN cf_client_guardian_notificationsettings nn ON cg.idofclientguardian = nn.idofclientguardian AND nn.notifytype = :notifyType WHERE cg.idofchildren = c.idofclient)) "
+                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced and od.menutype > :mintype and od.menutype < :maxtype)";
+            mquery = entityManager.createNativeQuery(query_menu);
+            mquery.setParameter("notifyType", notifyType);
+            mquery.setParameter("startTime", startDate.getTime());
+            mquery.setParameter("endTime", endDate.getTime());
+            mquery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            mquery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+            mquery.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+            mquery.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+            List mlist_complex = mquery.getResultList();
+
+            for (Object obj : mlist_complex) {
+                Object[] row = (Object[]) obj;
+                Long id = ((BigInteger) row[0]).longValue();
+                Integer qty = ((Integer) row[1]).intValue();
+                Long rprice = ((BigInteger) row[2]).longValue();
+                Long sum = qty * rprice;
+                String menu = OrderDetailFRationTypeWTdiet.getDescription(((Integer) row[3]).intValue());
+                String menu_name = "%" + menu + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
                 if (sum % 100 != 0) {
                     menu_name += " " + sum % 100 + " коп.";
                 }
