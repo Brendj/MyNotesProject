@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <h:panelGrid id="blockunblockReportPanel" binding="#{mainPage.blockUnblockReportPage.pageComponent}"
+                 styleClass="borderless-grid">
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Организация"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.blockUnblockReportPage.filter}" readonly="true"
+                             styleClass="input-text long-field" style="margin-right: 2px;"/>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;"/>
+            </h:panelGroup>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Клиенты"/>
+            <h:panelGroup id="clientFilter">
+                <a4j:commandButton value="..."
+                                   action="#{mainPage.showClientSelectListPage(mainPage.blockUnblockReportPage.getClientList())}"
+                                   render="modalClientListSelectorPanel,selectedClientList"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                    #{rich:component('modalClientListSelectorPanel')}.show();" styleClass="command-link"
+                                   style="width: 25px;" id="clientFilterButton">
+                    <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}"/>
+                    <f:setPropertyActionListener value="#{mainPage.blockUnblockReportPage.getStringClientList}"
+                                                 target="#{mainPage.clientSelectListPage.clientFilter}"/>
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                              value=" {#{mainPage.blockUnblockReportPage.filterClient}}"/>
+            </h:panelGroup>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="false" value="Построить по всем дружественным организациям" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{mainPage.blockUnblockReportPage.allFriendlyOrgs}"
+                                     styleClass="output-text">
+            </h:selectBooleanCheckbox>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Статус блокировки" styleClass="output-text"/>
+            <h:selectOneMenu id="regionsList" value="#{mainPage.blockUnblockReportPage.cardStatusFilter}"
+                             style="width:200px;">
+                <f:selectItems value="#{mainPage.blockUnblockReportPage.statusFilters}"/>
+            </h:selectOneMenu>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.blockUnblockReportPage.buildReportHTML}"
+                               render="blockunblockReportPanel" styleClass="command-button"
+                               status="reportGenerateStatus"/>
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.blockUnblockReportPage.generateXLS}"
+                             styleClass="command-button"/>
+            <a4j:status id="reportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+
+        <h:panelGrid columns="1" columnClasses="valign, valign">
+            <rich:dataTable id="blockUnblockTable" value="#{mainPage.blockUnblockReportPage.items}" var="item" rows="50"
+                            footerClass="data-table-footer" columnClasses="center-aligned-column"
+                            render="lastOrgUpdateTime">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText escape="false" value="Идентификатор"/><br/>
+                            <h:outputText escape="false" value="записи по запросу"/>
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.requestId}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText escape="false" value="Дата блокировки"/><br/>
+                            <h:outputText escape="false" value="по запросу"/>
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.blockdateString}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText escape="false" value="Дата разблокировки"/><br/>
+                            <h:outputText escape="false" value="по запросу"/>
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.unblockdateString}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Операция"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.operation}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText escape="false" value="Ид. обучающегося/"/><br/>
+                            <h:outputText escape="false" value="сотрудника"/>
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.extClientId}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText escape="false" value="ФИО обучающегося/"/><br/>
+                            <h:outputText escape="false" value="сотрудника"/>
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.lastname} #{item.firstname} #{item.middlename}"
+                                  styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Группа"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.groupname}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Л/С представителя"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.contractIdp}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="ФИО представителя"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.lastp} #{item.firp} #{item.middp}"
+                                  styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Название ОО"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.shortname}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Адрес ОО"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.address}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Текущий статус карты"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.cardstate}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Номер карты"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.cardno}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Номер на карте"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.cardprintedno}" styleClass="output-text"/>
+                </rich:column>
+
+                <f:facet name="footer">
+                    <rich:dataScroller for="blockUnblockTable" renderIfSinglePage="false" maxPages="10"
+                                       fastControls="hide"
+                                       stepControls="auto" boundaryControls="hide">
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                        </f:facet>
+                    </rich:dataScroller>
+                </f:facet>
+            </rich:dataTable>
+        </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

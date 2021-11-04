@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditCards())-->
+    <!--{ out.println("Недостаточно прав для просмотра страницы"); return; } %>-->
+
+    <h:panelGrid rendered="#{!mainPage.isEligibleToEditCards()}">
+        <h:outputText escape="true" styleClass="output-text"
+                      value="Недостаточно прав для просмотра страницы">
+        </h:outputText>
+    </h:panelGrid>
+
+    <!-- Панель регистрации цифровой подписи -->
+    <!--@elvariable id="cardSignCreatePage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignCreatePage"-->
+    <h:panelGrid id="cartSign" binding="#{cardSignCreatePage.pageComponent}"
+                 rendered="#{mainPage.isEligibleToEditCards()}">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Тип регистрируемого поставщика" styleClass="output-text"/>
+            <h:selectOneMenu value="#{cardSignCreatePage.newProvider}" styleClass="input-text">
+                <f:selectItems value="#{cardSignCreatePage.getTypesRegister()}"/>
+                <a4j:ajax event="change" render="cartSign"/>
+            </h:selectOneMenu>
+        </h:panelGrid>
+        <h:panelGroup rendered="#{cardSignCreatePage.newProvider}">
+            <h:panelGrid id="cardSignCreateGrid" styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тип ключа подписи производителя" styleClass="output-text"/>
+                <h:selectOneMenu value="#{cardSignCreatePage.signTypeProvider}" styleClass="input-text">
+                    <f:selectItems value="#{cardSignCreatePage.getTypes(2)}"/>
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Данные ключа производителя" styleClass="output-text"/>
+                <h:outputText value="#{cardSignCreatePage.signDataSize}" styleClass="output-text"/>
+                <h:outputText value="Загрузка файла с данными ключа производителя" styleClass="output-text"/>
+                <rich:fileUpload id="cardSignFileUploadElement" styleClass="upload"
+                                 addButtonClass="upload-command-button"
+                                 addButtonClassDisabled="upload-command-button-diasbled"
+                                 cleanButtonClass="upload-command-button"
+                                 cleanButtonClassDisabled="upload-command-button-diasbled"
+                                 stopButtonClass="upload-command-button"
+                                 stopButtonClassDisabled="upload-command-button-diasbled"
+                                 uploadButtonClass="upload-command-button"
+                                 uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
+                                 fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
+                                 fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
+                                 stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
+                                 addControlLabel="Добавить файл" clearControlLabel="Очистить"
+                                 clearAllControlLabel="Очистить все" doneLabel="Готово"
+                                 cancelEntryControlLabel="Отменить"
+                                 transferErrorLabel="Ошибка передачи" uploadControlLabel="Загрузка файла"
+                                 progressLabel="Загрузка" listHeight="70px"
+                                 fileUploadListener="#{cardSignCreatePage.fileUploadListener}">
+                    <f:facet name="label">
+                        <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
+                    </f:facet>
+                    <a4j:ajax event="uploadcomplete" render="cardSignCreateGrid"/>
+                    <a4j:ajax event="clear" render="cardSignCreateGrid"/>
+                </rich:fileUpload>
+                <h:outputText escape="true" value="Тип ключа подписи карт" styleClass="output-text"/>
+                <h:selectOneMenu value="#{cardSignCreatePage.signTypeCard}" styleClass="input-text">
+                    <f:selectItems value="#{cardSignCreatePage.getTypes(1)}"/>
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Код производителя" styleClass="output-text"/>
+                <h:inputText value="#{cardSignCreatePage.manufacturerCode}" styleClass="input-text"/>
+                <h:outputText escape="true" value="Наименование производителя" styleClass="output-text"/>
+                <h:inputText value="#{cardSignCreatePage.manufacturerName}" styleClass="input-text"/>
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid">
+                <a4j:commandButton value="Создать" action="#{cardSignCreatePage.createCardSign(1)}"
+                                   styleClass="command-button"/>
+                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                               warnClass="warn-messages"/>
+            </h:panelGrid>
+        </h:panelGroup>
+
+
+        <h:panelGroup rendered="#{!cardSignCreatePage.newProvider}">
+            <h:panelGrid id="cardSignCreateGrid_OLD" styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тип ключа" styleClass="output-text"/>
+                <h:selectOneMenu value="#{cardSignCreatePage.signTypeCard}" styleClass="input-text">
+                    <f:selectItems value="#{cardSignCreatePage.getTypes(2)}"/>
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Данные ключа" styleClass="output-text"/>
+                <h:outputText value="#{cardSignCreatePage.signDataSize}" styleClass="output-text"/>
+                <h:outputText value="Загрузка файла с данными ключа" styleClass="output-text"/>
+                <rich:fileUpload id="cardSignFileUploadElement_OLD" styleClass="upload"
+                                 addButtonClass="upload-command-button"
+                                 addButtonClassDisabled="upload-command-button-diasbled"
+                                 cleanButtonClass="upload-command-button"
+                                 cleanButtonClassDisabled="upload-command-button-diasbled"
+                                 stopButtonClass="upload-command-button"
+                                 stopButtonClassDisabled="upload-command-button-diasbled"
+                                 uploadButtonClass="upload-command-button"
+                                 uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
+                                 fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
+                                 fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
+                                 stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
+                                 addControlLabel="Добавить файл"
+                                 clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
+                                 cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
+                                 uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
+                                 fileUploadListener="#{cardSignCreatePage.fileUploadListener}">
+                    <f:facet name="label">
+                        <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
+                    </f:facet>
+                    <a4j:ajax event="uploadcomplete" render="cardSignCreateGrid_OLD"/>
+                    <a4j:ajax event="clear" render="cardSignCreateGrid_OLD"/>
+                </rich:fileUpload>
+                <h:outputText escape="true" value="Код производителя" styleClass="output-text"/>
+                <h:inputText value="#{cardSignCreatePage.manufacturerCode}" styleClass="input-text"/>
+                <h:outputText escape="true" value="Наименование производителя" styleClass="output-text"/>
+                <h:inputText value="#{cardSignCreatePage.manufacturerName}" styleClass="input-text"/>
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid">
+                <a4j:commandButton value="Создать" action="#{cardSignCreatePage.createCardSign(2)}"
+                                   styleClass="command-button"/>
+                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                               warnClass="warn-messages"/>
+            </h:panelGrid>
+        </h:panelGroup>
+    </h:panelGrid>
+</ui:composition>
