@@ -1,12 +1,11 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:panelGrid id="allComplexReportPanelGrid" binding="#{mainPage.allComplexReportPage.pageComponent}"
              styleClass="borderless-grid">
@@ -20,7 +19,7 @@
         <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
+                               render="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="#{mainPage.allComplexReportPage.getStringIdOfOrgList}"
@@ -29,7 +28,7 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.allComplexReportPage.filter}}" />
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildAllComplexReport}"
-                           reRender="workspaceTogglePanel, allComplexReportTable" styleClass="command-button"
+                           render="workspaceTogglePanel, allComplexReportTable" styleClass="command-button"
                            status="cReportGenerateStatus" />
         <a4j:status id="cReportGenerateStatus">
             <f:facet name="start">
@@ -72,7 +71,7 @@
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Время последней продажи" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" breakBefore="true">
+                    <rich:column headerClass="center-aligned-column" breakRowBefore="true">
                         <h:outputText styleClass="column-header" escape="true" value="Количество" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
@@ -144,7 +143,7 @@
                 <h:outputText styleClass="output-text" value="#{complex.lastTimeSale}" converter="timeConverter" />
             </rich:column>
             <f:facet name="footer">
-                <rich:datascroller for="allComplexReportTable" renderIfSinglePage="false" maxPages="10"
+                <rich:dataScroller for="allComplexReportTable" renderIfSinglePage="false" maxPages="10"
                                    fastControls="hide" stepControls="auto" boundaryControls="hide">
                     <f:facet name="previous">
                         <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -152,7 +151,7 @@
                     <f:facet name="next">
                         <h:graphicImage value="/images/16x16/right-arrow.png" />
                     </f:facet>
-                </rich:datascroller>
+                </rich:dataScroller>
             </f:facet>
         </rich:dataTable>
         <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showAllComplexCSVList}"
@@ -161,3 +160,4 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
+</ui:composition>
