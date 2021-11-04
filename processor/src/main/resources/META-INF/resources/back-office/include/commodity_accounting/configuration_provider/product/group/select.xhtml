@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="productGroupItemsPanel" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupItemsPanel"-->
+    <rich:popupPanel modal="true" id="productGroupSelectModalPanel" autosized="true" width="200" headerClass="modal-panel-header">
+        <rich:hotKey key="esc" handler="#{rich:component('productGroupSelectModalPanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText escape="true" value="Выберите группу"/>
+        </f:facet>
+        <h:form id="productGroupModalForm" styleClass="borderless-form"
+                  eventsQueue="productGroupSelectorFormEventsQueue">
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: left;">
+                        <h:panelGrid styleClass="borderless-grid">
+                            <h:outputText value="#{productGroupItemsPanel.selectProductGroup.nameOfGroup}"
+                                          styleClass="output-text"
+                                          style="margin-right: 2px; margin-top: 2px; width: 447px; float:left; min-height: 14px; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="4" styleClass="borderless-grid">
+                            <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
+                            <h:inputText value="#{productGroupItemsPanel.filter}" size="48" maxlength="128"
+                                         styleClass="input-text"/>
+                            <a4j:commandLink action="#{productGroupItemsPanel.updateConfigurationProviderSelectPage}"
+                                             render="productGroupModalForm"
+                                             styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/search.png" style="border: 0;"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink action="#{productGroupItemsPanel.updateConfigurationProviderSelectPage}"
+                                             render="productGroupModalForm"
+                                             styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                                <f:setPropertyActionListener value="" target="#{productGroupItemsPanel.filter}"/>
+                            </a4j:commandLink>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <rich:dataTable value="#{productGroupItemsPanel.productGroupList}" var="productGroup"
+                                        rowKeyVar="row"
+                                        width="100%" align="center" id="modalProductGroupSelectorTable" rows="15"
+                                        footerClass="data-table-footer" columnClasses="left-aligned-column"
+                                        rowClasses="select-panel-row"
+                                        onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
+                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+                            <a4j:ajax event="RowClick" render="productGroupModalForm">
+                                <f:setPropertyActionListener value="#{productGroup}"
+                                                             target="#{productGroupItemsPanel.selectProductGroup}"/>
+                            </a4j:ajax>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="№"/>
+                                </f:facet>
+                                <h:outputText value="#{row+1}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="Наименование группы"/>
+                                </f:facet>
+                                <h:outputText value="#{productGroup.nameOfGroup}"/>
+                            </rich:column>
+                            <f:facet name="footer">
+                                <rich:dataScroller for="modalProductGroupSelectorTable" renderIfSinglePage="false"
+                                                   maxPages="5"
+                                                   fastControls="hide" stepControls="auto" boundaryControls="hide">
+                                    <f:facet name="previous">
+                                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                                    </f:facet>
+                                    <f:facet name="next">
+                                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                                    </f:facet>
+                                </rich:dataScroller>
+                            </f:facet>
+                        </rich:dataTable>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">
+                        <h:panelGrid styleClass="borderless-div" columns="2">
+                            <a4j:commandButton value="Ok" action="#{productGroupItemsPanel.addProductGroup}"
+                                               render="workspaceTogglePanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px; margin-right: 4px;"/>
+
+                            <a4j:commandButton value="Отмена" action="#{productGroupItemsPanel.cancel}"
+                                               styleClass="command-button" style="width: 80px; float: right;"
+                                               render="workspaceTogglePanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.hide();"/>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
+</ui:composition>
