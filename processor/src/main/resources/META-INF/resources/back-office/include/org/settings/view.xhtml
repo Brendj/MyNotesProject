@@ -1,20 +1,12 @@
-<%--
-  ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%--
-  Created by IntelliJ IDEA.
-  User: damir
-  Date: 05.04.13
-  Time: 16:07
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-<%--@elvariable id="settingViewPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingViewPage"--%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<!--@elvariable id="settingViewPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingViewPage"-->
 <h:panelGrid id="settingsViewPage" binding="#{settingViewPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid columns="2">
@@ -214,7 +206,7 @@
     </h:panelGrid>
 
     <h:panelGrid columns="2">
-        <a4j:commandButton action="#{settingViewPage.edit}" value="Редактировать" styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/>
+        <a4j:commandButton action="#{settingViewPage.edit}" value="Редактировать" styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
     </h:panelGrid>
 
 </h:panelGrid>
@@ -224,3 +216,4 @@
         <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
     </f:facet>
 </a4j:status>
+</ui:composition>

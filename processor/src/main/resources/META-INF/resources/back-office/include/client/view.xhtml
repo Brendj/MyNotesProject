@@ -1,21 +1,20 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
-<%-- Панель просмотра клиента --%>
+<!-- Панель просмотра клиента -->
 <h:panelGrid id="clientViewGrid" styleClass="borderless-grid" columns="2"
              binding="#{mainPage.clientViewPage.pageComponent}">
     <h:outputText escape="true" value="Фотография" styleClass="output-text" />
     <h:graphicImage value="#{request.requestURL.substring(0, request.requestURL.length() - request.requestURI.length())}/processor/image/#{mainPage.clientViewPage.photoURL}"
                     width="150"/>
     <h:outputText escape="true" value="Организация" styleClass="output-text" />
-    <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{mainPage.clientViewPage.orgShortName}" styleClass="command-link"
+    <a4j:commandLink render="mainMenu, workspaceForm" value="#{mainPage.clientViewPage.orgShortName}" styleClass="command-link"
                    action="#{mainPage.showOrgViewPage}">
         <f:setPropertyActionListener value="#{mainPage.clientViewPage.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
     </a4j:commandLink>
@@ -228,7 +227,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер договора" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{clientGuardian.contractId}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{clientGuardian.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
@@ -259,12 +258,6 @@
                 <h:outputText escape="true" value="#{clientGuardian.createdWhereClientGuardianStr}" style="font-size: 8pt;" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
                 <h:outputText value="" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
 
-                <%-- <h:outputText escape="true" value="Законный представитель" styleClass="output-text" />
-                <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" disabled="true" readonly="true" styleClass="output-text" />
-
-                <h:outputText escape="true" value="Расширенные полномочия" styleClass="output-text" />
-                <h:selectBooleanCheckbox value="#{clientGuardian.extendedRights}" disabled="true" readonly="true" styleClass="output-text" />--%>
-
                 <h:outputText escape="true" value="Согласие на предзаказ" styleClass="output-text" />
                 <h:selectBooleanCheckbox value="#{clientGuardian.informedSpecialMenu}" disabled="true" readonly="true" styleClass="output-text" />
 
@@ -275,23 +268,17 @@
                 <h:outputText escape="true" value="Полномочия:" styleClass="output-text" />
                 <h:outputText escape="true" value="#{clientGuardian.representativeStr}" styleClass="output-text" />
             </h:panelGrid>
-            <rich:spacer/>
+
             <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
                 <h:outputText escape="true" value="Степень родства:" styleClass="output-text" />
                 <h:outputText escape="true" value="#{clientGuardian.relationStr}" styleClass="output-text" />
             </h:panelGrid>
         </rich:column>
-        <%--<rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Степень родства" />
-            </f:facet>
-            <h:outputText escape="true" value="#{clientGuardian.relationStr}" styleClass="output-text" />
-        </rich:column>--%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
-            <rich:dataTable id="clientNotificationSetting" value="#{clientGuardian.notificationItems}" var="it"
+            <rich:dataTable id="clientNotificationSettingGuardians" value="#{clientGuardian.notificationItems}" var="it"
                             rows="11" columnClasses="left-aligned-column, center-aligned-column" styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
@@ -311,7 +298,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер договора" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{clientWard.contractId}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{clientWard.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
@@ -355,7 +342,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
-            <rich:dataTable id="clientNotificationSetting" value="#{clientWard.notificationItems}" var="it"
+            <rich:dataTable id="clientNotificationSettingChildren" value="#{clientWard.notificationItems}" var="it"
                             rows="11" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
@@ -464,7 +451,7 @@
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showClientEditPage}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       render="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
 <rich:panel headerClass="workspace-panel-header">
     <f:facet name="header">
@@ -478,7 +465,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер карты" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardViewPage}" styleClass="command-link">
+            <a4j:commandLink render="mainMenu, workspaceForm" action="#{mainPage.showCardViewPage}" styleClass="command-link">
                 <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
@@ -507,13 +494,13 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardEditPage}" styleClass="command-link">
+            <a4j:commandLink render="mainMenu, workspaceForm" action="#{mainPage.showCardEditPage}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="clientCardTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:dataScroller for="clientCardTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -521,7 +508,8 @@
                 <f:facet name="next">
                     <h:graphicImage value="/images/16x16/right-arrow.png" />
                 </f:facet>
-            </rich:datascroller>
+            </rich:dataScroller>
         </f:facet>
     </rich:dataTable>
 </rich:panel>
+</ui:composition>

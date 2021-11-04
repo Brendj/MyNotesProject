@@ -1,20 +1,20 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<h:panelGrid rendered="#{!mainPage.isEligibleToProcessPayment()}">
+    <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
+</h:panelGrid>
 
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToProcessPayment()) {
-    out.println("Недостаточно прав для просмотра страницы");
-    return;
-} %>
 
-<%--@elvariable id="clientSubAccountTransferPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientSubAccountTransferPage"--%>
-<h:panelGrid id="clientBalanceRefundPanel" binding="#{clientSubAccountTransferPage.pageComponent}" styleClass="borderless-grid">
+<!--@elvariable id="clientSubAccountTransferPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientSubAccountTransferPage"-->
+<h:panelGrid id="clientBalanceRefundPanel" binding="#{clientSubAccountTransferPage.pageComponent}"
+             styleClass="borderless-grid" rendered="#{mainPage.isEligibleToProcessPayment()}">
 
 <a4j:status>
     <f:facet name="start">
@@ -22,7 +22,7 @@
     </f:facet>
 </a4j:status>
 
-<rich:simpleTogglePanel label="Перевод средств между счетами клиента" switchType="client" opened="true"
+<rich:togglePanel label="Перевод средств между счетами клиента" switchType="client" opened="true"
                         headerClass="filter-panel-header">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Клиент" styleClass="output-text" />
@@ -62,7 +62,7 @@
                            styleClass="command-button" />
 
     </h:panelGrid>
-</rich:simpleTogglePanel>
+</rich:togglePanel>
 
 
 <h:panelGrid styleClass="borderless-grid">
@@ -71,3 +71,4 @@
 </h:panelGrid>
 
 </h:panelGrid>
+</ui:composition>

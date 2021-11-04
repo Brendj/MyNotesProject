@@ -1,18 +1,16 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<%-- Панель просмотра списка клиентов --%>
+<!-- Панель просмотра списка клиентов -->
 <h:panelGrid id="clientListPanelGrid" binding="#{mainPage.clientListPage.pageComponent}" styleClass="borderless-grid">
     <a4j:region>
-    <rich:simpleTogglePanel label="Фильтр (#{mainPage.clientListPage.clientFilter.status})" switchType="client"
+    <rich:togglePanel label="Фильтр (#{mainPage.clientListPage.clientFilter.status})" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="false" headerClass="filter-panel-header">
 
         <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-250,column-width-500">
@@ -22,7 +20,7 @@
                 <h:inputText value="#{mainPage.clientListPage.clientFilter.org.shortName}" readonly="true"
                              styleClass="input-text" style="margin-right: 2px; width: 300px;" />
                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
-                                   reRender="modalOrgSelectorPanel"
+                                   render="modalOrgSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />
             </h:panelGroup>
@@ -55,7 +53,7 @@
             <h:selectOneMenu value="#{mainPage.clientListPage.clientFilter.clientGroupId}" styleClass="input-text"
                              style="width: 145px;">
                 <f:selectItems value="#{mainPage.clientListPage.clientFilter.clientGroupItems}" />
-                <a4j:support event="onchange" reRender="showDeletedClients" />
+                <a4j:ajax event="change" render="showDeletedClients" />
             </h:selectOneMenu>
 
         </h:panelGrid>
@@ -109,11 +107,11 @@
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{mainPage.updateClientListPage}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
+                               render="workspaceTogglePanel" styleClass="command-button" />
             <a4j:commandButton value="Очистить" action="#{mainPage.clearClientListPageFilter}"
-                               reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                               render="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
         </h:panelGrid>
-    </rich:simpleTogglePanel>
+    </rich:togglePanel>
 
     <a4j:status id="sReportGenerateStatus">
         <f:facet name="start">
@@ -128,7 +126,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="ИД" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfClient}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
@@ -138,7 +136,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Л/с" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.contractId}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
@@ -183,7 +181,7 @@
                 <h:outputText escape="true" value="Название ОО" />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showOrgViewPage}" styleClass="command-link"
-                             reRender="mainMenu, workspaceForm">
+                             render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.org.shortName}" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
@@ -219,7 +217,7 @@
                 <h:outputText escape="true" value="Операции" />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showClientOperationListPageWithOrgView}" styleClass="command-link"
-                             reRender="mainMenu, workspaceForm">
+                             render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="Операции" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </a4j:commandLink>
@@ -228,7 +226,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientEditPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientEditPage}" styleClass="command-link" render="mainMenu, workspaceForm">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </a4j:commandLink>
@@ -239,13 +237,13 @@
             </f:facet>
             <!-- TODO -->
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                             oncomplete="#{rich:component('removedClientDeletePanel')}.show()" reRender="removedClientDeletePanel">
+                             oncomplete="#{rich:component('removedClientDeletePanel')}.show()" render="removedClientDeletePanel">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="clientListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:dataScroller for="clientListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -253,30 +251,30 @@
                 <f:facet name="next">
                     <h:graphicImage value="/images/16x16/right-arrow.png" />
                 </f:facet>
-            </rich:datascroller>
+            </rich:dataScroller>
         </f:facet>
     </rich:dataTable>
 
-    <rich:simpleTogglePanel switchType="client" label="Групповые операции" opened="false" rendered="#{mainPage.eligibleToEditClients}">
+    <rich:togglePanel switchType="client" label="Групповые операции" opened="false" rendered="#{mainPage.eligibleToEditClients}">
         <rich:tabPanel switchType="client">
-            <rich:tab label="Изменение лимита овердрафта">
+            <rich:tab header="Изменение лимита овердрафта">
                 <h:panelGrid columns="2">
                     <h:outputText value="Лимит овердрафта" styleClass="output-text"/>
                     <h:inputText value="#{mainPage.clientListPage.limit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
-                    <rich:spacer/>
+
                     <a4j:commandButton value="Применить" action="#{mainPage.setLimit}"
-                                   reRender="workspaceTogglePanel" styleClass="command-button"/>
+                                   render="workspaceTogglePanel" styleClass="command-button"/>
                 </h:panelGrid>
             </rich:tab>
-            <rich:tab label="Изменение организации">
+            <rich:tab header="Изменение организации">
                 <h:panelGrid styleClass="borderless-grid" columns="3">
                     <h:outputText escape="true" value="Организация" styleClass="output-text" />
-                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
                                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                                styleClass="command-link" style="width: 25px;" />
                     <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientFilter.org.shortName}}" />
                     <h:outputText escape="true" value="Группа" styleClass="output-text" />
-                    <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
+                    <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" render="modalClientGroupSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
                                        styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientListPage.clientFilter.org.isEmpty()}">
                         <f:param name="idOfOrg" value="#{mainPage.clientListPage.clientFilter.org.idOfOrg}" />
@@ -284,47 +282,46 @@
                         <f:setPropertyActionListener value="#{null}" target="#{mainPage.clientGroupSelectPage.filter}" />
                     </a4j:commandButton>
                     <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientListPage.clientGroupName}}" />
-                    <rich:spacer/>
-                    <rich:spacer/>
+
                     <a4j:commandButton value="Применить" action="#{mainPage.setOrg}" disabled="#{!mainPage.clientListPage.clientGroupSelected()}"
-                                   reRender="workspaceTogglePanel" styleClass="command-button" oncomplete="" >
+                                   render="workspaceTogglePanel" styleClass="command-button" oncomplete="" >
                     </a4j:commandButton>
                 </h:panelGrid>
             </rich:tab>
-            <rich:tab label="Изменение лимита дневных трат">
+            <rich:tab header="Изменение лимита дневных трат">
                 <h:panelGrid columns="2">
                     <h:outputText value="Лимит дневных трат" styleClass="output-text"/>
                     <h:inputText value="#{mainPage.clientListPage.expenditureLimit}" maxlength="20" converter="copeckSumConverter" styleClass="input-text" />
-                    <rich:spacer/>
+
                     <a4j:commandButton value="Применить" action="#{mainPage.setExpenditureLimit}"
-                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                                   render="workspaceTogglePanel" styleClass="command-button" />
                 </h:panelGrid>
             </rich:tab>
-            <rich:tab label="SMS-уведомления">
+            <rich:tab header="SMS-уведомления">
                 <h:panelGrid columns="2">
                     <h:outputText value="Включить SMS-уведомления" styleClass="output-text"/>
                     <h:selectBooleanCheckbox value="#{mainPage.clientListPage.notifyViaSMS}" styleClass="output-text" />
-                    <rich:spacer/>
+
                     <a4j:commandButton value="Применить" action="#{mainPage.setClientGroupNofifyViaSMS}"
-                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                                   render="workspaceTogglePanel" styleClass="command-button" />
                 </h:panelGrid>
             </rich:tab>
-            <rich:tab label="PUSH-уведомления">
+            <rich:tab header="PUSH-уведомления">
                 <h:panelGrid columns="2">
                     <h:outputText value="Включить PUSH-уведомления" styleClass="output-text"/>
                     <h:selectBooleanCheckbox value="#{mainPage.clientListPage.notifyViaPUSH}" styleClass="output-text" />
-                    <rich:spacer/>
+
                     <a4j:commandButton value="Применить" action="#{mainPage.setClientGroupNofifyViaPUSH}"
-                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                                   render="workspaceTogglePanel" styleClass="command-button" />
                 </h:panelGrid>
             </rich:tab>
         </rich:tabPanel>
-    </rich:simpleTogglePanel>
+    </rich:togglePanel>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
 </a4j:region>
 </h:panelGrid>
 
-<rich:modalPanel id="removedClientDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+<rich:popupPanel modal="true" id="removedClientDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText value="Удаление клиента" styleClass="output-text" />
     </f:facet>
@@ -339,7 +336,7 @@
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeClientFromList}"
                                            oncomplete="#{rich:component('removedClientDeletePanel')}.hide();"
-                                           reRender="mainMenu, clientListTable"
+                                           render="mainMenu, clientListTable"
                                            styleClass="command-button">
                         </a4j:commandButton>
                         <a4j:commandButton value="Отмена" styleClass="command-button"
@@ -348,4 +345,5 @@
                 </td>
             </tr>
         </table>
-</rich:modalPanel>
+</rich:popupPanel>
+</ui:composition>

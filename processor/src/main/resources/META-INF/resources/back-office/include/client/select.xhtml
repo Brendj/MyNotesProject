@@ -1,13 +1,13 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-<script>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<script type="text/javascript">
     function disableButtons(value) {
         var element = document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clientButtonCardShow");
         if (element != null) {
@@ -33,7 +33,7 @@
         if (element != null) {
             element.disabled=value;
         }
-        for (i = 0; i < 10; i++) {
+        for (i = 0; i &lt; 10; i++) {
             var nameInTableBlock = "workspaceSubView:workspaceForm:workspacePageSubView:cardOperatorTable:".concat(i.toString(), ":blockCardButtonCardShow");
             var nameInTableCancel = "workspaceSubView:workspaceForm:workspacePageSubView:cardOperatorTable:".concat(i.toString(), ":cancelCardButtonCardShow");
             element = document.getElementById(nameInTableBlock);
@@ -47,12 +47,12 @@
         }
     }
 </script>
-<rich:modalPanel id="modalClientSelectorPanel" autosized="true" headerClass="modal-panel-header">
+<rich:popupPanel modal="true" id="modalClientSelectorPanel" autosized="true" height="500" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalClientSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор клиента" />
     </f:facet>
-    <a4j:form id="modalClientSelectorForm" styleClass="borderless-form" eventsQueue="modalClientSelectorFormEventsQueue"
+    <h:form id="modalClientSelectorForm" styleClass="borderless-form" eventsQueue="modalClientSelectorFormEventsQueue"
               binding="#{mainPage.clientSelectPage.pageComponent}">
         <table class="borderless-grid" width="100%">
             <tr>
@@ -65,7 +65,7 @@
             </tr>
             <tr>
                 <td>
-                    <rich:simpleTogglePanel id="modalClientSelectorFilterPanel"
+                    <rich:togglePanel id="modalClientSelectorFilterPanel"
                                             label="Фильтр (#{mainPage.clientSelectPage.clientFilter.status})"
                                             switchType="client" eventsQueue="mainFormEventsQueue" opened="true"
                                             headerClass="filter-panel-header">
@@ -76,7 +76,7 @@
                                              value="#{mainPage.clientSelectPage.clientFilter.org.shortName}"
                                              readonly="true" styleClass="input-text long-field" style="margin-right: 2px;" />
                                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
-                                                   reRender="modalOrgSelectorPanel" id="orgButtonSelectClient"
+                                                   render="modalOrgSelectorPanel" id="orgButtonSelectClient"
                                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show(); disableButtons(false);"
                                                    styleClass="command-link" style="width: 25px;"
                                                    onclick="disableButtons(true);"/>
@@ -96,16 +96,16 @@
                         </h:panelGrid>
                         <h:panelGrid columns="2" styleClass="borderless-grid">
                             <a4j:commandButton value="Применить" action="#{mainPage.updateClientSelectPage}"
-                                               reRender="modalClientSelectorForm" styleClass="command-button"
+                                               render="modalClientSelectorForm" styleClass="command-button"
                                                onclick="disableButtons(true);" oncomplete="disableButtons(false)"
                                                id="applyButtonSelectClient"/>
                             <a4j:commandButton value="Очистить" action="#{mainPage.clearClientSelectPageFilter}"
-                                               reRender="modalClientSelectorForm" ajaxSingle="true"
+                                               render="modalClientSelectorForm" ajaxSingle="true"
                                                styleClass="command-button"
                                                onclick="disableButtons(true);" oncomplete="disableButtons(false)"
                                                id="clearButtonSelectClient"/>
                         </h:panelGrid>
-                    </rich:simpleTogglePanel>
+                    </rich:togglePanel>
                 </td>
             </tr>
             <tr>
@@ -114,11 +114,13 @@
                                     value="#{mainPage.clientSelectPage.items}" var="item" rows="8"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                    onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
-                        <a4j:support event="onRowClick" reRender="modalClientSelectorForm">
-                            <f:setPropertyActionListener value="#{item}"
-                                                         target="#{mainPage.clientSelectPage.selectedItem}" />
-                        </a4j:support>
+                                    onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                    onrowclick="#{rich:element('detail')}.click();">
+                        <rich:column width="1" style="display: none">
+                            <a4j:commandButton id="detail" render="modalClientSelectorForm" execute="@this">
+                                <f:setPropertyActionListener value="#{item}" target="#{mainPage.clientSelectPage.selectedItem}"/>
+                            </a4j:commandButton>
+                        </rich:column>
                         <rich:column headerClass="column-header">
                             <f:facet name="header">
                                 <h:outputText escape="true" value="ФИО" />
@@ -144,7 +146,7 @@
                             <h:outputText escape="true" value="#{item.balance}" styleClass="output-text" converter="copeckSumConverter" />
                         </rich:column>
                         <f:facet name="footer">
-                            <rich:datascroller for="modalClientSelectorTable" renderIfSinglePage="false" maxPages="5"
+                            <rich:dataScroller for="modalClientSelectorTable" renderIfSinglePage="false" maxPages="5"
                                                fastControls="hide" stepControls="auto" boundaryControls="hide">
                                 <f:facet name="previous">
                                     <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -152,7 +154,7 @@
                                 <f:facet name="next">
                                     <h:graphicImage value="/images/16x16/right-arrow.png" />
                                 </f:facet>
-                            </rich:datascroller>
+                            </rich:dataScroller>
                         </f:facet>
                     </rich:dataTable>
                 </td>
@@ -161,11 +163,11 @@
                 <td style="text-align: right;">
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Ok" action="#{mainPage.completeClientSelection}"
-                                           reRender="#{mainPage.topMostPage.pageComponent.id}"
+                                           render="#{mainPage.topMostPage.pageComponent.id}"
                                            oncomplete="#{rich:component('modalClientSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
                         <a4j:commandButton value="Отмена" action="#{mainPage.completeClientSelection}"
-                                           reRender="#{mainPage.topMostPage.pageComponent.id}"
+                                           render="#{mainPage.topMostPage.pageComponent.id}"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px;">
                             <f:setPropertyActionListener value="#{null}"
@@ -175,5 +177,6 @@
                 </td>
             </tr>
         </table>
-    </a4j:form>
-</rich:modalPanel>
+    </h:form>
+</rich:popupPanel>
+</ui:composition>

@@ -1,29 +1,24 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditClients())
-      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <f:subview id="clientDeleteSubView">
-    <c:import url="include/client/confirm_client_delete.jsp" />
+    <ui:include src="confirm_client_delete.xhtml" />
 </f:subview>
 
-<%-- Панель редактирования клиента --%>
+<!-- Панель редактирования клиента -->
 <h:panelGrid id="clientEditGrid" styleClass="borderless-grid" binding="#{mainPage.clientEditPage.pageComponent}"
              columns="2">
     <h:outputText escape="true" value="Организация" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.clientEditPage.org.shortName}" readonly="true" styleClass="input-text"
                      style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
         <h:outputText value="Внимание! Выбранная организация не имеет льготы по всем категориям данного клиента."
@@ -32,7 +27,7 @@
     </h:panelGroup>
     <h:outputText escape="true" value="Сменить пароль" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.changePassword}" styleClass="output-text">
-        <a4j:support event="onclick" reRender="clientEditGrid" ajaxSingle="true" />
+        <a4j:ajax event="click" render="clientEditGrid" />
     </h:selectBooleanCheckbox>
     <h:outputText escape="true" value="Пароль" styleClass="output-text"
                   rendered="#{mainPage.clientEditPage.changePassword}" />
@@ -85,7 +80,7 @@
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.clientEditPage.clientGroupName}" readonly="true" styleClass="input-text"
                      style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
+        <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" render="modalClientGroupSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientEditPage.org.idOfOrg == null}" >
             <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
@@ -201,7 +196,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер договора" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{clientGuardian.contractId}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{clientGuardian.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
@@ -228,7 +223,7 @@
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text" />
                 <h:selectBooleanCheckbox value="#{clientGuardian.enabled}" styleClass="output-text" >
-                    <a4j:support reRender="clientGuardianEditTable" event="onchange" action="#{clientGuardian.activateNotificationSpecial()}"/>
+                    <a4j:ajax render="clientGuardianEditTable" event="change" action="#{clientGuardian.activateNotificationSpecial()}"/>
                 </h:selectBooleanCheckbox>
 
                 <h:outputText escape="true" value="#{clientGuardian.createdWhereClientGuardianStr}" style="font-size: 8pt;" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
@@ -246,7 +241,7 @@
                     <f:selectItems value="#{mainPage.clientEditPage.representativeList}" />
                 </h:selectOneMenu>
             </h:panelGrid>
-            <rich:spacer/>
+
             <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
                 <h:outputText escape="true" value="Степень родства:" styleClass="output-text" />
                 <h:selectOneMenu value="#{clientGuardian.relation}" styleClass="input-text">
@@ -258,7 +253,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
-            <rich:dataTable id="clientNotificationSetting" value="#{clientGuardian.notificationItems}" var="it"
+            <rich:dataTable id="clientNotificationSettingGuardians" value="#{clientGuardian.notificationItems}" var="it"
                             rows="11" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
@@ -272,14 +267,14 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link" reRender="clientGuardianEditTable"
+            <a4j:commandLink styleClass="command-link" render="clientGuardianEditTable"
                     action="#{mainPage.clientEditPage.removeClientGuardian}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{clientGuardian}" target="#{mainPage.clientEditPage.currentClientGuardian}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
+            <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}" render="modalClientSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                styleClass="command-link">
                 <f:setPropertyActionListener value="guardian" target="#{mainPage.clientEditPage.typeAddClient}" />
@@ -295,7 +290,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер договора" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" render="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{clientWard.contractId}" converter="contractIdConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{clientWard.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
@@ -320,7 +315,7 @@
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text" />
                 <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" >
-                        <a4j:support reRender="clientWardEditTable" event="onchange" action="#{clientWard.activateNotificationSpecial()}"/>
+                        <a4j:ajax render="clientWardEditTable" event="change" action="#{clientWard.activateNotificationSpecial()}"/>
                 </h:selectBooleanCheckbox>
 
                 <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" style="font-size: 8pt;" rendered="#{!clientWard.isCreatedWhereDefault}"/>
@@ -343,7 +338,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
-            <rich:dataTable id="clientNotificationSetting" value="#{clientWard.notificationItems}" var="it"
+            <rich:dataTable id="clientNotificationSettingChildren" value="#{clientWard.notificationItems}" var="it"
                             rows="11" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
@@ -357,14 +352,14 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link" reRender="clientWardEditTable"
+            <a4j:commandLink styleClass="command-link" render="clientWardEditTable"
                              action="#{mainPage.clientEditPage.removeClientWard}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{clientWard}" target="#{mainPage.clientEditPage.currentClientWard}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
+            <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}" render="modalClientSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                styleClass="command-link">
                 <f:setPropertyActionListener value="ward" target="#{mainPage.clientEditPage.typeAddClient}" />
@@ -373,7 +368,7 @@
     </rich:dataTable>
     <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.clientEditPage.discountMode}">
-        <a4j:support event="onchange" reRender="clientCategory" action="#{mainPage.clientEditPage.changeClientCategory}"/>
+        <a4j:ajax event="change" render="clientCategory" action="#{mainPage.clientEditPage.changeClientCategory}"/>
         <f:selectItems value="#{mainPage.clientEditPage.selectItemList}"/>
     </h:selectOneMenu>
     <h:outputText escape="true" value="Льготы" styleClass="output-text"/>
@@ -399,7 +394,7 @@
             <h:outputText escape="true" value="#{clientDiscount.lastDiscountsUpdate}" styleClass="output-text" />
         </rich:column>
         <f:facet name="footer">
-            <a4j:commandButton value="Редактировать" action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
+            <a4j:commandButton value="Редактировать" action="#{mainPage.showCategoryListSelectPage}" render="modalCategoryListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                                styleClass="command-link">
                 <f:param name="fullList" value="true" />
@@ -442,18 +437,18 @@
     <h:inputText value="#{mainPage.clientEditPage.cardRequest}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
 </h:panelGrid>
 <h:panelGrid columns="5" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{mainPage.updateClient}" reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
+    <a4j:commandButton value="Сохранить" action="#{mainPage.updateClient}" render="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
                        styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{mainPage.showClientEditPage}"
-                       reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable" ajaxSingle="true" styleClass="command-button" />
-    <rich:spacer height="1" width="15"/>
+                       render="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable" styleClass="command-button" />
+
     <a4j:commandButton value="Удалить"
                        onclick="#{rich:component('clientDeletePanel')}.show();"
                        styleClass="command-button" >
     </a4j:commandButton>
     <a4j:commandButton value="Отзыв ПД" action="#{mainPage.clientEditPage.deletePDClient()}"
-                       reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
-                       ajaxSingle="true" styleClass="command-button"
+                       render="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
+                       styleClass="command-button"
                        rendered="#{!mainPage.clientEditPage.predefined()}"/>
 </h:panelGrid>
 
@@ -461,3 +456,4 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
+</ui:composition>

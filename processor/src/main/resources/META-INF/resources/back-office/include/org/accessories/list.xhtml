@@ -1,21 +1,19 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
-<%--@elvariable id="accessoriesListPage" type="ru.axetta.ecafe.processor.web.ui.org.accessories.AccessoriesListPage"--%>
+<!--@elvariable id="accessoriesListPage" type="ru.axetta.ecafe.processor.web.ui.org.accessories.AccessoriesListPage"-->
 <h:panelGrid id="accessoriesListPage" binding="#{accessoriesListPage.pageComponent}" styleClass="borderless-grid">
 
-    <c:if test="${accessoriesListPage.accessories != null && not empty accessoriesListPage.accessories}">
+    <h:panelGrid rendered="#{accessoriesListPage.accessories != null &amp;&amp; not empty accessoriesListPage.accessories}">
         <a4j:region>
             <h:outputText value="Технические характеристики:" style="font: 12px Arial; font-weight: bold;"/>
-            <c:forEach items="#{accessoriesListPage.accessories}" var="it" varStatus="loop">
+            <ui:repeat value="#{accessoriesListPage.accessories}" var="it" varStatus="loop">
                 <h:panelGrid id="accessories" columns="6">
                     <h:outputText value="Тип оборудования: " style="padding-left: 10px; font: 12px Arial"/>
                     <h:selectOneMenu value="#{it.accessoryType}" styleClass="input-text" style="width: 150px">
@@ -26,7 +24,7 @@
                     <h:outputText value="Id корпуса: " style="padding-left: 50px; font: 12px Arial"/>
                     <h:inputText size="3" value="#{it.idOfTargetOrg}"/>
                 </h:panelGrid>
-            </c:forEach>
+            </ui:repeat>
             <br/>
             <h:outputText value="Оборудование корпусов:" style="font: 12px Arial; font-weight: bold;"/>
             <h:panelGrid id="org_equipment" columns="2">
@@ -51,10 +49,10 @@
             </h:panelGrid>
             <h:panelGrid columns="3">
                     <a4j:commandButton value="Сохранить" action="#{accessoriesListPage.save}"
-                                       reRender="accessories"
+                                       render="accessories"
                                        styleClass="command-button" status="accessoriesStatus" />
                     <a4j:commandButton value="Отменить" action="#{accessoriesListPage.update}"
-                                       reRender="accessories"
+                                       render="accessories"
                                        styleClass="command-button" status="accessoriesStatus" />
 
                     <a4j:status id="accessoriesStatus">
@@ -64,6 +62,7 @@
                     </a4j:status>
             </h:panelGrid>
         </a4j:region>
-    </c:if>
+    </h:panelGrid>
 
 </h:panelGrid>
+</ui:composition>
