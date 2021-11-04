@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="goodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodEditPage"-->
+    <!--@elvariable id="goodViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodViewPage"-->
+    <!--@elvariable id="goodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodListPage"-->
+    <!--@elvariable id="selectedGoodGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.SelectedGoodGroupPage"-->
+    <h:panelGrid id="goodListPage" binding="#{goodListPage.pageComponent}"
+                 styleClass="borderless-grid" columns="1">
+
+        <h:panelGrid id="goodListPageFilter" styleClass="borderless-grid" columns="1">
+            <rich:togglePanel label="Фильтр" switchType="client"
+                                    eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
+                <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                    <h:outputText escape="true" value="Производственная конфигурация"
+                                  styleClass="output-text required-field"/>
+                    <h:panelGroup styleClass="borderless-div">
+                        <h:outputText value="#{goodListPage.selectedConfigurationProvider.name}"
+                                      styleClass="output-text"
+                                      style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                        <a4j:commandButton value="..." action="#{goodListPage.selectConfigurationProvider}"
+                                           render="configurationProviderSelectModalPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                                           styleClass="command-link" style="width: 25px; float: right;"/>
+                    </h:panelGroup>
+                    <h:outputText escape="true" value="Группа товаров" styleClass="output-text required-field"/>
+                    <h:panelGroup styleClass="borderless-div">
+                        <h:outputText value="#{goodListPage.selectedGoodGroup.nameOfGoodsGroup}"
+                                      styleClass="output-text"
+                                      style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                        <a4j:commandButton value="..." action="#{goodListPage.selectGoodGroup}"
+                                           render="goodGroupSelectModalPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('goodGroupSelectModalPanel')}.show();"
+                                           styleClass="command-link" style="width: 25px; float: right;"/>
+                    </h:panelGroup>
+                    <h:outputText value="Удаленные элементы" styleClass="output-text" escape="true"/>
+                    <h:selectOneMenu id="selectDeletedStatus" value="#{goodListPage.deletedStatusSelected}"
+                                     styleClass="input-text long-field">
+                        <f:selectItem itemLabel="Скрыть" itemValue="false"/>
+                        <f:selectItem itemLabel="Показать" itemValue="true"/>
+                    </h:selectOneMenu>
+
+                </h:panelGrid>
+
+                <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                    <a4j:commandButton value="Применить" action="#{goodListPage.onSearch}"
+                                       render="workspaceTogglePanel" styleClass="command-button"/>
+
+                    <a4j:commandButton value="Очистить" action="#{goodListPage.onClear}"
+                                       render="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
+                </h:panelGrid>
+            </rich:togglePanel>
+        </h:panelGrid>
+
+        <a4j:status id="goodListTableStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+            </f:facet>
+        </a4j:status>
+
+        <rich:dataTable id="goodListTable" var="good" value="#{goodListPage.goodList}"
+                        rows="10" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Идентификатор" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.globalId}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="GUID" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.guid}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Наименование" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <a4j:commandLink render="mainMenu, workspaceForm" value="#{good.nameOfGood}"
+                                 action="#{goodViewPage.show}" styleClass="command-link">
+                    <f:setPropertyActionListener value="#{good}" target="#{selectedGoodGroupPage.currentGood}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Полное наименование товара" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.fullName}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Код" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.goodsCode}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Единица измерения" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.unitsScale}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Масса нетто" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.netWeight}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Срок годности (в минутах)" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.lifeTime}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Наценка" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{good.margin}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Статус товара" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:selectBooleanCheckbox value="#{good.deletedState}" readonly="true" disabled="true"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Редактировать" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <a4j:commandLink render="mainMenu, workspaceForm" action="#{goodEditPage.show}"
+                                 styleClass="command-link">
+                    <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
+                    <f:setPropertyActionListener value="#{good}" target="#{selectedGoodGroupPage.currentGood}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column style="text-align:center">
+                <f:facet name="header">
+                    <h:outputText value="Удалить" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                                 render="mainMenu, workspaceForm" rendered="#{good.deletedState}"
+                                 oncomplete="#{rich:component('removedGoodItemDeletePanel')}.show()">
+                    <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                    <f:setPropertyActionListener value="#{good}" target="#{goodEditPage.currentGood}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <f:facet name="footer">
+                <rich:dataScroller for="goodListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                    </f:facet>
+                </rich:dataScroller>
+            </f:facet>
+        </rich:dataTable>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</ui:composition>

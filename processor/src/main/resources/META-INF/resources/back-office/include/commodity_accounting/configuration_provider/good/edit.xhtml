@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <!-- Панель создания правила -->
+    <!--@elvariable id="goodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodEditPage"-->
+    <h:panelGrid id="goodEditPanelGrid" binding="#{goodEditPage.pageComponent}" styleClass="borderless-grid"
+                 columns="1">
+        <h:panelGrid columns="2">
+
+            <h:outputText escape="true" value="Группа товаров" styleClass="output-text required-field"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:outputText value="#{goodEditPage.currentGoodGroup.nameOfGoodsGroup}" styleClass="output-text"
+                              style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                <a4j:commandButton value="..." action="#{goodEditPage.selectGoodGroup}"
+                                   render="goodGroupSelectModalPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('goodGroupSelectModalPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px; float: right;"/>
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Продукт" styleClass="output-text required-field"
+                          rendered="#{goodEditPage.currentTechnologicalMap==null}"/>
+            <h:panelGroup styleClass="borderless-div" rendered="#{goodEditPage.currentTechnologicalMap==null}">
+                <h:outputText value="#{goodEditPage.currentProduct.productName}" styleClass="output-text"
+                              style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                <a4j:commandButton value="..." action="#{goodEditPage.selectProduct}" render="productSelectModalPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productSelectModalPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px; float: right;"/>
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Технологическая карта" styleClass="output-text required-field"
+                          rendered="#{goodEditPage.currentProduct==null}"/>
+            <h:panelGroup styleClass="borderless-div" rendered="#{goodEditPage.currentProduct==null}">
+                <h:outputText value="#{goodEditPage.currentTechnologicalMap.nameOfTechnologicalMap}"
+                              styleClass="output-text"
+                              style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                <a4j:commandButton value="..." action="#{goodEditPage.selectTechnologicalMap}"
+                                   render="technologicalMapSelectModalPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('technologicalMapSelectModalPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px; float: right;"/>
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Статус" styleClass="output-text"/>
+            <h:selectOneListbox value="#{goodEditPage.currentGood.deletedState}" size="1">
+                <f:selectItem itemLabel="Не удален" itemValue="false"/>
+                <f:selectItem itemLabel="Удален" itemValue="true"/>
+            </h:selectOneListbox>
+
+            <h:outputText escape="true" value="Наименование" styleClass="output-text required-field"/>
+            <h:inputText value="#{goodEditPage.currentGood.nameOfGood}" maxlength="128"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text"/>
+            <h:inputText value="#{goodEditPage.currentGood.fullName}" maxlength="128"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Код" styleClass="output-text"/>
+            <h:inputText value="#{goodEditPage.currentGood.goodsCode}" maxlength="128"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Единица измерения" styleClass="output-text"/>
+            <h:selectOneMenu value="#{goodEditPage.unitScale}">
+                <f:selectItems value="#{goodEditPage.selectItemList}"/>
+            </h:selectOneMenu>
+            <h:outputText escape="true" value="Масса нетто" styleClass="output-text"/>
+            <h:inputText value="#{goodEditPage.currentGood.netWeight}" maxlength="32"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Срок годности (в минутах)" styleClass="output-text"/>
+            <h:inputText value="#{goodEditPage.currentGood.lifeTime}" maxlength="32"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Наценка" styleClass="output-text"/>
+            <h:inputText value="#{goodEditPage.currentGood.margin}" maxlength="32" styleClass="input-text long-field"/>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Сохранить" action="#{goodEditPage.onSave}"
+                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+
+            <a4j:commandButton value="Восстановить" action="#{goodEditPage.show}"
+                               render="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
+        </h:panelGrid>
+
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+
+    </h:panelGrid>
+</ui:composition>
