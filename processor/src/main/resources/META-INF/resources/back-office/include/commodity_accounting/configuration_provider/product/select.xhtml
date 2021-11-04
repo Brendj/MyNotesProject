@@ -48,11 +48,15 @@
                                         footerClass="data-table-footer" columnClasses="left-aligned-column"
                                         rowClasses="select-panel-row"
                                         onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
-                            <a4j:ajax event="RowClick" render="productModalForm">
-                                <f:setPropertyActionListener value="#{product}"
-                                                             target="#{productPanel.selectProduct}"/>
-                            </a4j:ajax>
+                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                        onrowclick="#{rich:element('details')}.click();">
+
+                            <rich:column width="1" style="display: none">
+                                <a4j:commandButton id="details" render="productModalForm" execute="@this">
+                                    <f:setPropertyActionListener value="#{product}" target="#{productPanel.selectProduct}"/>
+                                </a4j:commandButton>
+                            </rich:column>
+
                             <rich:column headerClass="column-header">
                                 <f:facet name="header">
                                     <h:outputText escape="true" value="№"/>
