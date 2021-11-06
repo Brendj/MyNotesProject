@@ -1,18 +1,17 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditOrgs())
-      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
-
-<%-- Панель создания организации --%>
-<h:panelGrid id="orgCreateGrid" binding="#{mainPage.orgCreatePage.pageComponent}" styleClass="borderless-grid" columns="1">
+<h:panelGrid rendered="#{!mainPage.isEligibleToEditOrgs()}">
+    <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
+</h:panelGrid>
+<!-- Панель создания организации -->
+<h:panelGrid id="orgCreateGrid" styleClass="borderless-grid" columns="1">
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="ID в НСИ-3" styleClass="output-text" />
@@ -39,7 +38,7 @@
     <h:inputText value="#{mainPage.orgCreatePage.tag}" maxlength="256" styleClass="input-text" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Реквизиты:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_requisites" styleClass="borderless-grid" columns="2">
@@ -50,7 +49,7 @@
     <h:outputText escape="true" value="Детализация статуса" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:selectOneMenu value="#{mainPage.orgCreatePage.statusDetail}" styleClass="input-text">
-            <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
+            <a4j:ajax event="change" render="userEditGrid" />
             <f:selectItems value="#{mainPage.orgCreatePage.statusDetails}" />
         </h:selectOneMenu>
         <h:inputTextarea rows="2" cols="64" value="#{mainPage.orgCreatePage.statusTextArea}" styleClass="input-text" />
@@ -91,7 +90,7 @@
                    inputClass="input-text" showWeeksBar="false" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Местоположение:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_placement" styleClass="borderless-grid" columns="2">
@@ -109,7 +108,7 @@
     <h:inputText value="#{mainPage.orgCreatePage.longitude}" maxlength="12" styleClass="input-text long-field" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Поставщик питания:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_supplier" styleClass="borderless-grid" columns="2">
@@ -120,7 +119,7 @@
         <h:inputText value="#{mainPage.orgCreatePage.defaultSupplier.contragentName}" readonly="true"
                      styleClass="input-text long-field" style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                           reRender="modalContragentSelectorPanel"
+                           render="modalContragentSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
             <f:setPropertyActionListener value="0"
@@ -135,7 +134,7 @@
         <h:inputText value="#{mainPage.orgCreatePage.coSupplier.contragentName}" readonly="true"
                      styleClass="input-text long-field" style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                           reRender="modalContragentSelectorPanel"
+                           render="modalContragentSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                            rendered="#{mainPage.orgCreatePage.defaultSupplier != null}"
                            styleClass="command-link" style="width: 25px;" >
@@ -163,7 +162,7 @@
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.orgCreatePage.menuExchangeSourceOrgName}" readonly="true" styleClass="input-text long-field"
                      style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
             <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}" />
@@ -183,7 +182,7 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preorderlp}" styleClass="input-text"/>
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Настройки рассылки и уведомлений:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_notifications" styleClass="borderless-grid" columns="2">
@@ -204,7 +203,7 @@
     <h:inputText value="#{mainPage.orgCreatePage.mailingListReports2}" styleClass="input-text" />
 </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:outputText escape="true" value="Параметры синхронизации:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_sync" styleClass="borderless-grid" columns="2">
@@ -225,7 +224,7 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
     <br />
-    <rich:separator />
+
     <br />
     <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
     <h:panelGrid id="orgCreateGrid_cards" styleClass="borderless-grid" columns="2">
@@ -237,7 +236,7 @@
         <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardId}" styleClass="input-text" />
     </h:panelGrid>
 <br />
-<rich:separator />
+
 <br />
 <h:panelGrid id="orgCreateGrid_password" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Пароль для единого входа" styleClass="output-text" />
@@ -254,3 +253,4 @@
                    warnClass="warn-messages" />
 </h:panelGrid>
 </h:panelGrid>
+</ui:composition>

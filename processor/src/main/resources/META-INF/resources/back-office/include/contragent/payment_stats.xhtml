@@ -22,7 +22,7 @@
     </h:panelGrid>
 
     <!--@elvariable id="paymentStatsPage" type="ru.axetta.ecafe.processor.web.ui.contragent.PaymentStatsPage"-->
-    <h:panelGrid id="paymentStatsPanel" binding="#{paymentStatsPage.pageComponent}" styleClass="borderless-grid"
+    <h:panelGrid id="paymentStatsPanel" styleClass="borderless-grid"
                  rendered="#{mainPage.isEligibleToEditContragents()}">
         <h:outputText escape="true" value="Статистика платежей" styleClass="output-text-strong"/>
         <rich:dataTable id="paymentStatsTable" value="#{paymentStatsPage.items}" var="item" rows="25"

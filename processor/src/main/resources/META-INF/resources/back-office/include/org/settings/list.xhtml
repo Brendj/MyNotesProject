@@ -9,8 +9,7 @@
 <!--@elvariable id="settingsListPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingsListPage"-->
 <!--@elvariable id="selectedSettingsGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SelectedSettingsGroupPage"-->
 <!--@elvariable id="settingEditPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingEditPage"-->
-<h:panelGrid id="settingsListPage" binding="#{settingsListPage.pageComponent}"
-             styleClass="borderless-grid">
+<h:panelGrid id="settingsListPage" styleClass="borderless-grid">
 
     <rich:togglePanel label="Фильтр (#{settingsListPage.status})" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">

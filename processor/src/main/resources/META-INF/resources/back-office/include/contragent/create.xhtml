@@ -20,7 +20,7 @@
     </h:panelGrid>
 
     <!-- Панель создания контрагента -->
-    <h:panelGrid id="contragentCreateGrid" binding="#{mainPage.contragentCreatePage.pageComponent}"
+    <h:panelGrid id="contragentCreateGrid"
                  styleClass="borderless-grid" columns="2" rendered="#{mainPage.isEligibleToEditContragents()}">
         <h:outputText escape="true" value="Название" styleClass="output-text"/>
         <h:inputText value="#{mainPage.contragentCreatePage.contragentName}" maxlength="128"

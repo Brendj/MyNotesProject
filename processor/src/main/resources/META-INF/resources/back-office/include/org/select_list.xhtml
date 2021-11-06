@@ -39,7 +39,7 @@
     <f:facet name="header">
         <h:outputText escape="true" value="#{mainPage.orgFilterPageName}" />
     </f:facet>
-    <h:form id="modalOrgListSelectorForm" binding="#{mainPage.orgListSelectPage.pageComponent}"
+    <h:form id="modalOrgListSelectorForm"
               styleClass="borderless-form" eventsQueue="modalOrgListSelectorFormEventsQueue">
         <a4j:jsFunction name="selectAll" action="#{mainPage.selectAllOrgListSelectedItemsList}"
                         render="modalOrgListSelectorForm" />

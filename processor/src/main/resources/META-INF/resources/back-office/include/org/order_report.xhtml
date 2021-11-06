@@ -1,12 +1,11 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:panelGrid id="orgOrderReportGrid" binding="#{mainPage.orgOrderReportPage.pageComponent}"
              styleClass="borderless-grid">
@@ -16,7 +15,7 @@
         <h:panelGroup styleClass="borderless-div">
             <h:inputText value="#{mainPage.orgOrderReportPage.filter}" readonly="true"
                          styleClass="input-text long-field" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
@@ -33,7 +32,7 @@
                       styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgOrderReportPage.hideEmptyClients}" styleClass="output-text" />
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.orgOrderReportPage.buildOrgOrderReport}"
-                           reRender="workspaceTogglePanel, orgOrderReportTable" styleClass="command-button"
+                           render="workspaceTogglePanel, orgOrderReportTable" styleClass="command-button"
                            status="orgOrderReportGenerateStatus"/>
         <a4j:status id="orgOrderReportGenerateStatus">
             <f:facet name="start">
@@ -124,7 +123,7 @@
                               styleClass="output-text" style="font-weight: bold;" />
             </rich:column>
 
-            <rich:subTable value="#{clientGroup.clients}" var="client"
+            <rich:collapsibleSubTable value="#{clientGroup.clients}" var="client"
                            columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
                 <rich:column>
                     <h:outputText escape="true" value="#{client.contractId}" converter="contractIdConverter"
@@ -150,9 +149,9 @@
                     <h:outputText escape="true" value="#{client.totalGrantSum}" converter="copeckSumConverter"
                                   styleClass="output-text" />
                 </rich:column>
-            </rich:subTable>
+            </rich:collapsibleSubTable>
         </rich:dataTable>
-        <rich:datascroller id="orgOrderReportTableDatascroller" for="orgOrderReportTable"
+        <rich:dataScroller id="orgOrderReportTableDatascroller" for="orgOrderReportTable"
                            renderIfSinglePage="false" maxPages="10" fastControls="hide" stepControls="auto"
                            boundaryControls="hide"
                            style="border: solid 1px #C0C0C0; !important; background-color: white !important">
@@ -162,8 +161,9 @@
             <f:facet name="next">
                 <h:graphicImage value="/images/16x16/right-arrow.png" />
             </f:facet>
-        </rich:datascroller>
+        </rich:dataScroller>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
+</ui:composition>

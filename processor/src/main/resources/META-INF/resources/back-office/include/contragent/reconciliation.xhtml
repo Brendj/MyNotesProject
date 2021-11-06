@@ -23,7 +23,7 @@
     </h:panelGrid>
 
     <!--@elvariable id="reconciliationPage" type="ru.axetta.ecafe.processor.web.ui.contragent.ReconciliationPage"-->
-    <h:panelGrid id="reconcilePanel" binding="#{reconciliationPage.pageComponent}" styleClass="borderless-grid" rendered="#{mainPage.isEligibleToEditContragents()}">
+    <h:panelGrid id="reconcilePanel" styleClass="borderless-grid" rendered="#{mainPage.isEligibleToEditContragents()}">
         <rich:togglePanel label="Загрузка реестра для квитирования" switchType="client" opened="true"
                           headerClass="filter-panel-header">
             <h:panelGrid id="reconcileGrid" styleClass="borderless-grid" columns="2">

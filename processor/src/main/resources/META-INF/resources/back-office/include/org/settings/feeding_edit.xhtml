@@ -1,16 +1,14 @@
-<%--
-  ~ Copyright (c) 2017. Axetta LLC. All Rights Reserved.
-  --%>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
-<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
-<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
-
-<%--@elvariable id="mainPage" type="ru.axetta.ecafe.processor.web.ui.MainPage"--%>
-<h:panelGrid id="feedingSettingEditPage" binding="#{mainPage.feedingSettingEditPage.pageComponent}"
-             styleClass="borderless-grid">
+<!--@elvariable id="mainPage" type="ru.axetta.ecafe.processor.web.ui.MainPage"-->
+<h:panelGrid id="feedingSettingEditPage" styleClass="borderless-grid">
     <h:panelGrid columns="2">
 
         <h:outputText escape="true" value="Идентификатор настройки" styleClass="output-text" />
@@ -27,18 +25,18 @@
 
         <h:outputText escape="true" value="Скидка для комплексов" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.feedingSettingEditPage.useDiscount}" styleClass="output-text">
-            <a4j:support event="onchange" reRender="feedingSettingEditPage" />
+            <a4j:ajax event="change" render="feedingSettingEditPage" />
         </h:selectBooleanCheckbox>
 
         <h:outputText escape="true" value="Скидка для буфетной продукции" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.feedingSettingEditPage.useDiscountBuffet}" styleClass="output-text">
-            <a4j:support event="onchange" reRender="feedingSettingEditPage" />
+            <a4j:ajax event="change" render="feedingSettingEditPage" />
         </h:selectBooleanCheckbox>
 
         <h:outputText escape="true" value="Список организаций" styleClass="output-text" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
+                               render="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="#{mainPage.feedingSettingEditPage.getStringIdOfOrgList}"
@@ -57,15 +55,13 @@
 </h:panelGrid>
 
 <h:panelGrid columns="2">
-    <a4j:commandButton value="Сохранить" action="#{mainPage.feedingSettingEditPage.updateSetting}" reRender="mainMenu, workspaceTogglePanel"
+    <a4j:commandButton value="Сохранить" action="#{mainPage.feedingSettingEditPage.updateSetting}" render="mainMenu, workspaceTogglePanel"
                    styleClass="command-button" />
-    <%--<a4j:commandButton value="Удалить" action="#{mainPage.deleteFeedingSetting}" reRender="mainMenu, workspaceTogglePanel"
-                       styleClass="command-button" />--%>
     <a4j:commandButton value="Удалить" ajaxSingle="true" oncomplete="#{rich:component('removeFeedingSettingDeletePanel')}.show()"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       render="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
 
-<rich:modalPanel id="removeFeedingSettingDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+<rich:popupPanel modal="true" id="removeFeedingSettingDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText value="Удаление настройки платного питания" styleClass="output-text" />
     </f:facet>
@@ -81,14 +77,14 @@
                 <h:panelGroup styleClass="borderless-div">
                     <a4j:commandButton value="Да" action="#{mainPage.deleteFeedingSetting}"
                                        oncomplete="#{rich:component('removeFeedingSettingDeletePanel')}.hide();"
-                                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/>
+                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
                     <a4j:commandButton value="Отмена" styleClass="command-button"
                                        onclick="#{rich:component('removeFeedingSettingDeletePanel')}.hide();return false;" />
                 </h:panelGroup>
             </td>
         </tr>
     </table>
-</rich:modalPanel>
+</rich:popupPanel>
 
 <a4j:status id="feedingSettingEditStatus">
     <f:facet name="start">
@@ -99,3 +95,4 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
+</ui:composition>

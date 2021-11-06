@@ -11,7 +11,7 @@
 <h:panelGrid rendered="#{!mainPage.isEligibleToEditOrgs()}">
     <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
 </h:panelGrid>
-<h:panelGrid id="orgEditGrid" binding="#{mainPage.orgEditPage.pageComponent}" styleClass="borderless-grid" columns="1"
+<h:panelGrid id="orgEditGrid" styleClass="borderless-grid" columns="1"
 rendered="#{mainPage.isEligibleToEditOrgs()}">
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_basic" styleClass="borderless-grid" columns="2">

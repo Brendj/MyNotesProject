@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="../resources/css/font-awesome.min.css">
     <link rel="stylesheet" href="../resources/css/weather-icons.min.css">
 </head>
-<body style="background: url('../../../../../web/web/images/1.png')">
+<body style="background: url('../images/1.png')">
 
 <f:view>
 
@@ -58,7 +58,7 @@
                                 <form class="ng-pristine ng-valid" _lpchecked="1">
                                     <div class="form-group">
                                         <input type="password" name="j_password"  placeholder="Password" class="form-control" autocomplete="off"
-                                               style="cursor: auto; background-image: url('../../../../../web/web/images/2.png'); background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;">
+                                               style="cursor: auto; background-image: url('../images/2.png'); background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;">
                                     </div>
                                 </form>
                             </div>

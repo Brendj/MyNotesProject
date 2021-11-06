@@ -18,7 +18,7 @@
     </h:panelGrid>
 
     <!-- Панель редактирования начисленного платежа -->
-    <h:panelGrid id="addPaymentEditPanel" binding="#{mainPage.addPaymentEditPage.pageComponent}"
+    <h:panelGrid id="addPaymentEditPanel"
                  styleClass="borderless-grid" columns="2" rendered="#{mainPage.isEligibleToEditPayment()}">
         <h:outputText escape="true" value="Плательщик" styleClass="output-text"/>
         <h:inputText value="#{mainPage.addPaymentEditPage.contragentPayerName}" readonly="true"
