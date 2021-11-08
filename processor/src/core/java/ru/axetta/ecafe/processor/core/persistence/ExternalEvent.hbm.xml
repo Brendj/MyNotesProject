@@ -16,8 +16,8 @@
         <property name="enterName" column="EnterName" type="string" length="256"/>
         <property name="address" column="address" type="string" length="256"/>
         <property name="version" column="version" type="long" not-null="true"/>
-        <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
-        <property name="cardType" column="CardType" type="integer" not-null="true"/>
+        <property name="cardNo" column="CardNo" type="long" unique="true"/>
+        <property name="cardType" column="CardType" type="integer"/>
         <property name="evtType" column="EvtType">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ExternalEventType</param>
