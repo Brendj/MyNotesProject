@@ -268,6 +268,10 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 applicationForFood.setVersion(nextVersion);
                 applicationForFood.setLastUpdate(new Date());
                 session.update(applicationForFood);
+                JournalApplicationForFood journalApplicationForFood =
+                        new JournalApplicationForFood();
+                journalApplicationForFood.saveJournalApplicationForFood(session, MainPage.getSessionInstance().getCurrentUser(),
+                        applicationForFood.getIdOfApplicationForFood(), OperationtypeForJournalApplication.ARCHIVED);
 
                 Client client = DAOUtils.findClient(session, applicationForFood.getClient().getIdOfClient());
                 if (applicationForFoodInoeExists(session, client, applicationForFood.getCreatedDate())) continue;
@@ -306,6 +310,10 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 item.getApplicationForFood().setDiscountDateEnd(item.getEndDate());
                 session.update(item.getApplicationForFood());
                 builder.save(session, clientDTISZNDiscountVersion);
+                JournalApplicationForFood journalApplicationForFood =
+                        new JournalApplicationForFood();
+                journalApplicationForFood.saveJournalApplicationForFood(session, MainPage.getSessionInstance().getCurrentUser(),
+                        item.getApplicationForFood().getIdOfApplicationForFood(), OperationtypeForJournalApplication.CHANGED_DATE);
 
                 clientDiscountHistoryService.saveChangeHistoryByDiscountInfo(session, info,
                         DiscountChangeHistory.MODIFY_IN_WEBAPP + MainPage.getSessionInstance().getCurrentUser().getUserName());
