@@ -32,20 +32,23 @@ import javax.xml.bind.annotation.XmlType;
     "token"
 })
 @XmlSeeAlso({
-    DeleteCitizenProfileOptionsRequestType.class,
-    GetSubscriptionStreamCategoryRequestType.class,
-    SelectSubscriptionStreamCategoriesRequestType.class,
-    CreateCitizenProfileRequestType.class,
-    SetCitizenProfileRequestType.class,
-    SendSubscriptionStreamEventsRequestType.class,
-    SelectCitizenSubscriptionsRequestType.class,
     ActivateCitizenSubscriptionRequestType.class,
-    DeactivateCitizenSubscriptionRequestType.class,
-    DropCitizenSubscriptionSettingsRequestType.class,
-    SetUpCitizenSubscriptionSettingsRequestType.class,
     GetCitizenProfileRequestType.class,
+    DeactivateCitizenSubscriptionRequestType.class,
+    GetSubscriptionStreamRequestType.class,
     SelectSubscriptionStreamsRequestType.class,
-    GetSubscriptionStreamRequestType.class
+    DropCitizenSubscriptionSettingsRequestType.class,
+    SelectCitizenSubscriptionsRequestType.class,
+    GetSubscriptionStreamCategoryRequestType.class,
+    GetStreamDictValueRequestType.class,
+    SetUpCitizenSubscriptionSettingsRequestType.class,
+    SetCitizenProfileRequestType.class,
+    SelectStreamTariffsRequestType.class,
+    SelectSubscriptionStreamCategoriesRequestType.class,
+    SelectCitizenPaymentsRequestType.class,
+    CreateCitizenProfileRequestType.class,
+    SendSubscriptionStreamEventsRequestType.class,
+    DeleteCitizenProfileOptionsRequestType.class
 })
 public class BaseRequestType {
 

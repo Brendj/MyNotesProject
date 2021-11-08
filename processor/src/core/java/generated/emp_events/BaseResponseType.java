@@ -34,19 +34,22 @@ import javax.xml.bind.annotation.XmlType;
 })
 @XmlSeeAlso({
     GetCitizenProfileResponseType.class,
-    SelectSubscriptionStreamsResponseType.class,
+    SelectCitizenPaymentsResponseType.class,
     SetUpCitizenSubscriptionSettingsResponseType.class,
-    SendSubscriptionStreamEventsResponseType.class,
-    CreateCitizenProfileResponseType.class,
-    SetCitizenProfileResponseType.class,
-    SelectCitizenSubscriptionsResponseType.class,
-    GetSubscriptionStreamCategoryResponseType.class,
     ActivateCitizenSubscriptionResponseType.class,
-    DeactivateCitizenSubscriptionResponseType.class,
-    GetSubscriptionStreamResponseType.class,
-    SelectSubscriptionStreamCategoriesResponseType.class,
+    SelectStreamTariffsResponseType.class,
     DeleteCitizenProfileOptionsResponseType.class,
-    DropCitizenSubscriptionSettingsResponseType.class
+    GetSubscriptionStreamResponseType.class,
+    GetStreamDictValueResponseType.class,
+    DeactivateCitizenSubscriptionResponseType.class,
+    CreateCitizenProfileResponseType.class,
+    GetSubscriptionStreamCategoryResponseType.class,
+    SelectSubscriptionStreamCategoriesResponseType.class,
+    SendSubscriptionStreamEventsResponseType.class,
+    SelectSubscriptionStreamsResponseType.class,
+    SelectCitizenSubscriptionsResponseType.class,
+    DropCitizenSubscriptionSettingsResponseType.class,
+    SetCitizenProfileResponseType.class
 })
 public class BaseResponseType {
 

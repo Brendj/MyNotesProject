@@ -394,21 +394,23 @@ public class SummaryCalculationService {
         //Подсчет значений для детализации меню в случае уведомления по итогам дня
         Map menuMap = new TreeMap<Long, String>();
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+            //Сначала собираем данные для НЕ комплексов
             String query_menu = "SELECT DISTINCT c.idofclient, od.qty, od.rprice, od.menudetailname, o.idoforder "
                     + "FROM cf_clients c INNER JOIN cf_orders o ON c.idofclient = o.idofclient "
                     + "INNER JOIN cf_orderdetails od ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg "
                     + "WHERE (exists(SELECT * FROM cf_clientsnotificationsettings n WHERE c.idofclient = n.idofclient AND n.notifytype = :notifyType) OR exists (SELECT * FROM cf_client_guardian cg "
                     + "INNER JOIN cf_client_guardian_notificationsettings nn ON cg.idofclientguardian = nn.idofclientguardian AND nn.notifytype = :notifyType WHERE cg.idofchildren = c.idofclient)) "
-                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced";
+                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced and (od.menutype < :mintype or od.menutype > :maxtype)";
             Query mquery = entityManager.createNativeQuery(query_menu);
             mquery.setParameter("notifyType", notifyType);
             mquery.setParameter("startTime", startDate.getTime());
             mquery.setParameter("endTime", endDate.getTime());
             mquery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             mquery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+            mquery.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+            mquery.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
             List mlist = mquery.getResultList();
 
-            //String menu_name = "";
             for (Object obj : mlist) {
                 Object[] row = (Object[]) obj;
                 Long id = ((BigInteger) row[0]).longValue();
@@ -419,6 +421,39 @@ public class SummaryCalculationService {
                 String menu_name = (String) menuMap.get(id);
                 menu_name = (menu_name == null ? "" : menu_name);
                 menu_name += "%" + menu + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
+                if (sum % 100 != 0) {
+                    menu_name += " " + sum % 100 + " коп.";
+                }
+                menu_name += "%";
+                menuMap.put(id, menu_name);
+            }
+
+
+            //Собираем данные для  комплексов
+            String query_menu_complex = "SELECT DISTINCT c.idofclient, od.qty, od.rprice, od.fration, o.idoforder "
+                    + "FROM cf_clients c INNER JOIN cf_orders o ON c.idofclient = o.idofclient "
+                    + "INNER JOIN cf_orderdetails od ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg "
+                    + "WHERE (exists(SELECT * FROM cf_clientsnotificationsettings n WHERE c.idofclient = n.idofclient AND n.notifytype = :notifyType) OR exists (SELECT * FROM cf_client_guardian cg "
+                    + "INNER JOIN cf_client_guardian_notificationsettings nn ON cg.idofclientguardian = nn.idofclientguardian AND nn.notifytype = :notifyType WHERE cg.idofchildren = c.idofclient)) "
+                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced and od.menutype > :mintype and od.menutype < :maxtype";
+            mquery = entityManager.createNativeQuery(query_menu_complex);
+            mquery.setParameter("notifyType", notifyType);
+            mquery.setParameter("startTime", startDate.getTime());
+            mquery.setParameter("endTime", endDate.getTime());
+            mquery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            mquery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+            mquery.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+            mquery.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+            List mlist_complex = mquery.getResultList();
+
+            for (Object obj : mlist_complex) {
+                Object[] row = (Object[]) obj;
+                Long id = ((BigInteger) row[0]).longValue();
+                Integer qty = ((Integer) row[1]).intValue();
+                Long rprice = ((BigInteger) row[2]).longValue();
+                Long sum = qty * rprice;
+                String menu = OrderDetailFRationTypeWTdiet.getDescription(((Integer) row[3]).intValue());
+                String menu_name = "%" + menu + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
                 if (sum % 100 != 0) {
                     menu_name += " " + sum % 100 + " коп.";
                 }
@@ -580,33 +615,37 @@ public class SummaryCalculationService {
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
             String preorders_query =
                     "SELECT DISTINCT pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender,"
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder, cwc.idofdiettype "
                             + " FROM cf_preorder_complex pc "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pc.idofregularpreorder "
 
                             + " JOIN cf_clients c ON c.idofclient = pc.idofclient JOIN cf_persons p ON p.idofperson = c.idofperson "
                             + " JOIN cf_clientsnotificationsettings n ON c.idofclient = n.idofclient AND n.notifytype = :notifyType "
+                            + " JOIN cf_wt_complexes cwc on cwc.idofcomplex = pc.armcomplexid "
                             + " WHERE pc.preorderdate > :date AND pc.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
                             + " AND NOT exists(SELECT pc1.idofpreordercomplex FROM cf_preorder_complex pc1 "
                             + "WHERE pc1.idofclient = pc.idofclient AND pc1.deletedstate = 0 AND pc1.preorderdate = pc.preorderdate AND pc1.amount > 0) "
                             + " UNION "
                             + "SELECT DISTINCT pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender,"
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder, cwc.idofdiettype "
                             + " FROM cf_preorder_menudetail pmd "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pmd.idofregularpreorder "
                             + " JOIN cf_clients c ON c.idofclient = pmd.idofclient JOIN cf_persons p ON p.idofperson = c.idofperson "
                             + " JOIN cf_clientsnotificationsettings n ON c.idofclient = n.idofclient AND n.notifytype = :notifyType "
+                            + " JOIN cf_preorder_complex cpc on cpc.idofpreordercomplex = pmd.idofpreordercomplex "
+                            + " JOIN cf_wt_complexes cwc on cwc.idofcomplex = cpc.armcomplexid "
                             + " WHERE pmd.preorderdate > :date AND pmd.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
                             + " AND NOT exists(SELECT pmd1.idofpreordermenudetail FROM cf_preorder_menudetail pmd1 "
                             + "WHERE pmd1.idofclient = pmd.idofclient AND pmd1.deletedstate = 0 AND pmd1.preorderdate = pmd.preorderdate AND pmd1.amount > 0) "
                             + " UNION "
                             + "SELECT DISTINCT pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender, "
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder, cwc.idofdiettype "
                             + "FROM cf_client_guardian_notificationsettings n JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                             + "JOIN cf_clients c ON c.idofclient = cg.idofchildren "
                             + "JOIN cf_preorder_complex pc ON c.idofclient = pc.idofclient "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pc.idofregularpreorder "
                             + "JOIN cf_persons p ON p.idofperson = c.idofperson "
+                            + " JOIN cf_wt_complexes cwc on cwc.idofcomplex = pc.armcomplexid "
                             + "WHERE pc.preorderdate > :date AND pc.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
                             + "AND NOT exists(SELECT pc1.idofpreordercomplex FROM cf_preorder_complex pc1 "
                             + "WHERE pc1.idofclient = pc.idofclient AND pc1.deletedstate = 0 AND pc1.preorderdate = pc.preorderdate AND pc1.amount > 0) "
@@ -614,12 +653,14 @@ public class SummaryCalculationService {
 
 
                             + "SELECT DISTINCT pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender, "
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder, cwc.idofdiettype "
                             + "FROM cf_client_guardian_notificationsettings n JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                             + "JOIN cf_clients c ON c.idofclient = cg.idofchildren "
                             + "JOIN cf_preorder_menudetail pmd ON pmd.idofclient = c.idofclient "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pmd.idofregularpreorder "
                             + "JOIN cf_persons p ON p.idofperson = c.idofperson "
+                            + " JOIN cf_preorder_complex cpc on cpc.idofpreordercomplex = pmd.idofpreordercomplex "
+                            + " JOIN cf_wt_complexes cwc on cwc.idofcomplex = cpc.armcomplexid "
                             + "WHERE pmd.preorderdate > :date AND pmd.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
                             + "AND NOT exists(SELECT pmd1.idofpreordermenudetail FROM cf_preorder_menudetail pmd1 "
                             + "WHERE pmd1.idofclient = pmd.idofclient AND pmd1.deletedstate = 0 AND pmd1.preorderdate = pmd.preorderdate AND pmd1.amount > 0) "
@@ -652,6 +693,7 @@ public class SummaryCalculationService {
                 currPreorderRegularData.setItemname((String) row[10]);
                 currPreorderRegularData.setComplexId(((Integer) row[11]).longValue());
                 currPreorderRegularData.setCreateDate(new Date(((BigInteger) row[12]).longValue()));
+                currPreorderRegularData.setFration  ((int) ((BigInteger) row[14]).longValue());
                 regularData.add(currPreorderRegularData);
 
                 PreorderData currPreorderData = new PreorderData();
@@ -725,16 +767,16 @@ public class SummaryCalculationService {
                     notifyPreorderDailyDetail.setDeleteDate(currPreorderRegularData.lastUpdate);
                     notifyPreorderDailyDetail.setEndDate(currPreorderRegularData.endDateReg);
                     if (currPreorderRegularData.getItemCode() == null) {
-                        notifyPreorderDailyDetail.setComplexName(currPreorderRegularData.itemname);
+                        notifyPreorderDailyDetail.setFration(OrderDetailFRationTypeWTdiet.getDescription(currPreorderRegularData.fration));
                     } else {
                         try {
                             ComplexInfo complexInfo = DAOReadonlyService.getInstance()
                                     .getComplexInfo(entityManager.find(Client.class, clientEE.getIdOfClient()),
                                             currPreorderRegularData.getComplexId().intValue(), currPreorderRegularData.getCreateDate());
-                            notifyPreorderDailyDetail.setComplexName(complexInfo.getComplexName());
+                            notifyPreorderDailyDetail.setFration(OrderDetailFRationTypeWTdiet.getDescription(currPreorderRegularData.fration));
                             notifyPreorderDailyDetail.setDishName(currPreorderRegularData.itemname);
                         } catch (Exception e) {
-                            notifyPreorderDailyDetail.setComplexName(null);
+                            notifyPreorderDailyDetail.setFration(null);
                         }
                     }
 
@@ -872,7 +914,7 @@ public class SummaryCalculationService {
         values = attachValue(values, END_DATE_PREORDER + type + REGULAR + count,
                 CalendarUtils.dateToString(notifyPreorderDailyDetail.getEndDate()));
         values = attachValue(values, COMPLEX_NAME_PREORDER + type + REGULAR + count,
-                notifyPreorderDailyDetail.getComplexName() == null ? "" : notifyPreorderDailyDetail.getComplexName());
+                notifyPreorderDailyDetail.getFration() == null ? "" : notifyPreorderDailyDetail.getFration());
         values = attachValue(values, DISH_NAME_PREORDER + type + REGULAR + count,
                 notifyPreorderDailyDetail.getDishName() == null ? "" : notifyPreorderDailyDetail.getDishName());
         return values;
@@ -1643,8 +1685,9 @@ public class SummaryCalculationService {
 
         private Date deleteDate;
         private Date endDate;
-        private String complexName;
+        //private String complexName;
         private String dishName;
+        private String fration;
 
 
         public Date getEndDate() {
@@ -1653,14 +1696,6 @@ public class SummaryCalculationService {
 
         public void setEndDate(Date endDate) {
             this.endDate = endDate;
-        }
-
-        public String getComplexName() {
-            return complexName;
-        }
-
-        public void setComplexName(String complexName) {
-            this.complexName = complexName;
         }
 
         public String getDishName() {
@@ -1677,6 +1712,14 @@ public class SummaryCalculationService {
 
         public void setDeleteDate(Date deleteDate) {
             this.deleteDate = deleteDate;
+        }
+
+        public String getFration() {
+            return fration;
+        }
+
+        public void setFration(String fration) {
+            this.fration = fration;
         }
     }
 
@@ -1805,6 +1848,7 @@ public class SummaryCalculationService {
         private String itemCode;
         private String itemname;
         private Long complexId;
+        private Integer fration;
         private Date createDate;
 
         public Integer getStateReg() {
@@ -1861,6 +1905,14 @@ public class SummaryCalculationService {
 
         public void setCreateDate(Date createDate) {
             this.createDate = createDate;
+        }
+
+        public Integer getFration() {
+            return fration;
+        }
+
+        public void setFration(Integer fration) {
+            this.fration = fration;
         }
     }
 }

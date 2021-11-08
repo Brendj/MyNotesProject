@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ * Ответ на запрос выбора каналов подписки
+ * 
  * <p>Java class for selectSubscriptionStreamsResponse_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
@@ -46,7 +48,7 @@ public class SelectSubscriptionStreamsResponseType
     extends BaseResponseType
 {
 
-    @XmlElement(name = "return", required = true)
+    @XmlElement(name = "return", required = true, nillable = true)
     protected SelectSubscriptionStreamsResponseType.Return _return;
 
     /**
