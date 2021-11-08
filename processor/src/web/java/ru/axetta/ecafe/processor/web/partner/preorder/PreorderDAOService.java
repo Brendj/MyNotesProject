@@ -1555,7 +1555,7 @@ public class PreorderDAOService {
         for (PreorderComplex preorderComplex : list) {
             if (isGoodRequestExists(preorderComplex)) continue;
             nextVersion = nextVersionByPreorderComplex();
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, false);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, true);
         }
 
         logger.info("End relevancePreordersToOrgFlag process");
