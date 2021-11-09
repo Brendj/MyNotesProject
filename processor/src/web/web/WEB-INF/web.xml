@@ -650,7 +650,7 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Restrict transport for login page</web-resource-name>
-            <url-pattern>/back-office/login.faces</url-pattern>
+            <url-pattern>/back-office/login.xhtml</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
@@ -738,8 +738,8 @@
     <login-config>
         <auth-method>FORM</auth-method>
         <form-login-config>
-            <form-login-page>/back-office/login.faces</form-login-page>
-            <form-error-page>/back-office/login.faces?error=true</form-error-page>
+            <form-login-page>/back-office/login.xhtml</form-login-page>
+            <form-error-page>/back-office/login.xhtml?error=true</form-error-page>
         </form-login-config>
     </login-config>
 

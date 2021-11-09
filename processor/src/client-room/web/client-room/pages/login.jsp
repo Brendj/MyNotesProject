@@ -19,7 +19,7 @@
 
 
 
-     logger.info("from login.jsp: cityName from cookie="+ cityIdFromCookie);
+     logger.info("from login.xhtml: cityName from cookie="+ cityIdFromCookie);
 
     }
 
