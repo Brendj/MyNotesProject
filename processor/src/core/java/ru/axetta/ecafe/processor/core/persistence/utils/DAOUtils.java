@@ -5519,10 +5519,19 @@ public class DAOUtils {
     public static List<PreorderComplex> getContentDeletedPreorderDishOtherOO(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
-                + " and pc.modeOfAdd = 4 and pc.state in (3, 4, 5, 6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+                + " and pc.modeOfAdd = 4 and pc.state in (4, 5, 6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }
+
+    public static List<PreorderComplex> getcontentDeletedPreorderDishOtherCash(Session session, Date date) {
+        Query query = session.createQuery("select  pc from PreorderComplex pc "
+                + " where pc.preorderDate > :date and pc.deletedState = true "
+                + " and pc.modeOfAdd = 4 and pc.state in (3) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+        query.setParameter("date", date);
+        return (List<PreorderComplex>) query.list();
+    }
+
     public static List<PreorderComplex> getContentDeletedPreorderDishOtherPP(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
@@ -5533,7 +5542,15 @@ public class DAOUtils {
     public static List<PreorderComplex> getContentDeletedPreorderOtherOO(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
-                + " and pc.modeOfAdd = 2 and pc.state in (3,4,5,6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+                + " and pc.modeOfAdd = 2 and pc.state in (4,5,6) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+        query.setParameter("date", date);
+        return (List<PreorderComplex>) query.list();
+    }
+
+    public static List<PreorderComplex> getContentDeletedPreorderOtherCash(Session session, Date date) {
+        Query query = session.createQuery("select  pc from PreorderComplex pc "
+                + " where pc.preorderDate > :date and pc.deletedState = true "
+                + " and pc.modeOfAdd = 2 and pc.state in (3) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }

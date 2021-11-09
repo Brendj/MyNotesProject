@@ -205,22 +205,37 @@ public class PreorderCancelNotificationService {
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherOO", 1, result);
+
+        preorderComplexs = DAOUtils.getContentDeletedPreorderDishOtherOO(session, new Date());
+        setFlagSended(session, preorderComplexs);
+        preorderComplexs = getUniquleResult(preorderComplexs);
+        createData(preorderComplexs, "contentDeletedPreorderDishOtherCash", 1, result);
+
         preorderComplexs = DAOUtils.getContentDeletedPreorderDishOtherPP(session, new Date());
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherPP", 2, result);
+
         preorderComplexs = DAOUtils.getContentDeletedPreorderOtherOO(session, new Date());
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderOtherOO", 3, result);
+
+        preorderComplexs = DAOUtils.getContentDeletedPreorderOtherCash(session, new Date());
+        setFlagSended(session, preorderComplexs);
+        preorderComplexs = getUniquleResult(preorderComplexs);
+        createData(preorderComplexs, "contentDeletedPreorderOtherCash", 3, result);
+
         preorderComplexs = DAOUtils.getContentDeletedPreorderOtherPP(session, new Date());
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderOtherPP", 4, result);
+
         List<RegularPreorder> regularPreorders = DAOUtils.getContentDeletedPreorderOtherRegularOO(session, new Date());
         setFlagSendedRegular(session, regularPreorders);
         regularPreorders = getUniquleResultRegular(regularPreorders);
         createDataRegularPreorder(session, regularPreorders, "contentDeletedPreorderOtherRegularOO", 1, result);
+
         regularPreorders = DAOUtils.getContentDeletedPreorderDishOtherRegularOO(session, new Date());
         setFlagSendedRegular(session, regularPreorders);
         regularPreorders = getUniquleResultRegular(regularPreorders);
