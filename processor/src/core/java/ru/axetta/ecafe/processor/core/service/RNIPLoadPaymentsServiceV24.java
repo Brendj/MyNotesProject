@@ -163,6 +163,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         importCatalogRequest.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(
                 RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime()));
         importCatalogRequest.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
+        importCatalogRequest.setSenderRole("1");
         sendRequestRequest.getSenderProvidedRequestData().getMessagePrimaryContent().setImportCatalogRequest(importCatalogRequest);
 
         generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory serviceCatalogObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory();
@@ -388,7 +389,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
             hasError.set(null);
             return response;
         } catch (Exception e) {
-            logger.error("Error execute request for create/modify catalog in RNIP v2.0: ", e);
+            logger.error("Error execute request for create/modify catalog in RNIP v2.4: ", e);
             hasError.set(e.getMessage());
         }
         return null;
