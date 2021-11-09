@@ -44,12 +44,14 @@
                                         value="#{mainPage.contractSelectPage.items}" var="item" rows="15"
                                         footerClass="data-table-footer" columnClasses="left-aligned-column"
                                         rowClasses="select-panel-row"
-                                        onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
-                            <a4j:ajax event="RowClick" render="modalContractSelectorForm">
-                                <f:setPropertyActionListener value="#{item}"
-                                                             target="#{mainPage.contractSelectPage.selectedItem}"/>
-                            </a4j:ajax>
+                                        onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                        onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                        onrowclick="#{rich:element('detail')}.click();">
+                            <rich:column width="1" style="display: none">
+                                <a4j:commandButton id="detail" render="modalContractSelectorForm" execute="@this">
+                                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.contractSelectPage.selectedItem}"/>
+                                </a4j:commandButton>
+                            </rich:column>
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{item.contractName}" styleClass="output-text"/>
                             </rich:column>

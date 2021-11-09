@@ -24,7 +24,7 @@
                 <tr>
                     <td style="text-align: center;">
                         <h:panelGroup styleClass="borderless-div">
-                            <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeCCAccount}"
+                            <a4j:commandButton value="Да" action="#{mainPage.removeCCAccount}"
                                                oncomplete="#{rich:component('ccAccountDeletePanel')}.hide();"
                                                render="#{mainPage.topMostPage.pageComponent.id}"
                                                styleClass="command-button"/>

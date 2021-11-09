@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+xmlns:h="http://xmlns.jcp.org/jsf/html"
+xmlns:f="http://xmlns.jcp.org/jsf/core"
+xmlns:rich="http://richfaces.org/rich"
+xmlns:a4j="http://richfaces.org/a4j"
+xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<rich:popupPanel modal="true"  id="modalRuleListSelectorPanel" autosized="true" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('modalRuleListSelectorPanel')}.hide();return false;"/>
+    <f:facet name="header">
+        <h:outputText escape="true" value="Категории" />
+    </f:facet>
+    <h:form id="modalRuleListSelectorForm" styleClass="borderless-form"
+              eventsQueue="modalRuleListSelectorFormEventsQueue">
+        <table class="borderless-grid" width="100%">
+            <tr>
+                <td style="text-align: left;">
+                    <h:panelGrid columns="4" styleClass="borderless-grid">
+                        <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
+                        <h:inputText value="#{mainPage.ruleListSelectPage.filter}" size="48" maxlength="128"
+                                     styleClass="input-text" />
+                        <a4j:commandLink action="#{mainPage.updateRuleListSelectPage}" render="modalRuleListSelectorForm"
+                                         styleClass="command-link">
+                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
+                        </a4j:commandLink>
+                        <a4j:commandLink action="#{mainPage.updateRuleListSelectPage}" render="modaRuleListSelectorForm"
+                                         styleClass="command-link">
+                            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                            <f:setPropertyActionListener value="" target="#{mainPage.ruleListSelectPage.filter}" />
+                        </a4j:commandLink>
+                    </h:panelGrid>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">
+                    <rich:dataTable width="100%" align="center" id="modalRuleListSelectorRuleTable"
+                                    value="#{mainPage.ruleListSelectPage.items}" var="item" rows="15"
+                                    footerClass="data-table-footer" columnClasses="left-aligned-column"
+                                    rowClasses="select-panel-row" onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                    onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+                        <rich:column headerClass="column-header">
+                            <h:selectBooleanCheckbox value="#{item.selected}">
+                            </h:selectBooleanCheckbox>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{item.idOfRule}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{item.description}"
+                                          styleClass="output-text" />
+                        </rich:column>
+                        <f:facet name="footer">
+                            <rich:dataScroller for="modalRuleListSelectorRuleTable" renderIfSinglePage="false" maxPages="5"
+                                               fastControls="hide" stepControls="auto" boundaryControls="hide">
+                                
+                                <f:facet name="previous">
+                                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                                </f:facet>
+                                <f:facet name="next">
+                                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                                </f:facet>
+                            </rich:dataScroller>
+                        </f:facet>
+                    </rich:dataTable>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right;">
+                    <h:panelGroup styleClass="borderless-div">
+                        <a4j:commandButton value="Ok" action="#{mainPage.completeRuleListSelectionOk}"
+                                           render="#{mainPage.topMostPage.pageComponent.id}"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalRuleListSelectorPanel')}.hide();"
+                                           styleClass="command-button" style="width: 80px; margin-right: 4px;" />
+                        <a4j:commandButton value="Отмена" action="#{mainPage.completeRuleListSelectionCancel}"
+                                           render="#{mainPage.topMostPage.pageComponent.id}"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalRuleListSelectorPanel')}.hide();"
+                                           styleClass="command-button" style="width: 80px;">
+                        </a4j:commandButton>
+                    </h:panelGroup>
+                </td>
+            </tr>
+        </table>
+    </h:form>
+</rich:popupPanel>
+</ui:composition>

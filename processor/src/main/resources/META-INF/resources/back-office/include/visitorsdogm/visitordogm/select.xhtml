@@ -15,8 +15,7 @@
             <h:outputText escape="true" value="Выбор сотрудника"/>
         </f:facet>
         <h:form id="modalVisitorDogmSelectorForm" styleClass="borderless-form"
-                eventsQueue="modalVisitorDogmSelectorFormEventsQueue"
-                binding="#{visitorDogmSelectPage.pageComponent}">
+                eventsQueue="modalVisitorDogmSelectorFormEventsQueue">
             <table class="borderless-grid" width="100%">
                 <tr>
                     <td style="text-align: left;">
@@ -33,12 +32,14 @@
                                         value="#{visitorDogmSelectPage.visitorsDogm}" var="item" rows="8"
                                         footerClass="data-table-footer" columnClasses="left-aligned-column"
                                         rowClasses="select-panel-row"
-                                        onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
-                            <a4j:ajax event="RowClick" render="modalVisitorDogmSelectorForm">
-                                <f:setPropertyActionListener value="#{item}"
-                                                             target="#{visitorDogmSelectPage.selectVisitorDogm}"/>
-                            </a4j:ajax>
+                                        onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                        onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                        onrowclick="#{rich:element('detail')}.click();">
+                            <rich:column width="1" style="display: none">
+                                <a4j:commandButton id="detail" render="modalVisitorDogmSelectorForm" execute="@this">
+                                    <f:setPropertyActionListener value="#{item}" target="#{visitorDogmSelectPage.selectVisitorDogm}"/>
+                                </a4j:commandButton>
+                            </rich:column>
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{item.fullName}" styleClass="output-text"/>
                             </rich:column>
