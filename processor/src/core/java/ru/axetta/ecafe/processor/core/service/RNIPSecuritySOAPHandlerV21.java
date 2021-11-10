@@ -139,9 +139,9 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
 
             } else {
                 doc = soapPart.getEnvelope().getOwnerDocument();
-                additionalTaskOnInboundMessage(doc);
                 String msg = toString(doc);
                 messageLogger.LogPacket(msg, IRNIPMessageToLog.MESSAGE_IN);
+                additionalTaskOnInboundMessage(doc);
             }
         } catch (Exception e) {
             logger.error("Error in handle Rnip message", e);
