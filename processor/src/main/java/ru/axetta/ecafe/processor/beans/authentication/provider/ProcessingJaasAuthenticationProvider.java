@@ -4,8 +4,8 @@ import org.springframework.security.authentication.jaas.AuthorityGranter;
 import org.springframework.security.authentication.jaas.DefaultJaasAuthenticationProvider;
 import org.springframework.security.authentication.jaas.memory.InMemoryConfiguration;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.web.login.ProcessingLoginModule;
 
-import javax.annotation.PostConstruct;
 import javax.security.auth.login.AppConfigurationEntry;
 import java.security.Principal;
 import java.util.Collections;
@@ -15,8 +15,7 @@ import java.util.Set;
 
 @Component("processingJaasAuthenticationProvider")
 public class ProcessingJaasAuthenticationProvider extends DefaultJaasAuthenticationProvider {
-    @PostConstruct
-    public void init(){
+    public ProcessingJaasAuthenticationProvider(){
         Map<String, AppConfigurationEntry[]> mappedConfigurations = new HashMap<>();
         AppConfigurationEntry entry = new AppConfigurationEntry("ru.axetta.ecafe.processor.web.login.ProcessingLoginModule",
                 AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, new HashMap<>());
@@ -33,9 +32,9 @@ public class ProcessingJaasAuthenticationProvider extends DefaultJaasAuthenticat
         @Override
         public Set<String> grant(Principal principal) {
             if (principal.getName().equals("admin"))
-                return Collections.singleton("ADMIN");
+                return Collections.singleton(ProcessingLoginModule.ROLENAME_ADMIN);
             else
-                return Collections.singleton("CUSTOMER");
+                return Collections.singleton(ProcessingLoginModule.ROLENAME_DIRECTOR);
         }
     }
 }

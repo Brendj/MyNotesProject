@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui;
 import net.sf.jasperreports.engine.JRException;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
@@ -674,6 +675,7 @@ public class MainPage implements Serializable {
         if (null != httpSession && StringUtils.isNotEmpty(facesExternalContext.getRemoteUser())) {
             httpSession.invalidate();
             ((HttpServletRequest)facesExternalContext.getRequest()).logout();
+            SecurityContextHolder.clearContext();
         }
         return outcome;
     }
@@ -693,7 +695,7 @@ public class MainPage implements Serializable {
             user = (User) userCriteria.uniqueResult();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        }finally {
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
@@ -9629,8 +9631,7 @@ public class MainPage implements Serializable {
     public User getCurrentUser() throws Exception {
         if (currentUser == null) {
             FacesContext context = FacesContext.getCurrentInstance();
-            //todo todo todo фейковый юзер
-            String userName = "admin"; //context.getExternalContext().getRemoteUser();
+            String userName = context.getExternalContext().getRemoteUser();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             RuntimeContext runtimeContext = null;

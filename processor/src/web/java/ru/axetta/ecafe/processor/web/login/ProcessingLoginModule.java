@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.login;
 
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
@@ -41,6 +42,7 @@ import java.util.*;
  * Time: 12:17:44
  * To change this template use File | Settings | File Templates.
  */
+@Component
 public class ProcessingLoginModule implements LoginModule {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessingLoginModule.class);
