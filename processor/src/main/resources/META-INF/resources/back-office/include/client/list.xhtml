@@ -8,6 +8,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <!-- Панель просмотра списка клиентов -->
+    <h:panelGrid>
 <h:panelGrid id="clientListPanelGrid" binding="#{mainPage.clientListPage.pageComponent}" styleClass="borderless-grid">
     <a4j:region>
     <rich:togglePanel label="Фильтр (#{mainPage.clientListPage.clientFilter.status})" switchType="client"
@@ -320,7 +321,7 @@
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />
 </a4j:region>
 </h:panelGrid>
-
+    </h:panelGrid>
 <rich:popupPanel modal="true" id="removedClientDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText value="Удаление клиента" styleClass="output-text" />
