@@ -286,7 +286,8 @@
                                 </span>
                             </rich:tooltip>
                             <h:outputText value=" - " styleClass="output-text"/>
-                            <a4j:commandLink value="Выход" action="#{mainPage.logout}" styleClass="command-link" />
+                            <h:outputLink id="logout-link" styleClass="command-link"
+                                          value="/processor/j_spring_security_logout">Выход</h:outputLink>
                         </h:panelGroup>
                         <h:panelGroup style="text-align: left;">
                             <h:graphicImage value="/images/ecafe-favicon.png"

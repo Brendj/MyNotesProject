@@ -259,22 +259,22 @@
     </converter>
 
     <navigation-rule>
-        <from-view-id>/back-office/index.jsp</from-view-id>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>logout</from-outcome>
-            <to-view-id>/back-office/index.jsp</to-view-id>
+            <to-view-id>/back-office/index.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
     </navigation-rule>
 
-    <navigation-rule>
-        <from-view-id>/back-office/index.jsp</from-view-id>
+    <!--<navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>logoutAdmin</from-outcome>
             <to-view-id>/back-office/admin/index.jsp</to-view-id>
             <redirect/>
         </navigation-case>
-    </navigation-rule>
+    </navigation-rule>-->
 
     <navigation-rule>
         <from-view-id>/back-office/director/index.jsp</from-view-id>

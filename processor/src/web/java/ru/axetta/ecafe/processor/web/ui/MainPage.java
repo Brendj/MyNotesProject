@@ -95,6 +95,7 @@ import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
 import javax.security.auth.login.CredentialException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
@@ -663,19 +664,22 @@ public class MainPage implements Serializable {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext facesExternalContext = facesContext.getExternalContext();
         final String userLogin = facesExternalContext.getRemoteUser();
-        if(StringUtils.isNotEmpty(userLogin)) {
+        /*if(StringUtils.isNotEmpty(userLogin)) {
             user = getUserByLogin(userLogin);
             if(user != null) {
                 Integer idOfRole = user.getIdOfRole();
                 if((idOfRole.equals(User.DefaultRole.ADMIN.getIdentification()))||(idOfRole.equals(User.DefaultRole.ADMIN_SECURITY.getIdentification())))
                     outcome = "logoutAdmin";
             }
-        }
+        }*/
         HttpSession httpSession = (HttpSession) facesExternalContext.getSession(false);
         if (null != httpSession && StringUtils.isNotEmpty(facesExternalContext.getRemoteUser())) {
             httpSession.invalidate();
-            ((HttpServletRequest)facesExternalContext.getRequest()).logout();
+            HttpServletRequest request = (HttpServletRequest)facesExternalContext.getRequest();
+            request.logout();
             SecurityContextHolder.clearContext();
+
+            ((HttpServletResponse)facesExternalContext.getResponse()).sendRedirect(request.getContextPath() + "/login.xhtml");
         }
         return outcome;
     }
