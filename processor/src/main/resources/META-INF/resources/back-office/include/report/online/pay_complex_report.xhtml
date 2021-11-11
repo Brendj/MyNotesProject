@@ -6,7 +6,7 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
-
+<h:panelGrid>
 <h:panelGrid id="payComplexReportPanelGrid" styleClass="borderless-grid" binding="#{mainPage.payComplexReportPage.pageComponent}">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
@@ -128,5 +128,6 @@
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+</h:panelGrid>
 </h:panelGrid>
 </ui:composition>

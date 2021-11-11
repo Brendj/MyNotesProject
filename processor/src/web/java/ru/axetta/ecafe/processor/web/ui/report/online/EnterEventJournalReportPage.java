@@ -60,7 +60,7 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
         super();
         this.periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
         startDate = CalendarUtils.startOfDay(new Date());
-        onReportPeriodChanged(null);
+        onReportPeriodChanged();
     }
 
     private Boolean allFriendlyOrgs = false;

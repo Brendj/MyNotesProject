@@ -8,10 +8,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <!--<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditContragents())-->
-    <!--      { out.println("Недостаточно прав для просмотра страницы"); return; } %>-->
-
-    <!--Заменено на блок ниже-->
 
     <h:panelGrid rendered="#{!mainPage.isEligibleToEditContragents()}">
         <h:outputText escape="true" styleClass="output-text"

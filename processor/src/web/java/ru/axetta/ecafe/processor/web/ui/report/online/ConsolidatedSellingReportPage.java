@@ -58,7 +58,7 @@ public class ConsolidatedSellingReportPage extends OnlineReportWithContragentPag
 
     @PostConstruct
     private void setDates() {
-        onReportPeriodChanged(null);
+        onReportPeriodChanged();
     }
 
     @Override

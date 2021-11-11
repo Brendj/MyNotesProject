@@ -49,7 +49,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
     public ContragentPreordersReportPage(){
         super();
         startDate = CalendarUtils.startOfDay(new Date());
-        onReportPeriodChanged(null);
+        onReportPeriodChanged();
     }
 
     public String getClassTypeTSP(){

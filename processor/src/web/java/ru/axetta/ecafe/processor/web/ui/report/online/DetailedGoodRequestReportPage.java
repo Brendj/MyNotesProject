@@ -23,7 +23,7 @@ public class DetailedGoodRequestReportPage extends OnlineReportWithContragentPag
         return periodTypeMenu;
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
                 setEndDate(startDate);
