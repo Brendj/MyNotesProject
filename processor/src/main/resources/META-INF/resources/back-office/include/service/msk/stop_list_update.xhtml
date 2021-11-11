@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="uosStopListPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.UosStopListPage"-->
+
+    <h:panelGrid id="stopListUpdatePage" styleClass="borderless-grid">
+        <a4j:status>
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif"/>
+            </f:facet>
+        </a4j:status>
+
+
+        <rich:togglePanel label="Обновление стоп-лист карт" switchType="client" opened="true"
+                          headerClass="filter-panel-header">
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Время последнего обновления стоп-листа" styleClass="output-text"/>
+                <h:inputText value="#{uosStopListPage.lastUpdate}" maxlength="20" size="20" styleClass="input-text"
+                             readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Текущий размер стоп-листа" styleClass="output-text"/>
+                <h:inputText value="#{uosStopListPage.stopListSize}" maxlength="20" size="20" styleClass="input-text"
+                             readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                <a4j:commandButton value="Запросить" action="#{uosStopListPage.updateStopList}"
+                                   render="workspaceTogglePanel"
+                                   styleClass="command-button"/>
+
+            </h:panelGrid>
+        </rich:togglePanel>
+
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</ui:composition>

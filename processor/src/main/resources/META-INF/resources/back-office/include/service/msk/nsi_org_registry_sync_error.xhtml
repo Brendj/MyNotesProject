@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+
+    <!--@elvariable id="NSIOrgRegistrySynchErrorPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistrySyncErrorPage"-->
+    <rich:popupPanel modal="true" id="NSIOrgRegistrySynchErrorPage" width="450" height="280" resizeable="false"
+                     moveable="false">
+
+        <f:facet name="header">
+            <h:panelGroup>
+                <h:outputText value="Оповещение об ошибке"></h:outputText>
+            </h:panelGroup>
+        </f:facet>
+        <f:facet name="controls">
+            <h:panelGroup>
+                <h:graphicImage value="images/icon/close.png" styleClass="hidelink" id="hidelink"/>
+                <rich:componentControl for="NSIOrgRegistrySynchErrorPage" attachTo="hidelink" operation="hide"
+                                       event="onclick"/>
+            </h:panelGroup>
+        </f:facet>
+
+        <h:form>
+            <a4j:region>
+                <h:panelGrid styleClass="borderless-grid" id="errorCreateInfoPanel" style="padding-bottom: 5px;">
+                    <h:outputText escape="true" value="#{NSIOrgRegistrySynchErrorPage.errorMessages}"
+                                  rendered="#{not empty NSIOrgRegistrySynchErrorPage.errorMessages}"
+                                  styleClass="error-messages" style="font-size: 10pt;"/>
+                    <h:outputText escape="true" value="#{NSIOrgRegistrySynchErrorPage.infoMessages}"
+                                  rendered="#{not empty NSIOrgRegistrySynchErrorPage.infoMessages}"
+                                  styleClass="info-messages" style="font-size: 10pt;"/>
+                </h:panelGrid>
+
+                <h:panelGrid columns="2" styleClass="borderless-grid" id="errorCreateDataPanel">
+                    <h:outputText escape="true" value="Ошибка" styleClass="output-text"/>
+                    <h:selectOneListbox id="subscriptions"
+                                        value="#{NSIOrgRegistrySynchErrorPage.errorType}" style="width:400px;" size="5">
+                        <f:selectItems value="#{NSIOrgRegistrySynchErrorPage.errors}"/>
+                    </h:selectOneListbox>
+                    <h:outputText escape="true" value="Комментарий" styleClass="output-text"/>
+                    <h:inputTextarea value="#{NSIOrgRegistrySynchErrorPage.errorDetails}"
+                                     style="width:400px; height: 100px"/>
+
+                    <a4j:status id="createStatus">
+                        <f:facet name="start">
+                            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                        </f:facet>
+                    </a4j:status>
+                    <h:panelGrid columns="2" styleClass="borderless-grid">
+                        <a4j:commandButton value="Создать" action="#{NSIOrgRegistrySynchErrorPage.doApply}"
+                                           status="createStatus"
+                                           render="errorCreateDataPanel, errorCreateInfoPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null &amp;&amp; empty NSIOrgRegistrySynchErrorPage.errorMessages}) #{rich:component('NSIOrgRegistrySynchErrorPage')}.hide();"
+                                           styleClass="command-button" style="width: 80px;"/>
+                        <a4j:commandButton value="Закрыть" action="#{NSIOrgRegistrySynchErrorPage.doClose}"
+                                           render="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('NSIOrgRegistrySynchErrorPage')}.hide();"
+                                           styleClass="command-button" style="width: 80px;">
+                        </a4j:commandButton>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </a4j:region>
+        </h:form>
+    </rich:popupPanel>
+</ui:composition>

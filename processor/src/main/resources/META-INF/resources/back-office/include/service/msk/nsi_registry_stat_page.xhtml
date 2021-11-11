@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--
+      ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+      -->
+
+    <!--@elvariable id="NSIOrgsRegistryStatPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgsRegistryStatPage"-->
+
+    <h:panelGrid id="NSIRegistryStatPage" styleClass="borderless-grid">
+        <a4j:status>
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif"/>
+            </f:facet>
+        </a4j:status>
+
+        <h:panelGrid styleClass="borderless-grid" columns="1">
+            <a4j:commandButton value="Обновить список" action="#{NSIOrgsRegistryStatPage.buildStatReport}"
+                               render="nsiRegistryStatReportTable"
+                               styleClass="commandButton"/>
+        </h:panelGrid>
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Дата сверки разногласий" styleClass="output-text"/>
+            <h:selectOneMenu id="revisionDates" value="#{NSIOrgsRegistryStatPage.selectedRevision}"
+                             style="width:350px;">
+                <f:selectItems value="#{NSIOrgsRegistryStatPage.revisions}"/>
+            </h:selectOneMenu>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid">
+            <h:outputText value="Статистика сверки с АИС НСИ и Реестры по зданиям" styleClass="output-text"/>
+            <rich:dataTable id="nsiRegistryStatReportTable"
+                            value="#{NSIOrgsRegistryStatPage.nsiRegistryStatReport.items}"
+                            var="item" rowKeyVar="row" footerClass="data-table-footer">
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="Округ"/>
+                    </f:facet>
+                    <h:outputText value="#{item.district}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="Создание (кол-во зданий)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.createOperation}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="Изменение (кол-во зданий)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.changeOperation}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="Отключение (кол-во зданий)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.removeOperation}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="Итого (общее кол-во изменений)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.totalOperation}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+        </h:panelGrid>
+
+    </h:panelGrid>
+</ui:composition>

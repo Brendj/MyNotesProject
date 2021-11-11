@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <h:panelGrid styleClass="borderless-grid">
+        <h:outputText escape="true" value="Тест ЭЦП" styleClass="output-text"/>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Публичный ключ" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.publicSignKey}" size="64" styleClass="input-text"/>
+            <h:outputText escape="true" value="Закрытый ключ" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.privateSignKey}" size="64" styleClass="input-text"/>
+        </h:panelGrid>
+        <a4j:commandButton value="Генерировать пару ключей для ЭЦП" action="#{mainPage.testSignatureKeyPairGeneration}"
+                           render="serviceTestPanel" styleClass="command-button"/>
+
+        <!--Тест SMS -->
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Идентификатор SMS (не более 32 символов)" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.smsMessageId}" size="32" styleClass="input-text"/>
+            <h:outputText escape="true" value="Номер телефона" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.smsPhoneNumber}" size="20" styleClass="input-text"/>
+            <h:outputText escape="true" value="Текст SMS (не более 70 символов)" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.smsMessageText}" size="70" styleClass="input-text"/>
+        </h:panelGrid>
+        <a4j:commandButton value="Отправить" action="#{mainPage.testSmsSend}" render="serviceTestPanel"
+                           styleClass="command-button"/>
+        <a4j:commandButton value="Проверить статус доставки" action="#{mainPage.testSmsDeliveryCheck}"
+                           render="serviceTestPanel" styleClass="command-button"/>
+        <a4j:commandButton value="testConcurrentUpdates" action="#{mainPage.testConcurrentUpdates}"
+                           render="serviceTestPanel" styleClass="command-button"/>
+
+        <!--Тест генерации SMS message ID -->
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Исходный идентификатор SMS (не более 16 символов)"
+                          styleClass="output-text"/>
+            <h:inputText value="#{mainPage.currentSmsMessageId}" size="16" styleClass="input-text"/>
+        </h:panelGrid>
+        <a4j:commandButton value="Генерировать новый идентификатор SMS "
+                           action="#{mainPage.testSmsMessageIdGeneration2}"
+                           render="serviceTestPanel" styleClass="command-button"/>
+
+        <!--Тест лога -->
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Текст для логирования" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.testLogMessage}" size="128" styleClass="input-text"/>
+        </h:panelGrid>
+        <a4j:commandButton value="Записать текст в лог с уровнем ERROR" action="#{mainPage.testLogError}"
+                           render="serviceTestPanel" styleClass="command-button"/>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</ui:composition>
