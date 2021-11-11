@@ -166,6 +166,8 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         importCatalogRequest.setSenderRole("1");
         sendRequestRequest.getSenderProvidedRequestData().getMessagePrimaryContent().setImportCatalogRequest(importCatalogRequest);
 
+        ///////////////////////////
+
         generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory serviceCatalogObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory();
         ServiceCatalogType serviceCatalogType = serviceCatalogObjectFactory.createServiceCatalogType();
         setProperCatalogRequestSection(requestType, importCatalogRequest, serviceCatalogType);
@@ -321,6 +323,18 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         descriptionSimpleParameter13.setVisible(false);
         descriptionSimpleParameter13.setDefaultValue("off");
 
+        DescriptionSimpleParameter descriptionSimpleParameter14 = serviceTypeObjectFactory.createDescriptionSimpleParameter();
+        descriptionSimpleParameter14.setRegexp("^0$");
+        descriptionSimpleParameter14.setName("payerIdentifier");
+        descriptionSimpleParameter14.setLabel("Без документа");
+        descriptionSimpleParameter14.setRequired(false);
+        descriptionSimpleParameter14.setReadonly(false);
+        descriptionSimpleParameter14.setIsId(BigInteger.valueOf(1));
+        descriptionSimpleParameter14.setVisible(false);
+        descriptionSimpleParameter14.setForSearch(false);
+        descriptionSimpleParameter14.setForPayment(false);
+
+
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter1);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter2);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter3);
@@ -334,6 +348,7 @@ public class RNIPLoadPaymentsServiceV24 extends RNIPLoadPaymentsServiceV22 {
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter11);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter12);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter13);
+        descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter14);
 
         serviceType.setPaymentParameters(descriptionParametersType);
 
