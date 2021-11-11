@@ -48,7 +48,7 @@ public class PreorderStatsReportPage extends OnlineReportPage {
         super();
         periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
         startDate = CalendarUtils.startOfDay(new Date());
-        onReportPeriodChanged(null);
+        onReportPeriodChanged();
     }
 
     @Override

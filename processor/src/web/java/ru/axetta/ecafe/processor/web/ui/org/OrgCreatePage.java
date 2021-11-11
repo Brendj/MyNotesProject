@@ -388,6 +388,10 @@ public class OrgCreatePage extends BasicWorkspacePage
         return "org/create";
     }
 
+    public String getPageTitle() {
+        return "Организации / Регистрация";
+    }
+
     public OrgStateMenu getOrgStateMenu() {
         return orgStateMenu;
     }

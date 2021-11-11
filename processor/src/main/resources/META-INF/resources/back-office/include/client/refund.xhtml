@@ -10,7 +10,7 @@
 <h:panelGrid rendered="#{!mainPage.isEligibleToProcessPayment()}">
     <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
 </h:panelGrid>
-
+<h:panelGrid>
 <!--@elvariable id="clientRefundPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientRefundPage"-->
 <h:panelGrid id="clientBalanceRefundPanel" binding="#{clientRefundPage.pageComponent}" styleClass="borderless-grid"
 rendered="#{mainPage.isEligibleToProcessPayment()}">
@@ -58,5 +58,6 @@ rendered="#{mainPage.isEligibleToProcessPayment()}">
                    warnClass="warn-messages" />
 </h:panelGrid>
 
+</h:panelGrid>
 </h:panelGrid>
 </ui:composition>

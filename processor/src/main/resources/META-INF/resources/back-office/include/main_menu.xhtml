@@ -10,11 +10,10 @@
     <!-- Главное меню -->
     <h:form id="mainMenuForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
         <rich:panelMenu id="mainMenu" binding="#{mainPage.mainMenu}" styleClass="main-menu" expandSingle="true"
-                        disabledGroupClass="main-menu-disabled-group" disabledItemClass="main-menu-disabled-item"
-                        groupClass="main-menu-group" itemClass="main-menu-item" hoveredGroupClass="main-menu-hovered-group"
-                        hoveredItemClass="main-menu-hovered-item" topGroupClass="main-menu-top-group"
-                        topItemClass="main-menu-top-item" iconCollapsedGroup="triangle" iconExpandedGroup="triangleDown"
-                        iconItem="none" mode="ajax">
+                        groupDisabledClass="main-menu-disabled-group" itemDisabledClass="main-menu-disabled-item"
+                        groupClass="main-menu-group" itemClass="main-menu-item"
+                        topGroupClass="main-menu-top-group"
+                        topItemClass="main-menu-top-item" groupCollapsedLeftIcon="triangle" groupExpandedLeftIcon="triangleDown">
 
             <rich:panelMenuGroup id="orgGroupMenu" label="Организации" binding="#{mainPage.orgGroupPage.mainMenuComponent}"
                                  rendered="#{mainPage.eligibleToViewOrgs}">
@@ -1063,13 +1062,6 @@
                     <rich:panelMenuItem id="orgDiscountsReportMenuItem"
                                         binding="#{mainPage.orgDiscountsReportPage.mainMenuComponent}" label="Отчет по организации"
                                         action="#{mainPage.showOrgDiscountsReportPage}" render="workspaceForm" />
-
-                    <!--@elvariable id="statisticsPaymentPreferentialSupplyReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticsPaymentPreferentialSupplyReportPage"-->
-                    <rich:panelMenuItem id="statisticsPaymentPreferentialSupplyReportMenuItem"
-                                        binding="#{statisticsPaymentPreferentialSupplyReportPage.mainMenuComponent}"
-                                        label="Статистика оплаты льготного питания"
-                                        action="#{statisticsPaymentPreferentialSupplyReportPage.show}"
-                                        render="workspaceForm" rendered="false"/>
 
                 </rich:panelMenuGroup>
 

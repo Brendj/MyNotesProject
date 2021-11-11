@@ -10,6 +10,7 @@
 <h:panelGrid rendered="#{!mainPage.isEligibleToProcessPayment()}">
     <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
 </h:panelGrid>
+    <h:panelGrid>
 <!--@elvariable id="clientBalanceTransferPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientBalanceTransferPage"-->
 <h:panelGrid id="clientBalanceTransferPanel" binding="#{clientBalanceTransferPage.pageComponent}"
              styleClass="borderless-grid" rendered="#{mainPage.isEligibleToProcessPayment()}">
@@ -75,4 +76,5 @@
 </h:panelGrid>
 
 </h:panelGrid>
+    </h:panelGrid>
 </ui:composition>

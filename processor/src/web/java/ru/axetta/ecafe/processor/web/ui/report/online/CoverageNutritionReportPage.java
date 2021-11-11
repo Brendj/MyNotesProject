@@ -53,7 +53,7 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
     private Boolean showTotal = true;
 
     public CoverageNutritionReportPage() {
-        onReportPeriodChanged(null);
+        onReportPeriodChanged();
     }
 
     public Object buildReportHTML() {
