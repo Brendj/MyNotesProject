@@ -60,7 +60,7 @@ public class RegisterStampNewElectronicCollationPage extends OnlineReportPage{
         return periodTypeMenu;
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         htmlReport = null;
         switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
@@ -82,7 +82,7 @@ public class RegisterStampNewElectronicCollationPage extends OnlineReportPage{
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {

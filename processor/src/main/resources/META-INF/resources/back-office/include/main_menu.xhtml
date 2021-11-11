@@ -1119,6 +1119,7 @@
                                         binding="#{mainPage.deliveredServicesElectronicCollationReportPage.mainMenuComponent}"
                                         label="Сводный отчет по услугам (электронная сверка)"
                                         action="#{mainPage.showDeliveredServicesElectronicCollationReportPage}" render="workspaceForm" />
+                    <!--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"-->
                     <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                                         label="Справки расходования средств" action="#{referReportPage.show}"
                                         render="workspaceForm" />
@@ -1501,7 +1502,7 @@
                 <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}"
                                     label="Свод по услугам" action="#{totalServicesReportPage.show}" render="workspaceForm" rendered="#{mainPage.eligibleToViewTotalServicesReport}" />
 
-                <!--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"-->
+
 
 
                 <!--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"-->
