@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="monitoringPersistanceCachePage" type="ru.axetta.ecafe.processor.web.ui.monitoring.MonitoringPersistanceCachePage"-->
+    <h:panelGrid id="cachePersitentStat"
+                 width="100%" styleClass="cachePersitentStat borderless-grid">
+
+        <h1>Кеш второго уровня</h1>
+
+        <a4j:commandButton value="Обновить" action="#{monitoringPersistanceCachePage.update}"/>
+
+
+        <h:panelGrid columns="2" width="100%" columnClasses="left,right">
+            <h:outputText></h:outputText>
+            <h:panelGrid columns="2" columnClasses="left,right" width="100%">
+                <h:outputText>processorPU</h:outputText>
+                <h:outputText>reportPU</h:outputText>
+            </h:panelGrid>
+
+
+            <h:outputText styleClass="output-text" escape="true" value="Количество объектов"/>
+            <h:panelGrid columns="2" columnClasses="left,right" width="100%">
+                <h:outputText value="#{monitoringPersistanceCachePage.procesorStat.secondLevelCachePutCount}"/>
+                <h:outputText value="#{monitoringPersistanceCachePage.reportStat.secondLevelCachePutCount}"/>
+            </h:panelGrid>
+
+            <h:outputText styleClass="output-text" escape="true" value="Количество использования"/>
+            <h:panelGrid columns="2" columnClasses="left,right" width="100%">
+                <h:outputText value="#{monitoringPersistanceCachePage.procesorStat.secondLevelCacheHitCount}"/>
+                <h:outputText value="#{monitoringPersistanceCachePage.reportStat.secondLevelCacheHitCount}"/>
+            </h:panelGrid>
+
+            <h:outputText styleClass="output-text" escape="true" value="Не найденных объектов"/>
+            <h:panelGrid columns="2" columnClasses="left,right" width="100%">
+                <h:outputText value="#{monitoringPersistanceCachePage.procesorStat.secondLevelCacheMissCount}"/>
+                <h:outputText value="#{monitoringPersistanceCachePage.reportStat.secondLevelCacheMissCount}"/>
+            </h:panelGrid>
+        </h:panelGrid>
+
+        <br/>
+
+        <rich:togglePanel switchType="client" opened="false" label="Processor PU полная статистика">
+            <h:outputText value="#{monitoringPersistanceCachePage.procesorStat}"/>
+        </rich:togglePanel>
+
+        <rich:togglePanel switchType="client" opened="false"  label="Report PU полная статистика">
+            <h:outputText value="#{monitoringPersistanceCachePage.reportStat}"/>
+        </rich:togglePanel>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</ui:composition>

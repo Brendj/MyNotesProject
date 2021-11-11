@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!-- Панель просмотра списка организаций -->
+    <!--@elvariable id="syncStatsPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.SyncStatsPage"-->
+    <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
+    <h:panelGrid id="syncStatsPanelGrid" styleClass="borderless-grid">
+        <!--<h:outputText styleClass="output-text" escape="true" value="Данные по всем синхронизациям собираются и записываются в БД с интервалом 10 минут." />-->
+        <!--<h:outputText styleClass="output-text" escape="true" value="При необходимости можно инициировать сброс данных в БД кнопкой \"Сохранить данные из оперативной памяти в БД\"." />-->
+        <!--<h:outputText styleClass="output-text" escape="true" value="Если не указаны конкретные ОО, то будет показана информация по всем ОО за период." />-->
+        <!--<h:outputText styleClass="output-text" escape="true" value="Период по-умолчанию - текущая неделя." />-->
+        <h:panelGrid columns="2" columnClasses="valign, valign">
+
+            <h:outputText styleClass="output-text" escape="true" value="Организации(я)"/>
+            <h:panelGroup id="orgFilter">
+                <a4j:commandButton value="..." action="#{mainPage.syncStatsPage.showOrgListSelectPage}"
+                                   render="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   disabled="#{mainPage.syncStatsPage.applyUserSettings}"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}"/>
+                    <f:setPropertyActionListener value="#{mainPage.syncStatsPage.getStringIdOfOrgList}"
+                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true"
+                              value=" {#{mainPage.syncStatsPage.filter}}"/>
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Начало периода выборки" styleClass="output-text"/>
+            <rich:calendar value="#{mainPage.syncStatsPage.periodStart}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text"
+                           showWeeksBar="false">
+                <a4j:ajax event="change" render="syncStatsPanelGrid"/>
+            </rich:calendar>
+
+            <h:outputText escape="true" value="Конец периода выборки" styleClass="output-text"/>
+            <rich:calendar id="endDateCalendar" value="#{mainPage.syncStatsPage.periodEnd}"
+                           datePattern="dd.MM.yyyy" converter="dateConverter"
+                           inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="syncStatsPanelGrid"/>
+            </rich:calendar>
+        </h:panelGrid>
+
+        <a4j:commandButton value="Обновить" action="#{mainPage.syncStatsPage.update}"
+                           render="syncStatsPanelGrid"/>
+
+        <a4j:commandButton value="Сохранить данные из оперативной памяти в БД"
+                           action="#{otherActionsPage.runShowShortLog}"
+                           styleClass="command-button"/>
+
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+
+        <a4j:status>
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+            </f:facet>
+        </a4j:status>
+
+        <h:panelGrid columns="2" columnClasses="valign, valign">
+            <rich:dataTable id="syncStatsOnPeriodTable" value="#{mainPage.syncStatsPage.syncStatsOnPeriod}" var="item"
+                            footerClass="data-table-footer" columnClasses="center-aligned-column">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Параметр"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.name}" styleClass="output-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Значение"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.value}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+        </h:panelGrid>
+
+    </h:panelGrid>
+
+</ui:composition>
