@@ -1,106 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-xmlns:h="http://xmlns.jcp.org/jsf/html"
-xmlns:f="http://xmlns.jcp.org/jsf/core"
-xmlns:rich="http://richfaces.org/rich"
-xmlns:a4j="http://richfaces.org/a4j"
-xmlns:ui="http://java.sun.com/jsf/facelets">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<rich:popupPanel modal="true"  id="modalUserSelectorPanel" autosized="true" width="500" headerClass="modal-panel-header">
-    <rich:hotKey key="esc" handler="#{rich:component('modalUserSelectorPanel')}.hide();return false;" />
-    <f:facet name="header">
-        <h:outputText escape="true" value="Выбор пользователя" />
-    </f:facet>
-    <h:form id="modalUserSelectorForm" styleClass="borderless-form"
-              eventsQueue="modalUserSelectorFormEventsQueue">
-        <table class="borderless-grid" width="480">
-            <tr>
-                <td style="text-align: left;">
-                    <h:panelGrid styleClass="borderless-grid" columns="2">
-                        <h:inputText value="#{mainPage.userSelectPage.selectedItem.userName}" readonly="true" size="64"
-                                     styleClass="input-text" />
-                        <a4j:commandLink styleClass="command-link">
-                            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                            <a4j:ajax event="click" action="#{mainPage.userSelectPage.cancelFilter}"
-                                         render="modalUserSelectorForm" />
-                            <f:setPropertyActionListener value="" target="#{mainPage.userSelectPage.filter}" />
-                        </a4j:commandLink>
-                    </h:panelGrid>
-                    <h:panelGrid columns="3" styleClass="borderless-grid">
-                        <h:panelGrid columns="2" styleClass="borderless-grid">
-                            <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
-                            <h:inputText value="#{mainPage.userSelectPage.filter}" size="48" maxlength="128"
-                                         styleClass="input-text">
-                                <a4j:ajax event="keyup" listener="#{mainPage.updateUserSelectPage}"
-                                             render="modalUserSelectorUserTable" />
-                            </h:inputText>
+    <rich:popupPanel modal="true" id="modalUserSelectorPanel" autosized="true" width="500"
+                     headerClass="modal-panel-header">
+        <rich:hotKey key="esc" handler="#{rich:component('modalUserSelectorPanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText escape="true" value="Выбор пользователя"/>
+        </f:facet>
+        <h:form id="modalUserSelectorForm" styleClass="borderless-form"
+                eventsQueue="modalUserSelectorFormEventsQueue">
+            <table class="borderless-grid" width="480">
+                <tr>
+                    <td style="text-align: left;">
+                        <h:panelGrid styleClass="borderless-grid" columns="2">
+                            <h:inputText value="#{mainPage.userSelectPage.selectedItem.userName}" readonly="true"
+                                         size="64"
+                                         styleClass="input-text"/>
+                            <a4j:commandLink styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                                <a4j:ajax event="click" action="#{mainPage.userSelectPage.cancelFilter}"
+                                          render="modalUserSelectorForm"/>
+                                <f:setPropertyActionListener value="" target="#{mainPage.userSelectPage.filter}"/>
+                            </a4j:commandLink>
                         </h:panelGrid>
-                    </h:panelGrid>
-                </td>
-            </tr>
-            <tr>
-                <td style="text-align: center;">
-                    <rich:dataTable width="100%" align="center" id="modalUserSelectorUserTable"
-                                    value="#{mainPage.userSelectPage.items}" var="item" rows="12"
-                                    footerClass="data-table-footer" columnClasses="left-aligned-column"
-                                    rowClasses="select-panel-row" onrowmouseover="this.style.backgroundColor='#e6e6e6'"
-                                    onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
-                                    onrowclick="#{rich:element('detail')}.click();">
-                        <rich:column width="1" style="display: none">
-                            <a4j:commandButton id="detail" render="modalUserSelectorForm" execute="@this">
-                                <f:setPropertyActionListener value="#{item}" target="#{mainPage.userSelectPage.selectedItem}"/>
-                            </a4j:commandButton>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <f:facet name="header">
-                                <h:outputText escape="true" value="Ид." />
-                            </f:facet>
-                            <h:outputText escape="true" value="#{item.idOfUser}" styleClass="output-text" />
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <f:facet name="header">
-                                <h:outputText escape="true" value="Имя пользователя" />
-                            </f:facet>
-                            <h:outputText escape="true" value="#{item.userName}"
-                                          styleClass="output-text" />
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <f:facet name="header">
-                                <h:outputText escape="true" value="ФИО" />
-                            </f:facet>
-                            <h:outputText escape="true" value="#{item.getSurnameAndFirstLetters()}"
-                                          styleClass="output-text" />
-                        </rich:column>
-                        <f:facet name="footer">
-                            <rich:dataScroller for="modalUserSelectorUserTable" renderIfSinglePage="false" maxPages="5"
-                                               fastControls="hide" stepControls="auto" boundaryControls="hide">
-                                <f:facet name="previous">
-                                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                        <h:panelGrid columns="3" styleClass="borderless-grid">
+                            <h:panelGrid columns="2" styleClass="borderless-grid">
+                                <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
+                                <h:inputText value="#{mainPage.userSelectPage.filter}" size="48" maxlength="128"
+                                             styleClass="input-text">
+                                    <a4j:ajax event="keyup" listener="#{mainPage.updateUserSelectPage}"
+                                              render="modalUserSelectorUserTable"/>
+                                </h:inputText>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <rich:dataTable width="100%" align="center" id="modalUserSelectorUserTable"
+                                        value="#{mainPage.userSelectPage.items}" var="item" rows="12"
+                                        footerClass="data-table-footer" columnClasses="left-aligned-column"
+                                        rowClasses="select-panel-row"
+                                        onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                        onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                        onrowclick="#{rich:element('detail')}.click();">
+                            <rich:column width="1" style="display: none">
+                                <a4j:commandButton id="detail" render="modalUserSelectorForm" execute="@this">
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{mainPage.userSelectPage.selectedItem}"/>
+                                </a4j:commandButton>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="Ид."/>
                                 </f:facet>
-                                <f:facet name="next">
-                                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                                <h:outputText escape="true" value="#{item.idOfUser}" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="Имя пользователя"/>
                                 </f:facet>
-                            </rich:dataScroller>
-                        </f:facet>
-                    </rich:dataTable>
-                </td>
-            </tr>
-            <tr>
-                <td style="text-align: right;">
-                    <h:panelGroup styleClass="borderless-div">
-                        <a4j:commandButton value="Ok" action="#{mainPage.completeUserSelection}"
-                                           render="#{mainPage.topMostPage.pageComponent.id},userFilter"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalUserSelectorPanel')}.hide();"
-                                           styleClass="command-button" style="width: 80px; margin-right: 4px;" />
-                        <a4j:commandButton value="Отмена" action="#{mainPage.cancelUserSelection}"
-                                           render="#{mainPage.topMostPage.pageComponent.id}"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalUserSelectorPanel')}.hide();"
-                                           styleClass="command-button" style="width: 80px;" />
-                    </h:panelGroup>
-                </td>
-            </tr>
-        </table>
-    </h:form>
-</rich:popupPanel>
+                                <h:outputText escape="true" value="#{item.userName}"
+                                              styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="ФИО"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.getSurnameAndFirstLetters()}"
+                                              styleClass="output-text"/>
+                            </rich:column>
+                            <f:facet name="footer">
+                                <rich:dataScroller for="modalUserSelectorUserTable" renderIfSinglePage="false"
+                                                   maxPages="5"
+                                                   fastControls="hide" stepControls="auto" boundaryControls="hide">
+                                    <f:facet name="previous">
+                                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                                    </f:facet>
+                                    <f:facet name="next">
+                                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                                    </f:facet>
+                                </rich:dataScroller>
+                            </f:facet>
+                        </rich:dataTable>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">
+                        <h:panelGroup styleClass="borderless-div">
+                            <a4j:commandButton value="Ok" action="#{mainPage.completeUserSelection}"
+                                               render="#{mainPage.topMostPage.pageComponent.id},userFilter"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalUserSelectorPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px; margin-right: 4px;"/>
+                            <a4j:commandButton value="Отмена" action="#{mainPage.cancelUserSelection}"
+                                               render="#{mainPage.topMostPage.pageComponent.id}"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalUserSelectorPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px;"/>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
 </ui:composition>

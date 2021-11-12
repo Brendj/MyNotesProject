@@ -9,7 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
     <!-- Панель просмотра списка сотрудников -->
     <!--@elvariable id="employeeHistoryReportPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeHistoryReportPage"-->
-    <h:panelGrid id="employeeHistoryReportGrid" binding="#{employeeHistoryReportPage.pageComponent}"
+    <h:panelGrid id="employeeHistoryReportGrid"
                  styleClass="borderless-grid">
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -74,7 +74,7 @@
             </rich:column>
 
             <rich:dataTable value="#{employeer.operationItemList}" var="history"
-                           columnClasses="center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+                            columnClasses="center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="#{history.organization.shortName}" styleClass="output-text"/>
                 </rich:column>

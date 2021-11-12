@@ -1,73 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-xmlns:h="http://xmlns.jcp.org/jsf/html"
-xmlns:f="http://xmlns.jcp.org/jsf/core"
-xmlns:rich="http://richfaces.org/rich"
-xmlns:a4j="http://richfaces.org/a4j"
-xmlns:ui="http://java.sun.com/jsf/facelets">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<!-- Панель редактирования списка ролей комплексов -->
-<!--@elvariable id="complexRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.ComplexRuleEditPage"-->
-<h:panelGrid id="complexRuleEditPanel" styleClass="borderless-grid" columns="1">
+    <!-- Панель редактирования списка ролей комплексов -->
+    <!--@elvariable id="complexRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.ComplexRuleEditPage"-->
+    <h:panelGrid id="complexRuleEditPanel" styleClass="borderless-grid" columns="1">
 
-    <rich:dataTable id="complexRuleTable" value="#{complexRuleEditPage.complexRoles}" var="complexRole" rows="20"
-                    columnClasses="center-aligned-column" footerClass="data-table-footer">
-        <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Идентификатор" escape="true" styleClass="column-header"/>
-            </f:facet>
-            <h:outputText value="#{complexRole.idOfRole}" escape="true" styleClass="column-header"/>
-        </rich:column>
-        <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Роль комплекса" escape="true" styleClass="column-header"/>
-            </f:facet>
-            <rich:inplaceInput layout="block" value="#{complexRole.roleName}"
-                               id="inplaceRoleName"
-                               changedHoverClass="hover" viewHoverClass="hover"
-                               viewClass="inplace" changedClass="inplace"
-                               selectOnEdit="true" editEvent="ondblclick">
-
-                <a4j:ajax event="viewactivated" render="complexRuleEditPanel"/>
-
-            </rich:inplaceInput>
-        </rich:column>
-        <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Обобщенная роль" escape="true" styleClass="column-header"/>
-            </f:facet>
-            <rich:inplaceInput layout="block" value="#{complexRole.extendRoleName}"
-                               id="inplaceExtendRoleName"
-                               changedHoverClass="hover" viewHoverClass="hover"
-                               viewClass="inplace" changedClass="inplace"
-                               selectOnEdit="true" editEvent="ondblclick">
-
-                <a4j:support event="onviewactivated" render="complexRuleEditPanel"/>
-
-            </rich:inplaceInput>
-        </rich:column>
-        <f:facet name="footer">
-            <rich:dataScroller for="complexRuleTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                               stepControls="auto" boundaryControls="hide">
-                <f:facet name="previous">
-                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+        <rich:dataTable id="complexRuleTable" value="#{complexRuleEditPage.complexRoles}" var="complexRole" rows="20"
+                        columnClasses="center-aligned-column" footerClass="data-table-footer">
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Идентификатор" escape="true" styleClass="column-header"/>
                 </f:facet>
-                <f:facet name="next">
-                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                <h:outputText value="#{complexRole.idOfRole}" escape="true" styleClass="column-header"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Роль комплекса" escape="true" styleClass="column-header"/>
                 </f:facet>
-            </rich:dataScroller>
-        </f:facet>
-    </rich:dataTable>
-    <h:panelGrid columns="2" styleClass="borderless-grid">
-        <a4j:commandButton value="Сохранить" action="#{complexRuleEditPage.updateRule}" render="complexRuleEditPanel"
-                           styleClass="command-button" />
-        <a4j:commandButton value="Восстановить" action="#{complexRuleEditPage.show}" render="complexRuleEditPanel"
-                           ajaxSingle="true" styleClass="command-button" />
+                <rich:inplaceInput layout="block" value="#{complexRole.roleName}"
+                                   id="inplaceRoleName"
+                                   changedHoverClass="hover" viewHoverClass="hover"
+                                   viewClass="inplace" changedClass="inplace"
+                                   selectOnEdit="true" editEvent="ondblclick">
+
+
+                </rich:inplaceInput>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Обобщенная роль" escape="true" styleClass="column-header"/>
+                </f:facet>
+                <rich:inplaceInput layout="block" value="#{complexRole.extendRoleName}"
+                                   id="inplaceExtendRoleName"
+                                   changedHoverClass="hover" viewHoverClass="hover"
+                                   viewClass="inplace" changedClass="inplace"
+                                   selectOnEdit="true" editEvent="ondblclick">
+
+
+                </rich:inplaceInput>
+            </rich:column>
+            <f:facet name="footer">
+                <rich:dataScroller for="complexRuleTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                    </f:facet>
+                </rich:dataScroller>
+            </f:facet>
+        </rich:dataTable>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <a4j:commandButton value="Сохранить" action="#{complexRuleEditPage.updateRule}"
+                               render="complexRuleEditPanel"
+                               styleClass="command-button"/>
+            <a4j:commandButton value="Восстановить" action="#{complexRuleEditPage.show}" render="complexRuleEditPanel"
+                               ajaxSingle="true" styleClass="command-button"/>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid">
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages" />
-    </h:panelGrid>
-</h:panelGrid>
 </ui:composition>

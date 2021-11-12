@@ -8,10 +8,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <!--<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditRule()) {-->
-    <!--    out.println("Недостаточно прав для просмотра страницы");-->
-    <!--    return;-->
-    <!--} %>-->
 
     <h:panelGrid rendered="#{!mainPage.isEligibleToEditRule()}">
         <h:outputText escape="true" styleClass="output-text"
@@ -204,7 +200,7 @@
                     </f:facet>
 
                     <rich:dataTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
-                                   columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
+                                    columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
                            center-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
                            center-aligned-column">
 

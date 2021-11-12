@@ -8,32 +8,33 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<!--@elvariable id="bankDeletePage" type="ru.axetta.ecafe.processor.web.ui.option.banks.BankDeletePage"-->
-<rich:popupPanel modal="true" id="removedBankItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
-    <rich:hotKey key="esc" handler="#{rich:component('removedBankItemDeletePanel')}.hide();return false;"/>
-    <f:facet name="header">
-        <h:outputText value="Удаление Банка" styleClass="output-text" />
-    </f:facet>
-    <h:form styleClass="borderless-form">
-        <table class="borderless-grid" width="100%">
-            <tr>
-                <td style="text-align: center;">
-                    <h:outputText value="Вы уверены в том, что хотите удалить этот банк?" styleClass="output-text" />
-                </td>
-            </tr>
-            <tr>
-                <td style="text-align: center;">
-                    <h:panelGroup styleClass="borderless-div">
-                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{bankDeletePage.delete}"
-                                           oncomplete="#{rich:component('removedBankItemDeletePanel')}.hide();"
-                                           render="mainMenu, bankListTable"
-                                           styleClass="command-button" />
-                        <a4j:commandButton value="Отмена" styleClass="command-button"
-                                           onclick="#{rich:component('removedBankItemDeletePanel')}.hide();return false;" />
-                    </h:panelGroup>
-                </td>
-            </tr>
-        </table>
-    </h:form>
-</rich:popupPanel>
+    <!--@elvariable id="bankDeletePage" type="ru.axetta.ecafe.processor.web.ui.option.banks.BankDeletePage"-->
+    <rich:popupPanel modal="true" id="removedBankItemDeletePanel" autosized="true" width="200"
+                     headerClass="modal-panel-header">
+        <rich:hotKey key="esc" handler="#{rich:component('removedBankItemDeletePanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText value="Удаление Банка" styleClass="output-text"/>
+        </f:facet>
+        <h:form styleClass="borderless-form">
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: center;">
+                        <h:outputText value="Вы уверены в том, что хотите удалить этот банк?" styleClass="output-text"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <h:panelGroup styleClass="borderless-div">
+                            <a4j:commandButton value="Да" ajaxSingle="true" action="#{bankDeletePage.delete}"
+                                               oncomplete="#{rich:component('removedBankItemDeletePanel')}.hide();"
+                                               render="mainMenu, bankListTable"
+                                               styleClass="command-button"/>
+                            <a4j:commandButton value="Отмена" styleClass="command-button"
+                                               onclick="#{rich:component('removedBankItemDeletePanel')}.hide();return false;"/>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
 </ui:composition>

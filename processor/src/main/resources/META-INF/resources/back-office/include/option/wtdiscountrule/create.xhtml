@@ -23,7 +23,7 @@
     <!--@elvariable id="wtRuleCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleCreatePage"-->
     <h:panelGrid id="wtRuleCreatePanel" binding="#{wtRuleCreatePage.pageComponent}"
                  styleClass="borderless-grid borderless-grid-align-top" columns="2"
-                 rendered="#{!mainPage.isEligibleToEditRule()}">
+                 rendered="#{mainPage.isEligibleToEditRule()}">
 
         <h:panelGrid styleClass="borderless-grid">
             <h:outputText escape="true" value="Категории клиентов" styleClass="output-text"/>
@@ -193,7 +193,7 @@
                     </f:facet>
 
                     <rich:dataTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
-                                   columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
+                                    columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
                            center-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
                            center-aligned-column">
 
@@ -253,7 +253,6 @@
                         <rich:dataScroller for="wtComplexesTable" renderIfSinglePage="false"
                                            maxPages="5" fastControls="hide" stepControls="auto"
                                            boundaryControls="hide">
-                            <a4j:ajax event="pagechange"/>
                             <f:facet name="previous">
                                 <h:graphicImage value="/images/16x16/left-arrow.png"/>
                             </f:facet>

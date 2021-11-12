@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-xmlns:h="http://xmlns.jcp.org/jsf/html"
-xmlns:f="http://xmlns.jcp.org/jsf/core"
-xmlns:rich="http://richfaces.org/rich"
-xmlns:a4j="http://richfaces.org/a4j"
-xmlns:ui="http://java.sun.com/jsf/facelets">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<!--@elvariable id="cryptoInfoPage" type="ru.axetta.ecafe.processor.web.ui.option.CryptoInfoPage"-->
-<h:panelGrid id="cryptoInfoGrid" binding="#{cryptoInfoPage.pageComponent}" styleClass="borderless-grid">
+    <!--@elvariable id="cryptoInfoPage" type="ru.axetta.ecafe.processor.web.ui.option.CryptoInfoPage"-->
+    <h:panelGrid id="cryptoInfoGrid"  styleClass="borderless-grid">
 
-    <rich:togglePanel label="Информация о крипто-провайдере" switchType="client"
-                            opened="true" headerClass="filter-panel-header">
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+        <rich:togglePanel label="Информация о крипто-провайдере" switchType="client"
+                          opened="true" headerClass="filter-panel-header">
+            <h:panelGrid columns="2" styleClass="borderless-grid">
 
-                <h:outputText escape="true" value="Провайдер:" styleClass="output-text" />
+                <h:outputText escape="true" value="Провайдер:" styleClass="output-text"/>
                 <h:inputText value="#{cryptoInfoPage.cryptoProviderName}" maxlength="30"
-                             styleClass="input-text" readonly="true" />
+                             styleClass="input-text" readonly="true"/>
 
-                <h:outputText escape="true" value="Версия:" styleClass="output-text" />
+                <h:outputText escape="true" value="Версия:" styleClass="output-text"/>
                 <h:inputText value="#{cryptoInfoPage.cryptoLibVersion}" maxlength="30"
-                             styleClass="input-text" readonly="true" />
+                             styleClass="input-text" readonly="true"/>
 
-                <h:outputText escape="true" value="Релиз:" styleClass="output-text" />
+                <h:outputText escape="true" value="Релиз:" styleClass="output-text"/>
                 <h:inputText value="#{cryptoInfoPage.cryptoLibRelease}" maxlength="30"
-                             styleClass="input-text" readonly="true" />
-        </h:panelGrid>
-    </rich:togglePanel>
-</h:panelGrid>
+                             styleClass="input-text" readonly="true"/>
+            </h:panelGrid>
+        </rich:togglePanel>
+    </h:panelGrid>
 
 
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-</h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
 </ui:composition>

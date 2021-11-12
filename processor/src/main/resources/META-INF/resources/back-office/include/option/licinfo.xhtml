@@ -1,57 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-xmlns:h="http://xmlns.jcp.org/jsf/html"
-xmlns:f="http://xmlns.jcp.org/jsf/core"
-xmlns:rich="http://richfaces.org/rich"
-xmlns:a4j="http://richfaces.org/a4j"
-xmlns:ui="http://java.sun.com/jsf/facelets">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<rich:dataTable id="licInfoTable"
-                footerClass="data-table-footer" value="#{licInfoPage.licInfos}" var="item" rows="20"
-                columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Ид." />
-        </f:facet>
-        <h:outputText value="#{item.id}"/>
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Выдана" />
-        </f:facet>
-        <h:outputText value="#{item.org}"/>
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Локация" />
-        </f:facet>
-        <h:outputText value="#{item.location}"/>
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Лицензия" />
-        </f:facet>
-        <h:outputText value="#{item.info}"/>
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Выдана" />
-        </f:facet>
-        <h:outputText value="#{item.issuedDate}"/>
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Срок действия" />
-        </f:facet>
-        <h:outputText value="#{item.expiryDate}"/>
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Валидность" />
-        </f:facet>
-        <h:outputText value="#{item.validInfo}"/>
-    </rich:column>
 
-</rich:dataTable>
+    <rich:dataTable id="licInfoTable"
+                    footerClass="data-table-footer" value="#{licInfoPage.licInfos}" var="item" rows="20"
+                    columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Ид."/>
+            </f:facet>
+            <h:outputText value="#{item.id}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Выдана"/>
+            </f:facet>
+            <h:outputText value="#{item.org}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Локация"/>
+            </f:facet>
+            <h:outputText value="#{item.location}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Лицензия"/>
+            </f:facet>
+            <h:outputText value="#{item.info}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Выдана"/>
+            </f:facet>
+            <h:outputText value="#{item.issuedDate}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Срок действия"/>
+            </f:facet>
+            <h:outputText value="#{item.expiryDate}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Валидность"/>
+            </f:facet>
+            <h:outputText value="#{item.validInfo}"/>
+        </rich:column>
+
+    </rich:dataTable>
 </ui:composition>

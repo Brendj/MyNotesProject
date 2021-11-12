@@ -13,7 +13,7 @@
     <!--@elvariable id="employeeCardListPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardListPage"-->
     <!--@elvariable id="employeeCardViewPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardViewPage"-->
     <!--@elvariable id="employeeCardEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardEditPage"-->
-    <h:panelGrid id="employeeListGrid" binding="#{employeeCardListPage.pageComponent}" styleClass="borderless-grid">
+    <h:panelGrid id="employeeListGrid"  styleClass="borderless-grid">
 
         <rich:dataTable id="employeeCardTable" value="#{employeeCardListPage.cards}" var="card" rows="15"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column"
