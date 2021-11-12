@@ -25,19 +25,17 @@
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
                         <h:inputText value="#{mainPage.clientGroupSelectPage.filter}" size="52" maxlength="128"
-                                     styleClass="input-text">
-                            <a4j:ajax event="keyup" action="#{mainPage.updateClientGroupSelectPage}"
-                                         render="modalClientGroupSelectorClientGroupTable" >
-                                <f:param name="idOfOrg" value="#{mainPage.clientGroupSelectPage.idOfOrg}" />
-                            </a4j:ajax>
-                        </h:inputText>
+                                     styleClass="input-text" />
+                        <a4j:commandLink action="#{mainPage.updateClientGroupSelectPage}" render="modalClientGroupSelectorForm"
+                                         styleClass="command-link">
+                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
+                            <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
+                        </a4j:commandLink>
                         <a4j:commandLink action="#{mainPage.updateClientGroupSelectPage}"
                                          render="modalClientGroupSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.clientGroupSelectPage.filter}" />
                             <f:param name="idOfOrg" value="#{mainPage.clientGroupSelectPage.idOfOrg}" />
-                            <a4j:ajax event="click" listener="#{mainPage.clientGroupSelectPage.cancelFilter}"
-                                         render="modalClientGroupSelectorForm" />
                         </a4j:commandLink>
                     </h:panelGrid>
                 </td>
@@ -51,7 +49,7 @@
                                     onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
                                     onrowclick="#{rich:element('detail')}.click();">
                         <rich:column width="1" style="display: none">
-                            <a4j:commandButton id="detail" render="mainPage.clientGroupSelectPage.selectedItem" execute="@this">
+                            <a4j:commandButton id="detail" render="modalClientGroupSelectorForm" execute="@this">
                                 <f:setPropertyActionListener value="#{item}" target="#{mainPage.clientGroupSelectPage.selectedItem}"/>
                             </a4j:commandButton>
                         </rich:column>

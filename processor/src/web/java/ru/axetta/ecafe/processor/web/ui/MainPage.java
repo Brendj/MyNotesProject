@@ -1842,7 +1842,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if (params.get("idOfOrg") != null) {
+            if (!StringUtils.isEmpty(params.get("idOfOrg"))) {
                 Long idOfOrg = Long.parseLong(params.get("idOfOrg"));
                 clientGroupSelectPage.fill(persistenceSession, idOfOrg);
             } else {

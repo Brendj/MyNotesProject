@@ -25,19 +25,17 @@
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
                         <h:inputText value="#{mainPage.clientGroupListSelectPage.filter}" size="52" maxlength="128"
-                                     styleClass="input-text">
-                            <a4j:ajax event="keyup" action="#{mainPage.updateClientGroupListSelectPage}" 
-                                         render="modalClientGroupSelectorListClientGroupTable" >
-                                <f:param name="idOfOrg" value="#{mainPage.clientGroupListSelectPage.idOfOrg}" />
-                            </a4j:ajax>
-                        </h:inputText>
+                                     styleClass="input-text" />
+                        <a4j:commandLink action="#{mainPage.updateClientGroupListSelectPage}" render="modalClientGroupSelectorListForm"
+                                         styleClass="command-link">
+                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
+                            <f:param name="idOfOrg" value="#{mainPage.clientGroupListSelectPage.idOfOrg}" />
+                        </a4j:commandLink>
                         <a4j:commandLink action="#{mainPage.updateClientGroupListSelectPage}"
                                          render="modalClientGroupSelectorListForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.clientGroupListSelectPage.filter}" />
                             <f:param name="idOfOrg" value="#{mainPage.clientGroupListSelectPage.idOfOrg}" />
-                            <a4j:ajax event="click" action="#{mainPage.clientGroupListSelectPage.cancelFilter}"
-                                         render="modalClientGroupSelectorListForm" />
                         </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
