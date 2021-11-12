@@ -111,7 +111,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         return periodTypeMenu;
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
                 setEndDate(startDate);
@@ -132,7 +132,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if(CalendarUtils.addMonth(CalendarUtils.addDays(end, -1), -1).equals(startDate)){
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);

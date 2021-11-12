@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
+    <!--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"-->
+    <h:panelGrid binding="#{contragentCompletionReportPage.pageComponent}" id="contragentCompletionReportPanelGrid" styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{contragentCompletionReportPage.defaultSupplier.contragentName}" readonly="true"
+                             styleClass="input-text" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{contragentCompletionReportPage.showContragentSelectPage}"
+                                   render="modalContragentSelectorPanel, orgPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" >
+                    <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                    <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                </a4j:commandButton>
+            </h:panelGroup>
+
+            <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+            <rich:calendar value="#{contragentCompletionReportPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+            <rich:calendar value="#{contragentCompletionReportPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+
+            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <h:panelGroup id="orgPanel">
+                <a4j:commandButton value="..." action="#{contragentCompletionReportPage.showOrgListSelectPage}" render="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="#{contragentCompletionReportPage.getStringIdOfOrgList}"
+                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" value=" {#{contragentCompletionReportPage.filter}}" />
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+            <h:panelGroup>
+                <h:selectOneMenu value="#{contragentCompletionReportPage.organizationTypeModify}" styleClass="input-text"
+                                 style="width: 250px;">
+                    <f:converter converterId="organizationTypeModifyConverter" />
+                    <f:selectItems value="#{contragentCompletionReportPage.organizationTypeModifyMenu.customItems}" />
+                </h:selectOneMenu>
+            </h:panelGroup>
+
+            <h:outputText escape="false" value="Показать нулевые значения" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{contragentCompletionReportPage.showNullValues}" styleClass="output-text">
+            </h:selectBooleanCheckbox>
+
+        </h:panelGrid>
+
+        <h:panelGrid columns="2">
+            <a4j:commandButton value="Генерировать отчет" action="#{contragentCompletionReportPage.buildReportHTML}"
+                               render="contragentCompletionReportTable"
+                               styleClass="command-button" status="reportGenerateStatus" />
+            <h:commandButton value="Генерировать отчет в Excel" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />
+        </h:panelGrid>
+
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+        <h:panelGrid styleClass="borderless-grid" id="contragentCompletionReportTable">
+            <!-- не показывать пустую таблицу -->
+            <h:panelGrid rendered="${not empty contragentCompletionReportPage.htmlReport}">
+                <h:outputText escape="true" value="Отчет по обороту" styleClass="output-text" />
+                <h:outputText escape="false" value="#{contragentCompletionReportPage.htmlReport}" />
+            </h:panelGrid>
+        </h:panelGrid>
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

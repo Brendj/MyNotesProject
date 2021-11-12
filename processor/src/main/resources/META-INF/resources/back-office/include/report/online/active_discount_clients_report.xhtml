@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
+    <!--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"-->
+    <h:panelGrid id="reportPanelGrid" binding="#{activeDiscountClientsReportPage.pageComponent}" styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+            <rich:calendar value="#{activeDiscountClientsReportPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+            <rich:calendar value="#{activeDiscountClientsReportPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+
+            <h:outputText escape="true" value="Организация" styleClass="output-text" />
+            <h:panelGroup>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+                <h:outputText styleClass="output-text" escape="true" value=" {#{activeDiscountClientsReportPage.filter}}" />
+            </h:panelGroup>
+
+            <a4j:commandButton value="Генерировать отчет" action="#{activeDiscountClientsReportPage.executeReport}"
+                               render="workspaceTogglePanel, reportPanel"
+                               styleClass="command-button" status="reportGenerateStatus" />
+            <a4j:status id="reportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" id="reportPanel">
+
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages" />
+
+            <h:panelGrid rendered="${!empty activeDiscountClientsReportPage.report &amp;&amp; !empty activeDiscountClientsReportPage.report.items &amp;&amp; !empty activeDiscountClientsReportPage.report.columnNames}" >
+                <h:outputText escape="true" value="Отчет по питающимся льготникам" styleClass="output-text" />
+                <rich:dataTable id="itemsReportTable" value="#{activeDiscountClientsReportPage.report.items}"
+                                var="item" rowKeyVar="row" rows="100" footerClass="data-table-footer"
+                                columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+
+                    <rich:column styleClass="center-aligned-column">
+                        <f:facet name="header">
+                            <h:outputText value="" />
+                        </f:facet>
+                        <h:outputText value="" styleClass="output-text" />
+                    </rich:column>
+                    <ui:repeat id="items" value="#{activeDiscountClientsReportPage.report.columnNames}" var="columnName">
+                    <rich:column styleClass="left-aligned-column" headerClass="center-aligned-column">
+                        <f:facet name="header">
+                            <h:outputText escape="true" value="#{columnName}" />
+                        </f:facet>
+                        <h:outputText style="float: left;" escape="true"
+                                      value="#{item.getRowValue(columnName)}"
+                                      styleClass="output-text" />
+                    </rich:column>
+                    </ui:repeat>
+
+                    <f:facet name="footer">
+                        <rich:dataScroller for="itemsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+                                           stepControls="auto" boundaryControls="hide">
+                            <f:facet name="previous">
+                                <h:graphicImage value="/images/16x16/left-arrow.png" />
+                            </f:facet>
+                            <f:facet name="next">
+                                <h:graphicImage value="/images/16x16/right-arrow.png" />
+                            </f:facet>
+                        </rich:dataScroller>
+                    </f:facet>
+                </rich:dataTable>
+            </h:panelGrid>
+
+        </h:panelGrid>
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

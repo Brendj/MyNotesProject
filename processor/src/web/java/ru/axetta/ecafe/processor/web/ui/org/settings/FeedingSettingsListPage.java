@@ -38,7 +38,8 @@ public class FeedingSettingsListPage extends BasicWorkspacePage {
             items = new ArrayList<FeedingSettingsItem>();
         }
         items.clear();
-        User user = DAOReadonlyService.getInstance().getUserFromSession();
+        //todo todo todo
+        User user = DAOReadonlyService.getInstance().getUserFromSessionFake();
         user = (User)session.merge(user);
         Criteria criteria = session.createCriteria(FeedingSetting.class);
         criteria.addOrder(Order.asc("lastUpdate"));

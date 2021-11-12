@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
+    <!--@elvariable id="regularPaymentsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegularPaymentsReportPage"-->
+    <h:panelGrid id="regularPaymentsReportGrid" binding="#{mainPage.regularPaymentsReportPage.pageComponent}"
+                 styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+            <rich:calendar value="#{mainPage.regularPaymentsReportPage.startDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+                           inputClass="input-text" showWeeksBar="false" />
+            <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+            <rich:calendar value="#{mainPage.regularPaymentsReportPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+                           inputClass="input-text" showWeeksBar="false" />
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.regularPaymentsReportPage.exportToHTML}"
+                               render="regularPaymentsReportTable" styleClass="command-button" />
+            <h:commandButton value="Генерировать отчет в Excel"
+                             actionListener="#{mainPage.regularPaymentsReportPage.exportToXLS}"
+                             styleClass="command-button" />
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" id="regularPaymentsReportTable" columnClasses="center-aligned-column">
+            <!-- не показывать пустую таблицу -->
+            <h:panelGrid rendered="${not empty mainPage.regularPaymentsReportPage.htmlReport}" >
+                <h:outputText escape="false" value="#{mainPage.regularPaymentsReportPage.htmlReport}" />
+            </h:panelGrid>
+        </h:panelGrid>
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

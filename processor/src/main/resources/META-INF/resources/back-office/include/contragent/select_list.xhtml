@@ -26,17 +26,15 @@
                         <h:panelGrid columns="4" styleClass="borderless-grid">
                             <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
                             <h:inputText value="#{mainPage.contragentListSelectPage.filter}" size="48" maxlength="128"
-                                         styleClass="input-text">
-                                <a4j:ajax event="keyup" action="#{mainPage.showContragentListSelectPage}"
-                                             render="modalContragentListSelectorTable"/>
-                            </h:inputText>
+                                         styleClass="input-text" />
                             <a4j:commandLink action="#{mainPage.showContragentListSelectPage}"
-                                             render="modalContragentListSelectorForm" styleClass="command-link">
-                                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
-                                <f:setPropertyActionListener value=""
-                                                             target="#{mainPage.contragentListSelectPage.filter}"/>
-                                <a4j:ajax event="click" action="#{mainPage.contragentListSelectPage.cancelFilter}"
-                                             render="modalContragentListSelectorForm"/>
+                                            reRender="modalContragentListSelectorForm" styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
+                            </a4j:commandLink>
+                            <a4j:commandLink action="#{mainPage.showContragentListSelectPage}"
+                                             reRender="modalContragentListSelectorForm" styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                                <f:setPropertyActionListener value="" target="#{mainPage.contragentListSelectPage.filter}" />
                             </a4j:commandLink>
                         </h:panelGrid>
                         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -55,16 +53,12 @@
                                         value="#{mainPage.contragentListSelectPage.items}" var="item" rows="15"
                                         footerClass="data-table-footer" columnClasses="left-aligned-column"
                                         rowClasses="select-panel-row"
-                                        onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
-                            <!--<a4j:ajax event="RowClick" render="modalContragentListSelectorForm">
-                            <f:setPropertyActionListener value="#{item}"
-                                                         target="#{mainPage.contragentListSelectPage.selectedItem}"/>
-                        </a4j:ajax>-->
+                                        onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                        onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
                             <rich:column>
                                 <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text">
                                     <a4j:ajax event="change"
-                                                 action="#{mainPage.contragentListSelectPage.updateSelectedIds(item.idOfContragent, item.selected)}"
+                                                 listener="#{mainPage.contragentListSelectPage.updateSelectedIds(item.idOfContragent, item.selected)}"
                                                  render="contragentListValue"/>
                                 </h:selectBooleanCheckbox>
                             </rich:column>
