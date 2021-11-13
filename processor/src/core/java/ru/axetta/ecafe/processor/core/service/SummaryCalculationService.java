@@ -399,7 +399,7 @@ public class SummaryCalculationService {
                     + "INNER JOIN cf_orderdetails od ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg "
                     + "WHERE (exists(SELECT * FROM cf_clientsnotificationsettings n WHERE c.idofclient = n.idofclient AND n.notifytype = :notifyType) OR exists (SELECT * FROM cf_client_guardian cg "
                     + "INNER JOIN cf_client_guardian_notificationsettings nn ON cg.idofclientguardian = nn.idofclientguardian AND nn.notifytype = :notifyType WHERE cg.idofchildren = c.idofclient)) "
-                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced and c.idofclient in (1910175,613625)";
+                    + "AND o.createddate BETWEEN :startTime AND :endTime  AND c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced";
             Query mquery = entityManager.createNativeQuery(query_menu_complex);
             mquery.setParameter("notifyType", notifyType);
             mquery.setParameter("startTime", startDate.getTime());
