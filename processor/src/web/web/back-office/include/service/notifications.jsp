@@ -38,6 +38,8 @@
                 </rich:panel>
                 <a4j:commandButton value="Запустить Автоплатеж и уведомления"
                                    action="#{notificationsPage.runRegularPayments}" styleClass="command-button" />
+                <a4j:commandButton value="Отправка уведомлений об отмене предзаказа" action="#{notificationsPage.cancelPreorder}"
+                                   reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
             </h:panelGrid>
         </rich:panel>
     </h:panelGrid>
