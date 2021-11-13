@@ -1295,18 +1295,22 @@
                 <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"
                                      label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewInformReports}">
                     <a4j:ajax event="click" action="#{mainPage.showInformReportsGroupMenu}" render="workspaceForm" />
+                    <!--@elvariable id="sentSmsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SentSmsReportPage"-->
                     <rich:panelMenuItem id="SentSmsReportPageMenuItem"
                                         binding="#{sentSmsReportPage.mainMenuComponent}"
                                         label="Статистика отправки сообщений информирования по дням"
                                         action="#{sentSmsReportPage.show}" render="workspaceForm" />
+                    <!--@elvariable id="OrgSmsDeliveryReportPageMenuItem" type="ru.axetta.ecafe.processor.web.ui.report.online.SmsDeliveryReportPage"-->
                     <rich:panelMenuItem id="OrgSmsDeliveryReportPageMenuItem"
                                         binding="#{smsDeliveryReportPage.mainMenuComponent}"
                                         label="Отчет по быстрой синхронизации и времени доставки сообщений информирования"
                                         action="#{smsDeliveryReportPage.show}" render="workspaceForm" />
+                    <!--@elvariable id="OrgSmsStatsReportPageMenuItem" type="ru.axetta.ecafe.processor.web.ui.report.online.OrgSmsStatsReportPage"-->
                     <rich:panelMenuItem id="OrgSmsStatsReportPageMenuItem"
                                         binding="#{orgSmsStatsReportPage.mainMenuComponent}"
                                         label="Общая статистика"
                                         action="#{orgSmsStatsReportPage.show}" render="workspaceForm" />
+                    <!--@elvariable id="SmsAddressesReportPageMenuItem" type="ru.axetta.ecafe.processor.web.ui.report.online.SmsAddressesReportPage"-->
                     <rich:panelMenuItem id="SmsAddressesReportPageMenuItem"
                                         binding="#{smsAddressesReportPage.mainMenuComponent}"
                                         label="Отчет по доставке сообщений адресатам"

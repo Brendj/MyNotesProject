@@ -158,8 +158,6 @@
                                render="#{mainPage.topMostPage.pageComponent.id}"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientListSelectorPanel')}.hide();"
                                styleClass="command-button" style="width: 80px;">
-                <f:setPropertyActionListener value="#{null}"
-                                             target="#{mainPage.clientSelectListPage.selectedItem}" />
             </a4j:commandButton>
         </h:panelGroup>
     </h:form>
