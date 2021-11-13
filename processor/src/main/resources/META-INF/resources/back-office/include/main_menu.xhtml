@@ -469,7 +469,7 @@
 
             </rich:panelMenuGroup>
 
-            <!--@elvariable id="commodityAccountingGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.CommodityAccountingGroupPage"-->
+
             <rich:panelMenuGroup id="commodityAccountingGroupMenu" binding="#{commodityAccountingGroupPage.mainMenuComponent}"
                                  label="Товарный учет" rendered="#{commodityAccountingGroupPage.eligibleToWorkCommodityAccounting}">
 
@@ -1505,7 +1505,7 @@
 
             </rich:panelMenuGroup>
 
-            <!--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"-->
+
             <rich:panelMenuGroup id="reportRepositoryGroupMenu" binding="#{reportRepositoryListPage.groupPage.mainMenuComponent}"
                                  label="Репозиторий отчетов" rendered="#{mainPage.eligibleToShowReportsRepository}">
                 <a4j:ajax event="click" action="#{reportRepositoryListPage.groupPage.show}" render="workspaceForm" />
