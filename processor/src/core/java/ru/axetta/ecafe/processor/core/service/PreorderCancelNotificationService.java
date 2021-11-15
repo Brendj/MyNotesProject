@@ -206,7 +206,7 @@ public class PreorderCancelNotificationService {
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherOO", 1, result);
 
-        preorderComplexs = DAOUtils.getContentDeletedPreorderDishOtherOO(session, new Date());
+        preorderComplexs = DAOUtils.getcontentDeletedPreorderDishOtherCash(session, new Date());
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherCash", 1, result);
