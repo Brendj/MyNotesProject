@@ -11,6 +11,7 @@
 <!--    % if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToCommodityAccounting())-->
 <!--    { out.println("Недостаточно прав для просмотра страницы"); return; } %>-->
 
+<h:panelGrid>
     <h:panelGrid rendered="#{!mainPage.isEligibleToCommodityAccounting()}">
         <h:outputText escape="true" styleClass="output-text"
                       value="Недостаточно прав для просмотра страницы">
@@ -110,4 +111,5 @@
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

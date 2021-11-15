@@ -14,6 +14,7 @@
 <!--    return;-->
 <!--    } %>-->
 
+<h:panelGrid>
     <h:panelGrid rendered="#{!mainPage.isEligibleToCommodityAccounting()}">
         <h:outputText escape="true" styleClass="output-text"
                       value="Недостаточно прав для просмотра страницы">
@@ -136,4 +137,5 @@
         <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showLoadingElementsOfBasicGoodsCSVList}"
                          styleClass="command-button"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

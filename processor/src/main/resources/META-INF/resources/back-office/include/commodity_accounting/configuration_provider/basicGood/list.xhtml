@@ -11,6 +11,7 @@
     <!--@elvariable id="basicGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodListPage"-->
     <!--@elvariable id="basicGoodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodEditPage"-->
 
+<h:panelGrid>
     <h:panelGrid id="basicGoodListPage" binding="#{basicGoodListPage.pageComponent}"
                  styleClass="borderless-grid" columns="1">
 
@@ -21,8 +22,6 @@
                 <h:panelGrid columns="2" styleClass="borderless-grid">
                     <h:outputText escape="true" value="Наименование продукта" styleClass="output-text"/>
                     <h:inputText value="#{basicGoodListPage.filter.nameOfGood}" styleClass="input-text"/>
-                    <!--<h:outputText escape="true" value="Масса нетто (грамм)" styleClass="output-text" />
-                    <h:inputText value="#{basicGoodListPage.filter.netWeight}" styleClass="input-text" />-->
                     <h:outputText escape="true" value="Единица измерения" styleClass="output-text"/>
                     <h:selectOneListbox id="unitsScaleFilterValue" value="#{basicGoodListPage.filter.unitsScale}">
                         <f:selectItems value="#{basicGoodListPage.filter.unitsScaleSelectItemList}"/>
@@ -136,4 +135,5 @@
         </rich:dataTable>
 
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

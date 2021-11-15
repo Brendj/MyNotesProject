@@ -9,6 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <!--Тест лога -->
+<h:panelGrid>
     <h:panelGrid id="testLogGrid"  styleClass="borderless-grid">
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Текст для логирования" styleClass="output-text"/>
@@ -19,4 +20,5 @@
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

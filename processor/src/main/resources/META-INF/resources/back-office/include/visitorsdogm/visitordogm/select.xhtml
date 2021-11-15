@@ -9,6 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <!--@elvariable id="visitorDogmSelectPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmSelectPage"-->
+
     <rich:popupPanel modal="true" id="modalVisitorDogmSelectorPanel" autosized="true" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalVisitorDogmSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
@@ -37,7 +38,8 @@
                                         onrowclick="#{rich:element('detail')}.click();">
                             <rich:column width="1" style="display: none">
                                 <a4j:commandButton id="detail" render="modalVisitorDogmSelectorForm" execute="@this">
-                                    <f:setPropertyActionListener value="#{item}" target="#{visitorDogmSelectPage.selectVisitorDogm}"/>
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{visitorDogmSelectPage.selectVisitorDogm}"/>
                                 </a4j:commandButton>
                             </rich:column>
                             <rich:column headerClass="column-header">

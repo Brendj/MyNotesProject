@@ -10,13 +10,8 @@
 
     <!--@elvariable id="NSIOrgRegistrySynchOverviewPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistrySynchOverviewPage"-->
 
-    <h:panelGrid id="NSIOrgRegistrySynchOverviewPage" styleClass="borderless-grid" binding="#{NSIOrgRegistrySynchOverviewPage.pageComponent}">
-        <!--<a4j:status>
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" />
-            </f:facet>
-        </a4j:status>-->
-
+<h:panelGrid>
+    <h:panelGrid id="NSIOrgRegistrySynchOverviewPage" styleClass="borderless-grid" >
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Фильтр по названию организации" styleClass="output-text"/>
@@ -41,10 +36,10 @@
                         width="350px" rows="20" id="table" rowKeyVar="row">
             <rich:column>
                 <f:facet name="header">
-                    <h:outputText value="№"></h:outputText>
+                    <h:outputText value="№"/>
                 </f:facet>
                 <h:outputText value="#{row+1}"
-                              style="#{(e.outOfSynch) ? 'color:red' : ''}"></h:outputText>
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
             </rich:column>
             <rich:column>
                 <f:facet name="header">
@@ -124,4 +119,5 @@
         </rich:dataTable>
 
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

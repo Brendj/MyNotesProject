@@ -9,6 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <!--@elvariable id="wtSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.WtSettingsReportPage"-->
+<h:panelGrid>
     <h:panelGrid columns="2">
         <h:outputText escape="true" value="Количество дней, запрещенных для редактирования" styleClass="output-text"/>
         <h:inputText value="#{wtSettingsReportPage.daysForbid}" styleClass="input-text"
@@ -21,4 +22,5 @@
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

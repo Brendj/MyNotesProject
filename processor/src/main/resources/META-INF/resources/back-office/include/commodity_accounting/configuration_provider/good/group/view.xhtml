@@ -11,6 +11,7 @@
     <!-- Панель создания правила -->
     <!--@elvariable id="goodGroupViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupViewPage"-->
     <!--@elvariable id="goodGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupEditPage"-->
+<h:panelGrid>
     <h:panelGrid id="goodGroupViewPanelGrid" binding="#{goodGroupViewPage.pageComponent}"
                  styleClass="borderless-grid" columns="1">
         <h:panelGrid columns="2">
@@ -48,4 +49,5 @@
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

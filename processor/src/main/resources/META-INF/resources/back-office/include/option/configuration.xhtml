@@ -8,20 +8,22 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <h:panelGrid id="configurationPanelGrid" styleClass="borderless-grid">
-        <h:panelGrid styleClass="borderless-grid" columns="1">
-            <h:inputTextarea rows="40" cols="140" value="#{mainPage.configurationPage.configurationText}"
-                             styleClass="input-text"/>
-            <h:panelGroup>
-                <a4j:commandButton value="Сохранить" action="#{mainPage.saveConfiguration}"
-                                   render="workspaceTogglePanel, configurationPanelGrid"
-                                   styleClass="command-button"/>
-                <a4j:commandButton value="Отмена" action="#{mainPage.configurationPage.cancelConfiguration}"
-                                   render="workspaceTogglePanel, configurationPanelGrid"
-                                   styleClass="command-button"/>
-            </h:panelGroup>
+    <h:panelGrid>
+        <h:panelGrid id="configurationPanelGrid" styleClass="borderless-grid">
+            <h:panelGrid styleClass="borderless-grid" columns="1">
+                <h:inputTextarea rows="40" cols="140" value="#{mainPage.configurationPage.configurationText}"
+                                 styleClass="input-text"/>
+                <h:panelGroup>
+                    <a4j:commandButton value="Сохранить" action="#{mainPage.saveConfiguration}"
+                                       render="workspaceTogglePanel, configurationPanelGrid"
+                                       styleClass="command-button"/>
+                    <a4j:commandButton value="Отмена" action="#{mainPage.configurationPage.cancelConfiguration}"
+                                       render="workspaceTogglePanel, configurationPanelGrid"
+                                       styleClass="command-button"/>
+                </h:panelGroup>
+            </h:panelGrid>
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
         </h:panelGrid>
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages"/>
     </h:panelGrid>
 </ui:composition>
