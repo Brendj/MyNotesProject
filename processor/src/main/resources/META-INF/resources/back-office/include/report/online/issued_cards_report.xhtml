@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
+    <h:panelGrid id="issuedCardsReportPagePanelGrid" binding="#{mainPage.issuedCardsReportPage.pageComponent}" styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Пользователь" styleClass="output-text" />
+            <h:panelGroup id="userFilter">
+                <a4j:commandButton value="..." action="#{mainPage.issuedCardsReportPage.showUserSelectPage()}"
+                                   render="modalUserListSelectorPanel,userFilter"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalUserListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="#{mainPage.userListSelectPage.filter}" target="#{mainPage.userListSelectPage.filter}" />
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" id="selectedUser"
+                              value=" {#{mainPage.issuedCardsReportPage.filter}}" />
+            </h:panelGroup>
+
+            <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+            <rich:calendar value="#{mainPage.issuedCardsReportPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDateCalendar,issuedCardsReportPagePanel"
+                          listener="#{mainPage.issuedCardsReportPage.onReportPeriodChanged}" />
+            </rich:calendar>
+            <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+            <rich:calendar id="endDateCalendar" value="#{mainPage.issuedCardsReportPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDatePeriodSelect,issuedCardsReportPagePanel"
+                          listener="#{mainPage.issuedCardsReportPage.onEndDateSpecified}" />
+            </rich:calendar>
+            <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+            <h:selectOneMenu id="endDatePeriodSelect"
+                             value="#{mainPage.issuedCardsReportPage.periodTypeMenu.periodType}"
+                             styleClass="input-text" style="width: 200px;">
+                <f:converter converterId="periodTypeConverter" />
+                <f:selectItems value="#{mainPage.issuedCardsReportPage.periodTypeMenu.items}" />
+                <a4j:ajax event="change" render="endDateCalendar,issuedCardsReportPagePanelGrid"
+                             listener="#{mainPage.issuedCardsReportPage.onReportPeriodChanged}" />
+            </h:selectOneMenu>
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.issuedCardsReportPage.buildReportHTML}"
+                               render="issuedCardsReportPagePanel" styleClass="command-button" />
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.issuedCardsReportPage.exportToXLS}"
+                             styleClass="command-button" />
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" id="issuedCardsReportPagePanel">
+            <h:panelGrid rendered="${not empty mainPage.issuedCardsReportPage.htmlReport}">
+                <h:outputText escape="true" value="#{mainPage.issuedCardsReportPage.reportName}" styleClass="output-text" />
+                <h:outputText escape="false" value="#{mainPage.issuedCardsReportPage.htmlReport}" />
+                <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+            </h:panelGrid>
+        </h:panelGrid>
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>
