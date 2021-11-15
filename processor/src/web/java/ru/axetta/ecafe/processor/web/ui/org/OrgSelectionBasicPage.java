@@ -80,7 +80,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         if (webARM != null) {
             orgCriteria.add(Restrictions.eq("useWebArm", webARM));
         }
-        Long idOfUser = DAOReadonlyService.getInstance().getUserFromSessionFake().getIdOfUser();
+        Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
         if (idOfUser == null) {
             throw new Exception("Не удалось получить ID пользователя");
         }

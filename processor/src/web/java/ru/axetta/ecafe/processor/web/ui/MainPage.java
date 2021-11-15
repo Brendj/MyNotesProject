@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui;
 import net.sf.jasperreports.engine.JRException;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
@@ -94,6 +95,7 @@ import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
 import javax.security.auth.login.CredentialException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
@@ -662,18 +664,22 @@ public class MainPage implements Serializable {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext facesExternalContext = facesContext.getExternalContext();
         final String userLogin = facesExternalContext.getRemoteUser();
-        if(StringUtils.isNotEmpty(userLogin)) {
+        /*if(StringUtils.isNotEmpty(userLogin)) {
             user = getUserByLogin(userLogin);
             if(user != null) {
                 Integer idOfRole = user.getIdOfRole();
                 if((idOfRole.equals(User.DefaultRole.ADMIN.getIdentification()))||(idOfRole.equals(User.DefaultRole.ADMIN_SECURITY.getIdentification())))
                     outcome = "logoutAdmin";
             }
-        }
+        }*/
         HttpSession httpSession = (HttpSession) facesExternalContext.getSession(false);
         if (null != httpSession && StringUtils.isNotEmpty(facesExternalContext.getRemoteUser())) {
             httpSession.invalidate();
-            ((HttpServletRequest)facesExternalContext.getRequest()).logout();
+            HttpServletRequest request = (HttpServletRequest)facesExternalContext.getRequest();
+            request.logout();
+            SecurityContextHolder.clearContext();
+
+            ((HttpServletResponse)facesExternalContext.getResponse()).sendRedirect(request.getContextPath() + "/login.xhtml");
         }
         return outcome;
     }
@@ -693,7 +699,7 @@ public class MainPage implements Serializable {
             user = (User) userCriteria.uniqueResult();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        }finally {
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
@@ -9629,8 +9635,7 @@ public class MainPage implements Serializable {
     public User getCurrentUser() throws Exception {
         if (currentUser == null) {
             FacesContext context = FacesContext.getCurrentInstance();
-            //todo todo todo фейковый юзер
-            String userName = "admin"; //context.getExternalContext().getRemoteUser();
+            String userName = context.getExternalContext().getRemoteUser();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             RuntimeContext runtimeContext = null;
