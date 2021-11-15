@@ -6,10 +6,11 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:panelGrid>
 <!--@elvariable id="settingsListPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingsListPage"-->
 <!--@elvariable id="selectedSettingsGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SelectedSettingsGroupPage"-->
 <!--@elvariable id="settingEditPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingEditPage"-->
-<h:panelGrid id="settingsListPage" styleClass="borderless-grid">
+<h:panelGrid id="settingsListPage" binding="#{settingsListPage.pageComponent}" styleClass="borderless-grid">
 
     <rich:togglePanel label="Фильтр (#{settingsListPage.status})" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
@@ -80,6 +81,7 @@
         </rich:column>
     </rich:dataTable>
 </h:panelGrid>
+    </h:panelGrid>
 
 <a4j:status id="sSettingsListStatus">
     <f:facet name="start">

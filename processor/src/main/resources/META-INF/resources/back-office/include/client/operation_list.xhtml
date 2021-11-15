@@ -53,7 +53,7 @@
 <!-- Панель просмотра операций по карте -->
 <h:panelGrid id="clientOperationListGrid" binding="#{mainPage.clientOperationListPage.pageComponent}"
              styleClass="borderless-grid">
-    <h:panelGrid styleClass="borderless-grid" columns="5">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Начало периода" styleClass="output-text" />
         <rich:calendar value="#{mainPage.clientOperationListPage.startTime}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />

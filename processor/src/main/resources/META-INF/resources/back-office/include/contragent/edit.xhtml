@@ -8,19 +8,14 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <!--<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditContragents())-->
-    <!--      { out.println("Недостаточно прав для просмотра страницы"); return; } %>-->
-
-    <!--Заменено на блок ниже-->
-
     <h:panelGrid rendered="#{!mainPage.isEligibleToEditContragents()}">
         <h:outputText escape="true" styleClass="output-text"
                       value="Недостаточно прав для просмотра страницы">
         </h:outputText>
     </h:panelGrid>
-
+<h:panelGrid>
     <!-- Панель редактирования контрагента -->
-    <h:panelGrid id="contragentEditGrid"
+    <h:panelGrid id="contragentEditGrid" binding="#{mainPage.contragentEditPage.pageComponent}"
                  styleClass="borderless-grid"
                  columns="2" rendered="#{mainPage.isEligibleToEditContragents()}">
         <h:outputText escape="true" value="Идентификатор" styleClass="output-text"/>
@@ -111,6 +106,7 @@
         <h:selectBooleanCheckbox value="#{mainPage.contragentEditPage.payByCashier}" styleClass="input-text"
                                  rendered="#{mainPage.contragentEditPage.TSP}"/>
     </h:panelGrid>
+</h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Заметки" styleClass="output-text"/>
         <h:inputTextarea rows="5" cols="64" value="#{mainPage.contragentEditPage.remarks}" styleClass="input-text"/>
