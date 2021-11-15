@@ -394,7 +394,7 @@ public class SummaryCalculationService {
         //Подсчет значений для детализации меню в случае уведомления по итогам дня
         Map menuMap = new TreeMap<Long, String>();
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
-            String query_menu_complex = "SELECT DISTINCT c.idofclient, od.qty, od.rprice, od.fration, o.idoforder "
+            String query_menu_complex = "SELECT DISTINCT c.idofclient, od.qty, od.rprice, od.fration, od.MenuType, od.MenuDetailName, o.idoforder "
                     + "FROM cf_clients c INNER JOIN cf_orders o ON c.idofclient = o.idofclient "
                     + "INNER JOIN cf_orderdetails od ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg "
                     + "WHERE (exists(SELECT * FROM cf_clientsnotificationsettings n WHERE c.idofclient = n.idofclient AND n.notifytype = :notifyType) OR exists (SELECT * FROM cf_client_guardian cg "
@@ -415,9 +415,15 @@ public class SummaryCalculationService {
                 Long rprice = ((BigInteger) row[2]).longValue();
                 Long sum = qty * rprice;
                 String menu = OrderDetailFRationTypeWTdiet.getDescription(((Integer) row[3]).intValue());
+                Integer menyType = ((Integer) row[4]).intValue();
+                String menudetailname = (String) row[5];
+
                 String menu_name = (String) menuMap.get(id);
                 menu_name = (menu_name == null ? "" : menu_name);
-                menu_name += "%" + menu + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
+                if (menyType >= 50 && menyType <=99)
+                    menu_name += "%" + menu + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
+                else
+                    menu_name += "%" + menudetailname + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
                 if (sum % 100 != 0) {
                     menu_name += " " + sum % 100 + " коп.";
                 }
