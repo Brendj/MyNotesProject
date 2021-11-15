@@ -11,33 +11,36 @@
     <!-- Панель просмотра списка сотрудников -->
     <!--@elvariable id="visitorDogmCardEditPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCardEditPage"-->
     <!--@elvariable id="visitorDogmCardViewPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCardViewPage"-->
-    <h:panelGrid id="visitorDogmListGrid" binding="#{visitorDogmCardViewPage.pageComponent}"
-                 styleClass="borderless-grid">
+    <h:panelGrid>
+        <h:panelGrid id="visitorDogmListGrid" binding="#{visitorDogmCardViewPage.pageComponent}"
+                     styleClass="borderless-grid">
 
-        <h:panelGrid columns="2">
+            <h:panelGrid columns="2">
 
-            <h:outputText escape="true" value="Сотрудник" styleClass="output-text"/>
-            <h:inputText value="#{visitorDogmCardViewPage.card.visitorItem.shortFullName}" readonly="true"
-                         styleClass="input-text"
-                         style="margin-right: 2px;"/>
+                <h:outputText escape="true" value="Сотрудник" styleClass="output-text"/>
+                <h:inputText value="#{visitorDogmCardViewPage.card.visitorItem.shortFullName}" readonly="true"
+                             styleClass="input-text"
+                             style="margin-right: 2px;"/>
 
-            <h:outputLabel escape="true" value="Номер карты" styleClass="output-text"/>
-            <h:inputText value="#{visitorDogmCardViewPage.card.cardNo}" styleClass="input-text" readonly="true"/>
+                <h:outputLabel escape="true" value="Номер карты" styleClass="output-text"/>
+                <h:inputText value="#{visitorDogmCardViewPage.card.cardNo}" styleClass="input-text" readonly="true"/>
 
-            <h:outputLabel escape="true" value="Номер, нанесенный на карту" styleClass="output-text"/>
-            <h:inputText value="#{visitorDogmCardViewPage.card.cardPrintedNo}" styleClass="input-text" readonly="true"/>
+                <h:outputLabel escape="true" value="Номер, нанесенный на карту" styleClass="output-text"/>
+                <h:inputText value="#{visitorDogmCardViewPage.card.cardPrintedNo}" styleClass="input-text"
+                             readonly="true"/>
+
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <a4j:commandButton value="Редактировать" action="#{visitorDogmCardEditPage.show}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="borderless-grid">
+                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                               warnClass="warn-messages"/>
+            </h:panelGrid>
 
         </h:panelGrid>
-
-        <h:panelGrid styleClass="borderless-grid" columns="2">
-            <a4j:commandButton value="Редактировать" action="#{visitorDogmCardEditPage.show}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-        </h:panelGrid>
-
-        <h:panelGrid styleClass="borderless-grid">
-            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                           warnClass="warn-messages"/>
-        </h:panelGrid>
-
     </h:panelGrid>
 </ui:composition>

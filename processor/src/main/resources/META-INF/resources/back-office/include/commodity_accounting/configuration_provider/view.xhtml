@@ -10,6 +10,7 @@
 
     <!--@elvariable id="configurationProviderViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderViewPage"-->
     <!--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderEditPage"-->
+<h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Идентификатор" styleClass="output-text"/>
         <h:inputText readonly="true"
@@ -60,4 +61,5 @@
         <a4j:commandButton value="Редактировать" action="#{configurationProviderEditPage.show}"
                            render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

@@ -9,6 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <!--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"-->
+<h:panelGrid>
     <h:panelGrid id="orgSyncSettingsReportPanelGrid" binding="#{orgSyncSettingReportPage.pageComponent}"
                  styleClass="borderless-grid">
         <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -298,4 +299,5 @@
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

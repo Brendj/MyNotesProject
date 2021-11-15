@@ -29,6 +29,7 @@
     </script>
 
     <!--@elvariable id="kznClientsStatisticViewPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticViewPage"-->
+<h:panelGrid>
     <h:panelGrid id="kznClientsStatisticPanelGrid" binding="#{kznClientsStatisticViewPage.pageComponent}"
                  styleClass="borderless-grid">
         <h:panelGrid id="orgFilter" columns="3">
@@ -125,4 +126,5 @@
             </rich:column>
         </rich:dataTable>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

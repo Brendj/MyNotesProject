@@ -9,40 +9,43 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <!--@elvariable id="categoryOrgCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgCreatePage"-->
-    <h:panelGrid id="categoryOrgCreateTable" binding="#{categoryOrgCreatePage.pageComponent}"
-                 styleClass="borderless-grid" columns="2">
+    <h:panelGrid>
+        <h:panelGrid id="categoryOrgCreateTable" binding="#{categoryOrgCreatePage.pageComponent}"
+                     styleClass="borderless-grid" columns="2">
 
-        <h:outputText escape="true" value="Название" styleClass="output-text required-field"/>
-        <h:inputText value="#{categoryOrgCreatePage.categoryName}" maxlength="32" styleClass="input-text"/>
+            <h:outputText escape="true" value="Название" styleClass="output-text required-field"/>
+            <h:inputText value="#{categoryOrgCreatePage.categoryName}" maxlength="32" styleClass="input-text"/>
 
-        <h:outputText escape="true" value="Организации" styleClass="output-text required-field"/>
+            <h:outputText escape="true" value="Организации" styleClass="output-text required-field"/>
 
-        <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" render="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{categoryOrgCreatePage.getStringIdOfOrgList}"
-                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
-                          value=" {#{categoryOrgCreatePage.filter}}"/>
-        </h:panelGroup>
+            <h:panelGroup>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                                   render="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="#{categoryOrgCreatePage.getStringIdOfOrgList}"
+                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
+                              value=" {#{categoryOrgCreatePage.filter}}"/>
+            </h:panelGroup>
+
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid">
+            <a4j:commandButton value="Зарегистрировать категорию" action="#{categoryOrgCreatePage.createCategoryOrg}"
+                               render="categoryOrgCreateTable" styleClass="command-button"/>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid">
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
 
     </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid">
-        <a4j:commandButton value="Зарегистрировать категорию" action="#{categoryOrgCreatePage.createCategoryOrg}"
-                           render="categoryOrgCreateTable" styleClass="command-button"/>
-    </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid">
-        <a4j:status>
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-            </f:facet>
-        </a4j:status>
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages"/>
-    </h:panelGrid>
-
 </ui:composition>

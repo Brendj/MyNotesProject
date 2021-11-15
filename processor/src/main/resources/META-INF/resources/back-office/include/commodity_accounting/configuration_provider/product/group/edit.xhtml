@@ -10,6 +10,7 @@
 
     <!-- Панель создания правила -->
     <!--@elvariable id="productGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupEditPage"-->
+<h:panelGrid>
     <h:panelGrid id="productGroupEditPanelGrid" binding="#{productGroupEditPage.pageComponent}"
                  styleClass="borderless-grid" columns="1">
         <h:panelGrid columns="2">
@@ -55,4 +56,5 @@
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages"/>
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

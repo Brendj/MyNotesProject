@@ -9,6 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:c="http://java.sun.com/jsp/jstl/core">
 
     <!--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"-->
+<h:panelGrid>
     <h:panelGrid id="preorderJournalPanelGrid" binding="#{preorderJournalReportPage.pageComponent}"
                  styleClass="borderless-grid">
         <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -96,4 +97,5 @@
                        warnClass="warn-messages"/>
 
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

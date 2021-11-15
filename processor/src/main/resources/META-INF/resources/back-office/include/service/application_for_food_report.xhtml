@@ -9,6 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <!--@elvariable id="applicationForFoodReportPage" type="ru.axetta.ecafe.processor.web.ui.service.ApplicationForFoodReportPage"-->
+<h:panelGrid>
     <h:panelGrid id="applicationForFoodPanelGrid" binding="#{applicationForFoodReportPage.pageComponent}"
                  styleClass="borderless-grid">
         <rich:popupPanel modal="true" id="applicationForFoodMessagePanel" autosized="true" minWidth="500">
@@ -339,4 +340,5 @@
                        warnClass="warn-messages"/>
 
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>

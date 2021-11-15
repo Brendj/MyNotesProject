@@ -9,6 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
     <!-- Панель создания правила -->
     <!--@elvariable id="goodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodEditPage"-->
+<h:panelGrid>
     <h:panelGrid id="goodEditPanelGrid" binding="#{goodEditPage.pageComponent}" styleClass="borderless-grid"
                  columns="1">
         <h:panelGrid columns="2">
@@ -89,4 +90,5 @@
                        warnClass="warn-messages"/>
 
     </h:panelGrid>
+</h:panelGrid>
 </ui:composition>
