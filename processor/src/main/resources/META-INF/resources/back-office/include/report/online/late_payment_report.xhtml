@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:panelGrid>
+    <h:panelGrid id="latePaymentReportPanelGrid" binding="#{mainPage.latePaymentReportPage.pageComponent}"
+                 styleClass="borderless-grid">
+
+        <rich:togglePanel label="Настройки отчета" switchType="client" opened="true"
+                          headerClass="filter-panel-header">
+            <h:panelGrid id="lateParametrsGrid" styleClass="borderless-grid" columns="2">
+
+                <h:outputText styleClass="output-text" escape="true" value="Организация" />
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{mainPage.latePaymentReportPage.filter}" readonly="true"
+                                 styleClass="input-text long-field" style="margin-right: 2px;" />
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;" />
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+                <rich:calendar value="#{mainPage.latePaymentReportPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDateCalendar"
+                                 listener="#{mainPage.latePaymentReportPage.onReportPeriodChanged}" />
+                </rich:calendar>
+
+                <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+                <h:selectOneMenu id="endDatePeriodSelect"
+                                 value="#{mainPage.latePaymentReportPage.periodTypeMenu.periodType}" styleClass="input-text"
+                                 style="width: 250px;">
+                    <f:converter converterId="periodTypeConverter" />
+                    <f:selectItems value="#{mainPage.latePaymentReportPage.periodTypeMenu.items}" />
+                    <a4j:ajax event="change" render="endDateCalendar"
+                                 listener="#{mainPage.latePaymentReportPage.onReportPeriodChanged}" />
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+                <rich:calendar id="endDateCalendar" value="#{mainPage.latePaymentReportPage.endDate}"
+                               datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
+                               showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDatePeriodSelect"
+                                 listener="#{mainPage.latePaymentReportPage.onEndDateSpecified}" />
+                </rich:calendar>
+
+                <h:outputText styleClass="output-text" escape="true" value="Количество несвоевременной оплаты за 1 день" />
+                <h:panelGroup>
+                    <h:selectOneMenu value="#{mainPage.latePaymentReportPage.latePaymentByOneDayCountType}"
+                                     styleClass="input-text" style="width: 250px;">
+                        <f:converter converterId="latePaymentByOneDayCountConverter" />
+                        <f:selectItems value="#{mainPage.latePaymentReportPage.latePaymentByOneDayCountTypeMenu.items}" />
+                    </h:selectOneMenu>
+                </h:panelGroup>
+
+                <h:outputText styleClass="output-text" escape="true" value="Количество дней несвоевременной оплаты" />
+                <h:panelGroup>
+                    <h:selectOneMenu value="#{mainPage.latePaymentReportPage.latePaymentDaysCountType}"
+                                     styleClass="input-text" style="width: 250px;">
+                        <f:converter converterId="latePaymentDaysCountTypeConverter" />
+                        <f:selectItems value="#{mainPage.latePaymentReportPage.latePaymentDaysCountTypeMenu.items}" />
+                    </h:selectOneMenu>
+                </h:panelGroup>
+            </h:panelGrid>
+
+        </rich:togglePanel>
+
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.latePaymentReportPage.buildReportHTML}"
+                               render="latePaymentReportPanelGrid" styleClass="command-button"
+                               status="reportGenerateStatus" />
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.latePaymentReportPage.generateXLS}"
+                             styleClass="command-button" />
+            <a4j:commandButton value="Очистить" action="#{mainPage.latePaymentReportPage.clear}"
+                               render="latePaymentReportPanelGrid, lateParametrsGrid" styleClass="command-button"
+                               status="reportGenerateStatus" />
+        </h:panelGrid>
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+        <h:panelGrid styleClass="borderless-grid">
+            <h:panelGrid rendered="${not empty mainPage.latePaymentReportPage.htmlReport}">
+                <h:outputText escape="true" value="Сводный отчет по несвоевременной оплате питания"
+                              styleClass="output-text" />
+                <h:outputText escape="false" value="#{mainPage.latePaymentReportPage.htmlReport}" />
+                <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+            </h:panelGrid>
+        </h:panelGrid>
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

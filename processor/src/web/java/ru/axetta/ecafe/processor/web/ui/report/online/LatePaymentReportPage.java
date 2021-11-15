@@ -62,7 +62,7 @@ public class LatePaymentReportPage extends OnlineReportPage {
         return periodTypeMenu;
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
                 setEndDate(startDate);
@@ -83,7 +83,7 @@ public class LatePaymentReportPage extends OnlineReportPage {
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
