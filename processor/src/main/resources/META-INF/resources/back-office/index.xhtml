@@ -6,35 +6,6 @@
       xmlns:rich="http://richfaces.org/rich"
       xmlns:a4j="http://richfaces.org/a4j"
       xmlns:ui="http://java.sun.com/jsf/facelets">
-<!--<%
-    try {
-        if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
-            String mainPage;
-            if (User.isSuccessfullySendEMP()) {
-                mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
-            }
-            else
-            {
-                mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/emp_server_not_answer.faces");
-            }
-            response.sendRedirect(mainPage);
-            return;
-        }
-    } catch (Exception e) {
-            String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
-            response.sendRedirect(mainPage);
-    }
-    try {
-        if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.isNeedChangePassword(request.getRemoteUser())) {
-            String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/change-password.faces");
-            response.sendRedirect(mainPage);
-            return;
-        }
-    } catch (Exception e) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                e.getMessage(), null));
-    }
-%>-->
 <f:view>
 
 <h:head>
