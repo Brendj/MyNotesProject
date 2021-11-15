@@ -1,11 +1,7 @@
 package ru.axetta.ecafe.processor.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.jaas.DefaultJaasAuthenticationProvider;
-import org.springframework.security.authentication.jaas.memory.InMemoryConfiguration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,10 +10,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.axetta.ecafe.processor.beans.authentication.provider.ProcessingJaasAuthenticationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.login.ProcessingLoginModule;
-
-import javax.security.auth.login.AppConfigurationEntry;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by nuc on 26.10.2020.
@@ -39,7 +31,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(final HttpSecurity security) throws Exception {
         security.authorizeRequests().antMatchers("/javax.faces.resource/**")
                 .permitAll()
-                .antMatchers("/back-office/style.css").permitAll();
+                .antMatchers("/back-office/styles.css").permitAll();
 
         security/*.requestMatchers()
                 .antMatchers("/processor/sync", "/processor/back-office")
