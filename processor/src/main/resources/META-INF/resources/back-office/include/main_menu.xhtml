@@ -1390,10 +1390,12 @@
                                         binding="#{mainPage.orgOrderReportPage.mainMenuComponent}" label="Отчет по покупкам"
                                         action="#{mainPage.showOrgOrderReportPage}" render="workspaceForm" />
 
+                    <!--@elvariable id="basicBasketReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.BasicBasketReportPage"-->
                     <rich:panelMenuItem id="basicBasketReportMenuItem"
                                         binding="#{basicBasketReportPage.mainMenuComponent}" label="Отчет по базовой корзине"
                                         action="#{basicBasketReportPage.show}" render="workspaceForm"/>
 
+                    <!--@elvariable id="paymentsBetweenContragentsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PaymentsBetweenContragentsReportPage"-->
                     <rich:panelMenuItem id="paymentsBetweenContragentsReportMenuItem"
                                         binding="#{paymentsBetweenContragentsReportPage.mainMenuComponent}" label="Отчет по объемам оплат между поставщиками питания"
                                         action="#{paymentsBetweenContragentsReportPage.show}" render="workspaceForm"/>
