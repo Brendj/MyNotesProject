@@ -51,8 +51,7 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="1">
             <a4j:commandButton value="Обновить" action="#{mainPage.taloonApprovalVerificationPage.reload}"
-                               render="taloonApprovalVerificationPanelGrid" styleClass="command-button"
-                               status="reportGenerateStatus" id="reloadButton" />
+                               render="taloonApprovalVerificationPanelGrid" styleClass="command-button"/>
         </h:panelGrid>
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
@@ -225,8 +224,7 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="1">
             <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonApprovalVerificationPage.apply}"
-                               render="taloonApprovalVerificationTable" styleClass="command-button"
-                               status="reportGenerateStatus" id="applyButton" />
+                               render="taloonApprovalVerificationTable" styleClass="command-button"/>
         </h:panelGrid>
 
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

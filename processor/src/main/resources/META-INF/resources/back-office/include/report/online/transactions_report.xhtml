@@ -32,7 +32,7 @@
 
             <a4j:commandButton value="Генерировать отчет" action="#{transactionsReportPage.doGenerate}"
                                render="workspaceTogglePanel, reportPanel"
-                               styleClass="command-button" status="reportGenerateStatus" />
+                               styleClass="command-button" />
             <h:commandButton value="Выгрузить в Excel" actionListener="#{transactionsReportPage.doGenerateXLS}" styleClass="command-button" />
             <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                            warnClass="warn-messages" />

@@ -33,8 +33,7 @@
             <h:panelGroup>
                 <a4j:commandButton value="..." action="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.showContragentListSelectPage}" render="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;"
-                                   status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus">
+                                   styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.contragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                     <f:setPropertyActionListener value="Выбор контрагента" target="#{mainPage.orgFilterPageName}"/>
@@ -46,8 +45,7 @@
             <h:panelGroup>
                 <a4j:commandButton value="..." action="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.showOrgListSelectPage}" render="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;"
-                                   status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus">
+                                   styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                 </a4j:commandButton>
@@ -57,8 +55,7 @@
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDiscrepanciesOnOrdersAndAttendanceReport}"
                                render="workspaceTogglePanel, statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
-                               styleClass="command-button"
-                               status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" />
+                               styleClass="command-button"/>
 
             <h:commandButton value="Выгрузить в Excel"
                              actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReport}"

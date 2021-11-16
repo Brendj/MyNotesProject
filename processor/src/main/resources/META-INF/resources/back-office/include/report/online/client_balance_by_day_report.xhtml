@@ -55,7 +55,7 @@
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByDayReportPage.exportToHtmlOnePerUser}"
                                render="clientBalanceByDayReportTable, clientBalanceByDayReportTableDatascroller"
-                               styleClass="command-button" status="clientBalanceByDayReportGenerateStatus" />
+                               styleClass="command-button" />
             <h:commandButton value="Генерировать отчет в Excel"
                              actionListener="#{mainPage.clientBalanceByDayReportPage.exportToXLSOnePerUser}"
                              styleClass="command-button" />

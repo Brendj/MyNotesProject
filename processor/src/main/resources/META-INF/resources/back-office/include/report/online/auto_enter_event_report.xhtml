@@ -80,8 +80,7 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.autoEnterEventReportPage.buildReportHTML}"
-                               render="autoEnterEventReportPanel" styleClass="command-button"
-                               status="reportGenerateStatus" />
+                               render="autoEnterEventReportPanel" styleClass="command-button"/>
             <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.autoEnterEventReportPage.generateXLS}"
                              styleClass="command-button" />
             <a4j:status id="reportGenerateStatus">

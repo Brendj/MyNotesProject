@@ -50,13 +50,13 @@
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <a4j:commandButton value="Обновить" action="#{mainPage.taloonPreorderVerificationPage.reload}"
                                    render="taloonPreorderVerificationPanelGrid" styleClass="command-button"
-                                   status="reportGenerateStatus" id="reloadButton"/>
+                                   id="reloadButton"/>
                 <a4j:outputPanel ajaxRendered="true">
                     <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
                                        render="taloonPreorderVerificationPanelGrid" styleClass="command-button"
                                        disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
                                mainPage.taloonPreorderVerificationPage.needFillQty}"
-                                       status="reportGenerateStatus" id="applyAbove"/>
+                                       id="applyAbove"/>
                 </a4j:outputPanel>
             </h:panelGrid>
         </h:panelGroup>
@@ -403,7 +403,7 @@
                                        disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
                                mainPage.taloonPreorderVerificationPage.needFillQty}"
                                        render="taloonPreorderVerificationTable" styleClass="command-button"
-                                       status="reportGenerateStatus" id="applyButton"/>
+                                       id="applyButton"/>
                 </a4j:outputPanel>
             </h:panelGrid>
         </h:panelGroup>

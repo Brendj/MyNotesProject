@@ -87,11 +87,11 @@
         <h:panelGrid styleClass="borderless-grid" columns="4">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDeliveredServicesReport}"
                                render="workspaceTogglePanel"
-                               styleClass="command-button" status="reportGenerateStatus" />
+                               styleClass="command-button" />
             <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.deliveredServicesReportPage.showCSVList}" styleClass="command-button" />
             <a4j:commandButton value="Очистить" action="#{mainPage.deliveredServicesReportPage.clear}"
                                render="workspaceTogglePanel" styleClass="command-button"
-                               status="reportGenerateStatus" id="clearButton" />
+                               id="clearButton" />
             <a4j:status id="reportGenerateStatus">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

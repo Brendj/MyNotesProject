@@ -61,11 +61,11 @@
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать отчет" action="#{registerStampNewPage.buildReportHTML}"
                                render="registerStampNewReportPanel"
-                               styleClass="command-button" status="reportGenerateStatus" />
+                               styleClass="command-button" />
             <h:commandButton value="Выгрузить в Excel" actionListener="#{registerStampNewPage.showCSVList}" styleClass="command-button" />
             <a4j:commandButton value="Очистить" action="#{registerStampNewPage.clear}"
                                render="registerStampNewReportPanelGrid"
-                               styleClass="command-button" status="reportGenerateStatus" />
+                               styleClass="command-button" />
         </h:panelGrid>
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

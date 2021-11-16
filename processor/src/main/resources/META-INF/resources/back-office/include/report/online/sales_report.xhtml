@@ -26,7 +26,7 @@
             </h:panelGroup>
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildSalesReport}"
                                render="workspaceTogglePanel, salesReportTable"
-                               styleClass="command-button" status="reportGenerateStatus" />
+                               styleClass="command-button" />
             <a4j:status id="reportGenerateStatus">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

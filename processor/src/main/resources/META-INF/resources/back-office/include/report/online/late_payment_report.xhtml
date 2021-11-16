@@ -71,13 +71,11 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.latePaymentReportPage.buildReportHTML}"
-                               render="latePaymentReportPanelGrid" styleClass="command-button"
-                               status="reportGenerateStatus" />
+                               render="latePaymentReportPanelGrid" styleClass="command-button"/>
             <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.latePaymentReportPage.generateXLS}"
                              styleClass="command-button" />
             <a4j:commandButton value="Очистить" action="#{mainPage.latePaymentReportPage.clear}"
-                               render="latePaymentReportPanelGrid, lateParametrsGrid" styleClass="command-button"
-                               status="reportGenerateStatus" />
+                               render="latePaymentReportPanelGrid, lateParametrsGrid" styleClass="command-button"/>
         </h:panelGrid>
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

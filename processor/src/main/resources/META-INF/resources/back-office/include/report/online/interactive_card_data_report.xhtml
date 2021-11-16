@@ -21,8 +21,7 @@
             </h:panelGroup>
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <a4j:commandButton value="Генерировать отчет" action="#{interactiveCardDataReportPage.doGenerate}"
-                                   render="workspaceTogglePanel, reportPanel" styleClass="command-button"
-                                   status="reportGenerateStatus" />
+                                   render="workspaceTogglePanel, reportPanel" styleClass="command-button"/>
                 <h:commandButton value="Выгрузить в Excel" actionListener="#{interactiveCardDataReportPage.doGenerateXLS}"
                                  styleClass="command-button" />
             </h:panelGrid>

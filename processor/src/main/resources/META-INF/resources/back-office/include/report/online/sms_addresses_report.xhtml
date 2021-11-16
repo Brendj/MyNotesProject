@@ -39,7 +39,7 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Генерировать отчет" action="#{smsAddressesReportPage.doGenerate}"
                                render="workspaceTogglePanel, reportPanel"
-                               styleClass="command-button" status="reportGenerateStatus" />
+                               styleClass="command-button" />
             <h:commandButton value="Выгрузить в Excel" actionListener="#{smsAddressesReportPage.doGenerateXLS()}" styleClass="command-button" />
         </h:panelGrid>
 

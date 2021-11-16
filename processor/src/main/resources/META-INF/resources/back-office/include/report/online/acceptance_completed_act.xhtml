@@ -61,13 +61,11 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать документ" action="#{acceptanceOfCompletedWorksActPage.buildReportHTML}"
-                               render="acceptanceOfCompletedWorksActPanel" styleClass="command-button"
-                               status="reportGenerateStatus" />
+                               render="acceptanceOfCompletedWorksActPanel" styleClass="command-button"/>
             <h:commandButton value="Выгрузить в Word" actionListener="#{acceptanceOfCompletedWorksActPage.showWordList}"
                              styleClass="command-button" />
             <a4j:commandButton value="Очистить" action="#{acceptanceOfCompletedWorksActPage.clear}"
-                               render="acceptanceOfCompletedWorksActPanelGrid" styleClass="command-button"
-                               status="reportGenerateStatus" />
+                               render="acceptanceOfCompletedWorksActPanelGrid" styleClass="command-button"/>
         </h:panelGrid>
 
         <a4j:status id="reportGenerateStatus">

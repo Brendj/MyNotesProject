@@ -32,7 +32,7 @@
 
             <a4j:commandButton value="Генерировать отчет" action="#{activeClientsReportPage.executeReport}"
                                render="workspaceTogglePanel, itemsReportTable"
-                               styleClass="command-button" status="reportGenerateStatus" />
+                               styleClass="command-button" />
             <h:commandButton value="Сохранить в Excel" actionListener="#{activeClientsReportPage.exportToXLS}"
                              styleClass="command-button"/>
             <a4j:status id="reportGenerateStatus">

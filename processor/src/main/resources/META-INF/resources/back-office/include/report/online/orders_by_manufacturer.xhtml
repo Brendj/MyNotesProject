@@ -75,13 +75,13 @@
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.ordersByManufacturerReportPage.buildReportHTML}"
                                render="registerStampReportPanel" styleClass="command-button" onclick="disableButtons(true);"
-                               status="reportGenerateStatus" id="generateButton" oncomplete="disableButtons(false)"/>
+                               id="generateButton" oncomplete="disableButtons(false)"/>
             <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.ordersByManufacturerReportPage.showCSVList}"
                              styleClass="command-button" id="xlsButton">
             </h:commandButton>
             <a4j:commandButton value="Очистить" action="#{mainPage.ordersByManufacturerReportPage.clear}" onclick="disableButtons(true);"
                                render="registerStampReportPanelGrid" styleClass="command-button"
-                               status="reportGenerateStatus" id="clearButton" oncomplete="disableButtons(false)" />
+                               id="clearButton" oncomplete="disableButtons(false)" />
         </h:panelGrid>
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

@@ -27,8 +27,7 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.payComplexReportPage.filter}}" />
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildPayComplexReport}"
-                           render="workspaceTogglePanel, payComplexReportTable" styleClass="command-button"
-                           status="cReportGenerateStatus" />
+                           render="workspaceTogglePanel, payComplexReportTable" styleClass="command-button"/>
         <a4j:status id="cReportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

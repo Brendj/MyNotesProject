@@ -36,8 +36,7 @@
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientReport}"
-                               render="workspaceTogglePanel, clientReportTable" styleClass="command-button"
-                               status="clientReportGenerateStatus" />
+                               render="workspaceTogglePanel, clientReportTable" styleClass="command-button"/>
             <a4j:status id="clientReportGenerateStatus">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

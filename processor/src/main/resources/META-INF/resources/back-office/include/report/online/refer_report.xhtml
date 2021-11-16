@@ -47,7 +47,7 @@
                 <rich:tab header="Месячный отчет">
                     <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateMonthly}"
                                        render="workspaceTogglePanel"
-                                       styleClass="command-button" status="reportGenerateStatus" />
+                                       styleClass="command-button" />
                     <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateMonthlyExcel}" styleClass="command-button" />
                 </rich:tab>
                 <rich:tab header="Дневной отчет">
@@ -61,7 +61,7 @@
 
                     <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateDaily}"
                                        render="workspaceTogglePanel"
-                                       styleClass="command-button" status="reportGenerateStatus" />
+                                       styleClass="command-button" />
                     <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateDailyExcel}" styleClass="command-button" />
                 </rich:tab>
             </rich:tabPanel>
