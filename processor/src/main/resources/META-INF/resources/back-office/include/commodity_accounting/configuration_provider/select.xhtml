@@ -55,8 +55,8 @@
                                         rows="20"
                                         footerClass="data-table-footer" columnClasses="left-aligned-column"
                                         rowClasses="select-panel-row"
-                                        onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                        onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                        onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
                                         onrowclick="#{rich:element('details')}.click();">
 
                             <rich:column width="1" style="display: none">
@@ -66,15 +66,9 @@
                             </rich:column>
 
                             <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText escape="true" value="№"/>
-                                </f:facet>
                                 <h:outputText value="#{row+1}"/>
                             </rich:column>
                             <rich:column headerClass="column-header">
-                                <f:facet name="header">
-                                    <h:outputText escape="true" value="Наименование конфигурации"/>
-                                </f:facet>
                                 <h:outputText value="#{configurationProvider.name}"/>
                             </rich:column>
 

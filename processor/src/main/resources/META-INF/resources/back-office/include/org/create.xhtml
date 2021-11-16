@@ -11,7 +11,7 @@
     <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
 </h:panelGrid>
 <!-- Панель создания организации -->
-    <h:panelGrid>
+<h:panelGrid rendered="#{mainPage.isEligibleToEditOrgs()}">
 <h:panelGrid id="orgCreateGrid" binding="#{mainPage.orgCreatePage.pageComponent}" styleClass="borderless-grid" columns="1">
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_basic" styleClass="borderless-grid" columns="2">
@@ -254,5 +254,5 @@
                    warnClass="warn-messages" />
 </h:panelGrid>
 </h:panelGrid>
-    </h:panelGrid>
+</h:panelGrid>
 </ui:composition>
