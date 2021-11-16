@@ -490,7 +490,7 @@ public class DTSZNDiscountsReviseService {
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            session.setFlushMode(FlushMode.MANUAL);
+            //session.setFlushMode(FlushMode.MANUAL);
             transaction = session.beginTransaction();
 
             Long otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
@@ -502,18 +502,19 @@ public class DTSZNDiscountsReviseService {
             }
 
             Integer clientCounter = 1;
-            List<Long> finalDopProcessing = new ArrayList<>();
-            List<Long> currentProcessing = new ArrayList<>();
+
+            List<Long> finalDopProcessing = new LinkedList<>();
+            List<Long> currentProcessing = new LinkedList<>();
             for (Long idOfClient : clientList) {
                 try {
                     currentProcessing.add(idOfClient);
                     runOneClient(session, transaction, idOfClient, otherDiscountCode);
-                    transaction = null;
                     if (0 == clientCounter % maxRecords) {
                         session.flush();
                         session.clear();
                         currentProcessing.clear();
                     }
+                    transaction = null;
                     logger.info(String.format("Updating discounts for clients: client %d/%d", clientCounter++,
                             clientList.size()));
                 } catch (StaleObjectStateException e) {
@@ -525,9 +526,8 @@ public class DTSZNDiscountsReviseService {
                     HibernateUtils.rollback(transaction, logger);
                 }
             }
-            session.flush();
-            session.clear();
 
+            transaction = session.beginTransaction();
             if (finalDopProcessing.size() > 0) {
                 for (Long idOfClient : finalDopProcessing) {
                     runOneClient(session, transaction, idOfClient, otherDiscountCode);
@@ -535,7 +535,10 @@ public class DTSZNDiscountsReviseService {
                 session.flush();
                 session.clear();
             }
+            transaction.commit();
+            transaction = null;
 
+            session.close();
         } catch (Exception e) {
             logger.error("Error in update discounts", e);
             throw e;
