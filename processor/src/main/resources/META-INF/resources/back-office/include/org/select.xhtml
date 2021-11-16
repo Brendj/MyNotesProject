@@ -8,7 +8,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel modal="true" id="modalOrgSelectorPanel" autosized="true" width="700"
+    <rich:popupPanel modal="true" id="modalOrgSelectorPanel" autosized="false" width="770" height="770"
                      headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
@@ -74,8 +74,8 @@
                                 </a4j:commandLink>
                             </h:panelGrid>
                         </h:panelGrid>
-                        <rich:togglePanel label="Показать доп. фильтры" switchType="client" opened="false"
-                                          styleClass="borderNone" timeout="10"
+                        <rich:collapsiblePanel header="Показать доп. фильтры" switchType="client" expanded="false"
+                                          styleClass="borderNone"
                                           headerClass="imageNone borderNone linkClass"
                                           bodyClass="imageNone borderNone">
                             <h:panelGrid columns="2">
@@ -91,7 +91,7 @@
                                     </h:panelGrid>
                                 </a4j:repeat>
                             </h:panelGrid>
-                        </rich:togglePanel>
+                        </rich:collapsiblePanel>
                     </td>
                 </tr>
                 <tr>

@@ -38,9 +38,7 @@
     <h:outputText escape="true" value="Тэги" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.tag}" maxlength="256" styleClass="input-text" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Реквизиты:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_requisites" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Статус" styleClass="output-text" />
@@ -90,9 +88,7 @@
     <rich:calendar value="#{mainPage.orgCreatePage.contractTime}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Местоположение:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_placement" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Город" styleClass="output-text" />
@@ -108,9 +104,7 @@
     <h:outputText escape="true" value="Долгота" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.longitude}" maxlength="12" styleClass="input-text long-field" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Поставщик питания:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_supplier" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Наименование ОО для поставщика" styleClass="output-text required-field" />
@@ -182,9 +176,7 @@
     <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preorderlp}" styleClass="input-text"/>
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Настройки рассылки и уведомлений:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_notifications" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Отправитель SMS" styleClass="output-text" />
@@ -203,9 +195,7 @@
     <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.mailingListReports2}" styleClass="input-text" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Параметры синхронизации:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_sync" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />
@@ -224,9 +214,7 @@
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
-    <br />
 
-    <br />
     <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
     <h:panelGrid id="orgCreateGrid_cards" styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Разрешить один активный ЭИ" styleClass="output-text" />
@@ -236,9 +224,7 @@
         <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardId}" styleClass="input-text" />
     </h:panelGrid>
-<br />
 
-<br />
 <h:panelGrid id="orgCreateGrid_password" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Пароль для единого входа" styleClass="output-text" />
     <h:inputSecret value="#{mainPage.orgCreatePage.plainSsoPassword}" maxlength="64" styleClass="input-text" />

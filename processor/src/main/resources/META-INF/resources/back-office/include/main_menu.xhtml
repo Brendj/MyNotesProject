@@ -75,30 +75,6 @@
 
                 </rich:panelMenuGroup>
 
-                <!--@elvariable id="questionariesGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.QuestionariesGroupPage"-->
-                <rich:panelMenuGroup id="questionariesMenuGroup"
-                                     label="Анкетирование" render="workspaceForm">
-                    <a4j:ajax event="click" action="#{questionariesGroupPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="questionaryListPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryListPage"-->
-                    <rich:panelMenuItem id="questionaryListMenuItem"
-                                        label="Анкеты" action="#{questionaryListPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="questionaryGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryGroupPage"-->
-                    <rich:panelMenuGroup id="questionaryMenuGroup"
-                                         label="#{questionaryGroupPage.title}" render="workspaceForm" rendered="false">
-                        <a4j:ajax event="click" action="#{questionaryGroupPage.show}" render="workspaceForm" />
-                        <!--@elvariable id="questionaryViewPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryViewPage"-->
-                        <rich:panelMenuItem id="questionaryViewMenuItem"
-                                            label="Просмотр" action="#{questionaryViewPage.show}" render="workspaceForm" />
-                        <!--@elvariable id="questionaryEditPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryEditPage"-->
-                        <rich:panelMenuItem id="questionaryEditMenuItem"
-                                            label="Редактирование" action="#{questionaryEditPage.show}" render="workspaceForm" />
-                    </rich:panelMenuGroup>
-
-                    <!--@elvariable id="questionaryLoadPage" type="ru.axetta.ecafe.processor.web.ui.org.questionaries.questionary.QuestionaryLoadPage"-->
-                    <rich:panelMenuItem id="questionaryLoadMenuItem"
-                                        label="Загрузить с файла" action="#{questionaryLoadPage.show}" render="workspaceForm" />
-                </rich:panelMenuGroup>
-
                 <!--@elvariable id="clientAllocationRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.ClientAllocationRulesPage"-->
                 <rich:panelMenuItem id="clientAllocationRulesItem"
                                     label="Настройки распределения клиентов" action="#{clientAllocationRulesPage.show}"

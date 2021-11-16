@@ -8,7 +8,7 @@
     <distributable/>
 
     <context-param>
-        <param-name>org.richfaces.SKIN</param-name>
+        <param-name>org.richfaces.skin</param-name>
         <param-value>darkX</param-value>
     </context-param>
 
@@ -39,4 +39,9 @@
             <form-error-page>/back-office/login.xhtml?error=true</form-error-page>
         </form-login-config>
     </login-config>
+
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/back-office/login.xhtml?faces-redirect=true</location>
+    </error-page>
 </web-app>

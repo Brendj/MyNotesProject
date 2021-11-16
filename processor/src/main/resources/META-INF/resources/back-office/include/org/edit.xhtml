@@ -41,9 +41,7 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
     <h:outputText escape="true" value="Тэги" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.tag}" maxlength="256" styleClass="input-text long-field" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Реквизиты:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_requisites" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Статус" styleClass="output-text" />
@@ -92,9 +90,7 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
     <rich:calendar value="#{mainPage.orgEditPage.contractTime}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Местоположение:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_placement" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Город" styleClass="output-text" />
@@ -110,9 +106,7 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
     <h:outputText escape="true" value="Долгота" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.longitude}" maxlength="12" styleClass="input-text long-field" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Поставщик питания:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_supplier" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Наименование ОО для поставщика" styleClass="output-text" />
@@ -213,9 +207,7 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
     <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.preorderlp}" styleClass="input-text"/>
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Настройка рассылки и уведомлений:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_notifications" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Отправитель SMS" styleClass="output-text" />
@@ -234,9 +226,7 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
     <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.mailingListReports2}" styleClass="input-text long-field" />
 </h:panelGrid>
-<br />
 
-<br />
 <h:outputText escape="true" value="Параметры синхронизации:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_sync" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />
@@ -293,9 +283,7 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
-    <br />
-    
-    <br />
+
     <h:outputText escape="true" value="Параметры контроля доступа в здание:" styleClass="output-text-strong" />
     <h:panelGrid id="orgEditGrid_cards" styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Разрешить один активный ЭИ" styleClass="output-text" />
@@ -311,9 +299,7 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
         <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useLongCardNo}" styleClass="input-text"/>
     </h:panelGrid>
-<br />
 
-<br />
 <h:panelGrid id="orgEditGrid_password" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Сменить пароль для единого входа" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeSsoPassword}" styleClass="output-text">
