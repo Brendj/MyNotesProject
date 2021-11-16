@@ -2141,6 +2141,31 @@ public class MainPage implements Serializable {
         }
     }
 
+    public Object clearOrgSelectPage(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            orgSelectPage.updateOrgTypesItems();
+            orgSelectPage.clearFilter();
+            orgSelectPage.fill(persistenceSession, idOfContragentOrgList);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill org selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора организации: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
     public Object updateOrgSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
