@@ -159,7 +159,6 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
         <f:selectItems value="#{mainPage.orgEditPage.refectoryTypeComboMenuItems}" />
     </h:selectOneMenu>
 
-    <!-- Список категорий к которым пренадлежит организация -->
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
     <h:panelGroup>
         <a4j:commandButton id="categoryOrgAjaxButton1" value="..." action="#{mainPage.showCategoryOrgListSelectPage}" render="modalCategoryOrgListSelectorPanel"

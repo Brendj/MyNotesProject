@@ -43,7 +43,7 @@
 
                 </rich:panelMenuGroup>
 
-                <rich:panelMenuItem id="createOrgMenuItem" label="Регистрация"
+                <rich:panelMenuItem id="createOrgMenuItem" label="Регистрация" binding="#{mainPage.orgCreatePage.mainMenuComponent}"
                                     rendered="#{mainPage.eligibleToEditOrgs}" action="#{mainPage.showOrgCreatePage}"
                                     render="workspaceForm" />
 
