@@ -3398,6 +3398,7 @@ public class MainPage implements Serializable {
             contragentListPage.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            updateContragentListPage();
         } catch (Exception e) {
             logger.error("Failed to clear filter for client list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,

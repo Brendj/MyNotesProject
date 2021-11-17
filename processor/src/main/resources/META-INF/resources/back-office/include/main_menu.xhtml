@@ -275,6 +275,10 @@
                 <rich:panelMenuItem id="createClientMenuItem" binding="#{mainPage.clientCreatePage.mainMenuComponent}"
                                     label="Регистрация" action="#{mainPage.showClientCreatePage}" render="workspaceForm" />
 
+                <rich:panelMenuItem id="loadClientFromFileMenuItem" binding="#{mainPage.clientFileLoadPage.mainMenuComponent}"
+                                    label="Загрузить из файла" action="#{mainPage.showClientFileLoadPage}"
+                                    render="workspaceForm" />
+
                 <rich:panelMenuGroup id="clientOpsGroupMenu" binding="#{mainPage.clientOpsGroupPage.mainMenuComponent}"
                                      label="Операции">
                     <a4j:ajax event="click" action="#{mainPage.showClientOpsGroupPage}" render="workspaceForm" />
