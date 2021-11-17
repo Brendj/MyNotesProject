@@ -5548,16 +5548,15 @@ public class DAOUtils {
         Query query = session.createQuery("select rp from RegularPreorder rp "
                 + " where rp.itemCode is null and idofdish is null "
                 + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
-                + " and rp.endDate < :date");
+                + " and rp.endDate > :date");
         query.setParameter("date", date);
         return (List<RegularPreorder>) query.list();
     }
     public static List<RegularPreorder> getContentDeletedPreorderDishOtherRegularOO(Session session, Date date) {
         Query query = session.createQuery("select  rp from RegularPreorder rp "
-                + " where ((rp.itemCode is not null and idofdish is null) or "
-                + " (rp.itemCode is null and idofdish is not null)) "
+                + " where idofdish is not null "
                 + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
-                + " and rp.endDate < :date");
+                + " and rp.endDate > :date");
         query.setParameter("date", date);
         return (List<RegularPreorder>) query.list();
     }
