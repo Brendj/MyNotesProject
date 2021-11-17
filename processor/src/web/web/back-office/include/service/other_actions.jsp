@@ -20,8 +20,6 @@
 <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid borderless-grid-align-top" columns="2">
     <h:panelGrid styleClass="borderless-grid">
 
-        <a4j:commandButton value="Отправка уведомлений об отмене предзаказа" action="#{otherActionsPage.cancelPreorder}"
-                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <a4j:commandButton value="Архивирование событий освобождения от посещения ОО" action="#{otherActionsPage.archvedExeption}"
                            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
