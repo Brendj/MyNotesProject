@@ -772,20 +772,21 @@
                 <rich:panelMenuItem id="migrantsMenuItem" binding="#{migrantsPage.mainMenuComponent}"
                                     label="Заявки на посещение" action="#{migrantsPage.show}" render="workspaceForm" />
 
+                <!--@elvariable id="notificationsPage" type="ru.axetta.ecafe.processor.web.ui.service.NotificationsPage"-->
+                <rich:panelMenuItem id="notificationsMenuItem" binding="#{notificationsPage.mainMenuComponent}"
+                                    label="Уведомления" action="#{notificationsPage.show}" rendered="#{mainPage.eligibleToServiceAdmin}" render="workspaceForm" />
+
+                <!--@elvariable id="cardServicesPage" type="ru.axetta.ecafe.processor.web.ui.service.CardServicesPage"-->
+                <rich:panelMenuItem id="cardServicesMenuItem" binding="#{cardServicesPage.mainMenuComponent}"
+                                    label="Электронные идентификаторы" action="#{cardServicesPage.show}" rendered="#{mainPage.eligibleToServiceAdmin}" render="workspaceForm"/>
+
+                <!--@elvariable id="serviceControlPage" type="ru.axetta.ecafe.processor.web.ui.service.ServiceControlPage"-->
+                <rich:panelMenuItem id="serviceControllMenuItem" binding="#{serviceControlPage.mainMenuComponent}"
+                                    label="Управление микросервисами" action="#{serviceControlPage.show}" rendered="#{mainPage.eligibleToServiceAdmin}" render="workspaceForm"/>
+
                 <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
-                <rich:panelMenuGroup id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
-                                     rendered="#{mainPage.eligibleToServiceAdmin}" >
-                    <a4j:ajax event="click" action="#{otherActionsPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="notificationsPage" type="ru.axetta.ecafe.processor.web.ui.service.NotificationsPage"-->
-                    <rich:panelMenuItem id="notificationsMenuItem" binding="#{notificationsPage.mainMenuComponent}"
-                                        label="Уведомления" action="#{notificationsPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="cardServicesPage" type="ru.axetta.ecafe.processor.web.ui.service.CardServicesPage"-->
-                    <rich:panelMenuItem id="cardServicesMenuItem" binding="#{cardServicesPage.mainMenuComponent}"
-                                        label="Электронные идентификаторы" action="#{cardServicesPage.show}" render="workspaceForm"/>
-                    <!--@elvariable id="serviceControlPage" type="ru.axetta.ecafe.processor.web.ui.service.ServiceControlPage"-->
-                    <rich:panelMenuItem id="serviceControllMenuItem" binding="#{serviceControlPage.mainMenuComponent}"
-                                        label="Управление микросервисами" action="#{serviceControlPage.show}" render="workspaceForm"/>
-                </rich:panelMenuGroup>
+                <rich:panelMenuItem id="otherActionsMenuItem"
+                                    label="Другое" action="#{otherActionsPage.show}" rendered="#{mainPage.eligibleToServiceAdmin}" render="workspaceForm" />
 
                 <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Сверка"
                                      rendered="#{mainPage.eligibleToServiceAdmin &amp;&amp; mainPage.mskRegistry}">
