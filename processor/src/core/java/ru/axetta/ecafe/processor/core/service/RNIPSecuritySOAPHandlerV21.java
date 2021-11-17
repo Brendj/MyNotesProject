@@ -101,7 +101,14 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
                         assertionNode.setIdAttribute("Id", true);
                     } catch (NullPointerException npe2) {
                         assertionNode = (Element)doc.getElementsByTagName("AckTargetMessage").item(0);
-                        assertionNode.setIdAttribute("Id", true);
+                        try {
+                            assertionNode.setIdAttribute("Id", true);
+                        }
+                        catch (NullPointerException npe3)
+                        {
+                            assertionNode = (Element)doc.getElementsByTagNameNS("*", "AckTargetMessage").item(0);
+                            assertionNode.setIdAttribute("Id", true);
+                        }
                     }
                 }
 
@@ -132,9 +139,9 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
 
             } else {
                 doc = soapPart.getEnvelope().getOwnerDocument();
-                additionalTaskOnInboundMessage(doc);
                 String msg = toString(doc);
                 messageLogger.LogPacket(msg, IRNIPMessageToLog.MESSAGE_IN);
+                additionalTaskOnInboundMessage(doc);
             }
         } catch (Exception e) {
             logger.error("Error in handle Rnip message", e);

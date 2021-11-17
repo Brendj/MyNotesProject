@@ -334,6 +334,8 @@
                     <h:inputText value="#{optionPage.RNIPPaymentsURL_v20}" styleClass="input-text" size="100" />
                     <h:outputText escape="true" value="URL сервиса РНИП v2.2" styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPPaymentsURL_v22}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="URL сервиса РНИП v2.4" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPPaymentsURL_v24}" styleClass="input-text" size="100" />
                     <h:outputText escape="true" value="Обращаться к сервису РНИП версии" styleClass="output-text" />
                     <h:selectOneMenu value="#{optionPage.RNIPPaymentsWorkingVersion}" styleClass="input-text">
                         <f:selectItems value="#{optionPage.RNIPWorkingVersions}" />
