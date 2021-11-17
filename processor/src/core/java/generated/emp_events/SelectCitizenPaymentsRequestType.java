@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * «апрос получени€ платежей пользовател€
+ *
  * 
  * <p>Java class for selectCitizenPaymentsRequest_Type complex type.
  * 

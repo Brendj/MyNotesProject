@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос получения списка тарифов потока
+ *
  * 
  * <p>Java class for selectStreamTariffsResponse_Type complex type.
  * 

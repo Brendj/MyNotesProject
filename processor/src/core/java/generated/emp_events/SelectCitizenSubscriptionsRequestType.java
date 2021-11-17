@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос получения подписок пользователя
+ *
  * 
  * <p>Java class for selectCitizenSubscriptionsRequest_Type complex type.
  * 

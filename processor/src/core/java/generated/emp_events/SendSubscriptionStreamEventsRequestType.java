@@ -12,8 +12,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * Запрос метода приема событий
- * 
+ *
  * <p>Java class for sendSubscriptionStreamEventsRequest_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.

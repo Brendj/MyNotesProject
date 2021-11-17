@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос удаления опций профиля пользователя
+ *
  * 
  * <p>Java class for deleteCitizenProfileOptionsRequest_Type complex type.
  * 

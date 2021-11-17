@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос значения из словаря текстовых записей для потоков
+ *
  * 
  * <p>Java class for getStreamDictValueResponse_Type complex type.
  * 

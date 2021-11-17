@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос деактивации подписки
+ *
  * 
  * <p>Java class for deactivateCitizenSubscriptionRequest_Type complex type.
  * 

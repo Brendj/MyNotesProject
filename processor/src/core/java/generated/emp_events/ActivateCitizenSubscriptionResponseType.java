@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос активации подписки
+ *
  * 
  * <p>Java class for activateCitizenSubscriptionResponse_Type complex type.
  * 

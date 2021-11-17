@@ -192,8 +192,7 @@ public interface SubscriptionPortType {
         CreateCitizenProfileRequestType parameter);
 
     /**
-     * Метод получения списка тарифов для оплаты коммуникационных каналов в подписке
-     * 
+     *
      * @param parameter
      * @return
      *     returns generated.emp_events.SelectStreamTariffsResponseType
@@ -205,7 +204,7 @@ public interface SubscriptionPortType {
         SelectStreamTariffsRequestType parameter);
 
     /**
-     * Получение списка оплат коммуникационных каналов подписки
+     * пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
      * 
      * @param parameter
      * @return
@@ -218,7 +217,7 @@ public interface SubscriptionPortType {
         SelectCitizenPaymentsRequestType parameter);
 
     /**
-     * Получение значения справочника информационных записей для событийных потоков
+     * пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
      * 
      * @param parameter
      * @return

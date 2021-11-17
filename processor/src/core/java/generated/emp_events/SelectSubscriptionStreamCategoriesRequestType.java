@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос выбора категорий канала подписки
+ *
  * 
  * <p>Java class for selectSubscriptionStreamCategoriesRequest_Type complex type.
  * 

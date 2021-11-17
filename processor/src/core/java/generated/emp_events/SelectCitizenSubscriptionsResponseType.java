@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос получения подписок
+ *
  * 
  * <p>Java class for selectCitizenSubscriptionsResponse_Type complex type.
  * 

@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответа на запрос создания профиля пользователя
+ *
  * 
  * <p>Java class for createCitizenProfileResponse_Type complex type.
  * 

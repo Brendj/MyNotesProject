@@ -10,8 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос установки параметров подписки
- * 
+ *
  * <p>Java class for setUpCitizenSubscriptionSettingsRequest_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.

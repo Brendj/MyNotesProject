@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос получения информации о канале подписки
+ *
  * 
  * <p>Java class for getSubscriptionStreamResponse_Type complex type.
  * 

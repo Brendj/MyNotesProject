@@ -448,8 +448,7 @@ public class RNIPLoadPaymentsService {
     }
 
     public static RNIPLoadPaymentsService getRNIPServiceBean() {
-        return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV22", RNIPLoadPaymentsServiceV22.class);
-        /*RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
+        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
         switch (version) {
             case RNIP_V115:
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsService", RNIPLoadPaymentsService.class);
@@ -462,7 +461,7 @@ public class RNIPLoadPaymentsService {
             case RNIP_V24:
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV24", RNIPLoadPaymentsServiceV24.class);
         }
-        return null;*/
+        return null;
     }
 
     public static String messageToString(SOAPMessage msg) throws Exception {

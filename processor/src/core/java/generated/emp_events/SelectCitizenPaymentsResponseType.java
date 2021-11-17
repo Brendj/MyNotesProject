@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * ќтвет на запрос о получении платежей пользовател€
+ *
  * 
  * <p>Java class for selectCitizenPaymentsResponse_Type complex type.
  * 

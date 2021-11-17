@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос приема событий
+ *
  * 
  * <p>Java class for sendSubscriptionStreamEventsResponse_Type complex type.
  * 

@@ -8,8 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос установки данных профиля пользователя
- * 
+ *
  * <p>Java class for setCitizenProfileResponse_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.

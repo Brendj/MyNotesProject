@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос активации подписки
+ *
  * 
  * <p>Java class for activateCitizenSubscriptionRequest_Type complex type.
  * 

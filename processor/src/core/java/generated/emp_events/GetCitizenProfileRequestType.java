@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос получения данных профиля пользователя
+ *
  * 
  * <p>Java class for getCitizenProfileRequest_Type complex type.
  * 

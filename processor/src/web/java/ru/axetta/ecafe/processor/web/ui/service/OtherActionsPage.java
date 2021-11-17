@@ -114,11 +114,6 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Генерация данных ключевых показателей выполнена");
     }
 
-    public void cancelPreorder() throws Exception {
-        PreorderCancelNotificationService.sendNotification.manualStart();
-        printMessage("Отправка уведомлений об отмене предзаказа выполнена");
-    }
-
     public void archvedExeption() throws Exception {
         ArchivedExeptionService.archivedExeption.manualStart();
         printMessage("Архивирование событий выполнено");

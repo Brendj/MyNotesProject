@@ -4,8 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import org.apache.xerces.dom.AttrNSImpl;
-import org.apache.xerces.dom.AttributeMap;
+import com.sun.org.apache.xerces.internal.dom.AttrNSImpl;
+import com.sun.org.apache.xerces.internal.dom.AttributeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

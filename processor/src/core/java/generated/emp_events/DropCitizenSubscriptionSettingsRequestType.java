@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос сброса параметров подписки
+ *
  * 
  * <p>Java class for dropCitizenSubscriptionSettingsRequest_Type complex type.
  * 

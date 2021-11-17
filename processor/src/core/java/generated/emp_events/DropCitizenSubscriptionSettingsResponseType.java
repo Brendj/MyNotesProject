@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответ на запрос сброса параметров подписки
+ *
  * 
  * <p>Java class for dropCitizenSubscriptionSettingsResponse_Type complex type.
  * 
