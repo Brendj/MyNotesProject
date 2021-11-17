@@ -1474,7 +1474,7 @@ public class PreorderDAOService {
         WtComplex wtComplex = getWtComplex(preorderComplex, preorderComplex.getArmComplexId(), preorderDate);
 
         if (wtComplex == null) {
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
             return;
         }
         if (!wtComplex.getIsPortal()) {
@@ -1555,7 +1555,7 @@ public class PreorderDAOService {
         for (PreorderComplex preorderComplex : list) {
             if (isGoodRequestExists(preorderComplex)) continue;
             nextVersion = nextVersionByPreorderComplex();
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, false);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, true);
         }
 
         logger.info("End relevancePreordersToOrgFlag process");

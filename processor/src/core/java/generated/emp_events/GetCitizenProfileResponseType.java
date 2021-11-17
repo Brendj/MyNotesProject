@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ * Ответ на запрос получения данных профиля пользователя
+ * 
  * <p>Java class for getCitizenProfileResponse_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
@@ -34,7 +36,7 @@ public class GetCitizenProfileResponseType
     extends BaseResponseType
 {
 
-    @XmlElement(name = "return", required = true)
+    @XmlElement(name = "return", required = true, nillable = true)
     protected CitizenProfileType _return;
 
     /**

@@ -5216,7 +5216,7 @@ public class Processor implements SyncProcessor {
                     values = EventNotificationService
                             .attachToValues(EventNotificationService.PARAM_ORDER_EVENT_TIME, date, values);
                     values = EventNotificationService
-                            .attachToValues(EventNotificationService.PARAM_COMPLEX_NAME, getComplexName(payment),
+                            .attachToValues(EventNotificationService.PARAM_COMPLEX_NAME, getRationName(payment),
                                     values);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     values = EventNotificationService
@@ -5350,13 +5350,25 @@ public class Processor implements SyncProcessor {
         return false;
     }
 
-    private String getComplexName(Payment payment) {
+    //private String getComplexName(Payment payment) {
+    //    if (payment.getPurchases() == null) {
+    //        return "";
+    //    }
+    //    for (Purchase purchase : payment.getPurchases()) {
+    //        if (purchase.getType() != null && purchase.getType() > 0 && purchase.getType() < 100) {
+    //            return purchase.getName();
+    //        }
+    //    }
+    //    return "";
+    //}
+
+    private String getRationName(Payment payment) {
         if (payment.getPurchases() == null) {
             return "";
         }
         for (Purchase purchase : payment.getPurchases()) {
             if (purchase.getType() != null && purchase.getType() > 0 && purchase.getType() < 100) {
-                return purchase.getName();
+                return OrderDetailFRationTypeWTdiet.getDescription(purchase.getfRation());
             }
         }
         return "";

@@ -3110,6 +3110,40 @@ public class DAOReadonlyService {
         }
     }
 
+    public List getWtComplexsByComplexes(List<PreorderComplex> preorderComplexs) {
+        if (preorderComplexs == null || preorderComplexs.isEmpty())
+            return new ArrayList();
+        List <Long> preorderComplexIds = new ArrayList<>();
+        for (PreorderComplex preorderComplex: preorderComplexs)
+        {
+            preorderComplexIds.add(preorderComplex.getIdOfPreorderComplex());
+        }
+        Query query = entityManager.createNativeQuery("select distinct cpc.idofpreordercomplex, cwdt.description from cf_preorder_complex cpc "
+                + "LEFT JOIN cf_wt_complexes cwt on cwt.idofcomplex = cpc.armcomplexid "
+                + "left join cf_wt_diet_type cwdt on cwt.idofdiettype = cwdt.idofdiettype "
+                + "where cpc.idofpreordercomplex in (:preorderComplexIds) and cwdt.idofdiettype is not null");
+        query.setParameter("preorderComplexIds", preorderComplexIds);
+        return  query.getResultList();
+    }
+
+    public List getWtComplexsByRegular(List<RegularPreorder> regularPreorders) {
+        if (regularPreorders == null || regularPreorders.isEmpty())
+            return new ArrayList();
+        List <Long> regularPreordersIds = new ArrayList<>();
+        for (RegularPreorder regularPreorder: regularPreorders)
+        {
+            regularPreordersIds.add(regularPreorder.getIdOfRegularPreorder());
+        }
+        Query query = entityManager.createNativeQuery("select distinct crp.idofregularpreorder, cwdt.description "
+                + "from cf_regular_preorders crp "
+                + "LEFT JOIN cf_preorder_complex cpc on crp.idofregularpreorder = cpc.idofregularpreorder "
+                + "LEFT JOIN cf_wt_complexes cwt on cwt.idofcomplex = cpc.armcomplexid "
+                + "left join cf_wt_diet_type cwdt on cwt.idofdiettype = cwdt.idofdiettype "
+                + "where crp.idofregularpreorder in (:regularPreordersIds) and cwdt.idofdiettype is not null");
+        query.setParameter("regularPreordersIds", regularPreordersIds);
+        return  query.getResultList();
+    }
+
     public WtDish getWtDishById(Long idOfDish) {
         Query query = entityManager.createQuery("SELECT dish FROM WtDish dish "
                 + "where dish.idOfDish = :idOfDish");

@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ * Ответ на запрос установки параметров подписки
+ * 
  * <p>Java class for setUpCitizenSubscriptionSettingsResponse_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
@@ -34,22 +36,30 @@ public class SetUpCitizenSubscriptionSettingsResponseType
     extends BaseResponseType
 {
 
-    @XmlElement(name = "return")
-    protected boolean _return;
+    @XmlElement(name = "return", required = true, type = Boolean.class, nillable = true)
+    protected Boolean _return;
 
     /**
      * Gets the value of the return property.
      * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
      */
-    public boolean isReturn() {
+    public Boolean isReturn() {
         return _return;
     }
 
     /**
      * Sets the value of the return property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
      */
-    public void setReturn(boolean value) {
+    public void setReturn(Boolean value) {
         this._return = value;
     }
 

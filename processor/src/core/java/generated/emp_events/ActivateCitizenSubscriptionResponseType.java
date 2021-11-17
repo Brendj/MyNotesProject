@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ * Ответ на запрос активации подписки
+ * 
  * <p>Java class for activateCitizenSubscriptionResponse_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
@@ -34,22 +36,30 @@ public class ActivateCitizenSubscriptionResponseType
     extends BaseResponseType
 {
 
-    @XmlElement(name = "return")
-    protected int _return;
+    @XmlElement(name = "return", required = true, type = Integer.class, nillable = true)
+    protected Integer _return;
 
     /**
      * Gets the value of the return property.
      * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
      */
-    public int getReturn() {
+    public Integer getReturn() {
         return _return;
     }
 
     /**
      * Sets the value of the return property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
      */
-    public void setReturn(int value) {
+    public void setReturn(Integer value) {
         this._return = value;
     }
 
