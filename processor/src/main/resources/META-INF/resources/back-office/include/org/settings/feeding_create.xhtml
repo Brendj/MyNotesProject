@@ -6,8 +6,10 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
 <!--@elvariable id="mainPage" type="ru.axetta.ecafe.processor.web.ui.MainPage"-->
-<h:panelGrid id="feedingSettingCreatePage" styleClass="borderless-grid">
+<h:panelGrid id="feedingSettingCreatePage" styleClass="borderless-grid"
+             binding="#{mainPage.feedingSettingCreatePage.pageComponent}">
     <h:panelGrid columns="2">
 
         <h:outputText escape="true" value="Название" styleClass="output-text" />
@@ -53,5 +55,6 @@
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+</h:panelGrid>
 </h:panelGrid>
 </ui:composition>

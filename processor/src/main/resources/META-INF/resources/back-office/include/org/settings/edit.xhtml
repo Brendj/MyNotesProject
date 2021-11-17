@@ -6,8 +6,9 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
 <!--@elvariable id="settingEditPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingEditPage"-->
-<h:panelGrid id="settingsEditPage"
+<h:panelGrid id="settingsEditPage" binding="#{settingEditPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid columns="2" id="settingsEditMainPanelGrid">
         <h:outputText escape="true" value="Глобальный идентификатор" styleClass="output-text" />
@@ -298,5 +299,6 @@
 <h:panelGrid styleClass="borderless-grid" id="settingsMessagePanelGrid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+</h:panelGrid>
 </h:panelGrid>
 </ui:composition>
