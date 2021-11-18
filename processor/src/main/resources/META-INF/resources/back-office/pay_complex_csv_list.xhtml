@@ -12,13 +12,13 @@
     <f:event type="preRenderView"
              listener="#{facesContext.externalContext.response.setHeader('Content-type', 'text/csv; charset=windows-1251')}"/>
     <f:event type="preRenderView"
-             listener="#{facesContext.externalContext.response.setHeader('Content-disposition', 'attachment;filename=complexes.csv')}"/>
+             listener="#{facesContext.externalContext.response.setHeader('Content-disposition', 'attachment;filename=pay_complexes.csv')}"/>
 
     <f:view>
         <h:outputText escape="false"
                       value="Организация;Название;Цена за ед;Скидка на ед;Кол-во;Сумма без скидки;Сумма скидки;Итоговая сумма;Время первой продажи;Время последней продажи"/>
         <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
-        <a4j:repeat value="#{mainPage.allComplexReportPage.complexReport.complexItems}" var="item">
+        <a4j:repeat value="#{mainPage.payComplexReportPage.complexReport.complexItems}" var="item">
             <h:outputText escape="false"
                           value="#{item.officialName};#{item.menuDetailName};#{item.rPrice};#{item.discount};#{item.qty};#{item.sumPrice};#{item.sumPriceDiscount};#{item.total}"/>
             <h:outputText escape="false" value=";"/><h:outputText escape="false" value="#{item.firstTimeSale}"
@@ -28,5 +28,4 @@
             <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
         </a4j:repeat>
     </f:view>
-
 </ui:composition>
