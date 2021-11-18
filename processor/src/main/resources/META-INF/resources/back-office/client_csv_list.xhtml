@@ -6,9 +6,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setContentType('text/csv;charset=windows-1251')}" />
-    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setCharacterEncoding('windows-1251')}" />
-    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Content-type', 'text/csv; charset=windows-1251')}" />
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setContentType('text/csv;charset=utf-8')}" />
     <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Content-disposition', 'attachment;filename=clients.csv')}" />
 
     <f:view>

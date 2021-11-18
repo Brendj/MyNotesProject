@@ -79,6 +79,10 @@ public class FeedingSettingCreatePage extends BasicWorkspacePage implements OrgL
         }
     }
 
+    public String getStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
     public void clear() {
         settingName = "";
         limit = null;
