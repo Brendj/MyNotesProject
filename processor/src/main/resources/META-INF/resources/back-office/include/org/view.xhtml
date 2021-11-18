@@ -125,8 +125,6 @@
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgViewPage.refectoryTypeStringRepresentation}" readonly="true" styleClass="input-text long-field" />
 
-    <!-- Список категорий к которым пренадлежит организация,
-    если организация не пренадлежит к категории выводится соответствующее сообщение -->
     <h:outputText escape="true" value="Категории" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText value="Организация не принадлежит ни к одной категории" escape="true" styleClass="output-text" rendered="#{empty mainPage.orgViewPage.categoryOrg}"/>
