@@ -119,92 +119,6 @@
                                     label="Регистрация" action="#{mainPage.showContragentCreatePage}"
                                     rendered="#{mainPage.eligibleToEditContragents}" render="workspaceForm" />
 
-                <rich:panelMenuGroup id="ccAccountGroupMenu" binding="#{mainPage.ccAccountGroupPage.mainMenuComponent}"
-                                     label="Счета клиентов">
-                    <a4j:ajax event="click" action="#{mainPage.showCCAccountGroupPage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="ccAccountListMenuItem" label="Список"
-                                        binding="#{mainPage.ccAccountListPage.mainMenuComponent}"
-                                        action="#{mainPage.showCCAccountListPage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="ccAccountCreateMenuItem" binding="#{mainPage.CCAccountCreatePage.mainMenuComponent}"
-                                        label="Регистрация" action="#{mainPage.showCCAccountCreatePage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="ccAccountFileLoadMenuItem" binding="#{mainPage.CCAccountFileLoadPage.mainMenuComponent}"
-                                        label="Загрузка из файла" action="#{mainPage.showCCAccountFileLoadPage}"
-                                        render="workspaceForm" />
-
-                </rich:panelMenuGroup>
-                <rich:panelMenuGroup id="posGroupMenu" binding="#{mainPage.posGroupPage.mainMenuComponent}"
-                                     label="Cправочник точек продаж" rendered="#{mainPage.eligibleToViewPos}">
-                    <a4j:ajax event="click" action="#{mainPage.showPosGroupPage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="posListMenuItem" label="Список" binding="#{mainPage.posListPage.mainMenuComponent}"
-                                        action="#{mainPage.showPosListPage}" render="workspaceForm" />
-
-                    <rich:panelMenuGroup id="selectedPosGroupMenu" label="#{mainPage.selectedPosGroupPage.name}"
-                                         binding="#{mainPage.selectedPosGroupPage.mainMenuComponent}" rendered="false">
-                        <a4j:ajax event="click" action="#{mainPage.showSelectedPosGroupPage}" render="workspaceForm" />
-
-                        <rich:panelMenuItem id="editPosMenuItem" binding="#{mainPage.posEditPage.mainMenuComponent}"
-                                            label="Редактирование" action="#{mainPage.showPosEditPage}" render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
-
-                    <rich:panelMenuItem id="posCreateMenuItem" binding="#{mainPage.posCreatePage.mainMenuComponent}"
-                                        label="Регистрация" action="#{mainPage.showPosCreatePage}" render="workspaceForm" />
-
-                </rich:panelMenuGroup>
-                <rich:panelMenuGroup id="settlementGroupMenu" binding="#{mainPage.settlementGroupPage.mainMenuComponent}"
-                                     label="Платежи между контрагентами" rendered="#{mainPage.eligibleToViewPayment}">
-                    <a4j:ajax event="click" action="#{mainPage.showSettlementGroupPage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="settlementListMenuItem" label="Список"
-                                        binding="#{mainPage.settlementListPage.mainMenuComponent}"
-                                        action="#{mainPage.showSettlementListPage}" render="workspaceForm" />
-
-                    <rich:panelMenuGroup id="selectedSettlementGroupMenu" label="#{mainPage.selectedSettlementGroupPage.name}"
-                                         binding="#{mainPage.selectedSettlementGroupPage.mainMenuComponent}" rendered="false">
-                        <a4j:ajax event="click" action="#{mainPage.showSelectedSettlementGroupPage}"
-                                  render="workspaceForm" />
-
-                        <rich:panelMenuItem id="editSettlementMenuItem" binding="#{mainPage.settlementEditPage.mainMenuComponent}"
-                                            label="Редактирование" action="#{mainPage.showSettlementEditPage}"
-                                            render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
-
-                    <rich:panelMenuItem id="settlementCreateMenuItem" binding="#{mainPage.settlementCreatePage.mainMenuComponent}"
-                                        label="Регистрация" action="#{mainPage.showSettlementCreatePage}"
-                                        render="workspaceForm" />
-
-                </rich:panelMenuGroup>
-                <rich:panelMenuGroup id="addPaymentGroupMenu" binding="#{mainPage.addPaymentGroupPage.mainMenuComponent}"
-                                     label="Начисление платы" rendered="#{mainPage.eligibleToViewPayment}">
-                    <a4j:ajax event="click" action="#{mainPage.showAddPaymentGroupPage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="addPaymentListMenuItem" label="Список"
-                                        binding="#{mainPage.addPaymentListPage.mainMenuComponent}"
-                                        action="#{mainPage.showAddPaymentListPage}" render="workspaceForm" />
-
-                    <rich:panelMenuGroup id="selectedAddPaymentGroupMenu" label="#{mainPage.selectedAddPaymentGroupPage.name}"
-                                         binding="#{mainPage.selectedAddPaymentGroupPage.mainMenuComponent}" rendered="false">
-                        <a4j:ajax event="click" action="#{mainPage.showSelectedAddPaymentGroupPage}"
-                                  render="workspaceForm" />
-
-                        <rich:panelMenuItem id="editAddPaymentMenuItem" binding="#{mainPage.addPaymentEditPage.mainMenuComponent}"
-                                            label="Редактирование" action="#{mainPage.showAddPaymentEditPage}"
-                                            render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
-
-                    <rich:panelMenuItem id="addPaymentCreateMenuItem" binding="#{mainPage.addPaymentCreatePage.mainMenuComponent}"
-                                        label="Регистрация" action="#{mainPage.showAddPaymentCreatePage}"
-                                        render="workspaceForm" />
-
-                </rich:panelMenuGroup>
-
-
                 <rich:panelMenuGroup id="contractGroupMenu" label="Контракты"
                                      binding="#{contractListPage.groupPage.mainMenuComponent}">
                     <a4j:ajax event="click" action="#{contractListPage.groupPage.show}" render="workspaceForm" />
@@ -232,18 +146,6 @@
                     <!--@elvariable id="orgOfContractsReportPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.OrgOfContractsReportPage"-->
                     <rich:panelMenuItem id="orgOfContractsReportPageMenuItem" binding="#{orgOfContractsReportPage.mainMenuComponent}"
                                         label="Отчет" action="#{orgOfContractsReportPage.show}" render="workspaceForm" />
-
-                </rich:panelMenuGroup>
-                <rich:panelMenuGroup id="caOpsGroupMenu" binding="#{mainPage.caOpsGroupPage.mainMenuComponent}" label="Операции">
-                    <a4j:ajax event="click" action="#{mainPage.showContragentOpsGroupPage}" render="workspaceForm" />
-                    <!--@elvariable id="reconciliationPage" type="ru.axetta.ecafe.processor.web.ui.contragent.ReconciliationPage"-->
-                    <rich:panelMenuItem id="caReconcileMenuItem" label="Сверка реестров"
-                                        binding="#{reconciliationPage.mainMenuComponent}" action="#{reconciliationPage.show}"
-                                        render="workspaceForm" />
-                    <!--@elvariable id="paymentStatsPage" type="ru.axetta.ecafe.processor.web.ui.contragent.PaymentStatsPage"-->
-                    <rich:panelMenuItem id="caPaymentStatsMenuItem" label="Статистика платежей"
-                                        binding="#{paymentStatsPage.mainMenuComponent}" action="#{paymentStatsPage.show}"
-                                        render="workspaceForm" />
 
                 </rich:panelMenuGroup>
 

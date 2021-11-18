@@ -274,6 +274,34 @@
         </navigation-case>
     </navigation-rule>
 
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showAllComplexCSVList</from-outcome>
+            <to-view-id>/back-office/all_complex_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showFreeComplexCSVList</from-outcome>
+            <to-view-id>/back-office/free_complex_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showPayComplexCSVList</from-outcome>
+            <to-view-id>/back-office/pay_complex_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+
 
     <!--<navigation-rule>
         <from-view-id>/back-office/index.xhtml</from-view-id>
