@@ -5128,17 +5128,17 @@ public class MainPage implements Serializable {
         return ccAccountGroupPage;
     }
 
-    public Object showCCAccountGroupPage() {
-        currentWorkspacePage = ccAccountGroupPage;
-        updateSelectedMainMenu();
-        return null;
-    }
+//    public Object showCCAccountGroupPage() {
+//        currentWorkspacePage = ccAccountGroupPage;
+//        updateSelectedMainMenu();
+//        return null;
+//    }
 
-    public Object showContragentOpsGroupPage() {
-        currentWorkspacePage = caOpsGroupPage;
-        updateSelectedMainMenu();
-        return null;
-    }
+//    public Object showContragentOpsGroupPage() {
+//        currentWorkspacePage = caOpsGroupPage;
+//        updateSelectedMainMenu();
+//        return null;
+//    }
 
     public Object showClientOpsGroupPage() {
         currentWorkspacePage = clientOpsGroupPage;
@@ -8422,11 +8422,11 @@ public class MainPage implements Serializable {
         return posGroupPage;
     }
 
-    public Object showPosGroupPage() {
-        currentWorkspacePage = posGroupPage;
-        updateSelectedMainMenu();
-        return null;
-    }
+//    public Object showPosGroupPage() {
+//        currentWorkspacePage = posGroupPage;
+//        updateSelectedMainMenu();
+//        return null;
+//    }
 
     public PosListPage getPosListPage() {
         return posListPage;
@@ -8684,11 +8684,11 @@ public class MainPage implements Serializable {
         return settlementGroupPage;
     }
 
-    public Object showSettlementGroupPage() {
-        currentWorkspacePage = settlementGroupPage;
-        updateSelectedMainMenu();
-        return null;
-    }
+//    public Object showSettlementGroupPage() {
+//        currentWorkspacePage = settlementGroupPage;
+//        updateSelectedMainMenu();
+//        return null;
+//    }
 
     public SettlementListPage getSettlementListPage() {
         return settlementListPage;
@@ -8951,11 +8951,11 @@ public class MainPage implements Serializable {
         return addPaymentGroupPage;
     }
 
-    public Object showAddPaymentGroupPage() {
-        currentWorkspacePage = addPaymentGroupPage;
-        updateSelectedMainMenu();
-        return null;
-    }
+//    public Object showAddPaymentGroupPage() {
+//        currentWorkspacePage = addPaymentGroupPage;
+//        updateSelectedMainMenu();
+//        return null;
+//    }
 
     public AddPaymentListPage getAddPaymentListPage() {
         return addPaymentListPage;
