@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.RequestUtils;
+import ru.axetta.ecafe.processor.web.ServletUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
 import ru.axetta.ecafe.processor.web.ui.card.*;
@@ -9702,6 +9703,44 @@ public class MainPage implements Serializable {
 
     public String getUserRole() throws Exception {
         return getCurrentUser().getRoleName();
+    }
+
+    public void testSms() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest)facesContext.getExternalContext().getRequest();
+        HttpServletResponse response = (HttpServletResponse)facesContext.getExternalContext().getResponse();
+        try {
+            if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
+                String mainPage;
+                if (User.isSuccessfullySendEMP()) {
+                    mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
+                }
+                else
+                {
+                    mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/emp_server_not_answer.faces");
+                }
+                response.sendRedirect(mainPage);
+                return;
+            }
+        } catch (Exception e) {
+            String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
+            try {
+                response.sendRedirect(mainPage);
+            } catch (IOException ee) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        ee.getMessage(), null));
+            }
+        }
+        try {
+            if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.isNeedChangePassword(request.getRemoteUser())) {
+                String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/change-password.faces");
+                response.sendRedirect(mainPage);
+                return;
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(), null));
+        }
     }
 
     public boolean isMskRegistry() {

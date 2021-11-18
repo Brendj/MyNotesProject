@@ -9,7 +9,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
 
-<rich:popupPanel modal="true" id="modalClientListSelectorPanel" autosized="true" headerClass="modal-panel-header">
+<rich:popupPanel modal="true" resizeable="true" id="modalClientListSelectorPanel" autosized="false" width="880" height="600"
+                 headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalClientListSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Фильтр по клиентам" />
