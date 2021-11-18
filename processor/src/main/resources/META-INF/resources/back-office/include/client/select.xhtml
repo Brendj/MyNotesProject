@@ -47,7 +47,7 @@
         }
     }
 </script>
-<rich:popupPanel modal="true" id="modalClientSelectorPanel" autosized="true" height="500" headerClass="modal-panel-header">
+<rich:popupPanel modal="true" id="modalClientSelectorPanel" autosized="false" width="620" height="600" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalClientSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор клиента" />
@@ -57,7 +57,7 @@
             <tr>
                 <td style="text-align: left;">
                     <h:panelGrid styleClass="borderless-grid">
-                        <h:inputText value="#{mainPage.clientSelectPage.selectedItem.caption}" size="100" readonly="true"
+                        <h:inputText value="#{mainPage.clientSelectPage.selectedItem.caption}" size="90" readonly="true"
                                      styleClass="input-text" />
                     </h:panelGrid>
                 </td>
@@ -76,7 +76,8 @@
                                              readonly="true" styleClass="input-text long-field" style="margin-right: 2px;" />
                                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
                                                    render="modalOrgSelectorPanel" id="orgButtonSelectClient"
-                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show(); disableButtons(false);"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();
+                                                   disableButtons(false);"
                                                    styleClass="command-link" style="width: 25px;"
                                                    onclick="disableButtons(true);"/>
                             </h:panelGroup>
@@ -112,12 +113,15 @@
                     <rich:dataTable width="100%" align="center" id="modalClientSelectorTable"
                                     value="#{mainPage.clientSelectPage.items}" var="item" rows="8"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
-                                    rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                                    onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                    rowClasses="select-panel-row" onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                    onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
                                     onrowclick="#{rich:element('detail')}.click();">
-                        <rich:column width="1" style="display: none">
-                            <a4j:commandButton id="detail" render="modalClientSelectorForm" execute="@this">
-                                <f:setPropertyActionListener value="#{item}" target="#{mainPage.clientSelectPage.selectedItem}"/>
+                        <rich:column width="1" >
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="" />
+                            </f:facet>
+                            <a4j:commandButton id="detail" render="modalClientSelectorForm" execute="@this" value="" style="display: none;">
+                                <f:setPropertyActionListener value="#{item}" target="#{mainPage.clientSelectPage.selectedItem}" />
                             </a4j:commandButton>
                         </rich:column>
                         <rich:column headerClass="column-header">
