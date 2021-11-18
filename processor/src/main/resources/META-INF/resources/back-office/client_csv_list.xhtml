@@ -1,0 +1,34 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setContentType('text/csv;charset=windows-1251')}" />
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setCharacterEncoding('windows-1251')}" />
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Content-type', 'text/csv; charset=windows-1251')}" />
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Content-disposition', 'attachment;filename=clients.csv')}" />
+
+    <f:view>
+        <a4j:repeat value="#{mainPage.clientListPage.items}" var="item">
+            <h:outputText escape="false" value="#{item.contractId}" converter="contractIdConverter"/>
+            <h:outputText escape="false"
+                          value=";#{item.contractState};#{item.contractPerson.surname};#{item.contractPerson.firstName};#{item.contractPerson.secondName};#{item.contractPerson.idDocument};#{item.person.surname};#{item.person.firstName};#{item.person.secondName};#{item.person.idDocument};#{item.address};#{item.phone};#{item.mobile};#{item.email};#{item.payForSMS};#{item.notifyViaSMS};#{item.notifyViaEmail};#{item.notifyViaPUSH}"/>
+            <h:outputText escape="false" value=";"/>
+            <h:outputText escape="false" value="#{item.updateTime}" converter="timeConverter"/>
+            <h:outputText escape="false" value=";#{item.clientGroupName};"/>
+            <h:outputText escape="false" value=";#{item.org.shortName}"/>
+            <h:outputText escape="false" value=";"/>
+            <h:outputText escape="false" value="#{item.balance}" converter="copeckSumConverter"/>
+            <h:outputText escape="false" value=";"/>
+            <h:outputText escape="false" value="#{item.limit}" converter="copeckSumConverter"/>
+            <h:outputText escape="false" value=";"/>
+            <h:outputText escape="false" value="#{item.expenditureLimit}" converter="copeckSumConverter"/>
+            <h:outputText escape="false" value=";#{item.discountMode}"/>
+            <h:outputText escape="false" value=";#{item.guid}"/>
+            <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
+        </a4j:repeat>
+    </f:view>
+</ui:composition>

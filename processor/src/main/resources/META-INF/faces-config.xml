@@ -265,6 +265,16 @@
         </navigation-case>
     </navigation-rule>
 
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientCSVList</from-outcome>
+            <to-view-id>/back-office/client_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+
     <!--<navigation-rule>
         <from-view-id>/back-office/index.xhtml</from-view-id>
         <navigation-case>
