@@ -20,9 +20,10 @@
             <f:facet name="header">
                 <h:outputText value="История изменений записи" />
             </f:facet>
-            <h:inputTextarea value="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />
-
-            <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('taloonApprovalMessagePanel')" style="width: 180px;" ajaxSingle="true" />
+            <h:panelGrid styleClass="borderless-grid" columns="1">
+                <h:inputTextarea value="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />
+                <a4j:commandButton value="Закрыть" onclick="#{rich:component('taloonApprovalMessagePanel')}.hide();" style="width: 180px;" />
+            </h:panelGrid>
         </rich:popupPanel>
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText styleClass="output-text" escape="true" value="Организация" />
@@ -201,8 +202,8 @@
                     </a4j:commandLink>
                 </rich:column>
                 <rich:column>
-                    <a4j:commandButton value="..." render="taloonApprovalVerificationTable,ta_remarks_toshow" rendered="#{!detail.remarksEmpty}" ajaxSingle="true"
-                                       title="#{detail.remarks}" oncomplete="Richfaces.showModalPanel('taloonApprovalMessagePanel');">
+                    <a4j:commandButton value="..." render="taloonApprovalVerificationTable,ta_remarks_toshow" rendered="#{!detail.remarksEmpty}"
+                                       title="#{detail.remarks}" oncomplete="#{rich:component('taloonApprovalMessagePanel')}.show();">
                         <f:setPropertyActionListener value="#{detail.remarks}" target="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" />
                     </a4j:commandButton>
                 </rich:column>

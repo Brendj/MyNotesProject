@@ -27,7 +27,6 @@
                         <h:selectOneListbox id="subscriptions" valueChangeListener="#{manualReportRunnerPage.valueChangeListener}"
                                             value="#{manualReportRunnerPage.ruleItem}" style="width:300px;" size="10">
                             <f:selectItems value="#{manualReportRunnerPage.ruleItems}"/>
-                            <a4j:ajax event="select" render="workspaceSubView:workspaceForm:workspacePageSubView:manualParamHints,workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams" />
                             <a4j:ajax event="change" render="workspaceSubView:workspaceForm:workspacePageSubView:manualParamHints,workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams" />
                         </h:selectOneListbox>
                     </h:panelGrid>
