@@ -2956,12 +2956,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             result.getMenuWithComplexesList().setList(list);
 
+            transaction.commit();
+            transaction = null;
+
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         result.resultCode = RC_OK;
@@ -3157,12 +3160,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.getMenuWithComplexesList().setList(list);
             }
 
+            transaction.commit();
+            transaction = null;
+
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         result.resultCode = RC_OK;
