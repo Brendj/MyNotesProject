@@ -109,7 +109,7 @@
                                    render="goodRequestsNewReportPanelGrid"
                                    styleClass="command-button mleft20px"
                                    rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
-
+                <!-- rere -->
                 <h:outputText escape="true" value="Время генерации от" styleClass="output-text mleft20px"
                               rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
                 <rich:calendar value="#{mainPage.goodRequestsNewReportPage.generateBeginDate}"
@@ -129,7 +129,8 @@
                 <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.hideLastValue}"
                                          styleClass="output-text"
                                          rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
-
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Типы заявок" styleClass="output-text" />
                 <h:selectOneMenu value="#{mainPage.goodRequestsNewReportPage.preorderType}"
                                  styleClass="output-text">
