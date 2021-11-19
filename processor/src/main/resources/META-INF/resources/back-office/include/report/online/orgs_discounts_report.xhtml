@@ -46,15 +46,14 @@ xmlns:ui="http://java.sun.com/jsf/facelets">
                         <h:outputText value="#{row + 1}" styleClass="output-text" />
                     </rich:column>
 
-                <h:panelGrid rendered="${item.values == null}">
-                        <rich:column value="#{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.columnNames}"
-                                      var="value" index="ind" headerClass="center-aligned-column" >
+                    <ui:repeat value="#{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.columnNames}" varStatus="ind" var="value">
+                        <rich:column headerClass="center-aligned-column" >
                             <f:facet name="header" >
                                 <h:outputText escape="true" value="#{value}" />
                             </f:facet>
-                            <h:outputText escape="true" value="#{item.values[ind]}" styleClass="output-text" />
+                            <h:outputText escape="true" value="22" styleClass="output-text" />
                         </rich:column>
-                </h:panelGrid>
+                    </ui:repeat>
 
                 <f:facet name="footer">
                     <rich:dataScroller for="orgsDiscountsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"

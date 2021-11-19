@@ -45,7 +45,7 @@
             </rich:calendar>
         </h:panelGrid>
 
-        <rich:tabPanel switchType="ajax" selectedTab="#{mainPage.clientTransactionsReportPage.selectedTab}" width="500px">
+        <rich:tabPanel switchType="ajax" activeItem="clientTransactionsReportOrgTab" width="500px">
             <rich:tab header="Организация" id="clientTransactionsReportOrgTab">
                 <h:panelGrid styleClass="borderless-grid" columns="2">
                     <h:outputText styleClass="output-text" escape="true" value="Организация" />
@@ -72,11 +72,7 @@
                                            render="modalClientListSelectorPanel,selectedClientList"
                                            oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalClientListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;" id="clientFilterButton">
-                            <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
-                            <f:setPropertyActionListener value="#{mainPage.clientTransactionsReportPage.getStringClientList}"
-                                                         target="#{mainPage.clientSelectListPage.clientFilter}" />
-                        </a4j:commandButton>
+                                           styleClass="command-link" style="width: 25px;" id="clientFilterButton" />
                         <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
                                       value=" {#{mainPage.clientTransactionsReportPage.filterClient}}" />
                     </h:panelGroup>
@@ -96,7 +92,7 @@
                                render="clientTransactionsReportTable"
                                styleClass="command-button" />
             <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.clientTransactionsReportPage.exportToXLS}" styleClass="command-button" />
-            <a4j:status onstart="onstartloading()" onstop="onstoploading()">
+            <a4j:status>
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
                 </f:facet>

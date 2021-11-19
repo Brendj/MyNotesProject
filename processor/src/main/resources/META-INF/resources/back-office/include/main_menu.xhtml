@@ -1050,24 +1050,6 @@
 
                 </rich:panelMenuGroup>
 
-                <rich:panelMenuGroup id="subscriptionFeedingGroupMenu" binding="#{mainPage.subscriptionFeedingGroupMenu.mainMenuComponent}"
-                                     label="Абонементное питание" render="#{mainPage.eligibleToViewMealsReports}" rendered="#{mainPage.eligibleToViewSubscriptionFeeding}">
-                    <a4j:ajax event="click" action="#{mainPage.showSubscriptionFeedingGroupMenu}" render="workspaceForm" />
-                    <!--@elvariable id="registerStampSubscriptionFeedingPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampSubscriptionFeedingPage"-->
-                    <rich:panelMenuItem id="registerStampSubscriptionFeedingReportMenuItem" binding="#{registerStampSubscriptionFeedingPage.mainMenuComponent}"
-                                        label="Реестр талонов" action="#{registerStampSubscriptionFeedingPage.show}" render="workspaceForm" />
-                </rich:panelMenuGroup>
-
-                <rich:panelMenuGroup id="acceptanceActGroupMenu" binding="#{mainPage.acceptanceActGroupMenu.mainMenuComponent}"
-                                     label="Документы" rendered="#{mainPage.eligibleToWorkOnlineReportDocs}">
-                    <a4j:ajax event="click" action="#{mainPage.showAcceptanceGroupMenu}" render="workspaceForm" />
-                    <!--@elvariable id="acceptanceOfCompletedWorksActPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AcceptanceOfCompletedWorksActPage"-->
-                    <rich:panelMenuItem id="acceptanceOfCompletedWorksActMenuItem"
-                                        binding="#{acceptanceOfCompletedWorksActPage.mainMenuComponent}"
-                                        label="Акт сдачи-приёмки оказанных услуг"
-                                        action="#{acceptanceOfCompletedWorksActPage.show}" render="workspaceForm" />
-                </rich:panelMenuGroup>
-
                 <rich:panelMenuGroup id="paymentReportsGroupMenu" binding="#{mainPage.paymentReportsGroupMenu.mainMenuComponent}"
                                      label="Отчеты по пополнениям" rendered="#{mainPage.eligibleToViewRefillReports}">
                     <a4j:ajax event="click" action="#{mainPage.showPaymentReportsGroupMenu}" render="workspaceForm" />
@@ -1110,9 +1092,6 @@
                     <rich:panelMenuItem id="activeClientsMenuItem" binding="#{activeClientsReportPage.mainMenuComponent}"
                                         label="Отчет по активным клиентам" action="#{activeClientsReportPage.show}"
                                         render="workspaceForm" />
-                    <!--@elvariable id="commonStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CommonStatsPage"-->
-                    <rich:panelMenuItem id="commonStatsMenuItem" binding="#{commonStatsPage.mainMenuComponent}"
-                                        label="Общая статистика" action="#{commonStatsPage.show}" render="workspaceForm" />
                     <!--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"-->
                     <rich:panelMenuItem id="activeDiscountClientsMenuItem"
                                         binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
@@ -1129,12 +1108,6 @@
                                         label="Транзакции клиента" action="#{mainPage.showClientTransactionsReportPage}" render="workspaceForm" />
                     <a4j:ajax event="click" action="#{mainPage.showBudgetFoodGroupMenu}" render="workspaceForm" />
 
-                    <rich:panelMenuGroup id="coverageNutritionReportGroupMenu" label="Отчет по охвату питания">
-                        <!--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CoverageNutritionReportPage"-->
-                        <rich:panelMenuItem id="coverageNutritionReport" binding="#{coverageNutritionReportPage.mainMenuComponent}"
-                                            label="Отчет по охвату питания" action="#{coverageNutritionReportPage.show}" render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
                     <!--@elvariable id="transactionsReportMenuItem" type="ru.axetta.ecafe.processor.web.ui.report.online.TransactionsReportPage"-->
                     <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
                                         label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
@@ -1356,16 +1329,6 @@
                                         binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                                         label="Расчет комплексов по льготным правилам"
                                         action="#{mainPage.showClientsBenefitsReportPage}" render="workspaceForm" rendered="#{mainPage.eligibleToViewClientsBenefitsReport}" />
-                </rich:panelMenuGroup>
-                <!--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"-->
-                <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"
-                                     rendered="#{mainPage.eligibleToViewHelpdesk}">
-                    <a4j:ajax event="click" action="#{helpdeskGroupPage.show}" render="workspaceForm" />
-
-                    <!--@elvariable id="helpdeskReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskReportPage"-->
-                    <rich:panelMenuItem id="helpdeskMenuItem" binding="#{helpdeskReportPage.mainMenuComponent}"
-                                        label="Заявки в службу помощи" action="#{helpdeskReportPage.show}"
-                                        render="workspaceForm" />
                 </rich:panelMenuGroup>
 
                 <rich:panelMenuGroup id="esp" label="ЕСП" binding="#{mainPage.espHelpdeskGroupPage.mainMenuComponent}" rendered="#{mainPage.eligibleToViewESPdesk}">
