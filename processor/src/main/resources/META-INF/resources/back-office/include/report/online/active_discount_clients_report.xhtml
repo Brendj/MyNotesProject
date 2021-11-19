@@ -5,7 +5,8 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:ui="http://java.sun.com/jsf/facelets">
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
 <h:panelGrid>
     <!--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"-->
     <h:panelGrid id="reportPanelGrid" binding="#{activeDiscountClientsReportPage.pageComponent}" styleClass="borderless-grid">
@@ -52,16 +53,17 @@
                         </f:facet>
                         <h:outputText value="" styleClass="output-text" />
                     </rich:column>
-                    <ui:repeat id="items" value="#{activeDiscountClientsReportPage.report.columnNames}" var="columnName">
-                    <rich:column styleClass="left-aligned-column" headerClass="center-aligned-column">
-                        <f:facet name="header">
-                            <h:outputText escape="true" value="#{columnName}" />
-                        </f:facet>
-                        <h:outputText style="float: left;" escape="true"
-                                      value="#{item.getRowValue(columnName)}"
-                                      styleClass="output-text" />
-                    </rich:column>
-                    </ui:repeat>
+
+                    <c:forEach items="#{activeDiscountClientsReportPage.report.columnNames}" var="columnName">
+                        <rich:column>
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="#{columnName}" />
+                            </f:facet>
+                            <h:outputText style="float: left;" escape="true"
+                                          value="#{item.getRowValue(columnName)}"
+                                          styleClass="output-text" />
+                        </rich:column>
+                    </c:forEach>
 
                     <f:facet name="footer">
                         <rich:dataScroller for="itemsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
