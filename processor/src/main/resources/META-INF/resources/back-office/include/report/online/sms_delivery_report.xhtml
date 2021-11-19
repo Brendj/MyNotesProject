@@ -54,7 +54,7 @@
             <!-- не показывать пустую таблицу -->
             <h:panelGrid rendered="${not empty smsDeliveryReportPage.report &amp;&amp; not empty smsDeliveryReportPage.report.htmlReport}" >
                 <h:outputText escape="true" value="Общая статистика по отправленным сообщениям информирования" styleClass="output-text" />
-                <h:outputText escape="false" value="#{sentSmsReportPage.report.htmlReport}" />
+                <h:outputText escape="false" value="#{smsDeliveryReportPage.report.htmlReport}" />
             </h:panelGrid>
         </h:panelGrid>
         <h:commandButton value="Выгрузить в Excel" actionListener="#{smsDeliveryReportPage.showXLS}" styleClass="command-button" />
