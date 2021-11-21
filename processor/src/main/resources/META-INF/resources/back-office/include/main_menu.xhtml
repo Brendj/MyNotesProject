@@ -360,212 +360,6 @@
                                      label="Производственная конфигурация">
                     <a4j:ajax event="click" action="#{mainPage.showConfigurationProviderGroupPage}" render="workspaceForm" />
 
-                    <!--@elvariable id="goodCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodCreatePage"-->
-                    <!--@elvariable id="goodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodEditPage"-->
-                    <!--@elvariable id="goodViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodViewPage"-->
-                    <!--@elvariable id="goodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodListPage"-->
-                    <!--@elvariable id="selectedGoodGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.SelectedGoodGroupPage"-->
-
-                    <!--@elvariable id="goodGroupCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupCreatePage"-->
-                    <!--@elvariable id="goodGroupListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupListPage"-->
-                    <!--@elvariable id="goodGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupEditPage"-->
-                    <!--@elvariable id="goodGroupViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupViewPage"-->
-                    <!--@elvariable id="selectedGoodGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.SelectedGoodGroupGroupPage"-->
-
-                    <rich:panelMenuGroup id="goodGroupMenu" binding="#{mainPage.goodGroupPage.mainMenuComponent}" label="Справочник товаров"
-                                         rendered="#{commodityAccountingGroupPage.eligibleToWorkCommodityAccounting}">
-                        <a4j:ajax event="click" action="#{mainPage.showGoodGroupPage}" render="workspaceForm" />
-
-                        <rich:panelMenuGroup label="Группы товаров" id="goodsGroupsGroupMenu"
-                                             binding="#{mainPage.goodGroupsGroupPage.mainMenuComponent}">
-
-                            <rich:panelMenuItem id="listGoodGroupsMenuItem" label="Список" binding="#{goodGroupListPage.mainMenuComponent}"
-                                                action="#{goodGroupListPage.show}" render="workspaceForm" />
-                            <rich:panelMenuGroup id="selectedGoodGroupGroupMenu" binding="#{selectedGoodGroupGroupPage.mainMenuComponent}"
-                                                 label="#{selectedGoodGroupGroupPage.title}" rendered="false">
-                                <a4j:ajax event="click" action="#{selectedGoodGroupGroupPage.show}" render="workspaceForm" />
-
-                                <rich:panelMenuItem id="viewGoodGroupsMenuItem" label="Просмотр"
-                                                    binding="#{goodGroupViewPage.mainMenuComponent}" action="#{goodGroupViewPage.show}"
-                                                    render="workspaceForm" />
-
-                                <rich:panelMenuItem id="editGoodGroupsMenuItem" label="Редактирование"
-                                                    binding="#{goodGroupEditPage.mainMenuComponent}" action="#{goodGroupEditPage.show}"
-                                                    render="workspaceForm" />
-
-                            </rich:panelMenuGroup>
-
-                            <rich:panelMenuItem id="createGoodGroupsMenuItem" label="Регистрация"
-                                                binding="#{goodGroupCreatePage.mainMenuComponent}" action="#{goodGroupCreatePage.show}"
-                                                render="workspaceForm" />
-
-                        </rich:panelMenuGroup>
-
-                        <rich:panelMenuItem id="goodListMenuItem" label="Список" binding="#{goodListPage.mainMenuComponent}"
-                                            action="#{goodListPage.show}" render="workspaceForm" />
-
-
-                        <rich:panelMenuGroup id="selectedGoodMenu" binding="#{selectedGoodGroupPage.mainMenuComponent}"
-                                             label="#{selectedGoodGroupPage.title}" rendered="false">
-                            <a4j:ajax event="click" action="#{selectedGoodGroupPage.show}" render="workspaceForm" />
-
-                            <rich:panelMenuItem id="viewGoodMenuItem" label="Просмотр" binding="#{goodViewPage.mainMenuComponent}"
-                                                action="#{goodViewPage.show}" render="workspaceForm" />
-
-                            <rich:panelMenuItem id="editGoodMenuItem" label="Редактирование" binding="#{goodEditPage.mainMenuComponent}"
-                                                action="#{goodEditPage.show}" render="workspaceForm" />
-
-                        </rich:panelMenuGroup>
-
-                        <rich:panelMenuItem id="goodCreateMenuItem" label="Регистрация" binding="#{goodCreatePage.mainMenuComponent}"
-                                            action="#{goodCreatePage.show}" render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
-
-                    <!--@elvariable id="basicGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodListPage"-->
-                    <!--@elvariable id="basicGoodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodEditPage"-->
-                    <!--@elvariable id="basicGoodCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodCreatePage"-->
-                    <!--@elvariable id="basicGoodViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodViewPage"-->
-                    <rich:panelMenuGroup id="basicGoodGroupMenu" label="Справочник базовых товаров"
-                                         binding="#{basicGoodListPage.groupPage.mainMenuComponent}">
-                        <rich:panelMenuItem id="listBasicGoodMenuItem" label="Список" binding="#{basicGoodListPage.mainMenuComponent}"
-                                            action="#{basicGoodListPage.show}" render="workspaceForm" />
-
-                        <rich:panelMenuGroup id="selectedBasicGoodGroupMenu" label="#{basicGoodEditPage.selectedEntityGroupPage.title}"
-                                             binding="#{basicGoodEditPage.selectedEntityGroupPage.mainMenuComponent}" rendered="false">
-                            <a4j:ajax event="click" action="#{basicGoodEditPage.selectedEntityGroupPage.show}"
-                                      render="workspaceForm" />
-
-
-                            <rich:panelMenuItem id="viewBasicGoodMenuItem" binding="#{basicGoodViewPage.mainMenuComponent}" label="Просмотр"
-                                                action="#{basicGoodViewPage.show}" render="workspaceForm" />
-                            <rich:panelMenuItem id="editBasicGoodMenuItem" binding="#{basicGoodEditPage.mainMenuComponent}"
-                                                label="Редактирование" action="#{basicGoodEditPage.show}" render="workspaceForm" />
-
-                        </rich:panelMenuGroup>
-
-                        <rich:panelMenuItem id="createBasicGoodMenuItem" binding="#{basicGoodCreatePage.mainMenuComponent}"
-                                            label="Регистрация" action="#{basicGoodCreatePage.show}" render="workspaceForm" />
-
-                        <rich:panelMenuItem id="loadingElementsOfBasicGoodsMenuItem" binding="#{mainPage.loadingElementsOfBasicGoodsPage.mainMenuComponent}"
-                                            label="Загрузка элементов Базовых Товаров из csv" action="#{mainPage.loadingElementsOfBasicGoodsPage.show}" render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
-
-
-                    <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
-                                         label="Справочник продуктов"
-                                         rendered="#{commodityAccountingGroupPage.eligibleToWorkCommodityAccounting}">
-                        <a4j:ajax event="click" action="#{mainPage.showProductGuideGroupPage}" render="workspaceForm" />
-
-                        <rich:panelMenuGroup id="productGroupsGroupMenu" binding="#{mainPage.productGroupsGroupPage.mainMenuComponent}"
-                                             label="Группы продуктов">
-
-                            <rich:panelMenuItem id="listProductGroupsMenuItem" label="Список"
-                                                binding="#{productGroupListPage.mainMenuComponent}" action="#{productGroupListPage.show}"
-                                                render="workspaceForm" />
-
-
-                            <rich:panelMenuGroup id="selectedProductGroupGroupMenu"
-                                                 binding="#{selectedProductGroupGroupPage.mainMenuComponent}"
-                                                 label="#{selectedProductGroupGroupPage.title}" rendered="false">
-                                <a4j:ajax event="click" action="#{selectedProductGroupGroupPage.show}" render="workspaceForm" />
-
-                                <rich:panelMenuItem id="viewProductGroupsMenuItem" label="Просмотр"
-                                                    binding="#{productGroupViewPage.mainMenuComponent}"
-                                                    action="#{productGroupViewPage.show}" render="workspaceForm" />
-
-                                <rich:panelMenuItem id="editProductGroupsMenuItem" label="Редактирование"
-                                                    binding="#{productGroupEditPage.mainMenuComponent}"
-                                                    action="#{productGroupEditPage.show}" render="workspaceForm" />
-
-                            </rich:panelMenuGroup>
-
-                            <rich:panelMenuItem id="createProductGroupsMenuItem" label="Регистрация"
-                                                binding="#{productGroupCreatePage.mainMenuComponent}"
-                                                action="#{productGroupCreatePage.show}" render="workspaceForm" />
-
-
-                        </rich:panelMenuGroup>
-
-
-                        <rich:panelMenuItem id="productListMenuItem" label="Список" binding="#{productListPage.mainMenuComponent}"
-                                            action="#{productListPage.show}" render="workspaceForm" />
-
-                        <rich:panelMenuGroup id="selectedProductMenu" binding="#{selectedProductGroupPage.mainMenuComponent}"
-                                             label="#{selectedProductGroupPage.title}" rendered="false">
-                            <a4j:ajax event="click" action="#{selectedProductGroupPage.show}" render="workspaceForm" />
-
-                            <rich:panelMenuItem id="viewProductMenuItem" label="Просмотр" binding="#{productViewPage.mainMenuComponent}"
-                                                action="#{productViewPage.show}" render="workspaceForm" />
-
-                            <rich:panelMenuItem id="editProductMenuItem" label="Редактирование"
-                                                binding="#{productEditPage.mainMenuComponent}" action="#{productEditPage.show}"
-                                                render="workspaceForm" />
-
-                        </rich:panelMenuGroup>
-
-                        <rich:panelMenuItem id="productCreateMenuItem" label="Регистрация" binding="#{productCreatePage.mainMenuComponent}"
-                                            action="#{productCreatePage.show}" render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
-
-                    <rich:panelMenuGroup id="technologicalMapGroupMenu" binding="#{mainPage.technologicalMapGroupPage.mainMenuComponent}"
-                                         label="Технологические карты">
-                        <a4j:ajax event="click" action="#{mainPage.showTechnologicalMapGroupPage}" render="workspaceForm" />
-                        <rich:panelMenuGroup id="technologicalMapGroupsGroupMenu"
-                                             binding="#{mainPage.technologicalMapGroupsGroupPage.mainMenuComponent}"
-                                             label="Группы технологических карт">
-                            <rich:panelMenuItem id="listTechnologicalMapGroupsMenuItem" label="Список"
-                                                binding="#{technologicalMapGroupListPage.mainMenuComponent}"
-                                                action="#{technologicalMapGroupListPage.show}" render="workspaceForm" />
-
-                            <rich:panelMenuGroup id="selectedTechnologicalMapGroupsMenu"
-                                                 binding="#{selectedTechnologicalMapGroupGroupPage.mainMenuComponent}"
-                                                 label="#{selectedTechnologicalMapGroupGroupPage.title}" rendered="false">
-                                <a4j:ajax event="click" action="#{selectedTechnologicalMapGroupGroupPage.show}"
-                                          render="workspaceForm" />
-
-                                <rich:panelMenuItem id="viewTechnologicalMapGroupsMenuItem" label="Просмотр"
-                                                    binding="#{technologicalMapGroupViewPage.mainMenuComponent}"
-                                                    action="#{technologicalMapGroupViewPage.show}" render="workspaceForm" />
-
-                                <rich:panelMenuItem id="editTechnologicalMapGroupsMenuItem" label="Редактирование"
-                                                    binding="#{technologicalMapGroupEditPage.mainMenuComponent}"
-                                                    action="#{technologicalMapGroupEditPage.show}" render="workspaceForm" />
-                            </rich:panelMenuGroup>
-
-                            <rich:panelMenuItem id="createTechnologicalMapGroupsMenuItem" label="Регистрация"
-                                                binding="#{technologicalMapGroupCreatePage.mainMenuComponent}"
-                                                action="#{technologicalMapGroupCreatePage.show}" render="workspaceForm" />
-
-                        </rich:panelMenuGroup>
-
-                        <rich:panelMenuItem id="listTechnologicalMapMenuItem" label="Список"
-                                            binding="#{technologicalMapListPage.mainMenuComponent}"
-                                            action="#{technologicalMapListPage.show}" render="workspaceForm" />
-
-                        <rich:panelMenuGroup id="selectedTechnologicalMapsMenu"
-                                             binding="#{selectedTechnologicalMapGroupPage.mainMenuComponent}"
-                                             label="#{selectedTechnologicalMapGroupPage.title}" rendered="false">
-                            <a4j:ajax event="click" action="#{selectedTechnologicalMapGroupPage.show}" render="workspaceForm" />
-
-                            <rich:panelMenuItem id="viewTechnologicalMapMenuItem" label="Просмотр"
-                                                binding="#{technologicalMapViewPage.mainMenuComponent}"
-                                                action="#{technologicalMapViewPage.show}" render="workspaceForm" />
-
-                            <rich:panelMenuItem id="editTechnologicalMapMenuItem" label="Редактирование"
-                                                binding="#{technologicalMapEditPage.mainMenuComponent}"
-                                                action="#{technologicalMapEditPage.show}" render="workspaceForm" />
-
-                        </rich:panelMenuGroup>
-
-                        <rich:panelMenuItem id="createTechnologicalMapMenuItem" label="Регистрация"
-                                            binding="#{technologicalMapCreatePage.mainMenuComponent}"
-                                            action="#{technologicalMapCreatePage.show}" render="workspaceForm" />
-
-                    </rich:panelMenuGroup>
-
                     <!--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderListPage"-->
                     <rich:panelMenuItem id="configurationProviderListMenuItem" label="Список"
                                         binding="#{configurationProviderListPage.mainMenuComponent}"
@@ -591,57 +385,12 @@
                                             binding="#{configurationProviderEditPage.mainMenuComponent}" label="Редактирование"
                                             action="#{configurationProviderEditPage.show}" render="workspaceForm" />
                     </rich:panelMenuGroup>
-
-
-                </rich:panelMenuGroup>
-                <!--@elvariable id="documentsGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.DocumentsGroupPage"-->
-                <rich:panelMenuGroup id="documentsGroupMenu" binding="#{documentsGroupPage.mainMenuComponent}" label="Документы">
-                    <a4j:ajax event="click" action="#{documentsGroupPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="wayBillGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillGroupPage"-->
-                    <rich:panelMenuGroup id="wayBillGroupMenu" label="Накладные" binding="#{wayBillGroupPage.mainMenuComponent}"
-                                         render="workspaceForm">
-                        <a4j:ajax event="click" action="#{wayBillGroupPage.show}" render="workspaceForm" />
-                        <!--@elvariable id="wayBillListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillListPage"-->
-                        <rich:panelMenuItem id="wayBillListMenuItem" label="Список" binding="#{wayBillListPage.mainMenuComponent}"
-                                            action="#{wayBillListPage.show}" render="workspaceForm" />
-                        <!--@elvariable id="wayBillPositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillPositionListPage"-->
-                        <rich:panelMenuItem id="wayBillPositionListMenuItem" label="Подробно"
-                                            binding="#{wayBillPositionListPage.mainMenuComponent}"
-                                            action="#{wayBillPositionListPage.show}" render="workspaceForm"
-                                            rendered="#{wayBillPositionListPage.wayBillItem!=null}" />
-                    </rich:panelMenuGroup>
-
-                    <!--@elvariable id="actOfInventarizationListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfInventorizationListPage"-->
-                    <rich:panelMenuItem id="actOfInventorizationListMenuItem" label="Акты инвентаризации"
-                                        binding="#{actOfInventorizationListPage.mainMenuComponent}"
-                                        action="#{actOfInventorizationListPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="actOfWayBillDifferencePositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfWayBillDifferencePositionListPage"-->
-                    <rich:panelMenuItem id="actOfWayBillDifferencePositionListMenuItem" label="Акты о наличии расхождений"
-                                        binding="#{actOfWayBillDifferencePositionListPage.mainMenuComponent}"
-                                        action="#{actOfWayBillDifferencePositionListPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="tradeMaterialGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.TradeMaterialGoodListPage"-->
-                    <rich:panelMenuItem id="tradeMaterialGoodListMenuItem" label="Товарно-материальные ценности"
-                                        binding="#{tradeMaterialGoodListPage.mainMenuComponent}"
-                                        action="#{tradeMaterialGoodListPage.show}" render="workspaceForm" />
                 </rich:panelMenuGroup>
             </rich:panelMenuGroup>
 
             <rich:panelMenuGroup id="serviceGroupMenu" binding="#{mainPage.serviceGroupPage.mainMenuComponent}" label="Сервис"
                                  rendered="#{mainPage.eligibleToServiceAdmin || mainPage.eligibleToServiceSupport}">
                 <a4j:ajax event="click" action="#{mainPage.showServiceGroupPage}" render="workspaceForm" />
-
-                <!--@elvariable id="atolCompanyPage" type="ru.axetta.ecafe.processor.web.ui.service.atol.AtolCompanyPage"-->
-                <rich:panelMenuItem id="atolCompanyMenuItem" binding="#{atolCompanyPage.mainMenuComponent}"
-                                    label="Атрибуты компании" action="#{atolCompanyPage.show}" render="workspaceForm"
-                                    rendered="#{mainPage.eligibleToServiceAdmin}" />
-
-                <rich:panelMenuItem id="removeOrderMenuItem" binding="#{mainPage.orderRemovePage.mainMenuComponent}"
-                                    label="Удаление покупки" action="#{mainPage.showOrderRemovePage}" render="workspaceForm"
-                                    rendered="#{mainPage.eligibleToServiceAdmin}" />
-
-                <rich:panelMenuItem id="logTestMenuItem" binding="#{mainPage.testLogPage.mainMenuComponent}" label="Тест лога"
-                                    action="#{mainPage.showTestLogPage}" render="workspaceForm"
-                                    rendered="#{mainPage.eligibleToServiceAdmin}" />
 
                 <rich:panelMenuItem id="buildSignKeysMenuItem" binding="#{mainPage.buildSignKeysPage.mainMenuComponent}"
                                     label="Генерация ключей ЭЦП" action="#{mainPage.showBuildSignKeysPage}" render="workspaceForm"
@@ -658,21 +407,8 @@
                                     label="Информационная рассылка (ручной ввод)" action="#{mainPage.showSupportInfoMailingPage}" render="workspaceForm"
                                     rendered="#{mainPage.eligibleToServiceSupport &amp;&amp; mainPage.infospamEnabled}" />
 
-                <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
-                                    binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
-                                    rendered="#{mainPage.eligibleToServiceAdmin}" render="workspaceForm" />
-
-                <!--@elvariable id="usePlanOrdersRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.UsePlanOrdersRequestPage"-->
-                <rich:panelMenuItem id="usePlanOrdersRequestItem" label="Запрос использования плана питания"
-                                    binding="#{usePlanOrdersRequestPage.mainMenuComponent}" action="#{usePlanOrdersRequestPage.show}"
-                                    render="workspaceForm" />
-
-
                 <rich:panelMenuItem id="repositoryReportsRenameMenuItem" binding="#{repositoryReportsRenamePage.mainMenuComponent}"
                                     label="Переименование отчетов репозитория" action="#{repositoryReportsRenamePage.show}" render="workspaceForm" />
-
-                <rich:panelMenuItem id="loadRegistryFromFileMenuItem" binding="#{mainPage.registryLoadPage.mainMenuComponent}"
-                                    label="Обработать параметры клиентов из файлов" action="#{mainPage.showRegistryLoadPage}" render="workspaceForm" />
 
                 <!--@elvariable id="migrantsPage" type="ru.axetta.ecafe.processor.web.ui.client.MigrantsPage"-->
                 <rich:panelMenuItem id="migrantsMenuItem" binding="#{migrantsPage.mainMenuComponent}"
@@ -771,37 +507,6 @@
                     </rich:panelMenuGroup>
                 </rich:panelMenuGroup>
 
-                <rich:panelMenuGroup id="uosGroup" binding="#{mainPage.uosGroupPage.mainMenuComponent}" label="УОС"
-                                     rendered="#{mainPage.eligibleToServiceAdmin}">
-                    <a4j:ajax event="click" action="#{mainPage.showUOSGroupPage}" render="workspaceForm" />
-
-                    <!--@elvariable id="uosSendBlockPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.UosSendBlockPage"-->
-                    <!--@elvariable id="uosStopListPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.UosStopListPage"-->
-                    <rich:panelMenuItem id="uosSendBlock" binding="#{uosSendBlockPage.mainMenuComponent}" label="Запрос блокировки"
-                                        action="#{uosSendBlockPage.show}" render="workspaceForm" />
-                    <rich:panelMenuItem id="uosStopList" binding="#{uosStopListPage.mainMenuComponent}"
-                                        label="Получение стоп-листов" action="#{uosStopListPage.show}" render="workspaceForm" />
-                </rich:panelMenuGroup>
-                <rich:panelMenuGroup id="autorecharge" binding="#{mainPage.autorechargePage.mainMenuComponent}" label="Автопополнение"
-                                     rendered="#{mainPage.eligibleToServiceAdmin}">
-                    <a4j:ajax event="click" action="#{mainPage.showAutorechargeGroupPage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="groupControlSubscriptions" binding="#{mainPage.groupControlSubscriptionsPage.mainMenuComponent}" label="Групповое управление подписками"
-                                        action="#{mainPage.groupControlSubscriptionsPage.show}" render="workspaceForm" />
-                </rich:panelMenuGroup>
-
-                <rich:panelMenuGroup id="benefit" binding="#{mainPage.benefitPage.mainMenuComponent}" label="Льготы"
-                                     rendered="#{mainPage.eligibleToServiceAdmin}">
-                    <a4j:ajax event="click" action="#{mainPage.showBenefitGroupPage}" render="workspaceForm" />
-
-                    <rich:panelMenuItem id="groupControlBenefits" binding="#{mainPage.groupControlBenefitsPage.mainMenuComponent}" label="Групповая установка льготных категорий"
-                                        action="#{mainPage.groupControlBenefitsPage.show}" render="workspaceForm" />
-
-
-                    <rich:panelMenuItem id="cancelBenefits" binding="#{mainPage.cancelCategoryBenefitsPage.mainMenuComponent}" label="Отмена льготных категорий по всем учащимся"
-                                        action="#{mainPage.cancelCategoryBenefitsPage.show}" render="workspaceForm" />
-                </rich:panelMenuGroup>
-
                 <rich:panelMenuGroup id="preorderGroup" binding="#{mainPage.preorderPage.mainMenuComponent}" label="Предзаказ"
                                      rendered="#{mainPage.eligibleToServiceAdmin}">
                     <a4j:ajax event="click" action="#{mainPage.showPreorderGroupPage}" render="workspaceForm" />
@@ -827,9 +532,6 @@
                                         label="Отчет по предзаказам" action="#{preordersReportPage.show}"
                                         render="workspaceForm" />
                 </rich:panelMenuGroup>
-
-                <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
-                                    label="Просмотр записей в ЕМП" action="#{mainPage.empInfoPage.show}" render="workspaceForm" />
 
                 <rich:panelMenuItem id="syncStats" binding="#{mainPage.syncStatsPage.mainMenuComponent}"
                                     label="Статистика по синхронизациям" action="#{mainPage.showSyncStatsPage}" render="workspaceForm" />
@@ -1161,11 +863,7 @@
                                         binding="#{smsDeliveryReportPage.mainMenuComponent}"
                                         label="Отчет по быстрой синхронизации и времени доставки сообщений информирования"
                                         action="#{smsDeliveryReportPage.show}" render="workspaceForm" />
-                    <!--@elvariable id="OrgSmsStatsReportPageMenuItem" type="ru.axetta.ecafe.processor.web.ui.report.online.OrgSmsStatsReportPage"-->
-                    <rich:panelMenuItem id="OrgSmsStatsReportPageMenuItem"
-                                        binding="#{orgSmsStatsReportPage.mainMenuComponent}"
-                                        label="Общая статистика"
-                                        action="#{orgSmsStatsReportPage.show}" render="workspaceForm" />
+
                     <!--@elvariable id="SmsAddressesReportPageMenuItem" type="ru.axetta.ecafe.processor.web.ui.report.online.SmsAddressesReportPage"-->
                     <rich:panelMenuItem id="SmsAddressesReportPageMenuItem"
                                         binding="#{smsAddressesReportPage.mainMenuComponent}"
@@ -1250,11 +948,6 @@
                     <rich:panelMenuItem id="basicBasketReportMenuItem"
                                         binding="#{basicBasketReportPage.mainMenuComponent}" label="Отчет по базовой корзине"
                                         action="#{basicBasketReportPage.show}" render="workspaceForm"/>
-
-                    <!--@elvariable id="paymentsBetweenContragentsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PaymentsBetweenContragentsReportPage"-->
-                    <rich:panelMenuItem id="paymentsBetweenContragentsReportMenuItem"
-                                        binding="#{paymentsBetweenContragentsReportPage.mainMenuComponent}" label="Отчет по объемам оплат между поставщиками питания"
-                                        action="#{paymentsBetweenContragentsReportPage.show}" render="workspaceForm"/>
 
                     <!--@elvariable id="consolidatedSellingReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ConsolidatedSellingReportPage"-->
                     <rich:panelMenuItem id="consolidatedSellingReportMenuItem"
