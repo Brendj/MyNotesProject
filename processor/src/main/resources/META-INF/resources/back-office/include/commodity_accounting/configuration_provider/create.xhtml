@@ -35,8 +35,6 @@
                                    render="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
-                    <f:setPropertyActionListener value="#{configurationProviderCreatePage.getStringIdOfOrgList}"
-                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
                               value=" {#{configurationProviderCreatePage.filter}}"/>
