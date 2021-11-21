@@ -41,13 +41,11 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Генерировать отчет" action="#{orgSyncSettingReportPage.buildHTML()}"
                                render="orgSyncSettingsTable, autoDistributionSyncSettingsButton"
-                               styleClass="command-button" status="orgSyncReportStatus"
+                               styleClass="command-button"
                                id="buildHTMLButton"/>
 
             <h:commandButton value="Выгрузить в Excel" action="#{orgSyncSettingReportPage.buildXLS}"
-                             styleClass="command-button" id="buildXLSButton" disabled="false">
-                <a4j:ajax status="orgSyncReportStatus" id="buildXLSButtonSupport"/>
-            </h:commandButton>
+                             styleClass="command-button" id="buildXLSButton" disabled="false" />
         </h:panelGrid>
         <a4j:status id="orgSyncReportStatus">
             <f:facet name="start">
@@ -166,7 +164,7 @@
             <h:panelGrid columns="2" styleClass="borderless-grid" id="OrgSyncSettingEditPanelControllGrid">
             </h:panelGrid>
             <h:panelGrid columns="1" styleClass="borderless-grid">
-                <a4j:commandButton oncomplete="Richfaces.hideModalPanel('OrgSyncSettingEditPanel')"
+                <a4j:commandButton oncomplete="#{rich:component('OrgSyncSettingEditPanel')}.hide()  "
                                    render="workspaceTogglePanel, OrgSyncSettingEditPanel" value="Закрыть"
                                    status="orgSyncReportStatus"/>
             </h:panelGrid>
@@ -264,7 +262,7 @@
                     <h:outputText escape="true" value="Редактировать"/>
                 </f:facet>
                 <a4j:commandLink styleClass="command-link" action="#{orgSyncSettingReportPage.buildEditedItem()}"
-                                 oncomplete="Richfaces.showModalPanel('OrgSyncSettingEditPanel')"
+                                 oncomplete="#{rich:component('OrgSyncSettingEditPanel')}.show()"
                                  render="OrgSyncSettingEditPanel">
                     <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
                     <f:setPropertyActionListener value="#{item}" target="#{orgSyncSettingReportPage.selectedItem}"/>
@@ -285,7 +283,7 @@
         </rich:dataTable>
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Восстановить" action="#{orgSyncSettingReportPage.resetChanges()}"
-                               render="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
+                               render="orgSyncSettingsTable" styleClass="command-button"
                                id="resetChangesButton"/>
             <a4j:commandButton action="#{orgSyncSettingReportPage.beginDistributionSyncSettings()}"
                                disabled="#{orgSyncSettingReportPage.disableDistribution()}"
@@ -293,7 +291,7 @@
                                styleClass="command-button"
                                id="autoDistributionSyncSettingsButton"/>
             <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingReportPage.applyChanges()}"
-                               render="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
+                               render="orgSyncSettingsTable" styleClass="command-button"
                                id="applyChangesButton"/>
         </h:panelGrid>
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

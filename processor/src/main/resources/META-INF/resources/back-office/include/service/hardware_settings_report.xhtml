@@ -69,13 +69,11 @@
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Генерировать отчет" action="#{hardwareSettingsReportPage.buildHTML}"
-                               render="hardwareSettingsTable" styleClass="command-button" status="reportGenerateStatus"
+                               render="hardwareSettingsTable" styleClass="command-button"
                                id="buildHTMLButton"/>
 
             <h:commandButton value="Выгрузить в Excel" action="#{hardwareSettingsReportPage.buildXLS}"
-                             styleClass="command-button" id="buildXLSButton" disabled="false">
-                <a4j:ajax status="reportGenerateStatus" id="buildXLSButtonSupport"/>
-            </h:commandButton>
+                             styleClass="command-button" id="buildXLSButton" disabled="false" />
         </h:panelGrid>
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
