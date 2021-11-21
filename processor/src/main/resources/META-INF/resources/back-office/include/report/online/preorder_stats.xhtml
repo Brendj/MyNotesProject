@@ -76,16 +76,8 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="borderless-grid" id="preorderStatsReportTable">
-                <f:verbatim>
-                    <style type="text/css">
-                        div.htmlReportContent :empty {
-                            display: none;
-                        }
-                    </style>
-                    <div class="htmlReportContent">
-                        ${preorderStatsReportPage.htmlReport}
-                    </div>
-                </f:verbatim>
+                    <h:outputText escape="false"
+                                  value="#{preorderStatsReportPage.htmlReport}"/>
             </h:panelGrid>
             <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                            warnClass="warn-messages"/>

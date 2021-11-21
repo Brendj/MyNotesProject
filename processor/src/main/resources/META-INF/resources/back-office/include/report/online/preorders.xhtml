@@ -80,14 +80,7 @@
             <h:panelGrid styleClass="borderless-grid" id="preordersReportTable">
                 <c:if test="${not empty preordersReportPage.htmlReport}">
                     <h:outputText escape="true" value="#{preordersReportPage.reportName}" styleClass="output-text"/>
-                    <f:verbatim>
-                        <style type="text/css">
-                            div.htmlReportContent :empty {
-                                display: none;
-                            }
-                        </style>
-                        <div class="htmlReportContent"> ${preordersReportPage.htmlReport} </div>
-                    </f:verbatim>
+                    <h:outputText escape="false" value="#{preordersReportPage.htmlReport}"/>
                     <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text"/>
                 </c:if>
             </h:panelGrid>
