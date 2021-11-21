@@ -19,13 +19,13 @@
             <rich:calendar value="#{basicBasketReportPage.endDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
             <h:outputText styleClass="output-text" escape="true" value="Элемент базовой корзины" />
+
+
             <h:panelGroup>
                 <a4j:commandButton value="..." action="#{basicBasketReportPage.showBasicBasketSelectPage}"
                                    render="basicGoodListItemsPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('basicGoodListItemsPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
-                    <f:setPropertyActionListener value="#{basicBasketReportPage.getStringIdOfBasicBasketList}"
-                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{basicBasketReportPage.filter}}" />

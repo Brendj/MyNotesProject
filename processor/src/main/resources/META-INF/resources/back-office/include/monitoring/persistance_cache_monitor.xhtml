@@ -16,14 +16,12 @@
 
         <a4j:commandButton value="Обновить" action="#{monitoringPersistanceCachePage.update}"/>
 
-
         <h:panelGrid columns="2" width="100%" columnClasses="left,right">
             <h:outputText></h:outputText>
             <h:panelGrid columns="2" columnClasses="left,right" width="100%">
                 <h:outputText>processorPU</h:outputText>
                 <h:outputText>reportPU</h:outputText>
             </h:panelGrid>
-
 
             <h:outputText styleClass="output-text" escape="true" value="Количество объектов"/>
             <h:panelGrid columns="2" columnClasses="left,right" width="100%">
@@ -46,13 +44,20 @@
 
         <br/>
 
-        <rich:togglePanel switchType="client" opened="false" label="Processor PU полная статистика">
-            <h:outputText value="#{monitoringPersistanceCachePage.procesorStat}"/>
-        </rich:togglePanel>
+    </h:panelGrid>
 
-        <rich:togglePanel switchType="client" opened="false"  label="Report PU полная статистика">
-            <h:outputText value="#{monitoringPersistanceCachePage.reportStat}"/>
-        </rich:togglePanel>
+    <h:panelGrid width="100%" columns="1" columnClasses="center-aligned-column">
+        <rich:panelMenu styleClass="output-text" mode="ajax">
+            <rich:panelMenuGroup styleClass="output-text" escape="true" label="Processor PU полная статистика ">
+                <h:outputText value="#{monitoringPersistanceCachePage.procesorStat}"/>
+            </rich:panelMenuGroup>
+        </rich:panelMenu>
+
+        <rich:panelMenu styleClass="output-text" mode="ajax">
+            <rich:panelMenuGroup styleClass="output-text" escape="true" label="Report PU полная статистика ">
+                <h:outputText value="#{monitoringPersistanceCachePage.reportStat}"/>
+            </rich:panelMenuGroup>
+        </rich:panelMenu>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid">
