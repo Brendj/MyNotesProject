@@ -8,10 +8,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <!--<%&#45;&#45;<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditRule()) {&#45;&#45;%>-->
-    <!--<%&#45;&#45;    out.println("Недостаточно прав для просмотра страницы");&#45;&#45;%>-->
-    <!--<%&#45;&#45;    return;&#45;&#45;%>-->
-    <!--<%&#45;&#45;} %>&#45;&#45;%>-->
 
     <h:panelGrid>
         <h:panelGrid rendered="#{!mainPage.isEligibleToEditRule()}">
@@ -20,8 +16,8 @@
             </h:outputText>
         </h:panelGrid>
 
-        <!-- Панель создания правила -->
-        <!--@elvariable id="wtRuleCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleCreatePage"-->
+        <!--@elvariable id="wtRuleCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule.WtRuleCreatePage"-->
+        <!--@elvariable id="wtRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule.WtRuleEditPage"-->
         <h:panelGrid id="wtRuleCreatePanel" binding="#{wtRuleCreatePage.pageComponent}"
                      styleClass="borderless-grid borderless-grid-align-top" columns="2"
                      rendered="#{mainPage.isEligibleToEditRule()}">
@@ -193,64 +189,55 @@
                             </rich:columnGroup>
                         </f:facet>
 
-                        <rich:dataTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
+                        <rich:collapsibleSubTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
                                         columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
                            center-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
                            center-aligned-column">
 
-                            <!-- Чек-боксы-->
                             <rich:column headerClass="column-header">
                                 <h:selectBooleanCheckbox value="#{complex.checked}"/>
                             </rich:column>
 
-                            <!-- Название контрагента-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.contragent.contragentName}"
                                               styleClass="output-text"/>
                             </rich:column>
 
-                            <!-- ИД контрагента-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.contragent.idOfContragent}"
                                               styleClass="output-text"/>
                             </rich:column>
 
-                            <!-- ИД комплекса-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.idOfComplex}"
                                               styleClass="output-text"/>
                             </rich:column>
 
-                            <!-- Название-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.name}" styleClass="output-text"/>
                             </rich:column>
 
-                            <!-- Возрастная категория-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.wtAgeGroupItem.description}"
                                               styleClass="output-text"/>
                             </rich:column>
 
-                            <!-- Рацион-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.wtDietType.description}"
                                               styleClass="output-text"/>
                             </rich:column>
 
-                            <!-- Цена, руб-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.price}"
                                               styleClass="output-text"/>
                             </rich:column>
 
-                            <!-- Тип-->
                             <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="#{complex.wtComplex.wtComplexGroupItem.description}"
                                               styleClass="output-text"/>
                             </rich:column>
 
-                        </rich:dataTable>
+                        </rich:collapsibleSubTable>
                         <f:facet name="footer">
                             <rich:dataScroller for="wtComplexesTable" renderIfSinglePage="false"
                                                maxPages="5" fastControls="hide" stepControls="auto"
