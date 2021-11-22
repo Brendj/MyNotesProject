@@ -4,8 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.webTechnolog;
 
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -16,12 +21,14 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DishListSelectPage extends BasicPage {
-
+    private final static Logger logger = LoggerFactory.getLogger(DishListSelectPage.class);
     private String filter;
 
     public String getFilterContagents() {
@@ -174,6 +181,8 @@ public class DishListSelectPage extends BasicPage {
         this.selectedName = selectedName;
     }
 
+
+
     public void updateSelectedIds(Long id, String name) {
         selectedIds = id.toString();
         selectedName = name;
@@ -181,7 +190,30 @@ public class DishListSelectPage extends BasicPage {
 
     public Object cancelFilter() {
         items = Collections.emptyList();
+        applyFilter();
         return null;
+    }
+
+    public void applyFilter() {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill dish list selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора списка блюд: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 
     public String getFilter() {

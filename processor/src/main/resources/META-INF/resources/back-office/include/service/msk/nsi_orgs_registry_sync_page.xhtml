@@ -84,7 +84,7 @@
                     <h:panelGrid columns="2" styleClass="borderless-grid">
                         <a4j:commandButton value="Обновить" action="#{NSIOrgsRegistrySynchPage.doUpdate}"
                                            render="synchTable,synchTableInfoPanel,revisionInfo,resultTitle,synchTableControl"
-                                           styleClass="command-button" status="updateStatus"
+                                           styleClass="command-button"
                                            onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
                         <a4j:status id="updateStatus">
                             <f:facet name="start">
@@ -148,22 +148,23 @@
                 </h:panelGrid>
 
                 <rich:popupPanel modal="true" id="editSverkaPanel" autosized="true" minWidth="600">
+                    <h:form>
                     <f:facet name="header">
                         <h:outputText value="Принятие сверки по зданию"/>
                     </f:facet>
                     <a4j:commandButton value="Выбрать все" action="#{NSIOrgsRegistrySynchPage.doCheckAllSverkaPanel}"
                                        render="editSverkaPanelTable"
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;"
-                                       style="width: 180px;" ajaxSingle="true"/>
+                                       style="width: 180px;" />
                     <a4j:commandButton value="Очистить все" action="#{NSIOrgsRegistrySynchPage.doUncheckAllSverkaPanel}"
                                        render="editSverkaPanelTable"
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;"
-                                       style="width: 180px;" ajaxSingle="true"/>
+                                       style="width: 180px;" />
                     <rich:dataTable value="#{NSIOrgsRegistrySynchPage.orgModifyChangeItems}" id="editSverkaPanelTable"
                                     var="orgModifyItem" width="100%" columns="4">
                         <rich:column>
                             <h:selectBooleanCheckbox value="#{orgModifyItem.selected}" styleClass="checkboxes">
-                                <a4j:ajax event="change" ajaxSingle="true"/>
+                                <a4j:ajax event="change" />
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column>
@@ -185,13 +186,12 @@
                         </rich:column>
                     </rich:dataTable>
                     <a4j:commandButton value="Применить" action="#{NSIOrgsRegistrySynchPage.doApplyOneOrg}"
-                                       status="updateStatus" ajaxSingle="true"
-                                       onclick="this.disabled = true;"
-                                       oncomplete="Richfaces.hideModalPanel('editSverkaPanel');this.disabled = false;"
+                                       oncomplete="#{rich:component('editSverkaPanel')}.hide();"
                                        style="width: 180px;"
                                        render="synchTable,synchTableInfoPanel,resultTitle,synchTableControl"/>
-                    <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('editSverkaPanel')"
-                                       style="width: 180px;" ajaxSingle="true"/>
+                    <a4j:commandButton value="Закрыть" onclick="#{rich:component('editSverkaPanel')}.hide();"
+                                       style="width: 180px;" />
+                    </h:form>
                 </rich:popupPanel>
 
                 <rich:dataTable value="#{NSIOrgsRegistrySynchPage.items}" var="e" footerClass="data-table-footer"
@@ -224,7 +224,7 @@
                                       rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(e, true)}"/>
                     </rich:column>
                     <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)} padding-zero" rowspan="1"
-                                 colspan="1" breakBefore="true">
+                                 colspan="1" breakRowBefore="true">
                         <rich:dataTable rendered="#{e.orgsSize > 0}" var="org" value="#{e.orgs}">
                             <rich:column>
                                 <h:selectBooleanCheckbox value="#{org.selected}" styleClass="checkboxes"
@@ -235,8 +235,7 @@
                                 <a4j:commandButton value="..." style="width: 25px; height:25px; text-align: right"
                                                    title="Редактировать запись сверки"
                                                    render="editSverkaPanel" styleClass="command-button"
-                                                   status="updateStatus" ajaxSingle="true"
-                                                   oncomplete="Richfaces.showModalPanel('editSverkaPanel');"
+                                                   oncomplete="#{rich:component('editSverkaPanel')}.show();"
                                                    rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) &amp;&amp; org.isModify}">
                                     <f:setPropertyActionListener value="#{org}"
                                                                  target="#{NSIOrgsRegistrySynchPage.orgForEdit}"/>

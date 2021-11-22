@@ -1,17 +1,15 @@
-<%@ page contentType="text/csv; charset=windows-1251" language="java" pageEncoding="windows-1251" %><%@
-        taglib prefix="f" uri="http://java.sun.com/jsf/core" %><%@
-        taglib prefix="h" uri="http://java.sun.com/jsf/html" %><%@
-        taglib prefix="rich" uri="http://richfaces.org/rich" %><%@
-        taglib prefix="a4j" uri="http://richfaces.org/a4j" %><%--
-  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
-  --%>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
 
-<%
-    response.setHeader("Content-disposition", "inline;filename=totalservices.csv");
-%><f:view>
-    <h:outputText escape="false" value="Îðãàíèçàöèÿ;×èñëî ó÷àùèõñÿ;×èñëî ëüãîòíèêîâ;;Çàôèêñèðîâàí ïðîõîä;;Ïîëó÷èëè ëüãîòíîå ïèòàíèå;;Ïîëó÷èëè êîìïëåêñíîå ïèòàíèå;;Ïîëó÷èëè ïèòàíèå â áóôåòå;;Ïîëó÷èëè ïèòàíèå (ëüãîòíîå + ïëàòíîå)"/>
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setContentType('text/csv;charset=utf-8')}" />
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Content-disposition', 'attachment;filename=total_services.csv')}" />
+<f:view>
+    <h:outputText escape="false" value="ÐžÑ€Ð³Ð°Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ;Ð§Ð¸ÑÐ»Ð¾ ÑƒÑ‡Ð°Ñ‰Ð¸Ñ…ÑÑ;Ð§Ð¸ÑÐ»Ð¾ Ð»ÑŒÐ³Ð¾Ñ‚Ð½Ð¸ÐºÐ¾Ð²;;Ð—Ð°Ñ„Ð¸ÐºÑÐ¸Ñ€Ð¾Ð²Ð°Ð½ Ð¿Ñ€Ð¾Ñ…Ð¾Ð´;;ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ð»Ð¸ Ð»ÑŒÐ³Ð¾Ñ‚Ð½Ð¾Ðµ Ð¿Ð¸Ñ‚Ð°Ð½Ð¸Ðµ;;ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ð»Ð¸ ÐºÐ¾Ð¼Ð¿Ð»ÐµÐºÑÐ½Ð¾Ðµ Ð¿Ð¸Ñ‚Ð°Ð½Ð¸Ðµ;;ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ð»Ð¸ Ð¿Ð¸Ñ‚Ð°Ð½Ð¸Ðµ Ð² Ð±ÑƒÑ„ÐµÑ‚Ðµ;;ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ð»Ð¸ Ð¿Ð¸Ñ‚Ð°Ð½Ð¸Ðµ (Ð»ÑŒÐ³Ð¾Ñ‚Ð½Ð¾Ðµ + Ð¿Ð»Ð°Ñ‚Ð½Ð¾Ðµ)"/>
     <h:outputText escape="false" value="#{mainPage.endOfLine}" />
-    <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
+
     <a4j:repeat value="#{totalServicesReportPage.totalReport.items}" var="item">
         <h:outputText escape="false" value="#{item.shortName}" />
         <h:outputText escape="false" value=";#{item.totalClientsCount}" />
@@ -30,3 +28,4 @@
         <h:outputText escape="false" value="#{mainPage.endOfLine}" />
     </a4j:repeat>
 </f:view>
+</ui:composition>
