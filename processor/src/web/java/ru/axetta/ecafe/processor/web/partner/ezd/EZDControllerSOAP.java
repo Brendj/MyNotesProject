@@ -39,7 +39,7 @@ public class EZDControllerSOAP extends HttpServlet {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             List<Org> orgs = new ArrayList<>();
-            List<String> groupNames = new ArrayList<>();
+            List<String> groupNames = new ArrayList<>(orders.size());
             for (ResponseFromEzd responseFromEzd : orders) {
                 orgs.addAll(DAOUtils.findOrgsByGuid(persistenceSession,  responseFromEzd.getGuidOrg()));
                 groupNames.add(responseFromEzd.getGroupName());
@@ -50,7 +50,7 @@ public class EZDControllerSOAP extends HttpServlet {
             if (productionCalendars == null) {
                 productionCalendars = new ArrayList<>();
             }
-            logger.info(String.format("Всего записей по производственному календарю - %s", String.valueOf(productionCalendars.size())));
+            logger.info(String.format("Всего записей по производственному календарю - %d", productionCalendars.size()));
 
 
             List<Long> idOrgs = new ArrayList<>();
@@ -107,6 +107,7 @@ public class EZDControllerSOAP extends HttpServlet {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
+            logger.error("", e);
             responseToEZDResults = new ArrayList<>();
             ResponseToEZDResult responseToEZDResult = new ResponseToEZDResult();
             responseToEZDResult.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
