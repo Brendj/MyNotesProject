@@ -44,17 +44,11 @@
                        warnClass="warn-messages"/>
         <rich:popupPanel modal="true" id="webtechnologistcategoryItemViewCategoryPanel" resizeable="false"
                          minWidth="780"
-                         minHeight="700"
-                         domElementAttachment="form">
+                         minHeight="700">
+            <h:form>
             <f:facet name="header">
                 <h:panelGroup>
                     <h:outputText value="Просмотр Элементов : #{categoryCatalogListPage.selectedItem.description}"/>
-                </h:panelGroup>
-            </f:facet>
-            <f:facet name="controls">
-                <h:panelGroup>
-                    <rich:componentControl for="webtechnologistcategoryItemViewCategoryPanel"
-                                           operation="hide" event="onclick"/>
                 </h:panelGroup>
             </f:facet>
             <h:panelGroup id="WtViewDetailPanelGroup">
@@ -136,16 +130,15 @@
                     <h:inputText value="#{categoryCatalogListPage.descriptionForNewItem}" styleClass="input-text"/>
                     <a4j:commandButton value="Создать"
                                        render="WtViewDetailPanelGroup"
-                                       action="#{categoryCatalogListPage.createNewItem()}"
-                                       status="WebTechnologcategoryItemCatalogItemProcessStatus"/>
+                                       action="#{categoryCatalogListPage.createNewItem()}"/>
                 </h:panelGrid>
             </h:panelGroup>
             <h:panelGrid columns="2">
-                <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistcategoryItemViewCategoryPanel')"
+                <a4j:commandButton onclick="#{rich:component('webtechnologistcategoryItemViewCategoryPanel')}.hide();"
                                    value="Закрыть"
-                                   status="WebTechnologcategoryItemCatalogItemProcessStatus"
                                    render="webtechnologistcategoryItemViewCategoryPanel, webtechnologistcategoryItemCatalogItemListTable"/>
             </h:panelGrid>
+            </h:form>
         </rich:popupPanel>
         <rich:dataTable id="webtechnologistcategoryItemCatalogItemListTable"
                         value="#{categoryCatalogListPage.catalogListItem}" var="item" rows="30"
@@ -209,7 +202,7 @@
                     <h:outputText value="Элементы категории" escape="true"/>
                 </f:facet>
                 <a4j:commandLink styleClass="command-link"
-                                 onclick="Richfaces.showModalPanel('webtechnologistcategoryItemViewCategoryPanel');"
+                                 onclick="#{rich:component('webtechnologistcategoryItemViewCategoryPanel')}.show();"
                                  render="webtechnologistcategoryItemCatalogItemListTable, WtViewDetailPanelGroup">
                     <h:graphicImage value="/images/16x16/search.png" style="border: 0;"/>
                     <f:setPropertyActionListener value="#{item}"

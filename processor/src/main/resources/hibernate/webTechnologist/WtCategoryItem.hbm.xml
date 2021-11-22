@@ -10,8 +10,10 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem" table="cf_wt_category_items">
         <id name="idOfCategoryItem">
             <column name="idofcategoryitem" sql-type="long"/>
-            <generator class="sequence">
-                <param name="sequence">cf_wt_category_items_idofcategoryitem_seq1</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_wt_category_items_idofcategoryitem_seq1</param>
             </generator>
         </id>
         <property name="createDate">
