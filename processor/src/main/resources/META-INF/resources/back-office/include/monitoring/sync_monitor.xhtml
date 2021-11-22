@@ -8,29 +8,28 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-
-    <a4j:jsFunction name="updateList" action="#{mainPage.syncMonitorPage.buildReportHtml}"
-                    render="orgUnsychMonitorListTable,lastOrgUpdateTime">
-
-    </a4j:jsFunction>
-    <script type="text/javascript">
-        var inter = setInterval(updateList, 1000 * 120);
-
-        function onstartloading() {
-            jQuery(".command-button, input[type='checkbox']").attr('disabled', 'disabled');
-        }
-
-        function onstoploading() {
-            jQuery(".command-button, input[type='checkbox']").attr('disabled', '');
-        }
-
-        document.onload = updateList();
-    </script>
-
-    <!-- Панель просмотра списка организаций -->
     <h:panelGrid>
-        <h:panelGrid id="syncMonitorPanelGrid" binding="#{mainPage.syncMonitorPage.pageComponent}"
-                     styleClass="borderless-grid">
+        <a4j:jsFunction name="updateList" action="#{mainPage.syncMonitorPage.buildReportHtml}"
+                        render="orgUnsychMonitorListTable,lastOrgUpdateTime">
+
+        </a4j:jsFunction>
+        <script type="text/javascript">
+            var inter = setInterval(updateList, 1000 * 120);
+
+            function onstartloading() {
+                jQuery(".command-button, input[type='checkbox']").attr('disabled', 'disabled');
+            }
+
+            function onstoploading() {
+                jQuery(".command-button, input[type='checkbox']").attr('disabled', '');
+            }
+
+            document.onload = updateList();
+        </script>
+
+        <!-- Панель просмотра списка организаций -->
+
+        <h:panelGrid id="syncMonitorPanelGrid" styleClass="borderless-grid">
 
             <h:panelGrid styleClass="borderless-grid" columns="3">
                 <a4j:commandButton value="Обновить" action="#{mainPage.syncMonitorPage.buildReportHtml}"
