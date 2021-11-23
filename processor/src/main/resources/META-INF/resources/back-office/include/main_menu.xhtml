@@ -80,14 +80,6 @@
                                     label="Настройки распределения клиентов" action="#{clientAllocationRulesPage.show}"
                                     render="workspaceForm" rendered="#{mainPage.eligibleToEditOrgs}" />
 
-                <!--@elvariable id="distributionRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.DistributionRulesPage"-->
-                <rich:panelMenuItem id="distributionRulesMenuItem"
-                                    label="Правила распространения" action="#{distributionRulesPage.show}" render="workspaceForm"
-                                    rendered="#{mainPage.eligibleToEditOrgs}" />
-                <!--@elvariable id="orgListLoaderPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgListLoaderPage"-->
-                <rich:panelMenuItem id="orgListLoaderMenuItem"
-                                    label="Загрузить из файла" action="#{orgListLoaderPage.show}" render="workspaceForm" />
-
             </rich:panelMenuGroup>
 
             <rich:panelMenuGroup id="contragentGroupMenu" label="Контрагенты"
