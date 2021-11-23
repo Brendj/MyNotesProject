@@ -8,7 +8,7 @@
 
 <xs:element name="setBenefits" type="tns:setBenefits"/>
 
-<xs:element name="setBenefitsResponseSmall" type="tns:setBenefitsResponseSmall"/>
+<xs:element name="setBenefitsResponse" type="tns:SetBenefitsResponse"/>
 
 <xs:complexType name="setBenefits">
 <xs:sequence>
@@ -44,7 +44,7 @@
 </xs:complexContent>
 </xs:complexType>
 
-<xs:complexType name="setBenefitsResponseSmall">
+<xs:complexType name="setBenefitsResponse">
 <xs:sequence>
 <xs:element name="result" type="tns:SetBenefitsResponse" minOccurs="0"/>
 </xs:sequence>
