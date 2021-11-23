@@ -571,6 +571,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     public static RNIPLoadPaymentsServiceV21 getRNIPServiceBean() {
         RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
         switch (version) {
+            case RNIP_V21:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class);
+            case RNIP_V22:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV22", RNIPLoadPaymentsServiceV22.class);
             case RNIP_V24:
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV24", RNIPLoadPaymentsServiceV24.class);
             default:
