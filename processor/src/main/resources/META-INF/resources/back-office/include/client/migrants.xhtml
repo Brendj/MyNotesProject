@@ -35,12 +35,7 @@
                                            render="modalClientListSelectorPanel,selectedClientList"
                                            oncomplete="if (#{facesContext.maximumSeverity == null})
                                     #{rich:component('modalClientListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;" id="clientFilterButton">
-                            <f:setPropertyActionListener value="1"
-                                                         target="#{mainPage.clientSelectListPage.clientFilter}"/>
-                            <f:setPropertyActionListener value="#{migrantsPage.getStringClientList}"
-                                                         target="#{mainPage.clientSelectListPage.clientFilter}"/>
-                        </a4j:commandButton>
+                                           styleClass="command-link" style="width: 25px;" id="clientFilterButton" />
                         <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
                                       value=" {#{migrantsPage.filterClient}}"/>
                     </h:panelGroup>
