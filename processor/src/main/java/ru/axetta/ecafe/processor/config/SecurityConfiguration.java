@@ -33,6 +33,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/back-office/styles.css").permitAll();
 
+        security.authorizeRequests().antMatchers("/soap/**").permitAll();
+
         security/*.requestMatchers()
                 .antMatchers("/processor/sync", "/processor/back-office")
                 .and()*/
