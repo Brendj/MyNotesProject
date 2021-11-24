@@ -32,11 +32,7 @@
                                    render="modalClientListSelectorPanel,selectedClientList"
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalClientListSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;">
-                    <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}"/>
-                    <f:setPropertyActionListener value="#{preorderJournalReportPage.getStringClientList}"
-                                                 target="#{mainPage.clientSelectListPage.clientFilter}"/>
-                </a4j:commandButton>
+                                   styleClass="command-link" style="width: 25px;" />
                 <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
                               value=" {#{preorderJournalReportPage.stringClientList}}"/>
             </h:panelGroup>

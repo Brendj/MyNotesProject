@@ -373,37 +373,37 @@
 
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
                     <h:selectBooleanCheckbox value="#{item.governmentContract}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.useWebArm}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}"/>
+                        <a4j:ajax event="change" listener="#{item.change()}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.usePaydableSubscriptionFeeding}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.variableFeeding}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.preordersEnabled}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.reverseMonthOfSale}" disabled="false" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.denyPayPlanForTimeDifference}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
@@ -424,37 +424,37 @@
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.useMealSchedule}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
                     <h:selectBooleanCheckbox value="#{item.oneActiveCard}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
                     <h:selectBooleanCheckbox value="#{item.enableDuplicateCard}" styleClass="checkboxes" disabled="false">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
                     <h:selectBooleanCheckbox value="#{item.multiCardModeEnabled}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
                     <h:selectBooleanCheckbox value="#{item.needVerifyCardSign}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showOtherSetting}">
                     <h:selectBooleanCheckbox value="#{item.requestForVisitsToOtherOrg}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showOtherSetting}">
                     <h:selectBooleanCheckbox value="#{item.isWorkInSummerTime}" styleClass="checkboxes">
-                        <a4j:ajax event="change" action="#{item.change()}" />
+                        <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <f:facet name="footer">
@@ -474,7 +474,7 @@
 
             <h:panelGrid styleClass="borderless-grid" columns="1">
                 <a4j:commandButton value="Применить изменения" action="#{orgSettingsReportPage.countChangedRows()}"
-                                   oncomplete="Richfaces.showModalPanel('OrgSettingConfirmPanel')"
+                                   oncomplete="#{rich:component('OrgSettingConfirmPanel')}.show();"
                                    render="OrgSettingConfirmPanel" styleClass="command-button"
                                    status="reportGenerateStatus" id="applyChangesButton"/>
             </h:panelGrid>

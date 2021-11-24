@@ -10,11 +10,12 @@
 
     <!--@elvariable id="optionPage" type="ru.axetta.ecafe.processor.web.ui.option.OptionPage"-->
 
-    <h:panelGrid>
-        <h:panelGrid>
-            <h:panelGrid id="optionPanelGrid" binding="#{optionPage.pageComponent}" styleClass="borderless-grid">
-                <rich:tabPanel>
-                    <rich:tab header="Общие">
+    <h:panelGrid width="100%" columns="1">
+        <h:panelGrid id="optionPanelGrid" binding="#{optionPage.pageComponent}" width="100%"
+                     styleClass="center-aligned-column" columns="1">
+            <rich:panelMenu activeItem="general" styleClass="center-aligned-column" mode="ajax">
+                <rich:panelMenuGroup id="general" styleClass="center-aligned-column" escape="true" label="Общие">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:panelGrid styleClass="borderless-grid" columns="2">
                             <h:outputText escape="true" value="Использовать схему с оператором"
                                           styleClass="output-text"/>
@@ -199,8 +200,13 @@
                                           styleClass="output-text"/>
                             <h:inputText value="#{optionPage.cardAutoBlockNode}" styleClass="input-text"/>
                         </h:panelGrid>
-                    </rich:tab>
-                    <rich:tab header="Платежные системы">
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
+
+            <rich:panelMenu styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="output-text" escape="true" label="Платежные системы">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text"/>
                         <h:panelGrid styleClass="borderless-grid" columns="4">
 
@@ -310,10 +316,13 @@
 
                         <a4j:commandButton value="Добавить банк" action="#{bankListPage.addBank}"
                                            render="workspaceTogglePanel, optionPanelGrid" styleClass="command-button"/>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
 
-                    </rich:tab>
-
-                    <rich:tab header="Импорт/Экспорт">
+            <rich:panelMenu styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="output-text" escape="true" label="Импорт/Экспорт">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:panelGrid styleClass="borderless-grid" columns="1">
                             <rich:panel>
                                 <f:facet name="header"><h:outputText styleClass="column-header"
@@ -577,9 +586,13 @@
                                 </h:panelGrid>
                             </rich:panel>
                         </h:panelGrid>
-                    </rich:tab>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
 
-                    <rich:tab header="Криптопровайдер">
+            <rich:panelMenu styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="output-text" escape="true" label="Криптопровайдер">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:panelGrid styleClass="borderless-grid" columns="2">
                             <rich:panel>
                                 <f:facet name="header"><h:outputText styleClass="column-header"
@@ -612,9 +625,13 @@
                                 </h:panelGrid>
                             </rich:panel>
                         </h:panelGrid>
-                    </rich:tab>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
 
-                    <rich:tab header="Глобальные">
+            <rich:panelMenu styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="output-text" escape="true" label="Глобальные">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:panelGrid styleClass="borderless-grid" columns="2">
                             <h:outputText escape="true" value="URL адрес сервера для внешних ссылок"
                                           styleClass="output-text"/>
@@ -662,8 +679,13 @@
                             <h:selectBooleanCheckbox value="#{optionPage.enableNotificationsSpecial}"
                                                      styleClass="output-text"/>
                         </h:panelGrid>
-                    </rich:tab>
-                    <rich:tab header="Личный кабинет">
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
+
+            <rich:panelMenu styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="output-text" escape="true" label="Личный кабинет">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:panelGrid styleClass="borderless-grid" columns="2">
                             <h:outputText escape="true"
                                           value="Запретить пользователю включать/отключать СМС-информирование"
@@ -699,33 +721,42 @@
                                               value="* - при вводе списка значений разделителем является ';'"/>
                             </h:panelGrid>
                         </h:panelGrid>
-                    </rich:tab>
-                    <rich:tab header="Тонкий клиент">
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
+
+            <rich:panelMenu styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="output-text" escape="true" label="Тонкий клиент">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:panelGrid styleClass="borderless-grid" columns="2">
                             <h:outputText escape="true" value="Редактировать заявки с (дни)" styleClass="output-text"/>
                             <h:inputText value="#{optionPage.thinClientMinClaimsEditableDays}"
                                          styleClass="output-text"/>
                         </h:panelGrid>
-                    </rich:tab>
-                    <rich:tab header="Считыватель для веб-интерфейса">
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
+
+            <rich:panelMenu styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="output-text" escape="true" label="Считыватель для веб-интерфейса">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <h:panelGrid styleClass="borderless-grid" columns="2">
                             <h:outputText escape="true" value="Считыватель" styleClass="output-text"/>
                             <h:inputText value="#{optionPage.readerForWebInterfaceString}" styleClass="output-text"/>
                         </h:panelGrid>
-                    </rich:tab>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
 
-                </rich:tabPanel>
+            <h:panelGroup style="margin-top: 10px">
 
-                <h:panelGroup style="margin-top: 10px">
-
-                    <a4j:commandButton value="Сохранить" action="#{optionPage.save}"
-                                       render="workspaceTogglePanel, optionPanelGrid" styleClass="command-button"/>
-                    <a4j:commandButton value="Отмена" action="#{optionPage.cancel}"
-                                       render="workspaceTogglePanel, optionPanelGrid" styleClass="command-button"/>
-                </h:panelGroup>
-                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                               warnClass="warn-messages"/>
-            </h:panelGrid>
+                <a4j:commandButton value="Сохранить" action="#{optionPage.save}"
+                                   render="workspaceTogglePanel, optionPanelGrid" styleClass="command-button"/>
+                <a4j:commandButton value="Отмена" action="#{optionPage.cancel}"
+                                   render="workspaceTogglePanel, optionPanelGrid" styleClass="command-button"/>
+            </h:panelGroup>
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
         </h:panelGrid>
     </h:panelGrid>
 </ui:composition>

@@ -196,21 +196,10 @@
                 <h:commandLink action="#{otherActionsPage.downloadSampleFile}" id="downloadSampleSpecialDates"
                                value="Скачать текущий календарь" styleClass="command-link"/>
                 <rich:fileUpload id="specialDatesFileUploadElement" styleClass="upload"
-                                 addButtonClass="upload-command-button"
-                                 addButtonClassDisabled="upload-command-button-diasbled"
-                                 cleanButtonClass="upload-command-button"
-                                 cleanButtonClassDisabled="upload-command-button-diasbled"
-                                 stopButtonClass="upload-command-button"
-                                 stopButtonClassDisabled="upload-command-button-diasbled"
-                                 uploadButtonClass="upload-command-button"
-                                 uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
-                                 fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
-                                 fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
-                                 stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
-                                 addControlLabel="Добавить файл"
-                                 clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
-                                 cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
-                                 uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
+                                 addLabel="Добавить..."
+                                 clearAllLabel="Очистить"
+                                 uploadLabel="Загрузить"
+                                 doneLabel="Готово"
                                  fileUploadListener="#{otherActionsPage.specialDatesLoadFileListener}">
                     <f:facet name="label">
                         <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
@@ -273,12 +262,7 @@
                                            render="modalClientListSelectorPanel,selectedClientList"
                                            oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalClientListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;">
-                            <f:setPropertyActionListener value="1"
-                                                         target="#{mainPage.clientSelectListPage.clientFilter}"/>
-                            <f:setPropertyActionListener value="#{otherActionsPage.getStringClientList}"
-                                                         target="#{mainPage.clientSelectListPage.clientFilter}"/>
-                        </a4j:commandButton>
+                                           styleClass="command-link" style="width: 25px;" />
                         <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
                                       value=" {#{otherActionsPage.stringClientList}}"/>
                     </h:panelGroup>

@@ -25,17 +25,16 @@
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Введите название блюда: " styleClass="output-text" />
                         <h:inputText value="#{mainPage.dishWebListSelectPage.filter}" size="48" maxlength="128"
-                                     styleClass="input-text">
-                            <a4j:ajax event="keyup" action="#{mainPage.showDishListSelectPage}"
-                                         render="modalDishListSelectorTable" />
-                        </h:inputText>
-                        <a4j:commandLink action="#{mainPage.showDishListSelectPage}"
+                                     styleClass="input-text" />
+                        <a4j:commandLink action="#{mainPage.dishWebListSelectPage.applyFilter}"
+                                         render="modalDishListSelectorForm" styleClass="command-link">
+                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
+                        </a4j:commandLink>
+                        <a4j:commandLink action="#{mainPage.dishWebListSelectPage.cancelFilter}"
                                          render="modalDishListSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value=""
                                                          target="#{mainPage.dishWebListSelectPage.filter}" />
-                            <a4j:ajax event="click" action="#{mainPage.dishWebListSelectPage.cancelFilter}"
-                                         render="modalDishListSelectorForm" />
                         </a4j:commandLink>
                     </h:panelGrid>
                 </td>
@@ -52,10 +51,6 @@
 
                         <f:facet name="header">
                             <rich:columnGroup>
-                                <rich:column width="1" style="display: none">
-                                    <a4j:commandButton id="detail" render="dishValue" execute="@this"
-                                    action="#{mainPage.dishWebListSelectPage.updateSelectedIds(item.idOfDish, item.dishName)}"/>
-                                </rich:column>
                                 <rich:column headerClass="column-header">
                                     <h:outputText escape="true" value="Название" />
                                 </rich:column>
@@ -82,6 +77,14 @@
                                 </rich:column>
                             </rich:columnGroup>
                         </f:facet>
+                        <rich:column width="1" style="display: none">
+                            <a4j:commandButton id="detail" render="dishValue" execute="@this">
+                                <f:setPropertyActionListener value="#{item.idOfDish}"
+                                                             target="#{mainPage.dishWebListSelectPage.selectedIds}"/>
+                                <f:setPropertyActionListener value="#{item.dishName}"
+                                                             target="#{mainPage.dishWebListSelectPage.selectedName}"/>
+                            </a4j:commandButton>
+                        </rich:column>
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{item.dishName}" styleClass="output-text" />
                         </rich:column>

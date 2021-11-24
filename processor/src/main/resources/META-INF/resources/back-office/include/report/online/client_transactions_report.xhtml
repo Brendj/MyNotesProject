@@ -45,40 +45,45 @@
             </rich:calendar>
         </h:panelGrid>
 
-        <rich:tabPanel switchType="ajax" activeItem="clientTransactionsReportOrgTab" width="500px">
-            <rich:tab header="Организация" id="clientTransactionsReportOrgTab">
-                <h:panelGrid styleClass="borderless-grid" columns="2">
-                    <h:outputText styleClass="output-text" escape="true" value="Организация" />
-                    <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;">
-                            <f:setPropertyActionListener value="#{mainPage.clientTransactionsReportPage.getStringIdOfOrgList}"
-                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
-                        </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientTransactionsReportPage.filter}}" id="clientTransactionsOrgFilter" />
-                    </h:panelGroup>
-                    <h:outputText escape="false" value="Включать все корпуса" styleClass="output-text" />
-                    <h:selectBooleanCheckbox value="#{mainPage.clientTransactionsReportPage.showAllBuildings}" styleClass="output-text">
-                    </h:selectBooleanCheckbox>
-                </h:panelGrid>
-            </rich:tab>
-            <rich:tab header="Клиент" id="clientTransactionsReportClientTab">
-                <h:panelGrid styleClass="borderless-grid" columns="2">
-                    <h:outputText styleClass="output-text" escape="true" value="Клиент" />
-                    <h:panelGroup id="clientFilter">
-                        <a4j:commandButton value="..."
-                                           action="#{mainPage.showClientSelectListPage(mainPage.clientTransactionsReportPage.getClientList())}"
-                                           render="modalClientListSelectorPanel,selectedClientList"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null})
+        <h:panelGrid width="100%" columns="1" columnClasses="center-aligned-column">
+            <rich:panelMenu activeItem="clientTransactionsReportOrgTab" styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup id="clientTransactionsReportOrgTab" styleClass="center-aligned-column" escape="true" label="Организация">
+                    <h:panelGrid styleClass="left-aligned-column" columns="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+                        <h:panelGroup>
+                            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;">
+                                <f:setPropertyActionListener value="#{mainPage.clientTransactionsReportPage.getStringIdOfOrgList}"
+                                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                            </a4j:commandButton>
+                            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientTransactionsReportPage.filter}}" id="clientTransactionsOrgFilter" />
+                        </h:panelGroup>
+                        <h:outputText escape="false" value="Включать все корпуса" styleClass="output-text" />
+                        <h:selectBooleanCheckbox value="#{mainPage.clientTransactionsReportPage.showAllBuildings}" styleClass="output-text">
+                        </h:selectBooleanCheckbox>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
+
+            <rich:panelMenu width="100%" styleClass="output-text" mode="ajax">
+                <rich:panelMenuGroup styleClass="center-aligned-column" escape="true" label="Клиент">
+                    <h:panelGrid styleClass="left-aligned-column" columns="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Клиент" />
+                        <h:panelGroup id="clientFilter">
+                            <a4j:commandButton value="..."
+                                               action="#{mainPage.showClientSelectListPage(mainPage.clientTransactionsReportPage.getClientList())}"
+                                               render="modalClientListSelectorPanel,selectedClientList"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalClientListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;" id="clientFilterButton" />
-                        <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                                      value=" {#{mainPage.clientTransactionsReportPage.filterClient}}" />
-                    </h:panelGroup>
-                </h:panelGrid>
-            </rich:tab>
-        </rich:tabPanel>
+                                               styleClass="command-link" style="width: 25px;" id="clientFilterButton" />
+                            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                                          value=" {#{mainPage.clientTransactionsReportPage.filterClient}}" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
+        </h:panelGrid>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Тип операции" styleClass="output-text" />

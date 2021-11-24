@@ -80,7 +80,7 @@
 
                 <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDetailedGoodRequestReport}"
                                    render="workspaceTogglePanel, detailedGoodRequestTable"
-                                   styleClass="command-button" status="sReportGenerateStatus" />
+                                   styleClass="command-button" />
             </h:panelGrid>
 
         </rich:togglePanel>
@@ -124,7 +124,7 @@
                         <rich:column rowspan="2">
                             <h:outputText value="Дата выгрузки" />
                         </rich:column>
-                        <rich:column breakBefore="true">
+                        <rich:column breakRowBefore="true">
                             <h:outputText value="ID" />
                         </rich:column>
                         <rich:column>
@@ -159,13 +159,13 @@
                 <rich:column rowspan="#{items.commoditiesCounts}">
                     <h:outputText value="#{items.educationName}" />
                 </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+                <rich:column rowspan="1" style="height: 0 !important; ">
                 </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+                <rich:column rowspan="1" style="height: 0 !important; ">
                 </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+                <rich:column rowspan="1" style="height: 0 !important; ">
                 </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+                <rich:column rowspan="1" style="height: 0 !important; ">
                 </rich:column>
                 <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
                     <h:outputText value="#{items.doneDate}" converter="dateConverter" />
@@ -175,6 +175,18 @@
                 </rich:column>
                 <rich:collapsibleSubTable value="#{items.commodities}" var="commodity"
                                           columnClasses="center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    </rich:column>
+                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    </rich:column>
+                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    </rich:column>
+                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    </rich:column>
+                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    </rich:column>
+                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    </rich:column>
                     <rich:column>
                         <h:outputText value="#{commodity.name}" />
                     </rich:column>

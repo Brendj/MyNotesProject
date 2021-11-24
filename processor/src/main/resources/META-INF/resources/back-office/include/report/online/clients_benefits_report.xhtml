@@ -5,7 +5,8 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:ui="http://java.sun.com/jsf/facelets">
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
 <h:panelGrid>
     <h:panelGrid id="clientsBenefitsReportPanelGrid" binding="#{mainPage.clientsBenefitsReportPage.pageComponent}" styleClass="borderless-grid">
         <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -56,15 +57,16 @@
                         <h:outputText value="#{e.rule}" styleClass="output-text" />
                     </rich:column>
 
-                    <ui:repeat value="#{mainPage.clientsBenefitsReportPage.clientsBenefitsReport.columnNames}" var="columnName">
-                        <rich:column rendered="#{req.values == null}"
-                                     styleClass="left-aligned-column" headerClass="center-aligned-column" style="#{req.getBackgoundColor(columnName)}" >
-                            <f:facet name="header" >
-                                <h:outputText escape="true" value="#{columnName}" />
+                    <c:forEach items="#{mainPage.clientsBenefitsReportPage.clientsBenefitsReport.columnNames}"
+                               var="columnName" varStatus="metadata">
+                        <rich:column headerClass="center-aligned-column">
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="#{columnName}"/>
                             </f:facet>
-                            <h:outputText style="float: left;" escape="true" value="#{e.get(columnName)}" styleClass="output-text" />
+                            <h:outputText escape="true" value="#{e.get(columnName)}"
+                                          styleClass="output-text"/>
                         </rich:column>
-                    </ui:repeat>
+                    </c:forEach>
 
 
                     <f:facet name="footer">

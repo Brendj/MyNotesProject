@@ -310,6 +310,24 @@
         </navigation-case>
     </navigation-rule>
 
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showTotalServicesCSVList</from-outcome>
+            <to-view-id>/back-office/totalservices_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>downloadReportFile</from-outcome>
+            <to-view-id>/repository/download</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
     <!--<navigation-rule>
         <from-view-id>/back-office/index.xhtml</from-view-id>
         <navigation-case>
@@ -318,8 +336,6 @@
             <redirect/>
         </navigation-case>
     </navigation-rule>-->
-
-
 
     <converter>
         <description>Full date to time converter</description>

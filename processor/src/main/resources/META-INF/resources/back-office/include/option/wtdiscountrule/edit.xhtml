@@ -17,7 +17,7 @@
         </h:panelGrid>
 
         <!-- Панель редактирования правила -->
-        <!--@elvariable id="wtRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleEditPage"-->
+        <!--@elvariable id="wtRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule.WtRuleEditPage"-->
         <h:panelGrid id="ruleEditPanel" binding="#{wtRuleEditPage.pageComponent}"
                      styleClass="borderless-grid borderless-grid-align-top" columns="2"
                      rendered="#{mainPage.isEligibleToEditRule()}">
@@ -153,7 +153,7 @@
 
                     <h:panelGrid columns="2" styleClass="borderless-grid">
                         <a4j:commandButton value="Отобразить" action="#{wtRuleEditPage.fillWtSelectedComplexes()}"
-                                           render="workspaceTogglePanel"
+                                           render="wtComplexesTable"
                                            styleClass="command-button"/>
                     </h:panelGrid>
 
@@ -169,43 +169,41 @@
                     </a4j:status>
 
                     <rich:dataTable id="wtComplexesTable" value="#{wtRuleEditPage.wtSelectedComplexes}"
-                                    var="complex" rows="15" footerClass="data-table-footer" rowKeyVar="rowItemKey">
+                                    var="complex" rows="15" footerClass="data-table-footer" rowKeyVar="rowItemKey"
+                                    columnClasses="center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column,
+                           left-aligned-column, center-aligned-column, left-aligned-column, right-aligned-column,
+                           center-aligned-column">
                         <f:facet name="header">
                             <rich:columnGroup>
                                 <rich:column headerClass="column-header">
                                     <h:outputText escape="true" value=""/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="Название контрагента"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="Название контрагента"/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="ИД контрагента"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="ИД контрагента"/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="ИД комплекса"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="ИД комплекса"/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="Название"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="Название"/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="Возрастная категория"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="Возрастная категория"/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="Рацион"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="Рацион"/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="Цена"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="Цена"/>
                                 </rich:column>
-                                <rich:column headerClass="column-header">
-                                    <h:outputText escape="true" value="Тип"/>
+                                <rich:column headerClass="center-aligned-column">
+                                    <h:outputText styleClass="column-header" escape="true" value="Тип"/>
                                 </rich:column>
                             </rich:columnGroup>
                         </f:facet>
-
-                        <rich:dataTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
-                                        columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
-                           center-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
-                           center-aligned-column">
 
                             <!-- Чек-боксы-->
                             <rich:column headerClass="column-header">
@@ -293,12 +291,10 @@
                                               rendered="#{complex.wtComplex.deleteState == 1}"/>
                             </rich:column>
 
-                        </rich:dataTable>
                         <f:facet name="footer">
                             <rich:dataScroller for="wtComplexesTable" renderIfSinglePage="false"
                                                maxPages="5" fastControls="hide" stepControls="auto"
                                                boundaryControls="hide">
-                                <a4j:ajax event="pagechange"/>
                                 <f:facet name="previous">
                                     <h:graphicImage value="/images/16x16/left-arrow.png"/>
                                 </f:facet>
