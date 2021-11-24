@@ -23,7 +23,7 @@
 
                 <a4j:commandButton value="Генерировать отчет" action="#{employeeHistoryReportPage.buildReport}"
                                    reRender="workspaceTogglePanel, employeeHistoryReportTable"
-                                   styleClass="command-button" status="reportGenerateStatus"/>
+                                   styleClass="command-button" />
                 <a4j:status id="reportGenerateStatus">
                     <f:facet name="start">
                         <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
@@ -31,66 +31,36 @@
                 </a4j:status>
             </h:panelGrid>
             <rich:dataTable id="employeeHistoryReportTable" value="#{employeeHistoryReportPage.cardEventOperationItems}"
-                            var="employeer" rows="10" rowKeyVar="row"
-                            columnClasses="center-aligned-column, center-aligned-column, center-aligned-column"
-                            footerClass="data-table-footer">
+                            var="employeer" rows="10">
                 <f:facet name="header">
                     <rich:columnGroup>
-                        <rich:column headerClass="center-aligned-column">
-                            <h:outputText escape="true" value="№" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column">
-                            <h:outputText escape="true" value="Инженер" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column">
-                            <h:outputText escape="true" value="Должность" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column">
+                        <rich:column>
                             <h:outputText escape="true" value="Название учреждения" styleClass="column-header"/>
                         </rich:column>
-                        <rich:column headerClass="center-aligned-column" rendered="false">
-                            <h:outputText escape="true" value="Тип" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column">
+                        <rich:column>
                             <h:outputText escape="true" value="Направление прохода" styleClass="column-header"/>
                         </rich:column>
-                        <rich:column headerClass="center-aligned-column">
+                        <rich:column>
                             <h:outputText escape="true" value="Дата события" styleClass="column-header"/>
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
-
-                <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
-                    <h:outputText escape="true" value="#{row+1}" styleClass="output-text"/>
+                <rich:column colspan="3">
+                    <rich:collapsibleSubTableToggler for="sbtbl" />
+                    <h:outputText value="#{employeer.fullName}, #{employeer.position}" styleClass="output-text-strong" />
                 </rich:column>
-                <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
-                    <h:outputText escape="true" value="#{employeer.fullName}" styleClass="output-text"/>
-                </rich:column>
-                <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
-                    <h:outputText escape="true" value="#{employeer.position}" styleClass="output-text"/>
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
-                </rich:column>
-
-                <rich:dataTable value="#{employeer.operationItemList}" var="history"
-                                columnClasses="center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
-                    <rich:column headerClass="column-header">
+                <rich:collapsibleSubTable value="#{employeer.operationItemList}" var="history" id="sbtbl" expandMode="client">
+                    <rich:column>
                         <h:outputText escape="true" value="#{history.organization.shortName}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rendered="false">
-                        <h:outputText escape="true" value="#{history.organization.refectoryType}"
-                                      styleClass="output-text"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
+                    <rich:column>
                         <h:outputText escape="true" value="#{history.passDirection}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header">
+                    <rich:column>
                         <h:outputText escape="true" value="#{history.operationDate}" converter="timeConverter"
                                       styleClass="output-text"/>
                     </rich:column>
-                </rich:dataTable>
+                </rich:collapsibleSubTable>
 
                 <f:facet name="footer">
                     <rich:dataScroller for="employeeHistoryReportTable" renderIfSinglePage="false" maxPages="5"

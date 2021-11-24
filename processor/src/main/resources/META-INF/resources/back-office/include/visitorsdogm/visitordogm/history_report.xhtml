@@ -24,7 +24,7 @@
 
                 <a4j:commandButton value="Генерировать отчет" action="#{visitorDogmHistoryReportPage.buildReport}"
                                    render="workspaceTogglePanel, visitorDogmHistoryReportTable"
-                                   styleClass="command-button" status="reportGenerateStatus"/>
+                                   styleClass="command-button" />
                 <a4j:status id="reportGenerateStatus">
                     <f:facet name="start">
                         <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
@@ -32,26 +32,11 @@
                 </a4j:status>
             </h:panelGrid>
             <rich:dataTable id="visitorDogmHistoryReportTable"
-                            value="#{visitorDogmHistoryReportPage.cardEventOperationItems}" var="visitorDogm" rows="10"
-                            rowKeyVar="row"
-                            columnClasses="center-aligned-column, center-aligned-column, center-aligned-column"
-                            footerClass="data-table-footer">
+                            value="#{visitorDogmHistoryReportPage.cardEventOperationItems}" var="visitorDogm" rows="10">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column headerClass="center-aligned-column">
-                            <h:outputText escape="true" value="№" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column">
-                            <h:outputText escape="true" value="Сотрудник" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column">
-                            <h:outputText escape="true" value="Должность" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column">
                             <h:outputText escape="true" value="Название учреждения" styleClass="column-header"/>
-                        </rich:column>
-                        <rich:column headerClass="center-aligned-column" rendered="false">
-                            <h:outputText escape="true" value="Тип" styleClass="column-header"/>
                         </rich:column>
                         <rich:column headerClass="center-aligned-column">
                             <h:outputText escape="true" value="Направление прохода" styleClass="column-header"/>
@@ -61,38 +46,23 @@
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
-
-                <rich:column headerClass="column-header" rowspan="#{visitorDogm.operationItemListCount}">
-                    <h:outputText escape="true" value="#{row+1}" styleClass="output-text"/>
-                </rich:column>
-                <rich:column headerClass="column-header" rowspan="#{visitorDogm.operationItemListCount}">
-                    <h:outputText escape="true" value="#{visitorDogm.fullName}" styleClass="output-text"/>
-                </rich:column>
-                <rich:column headerClass="column-header" rowspan="#{visitorDogm.operationItemListCount}">
-                    <h:outputText escape="true" value="#{visitorDogm.position}" styleClass="output-text"/>
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+                <rich:column colspan="3">
+                    <rich:collapsibleSubTableToggler for="sbtbl" />
+                    <h:outputText value="#{visitorDogm.fullName}, #{visitorDogm.position}" styleClass="output-text-strong"/>
                 </rich:column>
 
-                <rich:dataTable value="#{visitorDogm.operationItemList}" var="history"
-                                columnClasses="center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
-                    <rich:column headerClass="column-header">
+                <rich:collapsibleSubTable value="#{visitorDogm.operationItemList}" var="history" id="sbtbl" expandMode="client">
+                    <rich:column>
                         <h:outputText escape="true" value="#{history.organization.shortName}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rendered="false">
-                        <h:outputText escape="true" value="#{history.organization.refectoryType}"
-                                      styleClass="output-text"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
+                    <rich:column>
                         <h:outputText escape="true" value="#{history.passDirection}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header">
+                    <rich:column>
                         <h:outputText escape="true" value="#{history.operationDate}" converter="timeConverter"
                                       styleClass="output-text"/>
                     </rich:column>
-                </rich:dataTable>
+                </rich:collapsibleSubTable>
 
                 <f:facet name="footer">
                     <rich:dataScroller for="visitorDogmHistoryReportTable" renderIfSinglePage="false" maxPages="5"
