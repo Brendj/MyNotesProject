@@ -1474,7 +1474,7 @@ public class PreorderDAOService {
         WtComplex wtComplex = getWtComplex(preorderComplex, preorderComplex.getArmComplexId(), preorderDate);
 
         if (wtComplex == null) {
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
             return;
         }
         if (!wtComplex.getIsPortal()) {
