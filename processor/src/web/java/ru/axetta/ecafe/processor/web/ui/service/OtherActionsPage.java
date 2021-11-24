@@ -136,7 +136,8 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runImportRNIPPayment() throws Exception {
-        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).runRequests(); //DEF
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        rnipLoadPaymentsService.runRequests(); //DEF
         printMessage("Импорт платежей RNIP был выполнен успешно");
     }
 
