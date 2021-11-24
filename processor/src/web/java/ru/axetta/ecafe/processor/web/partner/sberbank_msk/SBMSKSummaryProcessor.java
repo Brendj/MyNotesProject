@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.sberbank_msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientWithAddInfo;
@@ -34,7 +35,7 @@ public class SBMSKSummaryProcessor {
             transaction = session.beginTransaction();
             ClientsWithResultCode cd = RuntimeContext.getAppContext().getBean(CommonMethodUtil.class)
                     .getClientsByGuardMobile(guardMobile, session, SBMSKPaymentsCodes.OK.getCode(),
-                            SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode(), SBMSKPaymentsCodes.INTERNAL_ERROR.getCode());
+                            PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(), SBMSKPaymentsCodes.INTERNAL_ERROR.getCode());
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
