@@ -58,41 +58,15 @@
             <f:facet name="header">
                 <h:outputText value="Льгота #{applicationForFoodReportPage.currentItem.benefit}"/>
             </f:facet>
-            <h:inputTextarea value="#{applicationForFoodReportPage.benefitText}" cols="80" rows="10" readonly="true"/>
+            <h:panelGrid styleClass="borderless-grid" columns="1">
+                <h:inputTextarea value="#{applicationForFoodReportPage.benefitText}" cols="80" rows="10" readonly="true"/>
 
-            <a4j:commandButton value="Закрыть"
+                <a4j:commandButton value="Закрыть"
                                onclick="#{rich:component('applicationForFoodMessageBenefitPanel')}.hide()"
                                style="width: 180px;" />
+            </h:panelGrid>
         </rich:popupPanel>
 
-        <rich:popupPanel modal="true" id="applicationForFoodChangeDatesPanel" autosized="true" minWidth="500">
-            <f:facet name="header">
-                <h:outputText
-                        value="Изменение срока действия льготы по заявлению #{applicationForFoodReportPage.currentItem.serviceNumber}"/>
-            </f:facet>
-            <h:panelGrid styleClass="borderless-grid" columns="2">
-                <h:outputText styleClass="output-text" escape="true" value="Начальная дата"/>
-                <rich:calendar value="#{applicationForFoodReportPage.benefitStartDate}" datePattern="dd.MM.yyyy"
-                               id="benefitStartDateCalendar"
-                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-                    <a4j:ajax event="change" />
-                </rich:calendar>
-                <h:outputText styleClass="output-text" escape="true" value="Конечная дата"/>
-                <rich:calendar value="#{applicationForFoodReportPage.benefitEndDate}" datePattern="dd.MM.yyyy"
-                               id="benefitEndDateCalendar"
-                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-                    <a4j:ajax event="change" />
-                </rich:calendar>
-                <a4j:commandButton value="Сохранить" action="#{applicationForFoodReportPage.changeDates()}"
-                                   render="applicationForFoodPanelGrid,applicationForFoodChangeDatesPanel"
-                                   oncomplete="if (#{!applicationForFoodReportPage.validateDates()}) #{rich:component('applicationForFoodChangeDatesPanel')}.show()"
-                                   style="width: 180px;" />
-                <a4j:commandButton value="Закрыть"
-                                   onclick="#{rich:component('applicationForFoodChangeDatesPanel')}.hide()"
-                                   style="width: 180px;" ajaxSingle="true"/>
-            </h:panelGrid>
-            <h:outputText style="color: red" escape="true" value="#{applicationForFoodReportPage.errorMessage}"/>
-        </rich:popupPanel>
         <h:panelGrid styleClass="borderless-grid" columns="2" id="applicationForFoodParameters">
             <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
             <h:panelGroup>
@@ -269,36 +243,51 @@
                                  action="#{applicationForFoodReportPage.makeResume()}" styleClass="command-link">
                     <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}"/>
                 </a4j:commandLink>
+                <h:outputText escape="false" value="&nbsp;"/>
                 <a4j:commandLink render="applicationForFoodPanelGrid" rendered="#{item.isResumed}"
                                  value="Решение положительное"
                                  action="#{applicationForFoodReportPage.makeOK()}" styleClass="command-link">
                     <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}"/>
                 </a4j:commandLink>
-
+                <h:outputText escape="false" value="&nbsp;"/>
                 <a4j:commandLink render="applicationForFoodPanelGrid" rendered="#{item.isResumed}"
                                  value="Решение отрицательное"
                                  action="#{applicationForFoodReportPage.makeDenied()}" styleClass="command-link">
                     <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}"/>
                 </a4j:commandLink>
-
+                <h:outputText escape="false" value="&nbsp;"/>
                 <a4j:commandLink render="applicationForFoodPanelGrid" rendered="#{item.canBeMovedToArchieve()}"
                                  value="Архивировать"
                                  action="#{applicationForFoodReportPage.makeArchieved()}"
                                  styleClass="important-command-link">
                     <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}"/>
                 </a4j:commandLink>
-
-                <a4j:commandLink render="applicationForFoodPanelGrid,applicationForFoodChangeDatesPanel"
-                                 rendered="#{item.canChangeDates()}" value="Изменить даты"
-                                 styleClass="command-link"
-                                 oncomplete="#{rich:component('applicationForFoodChangeDatesPanel')}.show();"
-                                 action="#{applicationForFoodReportPage.setErrorMessage(&quot;&quot;)}">
-                    <f:setPropertyActionListener value="#{item.startDate}"
-                                                 target="#{applicationForFoodReportPage.benefitStartDate}"/>
-                    <f:setPropertyActionListener value="#{item.endDate}"
-                                                 target="#{applicationForFoodReportPage.benefitEndDate}"/>
-                    <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}"/>
-                </a4j:commandLink>
+                <h:outputText escape="false" value="&nbsp;"/>
+                <rich:collapsiblePanel header="Изменить даты" switchType="client" expanded="#{item.expand}"
+                                       styleClass="borderNone" rendered="#{item.canChangeDates()}"
+                                       headerClass="imageNone borderNone linkClass"
+                                       bodyClass="imageNone borderNone">
+                    <h:panelGrid styleClass="borderless-grid" columns="2">
+                        <h:outputText styleClass="output-text" escape="true" value="Начальная"/>
+                        <rich:calendar value="#{item.startDate}" datePattern="dd.MM.yyyy"
+                                       inputSize="10"
+                                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                        </rich:calendar>
+                        <h:outputText styleClass="output-text" escape="true" value="Конечная"/>
+                        <rich:calendar value="#{item.endDate}" datePattern="dd.MM.yyyy"
+                                       inputSize="10"
+                                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                        </rich:calendar>
+                    </h:panelGrid>
+                    <a4j:commandButton value="Сохранить" action="#{applicationForFoodReportPage.changeDates()}"
+                                       render="applicationForFoodPanelGrid"
+                                       style="width: 200px;">
+                        <f:setPropertyActionListener value="#{item.startDate}" target="#{applicationForFoodReportPage.benefitStartDate}" />
+                        <f:setPropertyActionListener value="#{item.endDate}" target="#{applicationForFoodReportPage.benefitEndDate}" />
+                        <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}"/>
+                    </a4j:commandButton>
+                    <h:outputText style="color: red" escape="true" value="#{applicationForFoodReportPage.errorMessage}"/>
+                </rich:collapsiblePanel>
             </rich:column>
 
             <rich:column headerClass="column-header">
