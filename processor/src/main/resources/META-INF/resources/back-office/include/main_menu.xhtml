@@ -52,7 +52,7 @@
                                      render="workspaceForm">
 
                     <!--@elvariable id="settingsListPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingsListPage"-->
-                    <rich:panelMenuItem id="settingsListMenuItem" label="Список"
+                    <rich:panelMenuItem id="settingsListMenuItem" binding="#{settingsListPage.mainMenuComponent}" label="Список"
                                         action="#{settingsListPage.show}" render="workspaceForm" />
 
                     <!--@elvariable id="selectedSettingsGroupPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SelectedSettingsGroupPage"-->
@@ -61,22 +61,23 @@
                         <a4j:ajax event="click" action="#{selectedSettingsGroupPage.show}" render="workspaceForm" />
 
                         <!--@elvariable id="settingViewPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingViewPage"-->
-                        <rich:panelMenuItem id="settingViewMenuItem"
+                        <rich:panelMenuItem id="settingViewMenuItem" binding="#{settingViewPage.mainMenuComponent}" label="Просмотр"
                                             action="#{settingViewPage.show}" render="workspaceForm" />
 
+
                         <!--@elvariable id="settingEditPage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingEditPage"-->
-                        <rich:panelMenuItem id="settingEditMenuItem"
+                        <rich:panelMenuItem id="settingEditMenuItem" binding="#{settingEditPage.mainMenuComponent}"
                                             label="Редактировать" action="#{settingEditPage.show}" render="workspaceForm" />
                     </rich:panelMenuGroup>
 
                     <!--@elvariable id="settingCreatePage" type="ru.axetta.ecafe.processor.web.ui.org.settings.SettingCreatePage"-->
-                    <rich:panelMenuItem id="settingsCreateMenuItem"
+                    <rich:panelMenuItem id="settingsCreateMenuItem" binding="#{settingCreatePage.mainMenuComponent}"
                                         label="Регистрация" action="#{settingCreatePage.show}" render="workspaceForm" />
 
                 </rich:panelMenuGroup>
 
                 <!--@elvariable id="clientAllocationRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.ClientAllocationRulesPage"-->
-                <rich:panelMenuItem id="clientAllocationRulesItem"
+                <rich:panelMenuItem id="clientAllocationRulesItem" binding="#{clientAllocationRulesPage.mainMenuComponent}"
                                     label="Настройки распределения клиентов" action="#{clientAllocationRulesPage.show}"
                                     render="workspaceForm" rendered="#{mainPage.eligibleToEditOrgs}" />
 
