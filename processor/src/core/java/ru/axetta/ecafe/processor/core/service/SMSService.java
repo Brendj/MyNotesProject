@@ -268,7 +268,7 @@ public class SMSService {
                         && messageType <= ClientSms.TYPE_NOTIFICATION_CANCEL_END_SICK) {
                     //Только для специальных уведомлений
                     for (Map.Entry<String, String> entry : ((EMPEventType) textObject).getParameters().entrySet()) {
-                        System.out.println("ID =  " + entry.getKey() + " День недели = " + entry.getValue());
+                        System.out.println("ID =  " + entry.getKey() + " Value = " + entry.getValue());
                         if (entry.getKey().equals(ExternalEventNotificationService.SURNAME) || entry.getKey()
                                 .equals(ExternalEventNotificationService.NAME) || entry.getKey().equals("OrgName")
                                 || entry.getKey().equals(ExternalEventNotificationService.ACCOUNT) || entry.getKey()
