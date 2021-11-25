@@ -39,22 +39,22 @@
         <h:panelGrid columns="2" id="settingsEditCashierCheckPrinterPanelGrid"
                      rendered="#{settingEditPage.settingsIds==0}">
             <h:outputText escape="true" value="Наименование принтера" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.a}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.a}" styleClass="input-text">
                 <f:selectItems value="#{settingEditPage.allPrinters}" />
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Текст сообщения" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.h}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingEditPage.parserBySettingValue.h}" styleClass="input-text" style="width: 224px" />
 
             <h:outputText escape="true" value="Общая ширина ленты принтера" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.b}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.b}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCashierCheckPrinterPanel" />
                 <f:selectItem itemValue="42" itemLabel="42"/>
                 <f:selectItem itemValue="48" itemLabel="48"/>
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина разделителя между колонками" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.c}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.c}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCashierCheckPrinterPanel" />
                 <f:selectItem itemValue="1" itemLabel="1"/>
                 <f:selectItem itemValue="2" itemLabel="2"/>
@@ -62,7 +62,7 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина колонки количество" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.e}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.e}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCashierCheckPrinterPanel" />
                 <f:selectItem itemValue="2" itemLabel="2"/>
                 <f:selectItem itemValue="3" itemLabel="3"/>
@@ -70,7 +70,7 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина колонки стоимость" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.f}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.f}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCashierCheckPrinterPanel" />
                 <f:selectItem itemValue="7" itemLabel="7"/>
                 <f:selectItem itemValue="8" itemLabel="8"/>
@@ -81,7 +81,7 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина колонки цена" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.g}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.g}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCashierCheckPrinterPanel" />
                 <f:selectItem itemValue="6" itemLabel="6"/>
                 <f:selectItem itemValue="7" itemLabel="7"/>
@@ -93,28 +93,28 @@
 
             <h:outputText escape="true" value="Ширина колонки наименование" styleClass="output-text" />
             <h:inputText id="resultvalueCashierCheckPrinterPanel" readonly="true" disabled="true"
-                         value="#{settingEditPage.parserBySettingValue.valuesByD}" styleClass="output-text" />
+                         value="#{settingEditPage.parserBySettingValue.valuesByD}" styleClass="output-text" style="width: 224px"/>
         </h:panelGrid>
 
         <h:panelGrid columns="2" id="settingsEditSalesReportPrinterPanelGrid"
                      rendered="#{settingEditPage.settingsIds==1}">
             <h:outputText escape="true" value="Наименование принтера" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.a}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.a}" styleClass="input-text">
                 <f:selectItems value="#{settingEditPage.allPrinters}" />
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Текст сообщения" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.g}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingEditPage.parserBySettingValue.g}" styleClass="input-text" style="width: 224px" />
 
             <h:outputText escape="true" value="Общая ширина ленты принтера" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.b}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.b}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueSalesReportPrinter" />
                 <f:selectItem itemValue="42" itemLabel="42"/>
                 <f:selectItem itemValue="48" itemLabel="48"/>
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина разделителя между колонками" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.c}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.c}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueSalesReportPrinter" />
                 <f:selectItem itemValue="1" itemLabel="1"/>
                 <f:selectItem itemValue="2" itemLabel="2"/>
@@ -122,7 +122,7 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина колонки количество" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.e}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.e}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueSalesReportPrinter" />
                 <f:selectItem itemValue="6" itemLabel="6"/>
                 <f:selectItem itemValue="7" itemLabel="7"/>
@@ -130,7 +130,7 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина колонки стоимость" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.f}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.f}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueSalesReportPrinter" />
                 <f:selectItem itemValue="10" itemLabel="10"/>
                 <f:selectItem itemValue="11" itemLabel="11"/>
@@ -142,29 +142,29 @@
 
             <h:outputText escape="true" value="Ширина колонки наименование" styleClass="output-text" />
             <h:inputText id="resultvalueSalesReportPrinter" readonly="true" disabled="true"
-                         value="#{settingEditPage.parserBySettingValue.valuesByD}" styleClass="output-text" />
+                         value="#{settingEditPage.parserBySettingValue.valuesByD}" styleClass="output-text" style="width: 224px"/>
 
         </h:panelGrid>
 
         <h:panelGrid columns="2" id="settingsEditCardBalanceReportPrinterPanelGrid"
                      rendered="#{settingEditPage.settingsIds==2}">
             <h:outputText escape="true" value="Наименование принтера" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.a}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.a}" styleClass="input-text">
                 <f:selectItems value="#{settingEditPage.allPrinters}" />
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Текст сообщения" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.g}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingEditPage.parserBySettingValue.g}" styleClass="input-text" style="width: 224px" />
 
             <h:outputText escape="true" value="Общая ширина ленты принтера" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.b}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.b}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCardBalanceReportPrinter" />
                 <f:selectItem itemValue="42" itemLabel="42"/>
                 <f:selectItem itemValue="48" itemLabel="48"/>
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина разделителя между колонками" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.c}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.c}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCardBalanceReportPrinter" />
                 <f:selectItem itemValue="1" itemLabel="1"/>
                 <f:selectItem itemValue="2" itemLabel="2"/>
@@ -172,7 +172,7 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина колонки номер карты" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.e}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.e}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCardBalanceReportPrinter" />
                 <f:selectItem itemValue="8" itemLabel="8"/>
                 <f:selectItem itemValue="10" itemLabel="10"/>
@@ -181,7 +181,7 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Ширина колонки баланс" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.f}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.f}" styleClass="input-text">
                 <a4j:ajax event="change" render="resultvalueCardBalanceReportPrinter" />
                 <f:selectItem itemValue="7" itemLabel="7"/>
                 <f:selectItem itemValue="8" itemLabel="8"/>
@@ -193,7 +193,7 @@
 
             <h:outputText escape="true" value="Ширина колонки наименование" styleClass="output-text" />
             <h:inputText id="resultvalueCardBalanceReportPrinter" readonly="true" disabled="true"
-                         value="#{settingEditPage.parserBySettingValue.valuesByD}" styleClass="output-text" />
+                         value="#{settingEditPage.parserBySettingValue.valuesByD}" styleClass="output-text" style="width: 224px"/>
 
         </h:panelGrid>
 
@@ -207,7 +207,7 @@
 
             <h:outputText escape="true" value="Время автооплаты (Ч:ММ)" styleClass="output-text" />
             <h:inputText value="#{settingEditPage.parserBySettingValue.payTime}" id="payTimeValue"
-                         maxlength="5"  styleClass="output-text" converterMessage="Не верный формат времени">
+                         maxlength="5"  styleClass="output-text" converterMessage="Не верный формат времени" style="width: 230px">
                 <f:convertDateTime pattern="HH:mm"/>
             </h:inputText>
 
@@ -220,10 +220,10 @@
                      rendered="#{settingEditPage.settingsIds==4}">
 
             <h:outputText escape="true" value="Количество дней, на которые оформляются заявки на поставку" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.dayRequest}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingEditPage.parserBySettingValue.dayRequest}" styleClass="input-text" style="width: 230px" />
 
             <h:outputText escape="true" value="Количество дней, пропустив которые, клиент приостанавливает свою подписку" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.dayDeActivate}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingEditPage.parserBySettingValue.dayDeActivate}" styleClass="input-text" style="width: 230px" />
 
             <h:outputText escape="true" value="Включить/Выключить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{settingEditPage.parserBySettingValue.enableFeeding}">
@@ -242,10 +242,10 @@
             </h:selectBooleanCheckbox>
 
             <h:outputText escape="true" value="Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.daysToForbidChangeInPos}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingEditPage.parserBySettingValue.daysToForbidChangeInPos}" styleClass="input-text" style="width: 230px" />
 
             <h:outputText escape="true" value="Количество дней, на которые создаются заявки вариативного питания" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.dayCreateVP}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingEditPage.parserBySettingValue.dayCreateVP}" styleClass="input-text" style="width: 230px" />
 
             <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки вариативного питания" styleClass="output-text" />
             <rich:inputNumberSlider inputClass="input-text" value="#{settingEditPage.parserBySettingValue.hoursForbidVP}"
@@ -256,13 +256,13 @@
         <h:panelGrid columns="2" id="settingsEditReplacingMissingBeneficiariesSettingPanelGrid"
                      rendered="#{settingEditPage.settingsIds==5}" >
             <h:outputText escape="true" value="Группа" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.value}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.value}" styleClass="input-text">
                 <f:selectItem itemValue="Резерв" itemLabel="Резерв"/>
                 <f:selectItem itemValue="Все" itemLabel="Все"/>
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Копуса (1 - только свой корпус / 2 - все корпуса)" styleClass="output-text" />
-            <h:selectOneMenu value="#{settingEditPage.parserBySettingValue.orgParam}" styleClass="input-text">
+             <h:selectOneMenu style="width: 230px"  value="#{settingEditPage.parserBySettingValue.orgParam}" styleClass="input-text">
                 <f:selectItem itemValue="1" itemLabel="Только свой корпус"/>
                 <f:selectItem itemValue="2" itemLabel="Все корпуса"/>
             </h:selectOneMenu>
@@ -281,7 +281,7 @@
                 <f:selectItem itemValue="false"/>
             </h:selectBooleanCheckbox>
             <h:outputText escape="true" value="Время автооплаты (Ч:ММ)" styleClass="output-text" />
-            <h:inputText value="#{settingEditPage.parserBySettingValue.processingTime_Preorder}" id="preorderAutopayTimeValue"
+            <h:inputText value="#{settingEditPage.parserBySettingValue.processingTime_Preorder}" id="preorderAutopayTimeValue" style="width: 230px"
                          maxlength="5"  styleClass="output-text" converterMessage="Не верный формат времени">
                 <f:convertDateTime pattern="HH:mm"/>
             </h:inputText>

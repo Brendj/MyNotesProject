@@ -72,7 +72,7 @@
 	<columnHeader>
 		<band height="20">
 			<staticText>
-				<reportElement uuid="c51cf688-38d5-4727-8cec-eba2107f8f8e" x="0" y="0" width="640" height="20">
+				<reportElement x="0" y="0" width="640" height="20" uuid="c51cf688-38d5-4727-8cec-eba2107f8f8e">
 					<printWhenExpression><![CDATA[new Boolean($F{groupName}==null)]]></printWhenExpression>
 				</reportElement>
 				<box leftPadding="15">
@@ -92,7 +92,7 @@
 	<detail>
 		<band height="25" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="46927850-db00-411d-97fc-ca1ec93ff0fc" style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="40" y="0" width="600" height="25" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC">
+				<reportElement style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="40" y="0" width="600" height="25" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC" uuid="46927850-db00-411d-97fc-ca1ec93ff0fc">
 					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.FALSE )]]></printWhenExpression>
 				</reportElement>
 				<box leftPadding="15"/>
@@ -102,7 +102,7 @@
 				<textFieldExpression><![CDATA["Группа " + $F{groupName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="46927850-db00-411d-97fc-ca1ec93ff0fc" style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="40" y="0" width="870" height="25" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC">
+				<reportElement style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="40" y="0" width="870" height="25" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC" uuid="46927850-db00-411d-97fc-ca1ec93ff0fc">
 					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
 				</reportElement>
 				<box leftPadding="15"/>
@@ -112,20 +112,19 @@
 				<textFieldExpression><![CDATA["Группа " + $F{groupName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="db285a90-fc62-4710-b01f-7995083f2dbc" style="table" x="0" y="0" width="40" height="25"/>
-				<textElement/>
+				<reportElement style="table" x="0" y="0" width="40" height="25" uuid="db285a90-fc62-4710-b01f-7995083f2dbc"/>
 				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
 		<band height="40">
 			<componentElement>
-				<reportElement uuid="cf65e38b-e791-4dec-a17c-f5f6f6769020" key="table 1" style="table 1" stretchType="RelativeToTallestObject" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true"/>
+				<reportElement key="table 1" style="table 1" stretchType="RelativeToTallestObject" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true" uuid="cf65e38b-e791-4dec-a17c-f5f6f6769020"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
 					<datasetRun subDataset="Table Dataset 1" uuid="7bd649fc-1747-412b-9556-23028c1124b3">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{clientItemList})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column uuid="e9af922c-d8e9-4455-9d25-8e89d1aef81b" width="40">
-						<jr:columnHeader height="40" rowSpan="1">
+					<jr:column width="40" uuid="e9af922c-d8e9-4455-9d25-8e89d1aef81b">
+						<jr:columnHeader height="30" rowSpan="1">
 							<box>
 								<pen lineWidth="1.0"/>
 								<topPen lineWidth="1.0"/>
@@ -134,12 +133,11 @@
 								<rightPen lineWidth="1.0"/>
 							</box>
 							<staticText>
-								<reportElement uuid="9a97c261-177a-4c32-868f-790794b70cb5" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="40" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="30" isPrintWhenDetailOverflows="true" uuid="9a97c261-177a-4c32-868f-790794b70cb5"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="14"/>
 								</textElement>
-								<text><![CDATA[№
-пп]]></text>
+								<text><![CDATA[№ пп]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell height="20" rowSpan="1">
@@ -150,7 +148,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-								<reportElement uuid="4fc7d830-f37b-4962-9f3d-a981c95d4c88" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="40" height="20" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="40" height="20" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="4fc7d830-f37b-4962-9f3d-a981c95d4c88"/>
 								<box leftPadding="15"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
 									<font fontName="SansSerif" size="14" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
@@ -160,10 +158,10 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="8a43159c-61a3-4aca-a87e-6205a12f23cf" width="330">
-						<jr:columnHeader style="table" height="40" rowSpan="1">
+					<jr:column width="330" uuid="8a43159c-61a3-4aca-a87e-6205a12f23cf">
+						<jr:columnHeader style="table" height="30" rowSpan="1">
 							<staticText>
-								<reportElement uuid="fd8e5678-372c-4957-b422-de71dbc9ab2f" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="40" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="30" isPrintWhenDetailOverflows="true" uuid="fd8e5678-372c-4957-b422-de71dbc9ab2f"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14"/>
@@ -173,7 +171,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="4fc7d830-f37b-4962-9f3d-a981c95d4c88" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true" uuid="4fc7d830-f37b-4962-9f3d-a981c95d4c88"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14"/>
@@ -182,10 +180,10 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="2646d8fd-cfb6-4804-a2a2-8d81c58aad98" width="270">
-						<jr:columnHeader style="table" height="40" rowSpan="1">
+					<jr:column width="270" uuid="2646d8fd-cfb6-4804-a2a2-8d81c58aad98">
+						<jr:columnHeader style="table" height="30" rowSpan="1">
 							<staticText>
-								<reportElement uuid="65c3e866-e85f-4377-badd-d49a641cca52" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="40" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="30" isPrintWhenDetailOverflows="true" uuid="65c3e866-e85f-4377-badd-d49a641cca52"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14"/>
@@ -195,7 +193,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="889ccd60-4432-4a81-85f4-de9c17ec3ce0" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true" uuid="889ccd60-4432-4a81-85f4-de9c17ec3ce0"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14"/>
@@ -204,9 +202,9 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="d785afbc-e56d-42e3-9873-08810f3a716d" width="270">
+					<jr:column width="270" uuid="d785afbc-e56d-42e3-9873-08810f3a716d">
 						<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
-						<jr:columnHeader height="40" rowSpan="1">
+						<jr:columnHeader height="30" rowSpan="1">
 							<box>
 								<pen lineWidth="0.25"/>
 								<topPen lineWidth="1.0"/>
@@ -215,7 +213,7 @@
 								<rightPen lineWidth="1.0"/>
 							</box>
 							<staticText>
-								<reportElement uuid="65c3e866-e85f-4377-badd-d49a641cca52" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="40" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="30" isPrintWhenDetailOverflows="true" uuid="65c3e866-e85f-4377-badd-d49a641cca52"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14" isUnderline="false"/>
@@ -231,7 +229,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="889ccd60-4432-4a81-85f4-de9c17ec3ce0" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true" uuid="889ccd60-4432-4a81-85f4-de9c17ec3ce0"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14"/>
@@ -245,12 +243,12 @@
 		</band>
 		<band height="40">
 			<componentElement>
-				<reportElement uuid="c596e66d-e0d8-4d32-9228-5462bcc0e003" key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true"/>
+				<reportElement key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true" uuid="c596e66d-e0d8-4d32-9228-5462bcc0e003"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
 					<datasetRun subDataset="Table Dataset 2" uuid="8e1de5e1-95cb-4ff0-84c5-0c65aae8dabb">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{categoryItemGroup})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column uuid="b934c48a-c6c1-44cb-9a92-2c658717a5a3" width="40">
+					<jr:column width="40" uuid="b934c48a-c6c1-44cb-9a92-2c658717a5a3">
 						<jr:columnHeader height="20" rowSpan="1">
 							<box>
 								<topPen lineWidth="1.0"/>
@@ -268,10 +266,10 @@
 							</box>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="95d342fc-91bc-40ad-ac23-7f4bcdb06c19" width="330">
+					<jr:column width="330" uuid="95d342fc-91bc-40ad-ac23-7f4bcdb06c19">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<staticText>
-								<reportElement uuid="2cdc64ff-6320-4596-953f-a1a2718dd441" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true" uuid="2cdc64ff-6320-4596-953f-a1a2718dd441"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
@@ -281,7 +279,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="1379d604-fe90-4053-9a40-9629e4b13942" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true" uuid="1379d604-fe90-4053-9a40-9629e4b13942"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
@@ -290,10 +288,10 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="c81fe89a-e8b0-4db1-b1d7-d83ff44ec2de" width="270">
+					<jr:column width="270" uuid="c81fe89a-e8b0-4db1-b1d7-d83ff44ec2de">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField evaluationTime="Report">
-								<reportElement uuid="a02e9c6a-f626-46c3-84e6-3c5283ea4a86" x="0" y="0" width="270" height="20"/>
+								<reportElement x="0" y="0" width="270" height="20" uuid="a02e9c6a-f626-46c3-84e6-3c5283ea4a86"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
@@ -303,7 +301,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="4d78882b-3312-400c-95b1-8c3428ef7542" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true" uuid="4d78882b-3312-400c-95b1-8c3428ef7542"/>
 								<box leftPadding="15"/>
 								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
@@ -312,7 +310,7 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="513f424c-1f0f-419f-a9db-7b6af7cb8828" width="270">
+					<jr:column width="270" uuid="513f424c-1f0f-419f-a9db-7b6af7cb8828">
 						<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
 						<jr:columnHeader height="20" rowSpan="1">
 							<box>
@@ -322,7 +320,7 @@
 								<rightPen lineWidth="1.0"/>
 							</box>
 							<staticText>
-								<reportElement uuid="b8e6177b-976e-4fec-ab70-333640fe417d" x="0" y="0" width="270" height="20"/>
+								<reportElement x="0" y="0" width="270" height="20" uuid="b8e6177b-976e-4fec-ab70-333640fe417d"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
@@ -337,7 +335,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<staticText>
-								<reportElement uuid="b8e6177b-976e-4fec-ab70-333640fe417d" x="0" y="0" width="270" height="20"/>
+								<reportElement x="0" y="0" width="270" height="20" uuid="b8e6177b-976e-4fec-ab70-333640fe417d"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
