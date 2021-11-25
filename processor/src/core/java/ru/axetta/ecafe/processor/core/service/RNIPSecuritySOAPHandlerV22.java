@@ -4,14 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import org.apache.xerces.dom.AttrNSImpl;
-import org.apache.xerces.dom.AttributeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 public class RNIPSecuritySOAPHandlerV22 extends RNIPSecuritySOAPHandlerV21 {
     private static final Logger logger = LoggerFactory.getLogger(RNIPSecuritySOAPHandlerV22.class);
@@ -58,11 +53,11 @@ public class RNIPSecuritySOAPHandlerV22 extends RNIPSecuritySOAPHandlerV21 {
     Замена namespace для нового формата
      */
     private void replaceNamespaceVersion(Element nodeItem) {
-        AttributeMap map = (AttributeMap) nodeItem.getAttributes();
+        NamedNodeMap map = nodeItem.getAttributes();
         for (int i = 0; i < map.getLength(); i++) {
-            AttrNSImpl node = (AttrNSImpl) map.item(i);
+            Node node = map.item(i);
             if (node.getLocalName().startsWith("ns")) {
-                node.setValue(node.getValue().replace("2.1.1", "2.2.0"));
+                node.setNodeValue(node.getNodeValue().replace("2.1.1", "2.2.0"));
             }
         }
     }
@@ -72,11 +67,11 @@ public class RNIPSecuritySOAPHandlerV22 extends RNIPSecuritySOAPHandlerV21 {
     }
 
     private void replaceNamespaceVersionInverse(Element nodeItem) {
-        AttributeMap map = (AttributeMap) nodeItem.getAttributes();
+        NamedNodeMap map = nodeItem.getAttributes();
         for (int i = 0; i < map.getLength(); i++) {
-            AttrNSImpl node = (AttrNSImpl) map.item(i);
+            Node node = map.item(i);
             if (node.getLocalName().startsWith("ns")) {
-                node.setValue(node.getValue().replace("2.2.0", "2.1.1"));
+                node.setNodeValue(node.getNodeValue().replace("2.2.0", "2.1.1"));
             }
         }
     }
