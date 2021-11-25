@@ -36,7 +36,10 @@ public class CashierCheckPrinterSettingValue extends AbstractParserBySettingValu
         this.d = values[3];
         this.e = values[4];
         this.f = values[5];
-        this.g = values[6];
+        if(values.length >= 7)
+            this.g = values[6];
+        else
+            this.g = "10";
         if(values.length==8) {
             this.h = values[7];
         } else {
