@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.clients;
 
+import org.springframework.web.bind.annotation.RestController;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateItem;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.clients.dto.ClientUpdateResult;
@@ -23,9 +24,18 @@ import javax.ws.rs.core.Response;
 
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "/clients")
-@Controller
-@ApplicationPath("/school/api/v1")
+@RestController
+@ApplicationPath("/school/api/v1/clients")
 public class ClientsRestController extends BaseSchoolApiController {
+
+    @GET
+    @Path("/ping")
+    public Response ping(){
+        if (!isWebArmAnyRole()) {
+            throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        }
+        return Response.ok().build();
+    }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)

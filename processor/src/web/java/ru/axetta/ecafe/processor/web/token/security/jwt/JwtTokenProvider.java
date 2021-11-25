@@ -32,6 +32,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Component
@@ -66,8 +68,7 @@ public class JwtTokenProvider {
         jwtBuilder.setExpiration(tokenExpiration);
         jwtBuilder.setHeaderParam(JwtClaimsConstant.TOKEN_TYPE, "JWT");
         jwtBuilder.setClaims(tokenData);
-        String token = jwtBuilder.signWith(SignatureAlgorithm.HS512, JwtConfig.getSecretKey()).compact();
-        return token;
+        return jwtBuilder.signWith(SignatureAlgorithm.HS512, JwtConfig.getSecretKey()).compact();
     }
 
     public RefreshToken refreshTokenIsValid(String refreshToken, String remoteAddress, Session persistenceSession) throws Exception{
@@ -110,12 +111,14 @@ public class JwtTokenProvider {
         return newRefreshToken.getRefreshTokenHash();
     }
 
-    public Jwt validateToken(String token) throws AuthenticationException{
-        Jwt jwt;
+    public String resolveToken(ServletRequest request){
+        return ((HttpServletRequest)request).getHeader(JwtConfig.TOKEN_HEADER);
+    }
+
+    public boolean validateToken(String token) throws AuthenticationException{
         DefaultClaims claims;
         try{
-            jwt = Jwts.parser().setSigningKey(JwtConfig.getSecretKey()).parse(token);
-            claims = (DefaultClaims) jwt.getBody();
+            claims = getTokenClaims(token);
         }
         catch (Exception ex){
             throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_CORRUPTED.getErrorCode(),
@@ -130,7 +133,22 @@ public class JwtTokenProvider {
             throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_EXPIRED.getErrorCode(),
                     JwtAuthenticationErrors.TOKEN_EXPIRED.getErrorMessage()));
         else
-            return jwt;
+            return true;
+    }
+
+    private DefaultClaims getTokenClaims(String token) {
+        Jwt jwt = Jwts.parser().setSigningKey(JwtConfig.getSecretKey()).parse(token);
+        return  (DefaultClaims) jwt.getBody();
+    }
+
+    public JWTAuthentication getAuthentication(String token) throws AuthenticationException {
+        try {
+            validateToken(token);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) getUserDetailsFromToken(getTokenClaims(token));
+            return new JWTAuthentication(token, jwtUserDetails.getAuthorities(), true, jwtUserDetails);
+        } catch (AuthenticationException ex) {
+            return new JWTAuthentication(token, Collections.emptySet(), false, null);
+        }
     }
 
     public UserDetails getUserDetailsFromToken(DefaultClaims claims) throws AuthenticationException {

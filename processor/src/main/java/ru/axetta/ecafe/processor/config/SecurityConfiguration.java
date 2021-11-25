@@ -14,6 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.axetta.ecafe.processor.beans.authentication.provider.ProcessingJaasAuthenticationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.login.ProcessingLoginModule;
+import ru.axetta.ecafe.processor.web.token.security.jwt.JwtConfigurer;
 
 /**
  * Created by nuc on 26.10.2020.
@@ -23,6 +24,8 @@ import ru.axetta.ecafe.processor.web.login.ProcessingLoginModule;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private ProcessingJaasAuthenticationProvider processingJaasAuthenticationProvider;
+    @Autowired
+    private JwtConfigurer jwtConfigurer;
 
     @Override
     public void configure(AuthenticationManagerBuilder auth)
@@ -37,14 +40,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/back-office/styles.css").permitAll();
 
-        security/*.requestMatchers()
-                .antMatchers("/processor/sync", "/processor/back-office")
-                .and()*/
+        security
                 .authorizeRequests()
                 .antMatchers("/processor/sync", "/school/api/v1/authorization/**").permitAll()
                 .antMatchers("/school/api/v1/**")
-                .hasAnyAuthority(User.WebArmRole.WA_OEE.getDescription(), User.WebArmRole.WA_OPP.getDescription(), User.WebArmRole.WA_OPP_OEE.getDescription())
+                //.hasAnyAuthority(User.WebArmRole.WA_OEE.name(), User.WebArmRole.WA_OPP.name(), User.WebArmRole.WA_OPP_OEE.name())
+                .hasAnyAuthority(User.WebArmRole.WA_OPP_OEE.name())
+               // .anyRequest().authenticated()
                 .and().x509();
+
 
         security.formLogin().loginPage("/back-office/login.faces").permitAll()
                 .loginProcessingUrl("/back-office/j_spring_security_check")
@@ -63,7 +67,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/back-office/director/index.faces").hasAnyAuthority(ProcessingLoginModule.ROLENAME_DIRECTOR)
                 .and()
                 .csrf().disable();
+
         security.cors();
+        security.apply(jwtConfigurer);
     }
 
     @Bean

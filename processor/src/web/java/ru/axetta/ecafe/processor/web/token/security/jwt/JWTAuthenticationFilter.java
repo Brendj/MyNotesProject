@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.token.security.jwt;
 
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationErrorResponse;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrorDTO;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
@@ -28,19 +29,25 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
+/*@Component
 public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+    private final JWTAuthenticationManager jwtAuthenticationManager;
 
-    public JWTAuthenticationFilter() {
-        super("/school/api/v1/");
+
+    public JWTAuthenticationFilter(JWTAuthenticationManager jwtAuthenticationManager) {
+        super("/school/api/v1/**");
+        this.jwtAuthenticationManager = jwtAuthenticationManager;
+
         setAuthenticationSuccessHandler(new AuthenticationSuccessHandler() {
             @Override
             public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                     Authentication authentication) throws IOException, ServletException {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                request.getRequestDispatcher(request.getServletPath() + request.getPathInfo())
-                        .forward(request, response);
+                *//*request.getRequestDispatcher(request.getServletPath() + request.getPathInfo())
+                        .forward(request, response);*//*
             }
         });
+       // setAuthenticationSuccessHandler(new SavedRequestAwareAuthenticationSuccessHandler());
         setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
             @Override
             public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -60,7 +67,8 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 objectMapper.writeValue(response.getOutputStream(), apiError);
             }
         });
-        super.setAuthenticationManager(new JWTAuthenticationManager());
+        super.setAuthenticationManager(jwtAuthenticationManager);
+        //setContinueChainBeforeSuccessfulAuthentication(true);
         afterPropertiesSet();
     }
 
@@ -102,6 +110,6 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     }
 
 
-}
+}*/
 
 
