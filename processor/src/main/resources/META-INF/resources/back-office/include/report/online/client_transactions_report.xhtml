@@ -46,8 +46,10 @@
         </h:panelGrid>
 
         <h:panelGrid width="100%" columns="1" columnClasses="center-aligned-column">
-            <rich:panelMenu activeItem="clientTransactionsReportOrgTab" styleClass="output-text" mode="ajax">
-                <rich:panelMenuGroup id="clientTransactionsReportOrgTab" styleClass="center-aligned-column" escape="true" label="Организация">
+            <rich:panelMenu activeItem="clientTransactionsReportOrgTab" styleClass="output-text" mode="ajax" expandSingle="true">
+                <rich:panelMenuGroup id="clientTransactionsReportOrgTab" styleClass="center-aligned-column" escape="true"
+                                     label="Организация">
+            <a4j:ajax event="expand" listener="#{mainPage.clientTransactionsReportPage.setFilterType(0)}" />
                     <h:panelGrid styleClass="left-aligned-column" columns="2">
                         <h:outputText styleClass="output-text" escape="true" value="Организация" />
                         <h:panelGroup>
@@ -64,10 +66,9 @@
                         </h:selectBooleanCheckbox>
                     </h:panelGrid>
                 </rich:panelMenuGroup>
-            </rich:panelMenu>
 
-            <rich:panelMenu width="100%" styleClass="output-text" mode="ajax">
                 <rich:panelMenuGroup styleClass="center-aligned-column" escape="true" label="Клиент">
+                    <a4j:ajax event="expand" listener="#{mainPage.clientTransactionsReportPage.setFilterType(1)}" />
                     <h:panelGrid styleClass="left-aligned-column" columns="2">
                         <h:outputText styleClass="output-text" escape="true" value="Клиент" />
                         <h:panelGroup id="clientFilter">

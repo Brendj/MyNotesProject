@@ -85,7 +85,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
 
             // выбрана организация
             //if (null != organizationIDString) {
-            if (FilterType.Organization == filterType) {
+            if (FilterType.Organization == filterType && null != organizationIDString) {
                 Long organizationID = Long.parseLong(organizationIDString);
                 Org organization = null;
 
