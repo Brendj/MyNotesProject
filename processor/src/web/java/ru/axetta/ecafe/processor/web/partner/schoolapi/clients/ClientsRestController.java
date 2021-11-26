@@ -23,16 +23,8 @@ public class ClientsRestController extends BaseSchoolApiController {
 
     public ClientsRestController(SchoolApiClientsService service) {this.service = service;}
 
-    @GetMapping("/ping")
-    public ResponseEntity<?> ping() {
-        if (!isWebArmAnyRole()) {
-            throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
-        }
-        return ResponseEntity.ok().build();
-    }
-
     @PutMapping(value = "/{id}", consumes = "application/json")
-    public ResponseEntity<?> updateClient(@PathVariable("id") Long idOfClient, ClientUpdateItem request) {
+    public ResponseEntity<?> updateClient(@PathVariable("id") Long idOfClient, @RequestBody ClientUpdateItem request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
@@ -41,7 +33,7 @@ public class ClientsRestController extends BaseSchoolApiController {
     }
 
     @PutMapping(value = "/move", consumes = "application/json")
-    public ResponseEntity<?> moveClients(ClientsUpdateRequest moveClientsRequest) throws WebApplicationException {
+    public ResponseEntity<?> moveClients(@RequestBody ClientsUpdateRequest moveClientsRequest) throws WebApplicationException {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
@@ -51,7 +43,7 @@ public class ClientsRestController extends BaseSchoolApiController {
 
 
     @PutMapping(value = "/plan/exclude", consumes = "application/json")
-    public ResponseEntity<?> planExclude(ClientsUpdateRequest request) {
+    public ResponseEntity<?> planExclude(@RequestBody ClientsUpdateRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
@@ -60,7 +52,7 @@ public class ClientsRestController extends BaseSchoolApiController {
     }
 
     @PutMapping(value = "/discounts", consumes = "application/json")
-    public ResponseEntity<?> updateDiscounts(ClientsUpdateRequest request) {
+    public ResponseEntity<?> updateDiscounts(@RequestBody ClientsUpdateRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }

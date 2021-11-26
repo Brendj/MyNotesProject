@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.payment;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.dto.PaymentDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.dto.ResPaymentDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.service.SchoolApiPaymentsService;
@@ -24,8 +21,8 @@ public class PaymentRestConroller extends BaseSchoolApiController {
     public PaymentRestConroller(SchoolApiPaymentsService service) {this.service = service;}
 
     @PostMapping(value = "/orgs/{id}", consumes = "application/json")
-    public ResponseEntity<?> registerPayments(@PathVariable("id") Long idOfOrg, List<PaymentDTO> payments) {
-        List<ResPaymentDTO> response = service.registerPayments(idOfOrg, payments, getUser());
+    public ResponseEntity<?> registerPayments(@PathVariable("id") Long idOfOrg, @RequestBody List<PaymentDTO> payments) {
+        List<ResPaymentDTO> response = service.registerPayments(idOfOrg, payments);
         return ResponseEntity.ok().body(response);
     }
 

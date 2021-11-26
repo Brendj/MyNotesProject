@@ -24,7 +24,7 @@ public class GroupManagersRestController extends BaseSchoolApiController {
 
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> attachedGroups(List<ClientGroupManagerDTO> groupClientManagers) {
+    public ResponseEntity<?> attachedGroups(@RequestBody List<ClientGroupManagerDTO> groupClientManagers) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }

@@ -26,7 +26,7 @@ public class PlanOrdersRestController extends BaseSchoolApiController {
     public ResponseEntity<?> setClientPlanOrderRestrictions(@PathVariable("id") Long idOfClient,
                                                             @RequestParam(value = "notified", defaultValue = "false")
                                                                     Boolean notified,
-                                                            List<PlanOrderRestrictionDTO> restrictions) {
+                                                            @RequestBody List<PlanOrderRestrictionDTO> restrictions) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }

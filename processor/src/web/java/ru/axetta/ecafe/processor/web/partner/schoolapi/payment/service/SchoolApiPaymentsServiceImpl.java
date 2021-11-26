@@ -19,7 +19,7 @@ class SchoolApiPaymentsServiceImpl implements SchoolApiPaymentsService {
     private RegisterPaymentCommand registerPaymentCommand;
 
     @Override
-    public List<ResPaymentDTO> registerPayments(Long idOfOrg, List<PaymentDTO> payments, User user) {
-        return registerPaymentCommand.registerPayments(idOfOrg, payments, user);
+    public List<ResPaymentDTO> registerPayments(Long idOfOrg, List<PaymentDTO> payments) {
+        return registerPaymentCommand.registerPayments(idOfOrg, payments);
     }
 }

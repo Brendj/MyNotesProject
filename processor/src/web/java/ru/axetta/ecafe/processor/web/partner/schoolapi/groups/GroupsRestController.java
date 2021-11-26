@@ -24,7 +24,7 @@ public class GroupsRestController extends BaseSchoolApiController {
 
     @PostMapping(value = "/{id}/org/{orgId}/subgroups", consumes = "application/json")
     public ResponseEntity<?> createMiddleGroup(@PathVariable("id") Long id, @PathVariable("orgId") Long orgId,
-                                               MiddleGroupRequest request) {
+                                               @RequestBody MiddleGroupRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
@@ -34,7 +34,7 @@ public class GroupsRestController extends BaseSchoolApiController {
 
     @PutMapping(value = "/{id}/org/{orgId}/subgroups", consumes = "application/json")
     public ResponseEntity<?> updateMiddleGroup(@PathVariable("id") Long id, @PathVariable("orgId") Long orgId,
-                                               MiddleGroupRequest request) {
+                                               @RequestBody MiddleGroupRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
@@ -53,7 +53,7 @@ public class GroupsRestController extends BaseSchoolApiController {
 
     @PutMapping(value = "/{id}/org/{orgId}", consumes = "application/json")
     public ResponseEntity<?> updateGroup(@PathVariable("id") Long id, @PathVariable("orgId") Long orgId,
-                                         GroupClientsUpdateRequest request) {
+                                         @RequestBody GroupClientsUpdateRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }

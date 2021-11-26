@@ -26,7 +26,7 @@ import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
  */
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity()
 public class SecurityConfiguration {
 
     @Order(1)

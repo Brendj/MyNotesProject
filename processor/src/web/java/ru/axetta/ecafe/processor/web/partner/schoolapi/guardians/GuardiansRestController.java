@@ -31,7 +31,7 @@ public class GuardiansRestController extends BaseSchoolApiController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createOrUpdateGuardian(CreateOrUpdateGuardianRequest request) {
+    public ResponseEntity<?> createOrUpdateGuardian(@RequestBody CreateOrUpdateGuardianRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }

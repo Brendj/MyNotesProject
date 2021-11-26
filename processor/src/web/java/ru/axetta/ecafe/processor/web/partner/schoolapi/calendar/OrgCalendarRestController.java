@@ -32,7 +32,7 @@ public class OrgCalendarRestController extends BaseSchoolApiController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createOrUpdateOrgCalendarDate(CreateOrUpdateOrgCalendarDateRequest request) {
+    public ResponseEntity<?> createOrUpdateOrgCalendarDate(@RequestBody CreateOrUpdateOrgCalendarDateRequest request) {
         if (!isWebArmAnyRole()) {throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);}
         CreateOrUpdateOrgCalendarDateResponse response = service.createOrUpdateOrgCalendarDate(request, getUser());
         return ResponseEntity.ok().body(response);
