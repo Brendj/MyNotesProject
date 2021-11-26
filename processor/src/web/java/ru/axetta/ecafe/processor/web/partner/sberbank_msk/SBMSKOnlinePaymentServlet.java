@@ -113,6 +113,8 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
                     code = SBMSKPaymentsCodes.INVALID_DATE_VALUE_ERROR;
                 } else if (e instanceof InvalidPaymentSumException) {
                     code = SBMSKPaymentsCodes.INVALID_PAYMENT_SUM_ERROR;
+                } else if (e instanceof InvalidMobileException) {
+                    code = SBMSKPaymentsCodes.INVALID_MOBILE_ERROR;
                 } else {
                     code = SBMSKPaymentsCodes.INTERNAL_ERROR;
                 }
@@ -122,7 +124,11 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
             }
             logger.info(String.format("New request: %s", payRequest.toString()));
             try {
-                response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
+                if (payRequest instanceof SBMSKSummaryRequest) {
+                    response = RuntimeContext.getAppContext().getBean(SBMSKSummaryProcessor.class).processRequest((SBMSKSummaryRequest)payRequest);
+                } else {
+                    response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
+                }
 
             } catch (Exception e) {
                 logger.error("Failed to process request", e);

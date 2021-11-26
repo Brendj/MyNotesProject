@@ -4,7 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.calendar;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.calendar.dto.CreateOrUpdateOrgCalendarDateRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.calendar.dto.CreateOrUpdateOrgCalendarDateResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.calendar.dto.DeleteOrgCalendarDateResponse;
@@ -13,35 +14,27 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiCont
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
-import org.springframework.stereotype.Controller;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-@Path(value = "/orgCalendar")
-@Controller
-@ApplicationPath("/school/api/v1")
+@RestController
+@RequestMapping(value = "/school/api/v1/orgCalendar", produces = "application/json")
 public class OrgCalendarRestController extends BaseSchoolApiController {
-    @DELETE
-    @Path("/{idOfRecord}/{idOfOrgRequester}")
-    public Response deleteOrgCalendarDate(@PathParam("idOfRecord") long idOfRecord, @PathParam("idOfOrgRequester") long idOfOrgRequester) {
-        if (!isWebArmAnyRole()) throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
-        DeleteOrgCalendarDateResponse response = getService().deleteOrgCalendarDate(idOfRecord, idOfOrgRequester, getUser());
-        return Response.ok().entity(response).build();
+    private final SchoolApiOrgCalendarService service;
+
+    public OrgCalendarRestController(SchoolApiOrgCalendarService service) {this.service = service;}
+
+    @DeleteMapping("/{idOfRecord}/{idOfOrgRequester}")
+    public ResponseEntity<?> deleteOrgCalendarDate(@PathVariable("idOfRecord") long idOfRecord,
+                                                   @PathVariable("idOfOrgRequester") long idOfOrgRequester) {
+        if (!isWebArmAnyRole()) {
+            throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
+        }
+        DeleteOrgCalendarDateResponse response = service.deleteOrgCalendarDate(idOfRecord, idOfOrgRequester, getUser());
+        return ResponseEntity.ok().body(response);
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrUpdateOrgCalendarDate(CreateOrUpdateOrgCalendarDateRequest request) {
-        if (!isWebArmAnyRole()) throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
-        CreateOrUpdateOrgCalendarDateResponse response = getService().createOrUpdateOrgCalendarDate(request, getUser());
-        return Response.ok().entity(response).build();
-    }
-
-    private SchoolApiOrgCalendarService getService()
-    {
-        return RuntimeContext.getAppContext().getBean(SchoolApiOrgCalendarService.class);
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<?> createOrUpdateOrgCalendarDate(@RequestBody CreateOrUpdateOrgCalendarDateRequest request) {
+        if (!isWebArmAnyRole()) {throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);}
+        CreateOrUpdateOrgCalendarDateResponse response = service.createOrUpdateOrgCalendarDate(request, getUser());
+        return ResponseEntity.ok().body(response);
     }
 }
