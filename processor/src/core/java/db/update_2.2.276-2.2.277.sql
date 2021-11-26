@@ -111,30 +111,30 @@ comment on column cf_wa_journal_requests.idofuser is 'Идентификатор
 comment on column cf_wa_journal_requests.createddate is 'Дата-время выполнения операции';
 
 -- issue_1073
-create table сf_wa_journal_applicationsforfood
-(
-    idofoperation bigint not null primary key,
-    idofapplicationforfood bigint,
-    operationtype integer,
-    idofuser bigint,
-    createddate timestamp without time zone not null,
-    CONSTRAINT сf_wa_journal_applicationsforfood_idofuser_fk FOREIGN KEY (idofuser)
-        REFERENCES cf_users (idofuser) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION,
-    CONSTRAINT сf_wa_journal_applicationsforfood_app_fk FOREIGN KEY (idofapplicationforfood)
-        REFERENCES cf_applications_for_food (idofapplicationforfood) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION
+CREATE SEQUENCE public.cf_wa_journal_applicationsforfood_idofoperation_seq
+    INCREMENT BY 8
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    START 217;
+
+CREATE TABLE public.cf_wa_journal_applicationsforfood (
+    idofoperation bigserial NOT NULL,
+    idofapplicationforfood int8 NULL,
+    operationtype int4 NULL,
+    idofuser int8 NULL,
+    createddate timestamp NOT NULL,
+    CONSTRAINT cf_wa_journal_applicationsforfood_pkey PRIMARY KEY (idofoperation),
+    CONSTRAINT cf_wa_journal_applicationsforfood_app_fk FOREIGN KEY (idofapplicationforfood) REFERENCES cf_applications_for_food(idofapplicationforfood),
+    CONSTRAINT cf_wa_journal_applicationsforfood_idofuser_fk FOREIGN KEY (idofuser) REFERENCES cf_users(idofuser)
 );
 
-CREATE SEQUENCE сf_wa_journal_applicationsforfood_idofoperation_seq
-    INCREMENT 8
-    START 1;
+comment on table cf_wa_journal_applicationsforfood is 'Логированиe операции управления заявлением, выполненной пользователем';
+comment on column cf_wa_journal_applicationsforfood.idofoperation is 'Идентификатор записи';
+comment on column cf_wa_journal_applicationsforfood.idofapplicationforfood is 'Идентификатор заявления';
+comment on column cf_wa_journal_applicationsforfood.operationType is 'Тип операции: 0 - Отклонение заявление ЛП, 1 - Подтверждение предоставления документов, 2 - Подтверждение заявления ЛП';
+comment on column cf_wa_journal_applicationsforfood.idofuser is 'Идентификатор пользователя веб арма';
+comment on column cf_wa_journal_applicationsforfood.createddate is 'Дата-время выполнения операции';
 
-comment on table сf_wa_journal_applicationsforfood is 'Логированиe операции управления заявлением, выполненной пользователем';
-comment on column сf_wa_journal_applicationsforfood.idofoperation is 'Идентификатор записи';
-comment on column сf_wa_journal_applicationsforfood.idofapplicationforfood is 'Идентификатор заявления';
-comment on column сf_wa_journal_applicationsforfood.operationType is 'Тип операции: 0 - Отклонение заявление ЛП, 1 - Подтверждение предоставления документов, 2 - Подтверждение заявления ЛП';
-comment on column сf_wa_journal_applicationsforfood.idofuser is 'Идентификатор пользователя веб арма';
-comment on column сf_wa_journal_applicationsforfood.createddate is 'Дата-время выполнения операции';
+
 
 --! ФИНАЛИЗИРОВАН 04.10.2021, НЕ МЕНЯТЬ
