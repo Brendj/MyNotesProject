@@ -4,7 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.guardians;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.CreateOrUpdateGuardianResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.dto.DeleteGuardianResponse;
@@ -13,41 +14,29 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiCont
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
-import org.springframework.stereotype.Controller;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-@Path(value = "/guardians")
-@Controller
-@ApplicationPath("/school/api/v1")
+@RestController
+@RequestMapping(value = "/school/api/v1/guardians", produces = "application/json")
 public class GuardiansRestController extends BaseSchoolApiController {
+    private final SchoolApiGuardiansService service;
 
-    @DELETE
-    //@Consumes(MediaType.APPLICATION_JSON)
-    @Path("/{idOfRecord}")
-    public Response deleteGuardian(@PathParam("idOfRecord") Long idOfRecord) {
+    public GuardiansRestController(SchoolApiGuardiansService service) {this.service = service;}
+
+    @DeleteMapping("/{idOfRecord}")
+    public ResponseEntity<?> deleteGuardian(@PathVariable("idOfRecord") Long idOfRecord) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        DeleteGuardianResponse response = getService().deleteGuardian(idOfRecord, getUser());
-        return Response.ok().entity(response).build();
+        DeleteGuardianResponse response = service.deleteGuardian(idOfRecord, getUser());
+        return ResponseEntity.ok().body(response);
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrUpdateGuardian(CreateOrUpdateGuardianRequest request) {
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<?> createOrUpdateGuardian(@RequestBody CreateOrUpdateGuardianRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        CreateOrUpdateGuardianResponse response = getService().createOrUpdateGuardian(request, getUser());
-        return Response.ok().entity(response).build();
-    }
-
-    private SchoolApiGuardiansService getService() {
-        return RuntimeContext.getAppContext().getBean(SchoolApiGuardiansService.class);
+        CreateOrUpdateGuardianResponse response = service.createOrUpdateGuardian(request, getUser());
+        return ResponseEntity.ok().body(response);
     }
 
 }

@@ -39,7 +39,7 @@ class RegisterPaymentCommand {
         this.runtimeContext = runtimeContext;
     }
 
-    public List<ResPaymentDTO> registerPayments(Long idOfOrg, List<PaymentDTO> payments, User user) {
+    public List<ResPaymentDTO> registerPayments(Long idOfOrg, List<PaymentDTO> payments) {
         List<ResPaymentDTO> response = new ArrayList<>();
         Processor processor = runtimeContext.getProcessor();
         List<Long> allocatedClients = ClientManager.getAllocatedClientsIds(idOfOrg);

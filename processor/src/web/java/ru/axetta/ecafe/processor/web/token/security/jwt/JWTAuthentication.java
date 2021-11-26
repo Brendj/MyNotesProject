@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 public class JWTAuthentication implements Authentication {
-    private String token;
+    private final String token;
     private Collection<GrantedAuthority> authorities;
     private boolean isAuthenticated;
     private UserDetails principal;
@@ -22,7 +22,7 @@ public class JWTAuthentication implements Authentication {
 
     public JWTAuthentication(String token, Collection<GrantedAuthority> authorities, boolean isAuthenticated,
             UserDetails principal) {
-        this.token = token;
+        this(token);
         this.authorities = authorities;
         this.isAuthenticated = isAuthenticated;
         this.principal = principal;

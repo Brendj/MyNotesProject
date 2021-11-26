@@ -4,7 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.planorders;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.dto.PlanOrderRestrictionDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.restrictions.service.SchoolApiPlanOrderRestrictionsService;
@@ -12,36 +13,27 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiCont
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
-import org.springframework.stereotype.Controller;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-@Path(value = "/planorders")
-@Controller
-@ApplicationPath("/school/api/v1")
+@RestController
+@RequestMapping(value = "/school/api/v1/planorders", produces = "application/json")
 public class PlanOrdersRestController extends BaseSchoolApiController {
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/restrictions/client/{id}")
-    public Response setClientPlanOrderRestrictions(@PathParam("id") Long idOfClient,
-            @QueryParam(value = "notified") @DefaultValue("false") Boolean notified,
-            List<PlanOrderRestrictionDTO> restrictions) {
+    private final SchoolApiPlanOrderRestrictionsService service;
+
+    public PlanOrdersRestController(SchoolApiPlanOrderRestrictionsService service) {this.service = service;}
+
+    @PostMapping(value = "/restrictions/client/{id}", consumes = "application/json")
+    public ResponseEntity<?> setClientPlanOrderRestrictions(@PathVariable("id") Long idOfClient,
+                                                            @RequestParam(value = "notified", defaultValue = "false")
+                                                                    Boolean notified,
+                                                            @RequestBody List<PlanOrderRestrictionDTO> restrictions) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        List<PlanOrdersRestriction> updatedItems = getService()
-                .updatePlanOrderRestrictions(idOfClient, restrictions, notified);
+        List<PlanOrdersRestriction> updatedItems =
+                service.updatePlanOrderRestrictions(idOfClient, restrictions, notified);
         List<PlanOrderRestrictionDTO> response = PlanOrderRestrictionDTO.fromList(updatedItems);
-        return Response.ok().entity(response).build();
+        return ResponseEntity.ok().body(response);
     }
-
-    private SchoolApiPlanOrderRestrictionsService getService() {
-        return RuntimeContext.getAppContext().getBean(SchoolApiPlanOrderRestrictionsService.class);
-    }
-
 
 }
