@@ -46,15 +46,14 @@ public class JWTAuthenticationManager implements AuthenticationManager {
                 throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
                                                                                    JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
             }
-            JWTAuthentication jwtAuthentication = jwtTokenProvider.getAuthentication(authentication.getToken());
-            if (!jwtAuthentication.isAuthenticated()){
+            if (!authentication.isAuthenticated()){
                 throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
                                                                                    JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
             }
-            if(!((JwtUserDetailsImpl)jwtAuthentication.getPrincipal()).isEnabled())
+            if(!((JwtUserDetailsImpl)authentication.getPrincipal()).isEnabled())
                 throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.USER_DISABLED.getErrorCode(),
                         JwtAuthenticationErrors.USER_DISABLED.getErrorMessage()));
-            return jwtAuthentication;
+            return authentication;
         } catch (AuthenticationException ex) {
             throw ex;
         }

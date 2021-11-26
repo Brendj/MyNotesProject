@@ -10,6 +10,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
@@ -32,13 +34,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Component
 @Scope("singleton")
 public class JwtTokenProvider {
+    private final JwtUserDetailsService userDetailsService;
+
+    public JwtTokenProvider(JwtUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     public String createToken(String username) throws Exception {
         if (username == null)
@@ -111,8 +117,8 @@ public class JwtTokenProvider {
         return newRefreshToken.getRefreshTokenHash();
     }
 
-    public String resolveToken(ServletRequest request){
-        return ((HttpServletRequest)request).getHeader(JwtConfig.TOKEN_HEADER);
+    public String resolveToken(HttpServletRequest request){
+        return request.getHeader(JwtConfig.TOKEN_HEADER);
     }
 
     public boolean validateToken(String token) throws AuthenticationException{
@@ -137,18 +143,13 @@ public class JwtTokenProvider {
     }
 
     private DefaultClaims getTokenClaims(String token) {
-        Jwt jwt = Jwts.parser().setSigningKey(JwtConfig.getSecretKey()).parse(token);
-        return  (DefaultClaims) jwt.getBody();
+        return  (DefaultClaims) Jwts.parser().setSigningKey(JwtConfig.getSecretKey()).parse(token).getBody();
     }
 
     public JWTAuthentication getAuthentication(String token) throws AuthenticationException {
-        try {
-            validateToken(token);
-            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) getUserDetailsFromToken(getTokenClaims(token));
-            return new JWTAuthentication(token, jwtUserDetails.getAuthorities(), true, jwtUserDetails);
-        } catch (AuthenticationException ex) {
-            return new JWTAuthentication(token, Collections.emptySet(), false, null);
-        }
+        JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) getUserDetailsFromToken(getTokenClaims(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(jwtUserDetails.getUsername());
+        return new JWTAuthentication(token, jwtUserDetails.getAuthorities(), true, userDetails);
     }
 
     public UserDetails getUserDetailsFromToken(DefaultClaims claims) throws AuthenticationException {

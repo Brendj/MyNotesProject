@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -37,18 +35,20 @@ import java.net.HttpURLConnection;
 @RequestMapping("/school/api/v1")
 public class SchoolRestController {
     private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
+    private final JwtTokenProvider tokenService;
+
+    public SchoolRestController(JwtTokenProvider jwtTokenProvider) {this.tokenService = jwtTokenProvider;}
+
 
     @PostMapping(value = "authorization/signin", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<?> signin(HttpServletRequest request, LoginData loginData){
+    public ResponseEntity<?> signin(HttpServletRequest request, @RequestBody LoginData loginData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        JwtTokenProvider tokenService;
         JWTLoginService jwtLoginService;
         try{
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            tokenService = new JwtTokenProvider();
             jwtLoginService = new JWTLoginServiceImpl();
             if(jwtLoginService.login(loginData.getUsername(), loginData.getPassword(), request.getRemoteAddr(), persistenceSession)){
                 String token = tokenService.createToken(loginData.getUsername());
@@ -82,15 +82,13 @@ public class SchoolRestController {
     }
 
     @PostMapping(value = "authorization/refreshtoken", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request, RefreshTokenData refreshTokenData){
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, @RequestBody RefreshTokenData refreshTokenData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        JwtTokenProvider tokenService;
         try{
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            tokenService = RuntimeContext.getAppContext().getBean(JwtTokenProvider.class);
             RefreshToken refreshToken = tokenService.refreshTokenIsValid(refreshTokenData.getRefreshToken(),request.getRemoteAddr(),persistenceSession);
             String accessToken = tokenService.createToken(refreshToken.getUser().getUserName());
             String newRefreshToken = tokenService.createRefreshToken(refreshToken.getUser().getUserName(),
@@ -117,7 +115,7 @@ public class SchoolRestController {
     }
 
     @PostMapping(value = "infos/changepassword", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> changePassword(HttpServletRequest request, ChangePasswordData changePasswordData) {
+    public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody ChangePasswordData changePasswordData) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
             checkAuthentication(authentication);
@@ -139,7 +137,7 @@ public class SchoolRestController {
     }
 
     @PostMapping(value = "infos/checksmscode", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> checkSmsCode(ConfirmSmsData confirmSmsData) {
+    public ResponseEntity<?> checkSmsCode(@RequestBody ConfirmSmsData confirmSmsData) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
             checkAuthentication(authentication);
