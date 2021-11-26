@@ -4,7 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.dto.ClientGroupManagerDTO;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.service.ClientGroupManagersService;
@@ -12,52 +13,42 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiCont
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
-import org.springframework.stereotype.Controller;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-@Path(value = "/groupmanagers")
-@Controller
-@ApplicationPath("/school/api/v1")
+@RestController
+@RequestMapping(value = "/school/api/v1/groupmanagers", produces = "application/json")
 public class GroupManagersRestController extends BaseSchoolApiController {
+    private final ClientGroupManagersService service;
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response attachedGroups(List<ClientGroupManagerDTO> groupClientManagers) {
+    public GroupManagersRestController(ClientGroupManagersService service) {this.service = service;}
+
+
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<?> attachedGroups(List<ClientGroupManagerDTO> groupClientManagers) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        List<ClientGroupManager> clientGroupManagers = getService().attachedGroups(groupClientManagers);
+        List<ClientGroupManager> clientGroupManagers = service.attachedGroups(groupClientManagers);
         List<ClientGroupManagerDTO> response = ClientGroupManagerDTO.fromCollection(clientGroupManagers);
-        return Response.ok().entity(response).build();
+        return ResponseEntity.ok().body(response);
     }
 
-    @DELETE
-    @Path("/{id}")
-    public Response dettachedGroup(@PathParam("id") Long idOfClientGroupManager) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> dettachedGroup(@PathVariable("id") Long idOfClientGroupManager) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        getService().dettachedGroup(idOfClientGroupManager);
-        return Response.ok().build();
+        service.dettachedGroup(idOfClientGroupManager);
+        return ResponseEntity.ok().build();
     }
 
-    @DELETE
-    @Path("")
-    public Response dettachedGroups(@QueryParam("id") final List<Long> ids) {
+    @DeleteMapping("")
+    public ResponseEntity<?> dettachedGroups(@RequestParam("id") final List<Long> ids) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        getService().dettachedGroups(ids);
-        return Response.ok().build();
-    }
-
-    private ClientGroupManagersService getService() {
-        return RuntimeContext.getAppContext().getBean(ClientGroupManagersService.class);
+        service.dettachedGroups(ids);
+        return ResponseEntity.ok().build();
     }
 
 }
