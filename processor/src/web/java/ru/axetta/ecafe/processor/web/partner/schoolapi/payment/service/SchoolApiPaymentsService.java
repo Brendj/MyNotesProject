@@ -11,5 +11,5 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.payment.dto.ResPaymentDTO
 import java.util.List;
 
 public interface SchoolApiPaymentsService {
-    List<ResPaymentDTO> registerPayments(Long idOfOrg, List<PaymentDTO> payments, User user);
+    List<ResPaymentDTO> registerPayments(Long idOfOrg, List<PaymentDTO> payments);
 }

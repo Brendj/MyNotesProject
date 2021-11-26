@@ -184,6 +184,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 if (!validateDates()) return;
                 item.setStartDate(benefitStartDate);
                 item.setEndDate(benefitEndDate);
+                item.setExpand(false);
                 changeDatesItems.add(item);
                 break;
             }

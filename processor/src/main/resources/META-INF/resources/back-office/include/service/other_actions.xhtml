@@ -200,6 +200,7 @@
                                  clearAllLabel="Очистить"
                                  uploadLabel="Загрузить"
                                  doneLabel="Готово"
+                                 onuploadcomplete="alert('Файл с производственным календарем загружен');"
                                  fileUploadListener="#{otherActionsPage.specialDatesLoadFileListener}">
                     <f:facet name="label">
                         <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>

@@ -83,10 +83,10 @@
                 <rich:column styleClass="#{item.style}" rendered="#{item.style.length() > 0 ? false : true}">
                     <h:outputText styleClass="output-text" value="#{item.region}" />
                 </rich:column>
-                <rich:column styleClass="#{item.style}">
+                <rich:column style="text-align:center" styleClass="#{item.style}">
                     <h:outputText styleClass="output-text" value="#{item.totalCount}" />
                 </rich:column>
-                <rich:column styleClass="#{item.style}">
+                <rich:column style="text-align:left" styleClass="#{item.style}">
                     <h:outputText styleClass="output-text" value="#{item.paymentCount}" />
                 </rich:column>
                 <rich:column styleClass="#{item.style}">
@@ -95,10 +95,10 @@
                 <rich:column styleClass="#{item.style}">
                     <h:outputText styleClass="output-text" value="#{item.realDiscountCount}" />
                 </rich:column>
-                <rich:column styleClass="#{item.style}">
+                <rich:column style="text-align:left" styleClass="#{item.style}">
                     <h:outputText styleClass="output-text" value="#{item.entersCount}" />
                 </rich:column>
-                <rich:column styleClass="#{item.style}">
+                <rich:column style="text-align:left" styleClass="#{item.style}">
                     <h:outputText styleClass="output-text" value="#{item.employeesCount}" />
                 </rich:column>
                 <rich:column styleClass="#{item.style}">

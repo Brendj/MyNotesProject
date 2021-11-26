@@ -66,6 +66,15 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         this.selectedOperationType = selectedOperationType;
     }
 
+    public void setFilterType(Integer filterType) {
+        if (filterType == 0) {
+            this.selectedTab = ClientTransactionsReport.FilterType.Organization;
+        }
+        if (filterType == 1) {
+            this.selectedTab = ClientTransactionsReport.FilterType.Client;
+        }
+    }
+
     public ClientFilter getClientFilter() {
         return clientFilter;
     }
