@@ -10,9 +10,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.config.LimitFilterParams;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -142,7 +144,7 @@ public class SyncServlet extends HttpServlet {
             if (syncType==SyncType.TYPE_FULL && isRestrictedFullSyncPeriod()) {
                 String message = String.format("Full sync not allowed in this time, idOfOrg=%d", idOfOrg);
                 logger.error(message);
-                response.addHeader("Retry-After", String.valueOf(LimitFilter.RETRY_AFTER));
+                response.addHeader("Retry-After", String.valueOf(LimitFilter.getLimitFilterParams().getSyncRetryAfter()));
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }
