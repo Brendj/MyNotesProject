@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setContentType('text/csv;charset=utf-8')}" />
+    <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Content-disposition', 'attachment;filename=getOrgBasicStats.csv')}" />
+    <!--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.DashboardPage"-->
+
+    <f:view>
+        <h:outputText value="Ид.;" escape="false"/>
+        <h:outputText value="Номер;" escape="false"/>
+        <h:outputText value="Дети;" escape="false"/>
+        <h:outputText value="Родители;" escape="false"/>
+        <h:outputText value="Сотруд. и др.;" escape="false"/>
+        <h:outputText value="Без карт;" escape="false"/>
+        <h:outputText value="Событий проходов;" escape="false"/>
+        <h:outputText value="%У;" escape="false"/>
+        <h:outputText value="%С;" escape="false"/>
+        <h:outputText value="Льготных заказов;" escape="false"/>
+        <h:outputText value="Платных заказов;" escape="false"/>
+        <h:outputText value="Район;" escape="false"/>
+        <h:outputText value="Локация;" escape="false"/>
+        <h:outputText value="Тэги;" escape="false"/>
+        <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
+        <a4j:repeat value="#{dashboardPage.orgBasicStats.orgBasicStatItems}" var="item">
+            <h:outputText value="#{item.idOfOrg};" escape="false"/>
+            <h:outputText value="#{item.orgNameNumber};" escape="false"/>
+            <h:outputText value="#{item.numberOfChildrenClients};" escape="false"/>
+            <h:outputText value="#{item.numberOfParentsClients};" escape="false"/>
+            <h:outputText value="#{item.numberOfNonStudentClients};" escape="false"/>
+            <h:outputText value="#{item.numberOfClientsWithoutCard};" escape="false"/>
+            <h:outputText value="#{item.numberOfEnterEvents};" escape="false"/>
+            <h:outputText value="#{item.numberOfStudentsWithEnterEventsPercent};" escape="false">
+                <f:convertNumber type="percent"/>
+            </h:outputText>
+            <h:outputText value="#{item.numberOfEmployeesWithEnterEventsPercent};" escape="false">
+                <f:convertNumber type="percent"/>
+            </h:outputText>
+            <h:outputText value="#{item.numberOfDiscountOrders};" escape="false"/>
+            <h:outputText value="#{item.numberOfPayOrders};" escape="false"/>
+            <h:outputText value="#{item.orgDistrict};" escape="false"/>
+            <h:outputText value="#{item.orgLocation};" escape="false"/>
+            <h:outputText value="#{item.orgTag};" escape="false"/>
+            <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
+        </a4j:repeat>
+    </f:view>
+</ui:composition>
