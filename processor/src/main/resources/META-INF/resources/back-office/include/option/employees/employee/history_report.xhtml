@@ -22,16 +22,18 @@
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
 
                 <a4j:commandButton value="Генерировать отчет" action="#{employeeHistoryReportPage.buildReport}"
-                                   reRender="workspaceTogglePanel, employeeHistoryReportTable"
+                                   render="workspaceTogglePanel, employeeHistoryReportTable"
                                    styleClass="command-button" />
-                <a4j:status id="reportGenerateStatus">
-                    <f:facet name="start">
-                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-                    </f:facet>
-                </a4j:status>
             </h:panelGrid>
+
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif"/>
+                </f:facet>
+            </a4j:status>
+
             <rich:dataTable id="employeeHistoryReportTable" value="#{employeeHistoryReportPage.cardEventOperationItems}"
-                            var="employeer" rows="10">
+                            var="employeer" rows="10" >
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
