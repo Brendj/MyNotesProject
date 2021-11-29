@@ -8,6 +8,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <!-- Панель просмотра клиента -->
+    <h:panelGrid>
 <h:panelGrid id="clientViewGrid" styleClass="borderless-grid" columns="2"
              binding="#{mainPage.clientViewPage.pageComponent}">
     <h:outputText escape="true" value="Фотография" styleClass="output-text" />
@@ -438,7 +439,7 @@
                  rendered="#{!mainPage.clientViewPage.isLastConfirmMobileEmpty()}" />
     <h:inputText value="#{mainPage.clientViewPage.lastConfirmMobile}" readonly="true" converter="timeConverter"
                  styleClass="input-text" rendered="#{!mainPage.clientViewPage.isLastConfirmMobileEmpty()}" />
-
+</h:panelGrid>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
