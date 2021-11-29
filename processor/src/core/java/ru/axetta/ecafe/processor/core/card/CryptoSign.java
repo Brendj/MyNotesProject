@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CryptoSign {
 
@@ -35,11 +36,19 @@ public class CryptoSign {
     public static final Integer SIZE_DATE = 12;
 
     public static KeyPair keyPairGen() throws Exception {
+        if (!providerBCLoaded()) {
+            Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        }
         ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(BP160R1);
         KeyPairGenerator g = KeyPairGenerator.getInstance(KEY_FACTOR, BC_PROV);
         g.initialize(ecSpec, new SecureRandom());
         KeyPair pair = g.generateKeyPair();
         return pair;
+    }
+
+    private static boolean providerBCLoaded() {
+        List<Provider> providers = Arrays.asList(Security.getProviders());
+        return (providers.stream().filter(prov -> prov.getName().equals(BC_PROV))).collect(Collectors.toList()).size() > 0;
     }
 
     public static byte[] sign(byte[] data, PrivateKey priv) throws Exception {

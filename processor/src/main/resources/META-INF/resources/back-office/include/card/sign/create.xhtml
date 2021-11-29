@@ -39,23 +39,10 @@
                     <h:outputText value="#{cardSignCreatePage.signDataSize}" styleClass="output-text"/>
                     <h:outputText value="Загрузка файла с данными ключа производителя" styleClass="output-text"/>
                     <rich:fileUpload id="cardSignFileUploadElement" styleClass="upload"
-                                     addButtonClass="upload-command-button"
-                                     addButtonClassDisabled="upload-command-button-diasbled"
-                                     cleanButtonClass="upload-command-button"
-                                     cleanButtonClassDisabled="upload-command-button-diasbled"
-                                     stopButtonClass="upload-command-button"
-                                     stopButtonClassDisabled="upload-command-button-diasbled"
-                                     uploadButtonClass="upload-command-button"
-                                     uploadButtonClassDisabled="upload-command-button-diasbled"
-                                     fileEntryClass="output-text"
-                                     fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
-                                     fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
-                                     stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
-                                     addControlLabel="Добавить файл" clearControlLabel="Очистить"
-                                     clearAllControlLabel="Очистить все" doneLabel="Готово"
-                                     cancelEntryControlLabel="Отменить"
-                                     transferErrorLabel="Ошибка передачи" uploadControlLabel="Загрузка файла"
-                                     progressLabel="Загрузка" listHeight="70px"
+                                     addLabel="Добавить..."
+                                     clearAllLabel="Очистить"
+                                     uploadLabel="Загрузить"
+                                     doneLabel="Готово"
                                      fileUploadListener="#{cardSignCreatePage.fileUploadListener}">
                         <f:facet name="label">
                             <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
@@ -91,22 +78,10 @@
                     <h:outputText value="#{cardSignCreatePage.signDataSize}" styleClass="output-text"/>
                     <h:outputText value="Загрузка файла с данными ключа" styleClass="output-text"/>
                     <rich:fileUpload id="cardSignFileUploadElement_OLD" styleClass="upload"
-                                     addButtonClass="upload-command-button"
-                                     addButtonClassDisabled="upload-command-button-diasbled"
-                                     cleanButtonClass="upload-command-button"
-                                     cleanButtonClassDisabled="upload-command-button-diasbled"
-                                     stopButtonClass="upload-command-button"
-                                     stopButtonClassDisabled="upload-command-button-diasbled"
-                                     uploadButtonClass="upload-command-button"
-                                     uploadButtonClassDisabled="upload-command-button-diasbled"
-                                     fileEntryClass="output-text"
-                                     fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
-                                     fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
-                                     stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
-                                     addControlLabel="Добавить файл"
-                                     clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
-                                     cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
-                                     uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
+                                     addLabel="Добавить..."
+                                     clearAllLabel="Очистить"
+                                     uploadLabel="Загрузить"
+                                     doneLabel="Готово"
                                      fileUploadListener="#{cardSignCreatePage.fileUploadListener}">
                         <f:facet name="label">
                             <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
