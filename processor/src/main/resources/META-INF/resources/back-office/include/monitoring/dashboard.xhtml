@@ -16,7 +16,7 @@
         }
     </style>
     <!--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.DashboardPage"-->
-    <h:panelGrid>
+    <h:panelGrid width="100%">
         <h:panelGrid id="dashboardPanelGrid" binding="#{dashboardPage.pageComponent}" styleClass="borderless-grid">
             <h:outputText escape="true" value="Организация" styleClass="output-text"/>
             <h:panelGroup styleClass="borderless-div">
@@ -44,9 +44,20 @@
                     <h:graphicImage value="/images/gif/waiting.gif"/>
                 </f:facet>
             </a4j:status>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
 
-                <rich:tabPanel switchType="client">
-                    <rich:tab header="Организации (общая)">
+        <h:panelGrid width="100%" columns="1" columnClasses="center-aligned-column">
+            <rich:panelMenu  styleClass="center-aligned-column" mode="ajax" expandSingle="true"
+                             groupCollapsedLeftIcon="triangle" groupExpandedLeftIcon="triangleDown">
+
+                <rich:panelMenuGroup styleClass="center-aligned-column"
+                                     escape="true"
+                                     label="Организации (общая)">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <a4j:commandButton value="Обновить" action="#{dashboardPage.updateOrgBasicStats}"
                                            render="orgBasicStatsTable"/>
 
@@ -119,7 +130,8 @@
                                 <f:facet name="header">
                                     <h:outputText value="%У" styleClass="output-text" escape="true"/>
                                 </f:facet>
-                                <h:outputText value="#{item.numberOfStudentsWithEnterEventsPercent}"><f:convertNumber
+                                <h:outputText
+                                        value="#{item.numberOfStudentsWithEnterEventsPercent}"><f:convertNumber
                                         type="percent"/></h:outputText>
                             </rich:column>
                             <rich:column headerClass="column-header" sortable="true"
@@ -128,7 +140,8 @@
                                 <f:facet name="header">
                                     <h:outputText value="%С" styleClass="output-text" escape="true"/>
                                 </f:facet>
-                                <h:outputText value="#{item.numberOfEmployeesWithEnterEventsPercent}"><f:convertNumber
+                                <h:outputText
+                                        value="#{item.numberOfEmployeesWithEnterEventsPercent}"><f:convertNumber
                                         type="percent"/></h:outputText>
                             </rich:column>
                             <rich:column headerClass="column-header" sortable="true"
@@ -139,7 +152,8 @@
                                 </f:facet>
                                 <h:outputText value="#{item.numberOfDiscountOrders}"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}"
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfPayOrders}"
                                          width="120px">
                                 <f:facet name="header">
                                     <h:outputText value="Платных заказов" styleClass="output-text" escape="true"/>
@@ -189,12 +203,14 @@
                         </rich:extendedDataTable>
                         <h:commandButton value="Выгрузить в CSV" action="#{dashboardPage.showOrgBasicStatsCSVList}"
                                          styleClass="command-button"/>
-                    </rich:tab>
-
-
-                    <rich:tab header="Платежные системы">
+                        <br>
+                        </br>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+                <rich:panelMenuGroup styleClass="center-aligned-column" escape="true" label="Платежные системы">
+                    <h:panelGrid styleClass="left-aligned-column">
                         <a4j:commandButton value="Обновить" action="#{dashboardPage.updatePaySysStatus}"
-                                           render="dashboardPanelGrid"/>
+                                           render="paySysStatusTable"/>
 
                         <rich:extendedDataTable id="paySysStatusTable"
                                                 value="#{dashboardPage.psStatus.paymentSystemItemInfos}"
@@ -202,13 +218,16 @@
                                                 rows="500" sortMode="multi" selectionMode="single" width="1500"
                                                 height="900"
                                                 footerClass="data-table-footer">
-                            <rich:column headerClass="column-header" sortable="true" sortBy="#{items.idOfContragent}"
-                                         width="30px" filterBy="#{items.idOfContragent}" filterEvent="onkeyup">
+
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.idOfOrg}"
+                                         width="35px"
+                                         filterBy="#{item.idOfOrg}" filterEvent="onkeyup">
                                 <f:facet name="header">
                                     <h:outputText value="Ид." styleClass="output-text" escape="true"/>
                                 </f:facet>
-                                <h:outputText value="#{items.idOfContragent}"/>
+                                <h:outputText value="#{item.idOfOrg}"/>
                             </rich:column>
+
                             <rich:column headerClass="column-header" sortable="true" sortBy="#{items.contragentName}"
                                          width="200px" filterBy="#{items.contragentName}" filterEvent="onkeyup">
                                 <f:facet name="header">
@@ -247,12 +266,9 @@
                                 </rich:dataScroller>
                             </f:facet>
                         </rich:extendedDataTable>
-                    </rich:tab>
-                </rich:tabPanel>
-        </h:panelGrid>
-        <h:panelGrid styleClass="borderless-grid">
-            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                           warnClass="warn-messages"/>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
         </h:panelGrid>
     </h:panelGrid>
 </ui:composition>

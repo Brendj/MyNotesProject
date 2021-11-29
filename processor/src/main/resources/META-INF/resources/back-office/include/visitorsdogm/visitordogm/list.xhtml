@@ -23,7 +23,7 @@
                     <f:selectItem itemValue="0" itemLabel="Всех"/>
                     <f:selectItem itemValue="1" itemLabel="Актуальных"/>
                     <f:selectItem itemValue="2" itemLabel="Удаленных"/>
-                    <a4j:ajax event="change" action="#{visitorDogmListPage.show}" render="visitorDogmListTable"/>
+                    <a4j:ajax event="change" listener="#{visitorDogmListPage.show}" execute="@this" render="visitorDogmListTable"/>
                 </h:selectOneMenu>
             </h:panelGrid>
 
