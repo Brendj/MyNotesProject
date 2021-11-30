@@ -633,6 +633,9 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.officialPersonSecondName);
         session.save(officialPerson);
 
+        if(DAOUtils.findOrgByShortname(session, getShortName()) != null) {
+            throw new Exception("\"Наименование ОО для поставщика\" уже существует");
+        }
         if (this.defaultSupplier.getIdOfContragent()==null) {
             throw new Exception("Не указан поставщик по умолчанию");
         }
