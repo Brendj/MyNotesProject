@@ -44,7 +44,8 @@ public class SBMSKSummaryProcessor {
                     }
                     SBMSKClientSummaryBase base = processSummaryBase(entry.getKey());
                     if (base != null) {
-                        clientSummaries.add(base);
+                        if (base.getInn() != null && !base.getInn().trim().isEmpty() && base.getContractId() != null)
+                            clientSummaries.add(base);
                     }
                 }
             }
