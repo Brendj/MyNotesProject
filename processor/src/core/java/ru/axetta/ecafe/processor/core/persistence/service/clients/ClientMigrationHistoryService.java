@@ -63,7 +63,7 @@ public class ClientMigrationHistoryService {
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
             discountChange(list);
-            deleteDOUDiscounts();
+            //deleteDOUDiscounts();
         }
 
         if (isOn(NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG)) {
