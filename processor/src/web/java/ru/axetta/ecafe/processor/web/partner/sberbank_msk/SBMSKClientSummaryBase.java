@@ -14,7 +14,8 @@ public class SBMSKClientSummaryBase {
     public SBMSKClientSummaryBase(Long contractId, Long balance, String firstName, String lastName, String middleName) {
         this.contractId = contractId;
         this.balance = String.format("%d.%02d",balance / 100, balance % 100);
-        this.fio = firstName + " " + middleName + " " + lastName.charAt(0) + ".";
+        //this.fio = firstName + " " + middleName + " " + lastName.charAt(0) + ".";
+        this.fio = firstName + " " + lastName.charAt(0) + ".";
     }
 
     public Long getContractId() {
