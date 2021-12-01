@@ -17,11 +17,11 @@
             var inter = setInterval(updateList, 1000 * 120);
 
             function onstartloading() {
-                jQuery(".command-button, input[type='checkbox']").attr('disabled', 'disabled');
+                jQuery(".command-button, input[type='checkbox']").attr('', '');
             }
 
             function onstoploading() {
-                jQuery(".command-button, input[type='checkbox']").attr('disabled', '');
+                jQuery(".command-button, input[type='checkbox']").attr('', '');
             }
 
             document.onload = updateList();
@@ -32,11 +32,11 @@
         <h:panelGrid id="syncMonitorPanelGrid" styleClass="borderless-grid">
 
             <h:panelGrid styleClass="borderless-grid" columns="3">
-                <a4j:commandButton value="Обновить" action="#{mainPage.syncMonitorPage.buildReportHtml}"
+                <a4j:commandButton value="Обновить" disabled="false" action="#{mainPage.syncMonitorPage.buildReportHtml}"
                                    render="orgUnsychMonitorListTable,lastOrgUpdateTime" status="syncMonitorReportStatus"
                                    styleClass="command-button"/>
 
-                <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.syncMonitorPage.buildReportXLS}"
+                <h:commandButton value="Выгрузить в Excel" disabled="false" actionListener="#{mainPage.syncMonitorPage.buildReportXLS}"
                                  styleClass="command-button"/>
 
                 <a4j:status id="syncMonitorReportStatus" onstart="onstartloading()" onstop="onstoploading()">
@@ -59,7 +59,7 @@
                         <h:outputText escape="true" value="Версия клиента"
                                       styleClass="output-text"/>
                         <h:selectBooleanCheckbox value="#{mainPage.syncMonitorPage.showVersion}"
-                                                 styleClass="output-text">
+                                                 disabled="false" styleClass="output-text">
                             <a4j:ajax event="click" render="syncMonitorVersionPanel"/>
                         </h:selectBooleanCheckbox>
 
