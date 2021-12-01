@@ -43,7 +43,7 @@ public class SecurityConfiguration {
                     .and()
                     .csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/school/api/v1/authorization/**","/school/api/v1/infos/**", "/school/api/v1/payments/**")
+                    .antMatchers("/school/api/v1/authorization/**", "/school/api/v1/payments/**")
                     .permitAll()
                     .antMatchers("/school/api/v1/**")
                     .hasAnyAuthority(User.WebArmRole.WA_OEE.name(), User.WebArmRole.WA_OPP.name(), User.WebArmRole.WA_OPP_OEE.name())
