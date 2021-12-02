@@ -97,4 +97,33 @@ CREATE INDEX "cf_plan_orders_web_idoforg_idx" ON "cf_plan_orders_web" USING btre
 ALTER TABLE cf_users
     ADD COLUMN createddate bigint DEFAULT null;
 
+CREATE TABLE cf_blazons
+(
+    idofblazon bigserial NOT NULL,
+    imagedata bytea NOT NULL,
+    lastupdate bigint,
+    CONSTRAINT cf_blazons_pkey PRIMARY KEY (idofblazon)
+)
+    WITH (
+        OIDS=FALSE
+    );
+
+ALTER TABLE cf_orgs
+    ADD COLUMN idofblazon bigint;
+ALTER TABLE cf_orgs
+    ADD FOREIGN KEY (idofblazon) REFERENCES cf_blazons (idofblazon) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE "cf_groupnames_to_orgs" ADD COLUMN "disablefromplan" BOOLEAN DEFAULT NULL;
+COMMENT ON COLUMN cf_groupnames_to_orgs.disablefromplan IS 'Флаг исключения из плана питания ЛП';
+
+alter table cf_taloon_approval add column lastchangedatetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+alter table cf_taloon_preorder add column lastchangedatetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+CREATE FUNCTION update_talon_lastchangedatetime() RETURNS TRIGGER AS $$ BEGIN NEW.lastchangedatetime = now(); RETURN NEW; END; $$ language 'plpgsql';
+create trigger updatelastchangedatetime before update on cf_taloon_approval for each row execute procedure update_talon_lastchangedatetime();
+create trigger updatelastchangedatetime before update on cf_taloon_preorder for each row execute procedure update_talon_lastchangedatetime();
+
+ALTER TABLE cf_specialdates ADD COLUMN idofuser bigint DEFAULT null;
+ALTER TABLE cf_specialdates_history ADD COLUMN idofuser bigint DEFAULT null;
+
 --! ФИНАЛИЗИРОВАН 01.12.2021, НЕ МЕНЯТЬ
