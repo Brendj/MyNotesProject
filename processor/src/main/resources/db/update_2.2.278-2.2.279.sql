@@ -126,4 +126,7 @@ create trigger updatelastchangedatetime before update on cf_taloon_preorder for 
 ALTER TABLE cf_specialdates ADD COLUMN idofuser bigint DEFAULT null;
 ALTER TABLE cf_specialdates_history ADD COLUMN idofuser bigint DEFAULT null;
 
+ALTER TABLE cf_etp_outgoing_message
+    ALTER COLUMN etpmessageid SET DATA TYPE varchar(32);
+
 --! ФИНАЛИЗИРОВАН 01.12.2021, НЕ МЕНЯТЬ
