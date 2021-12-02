@@ -30,7 +30,8 @@
                             <div align="center">
                                 <h:outputText value="Сервис отправки СМС не доступен. Попробуйте позже" styleClass="output-text" />
                             </div>
-                            <a4j:commandLink id="eer-iiop" value="Назад" action="#{mainPage.logout}" styleClass="command-link" oncomplete="window.location.href='/processor/back-office/index.faces'"/>
+                            <h:outputLink id="logout-link" styleClass="command-link"
+                                          value="/processor/j_spring_security_logout">Назад</h:outputLink>
                         </h:panelGrid>
                     </rich:panel>
                     </h:form>

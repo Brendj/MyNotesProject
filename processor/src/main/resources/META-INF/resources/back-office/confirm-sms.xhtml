@@ -42,10 +42,11 @@ function sendEvent() {
                                     onkeydown="if (event.keyCode === 13) { sendEvent(); return false;}"/>
                                 </h:panelGrid>
                                 <h:panelGrid columns="2">
-                                    <a4j:commandButton type="submit" value="Отправить sms повторно" action="#{mainPage.sendSMSagain()}" disabled="#{mainPage.canSendAgain}"/>
+                                    <a4j:commandButton type="submit" value="Отправить sms повторно" action="#{mainPage.sendSMSagain()}"/>
                                     <a4j:commandButton id="enterSmsCodeButton" type="submit" value="Войти" action="#{mainPage.checkUserSmsCode}" render="smscode-security" />
                                 </h:panelGrid>
-                                <a4j:commandLink id="eer-iiop" value="Назад" action="#{mainPage.logout}" styleClass="command-link" oncomplete="window.location.href='/processor/back-office/index.faces'"/>
+                                <h:outputLink id="logout-link" styleClass="command-link"
+                                              value="/processor/j_spring_security_logout">Назад</h:outputLink>
                             </div>
                         </h:panelGrid>
                     </rich:panel>

@@ -10409,17 +10409,16 @@ public class MainPage implements Serializable {
 
     public Object sendSMSagain() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest)context.getRequest();
+        HttpServletResponse response = (HttpServletResponse)context.getResponse();
         String userName = context.getRemoteUser();
         Boolean requstSMS = User.sendSmsAgain(userName);
         if (requstSMS){
             setCanSendAgain(true);
-            context.redirect(context.getRequestContextPath() + "/back-office/confirm-sms.faces");
+            response.sendRedirect(ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces"));
+        } else {
+            response.sendRedirect(ServletUtils.getHostRelativeResourceUri(request, "back-office/emp_server_not_answer.faces"));
         }
-        else {
-            context.redirect(context.getRequestContextPath() + "/back-office/emp_server_not_answer.faces");
-        }
-        setCanSendAgain(true);
-        context.redirect(context.getRequestContextPath() + "/back-office/confirm-sms.faces");
         return null;
     }
 
