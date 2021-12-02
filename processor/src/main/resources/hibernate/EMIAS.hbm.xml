@@ -8,8 +8,10 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.EMIAS" table="cf_emias">
         <id name="idOfEMIAS" column="id" type="long">
-            <generator class="sequence">
-                <param name="sequence">cf_emias_id_seq</param>
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_emias_id_seq</param>
             </generator>
         </id>
         <property name="guid" column="guid" type="string" length="128"/>
