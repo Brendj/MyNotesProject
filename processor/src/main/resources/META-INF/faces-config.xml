@@ -337,6 +337,15 @@
         </navigation-case>
     </navigation-rule>
 
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showCardCSVList</from-outcome>
+            <to-view-id>/back-office/card_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
 
     <!--<navigation-rule>
         <from-view-id>/back-office/index.xhtml</from-view-id>
