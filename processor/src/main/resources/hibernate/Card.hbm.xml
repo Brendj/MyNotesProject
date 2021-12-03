@@ -19,7 +19,7 @@
         <many-to-one name="visitor" class="ru.axetta.ecafe.processor.core.persistence.Visitor" column="IdOfVisitor"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"/>
         <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
-        <property name="longCardNo" column="longCardNo" type="long" not-null="true"/>
+        <property name="longCardNo" column="longCardNo" type="long"/>
         <property name="cardType" column="CardType" type="integer" not-null="true"/>
         <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
