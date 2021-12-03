@@ -3251,6 +3251,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             groupResult.resultCode = RC_INTERNAL_ERROR;
             groupResult.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return groupResult;
