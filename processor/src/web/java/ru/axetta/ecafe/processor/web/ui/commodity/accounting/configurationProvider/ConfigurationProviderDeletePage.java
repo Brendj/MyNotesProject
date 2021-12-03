@@ -42,7 +42,7 @@ public class ConfigurationProviderDeletePage extends BasicPage {
                 daoService.removeConfigurationProvider(configurationProvider);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Конфигурация удалена успешно", null));
             } else {
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Конфигурация имеет в себе сисок организаций", null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Конфигурация имеет в себе список организаций", null));
             }
         } catch (Exception e) {
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не возможно удалить Конфигурацию", null));
