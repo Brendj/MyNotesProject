@@ -95,8 +95,11 @@ public class ImportMigrantsFileService {
             session = RuntimeContext.getInstance().createPersistenceSession();
 
             logger.info("Clear esz migrants table");
+            transaction = session.beginTransaction();
             Query truncateQuery = session.createSQLQuery("truncate table cf_esz_migrants_requests");
             truncateQuery.executeUpdate();
+            transaction.commit();
+            transaction = null;
             logger.info("End of clearing esz migrants table");
 
             transaction = session.beginTransaction();
