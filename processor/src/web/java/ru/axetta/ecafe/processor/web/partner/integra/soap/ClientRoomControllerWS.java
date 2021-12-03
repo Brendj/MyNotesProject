@@ -3246,11 +3246,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .getPreorderComplexesWithWtMenuList(client, date, categoriesDiscount, ageGroupIds, complexSign);
 
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             groupResult.resultCode = RC_INTERNAL_ERROR;
             groupResult.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return groupResult;
@@ -5616,6 +5616,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             session.flush();
             persistenceTransaction.commit();
+            persistenceTransaction = null;
             session.close();
         } catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
@@ -6792,6 +6793,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             res.resultCode = RC_INTERNAL_ERROR;
             res.description = RC_INTERNAL_ERROR_DESC;
@@ -6864,6 +6866,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
             persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             res.resultCode = RC_INTERNAL_ERROR;
             res.description = RC_INTERNAL_ERROR_DESC;
@@ -7063,14 +7066,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 list.add(complexInfoExt);
             }
             transaction.commit();
+            transaction = null;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7230,14 +7234,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 t.add(transferSubBalance);
             }
             transaction.commit();
+            transaction = null;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7275,14 +7280,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 t.add(transferSubBalance);
             }
             transaction.commit();
+            transaction = null;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7347,11 +7353,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7378,6 +7384,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             criteria.add(Restrictions.eq("settingsId", SettingsIds.SubscriberFeeding));
             List list = criteria.list();
             transaction.commit();
+            transaction = null;
             if (list == null || list.isEmpty()) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
@@ -7412,11 +7419,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7451,6 +7458,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             transaction.commit();
+            transaction = null;
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
             SubscriptionFeeding sf = service
                     .getCurrentSubscriptionFeedingByClientToDay(session, client, currentDay, type);
@@ -7463,11 +7471,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = RC_OK_DESC;
             }
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
 
@@ -7542,6 +7550,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             transaction.commit();
+            transaction = null;
             SubscriptionFeedingService subscriptionFeedingService = SubscriptionFeedingService.getInstance();
             List<SubscriptionFeeding> subscriptionFeedings = subscriptionFeedingService
                     .findSubscriptionFeedingByClient(client, startDate, endDate);
@@ -7552,11 +7561,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
 
@@ -7599,14 +7608,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.cycleDiagramListExt.getC().add(new CycleDiagramOut(cycleDiagram));
             }
             transaction.commit();
+            transaction = null;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7640,6 +7650,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             transaction.commit();
+            transaction = null;
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
             List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client, type);
             for (CycleDiagram cycleDiagram : cycleDiagrams) {
@@ -7648,11 +7659,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7715,7 +7726,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 subscriptionFeeding.setDateActivateSubscription(dateActivateSubscription);
                 session.save(subscriptionFeeding);
                 transaction.commit();
-
+                transaction = null;
                 result.resultCode = RC_OK;
                 result.description = String.format("Подписка успешно активирована, начнет действовать после " + df
                         .format(dateActivateSubscription));
@@ -7727,11 +7738,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -7960,11 +7971,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -8061,11 +8072,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -8115,11 +8126,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -8330,11 +8341,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
