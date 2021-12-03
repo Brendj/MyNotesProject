@@ -3244,7 +3244,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             groupResult = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getPreorderComplexesWithWtMenuList(client, date, categoriesDiscount, ageGroupIds, complexSign);
-
+            transaction.commit();
+            transaction = null;
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             groupResult.resultCode = RC_INTERNAL_ERROR;
