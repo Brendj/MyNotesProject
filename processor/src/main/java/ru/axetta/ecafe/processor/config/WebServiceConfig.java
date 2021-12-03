@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.soap.POSPaymentControllerWS
 import ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWS;
 import ru.axetta.ecafe.processor.web.util.ClientRoomControllerLoggingInterceptor;
 import ru.axetta.ecafe.processor.web.util.RemoveSecurityHeaderSoapInterceptor;
+import ru.axetta.ecafe.processor.web.util.RemoveSoapActionInterceptor;
 
 /**
  * Created by nuc on 27.10.2020.
@@ -51,7 +52,9 @@ public class WebServiceConfig {
         EndpointImpl endpoint = new EndpointImpl(springBus(), clientRoomControllerWS());
         RemoveSecurityHeaderSoapInterceptor removeSecurityHeaderSoapInterceptor = new RemoveSecurityHeaderSoapInterceptor();
         ClientRoomControllerLoggingInterceptor clientRoomControllerLoggingInterceptor = new ClientRoomControllerLoggingInterceptor();
+        RemoveSoapActionInterceptor removeSoapActionInterceptor = new RemoveSoapActionInterceptor();
         endpoint.getInInterceptors().add(removeSecurityHeaderSoapInterceptor);
+        endpoint.getInInterceptors().add(removeSoapActionInterceptor);
         endpoint.getInInterceptors().add(clientRoomControllerLoggingInterceptor);
         endpoint.publish("/client");
         return endpoint;
