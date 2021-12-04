@@ -126,7 +126,7 @@
                     <h:outputText escape="true" value="#{detail.soldedQty}" styleClass="output-text" />
                     <h:outputText escape="false" value="&lt;/strong&gt;" rendered="#{detail.summaryDay}"/>
                 </rich:column>
-                <rich:column headerClass="column-header">
+                <rich:column styleClass="right-aligned-column" headerClass="column-header">
                     <h:inputText value="#{detail.shippedQty}" styleClass="output-text" rendered="#{detail.enableEditShippedQty()}">
                         <a4j:ajax event="change" />
                     </h:inputText>
@@ -142,7 +142,7 @@
                     <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
                     <h:outputText escape="false" value="&lt;/strong&gt;" rendered="#{detail.summaryDay}"/>
                 </rich:column>
-                <rich:column headerClass="column-header">
+                <rich:column styleClass="center-aligned-column" headerClass="column-header">
                     <h:graphicImage value="/images/taloons/applied.png" rendered="#{detail.isppStateConfirmed}" />
                 </rich:column>
                 <rich:column headerClass="column-header">
