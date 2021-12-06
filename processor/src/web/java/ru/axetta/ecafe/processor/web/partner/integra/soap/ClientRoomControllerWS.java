@@ -3129,11 +3129,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         for (WtComplex wtComplex : wtComplexes) {
                             // Определяем подходящий состав комплекса
                             WtComplexesItem complexItem = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class).getWtComplexItemByCycle(wtComplex, menuDate);
+                                    .getBean(PreorderDAOService.class).getWtComplexItemByCycle(wtComplex, menuDate, false);
                             List<WtDish> wtDishes;
                             if (complexItem != null) {
                                 wtDishes = DAOReadExternalsService.getInstance()
-                                        .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
+                                        .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate, false);
                             } else {
                                 // комплекс не выводим
                                 continue;
@@ -3811,11 +3811,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                 // Определяем подходящий состав комплекса
                 WtComplexesItem complexItem = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexItemByCycle(wtComplex, menuDate);
+                        .getWtComplexItemByCycle(wtComplex, menuDate, false);
                 List<WtDish> dishes;
                 if (complexItem != null) {
                     dishes = DAOReadExternalsService.getInstance()
-                            .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
+                            .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate, false);
                 } else {
                     // комплекс не выводим
                     continue;
@@ -10231,7 +10231,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getPreordersWithMenuListSinceDate(contractId, CalendarUtils.startOfDay(new Date()));
             RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getRegularPreordersList(contractId);
+                    .getRegularPreordersList(contractId, true);
             result.setRegularPreorders(regularPreordersList);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -10265,7 +10265,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
                     result.setComplexGroup(complexGroup);
                 }
-                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId);
+                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId, false);
                 if (regularPreordersList.getRegularPreorders() != null
                         && regularPreordersList.getRegularPreorders().size() > 0) {
                     result.setRegularPreorders(regularPreordersList);
