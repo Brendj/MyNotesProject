@@ -34,11 +34,11 @@ public class CryptoSign {
     public static final String ALGORITHM = "SHA1withECDSA";
     public static final String KEY_FACTOR = "ECDSA";
     public static final Integer SIZE_DATE = 12;
+    private static Object sync = new Object();
+    private static boolean bc_loaded = false;
 
     public static KeyPair keyPairGen() throws Exception {
-        if (!providerBCLoaded()) {
-            Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        }
+        loadProviderBC();
         ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(BP160R1);
         KeyPairGenerator g = KeyPairGenerator.getInstance(KEY_FACTOR, BC_PROV);
         g.initialize(ecSpec, new SecureRandom());
@@ -46,9 +46,17 @@ public class CryptoSign {
         return pair;
     }
 
-    private static boolean providerBCLoaded() {
-        List<Provider> providers = Arrays.asList(Security.getProviders());
-        return (providers.stream().filter(prov -> prov.getName().equals(BC_PROV))).collect(Collectors.toList()).size() > 0;
+    private static void loadProviderBC() {
+        synchronized (sync) {
+            if (bc_loaded) return;
+
+            List<Provider> providers = Arrays.asList(Security.getProviders());
+            boolean loaded = (providers.stream().filter(prov -> prov.getName().equals(BC_PROV))).collect(Collectors.toList()).size() > 0;
+            if (!loaded) {
+                Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+            }
+            bc_loaded = true;
+        }
     }
 
     public static byte[] sign(byte[] data, PrivateKey priv) throws Exception {
@@ -246,6 +254,7 @@ public class CryptoSign {
     }
 
     public static PublicKey loadPubKey(byte[] data) throws Exception {
+        loadProviderBC();
         List<String> arrayKey = Arrays.asList(StringUtils.split(new String(data), '\n'));
         String rezult = "";
         for (int i = 1; i < arrayKey.size() - 1; i++) {
@@ -259,6 +268,7 @@ public class CryptoSign {
     }
 
     public static PrivateKey loadPrivKey(byte[] data) throws Exception {
+        loadProviderBC();
         KeySpec ks = new PKCS8EncodedKeySpec(data);
         KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
         PrivateKey res = key_f.generatePrivate(ks);
