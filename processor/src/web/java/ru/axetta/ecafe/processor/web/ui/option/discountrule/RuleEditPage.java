@@ -510,6 +510,8 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     public void onShow() throws Exception {
         RuntimeContext.getAppContext().getBean(getClass()).reload();
     }
+
+    @Transactional
     public void reload() throws Exception {
         DiscountRule discountRule = em.merge(entity);
 
