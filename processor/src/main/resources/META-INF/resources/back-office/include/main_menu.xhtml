@@ -391,10 +391,10 @@
                 <!--@elvariable id="supportSMSPage" type="ru.axetta.ecafe.processor.web.ui.service.SupportSMSPage"-->
                 <rich:panelMenuItem id="supportSMSMenuItem" binding="#{supportSMSPage.mainMenuComponent}" label="Отправка SMS"
                                     action="#{supportSMSPage.show}" render="workspaceForm"
-                                    rendered="#{mainPage.eligibleToServiceSupport &amp;&amp; !mainPage.SMSServiceEMP}" />
+                                    rendered="#{mainPage.eligibleToServiceSupport and !mainPage.SMSServiceEMP}" />
                 <rich:panelMenuItem id="supportInfoMailingMenuItem" binding="#{mainPage.supportInfoMailingPage.mainMenuComponent}"
                                     label="Информационная рассылка (ручной ввод)" action="#{mainPage.showSupportInfoMailingPage}" render="workspaceForm"
-                                    rendered="#{mainPage.eligibleToServiceSupport &amp;&amp; mainPage.infospamEnabled}" />
+                                    rendered="#{mainPage.eligibleToServiceSupport and mainPage.infospamEnabled}" />
 
                 <rich:panelMenuItem id="repositoryReportsRenameMenuItem" binding="#{repositoryReportsRenamePage.mainMenuComponent}"
                                     label="Переименование отчетов репозитория" action="#{repositoryReportsRenamePage.show}" render="workspaceForm" />
