@@ -3129,11 +3129,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         for (WtComplex wtComplex : wtComplexes) {
                             // Определяем подходящий состав комплекса
                             WtComplexesItem complexItem = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class).getWtComplexItemByCycle(wtComplex, menuDate, false);
+                                    .getBean(PreorderDAOService.class).getWtComplexItemByCycle(wtComplex, menuDate);
                             List<WtDish> wtDishes;
                             if (complexItem != null) {
                                 wtDishes = DAOReadExternalsService.getInstance()
-                                        .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate, false);
+                                        .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
                             } else {
                                 // комплекс не выводим
                                 continue;
@@ -3811,11 +3811,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                 // Определяем подходящий состав комплекса
                 WtComplexesItem complexItem = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexItemByCycle(wtComplex, menuDate, false);
+                        .getWtComplexItemByCycle(wtComplex, menuDate);
                 List<WtDish> dishes;
                 if (complexItem != null) {
                     dishes = DAOReadExternalsService.getInstance()
-                            .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate, false);
+                            .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
                 } else {
                     // комплекс не выводим
                     continue;

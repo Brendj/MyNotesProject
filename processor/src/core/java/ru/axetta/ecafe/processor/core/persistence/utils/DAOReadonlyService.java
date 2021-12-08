@@ -1226,13 +1226,8 @@ public class DAOReadonlyService {
         }
     }
 
-    public List<WtComplexExcludeDays> getExcludeDaysByWtComplex(WtComplex wtComplex, boolean usedforDeleted) {
-        Query query;
-        if (usedforDeleted)
-            query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
-                + "WHERE excludeDays.complex = :complex ");
-        else
-            query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
+    public List<WtComplexExcludeDays> getExcludeDaysByWtComplex(WtComplex wtComplex) {
+        Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
                     + "WHERE excludeDays.complex = :complex "
                     + "AND excludeDays.deleteState = 0");
         query.setParameter("complex", wtComplex);
