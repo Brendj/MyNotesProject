@@ -434,8 +434,11 @@ public class PreorderDAOService {
                     }
                     List<PreorderMenuItemExt> menuItemExtList;
                     if (preordersArm.contains(wtComplex.getIdOfComplex())) //Если это удаленный предзаказ
+                    {
                         menuItemExtList = getWtMenuItemsExt(wtComplex, client, org, startDate,
-                            endDate, true);
+                                endDate, true);
+                        complexItemExt.setDeleted(true);
+                    }
                     else
                         menuItemExtList = getWtMenuItemsExt(wtComplex, client, org, startDate,
                                 endDate, false);
@@ -803,6 +806,8 @@ public class PreorderDAOService {
                 menuItemExt.setAmount(isComposite ? getAmountForPreorderMenuDetail(wtDish, amounts) : 0);
                 menuItemExt.setIsRegular(isComposite && getRegularSignForPreorderMenuDetail(wtDish, regularSigns));
                 menuItemExt.setAvailableForRegular(dishesRepeatable.contains(wtDish.getIdOfDish()));
+                if (usedforDeleted)
+                    menuItemExt.setDeleted(true);
                 menuItemExtList.add(menuItemExt);
             }
         }
