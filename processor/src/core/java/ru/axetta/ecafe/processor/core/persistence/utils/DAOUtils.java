@@ -5675,7 +5675,7 @@ public class DAOUtils {
             criteria.add(Restrictions.eq("org", org));
             return (List<ESP>) criteria.list();
         } catch (NoResultException e){
-            return null;
+            return new ArrayList<>();
         }
     }
 
