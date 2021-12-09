@@ -10265,7 +10265,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
                     result.setComplexGroup(complexGroup);
                 }
-                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId, false);
+                RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId, true);
                 if (regularPreordersList.getRegularPreorders() != null
                         && regularPreordersList.getRegularPreorders().size() > 0) {
                     result.setRegularPreorders(regularPreordersList);
