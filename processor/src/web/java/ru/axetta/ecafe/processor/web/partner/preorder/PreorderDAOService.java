@@ -890,7 +890,7 @@ public class PreorderDAOService {
             menuItemExt.setIdOfMenuDetail(preorderMenuDetail.getIdOfDish());
             menuItemExt.setAmount(isComposite ? preorderMenuDetail.getAmount() : 0);
             menuItemExt.setIsRegular(isComposite && getRegularSignByPreorderMenuDetail(preorderMenuDetail, regularSigns));
-            //menuItemExt.setAvailableForRegular(dishesRepeatable.contains(wtDish.getIdOfDish()));
+            menuItemExt.setAvailableForRegular(false);
             menuItemExt.setDeleted(true);
             menuItemExtList.add(menuItemExt);
         }
@@ -913,7 +913,7 @@ public class PreorderDAOService {
             menuItemExt.setFullName(preorderMenuDetail.getMenuDetailName());
             menuItemExt.setPrice(isComposite ? preorderMenuDetail.getUsedSum() : 0L);
             menuItemExt.setCalories(preorderMenuDetail.getCalories() == null ? (double) 0 : preorderMenuDetail.getCalories());
-            //menuItemExt.setOutput(preorderMenuDetail.getQty() == null ? "" : wtDish.getQty());
+            menuItemExt.setOutput(preorderMenuDetail.getAmount() == null ? "" : preorderMenuDetail.getAmount().toString());
             menuItemExt.setAvailableNow(0);
             menuItemExt.setCarbohydrates(preorderMenuDetail.getCarbohydrates() == null ? (double) 0 : preorderMenuDetail.getCarbohydrates());
             menuItemExt.setFat(preorderMenuDetail.getFat() == null ? (double) 0 : preorderMenuDetail.getFat());
@@ -921,7 +921,7 @@ public class PreorderDAOService {
             menuItemExt.setIdOfMenuDetail(preorderMenuDetail.getIdOfDish());
             menuItemExt.setAmount(isComposite ? preorderMenuDetail.getAmount() : 0);
             menuItemExt.setIsRegular(isComposite && getRegularSignByPreorderMenuDetail(preorderMenuDetail, regularSigns));
-            //menuItemExt.setAvailableForRegular(dishesRepeatable.contains(wtDish.getIdOfDish()));
+            menuItemExt.setAvailableForRegular(false);
             menuItemExt.setDeleted(true);
             menuItemExtList.add(menuItemExt);
 
