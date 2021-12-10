@@ -802,10 +802,10 @@ public class PreorderDAOService {
 
     private Map<Long, Long> getIdOfRegularForPreorderMenuDetail(Client client, Date startDate, Date endDate,
                                                                 PreorderComplex preorderComplex) {
-        Query query = emReport.createQuery("SELECT pmd.idofpreordermenudetail, pmd.regularPreorder.idOfRegularPreorder FROM PreorderMenuDetail pmd "
+        Query query = emReport.createQuery("SELECT pmd.idOfPreorderMenuDetail, pmd.regularPreorder.idOfRegularPreorder FROM PreorderMenuDetail pmd "
                 + "JOIN pmd.preorderComplex complex "
                 + "WHERE pmd.client = :client AND pmd.preorderDate between :startDate and :endDate "
-                + "AND pmd.deletedState = false AND complex.idofpreordercomplex = :idOfComplex");
+                + "AND pmd.deletedState = false AND complex.idOfPreorderComplex = :idOfComplex");
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
