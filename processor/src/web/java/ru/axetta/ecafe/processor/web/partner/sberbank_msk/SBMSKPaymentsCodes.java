@@ -24,6 +24,7 @@ public enum SBMSKPaymentsCodes {
     TOO_LARGE_AMOUNT_ERROR(11,	"Сумма слишком велика"),
     INVALID_DATE_VALUE_ERROR(12, "Неверное значение даты"),
     INVALID_MOBILE_ERROR(13, "Неверный номер телефона"),
+    NOT_FOUND_INN(14, "Отсутствует ИНН"),
     INTERNAL_ERROR(300, "Внутренняя ошибка Организации");
 
     private Integer code;

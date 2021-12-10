@@ -131,9 +131,15 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
                 }
 
             } catch (Exception e) {
-                logger.error("Failed to process request", e);
-                logger.error("Request string: " + requestParser.getQueryString(httpRequest));
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INTERNAL_ERROR);
+                SBMSKPaymentsCodes code;
+                if (e instanceof InvalidINNException)
+                    code = SBMSKPaymentsCodes.NOT_FOUND_INN;
+                else {
+                    code = SBMSKPaymentsCodes.INTERNAL_ERROR;
+                    logger.error("Failed to process request", e);
+                    logger.error("Request string: " + requestParser.getQueryString(httpRequest));
+                }
+                requestParser.serializeResponseIfException(httpResponse, code);
                 httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                 return;
             }
