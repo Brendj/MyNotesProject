@@ -57,14 +57,14 @@
             <h:outputText escape="true" value="Статус карты" styleClass="output-text"/>
             <h:panelGroup>
                 <h:selectOneMenu value="#{mainPage.cardEditPage.state}"
-                                 rendered="#{!mainPage.cardEditPage.tempCard}"
+                                 rendered="#{mainPage.cardEditPage.state != 4}"
                                  styleClass="input-text">
                     <f:selectItems value="#{mainPage.cardEditPage.cardStateMenu.items}"/>
                 </h:selectOneMenu>
                 <a4j:commandButton value="Возврат карты"
                                    render="mainMenu, workspaceForm"
                                    action="#{mainPage.cardEditPage.returnCard(request.remoteUser)}"
-                                   rendered="#{mainPage.cardEditPage.tempCard}"/>
+                                   rendered="#{mainPage.cardEditPage.state == 4}"/>
             </h:panelGroup>
             <h:outputText escape="true" value="Причина блокировки карты" styleClass="output-text"/>
             <h:selectOneMenu value="#{mainPage.cardEditPage.lockReasonState}" styleClass="input-text">
