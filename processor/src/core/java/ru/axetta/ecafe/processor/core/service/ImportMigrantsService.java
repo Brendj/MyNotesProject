@@ -260,12 +260,12 @@ public class ImportMigrantsService {
                     transaction.rollback();
                     logger.error("Error in loadMigrants cycle", e);
                 }
+
+                cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
                 if (transaction.isActive()) {
                     transaction.commit();
                 }
                 transaction = null;
-
-                cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
             }
 
             logger.info(String.format("End fill migrants table. Time taken %s ms", System.currentTimeMillis() - begin));
