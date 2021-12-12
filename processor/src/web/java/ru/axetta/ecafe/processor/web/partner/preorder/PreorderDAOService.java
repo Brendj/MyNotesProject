@@ -463,6 +463,12 @@ public class PreorderDAOService {
 
                 Integer idOfComplex = preorderComplex.getArmComplexId();
                 String complexName = preorderComplex.getComplexName();
+                if (complexName.toLowerCase().contains("завтрак"))
+                    complexName = "Завтрак";
+                else if (complexName.toLowerCase().contains("обед"))
+                    complexName = "Обед";
+                else if (complexName.toLowerCase().contains("ужин"))
+                complexName = "Ужин";
                 // Режим добавления блюд: если комплекс составной - режим составного комплекса,
                 // если нет - режим фиксированной цены
                 Integer complexType = preorderComplex.getModeOfAdd();
