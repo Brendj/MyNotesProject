@@ -1303,7 +1303,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 } catch (Exception e) {
                     logger.error("Error ClientRegistryChange: ", e);
                     setChangeError(change.getIdOfRegistryChange(), e);
-                    result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), e.getMessage()));
+                    result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), getErrorMessage(e)));
                 } finally {
                     HibernateUtils.rollback(transaction, logger);
                     HibernateUtils.close(session, logger);
@@ -1314,6 +1314,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private String getErrorMessage(Throwable error){
+        return (error.getCause() == null ? error.getMessage() : (getErrorMessage(error.getCause())));
     }
 
     protected List<RegistryChange> getRegistryChangeList(Session session, List<Long> changesList) {
