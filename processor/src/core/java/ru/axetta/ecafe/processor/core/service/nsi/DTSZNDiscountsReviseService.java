@@ -444,7 +444,7 @@ public class DTSZNDiscountsReviseService {
             CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
                     .getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
 
-            if (null != categoryDiscountDSZN) {
+            if (null != categoryDiscountDSZN && null != categoryDiscountDSZN.getCategoryDiscount()) {
                 if (!discountCodes.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
                     discountCodes.add(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount());
                 }
@@ -471,17 +471,22 @@ public class DTSZNDiscountsReviseService {
         runTaskPart2(null, null);
     }
 
-    private void runOneClient(Session session, Transaction transaction, Long idOfClient, Long otherDiscountCode)
+    private void runOneClient(Session session, Long idOfClient, Long otherDiscountCode)
             throws Exception {
-        transaction = session.beginTransaction();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
 
-        Client client = (Client) session.load(Client.class, idOfClient);
-        List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
-        if (!clientInfoList.isEmpty()) {
-            processDiscounts(session, client, clientInfoList, otherDiscountCode);
+            Client client = (Client) session.load(Client.class, idOfClient);
+            List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+            if (!clientInfoList.isEmpty()) {
+                processDiscounts(session, client, clientInfoList, otherDiscountCode);
+            }
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
         }
-        transaction.commit();
-        transaction = null;
     }
 
     public void runTaskPart2(Date startDate, String guid) throws Exception {
@@ -508,7 +513,7 @@ public class DTSZNDiscountsReviseService {
             for (Long idOfClient : clientList) {
                 try {
                     currentProcessing.add(idOfClient);
-                    runOneClient(session, transaction, idOfClient, otherDiscountCode);
+                    runOneClient(session, idOfClient, otherDiscountCode);
                     if (0 == clientCounter % maxRecords) {
                         session.clear();
                         currentProcessing.clear();
@@ -520,14 +525,12 @@ public class DTSZNDiscountsReviseService {
                     session.clear();
                 } catch (Exception e) {
                     logger.error(String.format("Error in update discounts for client %s", idOfClient), e);
-                } finally {
-                    HibernateUtils.rollback(transaction, logger);
                 }
             }
 
             if (finalDopProcessing.size() > 0) {
                 for (Long idOfClient : finalDopProcessing) {
-                    runOneClient(session, transaction, idOfClient, otherDiscountCode);
+                    runOneClient(session, idOfClient, otherDiscountCode);
                 }
                 session.clear();
             }
