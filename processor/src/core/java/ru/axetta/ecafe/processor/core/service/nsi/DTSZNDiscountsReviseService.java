@@ -473,9 +473,7 @@ public class DTSZNDiscountsReviseService {
 
     private void runOneClient(Session session, Transaction transaction, Long idOfClient, Long otherDiscountCode)
             throws Exception {
-        if (null == transaction || !transaction.isActive()) {
-            transaction = session.beginTransaction();
-        }
+        transaction = session.beginTransaction();
 
         Client client = (Client) session.load(Client.class, idOfClient);
         List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
@@ -483,6 +481,7 @@ public class DTSZNDiscountsReviseService {
             processDiscounts(session, client, clientInfoList, otherDiscountCode);
         }
         transaction.commit();
+        transaction = null;
     }
 
     public void runTaskPart2(Date startDate, String guid) throws Exception {
@@ -500,7 +499,8 @@ public class DTSZNDiscountsReviseService {
             } else {
                 clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate, guid);
             }
-
+            transaction.commit();
+            transaction = null;
             Integer clientCounter = 1;
 
             List<Long> finalDopProcessing = new LinkedList<>();
@@ -510,11 +510,9 @@ public class DTSZNDiscountsReviseService {
                     currentProcessing.add(idOfClient);
                     runOneClient(session, transaction, idOfClient, otherDiscountCode);
                     if (0 == clientCounter % maxRecords) {
-                        session.flush();
                         session.clear();
                         currentProcessing.clear();
                     }
-                    transaction = null;
                     logger.info(String.format("Updating discounts for clients: client %d/%d", clientCounter++,
                             clientList.size()));
                 } catch (StaleObjectStateException e) {
@@ -527,18 +525,13 @@ public class DTSZNDiscountsReviseService {
                 }
             }
 
-            transaction = session.beginTransaction();
             if (finalDopProcessing.size() > 0) {
                 for (Long idOfClient : finalDopProcessing) {
                     runOneClient(session, transaction, idOfClient, otherDiscountCode);
                 }
-                session.flush();
                 session.clear();
             }
-            transaction.commit();
-            transaction = null;
 
-            session.close();
         } catch (Exception e) {
             logger.error("Error in update discounts", e);
             throw e;
