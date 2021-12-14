@@ -81,9 +81,6 @@
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
                                     #{rich:component('modalClientListSelectorPanel')}.show();" styleClass="command-link"
                                    style="width: 25px;" id="clientFilterButton">
-                    <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
-                    <f:setPropertyActionListener value="#{mainPage.detailedEnterEventReportPage.getStringClientList}"
-                                                 target="#{mainPage.clientSelectListPage.clientFilter}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
                               value=" {#{mainPage.detailedEnterEventReportPage.filterClient}}" />
