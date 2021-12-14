@@ -56,6 +56,8 @@ public class PreorderMenuItemExt {
     private Boolean availableForRegular;
     @XmlAttribute(name = "creatorRole")
     private Integer creatorRole;
+    @XmlAttribute(name = "deleted")
+    private Boolean deleted;
 
     public PreorderMenuItemExt() {
 
@@ -252,5 +254,13 @@ public class PreorderMenuItemExt {
 
     public void setCreatorRole(Integer creatorRole) {
         this.creatorRole = creatorRole;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

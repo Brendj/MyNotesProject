@@ -363,7 +363,7 @@ public class DAOReadExternalsService {
         Set<Long> result = new HashSet<>();
         if (!wtComplex.getComposite()) return result;
         Query query = entityManager.createNativeQuery("select t.idofdish from cf_wt_complexes_dishes_repeatable t "
-                + "where t.idofcomplex = :idOfComplex and t.deletestate = 0");
+                    + "where t.idofcomplex = :idOfComplex and t.deletestate = 0");
         query.setParameter("idOfComplex", wtComplex.getIdOfComplex());
         List list = query.getResultList();
         for (Object entry : list) {
@@ -374,13 +374,14 @@ public class DAOReadExternalsService {
     }
 
     public List<WtDish> getWtDishesByComplexItemAndDates(WtComplexesItem complexItem, Date startDate, Date endDate) {
-        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish join dish.complexItems complex "
+        String sql = "SELECT DISTINCT dish FROM WtDish dish join dish.complexItems complex "
                 + "WHERE complex = :complexItem "
-                + "AND dish.deleteState = 0 "
                 + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
-                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))";
+        sql += " AND dish.deleteState = 0";
+        Query query = entityManager.createQuery(sql);
         query.setParameter("complexItem", complexItem);
         query.setParameter("startDate", startDate, TemporalType.DATE);
         query.setParameter("endDate", endDate, TemporalType.DATE);

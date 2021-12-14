@@ -38,6 +38,8 @@ public class PreorderComplexItemExt implements Comparable {
     private Boolean isRegular;
     @XmlAttribute(name = "creatorRole")
     private Integer creatorRole;
+    @XmlAttribute(name = "deleted")
+    private Boolean deleted;
     @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
 
@@ -212,5 +214,13 @@ public class PreorderComplexItemExt implements Comparable {
 
     public void setCreatorRole(Integer creatorRole) {
         this.creatorRole = creatorRole;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }
