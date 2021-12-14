@@ -8,9 +8,25 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
+    <script type="text/javascript">
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:messageConfigurePanelGridRender');
+        element.click();
+        element.hidden = true;
+    </script>
+
+    <a4j:commandLink id="messageConfigurePanelGridRender" value=""
+                     render="messageConfigurePanelGrid"/>
+
+    <h:panelGrid rendered="#{!mainPage.isEligibleToEditUsers() &amp;&amp; !mainPage.isAdmin()}">
+        <h:outputText escape="true" styleClass="output-text"
+                      value="Недостаточно прав для просмотра страницы">
+        </h:outputText>
+    </h:panelGrid>
+
     <h:panelGrid>
-        <h:panelGrid id="messageConfigurePanelGrid" styleClass="borderless-grid">
-            <rich:tabPanel>
+        <h:panelGrid id="messageConfigurePanelGrid" styleClass="borderless-grid"
+                     rendered="#{mainPage.isEligibleToEditUsers() &amp;&amp; mainPage.isAdmin()}">
+            <rich:tabPanel id="workspaceTogglePanel">
                 <rich:tab header="SMS уведомления о пополнении баланса" id="balance-SMS">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:outputText escape="true" value="Текст:" styleClass="output-text"/>
@@ -310,10 +326,10 @@
 
             <h:panelGroup style="margin-top: 10px">
                 <a4j:commandButton value="Сохранить" action="#{messageConfigurePage.save}"
-                                   render="workspaceTogglePanel, messageConfigurePanelGrid"
+                                   render="workspaceTogglePanel"
                                    styleClass="command-button"/>
                 <a4j:commandButton value="Отмена" action="#{messageConfigurePage.cancel}"
-                                   render="workspaceTogglePanel, messageConfigurePanelGrid"
+                                   render="workspaceTogglePanel"
                                    styleClass="command-button"/>
             </h:panelGroup>
             <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
