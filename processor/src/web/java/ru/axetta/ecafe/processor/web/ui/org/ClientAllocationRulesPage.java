@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -164,7 +165,17 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         List<ClientGroupsByRegExAndOrgItem> idOfClientGroupsList = ClientManager.findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
         List<Client> friendlyClients = ClientManager.findClientsByInOrgAndInGroups(session, idOfClientGroupsList);
         clients.addAll(friendlyClients);
-        ClientManager.updateClientVersionTransactional(session, clients);
+
+        Collection<Client> temp = new ArrayList<>();
+        for (Client client: clients) {
+            temp.add(client);
+            if (temp.size() == 1000) {
+                ClientManager.updateClientVersionTransactional(session, temp);
+                temp.clear();
+            }
+        }
+        if (temp.size() > 0)
+            ClientManager.updateClientVersionTransactional(session, temp);
     }
 
     @Override

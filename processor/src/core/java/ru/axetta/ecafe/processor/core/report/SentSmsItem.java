@@ -5,7 +5,8 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,45 +16,18 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class SentSmsItem implements Serializable {
-    private Long uniqueId;
-    private Long columnId;
     private String orgName;
-    private String date;
     private Long ts;
-    private String value;
+    private List<SentSmsValue> value;
 
-    public SentSmsItem(Long uniqueId, String orgName, String date, Long ts, String value) {
-        this.uniqueId = uniqueId;
-        this.columnId = null;
+    public SentSmsItem(String orgName) {
         this.orgName = orgName;
-        this.date = date;
+    }
+
+    public SentSmsItem(String orgName, Long ts, List<SentSmsValue> value) {
+        this.orgName = orgName;
         this.ts = ts;
         this.value = value;
-    }
-
-    public SentSmsItem(Long uniqueId, Long columnId, String orgName, String date, Long ts, String value) {
-        this.uniqueId = uniqueId;
-        this.columnId = columnId;
-        this.orgName = orgName;
-        this.date = date;
-        this.ts = ts;
-        this.value = value;
-    }
-
-    public Long getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(Long uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
-    public Long getColumnId() {
-        return columnId;
-    }
-
-    public void setColumnId(Long columnId) {
-        this.columnId = columnId;
     }
 
     public String getOrgName() {
@@ -64,14 +38,6 @@ public class SentSmsItem implements Serializable {
         this.orgName = orgName;
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
     public Long getTs() {
         return ts;
     }
@@ -80,11 +46,24 @@ public class SentSmsItem implements Serializable {
         this.ts = ts;
     }
 
-    public String getValue() {
+    public List<SentSmsValue> getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(List<SentSmsValue> value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SentSmsItem that = (SentSmsItem) o;
+        return Objects.equals(orgName, that.orgName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(orgName);
     }
 }

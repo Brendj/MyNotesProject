@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BasicBasketReport" pageWidth="900" pageHeight="842" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="18130f6b-d62b-45e2-8686-2b29dfa44354">
-	<property name="ireport.zoom" value="0.75"/>
+	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center" fontSize="10" isItalic="false">
@@ -32,7 +32,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch">
+		<band height="58" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="860" height="38" uuid="46b274c8-1ee2-4508-88e3-ab1156ffc58c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -49,9 +49,6 @@
 			</textField>
 		</band>
 	</title>
-	<detail>
-		<band height="18" splitType="Stretch"/>
-	</detail>
 	<summary>
 		<band height="153" splitType="Stretch">
 			<crosstab isRepeatColumnHeaders="false" isRepeatRowHeaders="false" ignoreWidth="true">
@@ -200,7 +197,7 @@
 				<measure name="nameOfConfigurationProviderMeasure" class="java.lang.String" calculation="First">
 					<measureExpression><![CDATA[$F{nameOfConfigurationProvider}]]></measureExpression>
 				</measure>
-				<crosstabCell width="322" height="151">
+				<crosstabCell width="322" height="63">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>

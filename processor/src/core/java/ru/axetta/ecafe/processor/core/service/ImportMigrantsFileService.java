@@ -63,6 +63,7 @@ public class ImportMigrantsFileService {
     }
 
     public void loadMigrantsFile() throws Exception {
+        logger.info("Start loadMigrantsFile");
         FileInputStream fileInputStream = null;
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
@@ -81,11 +82,14 @@ public class ImportMigrantsFileService {
 
             fillTable(bufferedReader);
 
+        } catch (Exception e) {
+          logger.error("Error in loadMigrantsFile: ", e);
         } finally {
             IOUtils.closeQuietly(bufferedReader);
             IOUtils.closeQuietly(inputStreamReader);
             IOUtils.closeQuietly(fileInputStream);
         }
+        logger.info("End loadMigrantsFile");
     }
 
     public void fillTable(BufferedReader bufferedReader) throws Exception {
@@ -93,13 +97,13 @@ public class ImportMigrantsFileService {
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
 
             logger.info("Clear esz migrants table");
             Query truncateQuery = session.createSQLQuery("truncate table cf_esz_migrants_requests");
             truncateQuery.executeUpdate();
             logger.info("End of clearing esz migrants table");
 
-            transaction = session.beginTransaction();
             StringBuilder sqlQueryBuilder = new StringBuilder(INITIAL_SQL);
 
             String line;                // считанная строка
@@ -149,6 +153,8 @@ public class ImportMigrantsFileService {
             transaction = null;
 
             logger.info(String.format("End fill esz migrants table. Time taken %s ms, processed %s lines, error lines: %s", System.currentTimeMillis() - begin, processed, errors));
+        } catch (Exception e) {
+            logger.error("Error in loadMigrantsFile.fillTable: ", e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

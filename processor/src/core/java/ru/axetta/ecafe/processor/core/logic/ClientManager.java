@@ -1542,21 +1542,21 @@ public class ClientManager {
     public static void updateClientVersion(Session session, Collection<Client> clients) throws Exception {
         List<Long> temp = new ArrayList<Long>();
         int counter = 0;
-        Query q = session.createSQLQuery("UPDATE cf_clients SET clientregistryversion = :version where idofclient in (:clientsList)");
         for (Client client : clients) {
             temp.add(client.getIdOfClient());
             counter++;
             if (counter % 10 == 0) {
-                updateClientVersionByList(session, q, temp);
+                updateClientVersionByList(session, temp);
                 temp.clear();
             }
         }
         if (temp.size() > 0) {
-            updateClientVersionByList(session, q, temp);
+            updateClientVersionByList(session, temp);
         }
     }
 
-    private static void updateClientVersionByList(Session session, Query query, List clientsList) throws Exception {
+    private static void updateClientVersionByList(Session session, List clientsList) throws Exception {
+        Query query = session.createSQLQuery("UPDATE cf_clients SET clientregistryversion = :version where idofclient in (:clientsList)");
         Long version = DAOUtils.updateClientRegistryVersion(session);
         query.setParameterList("clientsList", clientsList);
         query.setParameter("version", version);

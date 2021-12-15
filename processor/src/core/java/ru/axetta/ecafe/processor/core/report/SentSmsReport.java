@@ -26,6 +26,7 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,17 +37,17 @@ import java.util.*;
  */
 public class SentSmsReport extends BasicReportForAllOrgJob {
     /*
-    * Параметры отчета для добавления в правила и шаблоны
-    *
-    * При создании любого отчета необходимо добавить параметры:
-    * REPORT_NAME - название отчета на русском
-    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
-    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
-    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
-    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
-    *
-    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
-    */
+     * Параметры отчета для добавления в правила и шаблоны
+     *
+     * При создании любого отчета необходимо добавить параметры:
+     * REPORT_NAME - название отчета на русском
+     * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+     * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+     * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+     * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+     *
+     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+     */
     public static final String REPORT_NAME = "Статистика отправки сообщений информирования";
     public static final String[] TEMPLATE_FILE_NAMES = {"SentSmsReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
@@ -144,7 +145,6 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
         }
 
         public List<SentSmsItem> findSentSms(Session session, Date start, Date end) {
-            List<SentSmsItem> result = new ArrayList<SentSmsItem>();
             String orgRestrict = "";
             String orgIds = "";
             if (idOfOrgList.size() > 0) {
@@ -156,7 +156,7 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
                 orgRestrict = orgRestrict + orgIds + ")";
             }
             String sql = "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
-                    + "     EXTRACT(EPOCH FROM sms_data.d) * 1000, count(sms) " + "from ("
+                    + "     EXTRACT(EPOCH FROM sms_data.d) * 1000 + 3600000, count(sms) " + "from ("
                     + "select IdOfSms as sms, date_trunc('day', to_timestamp(servicesenddate/1000)) as d, cf_orgs.shortname as org "
                     + "from CF_ClientSms " + "join cf_clients on CF_ClientSms.IdOfClient=cf_clients.idofclient "
                     + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg " + "where servicesenddate >= :startDate and "
@@ -173,45 +173,45 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
 
             Date target = new Date();
             Calendar cal = new GregorianCalendar();
-            String prevOrg = "";
-            long uniqueId = 0;
-            Set<Long> dates = new TreeSet<Long>();
+
+            List<String> orgList = new ArrayList<>();
+            List<Long> dateList = new ArrayList<>();
 
             for (Object entry : res) {
-                Object e[] = (Object[]) entry;
-                String org = (String) e[0];
-                String orgName = (String) e[0];
-                long date = ((Double) e[2]).longValue();
-                int value = ((BigInteger) e[3]).intValue();
-
-                if (!dates.contains(date)) {
-                    dates.add(date);
-                }
-                cal.setTimeInMillis(date);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                target.setTime(cal.getTimeInMillis());
-
-                if (!prevOrg.equals(org)) {
-                    uniqueId++;
-                    prevOrg = org;
-                }
-
-                result.add(new SentSmsItem(uniqueId, orgName, YEAR_DATE_FORMAT.format(target), target.getTime(),
-                        "" + value));
+                Object[] e = (Object[]) entry;
+                orgList.add((String) e[0]);
+                dateList.add(((Double) e[2]).longValue());
             }
+            dateList.sort(null);
+            List<SentSmsItem> itemList = orgList.stream().map(SentSmsItem::new).distinct().collect(Collectors.toList());
 
-            long columnId = 0;
-            for (Long d : dates) {
-                columnId++;
-                for (SentSmsItem i : result) {
-                    if (i.getTs().equals(d)) {
-                        i.setColumnId(columnId);
+            itemList.forEach(o -> {
+                List<SentSmsValue> valueList = new ArrayList<>();
+                dateList.forEach(dates -> {
+                    boolean checkAddDate = false;
+                    cal.setTimeInMillis(dates);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
+                    target.setTime(cal.getTimeInMillis());
+
+                    for (Object entry : res) {
+                        Object e[] = (Object[]) entry;
+                        String orgName = (String) e[0];
+                        long date = ((Double) e[2]).longValue();
+                        if (orgName.equals(o.getOrgName()) && dates.equals(date)) {
+                            int value = ((BigInteger) e[3]).intValue();
+                            valueList.add(new SentSmsValue(YEAR_DATE_FORMAT.format(target), String.valueOf(value)));
+                            checkAddDate = true;
+                        }
                     }
-                }
-            }
+                    if(!checkAddDate)
+                        valueList.add(new SentSmsValue(YEAR_DATE_FORMAT.format(target), ""));
+                });
+                o.setValue(valueList);
+            });
+
             /*Date d = new Date(1391544000000L);
             result.add(new SentSmsItem(1L, 1L, "1234", YEAR_DATE_FORMAT.format(d), "100"));
             result.add(new SentSmsItem(2L, 1L, "5678", YEAR_DATE_FORMAT.format(d), "200"));
@@ -230,7 +230,7 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
 
             /*d = new Date(1391889600000L);
             result.add(new SentSmsItem(3L, 5L, "1111", YEAR_DATE_FORMAT.format(d), "99"));*/
-            return result;
+            return itemList;
         }
     }
 
@@ -239,13 +239,13 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
 
 
     public SentSmsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime,
-            List<SentSmsItem> items) {
+                         List<SentSmsItem> items) {
         super(generateTime, generateDuration, print, startTime, endTime);
         this.items = items;
     }
 
     public SentSmsReport(Date generateTime, long generateDuration, Date startTime, Date endTime,
-            List<SentSmsItem> items) {
+                         List<SentSmsItem> items) {
         this.items = items;
     }
 

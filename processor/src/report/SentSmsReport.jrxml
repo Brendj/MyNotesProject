@@ -8,7 +8,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.3310000000000015"/>
+	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
@@ -86,25 +86,18 @@
 		</box>
 	</style>
 	<style name="region" mode="Opaque" forecolor="#000000" backcolor="#99CCFF" hAlign="Center" vAlign="Middle" fontSize="10" isBold="true"/>
-	<subDataset name="Table Dataset 1" uuid="f9c27042-f9d0-4f15-83cb-2bcd8d0d457f"/>
-	<subDataset name="Table Dataset 2" uuid="2adc723e-b208-4505-8596-b618c3c6293e"/>
-	<subDataset name="Table Dataset 3" uuid="9862e719-4c1b-456d-83e2-a629b6d8d74b"/>
-	<subDataset name="Table Dataset 4" uuid="73697646-e656-41e3-89d5-9d40680c1422"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
-	<field name="uniqueId" class="java.lang.Long"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Home\\JBosser\\processor\\templates\\"]]></defaultValueExpression>
+	</parameter>
 	<field name="orgName" class="java.lang.String"/>
-	<field name="columnId" class="java.lang.Long"/>
-	<field name="date" class="java.lang.String"/>
-	<field name="value" class="java.lang.String"/>
-	<background>
-		<band splitType="Stretch"/>
-	</background>
+	<field name="value" class="java.util.List"/>
 	<title>
 		<band height="68" splitType="Stretch">
 			<elementGroup/>
 			<textField>
-				<reportElement uuid="23dabc45-4d42-4c37-8607-d6b7401a70f8" x="0" y="0" width="802" height="68"/>
+				<reportElement x="0" y="0" width="802" height="68" uuid="23dabc45-4d42-4c37-8607-d6b7401a70f8"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -115,107 +108,62 @@
 	<pageHeader>
 		<band/>
 	</pageHeader>
-	<detail>
-		<band/>
-	</detail>
-	<lastPageFooter>
-		<band height="32"/>
-	</lastPageFooter>
-	<summary>
-		<band height="237">
-			<crosstab>
-				<reportElement uuid="5f966044-d9d0-4053-9cc0-a70d80157163" x="0" y="0" width="802" height="50"/>
-				<crosstabParameter name="parameter1"/>
-				<crosstabHeaderCell>
-					<cellContents>
-						<staticText>
-							<reportElement uuid="946f92b4-2b50-42b7-a8d0-7ff2e683877b" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="210" height="22"/>
-							<textElement verticalAlignment="Middle">
-								<font isBold="true"/>
-							</textElement>
-							<text><![CDATA[Организация]]></text>
-						</staticText>
-					</cellContents>
-				</crosstabHeaderCell>
-				<rowGroup name="uniqueId" width="210">
-					<bucket class="java.lang.Long">
-						<bucketExpression><![CDATA[$F{uniqueId}]]></bucketExpression>
-					</bucket>
-					<crosstabRowHeader>
-						<cellContents>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="8270dbff-c129-4dcc-aece-3bb6bb6982ee" style="Crosstab Data Text" x="0" y="0" width="0" height="22"/>
-								<textElement verticalAlignment="Middle">
-									<font size="10"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{uniqueId}]]></textFieldExpression>
-							</textField>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="8270dbff-c129-4dcc-aece-3bb6bb6982ee" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="210" height="22"/>
-								<textElement verticalAlignment="Middle">
-									<font size="10"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{orgName}]]></textFieldExpression>
-							</textField>
-						</cellContents>
-					</crosstabRowHeader>
-					<crosstabTotalRowHeader>
-						<cellContents/>
-					</crosstabTotalRowHeader>
-				</rowGroup>
-				<columnGroup name="columnId" height="22">
-					<bucket class="java.lang.Long">
-						<bucketExpression><![CDATA[$F{columnId}]]></bucketExpression>
-					</bucket>
-					<crosstabColumnHeader>
-						<cellContents>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="e8240a6a-ee49-4a98-90f1-c48010a89249" style="Crosstab Data Text" x="0" y="0" width="85" height="22"/>
-								<textElement verticalAlignment="Middle">
-									<font isBold="true"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{date}]]></textFieldExpression>
-							</textField>
-						</cellContents>
-					</crosstabColumnHeader>
-					<crosstabTotalColumnHeader>
-						<cellContents/>
-					</crosstabTotalColumnHeader>
-				</columnGroup>
-				<measure name="orgName" class="java.lang.String">
-					<measureExpression><![CDATA[$F{orgName}]]></measureExpression>
-				</measure>
-				<measure name="date" class="java.lang.String">
-					<measureExpression><![CDATA[$F{date}]]></measureExpression>
-				</measure>
-				<measure name="value" class="java.lang.String">
-					<measureExpression><![CDATA[$F{value}]]></measureExpression>
-				</measure>
-				<crosstabCell width="85" height="22">
-					<cellContents>
-						<box>
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-						</box>
-						<textField isBlankWhenNull="true">
-							<reportElement uuid="e8240a6a-ee49-4a98-90f1-c48010a89249" style="Crosstab Data Text" x="0" y="0" width="85" height="22"/>
-							<textElement verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{value}]]></textFieldExpression>
-						</textField>
-					</cellContents>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="uniqueId">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell columnTotalGroup="columnId">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="uniqueId" columnTotalGroup="columnId">
-					<cellContents/>
-				</crosstabCell>
-			</crosstab>
+	<columnHeader>
+		<band height="28">
+			<staticText>
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="0" width="147" height="28" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" forecolor="#000000" uuid="8f8567aa-2bc1-4504-a9b7-1c8b0007e86d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Организация]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="147" y="0" width="84" height="28" isPrintInFirstWholeBand="true" uuid="124d88f5-5e6d-4540-9431-ddddf850f6a3"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{value})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "SentSmsReport_subreport2.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
-	</summary>
-	<noData>
-		<band height="57"/>
-	</noData>
+	</columnHeader>
+	<detail>
+		<band height="28">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="0" width="147" height="28" isPrintWhenDetailOverflows="true" uuid="982ef3e7-d078-4c0e-be92-c24cf3ea8441">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="147" y="0" width="84" height="28" uuid="a31ba321-d60c-4d40-b464-8b32ad149f3c"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{value})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "SentSmsReport_subreport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
 </jasperReport>

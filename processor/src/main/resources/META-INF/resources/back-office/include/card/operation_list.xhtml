@@ -16,11 +16,11 @@
                 <h:outputText escape="true" value="Начало периода" styleClass="output-text"/>
                 <rich:calendar value="#{mainPage.cardOperationListPage.startTime}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
-                <h:outputText escape="true" value="Окончание периода" styleClass="output-text"/>
+                <h:outputText style="margin-left: 50px" escape="true" value="Окончание периода" styleClass="output-text"/>
                 <rich:calendar value="#{mainPage.cardOperationListPage.endTime}" datePattern="dd.MM.yyyy"
                                converter="dateConverter"
                                inputClass="input-text" showWeeksBar="false"/>
-                <a4j:commandButton value="Показать" action="#{mainPage.showCardOperationListPage}"
+                <a4j:commandButton style="margin-left: 50px" value="Показать" action="#{mainPage.showCardOperationListPage}"
                                    render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
             </h:panelGrid>
             <h:panelGrid styleClass="borderless-grid">

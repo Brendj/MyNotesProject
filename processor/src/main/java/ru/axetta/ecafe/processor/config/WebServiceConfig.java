@@ -1,29 +1,28 @@
 package ru.axetta.ecafe.processor.config;
 
-import javax.xml.ws.Endpoint;
 import org.apache.cxf.bus.spring.SpringBus;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.dashboard.DashboardServiceWS;
 import ru.axetta.ecafe.processor.web.internal.CardSignature;
-import ru.axetta.ecafe.processor.web.partner.emias.EMIASController;
 import ru.axetta.ecafe.processor.web.internal.FrontController;
 import ru.axetta.ecafe.processor.web.internal.report.ReportControllerWS;
 import ru.axetta.ecafe.processor.web.partner.acquiropay.soap.RegularPaymentWS;
+import ru.axetta.ecafe.processor.web.partner.emias.EMIASController;
 import ru.axetta.ecafe.processor.web.partner.ezd.EZDControllerSOAP;
 import ru.axetta.ecafe.processor.web.partner.integra.notify.NotifyControllerWS;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.POSPaymentControllerWS;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWS;
+import ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWsInterceptor;
 import ru.axetta.ecafe.processor.web.util.ClientRoomControllerLoggingInterceptor;
 import ru.axetta.ecafe.processor.web.util.RemoveSecurityHeaderSoapInterceptor;
 import ru.axetta.ecafe.processor.web.util.RemoveSoapActionInterceptor;
+
+import javax.xml.ws.Endpoint;
 
 /**
  * Created by nuc on 27.10.2020.
@@ -80,6 +79,7 @@ public class WebServiceConfig {
     @Bean
     public Endpoint paymentControllerEndpoint() {
         EndpointImpl endpoint = new EndpointImpl(springBus(), paymentControllerWS());
+        endpoint.getOutInterceptors().add(new PaymentControllerWsInterceptor());
         endpoint.publish("/payment");
         return endpoint;
     }
