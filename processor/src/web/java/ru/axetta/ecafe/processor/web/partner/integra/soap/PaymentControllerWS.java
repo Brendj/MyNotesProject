@@ -95,7 +95,7 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
                 paymentResult.clientFIO = payResponse.getClientFullName();
             }
             paymentResult.tspContragentId = payResponse.getTspContragentId();
-            paymentResult.addInfo = payResponse.getAddInfo()==null?null:ParameterStringUtils.toString(payResponse.getAddInfo());
+            paymentResult.addInfo = payResponse.getAddInfo() == null ? null : ParameterStringUtils.toString(payResponse.getAddInfo());
             payResponse.getTspContragentId();
         }
         catch (Exception e) {
