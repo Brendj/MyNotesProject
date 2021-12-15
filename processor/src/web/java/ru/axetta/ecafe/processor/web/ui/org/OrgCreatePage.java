@@ -388,6 +388,10 @@ public class OrgCreatePage extends BasicWorkspacePage
         return "org/create";
     }
 
+    public String getPageTitle() {
+        return "Организации / Регистрация";
+    }
+
     public OrgStateMenu getOrgStateMenu() {
         return orgStateMenu;
     }
@@ -629,6 +633,9 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.officialPersonSecondName);
         session.save(officialPerson);
 
+        if(DAOUtils.findOrgByShortname(session, getShortName()) != null) {
+            throw new Exception("\"Наименование ОО для поставщика\" уже существует");
+        }
         if (this.defaultSupplier.getIdOfContragent()==null) {
             throw new Exception("Не указан поставщик по умолчанию");
         }
@@ -666,7 +673,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setLongitude(longitude);
         org.setLatitude(latitude);
         org.setGuid(this.guid);
-        org.setEkisId(ekisId.equals(0L) ? null : ekisId);
+        org.setEkisId(ekisId);
         org.setEgissoId(egissoId);
         org.setPhone(this.phone);
         org.setSmsSender(this.smsSender);
@@ -695,7 +702,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setPreordersEnabled(preordersEnabled);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         org.setPreorderlp(preorderlp);
-        org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
+        org.setOrgIdFromNsi(orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardId);
         session.save(org);

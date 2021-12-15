@@ -453,6 +453,10 @@ public class DAOUtils {
         return null;
     }
 
+    public static Person findPerson(Session session, Long id) {
+        return (Person)session.load(Person.class, id);
+    }
+
     public static Contragent findContragentIsSupplier(Session session, long idOfContragent) {
         Query query = session.createQuery("from Contragent c where c.idOfContragent = :idOfContragent "
                 + "and c.classId = 2"); // ТСП
@@ -5523,6 +5527,15 @@ public class DAOUtils {
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }
+
+    //public static List<PreorderComplex> getcontentDeletedPreorderDishOtherCash(Session session, Date date) {
+    //    Query query = session.createQuery("select  pc from PreorderComplex pc "
+    //            + " where pc.preorderDate > :date and pc.deletedState = true "
+    //            + " and pc.modeOfAdd = 4 and pc.state in (3) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+    //    query.setParameter("date", date);
+    //    return (List<PreorderComplex>) query.list();
+    //}
+
     public static List<PreorderComplex> getContentDeletedPreorderDishOtherPP(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
@@ -5537,6 +5550,14 @@ public class DAOUtils {
         query.setParameter("date", date);
         return (List<PreorderComplex>) query.list();
     }
+
+    //public static List<PreorderComplex> getContentDeletedPreorderOtherCash(Session session, Date date) {
+    //    Query query = session.createQuery("select  pc from PreorderComplex pc "
+    //            + " where pc.preorderDate > :date and pc.deletedState = true "
+    //            + " and pc.modeOfAdd = 2 and pc.state in (3) and (pc.cancelnotification is null or pc.cancelnotification = false) ");
+    //    query.setParameter("date", date);
+    //    return (List<PreorderComplex>) query.list();
+    //}
     public static List<PreorderComplex> getContentDeletedPreorderOtherPP(Session session, Date date) {
         Query query = session.createQuery("select  pc from PreorderComplex pc "
                 + " where pc.preorderDate > :date and pc.deletedState = true "
@@ -5548,16 +5569,15 @@ public class DAOUtils {
         Query query = session.createQuery("select rp from RegularPreorder rp "
                 + " where rp.itemCode is null and idofdish is null "
                 + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
-                + " and rp.endDate < :date");
+                + " and rp.endDate > :date");
         query.setParameter("date", date);
         return (List<RegularPreorder>) query.list();
     }
     public static List<RegularPreorder> getContentDeletedPreorderDishOtherRegularOO(Session session, Date date) {
         Query query = session.createQuery("select  rp from RegularPreorder rp "
-                + " where ((rp.itemCode is not null and idofdish is null) or "
-                + " (rp.itemCode is null and idofdish is not null)) "
+                + " where idofdish is not null "
                 + " and rp.state = 1 and rp.deletedState = 1 and (rp.cancelnotification is null or rp.cancelnotification = false) "
-                + " and rp.endDate < :date");
+                + " and rp.endDate > :date");
         query.setParameter("date", date);
         return (List<RegularPreorder>) query.list();
     }
@@ -5655,7 +5675,7 @@ public class DAOUtils {
             criteria.add(Restrictions.eq("org", org));
             return (List<ESP>) criteria.list();
         } catch (NoResultException e){
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -5678,6 +5698,13 @@ public class DAOUtils {
         } catch (NoResultException e){
             return null;
         }
+    }
+
+    public static Person getOrgOfficialPerson(Session session, long idOfPerson) {
+        Query query = session
+                .createQuery("SELECT p FROM Person p where p.idOfPerson = :idOfPerson");
+        query.setParameter("idOfPerson", idOfPerson);
+        return (Person) query.uniqueResult();
     }
 
     public static Contragent findDefaultSupplier(Session session, Long idOfOrg) {

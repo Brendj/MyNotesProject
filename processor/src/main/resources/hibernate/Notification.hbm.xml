@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Notification" table="CF_Notifications" mutable="false">
+        <id name="idOfNotification" column="IdOfNotification" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">CF_Notifications_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
+                     not-null="true" update="false"/>
+        <property name="notificationTime" column="NotificationTime"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="notificationType" column="NotificationType" type="integer" not-null="true" update="false"/>
+        <property name="notificationText" column="NotificationText" type="string" length="1024" not-null="true"
+                  update="false"/>
+    </class>
+</hibernate-mapping>
+
+

@@ -478,7 +478,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     public void reload() throws Exception {
         if (this.wtEntity != null) {
 
-            WtDiscountRule wtEntity = em.merge(this.wtEntity);
+            WtDiscountRule wtEntity = em.find(WtDiscountRule.class, this.wtEntity.getIdOfRule());
 
             StringBuilder categoryFilter = new StringBuilder();
             if (!wtEntity.getCategoryDiscounts().isEmpty()) {

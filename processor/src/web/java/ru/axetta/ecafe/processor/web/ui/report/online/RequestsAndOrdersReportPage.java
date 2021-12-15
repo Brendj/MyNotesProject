@@ -64,7 +64,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         this.endDate = localCalendar.getTime();
     }
 
-    public void applyOfOrgList(ActionEvent ae) {
+    public void applyOfOrgList() {
         if (applyUserSettings) {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -103,7 +103,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         }
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         htmlReport = null;
         switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
@@ -125,7 +125,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {

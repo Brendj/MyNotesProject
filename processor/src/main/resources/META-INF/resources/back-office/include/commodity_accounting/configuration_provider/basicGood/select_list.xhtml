@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="basicGoodListItemsPanel" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodListItemsPanel"-->
+    <rich:popupPanel modal="true" id="basicGoodListItemsPanel" autosized="true" width="200" headerClass="modal-panel-header">
+        <rich:hotKey key="esc" handler="#{rich:component('basicGoodListItemsPanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText escape="true" value="Выбор элементов базовой корзины"/>
+        </f:facet>
+        <h:form id="basicGoodListModalForm" styleClass="borderless-form"
+                  eventsQueue="basicGoodSelectorListFormEventsQueue">
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: left;">
+                        <h:panelGrid columns="4" styleClass="borderless-grid">
+                            <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
+                            <h:inputText value="#{basicGoodListItemsPanel.filter}" size="48" maxlength="128"
+                                         styleClass="input-text"/>
+                            <a4j:commandLink action="#{basicGoodListItemsPanel.updateBasicGoodSelectPage}"
+                                             render="modalBasicGoodListSelectorTable"
+                                             styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/search.png" style="border: 0;"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink action="#{basicGoodListItemsPanel.updateBasicGoodSelectPage}"
+                                             render="modalBasicGoodListSelectorTable"
+                                             styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                                <f:setPropertyActionListener value="" target="#{basicGoodListItemsPanel.filter}"/>
+                            </a4j:commandLink>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" styleClass="borderless-grid">
+                            <a4j:commandButton action="#{basicGoodListItemsPanel.selectAll}"
+                                               render="modalBasicGoodListSelectorTable"
+                                               styleClass="command-button" value="Выбрать все"/>
+                            <a4j:commandButton action="#{basicGoodListItemsPanel.clearAll}"
+                                               render="modalBasicGoodListSelectorTable"
+                                               styleClass="command-button" value="Очистить все"/>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <rich:dataTable value="#{basicGoodListItemsPanel.basicGoodList}" var="basicGood" rowKeyVar="row"
+                                        width="100%" align="center" id="modalBasicGoodListSelectorTable" rows="20"
+                                        footerClass="data-table-footer" columnClasses="left-aligned-column"
+                                        rowClasses="select-panel-row"
+                                        onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
+                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+                            <rich:column>
+                                <h:selectBooleanCheckbox value="#{basicGood.selected}" styleClass="output-text">
+                                    <a4j:ajax event="change"/>
+                                </h:selectBooleanCheckbox>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="Ид."/>
+                                </f:facet>
+                                <h:outputText value="#{basicGood.idOfBasicGood}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="Название"/>
+                                </f:facet>
+                                <h:outputText value="#{basicGood.name}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value="Масса нетто"/>
+                                </f:facet>
+                                <h:outputText value="#{basicGood.netWeight}"/>
+                            </rich:column>
+                        </rich:dataTable>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <rich:dataScroller for="modalBasicGoodListSelectorTable" renderIfSinglePage="false" maxPages="5"
+                                           styleClass="data-table-footer"
+                                           fastControls="hide" stepControls="auto" boundaryControls="hide"
+                                           render="basicGoodListItemsPanel">
+                            <f:facet name="previous">
+                                <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                            </f:facet>
+                            <f:facet name="next">
+                                <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                            </f:facet>
+                        </rich:dataScroller>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">
+                        <h:panelGrid styleClass="borderless-div" columns="2">
+                            <a4j:commandButton value="Ok" action="#{basicGoodListItemsPanel.completeBasicGoodSelection}"
+                                               render="workspaceTogglePanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('basicGoodListItemsPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px; margin-right: 4px;"/>
+
+                            <a4j:commandButton value="Отмена" action="#{basicGoodListItemsPanel.cancel}"
+                                               render="workspaceTogglePanel" styleClass="command-button"
+                                               style="width: 80px;"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('basicGoodListItemsPanel')}.hide();"/>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
+</ui:composition>

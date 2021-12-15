@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -205,22 +207,37 @@ public class PreorderCancelNotificationService {
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherOO", 1, result);
+
+        //preorderComplexs = DAOUtils.getcontentDeletedPreorderDishOtherCash(session, new Date());
+        //setFlagSended(session, preorderComplexs);
+        //preorderComplexs = getUniquleResult(preorderComplexs);
+        //createData(preorderComplexs, "contentDeletedPreorderDishOtherCash", 1, result);
+
         preorderComplexs = DAOUtils.getContentDeletedPreorderDishOtherPP(session, new Date());
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherPP", 2, result);
+
         preorderComplexs = DAOUtils.getContentDeletedPreorderOtherOO(session, new Date());
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderOtherOO", 3, result);
+
+        //preorderComplexs = DAOUtils.getContentDeletedPreorderOtherCash(session, new Date());
+        //setFlagSended(session, preorderComplexs);
+        //preorderComplexs = getUniquleResult(preorderComplexs);
+        //createData(preorderComplexs, "contentDeletedPreorderOtherCash", 3, result);
+
         preorderComplexs = DAOUtils.getContentDeletedPreorderOtherPP(session, new Date());
         setFlagSended(session, preorderComplexs);
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderOtherPP", 4, result);
+
         List<RegularPreorder> regularPreorders = DAOUtils.getContentDeletedPreorderOtherRegularOO(session, new Date());
         setFlagSendedRegular(session, regularPreorders);
         regularPreorders = getUniquleResultRegular(regularPreorders);
         createDataRegularPreorder(session, regularPreorders, "contentDeletedPreorderOtherRegularOO", 1, result);
+
         regularPreorders = DAOUtils.getContentDeletedPreorderDishOtherRegularOO(session, new Date());
         setFlagSendedRegular(session, regularPreorders);
         regularPreorders = getUniquleResultRegular(regularPreorders);
@@ -318,6 +335,14 @@ public class PreorderCancelNotificationService {
     {
         Map<Date, String> dateMessage = new HashMap<Date, String>();
         Map<String, Object> infoType = new HashMap<String, Object>();
+
+        Map<Long, String> frations = new HashMap<Long, String>();
+        List res = DAOReadonlyService.getInstance().getWtComplexsByRegular(regularPreorders);
+        for (Object o : res) {
+            Object[] row = (Object[]) o;
+            frations.put(((BigInteger)row[0]).longValue(), (String)row[1]);
+        }
+
         for (RegularPreorder regularPreorder: regularPreorders)
         {
             dateMessage = new HashMap<Date, String>();
@@ -328,7 +353,7 @@ public class PreorderCancelNotificationService {
                 if (result.get(client) == null)
                 {
                     String mess = "";
-                    createmassageregular(session, mess, regularPreorder, mode, dateMessage);
+                    createmassageregular(session, mess, regularPreorder, frations.get(regularPreorder.getIdOfRegularPreorder()), mode, dateMessage);
                     infoType.put(type, dateMessage);
                     result.put(client,infoType);
                 }
@@ -338,7 +363,7 @@ public class PreorderCancelNotificationService {
                     if (infoType.get(type) == null)
                     {
                         String mess = "";
-                        createmassageregular(session, mess, regularPreorder, mode, dateMessage);
+                        createmassageregular(session, mess, regularPreorder, frations.get(regularPreorder.getIdOfRegularPreorder()), mode, dateMessage);
                         infoType.put(type, dateMessage);
                     }
                     else
@@ -347,12 +372,12 @@ public class PreorderCancelNotificationService {
                         if (dateMessage.get(regularPreorder.getEndDate()) == null)
                         {
                             String mess = "";
-                            createmassageregular(session, mess, regularPreorder, mode, dateMessage);
+                            createmassageregular(session, mess, regularPreorder, frations.get(regularPreorder.getIdOfRegularPreorder()), mode, dateMessage);
                         }
                         else
                         {
                             String mess = dateMessage.get(regularPreorder.getEndDate());
-                            createmassageregular(session, mess, regularPreorder, mode, dateMessage);
+                            createmassageregular(session, mess, regularPreorder, frations.get(regularPreorder.getIdOfRegularPreorder()), mode, dateMessage);
                         }
                     }
                 }
@@ -364,6 +389,14 @@ public class PreorderCancelNotificationService {
     {
         Map<Date, String> dateMessage = new HashMap<Date, String>();
         Map<String, Object> infoType = new HashMap<String, Object>();
+
+        Map<Long, String> frations = new HashMap<Long, String>();
+        List res = DAOReadonlyService.getInstance().getWtComplexsByComplexes(preorderComplexs);
+        for (Object o : res) {
+            Object[] row = (Object[]) o;
+            frations.put(((BigInteger)row[0]).longValue(), (String)row[1]);
+        }
+
         for (PreorderComplex preorderComplex: preorderComplexs)
         {
             dateMessage = new HashMap<Date, String>();
@@ -374,7 +407,7 @@ public class PreorderCancelNotificationService {
                 if (result.get(client) == null)
                 {
                     String mess = "";
-                    createmassage(mess, preorderComplex, mode, dateMessage);
+                    createmassage(mess, preorderComplex, frations.get(preorderComplex.getIdOfPreorderComplex()), mode, dateMessage);
                     infoType.put(type, dateMessage);
                     result.put(client,infoType);
                 }
@@ -384,7 +417,7 @@ public class PreorderCancelNotificationService {
                     if (infoType.get(type) == null)
                     {
                         String mess = "";
-                        createmassage(mess, preorderComplex, mode, dateMessage);
+                        createmassage(mess, preorderComplex, frations.get(preorderComplex.getIdOfPreorderComplex()), mode, dateMessage);
                         infoType.put(type, dateMessage);
                     }
                     else
@@ -393,12 +426,12 @@ public class PreorderCancelNotificationService {
                         if (dateMessage.get(preorderComplex.getPreorderDate()) == null)
                         {
                             String mess = "";
-                            createmassage(mess, preorderComplex, mode, dateMessage);
+                            createmassage(mess, preorderComplex, frations.get(preorderComplex.getIdOfPreorderComplex()), mode, dateMessage);
                         }
                         else
                         {
                             String mess = dateMessage.get(preorderComplex.getPreorderDate());
-                            createmassage(mess, preorderComplex, mode, dateMessage);
+                            createmassage(mess, preorderComplex, frations.get(preorderComplex.getIdOfPreorderComplex()), mode, dateMessage);
                         }
                     }
                 }
@@ -406,18 +439,23 @@ public class PreorderCancelNotificationService {
         }
     }
 
-    private void createmassage (String mess, PreorderComplex preorderComplex, Integer mode, Map<Date, String> dateMessage)
+    private void createmassage (String mess, PreorderComplex preorderComplex, String fration, Integer mode, Map<Date, String> dateMessage)
     {
+        if (fration == null)
+            fration = "";
         if (mess.isEmpty())
             mess += "<br>";
         if (mode == 3 || mode == 4)
         {
-            mess += "Комплексный рацион «" + preorderComplex.getComplexName().trim() + "»";
+            //mess += "Комплексный рацион «" + preorderComplex.getComplexName().trim() + "»";
+            mess += "Комплексный рацион «" + fration.trim() + "»";
         }
         if (mode == 1 || mode == 2) {
-            mess += preorderComplex.getComplexName().trim() + ":";
+            //mess += preorderComplex.getComplexName().trim() + ":";
+            mess += fration.trim() + ":";
             for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                mess += "«" + preorderMenuDetail.getMenuDetailName().trim() + "»,";
+                if (preorderMenuDetail.getShortName() != null)
+                    mess += "«" + preorderMenuDetail.getShortName().trim() + "»,";
             }
             if (mess.length() > 4)
                 mess = mess.substring(0, mess.length() - 1);
@@ -426,21 +464,24 @@ public class PreorderCancelNotificationService {
         dateMessage.put(preorderComplex.getPreorderDate(), mess);
     }
 
-    private void createmassageregular (Session session, String mess, RegularPreorder regularPreorder, Integer mode,
+    private void createmassageregular (Session session, String mess, RegularPreorder regularPreorder, String fration, Integer mode,
             Map<Date, String> dateMessage)
     {
+        if (fration == null)
+            fration = "";
         if (mess.isEmpty())
             mess += "<br>";
         if (mode == 1) {
-            mess += "Комплексный рацион «" + regularPreorder.getItemName().trim() + "»";
-
+            //mess += "Комплексный рацион «" + regularPreorder.getItemName().trim() + "»";
+            mess += "Комплексный рацион «" + fration.trim() + "»";
         }
         if (mode == 2) {
             ComplexInfo complexInfo = DAOUtils.getComplexInfoForRegular(session, regularPreorder);
             if (complexInfo != null) {
                 mess += complexInfo.getIdOfComplex();
             }
-            mess += ": «" + regularPreorder.getItemName().trim() + "» ";
+            //mess += ": «" + regularPreorder.getItemName().trim() + "» ";
+            mess += ": «" + fration.trim() + "» ";
         }
         mess += " (стоимость " + regularPreorder.getPrice() / 100 + " руб., ";
         mess += regularPreorder.getAmount() + " шт)";

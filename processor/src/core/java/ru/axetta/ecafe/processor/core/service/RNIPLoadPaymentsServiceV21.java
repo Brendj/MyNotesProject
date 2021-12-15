@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.InvalidContentException;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangePortType;
+import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangePortType_24;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangeService;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.*;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.AckTargetMessage;
@@ -22,10 +23,7 @@ import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogReque
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogResponse;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
-import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -53,6 +51,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     private static final org.slf4j.Logger loggerGetResponse = LoggerFactory.getLogger(RNIPLoadPaymentsServiceV21.class);
     private static SMEVMessageExchangeService service21;
     private static SMEVMessageExchangePortType port21;
+    private static SMEVMessageExchangePortType_24 port24;
     private static BindingProvider bindingProvider21;
     private static final Object sync = new Object();
 
@@ -98,7 +97,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return null;
     }
 
-    private int getRequestType(RnipEventType eventType) {
+    protected int getRequestType(RnipEventType eventType) {
         switch (eventType) {
             case CONTRAGENT_EDIT: return REQUEST_MODIFY_CATALOG;
             case CONTRAGENT_CREATE: return REQUEST_CREATE_CATALOG;
@@ -155,7 +154,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return false;
     }
 
-    private SendRequestRequest getMessageHeaderV21(Contragent contragent) {
+    protected SendRequestRequest getMessageHeaderV21(Contragent contragent) {
         generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory requestObjectFactory =
                 new generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory();
         SendRequestRequest sendRequestRequest = requestObjectFactory.createSendRequestRequest();
@@ -541,9 +540,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         loggerGetResponse.info("Start processing rnip GetResponses in thread pool");
         List<RnipMessage> messages = RnipDAOService.getInstance().getRnipMessages();
+        RNIPLoadPaymentsServiceV21 rnipLoadPaymentsServiceV21 = getRNIPServiceBean();
         for (RnipMessage rnipMessage : messages) {
             try {
-                RuntimeContext.getAppContext().getBean(RNIPGetPaymentsServiceV21.class).processRnipMessage(rnipMessage);
+                rnipLoadPaymentsServiceV21.processRnipMessage(rnipMessage);
             } catch (Exception e) {
                 loggerGetResponse.error("Error in processing rnip message async", e);
             }
@@ -557,9 +557,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         loggerSendAck.info("Start processing rnip SendAck");
         List<RnipMessage> messages = RnipDAOService.getInstance().getProcessedRnipMessages();
+        RNIPLoadPaymentsServiceV21 rnipLoadPaymentsServiceV21 = getRNIPServiceBean();
         for (RnipMessage rnipMessage : messages) {
             try {
-                sendAckRnipMessage(rnipMessage);
+                rnipLoadPaymentsServiceV21.sendAckRnipMessage(rnipMessage);
             } catch (Exception e) {
                 loggerSendAck.error("Error in sending ack message async", e);
             }
@@ -567,7 +568,21 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         loggerSendAck.info("End processing rnip SendAck");
     }
 
-    private void sendAckRnipMessage(RnipMessage rnipMessage) throws Exception {
+    public static RNIPLoadPaymentsServiceV21 getRNIPServiceBean() {
+        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
+        switch (version) {
+            case RNIP_V21:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class);
+            case RNIP_V22:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV22", RNIPLoadPaymentsServiceV22.class);
+            case RNIP_V24:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV24", RNIPLoadPaymentsServiceV24.class);
+            default:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class);
+        }
+    }
+
+    protected void sendAckRnipMessage(RnipMessage rnipMessage) throws Exception {
         InitRNIP21Service(rnipMessage.getContragent());
 
         generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory requestObjectFactory =
@@ -668,7 +683,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
     }
 
-    private boolean isPaymentRequest(RnipMessage rnipMessage) {
+    protected boolean isPaymentRequest(RnipMessage rnipMessage) {
         return rnipMessage.getEventType().equals(RnipEventType.PAYMENT) || rnipMessage.getEventType().equals(RnipEventType.PAYMENT_MODIFIED);
     }
 
@@ -688,7 +703,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return eventType.equals(RnipEventType.CONTRAGENT_CREATE) || eventType.equals(RnipEventType.CONTRAGENT_EDIT);
     }
 
-    private RNIPPaymentsResponse parsePayments(Response internalResponse) {
+    public RNIPPaymentsResponse parsePayments(Response internalResponse) {
         ExportPaymentsResponse exportPaymentsResponse = internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse();
         List<ExportPaymentsResponse.PaymentInfo> paymentInfos = exportPaymentsResponse.getPaymentInfo();
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
@@ -761,7 +776,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return vals;
     }
 
-    private boolean getHasMore(Response internalResponse) {
+    protected boolean getHasMore(Response internalResponse) {
         try {
             return internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse().isHasMore();
         } catch (Exception e) {
@@ -769,7 +784,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
     }
 
-    private String[] checkResponseByEventType(Response internalResponse, RnipMessage rnipMessage) {
+    protected String[] checkResponseByEventType(Response internalResponse, RnipMessage rnipMessage) {
         SenderProvidedResponseData senderProvidedResponseData = internalResponse.getSenderProvidedResponseData();
         String[] result = {"", ""};
         switch (rnipMessage.getEventType()) {

@@ -31,6 +31,7 @@ import java.util.GregorianCalendar;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +43,11 @@ import javax.servlet.http.HttpServletResponse;
  * Time: 14:10
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "ProjectStateReportServlet",
+        description = "ProjectStateReportServlet",
+        urlPatterns = {"/prj-state"}
+)
 public class ProjectStateReportServlet extends HttpServlet {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProjectStateReportServlet.class);

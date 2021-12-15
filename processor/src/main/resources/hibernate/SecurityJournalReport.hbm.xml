@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SecurityJournalReport" table="CF_Security_Journal_Reports" optimistic-lock="version">
+        <id name="idOfJournalReport" column="idofjournalreport" type="long">
+            <generator class="identity" />
+        </id>
+        <property name="eventType" column="eventtype" type="string" not-null="true" />
+        <property name="eventDate" column="eventdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="success" column="issuccess" type="boolean" not-null="true"/>
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofuser" not-null="false" />
+    </class>
+</hibernate-mapping>

@@ -8,9 +8,15 @@ import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@WebServlet(
+        name = "SBRTOnlinePaymentServlet",
+        description = "SBRTOnlinePaymentServlet",
+        urlPatterns = {"/payment-sbrt"}
+)
 public class SBRTOnlinePaymentServlet extends OnlinePaymentServlet {
     private static final Logger logger = LoggerFactory.getLogger(SBRTOnlinePaymentServlet.class);
 

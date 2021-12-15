@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
+    <!--@elvariable id="commonStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CommonStatsPage"-->
+    <h:panelGrid id="commonStatsPanelGrid" binding="#{commonStatsPage.pageComponent}" styleClass="borderless-grid">
+        <a4j:status id="commonStatsPageStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+            </f:facet>
+        </a4j:status>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:dataTable id="commonStatsTable" value="#{commonStatsPage.statItems}"
+                            var="item" rowKeyVar="row" rows="50" footerClass="data-table-footer">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column" rowspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Параметр"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" rowspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Значение"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="left-aligned-column">
+                    <h:outputText styleClass="output-text" value="#{item.name}" />
+                </rich:column>
+                <rich:column styleClass="right-aligned-column">
+                    <h:outputText styleClass="output-text" value="#{item.value}" />
+                </rich:column>
+                <f:facet name="footer">
+                    <rich:dataScroller for="commonStatsTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+                                       stepControls="auto" boundaryControls="hide">
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png" />
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png" />
+                        </f:facet>
+                    </rich:dataScroller>
+                </f:facet>
+            </rich:dataTable>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Обновить" action="#{commonStatsPage.updateData}"
+                               render="workspaceTogglePanel, commonStatsTable"
+                               styleClass="command-button" />
+        </h:panelGrid>
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

@@ -9,6 +9,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -29,6 +30,7 @@ import java.util.Date;
 
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class FinancialOpsManager {
 
     static Boolean useOperatorScheme = null;

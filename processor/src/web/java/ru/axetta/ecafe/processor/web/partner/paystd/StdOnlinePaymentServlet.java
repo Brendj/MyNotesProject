@@ -16,9 +16,15 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.security.cert.X509Certificate;
 
+@WebServlet(
+        name = "PaymentStdServlet",
+        description = "Payment register",
+        urlPatterns = {"/payment-std"}
+)
 public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(StdOnlinePaymentServlet.class);

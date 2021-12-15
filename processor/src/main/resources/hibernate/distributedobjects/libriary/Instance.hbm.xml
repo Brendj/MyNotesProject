@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Instance" table="cf_instances">
+        <id name="globalId" column="IdOfInstance" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersionOnCreate" column="GlobalVersionOnCreate" type="long"/>
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="sendAll" column="SendAll">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <!-- End Global params -->
+
+        <many-to-one name="publication" column="IdOfPublication"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication"
+                     not-null="true"/>
+
+        <many-to-one name="fund" column="IdOfFund"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Fund"
+                     not-null="false"/>
+
+        <many-to-one name="inventoryBook" column="InvBook"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.InventoryBook"
+                     not-null="false"/>
+
+        <many-to-one name="ksu1Record" column="IdOfKSU1Record"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu1Record"
+                     not-null="false"/>
+
+        <many-to-one name="ksu2Record" column="IdOfKSU2Record"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu2Record"
+                     not-null="false"/>
+
+        <many-to-one name="exchangeOut" column="idofexchangeout"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.ExchangeOut"
+                     not-null="false"/>
+
+        <many-to-one name="exchangeIn" column="idofexchangein"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.ExchangeIn"
+                     not-null="false"/>
+
+        <property name="inGroup" column="InGroup" type="boolean" not-null="true"/>
+        <property name="invNumber" column="InvNumber" type="string" length="10" not-null="false"/>
+        <property name="cost" column="Cost" type="int" not-null="true"/>
+
+        <set name="issuableInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfInstance"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Issuable" />
+        </set>
+
+    </class>
+</hibernate-mapping>

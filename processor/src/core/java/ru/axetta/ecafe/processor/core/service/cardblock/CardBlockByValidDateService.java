@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service.cardblock;
 
+import org.springframework.context.annotation.DependsOn;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.Card;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.DependsOn;
 import java.util.Date;
 import java.util.List;
 

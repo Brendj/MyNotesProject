@@ -7,6 +7,7 @@ import ru.axetta.ecafe.processor.web.partner.OnlinePaymentServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -16,6 +17,11 @@ import javax.servlet.http.HttpServletRequest;
  * Time: 0:21:43
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "ElecsnetOnlinePaymentServlet",
+        description = "ElecsnetOnlinePaymentServlet",
+        urlPatterns = {"/payment-elecsnet"}
+)
 public class ElecsnetOnlinePaymentServlet extends OnlinePaymentServlet {
     private static final Logger logger = LoggerFactory.getLogger(ElecsnetOnlinePaymentServlet.class);
 

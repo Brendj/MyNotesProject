@@ -66,6 +66,15 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         this.selectedOperationType = selectedOperationType;
     }
 
+    public void setFilterType(Integer filterType) {
+        if (filterType == 0) {
+            this.selectedTab = ClientTransactionsReport.FilterType.Organization;
+        }
+        if (filterType == 1) {
+            this.selectedTab = ClientTransactionsReport.FilterType.Client;
+        }
+    }
+
     public ClientFilter getClientFilter() {
         return clientFilter;
     }
@@ -91,7 +100,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         MainPage.getSessionInstance().showOrgListSelectPage();
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         htmlReport = null;
         switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
@@ -113,7 +122,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {

@@ -565,21 +565,14 @@
         <url-pattern>/ispp/ESP/*</url-pattern>
     </servlet-mapping>
 
+<!--
     <servlet>
         <servlet-name>SchoolServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
             <param-name>resteasy.resources</param-name>
             <param-value>
-                ru.axetta.ecafe.processor.web.partner.schoolapi.SchoolRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.clients.ClientsRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.groups.GroupsRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.GuardiansRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.groupmanagers.GroupManagersRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.planorders.PlanOrdersRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.applicationforfood.ApplicationForFoodRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.calendar.OrgCalendarRestController,
-                ru.axetta.ecafe.processor.web.partner.schoolapi.payment.PaymentRestConroller
+                ru.axetta.ecafe.processor.web.partner.schoolapi.SchoolRestController
             </param-value>
         </init-param>
         <init-param>
@@ -598,6 +591,7 @@
         <servlet-name>SchoolServlet</servlet-name>
         <url-pattern>/school/api/v1/*</url-pattern>
     </servlet-mapping>
+-->
 
     <filter>
         <filter-name>CleanupFilter</filter-name>
@@ -608,13 +602,12 @@
         <url-pattern>/fps/api/*</url-pattern>
         <url-pattern>/assessment/*</url-pattern>
         <url-pattern>/smartwatch/*</url-pattern>
-        <url-pattern>/school/api/v1/*</url-pattern>
         <url-pattern>/ispp/library/*</url-pattern>
         <url-pattern>/ispp/ezd/*</url-pattern>
 	<url-pattern>/emias_internal/*</url-pattern>
 	<url-pattern>/ispp/ESP/*</url-pattern>
     </filter-mapping>
-
+<!--
     <filter>
         <filter-name>springSecurityTokenFilter</filter-name>
         <filter-class>ru.axetta.ecafe.processor.web.token.security.jwt.JWTAuthenticationFilter</filter-class>
@@ -622,7 +615,7 @@
     <filter-mapping>
         <filter-name>springSecurityTokenFilter</filter-name>
         <url-pattern>/school/api/v1/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping>-->
 
     <security-constraint>
         <web-resource-collection>
@@ -650,7 +643,7 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Restrict transport for login page</web-resource-name>
-            <url-pattern>/back-office/login.faces</url-pattern>
+            <url-pattern>/back-office/login.xhtml</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
@@ -738,8 +731,8 @@
     <login-config>
         <auth-method>FORM</auth-method>
         <form-login-config>
-            <form-login-page>/back-office/login.faces</form-login-page>
-            <form-error-page>/back-office/login.faces?error=true</form-error-page>
+            <form-login-page>/back-office/login.xhtml</form-login-page>
+            <form-error-page>/back-office/login.xhtml?error=true</form-error-page>
         </form-login-config>
     </login-config>
 

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditCards())-->
+    <!--{ out.println("Недостаточно прав для просмотра страницы"); return; } %>-->
+
+
+    <h:panelGrid>
+        <h:panelGrid rendered="#{!mainPage.isEligibleToEditCards()}">
+            <h:outputText escape="true" styleClass="output-text"
+                          value="Недостаточно прав для просмотра страницы">
+            </h:outputText>
+        </h:panelGrid>
+
+        <!-- Панель загрузки новых, непривязанных карт из файла -->
+        <h:panelGrid id="newCardFileLoaderPanel" binding="#{mainPage.newCardFileLoadPage.pageComponent}"
+                     styleClass="borderless-grid" rendered="#{mainPage.isEligibleToEditCards()}">
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Проверять дубликаты (по номеру, нанесенному на карту)"
+                              styleClass="output-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.newCardFileLoadPage.checkCardPrintedNoUnique}"
+                                         styleClass="output-text">
+                    <a4j:ajax event="click" render="newCardFileLoaderPanel"/>
+                </h:selectBooleanCheckbox>
+
+                <h:outputText escape="true" value="#{mainPage.newCardFileLoadPage.cardTypeNames}"
+                              styleClass="output-text"/>
+            </h:panelGrid>
+
+            <rich:fileUpload id="newCardFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
+                             addButtonClassDisabled="upload-command-button-diasbled"
+                             cleanButtonClass="upload-command-button"
+                             cleanButtonClassDisabled="upload-command-button-diasbled"
+                             stopButtonClass="upload-command-button"
+                             stopButtonClassDisabled="upload-command-button-diasbled"
+                             uploadButtonClass="upload-command-button"
+                             uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
+                             fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
+                             fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
+                             stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
+                             addControlLabel="Добавить файл"
+                             clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
+                             cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
+                             uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
+                             fileUploadListener="#{mainPage.newCardLoadFileListener}">
+                <f:facet name="label">
+                    <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
+                </f:facet>
+                <a4j:ajax event="uploadcomplete" render="newCardFileLoaderPanel"/>
+                <a4j:ajax event="clear" render="cardFileLoaderPanel"/>
+            </rich:fileUpload>
+
+            <h:outputText escape="true"
+                          value="Обработано: #{mainPage.newCardFileLoadPage.lineResultSize}. Успешно: #{mainPage.newCardFileLoadPage.successLineNumber}"
+                          styleClass="output-text"/>
+
+            <rich:dataTable id="newCardLoadResultTable" value="#{mainPage.newCardFileLoadPage.lineResults}" var="item"
+                            rows="20"
+                            columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column"
+                            footerClass="data-table-footer">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Номер строки файла"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.lineNo}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Код результата"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.resultCode}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Сообщение"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.message}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Идентификатор карты в БД (IdOfNewCard)"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.idOfNewCard}" styleClass="output-text"/>
+                </rich:column>
+
+                <f:facet name="footer">
+                    <rich:dataScroller for="newCardLoadResultTable" renderIfSinglePage="false" maxPages="5"
+                                       fastControls="hide"
+                                       stepControls="auto" boundaryControls="hide">
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                        </f:facet>
+                    </rich:dataScroller>
+                </f:facet>
+            </rich:dataTable>
+
+            <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showNewCardLoadResultCSVList}"
+                             styleClass="command-button"/>
+        </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

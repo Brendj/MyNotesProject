@@ -28,30 +28,14 @@ import javax.xml.bind.annotation.XmlType;
 public enum CitizenshipType {
 
 
-    /**
-     * ����������� ��
-     * 
-     */
     RF("RF"),
 
-    /**
-     * ����������� ����� �����������
-     * 
-     */
     @XmlEnumValue("Foreign")
     FOREIGN("Foreign"),
 
-    /**
-     * ��� �����������
-     * 
-     */
     @XmlEnumValue("None")
     NONE("None"),
 
-    /**
-     * ����������� �� � ����� �����������
-     * 
-     */
     @XmlEnumValue("Both")
     BOTH("Both");
     private final String value;

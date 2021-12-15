@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <script type="text/javascript">
+        function onstartloading() {
+            jQuery(".command-button").attr('disabled', 'disabled');
+        }
+        function onstoploading() {
+            jQuery(".command-button").attr('disabled', '');
+            updateWidth();
+        }
+        jQuery(document).ready(function () {
+            updateWidth();
+        });
+    </script>
+<h:panelGrid>
+    <h:panelGrid id="requestsAndOrdersReportPanelGrid" binding="#{mainPage.requestsAndOrdersReportPage.pageComponent}"
+                 styleClass="borderless-grid">
+
+        <rich:togglePanel label="Настройки отчета" switchType="client" style="width: 800px;" opened="true"
+                          headerClass="filter-panel-header" id="requestsAndOrdersReportFilterPanelGrid">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+
+                <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+                <h:panelGroup id="contragetFilter">
+                    <a4j:commandButton value="..."
+                                       action="#{mainPage.requestsAndOrdersReportPage.showContragentListSelectPage}"
+                                       render="modalOrgListSelectorPanel"
+                                       disabled="#{mainPage.requestsAndOrdersReportPage.applyUserSettings}"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
+                        <f:setPropertyActionListener
+                                value="#{mainPage.requestsAndOrdersReportPage.contragentStringIdOfOrgList}"
+                                target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                        <f:setPropertyActionListener value="Выбор организации - источника меню"
+                                                     target="#{mainPage.orgFilterPageName}" />
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" escape="true"
+                                  value=" {#{mainPage.requestsAndOrdersReportPage.contragentFilter}}" />
+                </h:panelGroup>
+
+                <h:outputText styleClass="output-text" escape="true" value="Организация" />
+                <h:panelGroup id="orgFilter">
+                    <a4j:commandButton value="..." action="#{mainPage.requestsAndOrdersReportPage.showOrgListSelectPage}"
+                                       render="modalOrgListSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                       disabled="#{mainPage.requestsAndOrdersReportPage.applyUserSettings}"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
+                        <f:setPropertyActionListener value="#{mainPage.requestsAndOrdersReportPage.getStringIdOfOrgList}"
+                                                     target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" escape="true"
+                                  value=" {#{mainPage.requestsAndOrdersReportPage.filter}}" />
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+                <rich:calendar value="#{mainPage.requestsAndOrdersReportPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDateCalendar,requestsAndOrdersReportPanel"
+                                 listener="#{mainPage.requestsAndOrdersReportPage.onReportPeriodChanged}" />
+                </rich:calendar>
+
+                <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+                <h:selectOneMenu id="endDatePeriodSelect"
+                                 value="#{mainPage.requestsAndOrdersReportPage.periodTypeMenu.periodType}"
+                                 styleClass="input-text" style="width: 250px;">
+                    <f:converter converterId="periodTypeConverter" />
+                    <f:selectItems value="#{mainPage.requestsAndOrdersReportPage.periodTypeMenu.items}" />
+                    <a4j:ajax event="change" render="endDateCalendar,requestsAndOrdersReportPanel"
+                                 listener="#{mainPage.requestsAndOrdersReportPage.onReportPeriodChanged}" />
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+                <rich:calendar id="endDateCalendar" value="#{mainPage.requestsAndOrdersReportPage.endDate}"
+                               datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
+                               showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDatePeriodSelect,requestsAndOrdersReportPanel"
+                                 listener="#{mainPage.requestsAndOrdersReportPage.onEndDateSpecified}" />
+                </rich:calendar>
+
+                <h:outputText escape="true" value="Скрывать даты с пустыми значениями" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.hideMissedColumns}"
+                                         styleClass="output-text">
+                    <a4j:ajax event="click" render="requestsAndOrdersReportFilterPanelGrid"
+                                 listener="#{mainPage.requestsAndOrdersReportPage.onHideMissedColumnsChange}" />
+                </h:selectBooleanCheckbox>
+
+                <h:outputText escape="true" value="Включить цветовую индикацию расхождений" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.useColorAccent}"
+                                         styleClass="output-text">
+                    <a4j:ajax event="click" render="requestsAndOrdersReportFilterPanelGrid"
+                                 listener="#{mainPage.requestsAndOrdersReportPage.onUseColorAccentChange}" />
+                </h:selectBooleanCheckbox>
+
+                <h:outputText escape="true" value="Отображать только расхождения" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.showOnlyDivergence}"
+                                         styleClass="output-text">
+                    <a4j:ajax event="click" render="requestsAndOrdersReportFilterPanelGrid"
+                                 listener="#{mainPage.requestsAndOrdersReportPage.onShowOnlyDivergenceChange}" />
+                </h:selectBooleanCheckbox>
+
+                <h:outputText escape="true" value="Тип питания" styleClass="output-text" />
+                <h:selectOneMenu id="feedingTypeList" value="#{mainPage.requestsAndOrdersReportPage.feedingPlanType}"
+                                 style="width:100px;">
+                    <f:selectItems value="#{mainPage.requestsAndOrdersReportPage.feedingPlanTypes}" />
+                    <a4j:ajax event="change" render="requestsAndOrdersReportFilterPanelGrid"
+                                 listener="#{mainPage.requestsAndOrdersReportPage.onFeedingPlanTypeChange}" />
+                </h:selectOneMenu>
+
+            </h:panelGrid>
+        </rich:togglePanel>
+
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.requestsAndOrdersReportPage.buildReportHTML}"
+                               render="requestsAndOrdersReportPanel" styleClass="command-button"/>
+
+            <h:commandButton value="Генерировать отчет в Excel"
+                             actionListener="#{mainPage.requestsAndOrdersReportPage.exportToXLS}"
+                             styleClass="command-button" />
+
+        </h:panelGrid>
+
+        <a4j:status id="requestsAndOrdersReportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+        <h:panelGrid styleClass="borderless-grid" id="requestsAndOrdersReportPanel" columnClasses="center-aligned-column">
+            <!-- не показывать пустую таблицу -->
+            <h:panelGrid rendered="${not empty mainPage.requestsAndOrdersReportPage.htmlReport}">
+                <h:outputText escape="false" value="#{mainPage.requestsAndOrdersReportPage.htmlReport}" />
+            </h:panelGrid>
+        </h:panelGrid>
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

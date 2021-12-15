@@ -12,8 +12,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.hibernate.Session;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -76,13 +76,13 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         return lineResults.size();
     }
 
-    public void uploadFile(UploadEvent event) {
+    public void uploadFile(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
 
         Map<String, String> columns;
         Map<Integer, Map<String, String>> results = new HashMap<>();
-        Path path = Paths.get(item.getFile().toURI());
+        Path path = Paths.get(item.getName());
         int lineNum = 0;
 
         // Считывание данных из файла

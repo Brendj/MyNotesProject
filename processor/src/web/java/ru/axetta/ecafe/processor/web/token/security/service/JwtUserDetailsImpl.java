@@ -4,10 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.token.security.service;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+//import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
@@ -54,7 +55,8 @@ public class JwtUserDetailsImpl implements UserDetails {
         this.isEnabled = !user.isBlocked();
         this.isAccountNonExpired = user.blockedDateExpired();
         this.grantedAuthorities = new ArrayList<>();
-        this.grantedAuthorities.add(new GrantedAuthorityImpl(getUserRoleNameByRoleId(user.getIdOfRole())));
+        //this.grantedAuthorities.add(new GrantedAuthorityImpl(getUserRoleNameByRoleId(user.getIdOfRole())));
+        this.grantedAuthorities.add(new SimpleGrantedAuthority(getUserRoleNameByRoleId(user.getIdOfRole())));
         this.idOfUser = user.getIdOfUser();
         this.idOfRole = user.getIdOfRole();
         this.roleName = user.getRoleName();

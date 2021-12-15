@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
@@ -25,7 +26,8 @@ import java.util.List;
 
 @Path(value = "")
 @Controller
-public class OkuRestController {
+@ApplicationPath("/assessment/")
+public class OkuRestController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(OkuRestController.class);
 

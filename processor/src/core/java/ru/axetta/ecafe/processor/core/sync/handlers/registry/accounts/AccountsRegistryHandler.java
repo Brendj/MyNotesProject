@@ -110,11 +110,11 @@ public class AccountsRegistryHandler {
 
     private List<AccountItem> getAccountItems(List<Client> clients) {
         List<Card> cards;
-        if (isNewWayAccountsRegistry()) {
-            cards = CardWritableRepository.getInstance().findAllByClientList(clients);
-        } else {
+        //if (isNewWayAccountsRegistry()) {
+        //    cards = CardWritableRepository.getInstance().findAllByClientList(clients);
+        //} else {
             cards = CardReadOnlyRepository.getInstance().findAllByClientList(clients);
-        }
+        //}
 
         List<AccountItem> result = new ArrayList<AccountItem>();
         for (Client client : clients) {

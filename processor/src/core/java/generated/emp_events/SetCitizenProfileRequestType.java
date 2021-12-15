@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ *
  * <p>Java class for setCitizenProfileRequest_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.

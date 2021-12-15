@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist" table="cf_visitreqresolutionhist">
+        <composite-id name="compositeIdOfVisitReqResolutionHist"
+                      class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfVisitReqResolutionHist">
+            <key-property name="idOfRequest" type="long" column="IdOfRequest"/>
+            <key-property name="idOfOrgResol" type="long" column="IdOfOrgResol"/>
+            <key-property name="idOfRecord" type="long" column="IdOfRecord"/>
+        </composite-id>
+        <many-to-one name="orgResol" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgResol"
+                     not-null="true" insert="false" update="false"/>
+        <many-to-one name="orgRegistry" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgRegistry"
+                     not-null="true"/>
+        <many-to-one name="migrant" class="ru.axetta.ecafe.processor.core.persistence.Migrant"
+                     not-null="true" insert="false" update="false">
+                    <column name="IdOfRequest"/>
+                    <column name="IdOfOrgRegistry"/>
+        </many-to-one>
+        <property name="resolution" column="Resolution" type="integer" not-null="true"/>
+        <property name="resolutionDateTime" column="ResolutionDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="resolutionCause" column="ResolutionCause" type="string"/>
+        <many-to-one name="clientResol" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClientResol"/>
+        <property name="contactInfo" column="ContactInfo" type="string"/>
+        <property name="syncState" column="SyncState" type="integer" not-null="true"/>
+        <property name="initiator" column="initiator">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHistInitiatorEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="extraId" column="extraId" type="long" not-null="true" insert="false" update="false"/>
+    </class>
+</hibernate-mapping>
+
+

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
+import org.springframework.context.annotation.DependsOn;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -20,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.ejb.DependsOn;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;

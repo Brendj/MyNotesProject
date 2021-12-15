@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:event type="preRenderView" listener="#{mainPage.testSms()}" />
+<f:view>
+
+<h:head>
+    <title><h:outputText value="Новая школа#{runtimeContext.instanceNameDecorated}: #{mainPage.userRole}"/></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Content-Language" content="ru"/>
+    <link rel="icon" href="/processor/images/ecafe-favicon.png" type="image/x-icon"/>
+    <link rel="shortcut icon" href="/processor/images/ecafe-favicon.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="/processor/back-office/styles.css" type="text/css"/>
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>-->
+</h:head>
+
+<h:body style="margin: 4px; padding: 0;">
+
+    <rich:togglePanel rendered="false" />
+
+    <rich:fileUpload rendered="false" />
+
+    <rich:calendar rendered="false" />
+
+    <f:subview id="employeeSelectSubView">
+        <ui:include src="include/option/employees/employee/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="technologicalMapSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="productSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/product/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="technologicalMapGroupSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/group/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="productGroupSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/product/group/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="goodGroupSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/good/group/select.xhtml" />
+    </f:subview>
+
+
+    <f:subview id="configurationProviderSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="configurationProviderSelectListSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="basicGoodSelectListSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/basicGood/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="goodSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/good/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="goodGroupsSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/good/group/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="productDeleteSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/product/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="productGroupsSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/product/group/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="technologicalMapGroupsSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/group/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="technologicalMapProductsSelectSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/product/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="configurationProviderItemDeleteSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="technologicalMapItemDeleteSubView">
+        <ui:include src="include/commodity_accounting/configuration_provider/technologicalMap/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="dogmSelectSubView">
+        <ui:include src="include/visitorsdogm/visitordogm/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="bankDeleteSubView">
+        <ui:include src="include/option/confirm_delete_bank.xhtml" />
+    </f:subview>
+
+    <f:subview id="abstractConfirmDeletePageSubView">
+        <ui:include src="include/abstractpage/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="confirmDeletePageSubView">
+        <ui:include src="include/confirm_delete.xhtml" />
+    </f:subview>
+
+    <!--<f:subview id="cardRegistrationConfirmSubView">
+        <ui:include src="include/cardoperator/card_create_confirm.xhtml" />
+    </f:subview>-->
+
+    <f:subview id="orgSelectSubView">
+        <ui:include src="include/org/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="orgListSelectSubView">
+        <ui:include src="include/org/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="contragentSelectSubView">
+        <ui:include src="include/contragent/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="contragentListSelectSubView">
+        <ui:include src="include/contragent/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="complexListSelectSubView">
+        <ui:include src="include/webtechnolog/complex/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="dishListSelectSubView">
+        <ui:include src="include/webtechnolog/dish/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="contractSelectSubView">
+        <ui:include src="include/contragent/contract/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="clientSelectSubView">
+        <ui:include src="include/client/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="clientSelectListSubView">
+        <ui:include src="include/client/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="clientGroupListSelectSubView">
+        <ui:include src="include/client/select_group_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="clientGroupSelectSubView">
+        <ui:include src="include/client/select_group.xhtml" />
+    </f:subview>
+
+    <f:subview id="categorySelectSubView">
+        <ui:include src="include/option/categorydiscount/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="categoryListSelectSubView">
+        <ui:include src="include/option/categorydiscount/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="categoryOrgListSelectSubView">
+        <ui:include src="include/option/categoryorg/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="ruleListSelectSubView">
+        <ui:include src="include/option/discountrule/select_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="ccAccountDeleteSubView">
+        <ui:include src="include/contragent/ccaccount/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="reportJobDeleteSubView">
+        <ui:include src="include/report/job/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="reportRuleDeleteSubView">
+        <ui:include src="include/report/rule/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="eventNotificationDeleteSubView">
+        <ui:include src="include/event_notification/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="PosDeleteSubView">
+        <ui:include src="include/contragent/pos/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="settlementDeleteSubView">
+        <ui:include src="include/contragent/settlement/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="addPaymentDeleteSubView">
+        <ui:include src="include/contragent/addpayment/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="categoryDeleteSubView">
+        <ui:include src="include/option/confirm_delete.xhtml" />
+    </f:subview>
+	
+	<f:subview id="templateDeleteSubView">
+        <ui:include src="include/option/confirm_delete.xhtml" />
+    </f:subview>
+
+    <f:subview id="syncErrorsSubView">
+        <ui:include src="include/monitoring/sync_errors_window.xhtml" />
+    </f:subview>
+
+    <f:subview id="userSelectSubView">
+        <ui:include src="include/option/user/select.xhtml" />
+    </f:subview>
+
+    <f:subview id="orgMainBuildingListSelectSubView">
+        <ui:include src="include/org/select_mainbuilding_list.xhtml" />
+    </f:subview>
+
+    <f:subview id="userListSelectSubView">
+        <ui:include src="include/option/user/select_list.xhtml" />
+    </f:subview>
+
+    <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
+        <tr>
+            <td colspan="2">
+                    <!-- Заголовок страницы -->
+                <h:form id="headerForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
+                    <a4j:jsFunction name="sayHello" action="#{mainPage.userSaidHello}"/>
+                    <a4j:jsFunction name="sayGoodbye" action="#{mainPage.userSaidGoodbye}"/>
+                    <rich:panel styleClass="header-panel" bodyClass="header-panel-body">
+                        <h:panelGroup style="text-align: right; float: right;">
+                            <h:outputText escape="true" value="Версия #{runtimeContext.currentDBSchemaVersion}"
+                                          styleClass="output-text" /><br />
+                            <a4j:commandLink value="Мои настройки"
+                                           action="#{userSettings.show}" styleClass="command-link" render="workspaceForm"/>
+                            &nbsp;&nbsp;&nbsp;
+                            <h:outputText id="sysuser" escape="true" value="#{request.remoteUser}" styleClass="output-text" />
+                            <rich:tooltip for="sysuser" followMouse="true" showDelay="500" styleClass="tooltip" rendered="#{not empty mainPage.userContragentsList}">
+                                <span  style="white-space:nowrap">
+                                    <h:outputText styleClass="output-text" style="font-weight: bold" value="Доступные контрагенты:" /><br />
+                                    <h:outputText escape="false" value="#{mainPage.userContragentsList}" /><br /><br />
+                                    <h:outputText styleClass="output-text" style="font-weight: bold" value="Доступные регионы:" /><br />
+                                    <h:outputText escape="false" value="#{mainPage.userRegionsList}" />
+                                </span>
+                            </rich:tooltip>
+                            <h:outputText value=" - " styleClass="output-text"/>
+                            <h:outputLink id="logout-link" styleClass="command-link"
+                                          value="/processor/j_spring_security_logout">Выход</h:outputLink>
+                        </h:panelGroup>
+                        <h:panelGroup style="text-align: left;">
+                            <h:graphicImage value="/images/ecafe-favicon.png"
+                                            style="border: 0; margin: 0 8px 0 0; vertical-align: middle; " />
+                            <h:outputText escape="true" id="headerText" value="Новая школа#{runtimeContext.instanceNameDecorated}: #{mainPage.userRole}"
+                                          styleClass="page-header-text" />
+                        </h:panelGroup>
+                    </rich:panel>
+                </h:form>
+            </td>
+        </tr>
+            <!-- Центральная область -->
+        <tr>
+            <td style="min-width: 210px; vertical-align: top;" width="215px">
+                    <!-- Главное меню -->
+                <f:subview id="mainMenuSubView">
+                    <ui:include src="/back-office/include/main_menu.xhtml" />
+                </f:subview>
+            </td>
+            <td style="vertical-align: top;" width="*">
+                    <!-- Рабочая область -->
+                <f:subview id="workspaceSubView">
+                    <ui:include src="/back-office/include/workspace.xhtml" />
+                </f:subview>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                    <!-- Нижний колонтитул -->
+                <h:panelGrid width="100%" cellspacing="4px" cellpadding="0" styleClass="borderless-grid"
+                             columnClasses="right-aligned-column">
+                </h:panelGrid> <!-- Нижний колонтитул -->
+            </td>
+        </tr>
+    </table>
+
+</h:body>
+
+</f:view>
+</html>

@@ -77,7 +77,7 @@ public class ETPMVClient implements MessageListener, ExceptionListener {
             jmsConnectionFactory = jmsFactoryFactory.createConnectionFactory();
             //jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_HOST_NAME, properties.getProperty("ecafe.processor.etp.host", "etp3.sm-soft.ru"));
             //jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_PORT, Integer.parseInt(properties.getProperty("ecafe.processor.etp.port", "2424")));
-            jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_CONNECTION_NAME_LIST, properties.getProperty("ecafe.processor.etp.hosts", "etp3.sm-soft.ru(2424),etp4.sm-soft.ru(2424)"));
+            jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_CONNECTION_NAME_LIST, properties.getProperty("ecafe.processor.etp.hosts", "etp3.sm-soft.ru(2424)"));
             jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_CLIENT_RECONNECT_OPTIONS, WMQConstants.WMQ_CLIENT_RECONNECT);
             jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_CLIENT_RECONNECT_TIMEOUT, Integer.parseInt(properties.getProperty("ecafe.processor.etp.reconnect_timeout", "600")));
             jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_CHANNEL, properties.getProperty("ecafe.processor.etp.channel", "CLNT.SAMPLE.SVRCONN"));

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <!--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"-->
+<h:panelGrid>
+    <h:panelGrid id="preorderJournalPanelGrid" binding="#{preorderJournalReportPage.pageComponent}"
+                 styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+            <h:panelGroup>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                                   render="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="#{preorderJournalReportPage.getStringIdOfOrgList}"
+                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" value=" {#{preorderJournalReportPage.filter}}"/>
+            </h:panelGroup>
+
+            <h:outputText styleClass="output-text" escape="true" value="Физ. лицо"/>
+            <h:panelGroup id="clientFilter">
+                <a4j:commandButton value="..."
+                                   action="#{mainPage.showClientSelectListPage(preorderJournalReportPage.getClientList())}"
+                                   render="modalClientListSelectorPanel,selectedClientList"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+                <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                              value=" {#{preorderJournalReportPage.stringClientList}}"/>
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Начальная дата" styleClass="output-text"/>
+            <rich:calendar value="#{preorderJournalReportPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDateCalendar"
+                             actionListener="#{preorderJournalReportPage.onReportPeriodChanged}"/>
+            </rich:calendar>
+
+            <h:outputText styleClass="output-text" escape="true" value="Интервал выборки"/>
+            <h:selectOneMenu id="endDatePeriodSelect"
+                             value="#{preorderJournalReportPage.periodTypeMenu.periodType}"
+                             styleClass="input-text" style="width: 250px;">
+                <f:converter converterId="periodTypeConverter"/>
+                <f:selectItems value="#{preorderJournalReportPage.periodTypeMenu.items}"/>
+                <a4j:ajax event="change" render="endDateCalendar,preorderJournalPanelGrid"
+                             actionListener="#{preorderJournalReportPage.onReportPeriodChanged}"/>
+            </h:selectOneMenu>
+
+            <h:outputText escape="true" value="Конечная дата" styleClass="output-text"/>
+            <rich:calendar id="endDateCalendar" value="#{preorderJournalReportPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDatePeriodSelect"
+                             actionListener="#{preorderJournalReportPage.onEndDateSpecified}"/>
+            </rich:calendar>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать отчет" action="#{preorderJournalReportPage.buildReportHTML}"
+                               render="preorderJournalPanelGrid" styleClass="command-button"/>
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{preorderJournalReportPage.exportToXLS}"
+                             styleClass="command-button"/>
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" id="preordersReportTable">
+            <c:if test="${not empty preorderJournalReportPage.htmlReport}">
+                <h:outputText escape="true" value="#{preorderJournalReportPage.reportName}" styleClass="output-text"/>
+                <h:outputText escape="false" value="#{preorderJournalReportPage.htmlReport}"/>
+                <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text"/>
+            </c:if>
+        </h:panelGrid>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

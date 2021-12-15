@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOCurrentOrgVersion" table="cf_do_org_current_version" optimistic-lock="version">
+        <id name="iDDOOrgCurrentVersion" column="IDDOOrgCurrentVersion" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <property name="idOfOrg" column="IdOfOrg" type="long"/>
+        <property name="lastVersion" column="LastVersion" type="long"/>
+        <property name="objectId" column="ObjectId" type="int"/>
+    </class>
+</hibernate-mapping>

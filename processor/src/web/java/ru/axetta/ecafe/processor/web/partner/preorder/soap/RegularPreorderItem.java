@@ -5,9 +5,10 @@
 package ru.axetta.ecafe.processor.web.partner.preorder.soap;
 
 import ru.axetta.ecafe.processor.core.persistence.RegularPreorder;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import javax.xml.bind.annotation.*;
-import java.util.Date;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * Created by i.semenov on 09.07.2018.
@@ -21,10 +22,10 @@ public class RegularPreorderItem {
     private Integer idOfComplex;
     @XmlAttribute(name = "startDate")
     @XmlSchemaType(name = "date")
-    private Date startDate;
+    private XMLGregorianCalendar startDate;
     @XmlAttribute(name = "endDate")
     @XmlSchemaType(name = "date")
-    private Date endDate;
+    private XMLGregorianCalendar endDate;
     @XmlAttribute(name = "price")
     private Long price;
     @XmlAttribute(name = "amount")
@@ -50,8 +51,8 @@ public class RegularPreorderItem {
     public RegularPreorderItem(RegularPreorder regularPreorder) {
         this. itemCode = regularPreorder.getItemCode();
         this.idOfComplex = regularPreorder.getIdOfComplex();
-        this.startDate = regularPreorder.getStartDate();
-        this.endDate = regularPreorder.getEndDate();
+        this.startDate = CalendarUtils.toXmlDateTimeWithTimezoneOffset(regularPreorder.getStartDate());
+        this.endDate = CalendarUtils.toXmlDateTimeWithTimezoneOffset(regularPreorder.getEndDate());
         this.price = regularPreorder.getPrice();
         this.amount = regularPreorder.getAmount();
         this.monday = regularPreorder.getMonday();
@@ -78,19 +79,19 @@ public class RegularPreorderItem {
         this.idOfComplex = idOfComplex;
     }
 
-    public Date getStartDate() {
+    public XMLGregorianCalendar getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(XMLGregorianCalendar startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public XMLGregorianCalendar getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(XMLGregorianCalendar endDate) {
         this.endDate = endDate;
     }
 

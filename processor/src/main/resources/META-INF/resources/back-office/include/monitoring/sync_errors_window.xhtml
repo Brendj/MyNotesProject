@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <rich:popupPanel modal="true" id="syncErrorsWindow" autosized="true" headerClass="modal-panel-header" width="450">
+        <rich:hotKey key="esc" handler="#{rich:component('syncErrorsWindow')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText escape="true" value="Просмотр зафиксированных ошибок"/>
+        </f:facet>
+        <h:form id="syncErrorsModalForm" styleClass="borderless-form" eventsQueue="syncErrorsFormEventsQueue">
+            <rich:dataTable id="syncErrorsTable" value="#{mainPage.statusSyncReportPage.currentStatusSync.syncErrors}"
+                            var="syncError" rowKeyVar="row" rows="8" footerClass="data-table-footer">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="№"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" width="380">
+                            <h:outputText styleClass="column-header" escape="true" value="Сообщение об ошибке"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{row + 1}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column styleClass="left-aligned-column">
+                    <h:outputText styleClass="output-text" value="#{syncError}"/>
+                </rich:column>
+                <f:facet name="footer">
+                    <rich:dataScroller for="syncErrorsTable" renderIfSinglePage="false" maxPages="10"
+                                       fastControls="hide"
+                                       stepControls="auto" boundaryControls="hide">
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                        </f:facet>
+                    </rich:dataScroller>
+                </f:facet>
+            </rich:dataTable>
+            <div style="text-align: center;">
+                <a4j:commandButton value="Закрыть" styleClass="command-button"
+                                   oncomplete="#{rich:component('syncErrorsWindow')}.hide();return false;"/>
+            </div>
+        </h:form>
+    </rich:popupPanel>
+</ui:composition>

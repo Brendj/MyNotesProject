@@ -163,7 +163,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         generateEndDate = new Date(generateBeginDate.getTime()+60*60*1000);
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){

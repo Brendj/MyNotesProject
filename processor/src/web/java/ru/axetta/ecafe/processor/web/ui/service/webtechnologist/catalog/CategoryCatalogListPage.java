@@ -160,28 +160,7 @@ public class CategoryCatalogListPage extends BasicWorkspacePage {
     }
 
     public void refreshItems() {
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            if (CollectionUtils.isEmpty(catalogListItem)) {
-                throw new IllegalArgumentException("Element collection is null or is empty");
-            }
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
-
-            for (WtCategory item : catalogListItem) {
-                session.refresh(item);
-            }
-
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e) {
-            printError("Не удалось восстановить элементы: " + e.getMessage());
-            logger.error("Can't restore elements", e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
+        catalogListItem = service.getAllActiveCategory();
     }
 
     public List<WtCategoryItem> getItemsForSelectedItem() {

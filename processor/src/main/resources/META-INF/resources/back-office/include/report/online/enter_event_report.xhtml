@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
+    <h:panelGrid binding="#{mainPage.enterEventReportPage.pageComponent}" id="enterEventReportPanelGrid" styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+            <rich:calendar value="#{mainPage.enterEventReportPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+            <rich:calendar value="#{mainPage.enterEventReportPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.enterEventReportPage.filter}" readonly="true"
+                             styleClass="input-text long-field" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+            </h:panelGroup>
+            <a4j:status id="reportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.enterEventReportPage.buildReportHTML}"
+                               render="workspaceTogglePanel" styleClass="command-button"/>
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.enterEventReportPage.generateXLS}"
+                             styleClass="command-button" />
+        </h:panelGrid>
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+        <h:panelGrid styleClass="borderless-grid" id="reportPanel">
+            <h:panelGrid rendered="${not empty  mainPage.enterEventReportPage.htmlReport}">
+                <h:outputText escape="false" value="#{mainPage.enterEventReportPage.htmlReport}" />
+                <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+            </h:panelGrid>
+        </h:panelGrid>
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding"
+           table="cf_subscriber_feeding">
+        <id name="globalId" column="IdOfServiceSubscriberFeeding" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersionOnCreate" column="GlobalVersionOnCreate" type="long"/>
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="sendAll" column="SendAll">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
+                <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+                <param name="type">4</param>
+            </type>
+        </property>
+        <!-- End Global params -->
+
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="idOfOrgLastChange" column="idOfOrgLastChange" type="long"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="IdOfClient" not-null="false"/>
+
+        <property name="dateActivateSubscription" column="DateActivateSubscription"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="lastDatePauseSubscription" column="LastDatePauseSubscription"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateDeactivateService" column="DateDeactivateService"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateCreateService" column="DateCreateService"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
+
+        <property name="wasSuspended" column="WasSuspended" type="java.lang.Boolean"/>
+
+        <property name="feedingType" column="FeedingType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeedingType</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+
+        <many-to-one name="staff" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+            <column name="idOfStaff" not-null="false" />
+        </many-to-one>
+
+
+    </class>
+</hibernate-mapping>

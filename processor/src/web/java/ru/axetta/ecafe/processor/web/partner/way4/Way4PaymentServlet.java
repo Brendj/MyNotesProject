@@ -13,8 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.cert.X509Certificate;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
+@WebServlet(
+        name = "Way4PaymentServlet",
+        description = "Way4PaymentServlet",
+        urlPatterns = {"/payment-way4"}
+)
 public class Way4PaymentServlet extends OnlinePaymentServlet {
     private static final Logger logger = LoggerFactory.getLogger(Way4PaymentServlet.class);
 

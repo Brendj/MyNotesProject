@@ -329,6 +329,7 @@ public class ClientFilter {
         clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
         clientBalanceCondition = ClientBalanceFilter.NO_CONDITION;
         clientGroupId = ClientGroupMenu.CLIENT_ALL;
+        email = null;
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws HibernateException {

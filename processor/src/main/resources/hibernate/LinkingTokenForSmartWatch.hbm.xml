@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.LinkingTokenForSmartWatch" table="cf_linking_tokens_for_smartwatch">
+        <id name="idOfLinkingTokensForSmartWatch" column="idOflinkingtokensforsmartwatch" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="phoneNumber" column="phoneNumber" type="string"/>
+        <property name="token" column="token" type="string" length="128" not-null="true"/>
+        <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+    </class>
+</hibernate-mapping>

@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ *
+ * 
  * <p>Java class for getSubscriptionStreamCategoryResponse_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
@@ -34,7 +36,7 @@ public class GetSubscriptionStreamCategoryResponseType
     extends BaseResponseType
 {
 
-    @XmlElement(name = "return", required = true)
+    @XmlElement(name = "return", required = true, nillable = true)
     protected StreamCategoryType _return;
 
     /**

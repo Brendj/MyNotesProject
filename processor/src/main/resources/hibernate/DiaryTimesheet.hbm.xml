@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet" table="CF_DiaryTimesheet">
+        <composite-id name="compositeIdOfDiaryTimesheet"
+                      class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfDiaryTimesheet">
+            <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
+            <key-property name="idOfClientGroup" type="long" column="IdOfClientGroup"/>
+            <key-property name="recDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="RecDate"/>
+        </composite-id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     insert="false" update="false"/>
+        <many-to-one name="clientGroup" class="ru.axetta.ecafe.processor.core.persistence.ClientGroup" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfClientGroup"/>
+        </many-to-one>
+        <property name="recDate" column="RecDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false" insert="false"/>
+        <property name="c0" type="long" column="C0"/>
+        <property name="c1" type="long" column="C1"/>
+        <property name="c2" type="long" column="C2"/>
+        <property name="c3" type="long" column="C3"/>
+        <property name="c4" type="long" column="C4"/>
+        <property name="c5" type="long" column="C5"/>
+        <property name="c6" type="long" column="C6"/>
+        <property name="c7" type="long" column="C7"/>
+        <property name="c8" type="long" column="C8"/>
+        <property name="c9" type="long" column="C9"/>
+
+        <many-to-one name="diaryClass0" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C0"/>
+        </many-to-one>
+        <many-to-one name="diaryClass1" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C1"/>
+        </many-to-one>
+        <many-to-one name="diaryClass2" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C2"/>
+        </many-to-one>
+        <many-to-one name="diaryClass3" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C3"/>
+        </many-to-one>
+        <many-to-one name="diaryClass4" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C4"/>
+        </many-to-one>
+        <many-to-one name="diaryClass5" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C5"/>
+        </many-to-one>
+        <many-to-one name="diaryClass6" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C6"/>
+        </many-to-one>
+        <many-to-one name="diaryClass7" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C7"/>
+        </many-to-one>
+        <many-to-one name="diaryClass8" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C8"/>
+        </many-to-one>
+        <many-to-one name="diaryClass9" class="ru.axetta.ecafe.processor.core.persistence.DiaryClass" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="C9"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>
+
+

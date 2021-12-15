@@ -16,9 +16,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.security.auth.login.CredentialException;
 import javax.servlet.http.HttpServletRequest;
@@ -232,6 +232,8 @@ public class User {
         public Integer getIdentification() {
             return identification;
         }
+
+        public String getDescription() { return description; }
     }
 
     public enum DefaultRole{
@@ -706,7 +708,7 @@ public class User {
     }
 
     private static String sendServiceSMSRequest(final User user, String code) throws Exception {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE);
         String comment = String.format("Период действия кода - %s дней", days);
         SecurityJournalAuthenticate record = SecurityJournalAuthenticate
@@ -746,7 +748,7 @@ public class User {
         this.setBlockedUntilDate(new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS));
         DAOService.getInstance().setUserInfo(this);
 
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
         String comment = String.format("Пользователь %s заблокирован", userName);

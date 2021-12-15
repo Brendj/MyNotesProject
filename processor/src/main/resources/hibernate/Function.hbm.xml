@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Function" table="CF_Functions">
+        <id name="idOfFunction" column="IdOfFunction" type="long"/>
+        <property name="functionName" column="FunctionName" type="string" not-null="true"/>
+        <property name="restrict" column="IsRestrict" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <set name="usersInternal" table="CF_Permissions" inverse="true" cascade="all">
+            <key column="IdOfFunction"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.User" column="IdOfUser"/>
+        </set>
+    </class>
+</hibernate-mapping>
+
+

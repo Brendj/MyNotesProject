@@ -47,7 +47,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
     public void valueChangeListener(ValueChangeEvent event){
         try {
             if(StringUtils.isNotEmpty(String.valueOf(event.getNewValue()))){
-                settingsIds = SettingsIds.fromString((String)event.getNewValue()).getId();
+                settingsIds = SettingsIds.valueOf((String)event.getNewValue()).getId();
                 init();
             }
         } catch (Exception e) {

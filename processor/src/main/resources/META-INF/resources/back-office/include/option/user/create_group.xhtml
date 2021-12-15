@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!-- Панель создания пользователя -->
+    <h:panelGrid>
+        <h:panelGrid id="userGroupCreateGrid"
+                     styleClass="borderless-grid"
+                     columns="2">
+            <h:outputText escape="true" value="Имя роли" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.userGroupCreatePage.roleName}" maxlength="64" styleClass="input-text"/>
+
+            <h:outputText escape="true" value="Организации" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.organizationItems}"
+                            var="organizationItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{organizationItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{organizationItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{organizationItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Контрагенты" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.contragentItems}"
+                            var="contragentItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{contragentItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{contragentItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Клиенты" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.clientItems}" var="clientItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{clientItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{clientItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{clientItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Сотрудники" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.visitorItems}" var="visitorItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{visitorItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{visitorItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{visitorItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Карты" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.cardItems}" var="cardItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{cardItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{cardItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{cardItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Товарный учет" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.wayBillItems}" var="wayBillItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{wayBillItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{wayBillItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{wayBillItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Сервис" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.serviceItems}" var="serviceItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{serviceItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{serviceItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{serviceItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Мониторинг" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.monitorItems}" var="monitorItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{monitorItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{monitorItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{monitorItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Репозиторий отчетов" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.repositoryItems}"
+                            var="repositoryItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{repositoryItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{repositoryItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{repositoryItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Служба помощи" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.helpdeskItems}" var="helpdeskItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{helpdeskItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{helpdeskItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{helpdeskItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="ЕСП" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.espItems}" var="espItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{espItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{espItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{espItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Настройки" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.optionsItems}" var="optionsItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{optionsItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{optionsItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{optionsItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+            <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text"/>
+            <rich:dataTable value="#{mainPage.userGroupCreatePage.functionSelector.onlineReportItems}"
+                            var="onlineReportItems">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{onlineReportItems.functionName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{onlineReportItems.functionDesc}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <a4j:commandButton value="Создать новую роль" action="#{mainPage.userGroupCreatePage.createGroup}"
+                               styleClass="command-button"/>
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientAllocationRule" table="CF_ClientAllocationRule">
+        <id name="id" column="IdOfClientAllocationRule" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="sourceOrg" class="ru.axetta.ecafe.processor.core.persistence.Org"
+                     column="IdOfSourceOrg" not-null="true" lazy="false" cascade="none"/>
+        <many-to-one name="destinationOrg" class="ru.axetta.ecafe.processor.core.persistence.Org"
+                     column="IdOfDestinationOrg" not-null="true" lazy="false" cascade="none"/>
+        <property name="groupFilter" type="string" column="GroupFilter" length="1024"/>
+        <property name="tempClient" type="boolean" column="IsTempClient" not-null="true"/>
+    </class>
+</hibernate-mapping>

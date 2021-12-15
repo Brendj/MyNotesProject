@@ -34,6 +34,7 @@ public class ApplicationForFoodReportItem {
     private Boolean archieved;
     private Date startDate;
     private Date endDate;
+    private Boolean expand;
 
     public ApplicationForFoodReportItem() {
 
@@ -61,6 +62,7 @@ public class ApplicationForFoodReportItem {
             this.startDate = applicationForFood.getDiscountDateStart();
             this.endDate = applicationForFood.getDiscountDateEnd();
         }
+        this.expand = false;
     }
 
     public String getApplicationForFoodStateString() {
@@ -246,5 +248,13 @@ public class ApplicationForFoodReportItem {
 
     public void setArchiveDate(Date archiveDate) {
         this.archiveDate = archiveDate;
+    }
+
+    public Boolean getExpand() {
+        return expand;
+    }
+
+    public void setExpand(Boolean expand) {
+        this.expand = expand;
     }
 }

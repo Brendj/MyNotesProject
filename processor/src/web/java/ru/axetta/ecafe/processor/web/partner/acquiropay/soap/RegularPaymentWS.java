@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.annotation.PostConstruct;
@@ -54,6 +55,7 @@ import java.util.Map;
  */
 
 @WebService
+@DependsOn("runtimeContext")
 public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
 
     private static final Logger logger = LoggerFactory.getLogger(RegularPaymentWS.class);

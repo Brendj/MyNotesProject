@@ -53,7 +53,7 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
     private Boolean showTotal = true;
 
     public CoverageNutritionReportPage() {
-        onReportPeriodChanged(null);
+        onReportPeriodChanged();
     }
 
     public Object buildReportHTML() {
@@ -199,7 +199,7 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
         return showYoungerClasses || showMiddleClasses || showOlderClasses || showEmployee;
     }
 
-    public void onClassesChecked(ActionEvent event) {
+    public void onClassesChecked() {
         if (!enableFoodTypeCheckBoxes()) {
             showFreeNutrition = false;
             showPaidNutrition = false;

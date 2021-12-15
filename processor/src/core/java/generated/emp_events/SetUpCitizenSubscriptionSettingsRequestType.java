@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ *
  * <p>Java class for setUpCitizenSubscriptionSettingsRequest_Type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
@@ -23,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;choice minOccurs="0">
  *           &lt;element name="SSOID" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *           &lt;element name="citizenId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *           &lt;element name="msisdn" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;/choice>
  *         &lt;element name="settings">
  *           &lt;complexType>
@@ -48,6 +50,7 @@ import javax.xml.bind.annotation.XmlType;
     "subscriptionId",
     "ssoid",
     "citizenId",
+    "msisdn",
     "settings"
 })
 public class SetUpCitizenSubscriptionSettingsRequestType
@@ -58,6 +61,7 @@ public class SetUpCitizenSubscriptionSettingsRequestType
     @XmlElement(name = "SSOID")
     protected String ssoid;
     protected Integer citizenId;
+    protected Long msisdn;
     @XmlElement(required = true)
     protected SetUpCitizenSubscriptionSettingsRequestType.Settings settings;
 
@@ -123,6 +127,30 @@ public class SetUpCitizenSubscriptionSettingsRequestType
      */
     public void setCitizenId(Integer value) {
         this.citizenId = value;
+    }
+
+    /**
+     * Gets the value of the msisdn property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getMsisdn() {
+        return msisdn;
+    }
+
+    /**
+     * Sets the value of the msisdn property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setMsisdn(Long value) {
+        this.msisdn = value;
     }
 
     /**

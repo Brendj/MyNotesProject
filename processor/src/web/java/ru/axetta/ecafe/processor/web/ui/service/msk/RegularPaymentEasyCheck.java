@@ -101,12 +101,13 @@ public class RegularPaymentEasyCheck {
             session.persist(request);
             requestResultEasyCheck.setErrorCode(0);
             transaction.commit();
+            transaction = null;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage());
             requestResultEasyCheck.setErrorCode(RC_BAD_REQUEST);
             requestResultEasyCheck.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, contractId));
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return requestResultEasyCheck;
@@ -185,9 +186,9 @@ public class RegularPaymentEasyCheck {
                         paymentAmount, session);
             }
             transaction.commit();
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
+            transaction = null;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
 

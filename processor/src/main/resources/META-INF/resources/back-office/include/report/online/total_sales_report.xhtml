@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <script type="text/javascript">
+        function disableButtons(value) {
+            document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateButton").disabled=value;
+            document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:xlsButton").disabled=value;
+            document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clearButton").disabled=value;
+        }
+    </script>
+<h:panelGrid>
+    <h:panelGrid id="registerStampReportPanelGrid" binding="#{mainPage.totalSalesPage.pageComponent}"
+                 styleClass="borderless-grid">
+
+        <rich:togglePanel label="Настройки отчета" switchType="client" opened="true"
+                          headerClass="filter-panel-header" width="800">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{mainPage.totalSalesPage.contragent.contragentName}" readonly="true"
+                                 styleClass="input-text" style="margin-right: 2px; width: 275px;" />
+                    <a4j:commandButton value="..."
+                                       action="#{mainPage.showContragentSelectPage}"
+                                       render="modalContragentSelectorPanel,registerStampReportPanelGrid"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                        <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                    </a4j:commandButton>
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Организация" styleClass="output-text" />
+                <h:panelGroup styleClass="borderless-div">
+                    <a4j:commandButton value="..." action="#{mainPage.totalSalesPage.showOrgListSelectPage}"
+                                       render="modalOrgListSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                       style="width: 25px;">
+                        <f:setPropertyActionListener value="#{mainPage.totalSalesPage.getStringIdOfOrgList}"
+                                                     target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.totalSalesPage.filter}}" />
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+                <rich:calendar value="#{mainPage.totalSalesPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDateCalendar,registerStampReportPanel"
+                                 listener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
+                </rich:calendar>
+
+                <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+                <h:selectOneMenu id="endDatePeriodSelect" value="#{mainPage.totalSalesPage.periodTypeMenu.periodType}"
+                                 styleClass="input-text" style="width: 250px;">
+                    <f:converter converterId="periodTypeConverter" />
+                    <f:selectItems value="#{mainPage.totalSalesPage.periodTypeMenu.items}" />
+                    <a4j:ajax event="change" render="endDateCalendar,registerStampReportPanel"
+                                 listener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+                <rich:calendar id="endDateCalendar" value="#{mainPage.totalSalesPage.endDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDatePeriodSelect,registerStampReportPanel"
+                                 actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
+                </rich:calendar>
+
+                <h:outputText escape="false" value="Показать в разрезе возрастных категорий" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showAgeGroups}" styleClass="output-text">
+                </h:selectBooleanCheckbox>
+
+                <h:panelGrid styleClass="borderless-grid" columns="1">
+                    <h:panelGrid id="preferencialPanel" styleClass="borderless-grid" columns="1">
+                        <h:panelGroup styleClass="borderless-div">
+                            <h:outputText escape="true" value="Отображать детализацию буфетной продукции "
+                                          styleClass="output-text" />
+                            <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showDetail}" styleClass="output-text">
+                                <a4j:ajax event="click" render="preferencialPanel" />
+                            </h:selectBooleanCheckbox>
+
+                            <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
+                                          rendered="#{mainPage.totalSalesPage.showDetail}">
+                                <h:selectManyCheckbox id="preferentialTitles"
+                                                      value="#{mainPage.totalSalesPage.preferentialTitleComplexes}"
+                                                      layout="pageDirection" styleClass="output-text"
+                                                      rendered="#{mainPage.totalSalesPage.showDetail}">
+                                    <f:selectItems value="#{mainPage.totalSalesPage.availableTitleComplexes}" />
+                                </h:selectManyCheckbox>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGrid id="benefitPanel" styleClass="borderless-grid" columns="1">
+                        <h:panelGroup styleClass="borderless-div">
+                            <h:outputText escape="true" value="Отображать детализацию льготных комплексов"
+                                          styleClass="output-text" />
+                            <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showBenefitDetail}"
+                                                     styleClass="output-text">
+                                <a4j:ajax event="click" render="benefitPanel" />
+                            </h:selectBooleanCheckbox>
+
+                            <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
+                                          rendered="#{mainPage.totalSalesPage.showBenefitDetail}">
+                                <h:selectManyCheckbox id="benefitTitles"
+                                                      value="#{mainPage.totalSalesPage.benefitTitleComplexes}"
+                                                      layout="pageDirection" styleClass="output-text"
+                                                      rendered="#{mainPage.totalSalesPage.showBenefitDetail}">
+                                    <f:selectItems
+                                            value="#{mainPage.totalSalesPage.availableComplexesWithPriceTitlesBenefit}" />
+                                </h:selectManyCheckbox>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGrid id="paidPanel" styleClass="borderless-grid" columns="1">
+                        <h:panelGroup styleClass="borderless-div">
+                            <h:outputText escape="true" value="Отображать детализацию платных комплексов  "
+                                          styleClass="output-text" />
+                            <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showPaidDetail}"
+                                                     styleClass="output-text">
+                                <a4j:ajax event="click" render="paidPanel" />
+                            </h:selectBooleanCheckbox>
+
+                            <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
+                                          rendered="#{mainPage.totalSalesPage.showPaidDetail}">
+                                <h:selectManyCheckbox id="paidTitles" value="#{mainPage.totalSalesPage.paidTitleComplexes}"
+                                                      layout="pageDirection" styleClass="output-text"
+                                                      rendered="#{mainPage.totalSalesPage.showPaidDetail}">
+                                    <f:selectItems
+                                            value="#{mainPage.totalSalesPage.availableComplexesWithPriceTitlesPaid}" />
+                                </h:selectManyCheckbox>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:panelGrid>
+
+            </h:panelGrid>
+
+        </rich:togglePanel>
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.totalSalesPage.buildReportHTML}"
+                               render="registerStampReportPanel" styleClass="command-button" onclick="disableButtons(true);"
+                               id="generateButton" oncomplete="disableButtons(false)"/>
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.totalSalesPage.showCSVList}"
+                             styleClass="command-button" id="xlsButton" onclick="setTimeout('disableButtons(true);', 50);" >
+            </h:commandButton>
+            <a4j:commandButton value="Очистить" action="#{mainPage.totalSalesPage.clear}" onclick="disableButtons(true);"
+                               render="registerStampReportPanelGrid" styleClass="command-button"
+                               id="clearButton" oncomplete="disableButtons(false)" />
+        </h:panelGrid>
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+        <h:panelGrid styleClass="borderless-grid" id="registerStampReportPanel" columnClasses="center-aligned-column">
+            <h:panelGrid rendered="${mainPage.totalSalesPage.htmlReport!=null &amp;&amp; not empty mainPage.totalSalesPage.htmlReport}">
+                <h:outputText escape="false" value="#{mainPage.totalSalesPage.htmlReport}" />
+            </h:panelGrid>
+        </h:panelGrid>
+
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

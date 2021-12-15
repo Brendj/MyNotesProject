@@ -225,7 +225,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         htmlReport = dailySalesReport.getHtmlReport();
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
                 setEndDate(startDate);
@@ -246,7 +246,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         return periodTypeMenu;
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);

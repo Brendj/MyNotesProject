@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:panelGrid>
+    <!--@elvariable id="cardApplicationReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardApplicationReportPage"-->
+    <h:panelGrid id="cardApplicationPanelGrid" binding="#{cardApplicationReportPage.pageComponent}"
+                 styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Организация" styleClass="output-text" />
+            <h:panelGroup id="orgFilter">
+                <a4j:commandButton value="..." action="#{cardApplicationReportPage.showOrgSelectPage()}"
+                                   render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" value=" {#{cardApplicationReportPage.filter}}" />
+            </h:panelGroup>
+
+            <h:outputText styleClass="output-text" escape="true" value="Клиент (учащийся)" />
+            <h:panelGroup id="clientFilter">
+                <a4j:commandButton value="..." action="#{mainPage.showClientSelectListPage(cardApplicationReportPage.getClientList(), cardApplicationReportPage.idOfOrg)}"
+                                   render="modalClientListSelectorPanel,selectedClientList"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
+                    <f:setPropertyActionListener value="#{cardApplicationReportPage.getStringClientList}"
+                                                 target="#{mainPage.clientSelectListPage.clientFilter}" />
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                              value=" {#{cardApplicationReportPage.stringClientList}}" />
+            </h:panelGroup>
+
+            <h:outputText value="Включить фильтр по датам: " styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{cardApplicationReportPage.enableDateFilter}">
+                <a4j:ajax event="change" render="cardApplicationPanelGrid"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
+            <rich:calendar value="#{cardApplicationReportPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" disabled="#{not cardApplicationReportPage.enableDateFilter}">
+                <a4j:ajax event="change" render="endDateCalendar"
+                          listener="#{cardApplicationReportPage.onReportPeriodChanged}" />
+            </rich:calendar>
+
+            <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+            <h:selectOneMenu id="endDatePeriodSelect"
+                             value="#{cardApplicationReportPage.periodTypeMenu.periodType}"
+                             styleClass="input-text" style="width: 250px;"
+                             disabled="#{not cardApplicationReportPage.enableDateFilter}">
+                <f:converter converterId="periodTypeConverter" />
+                <f:selectItems value="#{cardApplicationReportPage.periodTypeMenu.items}" />
+                <a4j:ajax event="change" render="endDateCalendar,cardApplicationPanelGrid"
+                          listener="#{cardApplicationReportPage.onReportPeriodChanged}" />
+            </h:selectOneMenu>
+
+            <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
+            <rich:calendar id="endDateCalendar" value="#{cardApplicationReportPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" disabled="#{not cardApplicationReportPage.enableDateFilter}">
+                <a4j:ajax event="change" render="endDatePeriodSelect"
+                             listener="#{cardApplicationReportPage.onEndDateSpecified}" />
+            </rich:calendar>
+
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать отчет" action="#{cardApplicationReportPage.buildReportHTML}"
+                               render="cardApplicationReportTable" styleClass="command-button" />
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{cardApplicationReportPage.exportToXLS}"
+                             styleClass="command-button" />
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" id="cardApplicationReportTable">
+            <h:panelGrid rendered="${not empty cardApplicationReportPage.htmlReport}">
+                <h:outputText escape="true" value="#{cardApplicationReportPage.reportName}" styleClass="output-text" />
+                <h:outputText escape="false" value="#{cardApplicationReportPage.htmlReport}" />
+                <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+            </h:panelGrid>
+        </h:panelGrid>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +51,7 @@ import java.util.*;
  */
 @Component
 @Scope("session")
+@DependsOn("runtimeContext")
 public class ContragentCompletionReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
     
     private String htmlReport;

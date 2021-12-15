@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -33,7 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
@@ -46,7 +49,8 @@ import static java.lang.Math.abs;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Controller
 @DependsOn("runtimeContext")
-public class SmartWatchRestController {
+@ApplicationPath("/smartwatch/")
+public class SmartWatchRestController extends Application {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
     private boolean debug;
@@ -74,8 +78,8 @@ public class SmartWatchRestController {
             OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal()
     ), ", ");
 
-
-    public SmartWatchRestController(){
+    @PostConstruct
+    public void init(){
         this.cardState = new HashMap<Integer, String>();
         for (CardState state : CardState.values()) {
             this.cardState.put(state.getValue(), state.getDescription());

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,7 +39,8 @@ import java.util.*;
 
 @Path(value = "")
 @Controller
-public class ESPController {
+@ApplicationPath("/ispp/ESP/")
+public class ESPController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(ESPController.class);
     public static final String KEY = "ecafe.processor.sendtoesp.key";
@@ -200,51 +202,49 @@ public class ESPController {
             for (ESP esp: esps)
             {
                 InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(esp.getNumberrequest());
-                boolean needUpdateDate = false;
-                if (infoESPresponse.getClosed_at() != null) {
-                    Date closed = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at());
-                    if (closed != esp.getCloseddate())
-                    {
-                        needUpdateDate = true;
+                if (infoESPresponse != null) {
+                    boolean needUpdateDate = false;
+                    if (infoESPresponse.getClosed_at() != null) {
+                        Date closed = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at());
+                        if (closed != esp.getCloseddate()) {
+                            needUpdateDate = true;
+                        }
+                        esp.setCloseddate(closed);
                     }
-                    esp.setCloseddate(closed);
-                }
-                if (infoESPresponse.getSolution() != null) {
-                    if (esp.getSolution() == null && !infoESPresponse.getSolution().equals(esp.getSolution()))
-                    {
-                        needUpdateDate = true;
+                    if (infoESPresponse.getSolution() != null) {
+                        if (esp.getSolution() == null && !infoESPresponse.getSolution().equals(esp.getSolution())) {
+                            needUpdateDate = true;
+                        }
+                        esp.setSolution(infoESPresponse.getSolution());
                     }
-                    esp.setSolution(infoESPresponse.getSolution());
-                }
-                if (infoESPresponse.getStatus() != null) {
-                    if (esp.getStatus() == null && !infoESPresponse.getStatus().equals(esp.getStatus()))
-                    {
-                        needUpdateDate = true;
+                    if (infoESPresponse.getStatus() != null) {
+                        if (esp.getStatus() == null && !infoESPresponse.getStatus().equals(esp.getStatus())) {
+                            needUpdateDate = true;
+                        }
+                        esp.setStatus(infoESPresponse.getStatus());
                     }
-                    esp.setStatus(infoESPresponse.getStatus());
-                }
-                if (infoESPresponse.getSd() != null) {
-                    if (esp.getSd() == null && !infoESPresponse.getSd().equals(esp.getSd()))
-                    {
-                        needUpdateDate = true;
+                    if (infoESPresponse.getSd() != null) {
+                        if (esp.getSd() == null && !infoESPresponse.getSd().equals(esp.getSd())) {
+                            needUpdateDate = true;
+                        }
+                        esp.setSd(infoESPresponse.getSd());
                     }
-                    esp.setSd(infoESPresponse.getSd());
+                    if (needUpdateDate)
+                        esp.setUpdateDate(new Date());
+                    ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
+                    responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
+                    responseESPRequestsPOJO.setEmail(esp.getEmail());
+                    responseESPRequestsPOJO.setIdOfOrg(esp.getOrg().getIdOfOrg());
+                    responseESPRequestsPOJO.setIdOfClient(esp.getClient().getIdOfClient());
+                    responseESPRequestsPOJO.setMessage(esp.getMessage());
+                    responseESPRequestsPOJO.setTopic(esp.getTopic());
+                    responseESPRequestsPOJO.setNumberrequest(esp.getNumberrequest());
+                    responseESPRequestsPOJO.setUpdateDate(esp.getUpdateDate());
+                    responseESPRequestsPOJO.setStatus(esp.getStatus());
+                    responseESPRequestsPOJO.setSolution(esp.getSolution());
+                    responseESPRequests.getEspRequests().add(responseESPRequestsPOJO);
+                    persistenceSession.save(esp);
                 }
-                if (needUpdateDate)
-                    esp.setUpdateDate(new Date());
-                ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
-                responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
-                responseESPRequestsPOJO.setEmail(esp.getEmail());
-                responseESPRequestsPOJO.setIdOfOrg(esp.getOrg().getIdOfOrg());
-                responseESPRequestsPOJO.setIdOfClient(esp.getClient().getIdOfClient());
-                responseESPRequestsPOJO.setMessage(esp.getMessage());
-                responseESPRequestsPOJO.setTopic(esp.getTopic());
-                responseESPRequestsPOJO.setNumberrequest(esp.getNumberrequest());
-                responseESPRequestsPOJO.setUpdateDate(esp.getUpdateDate());
-                responseESPRequestsPOJO.setStatus(esp.getStatus());
-                responseESPRequestsPOJO.setSolution(esp.getSolution());
-                responseESPRequests.getEspRequests().add(responseESPRequestsPOJO);
-                persistenceSession.save(esp);
             }
             responseESPRequests.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             responseESPRequests.setErrorMessage(ResponseCodes.RC_OK.toString());

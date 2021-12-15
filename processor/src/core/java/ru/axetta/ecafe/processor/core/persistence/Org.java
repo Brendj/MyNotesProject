@@ -173,15 +173,15 @@ public class Org implements Serializable {
     private Boolean governmentContract;
     private Boolean useLongCardNo;
 
-    @PostUpdate
+    /*@PostUpdate
     public void sendInvalidateCache() {
         logger.info("Send invalidate org id = " + idOfOrg);
         RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
-    }
+    }*/
 
     public static void sendInvalidateCache(long idOfOrg) {
-        logger.info("Send invalidate org id = " + idOfOrg);
-        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
+        /*logger.info("Send invalidate org id = " + idOfOrg);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);*/
     }
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SyncHistoryException" table="CF_SyncHistory_Exceptions" mutable="false">
+        <id name="idOfSyncHistoryException" column="IdOfSyncHistoryException" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">128</param>
+                <param name="sequence_name">CF_SyncHistory_Exceptions_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     update="false"/>
+        <many-to-one name="syncHistory" class="ru.axetta.ecafe.processor.core.persistence.SyncHistory" column="idofsync" not-null="true"
+                     update="false"/>
+        <property name="message" column="Message" type="string" length="20" not-null="false"/>
+    </class>
+</hibernate-mapping>
+
+

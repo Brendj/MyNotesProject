@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web;
 
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
@@ -27,6 +28,7 @@ import org.w3c.dom.Node;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +58,11 @@ import java.util.zip.GZIPOutputStream;
  * Time: 13:31
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "IntegroServlet",
+        description = "IntegroServlet",
+        urlPatterns = {"/integro"}
+)
 public class IntegroServlet extends HttpServlet {
 
     private static final String CONTENT_TYPE = "text/xml", CONTENT_TYPE_GZIPPED = "application/octet-stream";

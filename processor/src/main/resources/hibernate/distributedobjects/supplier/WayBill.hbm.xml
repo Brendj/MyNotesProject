@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill" table="cf_waybills">
+        <id name="globalId" column="IdOfWayBill" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersionOnCreate" column="GlobalVersionOnCreate" type="long"/>
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="sendAll" column="SendAll">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <!-- End Global params -->
+
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="number" column="NumberOfWayBill" type="string" length="128" not-null="true"/>
+        <property name="dateOfWayBill" column="DateOfWayBill" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="state" column="State">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="shipper" column="Shipper" type="string" length="128" not-null="true"/>
+        <property name="receiver" column="Receiver" type="string" length="128" not-null="true"/>
+        <property name="inn" column="INN" type="string" length="128" not-null="true"/>
+
+        <many-to-one name="staff" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+            <column name="IdOfStaff" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="actOfWayBillDifference" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfWayBillDifference">
+            <column name="IdOfActOfDifference" not-null="false" />
+        </many-to-one>
+
+        <set name="wayBillPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfWayBill"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBillPosition" />
+        </set>
+
+        <set name="stateChangeInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfWayBill"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.StateChange" />
+        </set>
+
+        <set name="internalIncomingDocumentInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfWayBill"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument" />
+        </set>
+
+    </class>
+</hibernate-mapping>

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.newispp;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
@@ -11,8 +13,6 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +42,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@WebServlet(
+        name = "LastModifiedOrgsServlet",
+        description = "LastModifiedOrgsServlet",
+        urlPatterns = {"/modified-orgs"}
+)
 public class LastModifiedOrgsServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(LastModifiedOrgsServlet.class);
 

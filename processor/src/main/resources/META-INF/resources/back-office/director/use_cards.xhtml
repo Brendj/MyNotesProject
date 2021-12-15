@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<style type="text/css">
+    .out-of-date {
+        color: gray;
+    }
+    .director-grid > tbody > tr:first-child > td:first-child {
+        vertical-align: top;
+        padding-top: 7px;
+    }
+</style>
+
+<h:panelGrid id="directorUseCardsGrid" styleClass="borderless-grid, director-grid"
+             columns="2">
+    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+    <h:selectManyCheckbox value="#{directorPage.directorUseCardsPage.selectedOrgs}" id="directorUseCardsGridSelectionPanel" styleClass="output-text" layout="pageDirection">
+        <f:selectItem itemValue="-1" itemLabel="весь комплекс ОО"/>
+        <a4j:repeat value="#{directorPage.directorUseCardsPage.organizations}" var="item">
+            <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName} - #{item.shortAddress}" itemDisabled="#{directorPage.directorUseCardsPage.selectedOrgs.contains('-1')}"/>
+        </a4j:repeat>
+        <a4j:ajax event="change" render="directorUseCardsGridSelectionPanel"/>
+    </h:selectManyCheckbox>
+
+    <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+    <rich:calendar value="#{directorPage.directorUseCardsPage.startDate}" datePattern="dd.MM.yyyy"
+                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" dataModel="#{directorPage.directorUseCardsPage.startCalendarModel}"
+                   mode="ajax" boundaryDatesMode="scroll">
+        <a4j:ajax event="change" render="directorUseCardsGrid" />
+    </rich:calendar>
+    <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+    <rich:calendar value="#{directorPage.directorUseCardsPage.endDate}" datePattern="dd.MM.yyyy"
+                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" dataModel="#{directorPage.directorUseCardsPage.endCalendarModel}"
+                   mode="ajax" boundaryDatesMode="scroll">
+        <a4j:ajax event="change" render="directorUseCardsGrid" />
+    </rich:calendar>
+    <h:outputText styleClass="output-text" escape="true" value="Тип отчета"/>
+    <h:selectOneMenu styleClass="input-text"
+                   value="#{directorPage.directorUseCardsPage.reportType}">
+        <f:selectItem itemValue="0" itemLabel="графический"/>
+        <f:selectItem itemValue="1" itemLabel="табличный"/>
+    </h:selectOneMenu>
+    <a4j:commandButton value="Генерировать отчет" action="#{directorPage.directorUseCardsPage.buildUseCardsReport}"
+                       render="workspaceTogglePanel, directorUseCardsGrid" styleClass="command-button"
+                       status="idReportGenerateStatus"/>
+    <a4j:status id="idReportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+    <h:outputText styleClass="output-text" escape="true" value=""/>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+</h:panelGrid>
+<h:panelGrid id="directorUseCardsGraphReportGrid" styleClass="borderless-grid" columns="1"
+              rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '0')}">
+    <ui:repeat value="#{directorPage.directorUseCardsPage.chartData}" var="item" varStatus="var">
+        <h:panelGroup id="report-holder-${var.index}" styleClass="borderless-grid"
+                      rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '0')}">
+            <h:graphicImage value="#{item}" width="800" height="400"/>
+        </h:panelGroup>
+    </ui:repeat>
+</h:panelGrid>
+<h:panelGrid rendered="#{!directorPage.directorUseCardsPage.directorUseCardsReport.allOO}">
+    <ui:repeat value="#{directorPage.directorUseCardsPage.directorUseCardsReport.items}" var="item" varStatus="var">
+        <h:panelGrid id="directorUseCardsTableReportGrid-${var.index}" styleClass="borderless-grid" columns="1"
+                      rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '1')}">
+            <rich:dataTable value="#{item}" footerClass="data-table-footer">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column" colspan="4">
+                            <h:outputText styleClass="column-header" value="Использование электронных носителей при посещении здания #{item.shortNameInfoService}"/>
+                            <h:panelGroup rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '1')}">
+                                <br />
+                            </h:panelGroup>
+                            <h:outputText styleClass="column-header" value="(#{item.shortAddress})" />
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true">
+                            <h:outputText styleClass="column-header" escape="true" value="Сервисная карта, браслет, брелок"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Социальная карта"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Без электронных носителей СОШ"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Без электронных носителей ДОУ"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.serviceValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.socialValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.withoutSOSHValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.withoutDOUValue}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
+            <h:panelGroup rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '1')}">
+                <br />
+            </h:panelGroup>
+        </h:panelGrid>
+    </ui:repeat>
+</h:panelGrid>
+<h:panelGrid rendered="#{directorPage.directorUseCardsPage.directorUseCardsReport.allOO}">
+    <ui:repeat value="#{directorPage.directorUseCardsPage.directorUseCardsReport.allOOItem}" var="item">
+        <h:panelGrid id="directorUseCardsTableReportAllGrid" styleClass="borderless-grid" columns="1"
+                      rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '1')}">
+            <rich:dataTable value="#{item}" footerClass="data-table-footer">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column" colspan="4">
+                            <h:outputText styleClass="column-header" value="Использование электронных носителей при посещении здания #{item.shortNameInfoService}"/>
+                            <h:panelGroup rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '1')}">
+                                <br />
+                            </h:panelGroup>
+                            <h:outputText styleClass="column-header" value="весь комплекс" />
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true">
+                            <h:outputText styleClass="column-header" escape="true" value="Сервисная карта, браслет, брелок"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Социальная карта"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Без электронных носителей СОШ"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Без электронных носителей ДОУ"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.serviceValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.socialValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.withoutSOSHValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.withoutDOUValue}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
+            <h:panelGroup rendered="#{directorPage.directorUseCardsPage.showReport &amp;&amp; (directorPage.directorUseCardsPage.reportType == '1')}">
+                <br />
+            </h:panelGroup>
+        </h:panelGrid>
+    </ui:repeat>
+</h:panelGrid>
+</html>

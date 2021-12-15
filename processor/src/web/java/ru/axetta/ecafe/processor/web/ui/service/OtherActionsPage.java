@@ -34,8 +34,8 @@ import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -114,11 +114,6 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Генерация данных ключевых показателей выполнена");
     }
 
-    public void cancelPreorder() throws Exception {
-       PreorderCancelNotificationService.sendNotification.manualStart();
-        printMessage("Отправка уведомлений об отмене предзаказа выполнена");
-    }
-
     public void archvedExeption() throws Exception {
         ArchivedExeptionService.archivedExeption.manualStart();
         printMessage("Архивирование событий выполнено");
@@ -136,7 +131,8 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runImportRNIPPayment() throws Exception {
-        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).runRequests(); //DEF
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        rnipLoadPaymentsService.runRequests(); //DEF
         printMessage("Импорт платежей RNIP был выполнен успешно");
     }
 
@@ -321,7 +317,7 @@ public class OtherActionsPage extends OnlineReportPage {
                 User user = MainPage.getSessionInstance().getCurrentUser();
                 clientsMobileHistory.setUser(user);
                 clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
-				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
                 clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
                 clientGuardianHistory.setReason("Нажата кнопка \"Генерировать представителей\" в Сервис/Другое");
@@ -530,7 +526,7 @@ public class OtherActionsPage extends OnlineReportPage {
             User user = MainPage.getSessionInstance().getCurrentUser();
             clientsMobileHistory.setUser(user);
             clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
-			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов\" в Сервис/Другое");
             clientGuardianHistory.setAction("Обработка мигрантов");
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
@@ -543,17 +539,12 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
-    public void specialDatesLoadFileListener(UploadEvent event) {
-        UploadItem item = event.getUploadItem();
+    public void specialDatesLoadFileListener(FileUploadEvent event) {
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            inputStream = new ByteArrayInputStream(data);
             DAOService.getInstance().loadProductionCalendar(inputStream);
             printMessage("Файл загружен успешно");
         } catch (Exception e) {
@@ -836,7 +827,7 @@ public class OtherActionsPage extends OnlineReportPage {
             User user = MainPage.getSessionInstance().getCurrentUser();
             clientsMobileHistory.setUser(user);
             clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
-			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setReason("Нажата кнопка \"Обработка мигрантов (перевод в выбывшие)\" в Сервис/Другое");
             clientGuardianHistory.setAction("Обработка мигрантов  (перевод в выбывшие)");
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());

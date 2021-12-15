@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.RegistryChangeGuardians"
+           table="CF_RegistryChange_Guardians">
+        <id name="idOfRegistryGuardian" column="idofregistryguardian" type="long">
+            <generator class="identity">
+            </generator>
+        </id>
+        <property name="familyName" column="familyName" type="string" length="128"/>
+        <property name="firstName" column="firstName" type="string" length="128"/>
+        <property name="secondName" column="secondName" type="string" length="128"/>
+        <property name="relationship" column="relationship" type="string" length="128"/>
+        <property name="phoneNumber" column="phoneNumber" type="string" length="128"/>
+        <property name="emailAddress" column="emailAddress" type="string" length="128"/>
+        <property name="legal_representative" column="legal_representative" type="boolean"/>
+        <property name="ssoid" column="ssoid" type="string" length="50"/>
+        <property name="guid" column="guid" type="string" length="40"/>
+        <property name="applied" column="Applied" type="boolean" not-null="true"/>
+
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+
+        <many-to-one name="registryChange" class="ru.axetta.ecafe.processor.core.persistence.RegistryChange"
+                     column="idofregistrychange"/>
+    </class>
+</hibernate-mapping>

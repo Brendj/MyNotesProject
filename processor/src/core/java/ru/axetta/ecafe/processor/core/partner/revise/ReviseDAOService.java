@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.service.nsi.ReviseLogger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Component("ReviseDAOService")
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class ReviseDAOService {
     private static final Logger logger = LoggerFactory.getLogger(ReviseDAOService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);

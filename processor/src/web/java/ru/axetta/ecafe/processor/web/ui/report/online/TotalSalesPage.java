@@ -218,7 +218,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         return periodTypeMenu;
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         htmlReport = null;
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
@@ -236,7 +236,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){

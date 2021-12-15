@@ -30,7 +30,10 @@ public class OrderDetailFRationTypeWTdiet {
     public static String getDescription(Integer key)
     {
         initvalues();
-        return values.get(key.longValue());
+        if (key == null || values.get(key.longValue()) == null)
+            return "Не указано";
+        else
+            return values.get(key.longValue());
     }
 
     public static Integer getCode(String value)

@@ -96,6 +96,17 @@ public class CalendarUtils {
         }
     }
 
+    public static XMLGregorianCalendar toXmlDateTimeWithTimezoneOffset(Date date) {
+        try {
+            GregorianCalendar c = new GregorianCalendar();
+            c.setTime(date);
+            XMLGregorianCalendar xc = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
+                    RuntimeContext.getInstance().getDefaultLocalTimeZone(null).getRawOffset()/60000);
+            xc.setTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
+            return xc;
+        }catch (Exception ignore) { return null;}
+    }
+
     public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) {
         SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
         try {safeDateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));} catch (Exception ignore) {}

@@ -4,7 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.schoolapi.groups;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateRequest;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.GroupClientsUpdateResponse;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.groups.dto.MiddleGroupRequest;
@@ -14,64 +15,51 @@ import ru.axetta.ecafe.processor.web.partner.schoolapi.service.BaseSchoolApiCont
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
-import org.springframework.stereotype.Controller;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-@Path(value = "/groups")
-@Controller
+@RestController
+@RequestMapping(value = "/school/api/v1/groups", produces = "application/json")
 public class GroupsRestController extends BaseSchoolApiController {
+    private final SchoolApiClientGroupsService service;
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path(value = "/{id}/org/{orgId}/subgroups")
-    public Response createMiddleGroup(@PathParam("id") Long id, @PathParam("orgId") Long orgId,
-            MiddleGroupRequest request) {
+    public GroupsRestController(SchoolApiClientGroupsService service) {this.service = service;}
+
+    @PostMapping(value = "/{id}/org/{orgId}/subgroups", consumes = "application/json")
+    public ResponseEntity<?> createMiddleGroup(@PathVariable("id") Long id, @PathVariable("orgId") Long orgId,
+                                               @RequestBody MiddleGroupRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        MiddleGroupResponse response = getService().createMiddleGroup(id, orgId, request, getUser());
-        return Response.ok().entity(response).build();
+        MiddleGroupResponse response = service.createMiddleGroup(id, orgId, request, getUser());
+        return ResponseEntity.ok().body(response);
     }
 
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path(value = "/{id}/org/{orgId}/subgroups")
-    public Response updateMiddleGroup(@PathParam("id") Long id, @PathParam("orgId") Long orgId,
-            MiddleGroupRequest request) {
+    @PutMapping(value = "/{id}/org/{orgId}/subgroups", consumes = "application/json")
+    public ResponseEntity<?> updateMiddleGroup(@PathVariable("id") Long id, @PathVariable("orgId") Long orgId,
+                                               @RequestBody MiddleGroupRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        MiddleGroupResponse response = getService().updateMiddleGroup(id, orgId, request, getUser());
-        return Response.ok().entity(response).build();
+        MiddleGroupResponse response = service.updateMiddleGroup(id, orgId, request, getUser());
+        return ResponseEntity.ok().body(response);
     }
 
-    @DELETE
-    @Path("/subgroups/{id}")
-    public Response deleteMiddleGroup(@PathParam("id") Long id){
+    @DeleteMapping("/subgroups/{id}")
+    public ResponseEntity<?> deleteMiddleGroup(@PathVariable("id") Long id) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        MiddleGroupResponse response = getService().deleteMiddleGroup(id);
-        return Response.ok().entity(response).build();
+        MiddleGroupResponse response = service.deleteMiddleGroup(id);
+        return ResponseEntity.ok().body(response);
     }
 
-
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path(value = "/{id}/org/{orgId}")
-    public Response updateGroup(@PathParam("id") Long id, @PathParam("orgId") Long orgId, GroupClientsUpdateRequest request) {
+    @PutMapping(value = "/{id}/org/{orgId}", consumes = "application/json")
+    public ResponseEntity<?> updateGroup(@PathVariable("id") Long id, @PathVariable("orgId") Long orgId,
+                                         @RequestBody GroupClientsUpdateRequest request) {
         if (!isWebArmAnyRole()) {
             throw new JwtAuthenticationException(JwtAuthenticationErrors.USER_ROLE_NOT_ALLOWED);
         }
-        GroupClientsUpdateResponse response = getService().updateGroup(id, orgId, request, getUser());
-        return Response.ok().entity(response).build();
+        GroupClientsUpdateResponse response = service.updateGroup(id, orgId, request, getUser());
+        return ResponseEntity.ok().body(response);
     }
 
-    private SchoolApiClientGroupsService getService() {
-        return RuntimeContext.getAppContext().getBean(SchoolApiClientGroupsService.class);
-    }
+
 }

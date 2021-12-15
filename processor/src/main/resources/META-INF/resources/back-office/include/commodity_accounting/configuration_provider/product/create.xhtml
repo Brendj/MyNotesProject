@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <!-- Панель создания правила -->
+    <!--@elvariable id="productCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.ProductCreatePage"-->
+<h:panelGrid>
+    <h:panelGrid id="productCreatePanelGrid" binding="#{productCreatePage.pageComponent}" styleClass="borderless-grid"
+                 columns="1">
+        <h:panelGrid columns="2">
+            <h:outputText escape="true" value="Группа продуктов" styleClass="output-text required-field"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:outputText value="#{productCreatePage.currentProductGroup.nameOfGroup}" styleClass="output-text"
+                              style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                <a4j:commandButton value="..." action="#{productCreatePage.selectProductGroup}"
+                                   render="productGroupSelectModalPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('productGroupSelectModalPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px; float: right;"/>
+
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Товарное название" styleClass="output-text required-field"/>
+            <h:inputText value="#{productCreatePage.product.productName}" maxlength="128"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Код" styleClass="output-text"/>
+            <h:inputText value="#{productCreatePage.product.code}" maxlength="128" styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Полное наименование пищевого продукта" styleClass="output-text"/>
+            <h:inputText value="#{productCreatePage.product.fullName}" maxlength="128"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Код (коды) ОКП" styleClass="output-text"/>
+            <h:inputText value="#{productCreatePage.product.okpCode}" maxlength="128"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Код классификации" styleClass="output-text"/>
+            <h:inputText value="#{productCreatePage.product.classificationCode}" maxlength="32"
+                         styleClass="input-text long-field"/>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid">
+            <a4j:commandButton value="Создать продукт" action="#{productCreatePage.onSave}"
+                               render="productCreatePanelGrid" styleClass="command-button"/>
+        </h:panelGrid>
+
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

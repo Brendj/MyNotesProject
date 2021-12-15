@@ -80,7 +80,7 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         super.completeOrgSelection(session, idOfOrg);
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         htmlReport = null;
         switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
@@ -102,7 +102,7 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {

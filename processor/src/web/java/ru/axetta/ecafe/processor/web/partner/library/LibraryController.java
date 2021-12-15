@@ -22,10 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,7 +33,8 @@ import java.util.Enumeration;
 
 @Path(value = "")
 @Controller
-public class LibraryController {
+@ApplicationPath("/ispp/library")
+public class LibraryController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(LibraryController.class);
     public static final String KEY_FOR_LIBRARY = "ecafe.processor.library.key";

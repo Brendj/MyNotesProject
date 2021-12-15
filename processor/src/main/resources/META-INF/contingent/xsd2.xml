@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2. -->
+<xs:schema xmlns:tns="urn:contingent.mos.ru:ws:ispp" xmlns:ns1="urn:contingent.mos.ru:ws:service" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="urn:contingent.mos.ru:ws:ispp">
+
+<xs:import namespace="urn:contingent.mos.ru:ws:service" schemaLocation="xsd1.xml"/>
+
+<xs:element name="ServiceHeader" nillable="true" type="tns:ServiceHeader"/>
+
+<xs:element name="setBenefits" type="tns:setBenefits"/>
+
+<xs:element name="setBenefitsResponse" type="tns:SetBenefitsResponse"/>
+
+<xs:complexType name="setBenefits">
+<xs:sequence>
+<xs:element name="request" type="tns:SetBenefitsRequest" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="SetBenefitsRequest">
+<xs:sequence>
+<xs:element name="Children" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Child" type="tns:Child" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="Child">
+<xs:sequence>
+<xs:element name="Guid" type="xs:string"/>
+<xs:element name="MeshGUID" type="xs:string"/>
+<xs:element name="BenefitCode" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ServiceHeader">
+<xs:complexContent>
+<xs:extension base="ns1:ServiceHeader">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="setBenefitsResponse">
+<xs:sequence>
+<xs:element name="result" type="tns:SetBenefitsResponse" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="SetBenefitsResponse">
+<xs:sequence>
+<xs:element name="Success" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Child" type="tns:Child" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="NotFound" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Child" type="tns:Child" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>

@@ -12,14 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Created by nuc on 08.11.2018.
- */
+@WebServlet(
+        name = "CommonTaskServlet",
+        description = "Tasks",
+        urlPatterns = {"/commontask"}
+)
 public class CommonTaskServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(CommonTaskServlet.class);
 
@@ -52,11 +55,12 @@ public class CommonTaskServlet extends HttpServlet {
     }
 
     private void runInvalidateCache(String idOfOrgStr) {
-        try {
+        return;
+        /*try {
             Long idOfOrg = new Long(idOfOrgStr);
             RuntimeContext.getAppContext().getBean(CacheService.class).invalidateCache(idOfOrg);
         } catch (Exception e) {
             logger.error("Error in runInvalidateCache: ", e);
-        }
+        }*/
     }
 }

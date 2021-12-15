@@ -110,11 +110,7 @@ public class CardFilter {
     }
 
     public void setCardNo(Long cardNo) {
-        if (0L == cardNo) {
-            this.cardNo = null;
-        } else {
-            this.cardNo = cardNo;
-        }
+        this.cardNo = cardNo;
     }
 
     public Long getCardPrintedNo() {
@@ -122,11 +118,7 @@ public class CardFilter {
     }
 
     public void setCardPrintedNo(Long cardPrintedNo) {
-        if (0L == cardPrintedNo) {
-            this.cardPrintedNo = null;
-        } else {
-            this.cardPrintedNo = cardPrintedNo;
-        }
+        this.cardPrintedNo = cardPrintedNo;
     }
 
     public OrgItem getOrg() {

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+    <!-- Для работы шаринга сессий в кластере -->
+    <distributable/>
+
+    <context-param>
+        <param-name>org.richfaces.skin</param-name>
+        <param-value>darkX</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.richfaces.CONTROL_SKINNING</param-name>
+        <param-value>disable</param-value>
+    </context-param>
+
+
+    <listener>
+        <display-name>JavaServer Faces configure listener</display-name>
+        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+    </listener>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Restrict transport for login page</web-resource-name>
+            <url-pattern>/back-office/login.xhtml</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/back-office/login.xhtml</form-login-page>
+            <form-error-page>/back-office/login.xhtml?error=true</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/back-office/login.xhtml?faces-redirect=true</location>
+    </error-page>
+</web-app>

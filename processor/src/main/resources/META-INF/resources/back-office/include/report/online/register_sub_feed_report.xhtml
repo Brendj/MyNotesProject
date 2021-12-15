@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:panelGrid>
+    <!--@elvariable id="registerStampSubscriptionFeedingPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampSubscriptionFeedingPage"-->
+    <h:panelGrid id="registerStampSubscriptionFeedingReportPanelGrid" binding="#{registerStampSubscriptionFeedingPage.pageComponent}"
+                 styleClass="borderless-grid">
+
+        <rich:togglePanel label="Настройки отчета" switchType="client" opened="true"
+                          headerClass="filter-panel-header" width="800">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+
+                <h:outputText styleClass="output-text" escape="true" value="Организация" />
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{registerStampSubscriptionFeedingPage.filter}" readonly="true" styleClass="input-text long-field"
+                                 style="margin-right: 2px;" />
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;" />
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+                <rich:calendar value="#{registerStampSubscriptionFeedingPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text"
+                               showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDateCalendar,registerStampSubscriptionFeedingReportPanel"
+                                 listener="#{registerStampSubscriptionFeedingPage.onReportPeriodChanged}" />
+                </rich:calendar>
+
+                <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+                <h:selectOneMenu id="endDatePeriodSelect" value="#{registerStampSubscriptionFeedingPage.periodTypeMenu.periodType}"
+                                 styleClass="input-text" style="width: 250px;">
+                    <f:converter converterId="periodTypeConverter" />
+                    <f:selectItems value="#{registerStampSubscriptionFeedingPage.periodTypeMenu.items}" />
+                    <a4j:ajax event="change" render="endDateCalendar,registerStampSubscriptionFeedingReportPanel"
+                                 listener="#{registerStampSubscriptionFeedingPage.onReportPeriodChanged}" />
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+                <rich:calendar id="endDateCalendar" value="#{registerStampSubscriptionFeedingPage.endDate}"
+                               datePattern="dd.MM.yyyy" converter="dateConverter"
+                               inputClass="input-text" showWeeksBar="false">
+                    <a4j:ajax event="change" render="endDatePeriodSelect,registerStampSubscriptionFeedingReportPanel"
+                                 listener="#{registerStampSubscriptionFeedingPage.onEndDateSpecified}" />
+                </rich:calendar>
+
+            </h:panelGrid>
+
+        </rich:togglePanel>
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать отчет" action="#{registerStampSubscriptionFeedingPage.buildReportHTML}"
+                               render="registerStampSubscriptionFeedingReportPanel"
+                               styleClass="command-button" />
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{registerStampSubscriptionFeedingPage.showCSVList}" styleClass="command-button" />
+            <a4j:commandButton value="Очистить" action="#{registerStampSubscriptionFeedingPage.clear}"
+                               render="registerStampSubscriptionFeedingReportPanelGrid"
+                               styleClass="command-button" />
+        </h:panelGrid>
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+        <h:panelGrid styleClass="borderless-grid" id="registerStampSubscriptionFeedingReportPanel" columnClasses="center-aligned-column">
+            <!-- не показывать пустую таблицу -->
+            <h:panelGrid rendered="${registerStampSubscriptionFeedingPage.htmlReport!=null &amp;&amp; not empty registerStampSubscriptionFeedingPage.htmlReport}" >
+                <h:outputText escape="false" value="#{registerStampSubscriptionFeedingPage.htmlReport}" />
+            </h:panelGrid>
+        </h:panelGrid>
+
+
+    </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

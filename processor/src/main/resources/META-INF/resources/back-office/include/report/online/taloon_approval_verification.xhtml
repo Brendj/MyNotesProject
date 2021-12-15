@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <script type="text/javascript">
+        function disableButtons(value) {
+            document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateButton").disabled=value;
+            document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:xlsButton").disabled=value;
+            document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clearButton").disabled=value;
+        }
+    </script>
+<h:panelGrid>
+    <h:panelGrid id="taloonApprovalVerificationPanelGrid" binding="#{mainPage.taloonApprovalVerificationPage.pageComponent}"
+                 styleClass="borderless-grid">
+        <rich:popupPanel modal="true"  id="taloonApprovalMessagePanel" autosized="true" minWidth="400">
+            <f:facet name="header">
+                <h:outputText value="История изменений записи" />
+            </f:facet>
+            <h:panelGrid styleClass="borderless-grid" columns="1">
+                <h:inputTextarea value="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />
+                <a4j:commandButton value="Закрыть" onclick="#{rich:component('taloonApprovalMessagePanel')}.hide();" style="width: 180px;" />
+            </h:panelGrid>
+        </rich:popupPanel>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.taloonApprovalVerificationPage.filter}" readonly="true" styleClass="input-text long-field"
+                             style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
+            <rich:calendar value="#{mainPage.taloonApprovalVerificationPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDateCalendar"
+                             listener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
+            </rich:calendar>
+
+            <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
+            <rich:calendar id="endDateCalendar" value="#{mainPage.taloonApprovalVerificationPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDatePeriodSelect"
+                             listener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
+            </rich:calendar>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="1">
+            <a4j:commandButton value="Обновить" action="#{mainPage.taloonApprovalVerificationPage.reload}"
+                               render="taloonApprovalVerificationPanelGrid" styleClass="command-button"/>
+        </h:panelGrid>
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <rich:dataTable id="taloonApprovalVerificationTable" value="#{mainPage.taloonApprovalVerificationPage.items}" var="item" rows="25"
+                        footerClass="data-table-footer">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Дата" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Ид ОО" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Название" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Заказ ОО" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Оплата ОО" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Отгрузка ПП" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Цена" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Сумма" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Статус ОО" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Статус ПП - согласие" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Статус ПП - отказ" />
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText escape="true" value="История изменений"/>
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:collapsibleSubTable value="#{item.details}" var="detail" rowKeyVar="rowKey"
+                                      columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
+                       right-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+                <rich:column headerClass="column-header" rowspan="#{item.details.size()}" rendered="#{rowKey eq 0}">
+                    <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text" converter="dateConverter" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="#{detail.idOfOrgCreated}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="false" value="&lt;strong&gt;" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.taloonName}" styleClass="output-text" />
+                    <h:outputText escape="false" value="&lt;/strong&gt;" rendered="#{detail.summaryDay}"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="false" value="&lt;strong&gt;" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text" />
+                    <h:outputText escape="false" value="&lt;/strong&gt;" rendered="#{detail.summaryDay}"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="false" value="&lt;strong&gt;" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.soldedQty}" styleClass="output-text" />
+                    <h:outputText escape="false" value="&lt;/strong&gt;" rendered="#{detail.summaryDay}"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:inputText value="#{detail.shippedQty}" styleClass="output-text" rendered="#{detail.enableEditShippedQty()}">
+                        <a4j:ajax event="change" />
+                    </h:inputText>
+                    <h:outputText escape="false" value="&lt;strong&gt;" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text" rendered="#{!detail.enableEditShippedQty()}" />
+                    <h:outputText escape="false" value="&lt;/strong&gt;" rendered="#{detail.summaryDay}"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="#{detail.price}" styleClass="output-text" converter="copeckSumConverter" rendered="#{!detail.summaryDay}" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="false" value="&lt;strong&gt;" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
+                    <h:outputText escape="false" value="&lt;/strong&gt;" rendered="#{detail.summaryDay}"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:graphicImage value="/images/taloons/applied.png" rendered="#{detail.isppStateConfirmed}" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <a4j:commandLink render="taloonApprovalVerificationTable" rendered="#{detail.ppStateNotSelected || detail.ppStateCanceled}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.switchPpState()}" style="color:lightgray;"
+                                     onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
+                        <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                        <h:graphicImage value="/images/taloons/applied-gray.png" />
+                    </a4j:commandLink>
+                    <a4j:commandLink render="taloonApprovalVerificationTable" rendered="#{detail.ppStateConfirmed}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.resetPpState()}"
+                                     onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
+                        <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                        <h:graphicImage value="/images/taloons/applied.png" />
+                    </a4j:commandLink>
+                    <a4j:commandLink render="taloonApprovalVerificationTable" rendered="#{detail.summaryDay and !detail.isTotal()}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.confirmPpStateAllDay()}" style="color:lightgray;"
+                                     onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />
+                        <h:graphicImage value="/images/taloons/applied-big.png" />
+                    </a4j:commandLink>
+                    <a4j:commandLink render="taloonApprovalVerificationTable" rendered="#{detail.summaryDay and !detail.isTotal()}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.deselectPpStateAllDay()}" style="color:lightgray;"
+                                     onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png" />
+                    </a4j:commandLink>
+                    <a4j:commandLink render="taloonApprovalVerificationTable" rendered="#{detail.summaryDay and detail.isTotal()}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.confirmPpStatePeriod()}" style="color:lightgray;"
+                                     onclick="if (#{!mainPage.taloonApprovalVerificationPage.allowedSetFirstFlagPeriod()}) { alert('Операция запрещена'); return false; }">
+                        <h:graphicImage value="/images/taloons/applied-big.png" />
+                    </a4j:commandLink>
+                    <a4j:commandLink render="taloonApprovalVerificationTable" rendered="#{detail.summaryDay and detail.isTotal()}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.deselectPpStatePeriod()}" style="color:lightgray;"
+                                     onclick="if (#{!mainPage.taloonApprovalVerificationPage.allowedClearFirstFlagPeriod()}) { alert('Операция запрещена'); return false; }">
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png" />
+                    </a4j:commandLink>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <a4j:commandLink oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"
+                                     render="taloonApprovalVerificationTable" rendered="#{detail.ppStateNotSelected || detail.ppStateConfirmed}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.switchPpState()}"
+                                     onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"
+                                     style="color:lightgray;" >
+                        <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
+                        <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                        <h:graphicImage value="/images/taloons/canceled-gray.png" />
+                    </a4j:commandLink>
+                    <a4j:commandLink render="taloonApprovalVerificationTable" rendered="#{detail.ppStateCanceled}"
+                                     action="#{mainPage.taloonApprovalVerificationPage.resetPpState()}"
+                                     onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
+                        <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                        <h:graphicImage value="/images/taloons/canceled.png" />
+                    </a4j:commandLink>
+                </rich:column>
+                <rich:column>
+                    <a4j:commandButton value="..." render="taloonApprovalVerificationTable,ta_remarks_toshow" rendered="#{!detail.remarksEmpty}"
+                                       title="#{detail.remarks}" oncomplete="#{rich:component('taloonApprovalMessagePanel')}.show();">
+                        <f:setPropertyActionListener value="#{detail.remarks}" target="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" />
+                    </a4j:commandButton>
+                </rich:column>
+            </rich:collapsibleSubTable>
+            <f:facet name="footer">
+                <rich:dataScroller for="taloonApprovalVerificationTable" renderIfSinglePage="false"
+                                   maxPages="5" fastControls="hide" stepControls="auto"
+                                   boundaryControls="hide">
+
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:dataScroller>
+            </f:facet>
+        </rich:dataTable>
+
+        <h:panelGrid styleClass="borderless-grid" columns="1">
+            <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonApprovalVerificationPage.apply}"
+                               render="taloonApprovalVerificationTable" styleClass="command-button"/>
+        </h:panelGrid>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

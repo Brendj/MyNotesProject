@@ -32,13 +32,13 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.persistence.*;
 import javax.servlet.http.HttpServletRequest;
@@ -200,7 +200,7 @@ public class DAOReadonlyService {
 
     public User getUserFromSession() {
         try {
-            HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+            HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
             HttpSession httpSession = request.getSession(true);
             Long idOfUser = (Long) httpSession.getAttribute(User.USER_ID_ATTRIBUTE_NAME);
             return findUserById(idOfUser);
@@ -2668,10 +2668,10 @@ public class DAOReadonlyService {
     }
 
     public Person getPersonByClient(Client client) {
-        Client cl = (Client) entityManager.merge(client);
-        Person p = cl.getPerson();
-        p.getFirstName();
-        return p;
+        Query query = entityManager.createQuery("select c.person from Client c where c = :client");
+        query.setParameter("client", client);
+        List<Person> list = query.getResultList();
+        return list.get(0);
     }
 
     public long getNotBindedEMPClientsCount() {
@@ -3108,6 +3108,40 @@ public class DAOReadonlyService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List getWtComplexsByComplexes(List<PreorderComplex> preorderComplexs) {
+        if (preorderComplexs == null || preorderComplexs.isEmpty())
+            return new ArrayList();
+        List <Long> preorderComplexIds = new ArrayList<>();
+        for (PreorderComplex preorderComplex: preorderComplexs)
+        {
+            preorderComplexIds.add(preorderComplex.getIdOfPreorderComplex());
+        }
+        Query query = entityManager.createNativeQuery("select distinct cpc.idofpreordercomplex, cwdt.description from cf_preorder_complex cpc "
+                + "LEFT JOIN cf_wt_complexes cwt on cwt.idofcomplex = cpc.armcomplexid "
+                + "left join cf_wt_diet_type cwdt on cwt.idofdiettype = cwdt.idofdiettype "
+                + "where cpc.idofpreordercomplex in (:preorderComplexIds) and cwdt.idofdiettype is not null");
+        query.setParameter("preorderComplexIds", preorderComplexIds);
+        return  query.getResultList();
+    }
+
+    public List getWtComplexsByRegular(List<RegularPreorder> regularPreorders) {
+        if (regularPreorders == null || regularPreorders.isEmpty())
+            return new ArrayList();
+        List <Long> regularPreordersIds = new ArrayList<>();
+        for (RegularPreorder regularPreorder: regularPreorders)
+        {
+            regularPreordersIds.add(regularPreorder.getIdOfRegularPreorder());
+        }
+        Query query = entityManager.createNativeQuery("select distinct crp.idofregularpreorder, cwdt.description "
+                + "from cf_regular_preorders crp "
+                + "LEFT JOIN cf_preorder_complex cpc on crp.idofregularpreorder = cpc.idofregularpreorder "
+                + "LEFT JOIN cf_wt_complexes cwt on cwt.idofcomplex = cpc.armcomplexid "
+                + "left join cf_wt_diet_type cwdt on cwt.idofdiettype = cwdt.idofdiettype "
+                + "where crp.idofregularpreorder in (:regularPreordersIds) and cwdt.idofdiettype is not null");
+        query.setParameter("regularPreordersIds", regularPreordersIds);
+        return  query.getResultList();
     }
 
     public WtDish getWtDishById(Long idOfDish) {

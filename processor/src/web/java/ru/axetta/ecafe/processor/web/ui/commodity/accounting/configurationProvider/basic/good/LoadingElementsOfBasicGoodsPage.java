@@ -4,13 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good;
 
+import org.richfaces.model.UploadedFile;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.StringUtils;
-import org.richfaces.model.UploadItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(LoadingElementsOfBasicGoodsPage.class);
     public static final String UTF8_BOM = "\uFEFF";
 
-    public UploadItem uploadItem;
+    public UploadedFile uploadItem;
 
     private List<LoadingElementsOfBasicGoodsItem> loadingElementsOfBasicGoodsItems;
 
@@ -42,11 +42,11 @@ public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
         this.files = files;
     }
 
-    public UploadItem getUploadItem() {
+    public UploadedFile getUploadItem() {
         return uploadItem;
     }
 
-    public void setUploadItem(UploadItem uploadItem) {
+    public void setUploadItem(UploadedFile uploadItem) {
         this.uploadItem = uploadItem;
     }
 
@@ -70,7 +70,7 @@ public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
         return s;
     }
 
-    public void loadingElementsOfBasicGoodsGenerate(UploadItem item, RuntimeContext runtimeContext) throws Exception {
+    public void loadingElementsOfBasicGoodsGenerate(UploadedFile item, RuntimeContext runtimeContext) throws Exception {
 
         LoadingElementsOfBasicGoodsService loadingElementsOfBasicGoodsService = new LoadingElementsOfBasicGoodsService();
 
@@ -78,9 +78,8 @@ public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
         String csvSplitBy = ";";
 
         if (item != null) {
-            File file = item.getFile();
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(file.getAbsolutePath()), Charset.forName("UTF-8")));
+                    new InputStreamReader(item.getInputStream(), Charset.forName("UTF-8")));
 
             loadingElementsOfBasicGoodsItems = new ArrayList<LoadingElementsOfBasicGoodsItem>();
             files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();

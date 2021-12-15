@@ -19,6 +19,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ import java.util.Properties;
 
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class EventNotificationService {
 
     Logger logger = LoggerFactory.getLogger(EventNotificationService.class);
@@ -284,16 +286,16 @@ public class EventNotificationService {
     }
 
     @Async
-    public boolean sendEmailAsync(String email, String type, String[] values) {
+    public void sendEmailAsync(String email, String type, String[] values) {
         if (StringUtils.isEmpty(email)) {
-            return false;
+            return;
         }  else {
 
             String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
                     TYPE_EMAIL_SUBJECT);
             if (emailText == null || emailSubject == null) {
                 logger.info(String.format("No email text is specified for type '%s'. Email is not sent", type));
-                return false;
+                return;
             } else {
                 emailText = formatMessage(emailText, values);
                 emailSubject = formatMessage(emailSubject, values);
@@ -302,12 +304,11 @@ public class EventNotificationService {
                         RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
                     } catch (Exception e) {
                         logger.error("Failed to send email notification", e);
-                        return false;
+                        return;
                     }
                 }
             }
         }
-        return true;
     }
 
     @Async
@@ -602,6 +603,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
@@ -649,8 +651,13 @@ public class EventNotificationService {
                 Date eventDate = df.parse(empDateStr);
                 empType.setTime(eventDate.getTime());
             } catch (Exception e) {
+                empType.setTime(new Date().getTime());
                 logger.error("Failed to parse EMP date", e);
             }
+        }
+        else
+        {
+            empType.setTime(new Date().getTime());
         }
         return empType;
     }
@@ -696,6 +703,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
@@ -704,6 +712,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 

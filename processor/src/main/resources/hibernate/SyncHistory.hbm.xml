@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SyncHistory" table="CF_SyncHistory">
+        <id name="idOfSync" column="IdOfSync" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">512</param>
+                <param name="sequence_name">CF_SyncHistory_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     update="false"/>
+        <property name="syncStartTime" column="SyncStartTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="syncEndTime" column="SyncEndTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="syncResult" column="SyncResult" type="int"/>
+        <property name="idOfPacket" column="IdOfPacket" type="long" not-null="true" update="false"/>
+        <property name="clientVersion" column="ClientVersion" type="string" length="16" not-null="false"/>
+        <property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>
+        <property name="syncType" column="SyncType" type="integer" />
+        <set name="syncHistoryExceptions" table="CF_SyncHistory_Exceptions" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="idofsync" not-null="true" />
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SyncHistoryException" />
+        </set>
+    </class>
+</hibernate-mapping>
+
+

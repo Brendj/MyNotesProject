@@ -69,6 +69,8 @@ public class SettingsListPage extends BasicWorkspacePage implements OrgSelectPag
         final Long idOfOrg = (orgItem == null ? null : orgItem.getIdOfOrg());
         final SettingsIds settingsid = (settingsIds == null || settingsIds < 0 ? null : SettingsIds.fromInteger(settingsIds));
         List<ECafeSettings> list = daoService.geteCafeSettingsesWithoutFiveElm(idOfOrg,settingsid,deleted);
+        for (ECafeSettings eCafeSettings : list)
+            eCafeSettings.setSettingsIdDescription(eCafeSettings.getSettingsId().toString());
         this.settingsList = new ListDataModel(list);
     }
 
