@@ -109,12 +109,10 @@
                                    render="clientAllocationRulesTable"/>
                 <h:panelGroup style="margin-top: 10px">
                     <a4j:commandButton value="Сохранить" action="#{clientAllocationRulesPage.save}"
-                                       render="clientAllocationRulesTable"
-                                       onclick="this.disabled = true;"
-                                       oncomplete="this.disabled = false;"/>
+                                       render="clientAllocationRulesTable"/>
                     <a4j:commandButton id="resetRules" value="Отмена" action="#{clientAllocationRulesPage.cancel}"
                                        render="clientAllocationRulesTable"/>
-                    <a4j:status id="sSaveRulesStatus">
+                    <a4j:status>
                         <f:facet name="start">
                             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
                         </f:facet>

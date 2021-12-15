@@ -231,7 +231,7 @@
                         </rich:column>
                         <rich:column breakRowBefore="true">
                         </rich:column>
-                        <rich:column breakBefore="true" rendered="#{orgSettingsReportPage.showRequisite}">
+                        <rich:column breakRowBefore="true" rendered="#{orgSettingsReportPage.showRequisite}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseGovernmentContract}" disabled="false">
                                 <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(12)}"/>
                             </h:selectBooleanCheckbox>

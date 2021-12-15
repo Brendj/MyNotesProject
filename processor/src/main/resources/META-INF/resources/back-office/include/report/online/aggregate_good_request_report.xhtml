@@ -141,52 +141,29 @@
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
-                <rich:column rowspan="#{items.commoditiesCounts}">
-                    <h:outputText value="#{items.number}" />
-                </rich:column>
-                <rich:column rowspan="#{items.commoditiesCounts}">
-                    <h:outputText value="#{items.idOfSupplier}" />
-                </rich:column>
-                <rich:column rowspan="#{items.commoditiesCounts}">
-                    <h:outputText value="#{items.supplierName}" />
-                </rich:column>
-                <rich:column rowspan="#{items.commoditiesCounts}">
-                    <h:outputText value="#{items.idOfEducation}" />
-                </rich:column>
-                <rich:column rowspan="#{items.commoditiesCounts}">
-                    <h:outputText value="#{items.educationNumber}" />
-                </rich:column>
-                <rich:column rowspan="#{items.commoditiesCounts}">
-                    <h:outputText value="#{items.educationName}" />
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; ">
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; ">
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; ">
-                </rich:column>
-                <rich:column rowspan="1" style="height: 0 !important; ">
-                </rich:column>
-                <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
-                    <h:outputText value="#{items.doneDate}" converter="dateConverter" />
-                </rich:column>
-                <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
-                    <h:outputText value="#{items.lastCreateOrUpdateDate}" converter="timeConverter" />
-                </rich:column>
+
                 <rich:collapsibleSubTable value="#{items.commodities}" var="commodity"
                                           columnClasses="center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
-                    <rich:column rowspan="1" style="height: 0 !important; ">
+
+                    <rich:column rowspan="#{items.commoditiesCounts}">
+                        <h:outputText value="#{items.number}" />
                     </rich:column>
-                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    <rich:column rowspan="#{items.commoditiesCounts}">
+                        <h:outputText value="#{items.idOfSupplier}" />
                     </rich:column>
-                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    <rich:column rowspan="#{items.commoditiesCounts}">
+                        <h:outputText value="#{items.supplierName}" />
                     </rich:column>
-                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    <rich:column rowspan="#{items.commoditiesCounts}">
+                        <h:outputText value="#{items.idOfEducation}" />
                     </rich:column>
-                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    <rich:column rowspan="#{items.commoditiesCounts}">
+                        <h:outputText value="#{items.educationNumber}" />
                     </rich:column>
-                    <rich:column rowspan="1" style="height: 0 !important; ">
+                    <rich:column rowspan="#{items.commoditiesCounts}">
+                        <h:outputText value="#{items.educationName}" />
                     </rich:column>
+
                     <rich:column>
                         <h:outputText value="#{commodity.name}" />
                     </rich:column>
@@ -199,6 +176,15 @@
                     <rich:column>
                         <h:outputText value="#{commodity.tempClientsCount==null?'0':commodity.tempClientsCount}" />
                     </rich:column>
+
+                    <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
+                        <h:outputText value="#{items.doneDate}" converter="dateConverter" />
+                    </rich:column>
+                    <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
+                        <h:outputText value="#{items.lastCreateOrUpdateDate}" converter="timeConverter" />
+                    </rich:column>
+
+
                 </rich:collapsibleSubTable>
                 <f:facet name="footer">
                     <rich:dataScroller for="detailedGoodRequestTable" renderIfSinglePage="false" maxPages="10"

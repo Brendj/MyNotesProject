@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui;
 
 import net.sf.jasperreports.engine.JRException;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -5392,7 +5393,9 @@ public class MainPage implements Serializable {
         UploadedFile item = event.getUploadedFile();
         try {
             ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
-            file.setFile(new File(item.getName()));
+            File newFile = new File(item.getName());
+            FileUtils.writeByteArrayToFile(newFile, item.getData());
+            file.setFile(newFile);
             file.setFileName(item.getName());
             file.setContentType(item.getContentType());
             supportEmailPage.loadFiles(file);
