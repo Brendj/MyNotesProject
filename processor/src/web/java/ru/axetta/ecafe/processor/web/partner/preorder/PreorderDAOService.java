@@ -810,7 +810,7 @@ public class PreorderDAOService {
     public void savePreorderComplexes(PreorderSaveListParam list, String guardianMobile,
             Integer externalSystem) throws Exception {
         //Собираем коллекцию в нужном виде
-        Map<Integer, ComplexListParam> map = new HashMap<Integer, ComplexListParam>();
+        Map<Integer, ComplexListParam> map = new HashMap<>();
         for (ComplexListParam complex : list.getComplexes()) {
             Integer idOfComplex = complex.getIdOfComplex();
             ComplexListParam param = map.get(idOfComplex);
@@ -829,7 +829,7 @@ public class PreorderDAOService {
                 }
             }
         }
-        List<ComplexListParam> complexes = new ArrayList<ComplexListParam>();
+        List<ComplexListParam> complexes = new LinkedList<>();
         for (Map.Entry<Integer, ComplexListParam> entry : map.entrySet()) {
             ComplexListParam param = new ComplexListParam();
             param.setIdOfComplex(entry.getKey());
@@ -933,10 +933,10 @@ public class PreorderDAOService {
                     if (complexSelected) {
                         if (!isWtMenu) {
                             preorderComplex = createPreorderComplex(idOfComplex, client, date, complexAmount, null,
-                                    nextVersion, guardianMobile, mobileGroupOnCreate);
+                                    nextVersion, guardianMobile, mobileGroupOnCreate, externalSystem);
                         } else {
                             preorderComplex = createWtPreorderComplex(idOfComplex, client, date, complexAmount, null,
-                                    nextVersion, guardianMobile, mobileGroupOnCreate);
+                                    nextVersion, guardianMobile, mobileGroupOnCreate, externalSystem);
                         }
                         if (complex.getMenuItems() == null) {
                             //создаем детализацию предзаказа по блюдам меню, т.к. ее нет в запросе
@@ -1857,11 +1857,11 @@ public class PreorderDAOService {
                     preorderComplex = createPreorderComplex(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
                             complexInfo.getMenuDate(),
                             !isMenuDetailPreorder(regularPreorder) ? regularPreorder.getAmount() : 0, complexInfo,
-                            nextVersion, regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
+                            nextVersion, regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate(), null);
                 } else {
                     preorderComplex = createWtPreorderComplex(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
                             currentDate, !isMenuDetailPreorder(regularPreorder) ? regularPreorder.getAmount() : 0, wtComplex,
-                            nextVersion, regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
+                            nextVersion, regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate(), null);
                 }
                 preorderComplex.setRegularPreorder(regularPreorder);
                 em.persist(preorderComplex);
@@ -2210,7 +2210,7 @@ public class PreorderDAOService {
     }
 
     private PreorderComplex createPreorderComplex(Integer idOfComplex, Client client, Date date, Integer complexAmount, ComplexInfo ci,
-            Long nextVersion, String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws MenuDetailNotExistsException {
+            Long nextVersion, String guardianMobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate, Integer externalSystem) throws MenuDetailNotExistsException {
         PreorderComplex preorderComplex = new PreorderComplex();
         preorderComplex.setClient(client);
         preorderComplex.setPreorderDate(date);
@@ -2241,12 +2241,16 @@ public class PreorderDAOService {
         } else {
             throw new MenuDetailNotExistsException("Не найден комплекс с ид.=" + idOfComplex.toString());
         }
+        if(externalSystem != null){
+            PreorderExternalSystemCode code = PreorderExternalSystemCode.getExternalSystemCode(externalSystem);
+            preorderComplex.setExternalSystem(code);
+        }
         return preorderComplex;
     }
 
     private PreorderComplex createWtPreorderComplex(Integer idOfComplex, Client client, Date date,
             Integer complexAmount, WtComplex wtComplex, Long nextVersion, String guardianMobile,
-            PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws MenuDetailNotExistsException {
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate, Integer externalSystem) throws MenuDetailNotExistsException {
         PreorderComplex preorderComplex = new PreorderComplex();
         preorderComplex.setClient(client);
         preorderComplex.setArmComplexId(idOfComplex);
@@ -2277,6 +2281,10 @@ public class PreorderDAOService {
             preorderComplex.setModeOfAdd(wtComplex.getComposite() ? 4 : 2);
         } else {
             throw new MenuDetailNotExistsException("Не найден комплекс с ид.=" + idOfComplex.toString());
+        }
+        if(externalSystem != null){
+            PreorderExternalSystemCode code = PreorderExternalSystemCode.getExternalSystemCode(externalSystem);
+            preorderComplex.setExternalSystem(code);
         }
         return preorderComplex;
     }
