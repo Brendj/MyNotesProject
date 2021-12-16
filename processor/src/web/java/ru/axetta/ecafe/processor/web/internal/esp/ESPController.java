@@ -67,16 +67,14 @@ public class ESPController extends Application {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Client client = DAOUtils.findClient(persistenceSession, espRequest.getIdOfClient());
-            if (client == null)
-            {
+            if (client == null) {
                 logger.error(String.format("Client with idOfClient=%s not found", espRequest.getIdOfClient()));
                 result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
             Org org = DAOUtils.findOrg(persistenceSession, espRequest.getIdOfOrg());
-            if (org == null)
-            {
+            if (org == null) {
                 logger.error(String.format("Org with idOfOrg=%s not found", espRequest.getIdOfOrg()));
                 result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
@@ -94,8 +92,9 @@ public class ESPController extends Application {
             ESPrequestsService esPrequestsService = new ESPrequestsService();
             Integer count = 1;
             List<String> files = new ArrayList<>();
-            for (ESPRequestAttachedFile espRequestAttachedFile: espRequest.getAttached())
-            {
+            List<String> goodFilePaths = new ArrayList<>();
+            List<ESPattached> esPattacheds = new ArrayList<>();
+            for (ESPRequestAttachedFile espRequestAttachedFile : espRequest.getAttached()) {
                 String path = FileUtils.saveFile(esp.getIdesprequest(), espRequestAttachedFile.getAttached_filedata(),
                         espRequestAttachedFile.getAttached_filename());
                 ESPattached espattached = new ESPattached();
@@ -106,21 +105,24 @@ public class ESPController extends Application {
                 espattached.setPath(path);
                 //Отправка в FOS файлов
                 SendFileESPresponse sendFileESPresponse = esPrequestsService.sendFileForESPRequest(path);
-                if (sendFileESPresponse != null && sendFileESPresponse.getType().equals(SUCCESS))
-                {
+                if (sendFileESPresponse != null && sendFileESPresponse.getType().equals(SUCCESS)) {
                     espattached.setLinkinfos(sendFileESPresponse.getUrl());
                     files.add(sendFileESPresponse.getUrl());
+                    goodFilePaths.add(path);
+                    esPattacheds.add(espattached);
+                    persistenceSession.save(espattached);
+                    count++;
+                } else {
+                    //Удаляем файл с сервера, если отправка файла неудачная
+                    FileUtils.removeFile(FileUtils.getBaseFilePathForESP() + path);
+                    logger.error(String.format("File %s cant send to ESP", espRequestAttachedFile.getAttached_filename()));
                 }
-                count++;
-                persistenceSession.save(espattached);
-
             }
             /////////
             //Создание нового обращения
             NewESPresponse newESPresponse = esPrequestsService.sendNewESPRequst(espRequest, client, org, files);
 
-            if (newESPresponse != null && newESPresponse.getType().equals(SUCCESS))
-            {
+            if (newESPresponse != null && newESPresponse.getType().equals(SUCCESS)) {
                 //Если обращение успешно создано
                 esp.setNumberrequest(newESPresponse.getId());
                 InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(newESPresponse.getId());
@@ -134,6 +136,13 @@ public class ESPController extends Application {
                     esp.setSd(infoESPresponse.getSd());
                 esp.setUpdateDate(new Date());
                 persistenceSession.save(esp);
+            } else {
+                logger.error("ESP request not created");
+                //Если сообщение не создано, то удаляем те файлы, которые должны были прикрепить
+                for (String path : goodFilePaths)
+                    FileUtils.removeFile(FileUtils.getBaseFilePathForESP() + path);
+                for (ESPattached esPattached : esPattacheds)
+                    persistenceSession.delete(esPattached);
             }
 
             persistenceTransaction.commit();
@@ -168,6 +177,7 @@ public class ESPController extends Application {
             this.idOfOrg = idOfOrg;
         }
     }
+
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -190,61 +200,63 @@ public class ESPController extends Application {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Org org = DAOUtils.findOrg(persistenceSession, org1.getIdOfOrg());
-            if (org == null)
-            {
+            if (org == null) {
                 logger.error(String.format("Org with idOfOrg=%s not found", org1.idOfOrg));
                 result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
             }
-            List<ESP> esps = DAOUtils.getESPForOrg(persistenceSession,org);
+            List<ESP> esps = DAOUtils.getESPForOrg(persistenceSession, org);
             ESPrequestsService esPrequestsService = new ESPrequestsService();
-            for (ESP esp: esps)
-            {
-                InfoESPresponse infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(esp.getNumberrequest());
-                if (infoESPresponse != null) {
-                    boolean needUpdateDate = false;
-                    if (infoESPresponse.getClosed_at() != null) {
-                        Date closed = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at());
-                        if (closed != esp.getCloseddate()) {
-                            needUpdateDate = true;
+            for (ESP esp : esps) {
+                InfoESPresponse infoESPresponse = null;
+                if (esp.getCloseddate() == null) {
+                    infoESPresponse = esPrequestsService.getInfoAboutESPReqeust(esp.getNumberrequest());
+                    if (infoESPresponse != null) {
+                        boolean needUpdateDate = false;
+                        if (infoESPresponse.getClosed_at() != null) {
+                            Date closed = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(infoESPresponse.getClosed_at());
+                            if (closed != esp.getCloseddate()) {
+                                needUpdateDate = true;
+                            }
+                            esp.setCloseddate(closed);
                         }
-                        esp.setCloseddate(closed);
-                    }
-                    if (infoESPresponse.getSolution() != null) {
-                        if (esp.getSolution() == null && !infoESPresponse.getSolution().equals(esp.getSolution())) {
-                            needUpdateDate = true;
+                        if (infoESPresponse.getSolution() != null) {
+                            if (esp.getSolution() == null && !infoESPresponse.getSolution().equals(esp.getSolution())) {
+                                needUpdateDate = true;
+                            }
+                            esp.setSolution(infoESPresponse.getSolution());
                         }
-                        esp.setSolution(infoESPresponse.getSolution());
-                    }
-                    if (infoESPresponse.getStatus() != null) {
-                        if (esp.getStatus() == null && !infoESPresponse.getStatus().equals(esp.getStatus())) {
-                            needUpdateDate = true;
+                        if (infoESPresponse.getStatus() != null) {
+                            if (esp.getStatus() == null && !infoESPresponse.getStatus().equals(esp.getStatus())) {
+                                needUpdateDate = true;
+                            }
+                            esp.setStatus(infoESPresponse.getStatus());
                         }
-                        esp.setStatus(infoESPresponse.getStatus());
-                    }
-                    if (infoESPresponse.getSd() != null) {
-                        if (esp.getSd() == null && !infoESPresponse.getSd().equals(esp.getSd())) {
-                            needUpdateDate = true;
+                        if (infoESPresponse.getSd() != null) {
+                            if (esp.getSd() == null && !infoESPresponse.getSd().equals(esp.getSd())) {
+                                needUpdateDate = true;
+                            }
+                            esp.setSd(infoESPresponse.getSd());
                         }
-                        esp.setSd(infoESPresponse.getSd());
+                        if (needUpdateDate)
+                            esp.setUpdateDate(new Date());
                     }
-                    if (needUpdateDate)
-                        esp.setUpdateDate(new Date());
-                    ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
-                    responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
-                    responseESPRequestsPOJO.setEmail(esp.getEmail());
-                    responseESPRequestsPOJO.setIdOfOrg(esp.getOrg().getIdOfOrg());
-                    responseESPRequestsPOJO.setIdOfClient(esp.getClient().getIdOfClient());
-                    responseESPRequestsPOJO.setMessage(esp.getMessage());
-                    responseESPRequestsPOJO.setTopic(esp.getTopic());
-                    responseESPRequestsPOJO.setNumberrequest(esp.getNumberrequest());
-                    responseESPRequestsPOJO.setUpdateDate(esp.getUpdateDate());
-                    responseESPRequestsPOJO.setStatus(esp.getStatus());
-                    responseESPRequestsPOJO.setSolution(esp.getSolution());
-                    responseESPRequests.getEspRequests().add(responseESPRequestsPOJO);
-                    persistenceSession.save(esp);
                 }
+                ResponseESPRequestsPOJO responseESPRequestsPOJO = new ResponseESPRequestsPOJO();
+                responseESPRequestsPOJO.setDateRequest(esp.getCreateDate());
+                responseESPRequestsPOJO.setEmail(esp.getEmail());
+                responseESPRequestsPOJO.setIdOfOrg(esp.getOrg().getIdOfOrg());
+                responseESPRequestsPOJO.setIdOfClient(esp.getClient().getIdOfClient());
+                responseESPRequestsPOJO.setMessage(esp.getMessage());
+                responseESPRequestsPOJO.setTopic(esp.getTopic());
+                responseESPRequestsPOJO.setNumberrequest(esp.getNumberrequest());
+                responseESPRequestsPOJO.setUpdateDate(esp.getUpdateDate());
+                responseESPRequestsPOJO.setStatus(esp.getStatus());
+                responseESPRequestsPOJO.setSolution(esp.getSolution());
+                responseESPRequests.getEspRequests().add(responseESPRequestsPOJO);
+                persistenceSession.save(esp);
+
             }
             responseESPRequests.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             responseESPRequests.setErrorMessage(ResponseCodes.RC_OK.toString());
@@ -277,6 +289,7 @@ public class ESPController extends Application {
             this.numberrequest = numberrequest;
         }
     }
+
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -299,8 +312,7 @@ public class ESPController extends Application {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ESP esp = DAOUtils.findESPByRequestByNumber(persistenceSession, number.getNumberrequest());
-            if (esp == null)
-            {
+            if (esp == null) {
                 logger.error(String.format("ESP request with numberrequest=%s not found", number.getNumberrequest()));
                 result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ESP.getCode().toString());
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ESP.toString());
@@ -318,8 +330,7 @@ public class ESPController extends Application {
                     }
                 }
             });
-            for (ESPattached esPattached : esPattacheds)
-            {
+            for (ESPattached esPattached : esPattacheds) {
                 ESPRequestAttachedFile espRequestAttachedFile = new ESPRequestAttachedFile();
                 espRequestAttachedFile.setAttached_filename(esPattached.getFilename());
                 espRequestAttachedFile.setAttached_filedata(FileUtils.loadFile(esPattached.getPath()));
@@ -348,8 +359,7 @@ public class ESPController extends Application {
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
                 String header = headerNames.nextElement();
-                if (header.toLowerCase().equals("key"))
-                {
+                if (header.toLowerCase().equals("key")) {
                     securityKey = request.getHeader(header);
                     break;
                 }

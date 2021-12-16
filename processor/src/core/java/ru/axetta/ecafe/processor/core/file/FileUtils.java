@@ -70,6 +70,12 @@ public class FileUtils {
             return "";
         }
     }
+
+    public static Boolean removeFile(String path) throws SecurityException {
+        File file = new File(path);
+        return file.delete();
+    }
+
     public static String loadFile(String path) {
         byte[] fileData = null;
         try {
