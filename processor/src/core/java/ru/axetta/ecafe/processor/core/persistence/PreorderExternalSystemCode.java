@@ -5,9 +5,12 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 public enum PreorderExternalSystemCode {
-    MOS_RU(1, "портал mos.ru"),
-    GOSUSLUGI(2, "МП Госууслуги"),
-    MESH(3, "МП Дневник МЭШ");
+    MOS_RU(1, "Портал mos.ru"),
+    GOSUSLUGI(2, "МП Госуслуги"),
+    MESH(3, "МП Дневник МЭШ"),
+    OTHER_1(4, "Неизвестная ИС №1"), // *
+    OTHER_2(5, "Неизвестная ИС №2"), // * TODO зарезервировано для будущих ИС
+    OTHER_3(6, "Неизвестная ИС №3"); // *
 
     private final Integer code;
     private final String description;
