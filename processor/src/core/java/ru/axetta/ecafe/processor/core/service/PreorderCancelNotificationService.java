@@ -208,10 +208,10 @@ public class PreorderCancelNotificationService {
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderDishOtherOO", 1, result);
 
-        //preorderComplexs = DAOUtils.getcontentDeletedPreorderDishOtherCash(session, new Date());
-        //setFlagSended(session, preorderComplexs);
-        //preorderComplexs = getUniquleResult(preorderComplexs);
-        //createData(preorderComplexs, "contentDeletedPreorderDishOtherCash", 1, result);
+        preorderComplexs = DAOUtils.getcontentDeletedPreorderDishOtherCash(session, new Date());
+        setFlagSended(session, preorderComplexs);
+        preorderComplexs = getUniquleResult(preorderComplexs);
+        createData(preorderComplexs, "contentDeletedPreorderDishOtherCash", 1, result);
 
         preorderComplexs = DAOUtils.getContentDeletedPreorderDishOtherPP(session, new Date());
         setFlagSended(session, preorderComplexs);
@@ -223,10 +223,10 @@ public class PreorderCancelNotificationService {
         preorderComplexs = getUniquleResult(preorderComplexs);
         createData(preorderComplexs, "contentDeletedPreorderOtherOO", 3, result);
 
-        //preorderComplexs = DAOUtils.getContentDeletedPreorderOtherCash(session, new Date());
-        //setFlagSended(session, preorderComplexs);
-        //preorderComplexs = getUniquleResult(preorderComplexs);
-        //createData(preorderComplexs, "contentDeletedPreorderOtherCash", 3, result);
+        preorderComplexs = DAOUtils.getContentDeletedPreorderOtherCash(session, new Date());
+        setFlagSended(session, preorderComplexs);
+        preorderComplexs = getUniquleResult(preorderComplexs);
+        createData(preorderComplexs, "contentDeletedPreorderOtherCash", 3, result);
 
         preorderComplexs = DAOUtils.getContentDeletedPreorderOtherPP(session, new Date());
         setFlagSended(session, preorderComplexs);
