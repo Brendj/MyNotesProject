@@ -143,6 +143,7 @@ public class ESPController extends Application {
                     FileUtils.removeFile(FileUtils.getBaseFilePathForESP() + path);
                 for (ESPattached esPattached : esPattacheds)
                     persistenceSession.delete(esPattached);
+                persistenceSession.delete(esp);
             }
 
             persistenceTransaction.commit();
