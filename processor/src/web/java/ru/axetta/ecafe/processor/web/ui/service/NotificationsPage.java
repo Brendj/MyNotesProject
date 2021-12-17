@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.service.BenefitService;
+import ru.axetta.ecafe.processor.core.service.PreorderCancelNotificationService;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
@@ -65,6 +66,11 @@ public class NotificationsPage extends BasicWorkspacePage {
         }
 
         printMessage("Оповещение об отказе в заявлении отправлено");
+    }
+
+    public void cancelPreorder() throws Exception {
+        PreorderCancelNotificationService.sendNotification.manualStart();
+        printMessage("Отправка уведомлений об отмене предзаказа выполнена");
     }
 
     public void runRegularPayments() throws Exception {

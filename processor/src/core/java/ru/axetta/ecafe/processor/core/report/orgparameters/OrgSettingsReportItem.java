@@ -30,6 +30,9 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     private String shortAddress;
     private String type;
     private String status;
+    private String organizationStatus;
+    private String statusDetailing;
+    private Boolean governmentContract;
 
     //----------------- Реквизиты --------------------//
     private String GUID;
@@ -50,6 +53,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     private Boolean reverseMonthOfSale;
     private Boolean denyPayPlanForTimeDifference;
     private Boolean useWebArm;
+    private Boolean useMealSchedule;
 
     //FeedingSetting Info
     private Long idOfSetting = -1L;
@@ -94,6 +98,9 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.shortAddress = org.getShortAddress();
         this.type = org.getType().getShortType();
         this.status = Org.STATE_NAMES[org.getState()];
+        this.organizationStatus = StringUtils.substringBefore(org.getStatusDetailing(), "/");
+        this.statusDetailing = StringUtils.substringAfter(org.getStatusDetailing(), "/");
+        this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
 
         this.GUID = org.getGuid();
         this.additionalIdBuilding = org.getAdditionalIdBuilding();
@@ -116,6 +123,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
             this.limit = setting.getLimit();
         }
         this.useWebArm = org.getUseWebArm();
+        this.useMealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
 
         this.oneActiveCard = org.getOneActiveCard();
         this.enableDuplicateCard = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED);
@@ -464,5 +472,37 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     public void change(){
         changed = true;
+    }
+
+    public String getOrganizationStatus() {
+        return organizationStatus;
+    }
+
+    public void setOrganizationStatus(String organizationStatus) {
+        this.organizationStatus = organizationStatus;
+    }
+
+    public String getStatusDetailing() {
+        return statusDetailing;
+    }
+
+    public void setStatusDetailing(String statusDetailing) {
+        this.statusDetailing = statusDetailing;
+    }
+
+    public Boolean getGovernmentContract() {
+        return governmentContract;
+    }
+
+    public void setGovernmentContract(Boolean governmentContract) {
+        this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseMealSchedule() {
+        return useMealSchedule == null ? false : useMealSchedule;
+    }
+
+    public void setUseMealSchedule(Boolean useMealSchedule) {
+        this.useMealSchedule = useMealSchedule;
     }
 }

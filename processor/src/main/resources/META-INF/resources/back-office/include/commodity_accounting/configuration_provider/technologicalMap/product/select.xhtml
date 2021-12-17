@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="productListItemsPanel" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.technologicalMapProduct.ProductListItemsPanel"-->
+
+    <rich:popupPanel modal="true" id="modalTechnologicalMapListSelectorPanel" autosized="true" headerClass="modal-panel-header">
+        <rich:hotKey key="esc"
+                     handler="#{rich:component('modalTechnologicalMapListSelectorPanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText escape="true" value="Выбор продуктов"/>
+        </f:facet>
+        <h:form id="modalTechnologicalMapListSelectorForm"
+                  styleClass="borderless-form"
+                  eventsQueue="modalTechnologicalMapListSelectorFormEventsQueue">
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: left;">
+                        <h:panelGrid columns="4" styleClass="borderless-grid">
+                            <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
+                            <h:inputText value="#{productListItemsPanel.filter}" size="48" maxlength="128"
+                                         styleClass="input-text"/>
+                            <a4j:commandLink
+                                    action="#{productListItemsPanel.updateTechnologicalMapProductListSelectPage}"
+                                    render="modalTechnologicalMapListSelectorForm"
+                                    styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/search.png" style="border: 0;"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink
+                                    action="#{productListItemsPanel.updateTechnologicalMapProductListSelectPage}"
+                                    render="modalTechnologicalMapListSelectorForm"
+                                    styleClass="command-link">
+                                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                                <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.filter}"/>
+                            </a4j:commandLink>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <rich:dataTable value="#{productListItemsPanel.productItems}" var="item" rows="15"
+                                        width="100%" align="center"
+                                        id="modalTechnologicalMapListSelectorTechnologicalMapTable"
+                                        footerClass="data-table-footer" columnClasses="left-aligned-column"
+                                        rowClasses="select-panel-row"
+                                        onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
+                                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+                            <rich:column headerClass="column-header">
+                                <h:selectBooleanCheckbox value="#{item.checked}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText value="#{item.product.productName}"/>
+                            </rich:column>
+                            <f:facet name="footer">
+                                <rich:dataScroller for="modalTechnologicalMapListSelectorTechnologicalMapTable"
+                                                   renderIfSinglePage="false" maxPages="5"
+                                                   fastControls="hide" stepControls="auto" boundaryControls="hide">
+<!--                                    <a4j:ajax event="pagechange"/>-->
+                                    <f:facet name="previous">
+                                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                                    </f:facet>
+                                    <f:facet name="next">
+                                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                                    </f:facet>
+                                </rich:dataScroller>
+                            </f:facet>
+                        </rich:dataTable>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">
+                        <h:panelGroup styleClass="borderless-div">
+                            <a4j:commandButton value="Ok" action="#{productListItemsPanel.addProducts}"
+                                               render="workspaceTogglePanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px; margin-right: 4px;"/>
+                            <a4j:commandButton value="Отмена" action="#{productListItemsPanel.cancel}"
+                                               render="#{productListItemsPanel.pageComponent.id}"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalTechnologicalMapListSelectorPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px;">
+                            </a4j:commandButton>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
+</ui:composition>

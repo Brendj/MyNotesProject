@@ -10,8 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.CheckSums;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.vfs.VFS;
-import org.jboss.vfs.VirtualFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -155,13 +153,13 @@ public class CheckSumsMessageDigitsService {
             URL url = en.nextElement();
             String surl = url.toString();
             if (surl.startsWith("vfs:/") && surl.endsWith("/WEB-INF/classes/")) {
-                VirtualFile classFolder = VFS.getChild(surl.substring(5));
+                /*VirtualFile classFolder = VFS.getChild(surl.substring(5));
                 List<VirtualFile> virtualFiles = classFolder.getChildrenRecursively();
                 for (VirtualFile vf : virtualFiles) {
                     if (vf.isFile()) {
                         res.add(vf.getPhysicalFile().getAbsolutePath());
                     }
-                }
+                }*/
             }
         }
         return res;

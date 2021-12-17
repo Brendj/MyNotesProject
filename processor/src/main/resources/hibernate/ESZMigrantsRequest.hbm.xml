@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ESZMigrantsRequest" table="cf_esz_migrants_requests" optimistic-lock="version">
+        <id name="idOfESZMigrantsRequest" column="IdOfESZMigrantsRequest" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_esz_migrants_requests_idofeszmigrantsrequest_seq</param>
+            </generator>
+        </id>
+        <property name="idOfServiceClass" column="IdOfServiceClass" type="long" not-null="true" unique-key="idOfServiceClass_clientGuid_uq"/>
+        <property name="groupName" column="GroupName" type="string" length="255"/>
+        <property name="clientGuid" column="ClientGuid" type="string" length="36" not-null="true" unique-key="idOfServiceClass_clientGuid_uq"/>
+        <property name="visitOrgInn" column="VisitOrgInn" type="string" length="32"/>
+        <property name="visitOrgUnom" column="VisitOrgUnom" type="integer"/>
+        <property name="dateEnd" column="DateEnd" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateLearnStart" column="DateLearnStart" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateLearnEnd" column="DateLearnEnd" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="firstname" column="Firstname" type="string"/>
+        <property name="surname" column="Surname" type="string"/>
+        <property name="secondname" column="Secondname" type="string"/>
+        <property name="idOfESZ" column="idOfESZ" type="long"/>
+    </class>
+</hibernate-mapping>

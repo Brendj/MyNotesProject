@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"-->
+    <f:verbatim>
+        <script type="text/javascript">
+            function checkReporitoryDate() {
+                var startDate = RichFaces.$('startDate').currentDate.getTime();
+                var endDate = RichFaces.$('endDate').currentDate.getTime();
+                alert(startDate + " :: " + endDate);
+                RichFaces.$('startDate').currentDate.setTime(endDate);
+                RichFaces.$('startDate').currentDate.setTime(startDate);
+            }
+        </script>
+    </f:verbatim>
+    <h:panelGrid id="reportRepListPanelGrid" binding="#{reportRepositoryListPage.pageComponent}"
+                 styleClass="borderless-grid">
+        <rich:togglePanel label="Фильтр (#{reportRepositoryListPage.filter.status})" switchType="client" opened="true"
+                          headerClass="filter-panel-header">
+
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:panelGrid columns="1">
+                    <h:outputText escape="true" value="Название правила" styleClass="output-text"/>
+                    <h:selectOneListbox value="#{reportRepositoryListPage.filter.ruleName}"
+                                        style="width:400px; height: 200px">
+                        <f:selectItems value="#{reportRepositoryListPage.ruleNameItems}"/>
+                    </h:selectOneListbox>
+                    <!--<rich:comboBox value="#{reportRepositoryListPage.filter.ruleName}" width="400px" styleClass="input-text">
+                        <f:selectItems value="#{reportRepositoryListPage.ruleNameItems}" />
+                    </rich:comboBox>-->
+                </h:panelGrid>
+                <h:panelGrid columns="2">
+                    <h:outputText escape="true" value="Название отчета" styleClass="output-text"/>
+                    <h:inputText value="#{reportRepositoryListPage.filter.reportName}" styleClass="input-text"/>
+                    <h:outputText escape="true" value="Организации" styleClass="output-text"/>
+                    <h:panelGroup styleClass="borderless-div">
+                        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                                           render="modalOrgListSelectorPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                           styleClass="command-link" style="width: 25px;">
+                            <f:setPropertyActionListener value="#{reportRepositoryListPage.getStringIdOfOrgList}"
+                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                        </a4j:commandButton>
+                        <h:outputText styleClass="output-text" escape="true"
+                                      value=" {#{reportRepositoryListPage.orgsFilter}}"/>
+                    </h:panelGroup>
+
+                    <h:outputText escape="true" value="Дата создания" styleClass="output-text"/>
+                    <rich:calendar value="#{reportRepositoryListPage.filter.createdDate}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
+                    <h:outputText escape="true" value="Дата выборки от" styleClass="output-text"/>
+                    <rich:calendar id="startDate" value="#{reportRepositoryListPage.filter.startDate}"
+                                   onchanged="if(#{rich:component('startDate')}.getSelectedDate().getTime() > #{rich:component('endDate')}.getSelectedDate().getTime()) { #{rich:component('startDate')}.selectDate(#{rich:component('endDate')}.getSelectedDate()) }"
+                                   datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
+                                   showWeeksBar="false"/>
+                    <h:outputText escape="true" value="Дата выборки до" styleClass="output-text"/>
+                    <rich:calendar id="endDate"
+                                   onchanged="if(#{rich:component('startDate')}.getSelectedDate().getTime() > #{rich:component('endDate')}.getSelectedDate().getTime()) { #{rich:component('startDate')}.selectDate(#{rich:component('endDate')}.getSelectedDate()) }"
+                                   value="#{reportRepositoryListPage.filter.endDate}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <!---->
+            <h:panelGrid columns="3" styleClass="borderless-grid">
+                <a4j:commandButton value="Применить" action="#{reportRepositoryListPage.reload}"
+                                   render="workspaceTogglePanel" styleClass="command-button" status="repositoryStatus"/>
+                <a4j:commandButton value="Очистить" action="#{reportRepositoryListPage.resetFilter}"
+                                   render="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
+                <a4j:status id="repositoryStatus">
+                    <f:facet name="start">
+                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                    </f:facet>
+                </a4j:status>
+            </h:panelGrid>
+        </rich:togglePanel>
+        <rich:popupPanel modal="true" id="errorPanel" width="600" height="600" style="overflow: scroll;">
+            <f:facet name="header">
+                <h:outputText value="Текст ошибки"/>
+            </f:facet>
+            <f:facet name="controls">
+                <a4j:commandLink onclick="Richfaces.hideModalPanel('errorPanel')" render="this" style="color: white;">
+                    <h:outputText value="Закрыть"/>
+                </a4j:commandLink>
+            </f:facet>
+            <h:outputText value="#{reportRepositoryListPage.displayedError}"/>
+        </rich:popupPanel>
+        <rich:dataTable id="contractListTable" value="#{reportRepositoryListPage.itemList}" var="item" rows="50"
+                        footerClass="data-table-footer"
+                        columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Ид. организации"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Правило"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.ruleName}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Название"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.reportName}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Номер организации"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.orgNum}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header" styleClass="#{item.createStateStyle}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Статус"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.createState}" styleClass="#{item.createStateStyle}"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Формат"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.documentFormatAsString}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Дата создания"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.createdDate}" styleClass="output-text">
+                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Время формирования"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.generationTime} мс." styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Дата выборки от"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.startDate}" styleClass="output-text">
+                    <f:convertDateTime pattern="dd.MM.yyyy"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Дата выборки до"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.endDate}" styleClass="output-text">
+                    <f:convertDateTime pattern="dd.MM.yyyy"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Загрузить файл"/>
+                </f:facet>
+                <a4j:commandLink value="#{item.reportFile}" action="#{reportRepositoryListPage.downloadReportFile}"
+                                 styleClass="command-link" render="mainMenu, workspaceForm">
+                    <f:setPropertyActionListener value="#{item}" target="#{reportRepositoryListPage.selectedItem}"/>
+                </a4j:commandLink>
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Ошибка"/>
+                </f:facet>
+                <a4j:commandLink value="Текст ошибки" rendered="#{item.errorButtonRendered}" ajaxSingle="true"
+                                 oncomplete="Richfaces.showModalPanel('errorPanel');"
+                                 render="errorPanel" styleClass="command-link">
+                    <f:setPropertyActionListener value="#{item.errorString}"
+                                                 target="#{reportRepositoryListPage.displayedError}"/>
+                </a4j:commandLink>
+                <!--<h:outputText escape="true" value="#{item.errorString}" styleClass="output-text"  />-->
+            </rich:column>
+
+            <rich:column headerClass="column-header" rendered="#{reportRepositoryListPage.canDelete}">
+                <f:facet name="header">
+                    <h:outputText value="Удалить" escape="true"/>
+                </f:facet>
+                <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                                 render="uvDeleteConfirmPanel"
+                                 action="#{uvDeletePage.show}"
+                                 oncomplete="#{rich:component('uvDeleteConfirmPanel')}.show()">
+                    <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                    <f:setPropertyActionListener value="#{item}" target="#{uvDeletePage.currentEntityItem}"/>
+                </a4j:commandLink>
+            </rich:column>
+
+            <f:facet name="footer">
+                <rich:dataScroller for="contractListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                    </f:facet>
+                </rich:dataScroller>
+            </f:facet>
+        </rich:dataTable>
+
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</ui:composition>

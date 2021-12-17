@@ -28,6 +28,7 @@ public class DiscountChangeHistory {
     public static final String MODIFY_IN_REGISTRY = "Изменено в Реестрах.";
     public static final String MODIFY_BY_US = "Положительное решение УС";
     public static final String MODIFY_BY_TRANSITION = "Удалено при переводе";
+    public static final String MODIFY_IN_WEB_ARM = "Изменено в Веб-АРМ. Пользователь: ";
 
     private Long idOfDiscountChange;
     private Date registrationDate;

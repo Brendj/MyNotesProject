@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RequestFeeding implements SectionRequest {
     public static final String SECTION_NAME="RequestFeeding";
@@ -32,6 +33,14 @@ public class RequestFeeding implements SectionRequest {
             }
             itemNode = itemNode.getNextSibling();
         }
+    }
+
+    public RequestFeeding(RequestFeedingItem item, long idOfOrgOwner) {
+        Objects.requireNonNull(item);
+        this.idOfOrgOwner = idOfOrgOwner;
+        this.maxVersion = 0L;
+        this.items = new ArrayList<>();
+        this.items.add(item);
     }
 
     public List<RequestFeedingItem> getItems() {

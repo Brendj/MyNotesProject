@@ -31,6 +31,7 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
     private ClientItem client = new ClientItem();
     private long idOfOrg;
     private Long cardNo;
+    private Long longCardNo;
     private Integer cardType;
     private Integer state;
     private String lockReason;
@@ -70,6 +71,14 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
 
     public void setCardNo(Long cardNo) {
         this.cardNo = cardNo;
+    }
+
+    public Long getLongCardNo() {
+        return longCardNo;
+    }
+
+    public void setLongCardNo(Long longCardNo) {
+        this.longCardNo = longCardNo;
     }
 
     public Integer getCardType() {
@@ -175,7 +184,7 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
         validTime = CalendarUtils.endOfDay(validTime);
         runtimeContext.getCardManager()
                 .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, this.state, this.validTime,
-                        this.lifeState, this.lockReason, this.issueTime, this.cardPrintedNo);
+                        this.lifeState, this.lockReason, this.issueTime, this.cardPrintedNo, this.longCardNo);
     }
 
 

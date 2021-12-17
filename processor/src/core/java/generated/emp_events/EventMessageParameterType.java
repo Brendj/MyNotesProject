@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Тип описывающий параметры сообщения
+ *
  * 
  * <p>Java class for EventMessageParameter_Type complex type.
  * 

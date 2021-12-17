@@ -11,7 +11,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -225,7 +225,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         htmlReport = dailySalesReport.getHtmlReport();
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
                 setEndDate(startDate);
@@ -246,7 +246,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         return periodTypeMenu;
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
@@ -279,7 +279,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         Org org;
         List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
         for (Long idOfOrg : orgIds) {
-            org = DAOService.getInstance().findOrById(idOfOrg);
+            org = DAOReadonlyService.getInstance().findOrById(idOfOrg);
             list.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(),
                     org.getOfficialName()));
         }

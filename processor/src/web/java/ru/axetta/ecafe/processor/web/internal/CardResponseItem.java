@@ -46,4 +46,10 @@ public class CardResponseItem extends ResponseItem {
             super(message);
         }
     }
+
+    public static class LongCardNoNotSpecified extends Exception {
+        public LongCardNoNotSpecified(String message) {
+            super(message);
+        }
+    }
 }

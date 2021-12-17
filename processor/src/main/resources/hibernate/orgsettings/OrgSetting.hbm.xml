@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting" table="CF_OrgSettings">
+        <id name="idOfOrgSetting" column="idOfOrgSetting" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOfOrg" column="idOfOrg" type="long" not-null="true" update="false"/>
+        <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+        
+        <property name="settingGroup" column="settingGroup">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup</param>
+            </type>
+        </property>
+        
+        <set name="orgSettingItems" inverse="true" cascade="all" lazy="false">
+            <key column="idOfOrgSetting"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem"/>
+        </set>
+    </class>
+</hibernate-mapping>

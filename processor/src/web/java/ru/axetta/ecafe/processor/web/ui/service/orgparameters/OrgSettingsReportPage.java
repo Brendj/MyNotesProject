@@ -71,6 +71,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean allNeedVerifyCardSign = true;
     private Boolean allRequestForVisitsToOtherOrg = true;
     private Boolean allIsWorkInSummerTime = true;
+    private Boolean allUseGovernmentContract = true;
+    private Boolean allUseMealSchedule = true;
 
     private void resetSelectedColumns() {
         allUseWebArm = true;
@@ -85,6 +87,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         allNeedVerifyCardSign = true;
         allRequestForVisitsToOtherOrg = true;
         allIsWorkInSummerTime = true;
+        allUseGovernmentContract = true;
+        allUseMealSchedule = true;
     }
 
     private void processSelectedColumns(List<OrgSettingsReportItem> items) {
@@ -105,6 +109,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             allNeedVerifyCardSign &= item.getNeedVerifyCardSign();
             allRequestForVisitsToOtherOrg &= item.getRequestForVisitsToOtherOrg();
             allIsWorkInSummerTime &= item.getIsWorkInSummerTime();
+            allUseGovernmentContract &= item.getGovernmentContract();
+            allUseMealSchedule &= item.getUseMealSchedule();
         }
     }
 
@@ -203,6 +209,12 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                 case 11:
                     item.setIsWorkInSummerTime(allIsWorkInSummerTime);
                     break;
+                case 12:
+                    item.setGovernmentContract(allUseGovernmentContract);
+                    break;
+                case 13:
+                    item.setUseMealSchedule(allUseMealSchedule);
+                    break;
             }
             item.change();
         }
@@ -237,7 +249,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                 idOfOrgList.add(Long.parseLong(item));
             }
 
-            items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
+            items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession,
+                    selectedDistricts, allFriendlyOrgs);
             Collections.sort(items);
             processSelectedColumns(items);
 
@@ -353,6 +366,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                             friendlyOrg.setUseWebArm(item.getUseWebArm());
                         }
                     }
+                    manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, item.getUseMealSchedule(), session,
+                            lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
 
                     org.setOneActiveCard(item.getOneActiveCard());
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED, item.getEnableDuplicateCard(), session,
@@ -368,6 +383,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
                     org.setOrgStructureVersion(nextOrgVersion);
                     org.setOrgSettingsSyncParam(Boolean.TRUE);
+                    org.setGovernmentContract(item.getGovernmentContract());
                     session.update(org);
 
                     logger.info("Success");
@@ -577,5 +593,21 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setNumOfChangedRecords(Long numOfChangedRecords) {
         this.numOfChangedRecords = numOfChangedRecords;
+    }
+
+    public Boolean getAllUseGovernmentContract() {
+        return allUseGovernmentContract;
+    }
+
+    public void setAllUseGovernmentContract(Boolean allUseGovernmentContract) {
+        this.allUseGovernmentContract = allUseGovernmentContract;
+    }
+
+    public Boolean getAllUseMealSchedule() {
+        return allUseMealSchedule;
+    }
+
+    public void setAllUseMealSchedule(Boolean allUseMealSchedule) {
+        this.allUseMealSchedule = allUseMealSchedule;
     }
 }

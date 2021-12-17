@@ -26,17 +26,9 @@ import javax.xml.bind.annotation.XmlType;
 public enum RegType {
 
 
-    /**
-     * ����������
-     * 
-     */
     @XmlEnumValue("Constant")
     CONSTANT("Constant"),
 
-    /**
-     * ���������
-     * 
-     */
     @XmlEnumValue("Temporary")
     TEMPORARY("Temporary");
     private final String value;

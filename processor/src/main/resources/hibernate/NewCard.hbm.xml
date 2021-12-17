@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.NewCard" table="CF_NewCards" optimistic-lock="version">
+        <id name="idOfNewCard" column="IdOfNewCard" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
+        <property name="cardPrintedNo" column="CardPrintedNo" type="long" update="false"/>
+        <property name="cardType" column="CardType" type="integer" update="false"/>
+    </class>
+</hibernate-mapping>
+
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem" table="CF_OrgSettings_Items">
+        <id name="idOfOrgSettingItem" column="idOfOrgSettingItem" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="settingValue" column="settingValue" type="string" length="128"/>
+        <property name="settingType" column="settingType" type="integer" not-null="true"/>
+
+        <many-to-one name="orgSetting" class="ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting" column="idOfOrgSetting"/>
+    </class>
+</hibernate-mapping>

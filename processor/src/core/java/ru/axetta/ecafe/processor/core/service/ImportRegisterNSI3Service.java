@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Query;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by i.semenov on 14.01.2020.
@@ -34,10 +35,21 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
         query.setParameterList("guids", orgGuids.getOrgNSIIds());
     }
 
+    private String extractDifferentIds(Set<String> set) {
+        String result = "";
+        for (String str : set) {
+            result += str + ", ";
+        }
+        return result.substring(0, result.length()-2);
+    }
+
     public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> list = new ArrayList<String>();
         if (orgGuids.getOrgNSIIds().size() == 0) {
             return "У организации не задан НСИ-3 Id";
+        }
+        if (orgGuids.getOrgNSIIds().size() > 1) {
+            return "У организации заданы несколько разных НСИ-3 Id: " + extractDifferentIds(orgGuids.getOrgNSIIds());
         }
         Boolean guidOK;
         Session session = null;
@@ -47,7 +59,7 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
             transaction = session.beginTransaction();
             for (String nsiId : orgGuids.getOrgNSIIds()) {
                 //Проверка на существование ЕКИС Ид ОО в выгрузке
-                Query query = session.createSQLQuery("select global_id from cf_kf_organization_registry where global_id = :globalId limit 1");
+                Query query = session.createSQLQuery("select personguid from cf_mh_persons where organizationid = :globalId limit 1");
                 query.setParameter("globalId", Long.parseLong(nsiId));
                 try {
                     Object res = query.uniqueResult();
@@ -57,7 +69,7 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
                 }
                 if (!guidOK) {
                     String badGuidString = "";
-                    List<Org> orgs = DAOService.getInstance().findOrgsByNSIId(Long.parseLong(nsiId));
+                    List<Org> orgs = DAOReadonlyService.getInstance().findOrgsByNSIId(Long.parseLong(nsiId));
                     for (Org o : orgs) {
                         badGuidString += String.format("НСИ-3 Ид: %s, Ид. организации: %s, Название организации: %s;\n", nsiId, o.getIdOfOrg(), o.getShortNameInfoService());
                     }

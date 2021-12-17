@@ -10,11 +10,12 @@ import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.ite
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class ResHardwareSettingsRequest implements AbstractToElement {
 
-    private List<ResHardwareSettingsRequestItem> items;
+    private List<ResHardwareSettingsRequestItem> items = new LinkedList<>();
 
     ResHardwareSettingsRequest() {
     }

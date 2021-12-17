@@ -402,7 +402,7 @@
 
     <servlet>
         <servlet-name>EMIASControllewWS</servlet-name>
-        <servlet-class>ru.axetta.ecafe.processor.web.internal.EMIASController</servlet-class>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.emias.EMIASController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>EMIASControllewWS</servlet-name>
@@ -506,12 +506,29 @@
         </init-param>
         <init-param>
             <param-name>resteasy.servlet.mapping.prefix</param-name>
-            <param-value>/ezd</param-value>
+            <param-value>/ispp/ezd</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>EzdServlet</servlet-name>
-        <url-pattern>/ezd/*</url-pattern>
+        <url-pattern>/ispp/ezd/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>EmiasKafkaServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.internal.emias.EmiasInternal</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/emias_internal</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EmiasKafkaServlet</servlet-name>
+        <url-pattern>/emias_internal/*</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -532,21 +549,49 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>ESPServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.internal.esp.ESPController</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/ispp/ESP</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ESPServlet</servlet-name>
+        <url-pattern>/ispp/ESP/*</url-pattern>
+    </servlet-mapping>
+
+<!--
+    <servlet>
         <servlet-name>SchoolServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
             <param-name>resteasy.resources</param-name>
-            <param-value>ru.axetta.ecafe.processor.web.partner.schoolapi.SchoolRestController</param-value>
+            <param-value>
+                ru.axetta.ecafe.processor.web.partner.schoolapi.SchoolRestController
+            </param-value>
         </init-param>
         <init-param>
             <param-name>resteasy.servlet.mapping.prefix</param-name>
             <param-value>/school/api/v1</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.providers</param-name>
+            <param-value>
+                ru.axetta.ecafe.processor.web.partner.schoolapi.error.WebApplicationExceptionMapper,
+                ru.axetta.ecafe.processor.web.partner.schoolapi.error.GenericExceptionMapper
+            </param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>SchoolServlet</servlet-name>
         <url-pattern>/school/api/v1/*</url-pattern>
     </servlet-mapping>
+-->
 
     <filter>
         <filter-name>CleanupFilter</filter-name>
@@ -557,10 +602,12 @@
         <url-pattern>/fps/api/*</url-pattern>
         <url-pattern>/assessment/*</url-pattern>
         <url-pattern>/smartwatch/*</url-pattern>
-        <url-pattern>/school/api/v1/*</url-pattern>
         <url-pattern>/ispp/library/*</url-pattern>
+        <url-pattern>/ispp/ezd/*</url-pattern>
+	<url-pattern>/emias_internal/*</url-pattern>
+	<url-pattern>/ispp/ESP/*</url-pattern>
     </filter-mapping>
-
+<!--
     <filter>
         <filter-name>springSecurityTokenFilter</filter-name>
         <filter-class>ru.axetta.ecafe.processor.web.token.security.jwt.JWTAuthenticationFilter</filter-class>
@@ -568,8 +615,7 @@
     <filter-mapping>
         <filter-name>springSecurityTokenFilter</filter-name>
         <url-pattern>/school/api/v1/*</url-pattern>
-    </filter-mapping>
-
+    </filter-mapping>-->
 
     <security-constraint>
         <web-resource-collection>
@@ -597,7 +643,7 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Restrict transport for login page</web-resource-name>
-            <url-pattern>/back-office/login.faces</url-pattern>
+            <url-pattern>/back-office/login.xhtml</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
@@ -685,8 +731,8 @@
     <login-config>
         <auth-method>FORM</auth-method>
         <form-login-config>
-            <form-login-page>/back-office/login.faces</form-login-page>
-            <form-error-page>/back-office/login.faces?error=true</form-error-page>
+            <form-login-page>/back-office/login.xhtml</form-login-page>
+            <form-error-page>/back-office/login.xhtml?error=true</form-error-page>
         </form-login-config>
     </login-config>
 

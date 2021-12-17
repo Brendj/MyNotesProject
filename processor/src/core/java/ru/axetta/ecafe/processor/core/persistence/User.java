@@ -16,9 +16,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.security.auth.login.CredentialException;
 import javax.servlet.http.HttpServletRequest;
@@ -100,6 +100,53 @@ public class User {
         this.setPassword(plainPassword);
     }
 
+    public static void changePasswordExternal(String userName, String newPassword, String newPasswordConfirm, String remoteAddr) throws Exception {
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
+        try {
+            if (!newPassword.equals(newPasswordConfirm)) {
+                throw new CredentialException("Неверный ввод пароля: введенные значения не совпадают");
+            }
+            if (!User.passwordIsEnoughComplex(newPassword)) {
+                throw new CredentialException("Пароль не удовлетворяет требованиям безопасности: минимальная длина - 6 символов, "
+                        + "должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол");
+            }
+
+            user.doChangePassword(newPassword);
+            user.setNeedChangePassword(false);
+            user.setPasswordDate(new Date(System.currentTimeMillis()));
+            DAOService.getInstance().setUserInfo(user);
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, remoteAddr,
+                            userName, user, true, null, null);
+            DAOService.getInstance().writeAuthJournalRecord(record);
+        } catch (CredentialException e) {
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, remoteAddr,
+                            userName, user, false,
+                            SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), e.getMessage());
+            DAOService.getInstance().writeAuthJournalRecord(record);
+            throw e;
+        }
+    }
+
+    public static void checkSmsCode(String userName, String smsCode) throws Exception {
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
+        String reqCode = user.getLastSmsCode();
+        if (reqCode != null && smsCode != null && reqCode.equals(smsCode)) {
+            user.setSmsCodeEnterDate(new Date(System.currentTimeMillis()));
+            DAOService.getInstance().setUserInfo(user);
+        } else {
+            throw new CredentialException("Введен неверный код активации");
+        }
+    }
+
+    public static boolean sendSmsAgain(String userName) throws Exception {
+        logger.info(String.format("Start of sending SMS code for the user %s", userName));
+        Boolean requstSMS = User.requestSmsCode(userName);
+        logger.info(String.format("End of sending SMS code for the user %s", userName));
+        return requstSMS;
+    }
+
     public Date getPasswordDate() {
         return passwordDate;
     }
@@ -158,6 +205,37 @@ public class User {
         isGroup = group;
     }
 
+    public enum WebArmRole {
+        WA_OPP(10000,"Ответственный за питание"),
+        WA_OEE(10001,"Ответственный за проход"),
+        WA_OPP_OEE(10002,"Ответственный за питание и проход");
+
+        private Integer identification;
+        private String description;
+
+        WebArmRole(Integer identification, String description) {
+            this.description = description;
+            this.identification = identification;
+        }
+
+        static Map<Integer, WebArmRole> integerDefaultRoleMap = new HashMap<Integer, WebArmRole>();
+        static {
+            for (WebArmRole role: WebArmRole.values()){
+                integerDefaultRoleMap.put(role.identification, role);
+            }
+        }
+
+        public static WebArmRole parse(Integer identification){
+            return integerDefaultRoleMap.get(identification);
+        }
+
+        public Integer getIdentification() {
+            return identification;
+        }
+
+        public String getDescription() { return description; }
+    }
+
     public enum DefaultRole{
         DEFAULT(0,"Настраиваемая роль"),
         ADMIN(1,"Администратор"),
@@ -170,7 +248,8 @@ public class User {
         PRODUCTION_DIRECTOR(8, "Заведующий производством"),
         INFORMATION_SYSTEM_OPERATOR(9,"Оператор ИС"),
         CLASSROOM_TEACHER(10,"Классный руководитель"),
-        CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания");
+        CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания"),
+        WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)");
 
 
         private Integer identification;
@@ -289,6 +368,13 @@ public class User {
         this.deletedState = false;
         this.person = null;
         this.isGroup = true;
+    }
+
+    public boolean isWebArmUser() {
+        return idOfRole.equals(DefaultRole.WA_ADMIN_SECURITY.getIdentification())
+                || idOfRole.equals(WebArmRole.WA_OPP.getIdentification())
+                || idOfRole.equals(WebArmRole.WA_OEE.getIdentification())
+                || idOfRole.equals(WebArmRole.WA_OPP_OEE.getIdentification());
     }
 
     public Long getIdOfUser() {
@@ -544,13 +630,13 @@ public class User {
     }
 
     public static boolean isNeedChangePassword(String userName) throws Exception {
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         return user.getNeedChangePassword();
     }
 
     public static boolean needEnterSmsCode(String userName) throws Exception {
         if (RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.enabled", "true").equals("false")) return false;
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         if (StringUtils.isEmpty(user.getPhone()) || user.getPhone().equals("''")) {
             return false; //если не указан номер телефона, то и смс отправить некуда.
         }
@@ -582,7 +668,7 @@ public class User {
     }
 
     public static boolean requestSmsCode(String userName) throws Exception {
-        User user = DAOService.getInstance().findUserByUserName(userName);
+        User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
         if (user == null) {
             logger.error(String.format("Cannot find user %s", userName));
             throw new Exception(String.format("Cannot find user %s", userName));
@@ -610,7 +696,7 @@ public class User {
     //todo Временная заглушка. В продакшене должен использоваться метод серверного обращения к сервису смс ниже - sendServiceSMSRequest
     public static String getStubSMS(String userName) {
         try {
-            User user = DAOService.getInstance().findUserByUserName(userName);
+            User user = DAOReadonlyService.getInstance().findUserByUserName(userName);
             if (user == null) {
                 return "#";
             }
@@ -622,7 +708,7 @@ public class User {
     }
 
     private static String sendServiceSMSRequest(final User user, String code) throws Exception {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE);
         String comment = String.format("Период действия кода - %s дней", days);
         SecurityJournalAuthenticate record = SecurityJournalAuthenticate
@@ -662,7 +748,7 @@ public class User {
         this.setBlockedUntilDate(new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS));
         DAOService.getInstance().setUserInfo(this);
 
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
         String comment = String.format("Пользователь %s заблокирован", userName);

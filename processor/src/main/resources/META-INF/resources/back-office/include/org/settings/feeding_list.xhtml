@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+<!--@elvariable id="mainPagePage" type="ru.axetta.ecafe.processor.web.ui.MainPage"-->
+<h:panelGrid id="feedingSettingsListPage" styleClass="borderless-grid">
+
+    <rich:dataTable id="feedingSettingsListTable" value="#{mainPage.feedingSettingsListPage.items}" var="setting">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Идентификатор"/>
+            </f:facet>
+            <h:outputText value="#{setting.idOfSetting}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Название"/>
+            </f:facet>
+            <a4j:commandLink value="#{setting.settingName}" action="#{mainPage.showFeedingSettingViewPage}"
+                             render="mainMenu, workspaceForm">
+                <f:setPropertyActionListener value="#{setting.idOfSetting}" target="#{mainPage.feedingSettingViewPage.idOfSetting}" />
+                <f:setPropertyActionListener value="#{setting.idOfSetting}" target="#{mainPage.selectedIdOfFeedingSetting}" />
+            </a4j:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Сумма лимита" />
+            </f:facet>
+            <h:outputText value="#{setting.limit}" converter="copeckSumConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Сумма скидки" />
+            </f:facet>
+            <h:outputText value="#{setting.discount}" converter="copeckSumConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Скидка для комплексов" />
+            </f:facet>
+            <h:outputText value="#{setting.useDiscountString}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Скидка для буфетной продукции" />
+            </f:facet>
+            <h:outputText value="#{setting.useDiscountBuffetString}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Дата изменения"/>
+            </f:facet>
+            <h:outputText value="#{setting.lastUpdate}" converter="timeConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Пользователь" />
+            </f:facet>
+            <h:outputText value="#{setting.userName}"/>
+        </rich:column>
+        <rich:column styleClass="center-aligned-column">
+            <a4j:commandLink render="mainMenu, workspaceForm" action="#{mainPage.showFeedingSettingEditPage}" styleClass="command-link">
+                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{setting.idOfSetting}" target="#{mainPage.feedingSettingEditPage.idOfSetting}" />
+                <f:setPropertyActionListener value="#{setting.idOfSetting}" target="#{mainPage.selectedIdOfFeedingSetting}" />
+            </a4j:commandLink>
+        </rich:column>
+    </rich:dataTable>
+</h:panelGrid>
+
+<a4j:status id="feedingSettingsListStatus">
+    <f:facet name="start">
+        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+    </f:facet>
+</a4j:status>
+<h:panelGrid styleClass="borderless-grid">
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+</h:panelGrid>
+</ui:composition>

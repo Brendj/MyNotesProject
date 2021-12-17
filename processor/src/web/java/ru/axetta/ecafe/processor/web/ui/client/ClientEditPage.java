@@ -4,6 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
@@ -21,14 +29,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -744,8 +744,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
 
-        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
-        this.clientWardItems = loadWardsByClient(session, idOfClient);
+        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
+        this.clientWardItems = loadWardsByClient(session, idOfClient, true);
         this.changePassword = false;
 
         fill(session, client);
@@ -1037,7 +1037,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setPayForSMS(this.payForSMS);
 
         /* категори скидок */
-        Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+        Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
@@ -1050,9 +1050,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 }
                 categoryDiscountSet.add(categoryDiscount);
             }
-        } else {
-            /* очистить список если он не пуст */
-            client.getCategories().clear();
         }
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
@@ -1062,6 +1059,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                         DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
                 client.setLastDiscountsUpdate(new Date());
             } catch (Exception ignore){}
+        }
+
+        if (CollectionUtils.isEmpty(this.idOfCategoryList)) {
+            /* очистить список если он не пуст */
+            client.getCategories().clear();
         }
 
         if (null != discountMode) {
@@ -1106,17 +1108,38 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
-            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
+                    idOfClient));
+            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems,
+                    clientGuardianHistory);
         }
         if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
-            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекун",
+                    idOfClient));
+            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems, clientGuardianHistory);
         }
 
         if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
         }
         if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
-            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
         }
 
         if (isReplaceOrg) {
@@ -1157,9 +1180,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) || (this.idOfClientGroup == null
                     && client.getIdOfClientGroup() != null) || (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
+				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+                clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                clientGuardianHistory.setReason(String.format("Обновление данных клиента через карточку клиента id = %s",
+                        idOfClient));
                 ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, this.idOfClientGroup,
                         this.clientGroupName, ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
-                                .getExternalContext().getRemoteUser());
+                                .getExternalContext().getRemoteUser(), clientGuardianHistory);
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }

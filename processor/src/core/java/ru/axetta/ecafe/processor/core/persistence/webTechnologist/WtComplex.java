@@ -67,6 +67,9 @@ public class WtComplex {
     @Column(name = "barcode")
     private String barcode;
 
+    @Column(name = "comment")
+    private String comment;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idOfComplexGroupItem")
     private WtComplexGroupItem wtComplexGroupItem;
@@ -113,6 +116,9 @@ public class WtComplex {
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
 
+    @Column(name = "idOfOrgGroup", insertable = false, updatable = false)
+    private Long idOfOrgGroup;
+
     public WtComplex(WtComplex complex) {
         this.idOfComplex = complex.idOfComplex;
         this.name = complex.name;
@@ -139,6 +145,8 @@ public class WtComplex {
         this.orgs = complex.orgs;
         this.discountRules = complex.discountRules;
         this.wtComplexesItems = complex.wtComplexesItems;
+        this.comment = complex.comment;
+        this.idOfOrgGroup = complex.idOfOrgGroup;
     }
 
     public WtComplex() {
@@ -357,8 +365,24 @@ public class WtComplex {
         return discountRules;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public void setDiscountRules(Set<WtDiscountRule> discountRules) {
         this.discountRules = discountRules;
+    }
+
+    public Long getIdOfOrgGroup() {
+        return idOfOrgGroup;
+    }
+
+    public void setIdOfOrgGroup(Long idOfOrgGroup) {
+        this.idOfOrgGroup = idOfOrgGroup;
     }
 
     @Override

@@ -4,13 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -18,11 +11,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -125,10 +124,10 @@ public class ThinClientUserViewPage extends BasicWorkspacePage {
             role            = ((Integer) entry [2]).intValue();
             username        = ((String) entry [3]).trim();
 
-            cl = DAOService.getInstance().findClientById(idOfClient); cl = (Client) session.merge(cl);
+            cl = DAOReadonlyService.getInstance().findClientById(idOfClient); cl = (Client) session.merge(cl);
             person = cl.getPerson();
             String fullName = person.getFullName();
-            org = DAOService.getInstance().getOrg(idOfOrg);
+            org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
             roleName = ThinClientUserListPage.DEFAULT_ROLE;
         }
     }

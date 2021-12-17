@@ -10,6 +10,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -31,11 +34,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Component
 @Scope("singleton")
 public class JwtTokenProvider {
+    private final JwtUserDetailsService userDetailsService;
+
+    public JwtTokenProvider(JwtUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     public String createToken(String username) throws Exception {
         if (username == null)
@@ -65,8 +74,7 @@ public class JwtTokenProvider {
         jwtBuilder.setExpiration(tokenExpiration);
         jwtBuilder.setHeaderParam(JwtClaimsConstant.TOKEN_TYPE, "JWT");
         jwtBuilder.setClaims(tokenData);
-        String token = jwtBuilder.signWith(SignatureAlgorithm.HS512, JwtConfig.getSecretKey()).compact();
-        return token;
+        return jwtBuilder.signWith(SignatureAlgorithm.HS512, JwtConfig.getSecretKey()).compact();
     }
 
     public RefreshToken refreshTokenIsValid(String refreshToken, String remoteAddress, Session persistenceSession) throws Exception{
@@ -86,6 +94,14 @@ public class JwtTokenProvider {
         return refreshTokenEntity;
     }
 
+    public Boolean getUserNeedChangePassword(String username) throws Exception {
+        return User.isNeedChangePassword(username);
+    }
+
+    public Boolean getUserNeedEnterSmsCode(String username) throws Exception {
+        return User.needEnterSmsCode(username);
+    }
+
     public String createRefreshToken(String username, String remoteAddress, Session persistenceSession)
             throws Exception {
         User user = DAOUtils.findUser(persistenceSession, username);
@@ -101,12 +117,14 @@ public class JwtTokenProvider {
         return newRefreshToken.getRefreshTokenHash();
     }
 
-    public Jwt validateToken(String token) throws AuthenticationException{
-        Jwt jwt;
+    public String resolveToken(HttpServletRequest request){
+        return request.getHeader(JwtConfig.TOKEN_HEADER);
+    }
+
+    public boolean validateToken(String token) throws AuthenticationException{
         DefaultClaims claims;
         try{
-            jwt = Jwts.parser().setSigningKey(JwtConfig.getSecretKey()).parse(token);
-            claims = (DefaultClaims) jwt.getBody();
+            claims = getTokenClaims(token);
         }
         catch (Exception ex){
             throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_CORRUPTED.getErrorCode(),
@@ -121,12 +139,22 @@ public class JwtTokenProvider {
             throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_EXPIRED.getErrorCode(),
                     JwtAuthenticationErrors.TOKEN_EXPIRED.getErrorMessage()));
         else
-            return jwt;
+            return true;
+    }
+
+    private DefaultClaims getTokenClaims(String token) {
+        return  (DefaultClaims) Jwts.parser().setSigningKey(JwtConfig.getSecretKey()).parse(token).getBody();
+    }
+
+    public JWTAuthentication getAuthentication(String token) throws AuthenticationException {
+        JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) getUserDetailsFromToken(getTokenClaims(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(jwtUserDetails.getUsername());
+        return new JWTAuthentication(token, jwtUserDetails.getAuthorities(), true, userDetails);
     }
 
     public UserDetails getUserDetailsFromToken(DefaultClaims claims) throws AuthenticationException {
         try {
-            Collection<GrantedAuthority> grantedAuthorities = (Collection<GrantedAuthority>) claims.get(JwtClaimsConstant.AUTHORITIES);
+            Collection<GrantedAuthority> grantedAuthorities = getGrantedAuthorities(claims);
             Number idOfUserNum = ((Number) claims.get(JwtClaimsConstant.ID_OF_USER)).longValue();
             Long idOfUser = null;
             if(idOfUserNum != null){
@@ -162,6 +190,26 @@ public class JwtTokenProvider {
             throw  new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
                     JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
         }
+    }
+
+    private Collection<GrantedAuthority> getGrantedAuthorities(DefaultClaims claims) {
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        Collection<?> items = (Collection<?>) claims.get(JwtClaimsConstant.AUTHORITIES);
+        if (items != null) {
+            for (Object item : items) {
+                if (item instanceof GrantedAuthority) {
+                    grantedAuthorities.add((GrantedAuthority) item);
+                }
+                else if (item instanceof Map){
+                    for (Object o : ((Map) item).values()) {
+                        if (o instanceof String) {
+                            grantedAuthorities.add(new SimpleGrantedAuthority((String) o));
+                        }
+                    }
+                }
+            }
+        }
+        return grantedAuthorities;
     }
 
     public void closeAllUserRefreshTokenSessions(User user, Session persistenceSession) throws Exception {

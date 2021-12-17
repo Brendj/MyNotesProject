@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.TaloonPreorder" table="CF_Taloon_Preorder">
+
+        <id name="idOfTaloonPreorder" column="idOfTaloonPreorder" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">CF_Taloon_Preorder_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <property name="idOfOrg" column="IdOfOrg" type="long" not-null="true"/>
+        <property name="taloonDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="taloonDate"/>
+        <property name="complexId" type="long" column="complexId"/>
+        <property name="complexName" type="string" column="complexName"/>
+        <property name="goodsName" column="GoodsName" type="string"/>
+        <property name="goodsGuid" type="string" column="goodsGuid" />
+        <property name="idOfOrgCreated" column="IdOfOrgCreated" type="long" not-null="false"/>
+        <property name="soldQty" column="soldQty" type="integer" not-null="true"/>
+        <property name="requestedQty" column="RequestedQty" type="integer" not-null="false"/>
+        <property name="shippedQty" column="ShippedQty" type="integer" not-null="false"/>
+        <property name="reservedQty" column="reservedQty" type="integer" not-null="false"/>
+        <property name="blockedQty" column="blockedQty" type="integer" not-null="false"/>
+        <property name="price" column="Price" type="long" not-null="true"/>
+        <property name="createdType" column="CreatedType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="taloonNumber" column="TaloonNumber" type="long" not-null="false"/>
+
+        <property name="version" column="Version" type="long" not-null="true"/>
+        <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
+        <property name="isppState" column="ISPP_State">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="ppState" column="PP_State">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="remarks" column="Remarks" type="string" length="1024"/>
+        <property name="comments" column="comments" type="string" length="128"/>
+        <property name="guid" type="string" column="guid" />
+        <property name="idOfDish" column="idOfDish" type="long"/>
+        <property name="byWebSupplier" column="byWebSupplier" type="boolean" not-null="true"/>
+
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     insert="false" update="false"/>
+        <many-to-one name="orgOwner" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgOwner" not-null="true"/>
+    </class>
+</hibernate-mapping>
+
+

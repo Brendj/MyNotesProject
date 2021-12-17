@@ -502,11 +502,13 @@ public interface ClientRoomController {
 
     @WebMethod CultureEnterInfo getCultureEnterInfo(@WebParam(name = "cardId") String cardId);
 
-    @WebMethod Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
+    @WebMethod Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "mesId") String mesId,
+            @WebParam(name = "museumCode") String museumCode,
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus);
 
-    @WebMethod Result enterCulture(@XmlElement(required=true)@WebParam(name = "guid") String guid,
+    @WebMethod Result enterCulture(@WebParam(name = "guid") String guid,
+            @WebParam(name = "mesId") String mesId,
             @XmlElement(required=true)@WebParam(name = "orgCode") String orgCode,
             @XmlElement(required=true)@WebParam(name = "CultureName") String CultureName,
             @XmlElement(required=true)@WebParam(name = "CultureShortName") String CultureShortName,
@@ -531,6 +533,9 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getPreorderClientSummaryOnDate")
     PreorderClientSummaryResult getPreorderClientSummaryOnDate(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile,
             @WebParam(name="date") Date date);
+
+    @WebMethod(operationName = "setInformedSpecialMenuForClient")
+    Result setInformedSpecialMenuForClient(@WebParam(name="contractId") Long contractId);
 
     @WebMethod(operationName = "setInformedSpecialMenu")
     Result setInformedSpecialMenu(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile);

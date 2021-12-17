@@ -23,9 +23,6 @@
           <root url="file://$MODULE_DIR$/../../../src/client-room/java" />
         </sourceRoots>
       </configuration>
-      <facet type="jsf" name="JSF">
-        <configuration />
-      </facet>
     </facet>
     <facet type="Spring" name="Spring">
       <configuration>
@@ -65,3 +62,4 @@
     <orderEntry type="library" name="jboss_J2EE" level="project" />
   </component>
 </module>
+

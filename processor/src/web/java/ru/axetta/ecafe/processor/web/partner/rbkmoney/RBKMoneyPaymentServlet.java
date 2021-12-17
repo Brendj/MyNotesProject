@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,11 @@ import java.io.IOException;
  * Time: 16:02:24
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "RBKMoneyPaymentServlet",
+        description = "RBKMoneyPaymentServlet",
+        urlPatterns = {"/rbkmoney/acceptpay"}
+)
 public class RBKMoneyPaymentServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(RBKMoneyPaymentServlet.class);

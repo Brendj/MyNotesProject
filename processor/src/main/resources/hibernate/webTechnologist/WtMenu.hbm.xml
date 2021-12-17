@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu" table="cf_wt_menu">
+        <id name="idOfMenu">
+            <column name="idofmenu" sql-type="long"/>
+        </id>
+
+        <property name="menuName">
+            <column name="menuName" sql-type="varchar(128)" length="128"/>
+        </property>
+
+        <property name="beginDate">
+            <column name="beginDate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+
+        <property name="endDate">
+            <column name="endDate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+
+        <property name="createDate">
+            <column name="createDate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+
+        <property name="lastUpdate">
+            <column name="lastUpdate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+
+        <many-to-one name="wtOrgGroup" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
+            <column name="idOfOrgGroup"/>
+        </many-to-one>
+
+        <many-to-one name="createdUser" class="ru.axetta.ecafe.processor.core.persistence.User">
+            <column name="create_by_id"/>
+        </many-to-one>
+
+        <many-to-one name="updatedUser" class="ru.axetta.ecafe.processor.core.persistence.User">
+            <column name="update_by_id"/>
+        </many-to-one>
+
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
+
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+            <column name="idOfContragent"/>
+        </many-to-one>
+
+        <property name="deleteState">
+            <column name="deleteState" sql-type="integer"/>
+        </property>
+
+        <set name="menuGroupMenus" inverse="true" cascade="all" lazy="false">
+            <key>
+                <column name="id"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu"/>
+        </set>
+
+        <set name="orgs" lazy="true" table="cf_wt_menu_org">
+            <key column="idOfMenu"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

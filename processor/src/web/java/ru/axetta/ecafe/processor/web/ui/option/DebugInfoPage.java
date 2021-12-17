@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.ApplicationForFoodProcessingService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -21,8 +21,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jboss.vfs.VFS;
-import org.jboss.vfs.VirtualFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,7 +254,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
         EntityManager em = entityManager.getEntityManagerFactory().createEntityManager();
         Session session = em.unwrap(Session.class);
 
-        List<Client> clients = DAOService.getInstance().findClientsForOrgAndFriendly(20L, false);
+        List<Client> clients = DAOReadonlyService.getInstance().findClientsForOrgAndFriendly(20L, false);
         for (Client cc : clients) {
             //Client client = (Client)session.load(Client.class, cc.getIdOfClient());
             /*Set<ClientNotificationSetting> settings = client.getNotificationSettings();
@@ -315,7 +313,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
             String surl = url.toString();
             res += surl + "\n";
             if (surl.startsWith("vfs:/") && surl.endsWith("/WEB-INF/classes/")) {
-                VirtualFile zzz = VFS.getChild(surl.substring(5));
+                /*VirtualFile zzz = VFS.getChild(surl.substring(5));
                 if (zzz.isFile()) {
                     res += "!" + zzz.getPhysicalFile().getAbsolutePath() + "\n";
                 }
@@ -324,7 +322,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
                     if (vf.isFile()) {
                         res += vf.getPhysicalFile().getAbsolutePath() + "\n";
                     }
-                }
+                }*/
             }
         }
         result = res;

@@ -358,9 +358,9 @@ public class DirectorDiscountFoodReport extends BasicReport {
         barChart.setBackgroundPaint(color);
         barChart.getLegend().setBackgroundPaint(color);
         barChart.getCategoryPlot().setRangeGridlinePaint(Color.GRAY);
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
+        barChart.getCategoryPlot().getRenderer().setBaseItemLabelGenerator(
                 new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
+        barChart.getCategoryPlot().getRenderer().setBaseItemLabelsVisible(true);
         barChart.getCategoryPlot().setNoDataMessage("Нет данных");
     }
 

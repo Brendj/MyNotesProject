@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.clientphoto;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -37,11 +37,11 @@ public class ClientPhotosItem {
 
         idOfClient = getLongValue(itemNode, "IdOfClient", emSetter, true);
         if(idOfClient != null) {
-            Client client = DAOService.getInstance().findClientById(idOfClient);
+            Client client = DAOReadonlyService.getInstance().findClientById(idOfClient);
             if (client == null) {
                 emSetter.setCompositeErrorMessage(String.format("Клиент с ИД=%s не найден", idOfClient));
             } else {
-                List<Long> orgsIds = DAOService.getInstance().findFriendlyOrgsIds(orgOwner);
+                List<Long> orgsIds = DAOReadonlyService.getInstance().findFriendlyOrgsIds(orgOwner);
                 if(!orgsIds.contains(client.getOrg().getIdOfOrg())){
                     emSetter.setCompositeErrorMessage(String.format("Клиент с ИД=%s не принадлежит организации", idOfClient));
                 }

@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -45,7 +45,7 @@ public class ProductGroupItemsPanel extends BasicPage {
     private ProductGroup selectProductGroup;
     private String filter;
     @Autowired
-    private DAOService daoService;
+    private DAOReadonlyService daoReadonlyService;
     @Autowired
     private ContextDAOServices contextDAOServices;
 
@@ -100,15 +100,15 @@ public class ProductGroupItemsPanel extends BasicPage {
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(orgOwners==null || orgOwners.isEmpty()){
             if (StringUtils.isEmpty(filter)){
-                productGroupList = daoService.findProductGroupByConfigurationProvider(false);
+                productGroupList = daoReadonlyService.findProductGroupByConfigurationProvider(false);
             } else{
-                productGroupList = daoService.findProductGroupByConfigurationProvider(filter);
+                productGroupList = daoReadonlyService.findProductGroupByConfigurationProvider(filter);
             }
         } else {
             if (StringUtils.isEmpty(filter)){
-                productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners, false);
+                productGroupList = daoReadonlyService.findProductGroupByConfigurationProvider(orgOwners, false);
             } else{
-                productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners, filter);
+                productGroupList = daoReadonlyService.findProductGroupByConfigurationProvider(orgOwners, filter);
             }
         }
     }

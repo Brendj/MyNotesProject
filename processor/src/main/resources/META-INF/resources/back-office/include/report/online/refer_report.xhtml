@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <style type="text/css">
+        .region {
+            font-weight: bold;
+            background-color: #E3F6FF;
+        }
+        .overall {
+            font-weight: bold;
+            background-color: #D5E7F0;
+        }
+    </style>
+<h:panelGrid>
+    <!--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"-->
+    <h:panelGrid id="referReportGrid" binding="#{referReportPage.pageComponent}" styleClass="borderless-grid">
+        <h:panelGrid styleClass="borderless-grid">
+            <h:panelGrid columns="2">
+                <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+                <rich:calendar value="#{referReportPage.start}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+                <rich:calendar value="#{referReportPage.end}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+
+                <h:outputText escape="true" value="Организация" styleClass="output-text" />
+                <h:panelGroup>
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;" />
+                    <h:outputText styleClass="output-text" escape="true" value=" {#{referReportPage.filter}}" />
+                </h:panelGroup>
+
+                <h:outputText escape="true" value="Округ" styleClass="output-text" />
+                <h:selectOneMenu id="regionsList" value="#{referReportPage.region}" style="width:325px;" >
+                    <f:selectItems value="#{referReportPage.regions}"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+
+            <rich:tabPanel style="width: 500px;" switchType="client">
+                <rich:tab header="Месячный отчет">
+                    <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateMonthly}"
+                                       render="workspaceTogglePanel"
+                                       styleClass="command-button" />
+                    <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateMonthlyExcel}" styleClass="command-button" />
+                </rich:tab>
+                <rich:tab header="Дневной отчет">
+                    <h:panelGrid columns="2">
+                        <h:outputText escape="true" value="Категория" styleClass="output-text" />
+                        <h:selectOneMenu id="categoriesList" value="#{referReportPage.category}" style="width:325px;" >
+                            <f:selectItems value="#{referReportPage.categories}"/>
+                        </h:selectOneMenu>
+
+                    </h:panelGrid>
+
+                    <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateDaily}"
+                                       render="workspaceTogglePanel"
+                                       styleClass="command-button" />
+                    <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateDailyExcel}" styleClass="command-button" />
+                </rich:tab>
+            </rich:tabPanel>
+
+            <a4j:status id="reportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <h:panelGrid rendered="${not empty referReportPage.htmlReport}" >
+                <h:outputText escape="true" value="Справка расходованных средств" styleClass="output-text" />
+                <h:outputText escape="false" value="#{referReportPage.htmlReport}" />
+            </h:panelGrid>
+
+            <h:outputText escape="true" value="Не удалось найти данные по указанными параметрами. Попробуйте изменить параметры отчета" style="font-style: italic"
+                          styleClass="output-text" rendered="#{referReportPage.showMissReportMessage}"/>
+
+        </h:panelGrid>
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail" table="cf_preorder_menudetail">
+        <id name="idOfPreorderMenuDetail" column="IdOfPreorderMenuDetail" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="IdOfClient" not-null="true" fetch="select"/>
+        <property name="amount" column="amount" type="integer"/>
+        <property name="preorderDate" column="preorderDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="guid" column="guid" type="string" length="36" />
+        <property name="armIdOfMenu" column="armidofmenu" type="long" />
+        <property name="menuDetailName" column="menudetailname" type="string" length="512"/>
+        <property name="menuDetailPrice" column="menudetailprice" type="long"/>
+        <property name="itemCode" column="itemcode" type="string" length="32"/>
+        <many-to-one name="preorderComplex" class="ru.axetta.ecafe.processor.core.persistence.PreorderComplex"
+                     column="IdOfPreorderComplex" not-null="true" fetch="select" />
+        <property name="state" column="state">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderState</param>
+            </type>
+        </property>
+        <property name="idOfGoodsRequestPosition" column="idofgoodsrequestposition" type="long"/>
+        <many-to-one name="regularPreorder" class="ru.axetta.ecafe.processor.core.persistence.RegularPreorder"
+                     column="IdOfRegularPreorder" fetch="select"/>
+        <property name="shortName" column="ShortName" type="string" length="256"/>
+        <property name="menuDetailOutput" column="MenuDetailOutput" type="string" length="32"/>
+        <property name="availableNow" column="AvailableNow" type="int" not-null="true"/>
+        <property name="groupName" column="GroupName" type="string" length="60" not-null="true"/>
+        <property name="fat" column="Fat" type="double" update="false"/>
+        <property name="carbohydrates" column="Carbohydrates" type="double" update="false"/>
+        <property name="protein" column="Protein" type="double" update="false"/>
+        <property name="calories" column="Calories" type="double" update="false"/>
+        <property name="idOfGood" column="idofgood" type="long" />
+        <property name="usedSum" column="usedsum" type="long"/>
+        <property name="usedAmount" column="usedamount" type="long"/>
+        <property name="mobile" column="mobile" type="string" length="32" />
+        <property name="mobileGroupOnCreate" column="mobileGroupOnCreate">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType</param>
+            </type>
+        </property>
+        <property name="idOfDish" column="idOfDish" type="long"/>
+    </class>
+</hibernate-mapping>

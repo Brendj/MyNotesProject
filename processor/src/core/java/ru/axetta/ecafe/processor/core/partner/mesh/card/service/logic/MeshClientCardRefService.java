@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.mesh.card.service.logic;
 
+import org.springframework.context.annotation.DependsOn;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardService;
 import ru.axetta.ecafe.processor.core.partner.mesh.card.service.rest.MeshCardServiceIml;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.DependsOn;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;

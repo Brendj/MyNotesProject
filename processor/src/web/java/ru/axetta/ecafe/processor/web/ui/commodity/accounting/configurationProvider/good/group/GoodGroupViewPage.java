@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodListPage;
@@ -18,9 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -45,16 +43,18 @@ public class GoodGroupViewPage extends BasicWorkspacePage {
     private GoodListPage goodListPage;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
 
     @Override
     public void onShow() throws Exception {
         selectedGoodGroupGroupPage.onShow();
         currentGoodGroup = selectedGoodGroupGroupPage.getCurrentGoodGroup();
-        List<Good> goods = daoService.findGoodsByGoodGroup(currentGoodGroup, false);
+        List<Good> goods = daoReadonlyService.findGoodsByGoodGroup(currentGoodGroup, false);
         countGoods = goods.size();
-        currentOrg = daoService.getOrg(currentGoodGroup.getOrgOwner());
+        currentOrg = DAOReadonlyService.getInstance().findOrg(currentGoodGroup.getOrgOwner());
         if(currentGoodGroup.getIdOfConfigurationProvider()!=null){
-            currentConfigurationProvider = daoService.getConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
+            currentConfigurationProvider = daoReadonlyService.getConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
         }
     }
 

@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
@@ -88,7 +88,7 @@ public class SubscriptionRegRequest implements IRequestOperation {
     public Map<String, String> getRequestParams(MfrRequest mfrRequest) {
         Map<String, String> params = new HashMap<String, String>();
         params.put("action", runtimeContext.getAcquiropaySystemConfig().getLinkingUrl());
-        Contragent c = DAOService.getInstance().findContragentByClient(mfrRequest.getClient().getContractId());
+        Contragent c = DAOReadonlyService.getInstance().findContragentByClient(mfrRequest.getClient().getContractId());
         String productId = c.getMfrId();
         if (StringUtils.isEmpty(productId)) {
             logger.error("Contragent '{}' with idOfContragent = {} doesn't have specified MFR_ID.",

@@ -40,10 +40,12 @@ public class CardsItem {
     private Long idOfCard;        //Идентификатор карты в БД процессинга
     private Integer transitionState;    //Состояние перехода
     private Integer cardSignCertNum; //номер сертификата эцп
+    private Long longCardId;      // Длинный UID карты
 
 
     public CardsItem(long cardNo, int cardType, int state, long idOfClient, String lockReason, Date validDate,
-            Date issueDate, long orgOwner, boolean temp, Long visistorId, Long contractId, Long printedNo, boolean isLongUid) {
+            Date issueDate, long orgOwner, boolean temp, Long visistorId, Long contractId, Long printedNo,
+            boolean isLongUid, Long longCardId) {
         this.cardNo = cardNo;
         this.cardType = cardType;
         this.state = state;
@@ -56,6 +58,8 @@ public class CardsItem {
         this.visistorId = visistorId;
         this.contractId = contractId;
         this.printedNo = printedNo;
+        this.isLongUid = isLongUid;
+        this.longCardId = longCardId;
     }
 
     public CardsItem(Card card, Client client) {
@@ -91,6 +95,9 @@ public class CardsItem {
         this.idOfCard = card.getIdOfCard();
         this.transitionState = card.getTransitionState();
         this.cardSignCertNum = card.getCardSignCertNum();
+        if(null != card.getLongCardNo()){
+            this.longCardId = card.getLongCardNo();
+        }
     }
 
     public CardsItem(Card card, Visitor visitor){
@@ -211,6 +218,14 @@ public class CardsItem {
         this.idOfCard = idOfCard;
     }
 
+    public Long getLongCardId() {
+        return longCardId;
+    }
+
+    public void setLongCardId(Long longCardId) {
+        this.longCardId = longCardId;
+    }
+
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement(SYNC_NAME);
         element.setAttribute("CardNo", Long.toString(this.cardNo));
@@ -252,6 +267,9 @@ public class CardsItem {
         }
         if (null != cardSignCertNum) {
             element.setAttribute("CardSignCertNum", this.getCardSignCertNum().toString());
+        }
+        if(null != longCardId){
+            element.setAttribute("LongCardId", this.longCardId.toString());
         }
 
         return element;

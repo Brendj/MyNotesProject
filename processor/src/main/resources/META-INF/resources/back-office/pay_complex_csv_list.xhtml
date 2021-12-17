@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <f:event type="preRenderView"
+             listener="#{facesContext.externalContext.response.setContentType('text/csv;charset=windows-1251')}"/>
+    <f:event type="preRenderView"
+             listener="#{facesContext.externalContext.response.setCharacterEncoding('windows-1251')}"/>
+    <f:event type="preRenderView"
+             listener="#{facesContext.externalContext.response.setHeader('Content-type', 'text/csv; charset=windows-1251')}"/>
+    <f:event type="preRenderView"
+             listener="#{facesContext.externalContext.response.setHeader('Content-disposition', 'attachment;filename=pay_complexes.csv')}"/>
+
+    <f:view>
+        <h:outputText escape="false"
+                      value="Организация;Название;Цена за ед;Скидка на ед;Кол-во;Сумма без скидки;Сумма скидки;Итоговая сумма;Время первой продажи;Время последней продажи"/>
+        <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
+        <a4j:repeat value="#{mainPage.payComplexReportPage.complexReport.complexItems}" var="item">
+            <h:outputText escape="false"
+                          value="#{item.officialName};#{item.menuDetailName};#{item.rPrice};#{item.discount};#{item.qty};#{item.sumPrice};#{item.sumPriceDiscount};#{item.total}"/>
+            <h:outputText escape="false" value=";"/><h:outputText escape="false" value="#{item.firstTimeSale}"
+                                                                  converter="timeConverter"/>
+            <h:outputText escape="false" value=";"/><h:outputText escape="false" value="#{item.lastTimeSale}"
+                                                                  converter="timeConverter"/>
+            <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
+        </a4j:repeat>
+    </f:view>
+</ui:composition>

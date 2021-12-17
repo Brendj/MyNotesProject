@@ -22,6 +22,7 @@ public class OrderItem {
     private long sum;
     private long sumPay;
     private long sumDiscount;
+    private long kazanDiscount;
 
     private long createdDateEqualsOrderDate;
 
@@ -66,7 +67,7 @@ public class OrderItem {
         this.sum = sum;
     }
     public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype, int menuOrigin, Long idOfClient, String groupName,
-            Long idOfClientGroup, long sumPay, long sumDiscount) {
+            Long idOfClientGroup, long sumPay, long sumDiscount, long kazanDiscount) {
         this.idOfOrg = idOfOrg;
         this.orderDate = orderDate;
         this.sum = sum;
@@ -78,6 +79,7 @@ public class OrderItem {
         this.idOfClientGroup = idOfClientGroup;
         this.sumPay = sumPay;
         this.sumDiscount = sumDiscount;
+        this.kazanDiscount = kazanDiscount;
     }
 
     public OrderItem(long idOfOrg, long orderDate, long sum, String manufacturer) {
@@ -270,5 +272,13 @@ public class OrderItem {
 
     public void setSumDiscount(long sumDiscount) {
         this.sumDiscount = sumDiscount;
+    }
+
+    public long getKazanDiscount() {
+        return kazanDiscount;
+    }
+
+    public void setKazanDiscount(long kazanDiscount) {
+        this.kazanDiscount = kazanDiscount;
     }
 }

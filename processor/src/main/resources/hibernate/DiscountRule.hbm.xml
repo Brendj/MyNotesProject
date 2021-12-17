@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.DiscountRule" table="CF_DiscountRules">
+        <id name="idOfRule" column="IdOfRule" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">CF_DiscountRules_Id_Gen_seq</param>
+            </generator>
+        </id>
+                        <!--
+        <many-to-one name="categoryDiscount" class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount"
+                     column="IdOfCategoryDiscount"
+                     not-null="true"/>
+                            -->
+        <property name="description" column="Description" type="string" length="100" not-null="true" />
+        <property name="complex0" column="Complex0" type="integer" not-null="true" />
+        <property name="complex1" column="Complex1" type="integer" not-null="true" />
+        <property name="complex2" column="Complex2" type="integer" not-null="true" />
+        <property name="complex3" column="Complex3" type="integer" not-null="true" />
+        <property name="complex4" column="Complex4" type="integer" not-null="true" />
+        <property name="complex5" column="Complex5" type="integer" not-null="true" />
+        <property name="complex6" column="Complex6" type="integer" not-null="true" />
+        <property name="complex7" column="Complex7" type="integer" not-null="true" />
+        <property name="complex8" column="Complex8" type="integer" not-null="true" />
+        <property name="complex9" column="Complex9" type="integer" not-null="true" />
+        <property name="complex10" column="Complex10" type="integer" not-null="true" />
+        <property name="complex11" column="Complex11" type="integer" not-null="true" />
+        <property name="complex12" column="Complex12" type="integer" not-null="true" />
+        <property name="complex13" column="Complex13" type="integer" not-null="true" />
+        <property name="complex14" column="Complex14" type="integer" not-null="true" />
+        <property name="complex15" column="Complex15" type="integer" not-null="true" />
+        <property name="complex16" column="Complex16" type="integer" not-null="true" />
+        <property name="complex17" column="Complex17" type="integer" not-null="true" />
+        <property name="complex18" column="Complex18" type="integer" not-null="true" />
+        <property name="complex19" column="Complex19" type="integer" not-null="true" />
+        <property name="complex20" column="Complex20" type="integer" not-null="true" />
+        <property name="complex21" column="Complex21" type="integer" not-null="true" />
+        <property name="complex22" column="Complex22" type="integer" not-null="true" />
+        <property name="complex23" column="Complex23" type="integer" not-null="true" />
+        <property name="complex24" column="Complex24" type="integer" not-null="true" />
+        <property name="complex25" column="Complex25" type="integer" not-null="true" />
+        <property name="complex26" column="Complex26" type="integer" not-null="true" />
+        <property name="complex27" column="Complex27" type="integer" not-null="true" />
+        <property name="complex28" column="Complex28" type="integer" not-null="true" />
+        <property name="complex29" column="Complex29" type="integer" not-null="true" />
+        <property name="complex30" column="Complex30" type="integer" not-null="true" />
+        <property name="complex31" column="Complex31" type="integer" not-null="true" />
+        <property name="complex32" column="Complex32" type="integer" not-null="true" />
+        <property name="complex33" column="Complex33" type="integer" not-null="true" />
+        <property name="complex34" column="Complex34" type="integer" not-null="true" />
+        <property name="complex35" column="Complex35" type="integer" not-null="true" />
+        <property name="complex36" column="Complex36" type="integer" not-null="true" />
+        <property name="complex37" column="Complex37" type="integer" not-null="true" />
+        <property name="complex38" column="Complex38" type="integer" not-null="true" />
+        <property name="complex39" column="Complex39" type="integer" not-null="true" />
+        <property name="complex40" column="Complex40" type="integer" not-null="true" />
+        <property name="complex41" column="Complex41" type="integer" not-null="true" />
+        <property name="complex42" column="Complex42" type="integer" not-null="true" />
+        <property name="complex43" column="Complex43" type="integer" not-null="true" />
+        <property name="complex44" column="Complex44" type="integer" not-null="true" />
+        <property name="complex45" column="Complex45" type="integer" not-null="true" />
+        <property name="complex46" column="Complex46" type="integer" not-null="true" />
+        <property name="complex47" column="Complex47" type="integer" not-null="true" />
+        <property name="complex48" column="Complex48" type="integer" not-null="true" />
+        <property name="complex49" column="Complex49" type="integer" not-null="true" />
+        <property name="priority" column="Priority" type="integer" not-null="true"/>
+        <property name="operationOr" column="OperationOr" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+
+        <property name="complexesMap" column="ComplexesMap" type="string" length="512"/>
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
+        <property name="subCategory" column="Subcategory" type="string" length="100" />
+
+        <many-to-one name="codeMSP" column="idofcode" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.CodeMSP"/>
+
+        <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
+        <set name="categoriesDiscountsInternal" table="CF_DiscountRules_CategoryDiscounts">
+            <key column="IdOfRule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount"/>
+        </set>
+
+        <!-- Cвязь многие ко многим между таблицами CategoryOrg и DiscountRule -->
+        <set name="categoryOrgsInternal" table="CF_DiscountRules_CategoryOrg">
+            <key column="IdOfRule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="IdOfCategoryOrg"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2015. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SyncHistoryCalc" table="cf_synchistory_calc2">
+        <id name="idOfSyncHistoryCalc" column="idOfSyncHistoryCalc" type="java.lang.Long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">256</param>
+                <param name="sequence_name">cf_synchistory_calc2_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <property name="idOfOrg" column="idoforg" type="java.lang.Long"/>
+        <property name="syncDay" column="calcdateat" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dataType" column="calctype" type="java.lang.Integer"/>
+        <property name="value" column="calcvalue" type="java.lang.String"
+                  not-null="true" update="false"/>
+    </class>
+</hibernate-mapping>
+
+

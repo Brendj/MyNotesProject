@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
@@ -105,33 +106,41 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
             /* проверка на отсутвие конфигурации провайдера */
             if(selectedConfigurationProvider!=null){
                 if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(
                             selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
                 } else {
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(
                             selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
                 }
             } else {
                 if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(deletedStatusSelected);
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(deletedStatusSelected);
                 } else {
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(orgOwners, deletedStatusSelected);
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(orgOwners, deletedStatusSelected);
                 }
             }
         } else {
             if(selectedConfigurationProvider!=null){
                 if(orgOwners==null || orgOwners.isEmpty()){
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,
                             selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
                 } else {
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,
                             selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
                 }
             } else {
                 if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,deletedStatusSelected);
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,deletedStatusSelected);
                 } else {
-                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup, orgOwners, deletedStatusSelected);
+                    technologicalMapList = DAOReadonlyService.getInstance()
+                            .findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup, orgOwners, deletedStatusSelected);
                 }
             }
         }

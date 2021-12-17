@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="goodGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupEditPage"-->
+    <!--@elvariable id="goodGroupListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupListPage"-->
+    <rich:popupPanel modal="true" id="removedGoodGroupItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+        <rich:hotKey key="esc" handler="#{rich:component('removedGoodGroupItemDeletePanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText value="Удаление группы товаров из справочника" styleClass="output-text"/>
+        </f:facet>
+        <h:form styleClass="borderless-form">
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: center;">
+                        <h:outputText value="Вы уверены в том, что хотите удалить группу?" styleClass="output-text"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <h:panelGroup styleClass="borderless-div">
+                            <a4j:commandButton value="Да" ajaxSingle="true" action="#{goodGroupEditPage.remove}"
+                                               oncomplete="#{rich:component('removedGoodGroupItemDeletePanel')}.hide();"
+                                               render="mainMenu, goodGroupListTable, #{goodGroupListPage.pageComponent.id}"
+                                               styleClass="command-button"/>
+                            <a4j:commandButton value="Отмена" styleClass="command-button"
+                                               onclick="#{rich:component('removedGoodGroupItemDeletePanel')}.hide();return false;"/>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
+</ui:composition>

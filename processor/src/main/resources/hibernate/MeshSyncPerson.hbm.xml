@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.MeshSyncPerson" table="cf_mh_persons">
+        <id name="personguid" type="string"/>
+        <property name="createdate">
+            <column name="createdate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+        <property name="lastupdate">
+            <column name="lastupdate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+        <property name="birthdate">
+            <column name="birthdate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        </property>
+        <property name="classname" column="classname" type="string" />
+        <property name="classuid" column="classuid" type="string" />
+        <property name="deletestate" column="deletestate" type="boolean" />
+        <property name="firstname" column="firstname" type="string" />
+        <property name="genderid" column="genderid" type="integer" />
+        <property name="lastname" column="lastname" type="string" />
+        <property name="organizationid" column="organizationid" type="long" />
+        <property name="parallelid" column="parallelid" type="integer" />
+        <property name="patronymic" column="patronymic" type="string" />
+        <property name="invaliddata" column="invaliddata" type="boolean" not-null="true" />
+        <property name="educationstageid" column="educationstageid" type="integer" />
+        <property name="comment" column="comment" type="string" />
+        <property name="guidnsi" column="guidnsi" type="string" />
+        <property name="lastupdateRest">
+            <column name="lastupdate_rest" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+        </property>
+        <many-to-one name="meshClass" column="idofclass" class="ru.axetta.ecafe.processor.core.persistence.MeshClass" cascade="merge"/>
+
+    </class>
+</hibernate-mapping>
+
+

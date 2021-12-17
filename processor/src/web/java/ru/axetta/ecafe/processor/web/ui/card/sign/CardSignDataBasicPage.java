@@ -8,8 +8,8 @@ import ru.axetta.ecafe.processor.core.persistence.CardSign;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.io.IOUtils;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,18 +38,13 @@ public class CardSignDataBasicPage extends BasicWorkspacePage {
     public static final String NEW_TYPE_PROVIDER = "По новому типу";
     public static final String TYPE_PROVIDER = "По старому типу";
 
-    public void fileUploadListener(UploadEvent event) {
+    public void fileUploadListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         try {
-            if (item.isTempFile()) {
-                File file = item.getFile();
-                inputStream = new FileInputStream(file);
-            } else {
-                byte[] data = item.getData();
-                inputStream = new ByteArrayInputStream(data);
-            }
+            byte[] data = item.getData();
+            inputStream = new ByteArrayInputStream(data);
             signData = IOUtils.toByteArray(inputStream);
 
             facesContext.addMessage(null,
@@ -75,7 +70,7 @@ public class CardSignDataBasicPage extends BasicWorkspacePage {
         items.add(new SelectItem(0, CardSign.CARDSIGN_SCRIPT_TYPE));
         items.add(new SelectItem(1, CardSign.CARDSIGN_ECDSA_TYPE));
         if (type == 2)
-         items.add(new SelectItem(2, CardSign.CARDSIGN_GOST2012_TYPE));
+            items.add(new SelectItem(2, CardSign.CARDSIGN_GOST2012_TYPE));
         return items;
     }
 

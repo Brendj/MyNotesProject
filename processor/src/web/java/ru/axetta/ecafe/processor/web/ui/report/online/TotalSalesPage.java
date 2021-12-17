@@ -218,7 +218,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         return periodTypeMenu;
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
+    public void onReportPeriodChanged() {
         htmlReport = null;
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
@@ -236,7 +236,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         }
     }
 
-    public void onEndDateSpecified(ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
@@ -630,10 +630,10 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 });
 
                 Query query = session.createSQLQuery(
-                        "SELECT od.socdiscount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                        "SELECT od.socdiscount, od.rprice, od.discount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                                 + "WHERE o.idoforg IN (:idOfOrgs) AND o.createdDate >= :startDate AND o.createdDate <= :endDate AND od.rprice = 0 AND"
                                 + "      (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99)) AND o.state = 0 AND od.state = 0"
-                                + "GROUP BY od.socdiscount ORDER BY od.socdiscount");
+                                + "GROUP BY od.socdiscount, od.rprice, od.discount ORDER BY od.socdiscount");
 
                 query.setParameter("startDate", startDate.getTime());
                 query.setParameter("endDate", endDate.getTime());
@@ -644,9 +644,15 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 String str;
                 titleAndSumBenefitMap = new HashMap<String, String>();
                 for (Object o : resultList) {
-                    str = "Льготный комплекс " + ((BigInteger) o).longValue() / 100 + "."
-                            + ((BigInteger) o).longValue() % 100 + " руб.";
-                    titleAndSumBenefitMap.put(str, o.toString());
+                    Object[] row = (Object[]) o;
+                    Long socdiscount = ((BigInteger) row[0]).longValue();
+                    Long price = ((BigInteger) row[1]).longValue() + ((BigInteger) row[2]).longValue();
+                    if (socdiscount > 0) {
+                        str = "Льготный комплекс " + socdiscount / 100 + "." + socdiscount % 100 + " руб.";
+                    } else {
+                        str = "Льготный комплекс " + price / 100 + "." + price % 100 + " руб.";
+                    }
+                    titleAndSumBenefitMap.put(str, socdiscount > 0 ? socdiscount.toString() : price.toString());
                     titles.add(str);
                 }
             }
@@ -705,10 +711,10 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 });
 
                 Query query = session.createSQLQuery(
-                        "SELECT od.rprice, od.socdiscount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                        "SELECT od.rprice, od.socdiscount, od.discount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                                 + "WHERE o.idoforg IN (:idOfOrgs) AND o.createdDate >= :startDate AND o.createdDate <= :endDate  AND od.rprice > 0 "
                                 + "AND(od.menuType >= 50 AND od.menuType <= 99) AND o.state = 0 AND od.state = 0"
-                                + "GROUP BY od.rprice, od.socdiscount ORDER BY od.rprice");
+                                + "GROUP BY od.rprice, od.socdiscount, od.discount ORDER BY od.rprice");
 
                 query.setParameter("startDate", startDate.getTime());
                 query.setParameter("endDate", endDate.getTime());
@@ -720,11 +726,13 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 titleAndSumPaidMap = new HashMap<String, String>();
                 for (Object o : resultList) {
                     Object[] row = (Object[]) o;
-                    str = "Платный комплекс " + ((BigInteger) row[0]).longValue() / 100 + "."
-                            + ((BigInteger) row[0]).longValue() % 100 + " руб.";
-                    Long discount = ((BigInteger) row[1]).longValue();
+                    Long rprice = ((BigInteger) row[0]).longValue();
+                    Long discount = ((BigInteger) row[1]).longValue() + ((BigInteger) row[2]).longValue();
+                    str = "Платный комплекс " + (rprice + discount) / 100 + "."
+                            + (rprice + discount) % 100 + " руб.";
+
                     if (discount > 0) {
-                        str += String.format(" (скидка %s.%s)", ((BigInteger) row[1]).longValue() / 100, ((BigInteger) row[1]).longValue() % 100);
+                        str += String.format(" (скидка %s.%s)", discount / 100, discount % 100);
                     }
                     titleAndSumPaidMap.put(str, row[0].toString());
                     titles.add(str);

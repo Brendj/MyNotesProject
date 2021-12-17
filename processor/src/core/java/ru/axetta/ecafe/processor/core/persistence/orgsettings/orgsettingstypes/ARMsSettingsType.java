@@ -12,7 +12,8 @@ import java.util.Map;
 public enum ARMsSettingsType implements SettingType {
     CARD_DUPLICATE_ENABLED(1300,"Дубликаты для основных карт", OrgSettingsDataTypes.BOOLEAN),
     REVERSE_MONTH_OF_SALE(1301,"Оплата/сторнирование месяц продажи", OrgSettingsDataTypes.BOOLEAN),
-    LP_DAYS_ON_WHICH_APPLICATIONS_ARE_MADE(11001, "ЛП. Количество дней, запрещенных к редактированию на сайте, начиная с текущего", OrgSettingsDataTypes.INT32);
+    LP_DAYS_ON_WHICH_APPLICATIONS_ARE_MADE(11001, "ЛП. Количество дней, запрещенных к редактированию на сайте, начиная с текущего", OrgSettingsDataTypes.INT32),
+    USE_MEAL_SCHEDULE(1080, "Использовать расписание питания", OrgSettingsDataTypes.BOOLEAN);
 
     private Integer globalId;
     private String description;

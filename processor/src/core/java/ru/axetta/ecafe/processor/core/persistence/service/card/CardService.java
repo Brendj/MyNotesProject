@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepositor
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
@@ -60,15 +60,16 @@ public class CardService {
 
 
     //1. Регистрация карты
-    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type,
+    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignVerifyRes, Integer cardSignCertNum, Boolean isLongUid) throws Exception {
-        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
+        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, longCardNo,
+                cardSignVerifyRes, cardSignCertNum, isLongUid);
     }
 
-    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
+    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type, Long longCardNo, Integer cardSignVerifyRes,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
-        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
-                isLongUid, cardTransitionState);
+        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, longCardNo,
+                cardSignVerifyRes, cardSignCertNum, isLongUid, cardTransitionState);
     }
 
     public void updateTransitionState(Card card, Integer transitionState) {
@@ -76,11 +77,11 @@ public class CardService {
         card.setUpdateTime(new Date());
     }
 
-    public Card registerNewSpecial(long idOfOrg, long cardNo, long cardPrintedNo, int type,
+    public Card registerNewSpecial(long idOfOrg, long cardNo, long cardPrintedNo, int type, Long longCardNo,
             Integer cardSignCertNum) throws Exception {
         Org org = orgRepository.findOne(idOfOrg);
         if (org == null) throw new Exception("Org not found");
-        return cardWritableRepository.createCardSpecial(org, cardNo, cardPrintedNo, type, cardSignCertNum);
+        return cardWritableRepository.createCardSpecial(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum);
     }
 
     //1. Регистрация карты
@@ -220,10 +221,20 @@ public class CardService {
         }
     }
 
-    public Card unblockOrReturnCard(Long cardNo, Long idOfOrg) throws Exception {
-        Card card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
+    public Card unblockOrReturnCard(Long cardNo, Long longCardNo, Long idOfOrg) throws Exception {
+        Card card = null;
+        if(longCardNo == null){
+            card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
+        } else {
+            card = cardWritableRepository.findByLongCardNo(longCardNo, idOfOrg);
+            if(card == null){
+                card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
+            }
+        }
         if (null == card) {
-            throw new CardNotFoundException(String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg));
+            throw new CardNotFoundException(
+                    String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg)
+            );
         }
 
         if (CardState.TEMPBLOCKED.getValue() == card.getState()) {
@@ -305,7 +316,7 @@ public class CardService {
         }
         else
         {
-            for (Long friendlyOrgid : DAOService.getInstance().findFriendlyOrgsIds(idOfOrg)) {
+            for (Long friendlyOrgid : DAOReadonlyService.getInstance().findFriendlyOrgsIds(idOfOrg)) {
                 CardWritableRepository.getInstance().updateCardSync(friendlyOrgid, card, changeState);
             }
         }

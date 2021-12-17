@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <h:panelGrid>
+        <h:panelGrid id="orgsDiscountReportPanelGrid" binding="#{mainPage.allOrgsDiscountsReportPage.pageComponent}"
+                     styleClass="borderless-grid">
+
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+
+                <h:outputText escape="true" value="Округ" styleClass="output-text"/>
+                <h:selectOneMenu id="regionsList" value="#{mainPage.allOrgsDiscountsReportPage.region}"
+                                 style="width:100px;">
+                    <f:selectItems value="#{mainPage.allOrgsDiscountsReportPage.regions}"/>
+                </h:selectOneMenu>
+
+                <h:outputText escape="false" value="Показать все организации" styleClass="output-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.allOrgsDiscountsReportPage.showAllOrgs}"
+                                         styleClass="output-text">
+                </h:selectBooleanCheckbox>
+
+                <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildAllOrgsDiscountsReport}"
+                                   render="workspaceTogglePanel, orgsDiscountsReportTable, testPanelGrid"
+                                   styleClass="commandButton"/>
+                <a4j:status>
+                    <f:facet name="start">
+                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                    </f:facet>
+                </a4j:status>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="borderless-grid">
+                <!-- не показывать пустую таблицу -->
+                <h:panelGrid rendered="#{!empty mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.itemsList}">
+                    <h:outputText value="Отчет по льготам организаций" styleClass="output-text"/>
+                    <rich:dataTable id="orgsDiscountsReportTable"
+                                    value="#{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.itemsList}"
+                                    var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer">
+
+                        <rich:column styleClass="center-aligned-column">
+                            <f:facet name="header">
+                                <h:outputText value="№"/>
+                            </f:facet>
+                            <h:outputText value="#{row + 1}" styleClass="output-text"/>
+                        </rich:column>
+
+                        <c:if test="${item.values == null}">
+                            <c:forEach items="#{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.columnNames}"
+                                       var="columnName" varStatus="metadata">
+                                <rich:column headerClass="center-aligned-column">
+                                    <f:facet name="header">
+                                        <h:outputText escape="true" value="#{columnName}"/>
+                                    </f:facet>
+                                    <h:outputText escape="true" value="#{item.values[metadata.index]}"
+                                                  styleClass="output-text"/>
+                                </rich:column>
+                            </c:forEach>
+                        </c:if>
+
+                        <f:facet name="footer">
+                            <rich:dataScroller for="orgsDiscountsReportTable" renderIfSinglePage="false" maxPages="10"
+                                               fastControls="hide"
+                                               stepControls="auto" boundaryControls="hide">
+                                <f:facet name="previous">
+                                    <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                                </f:facet>
+                                <f:facet name="next">
+                                    <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                                </f:facet>
+                            </rich:dataScroller>
+                        </f:facet>
+
+                    </rich:dataTable>
+                    <h:outputText value="Итого: #{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.count}"
+                                  escape="true" styleClass="output-text"/>
+
+
+                </h:panelGrid>
+            </h:panelGrid>
+        </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

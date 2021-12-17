@@ -25,16 +25,8 @@ import javax.xml.bind.annotation.XmlType;
 public enum AccountType {
 
 
-    /**
-     * Юридическое лицо
-     * 
-     */
     UL,
 
-    /**
-     * Индивидуальный предприниматель
-     * 
-     */
     IP;
 
     public String value() {

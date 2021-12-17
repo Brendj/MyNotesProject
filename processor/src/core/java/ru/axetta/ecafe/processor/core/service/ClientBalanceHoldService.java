@@ -4,12 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-
 import org.apache.cxf.common.util.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -17,6 +11,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -93,7 +93,7 @@ public class ClientBalanceHoldService {
 
     public List<ClientBalanceHold> getClientBalanceHoldForOrgSinceVersion(Session session,
             long orgOwner, long version) throws Exception {
-        List<Long> listOfOrgs = DAOUtils.findFriendlyOrgIds(session, orgOwner);
+        List<Long> listOfOrgs = DAOReadonlyService.getInstance().findFriendlyOrgsIds(orgOwner);
         Query query = session.createQuery("select cbh from ClientBalanceHold cbh "
                 + "where cbh.version > :version and cbh.oldOrg.idOfOrg in (:idOfOrgList)");
         query.setParameter("version", version);

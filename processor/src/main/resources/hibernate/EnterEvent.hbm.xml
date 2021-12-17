@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.EnterEvent" table="CF_EnterEvents">
+        <composite-id name="compositeIdOfEnterEvent" class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfEnterEvent">
+            <key-property name="idOfEnterEvent" type="long" column="idOfEnterEvent"/>
+            <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
+        </composite-id>
+        <property name="enterName" column="EnterName" type="string" length="100" not-null="true"/>
+        <property name="turnstileAddr" column="TurnstileAddr" type="string" length="30" not-null="true"/>
+        <property name="passDirection" column="PassDirection" type="integer" not-null="true"/>
+        <property name="eventCode" column="EventCode" type="integer" not-null="true"/>
+        <property name="idOfCard" column="IdOfCard" type="long" not-null="false"/>
+        <property name="longCardId" column="longCardId" type="long" not-null="false"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
+                     not-null="true" update="false" insert="false" />
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
+                     not-null="false" update="false" />
+        <property name="idOfTempCard" column="IdOfTempCard" type="long" not-null="false"/>
+        <property name="evtDateTime" column="EvtDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true"/>
+        <property name="idOfVisitor" column="IdOfVisitor" type="long" not-null="false"/>
+        <property name="visitorFullName" column="VisitorFullName" type="string" length="110" not-null="false"/>
+        <property name="docType" column="DocType" type="integer" not-null="false"/>
+        <property name="docSerialNum" column="DocSerialNum" type="string" length="45" not-null="false"/>
+        <property name="issueDocDate" column="IssueDocDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="false"/>
+        <property name="visitDateTime" column="VisitDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="false"/>
+        <property name="guardianId" column="GuardianId" type="long" not-null="false"/>
+        <property name="childPassChecker" column="ChildPassChecker" type="integer" not-null="false"/>
+        <property name="childPassCheckerId" column="ChildPassCheckerId" type="long" not-null="false"/>
+        <property name="idOfClientGroup" column="IdOfClientGroup" type="long"/>
+        <many-to-one name="clientGroup" class="ru.axetta.ecafe.processor.core.persistence.ClientGroup" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfClientGroup"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

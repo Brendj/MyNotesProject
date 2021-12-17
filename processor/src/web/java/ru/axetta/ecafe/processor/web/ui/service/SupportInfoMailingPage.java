@@ -7,13 +7,13 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.StringUtils;
-import org.richfaces.event.UploadEvent;
-import org.richfaces.model.UploadItem;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,19 +72,15 @@ public class SupportInfoMailingPage extends BasicWorkspacePage {
         return "service/support_info_mailing";
     }
 
-    public void loadFileListener(UploadEvent event) {
+    public void loadFileListener(FileUploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        UploadItem item = event.getUploadItem();
+        UploadedFile item = event.getUploadedFile();
         try {
-            if (item.isTempFile()) {
-                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
-                file.setFile(item.getFile());
-                file.setFileName(item.getFileName());
-                file.setContentType(item.getContentType());
-                loadFile(file);
-            } else {
-                throw new Exception("Invalid file");
-            }
+            ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+            file.setFile(new java.io.File(item.getName()));
+            file.setFileName(item.getName());
+            file.setContentType(item.getContentType());
+            loadFile(file);
         } catch (Exception e) {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(),
@@ -125,7 +121,7 @@ public class SupportInfoMailingPage extends BasicWorkspacePage {
         final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
                 EventNotificationService.class);
         for (Long contractId : clients) {
-            Client client = DAOService.getInstance().getClientByContractId(contractId);
+            Client client = DAOReadonlyService.getInstance().getClientByContractId(contractId);
             String[] values = generateInfoMailingNotificationParams();
             notificationService.sendNotificationInfoMailingAsync(client, values, new Date());
         }
@@ -170,16 +166,16 @@ public class SupportInfoMailingPage extends BasicWorkspacePage {
         String sClientType = new Integer(guardianFilter).toString();
         String sGender = new Integer(genderFilter).toString();
         return new String[] {
-            "infoText", text,
-            "clientType", sClientType,
-            "gender", sGender,
-            "ageBefore20", sAgeBefore20,
-            "age2125", sAge2125,
-            "age2630", sAge2630,
-            "age3135", sAge3135,
-            "age3645", sAge3645,
-            "ageOver46", sAgeOver46,
-            EventNotificationService.TARGET_VALUES_KEY, sClientType + sGender + sAgeBefore20 + sAge2125 + sAge2630 + sAge3135 + sAge3645 + sAgeOver46
+                "infoText", text,
+                "clientType", sClientType,
+                "gender", sGender,
+                "ageBefore20", sAgeBefore20,
+                "age2125", sAge2125,
+                "age2630", sAge2630,
+                "age3135", sAge3135,
+                "age3645", sAge3645,
+                "ageOver46", sAgeOver46,
+                EventNotificationService.TARGET_VALUES_KEY, sClientType + sGender + sAgeBefore20 + sAge2125 + sAge2630 + sAge3135 + sAge3645 + sAgeOver46
         };
     }
 

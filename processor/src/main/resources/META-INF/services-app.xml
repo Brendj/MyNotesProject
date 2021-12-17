@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+
+    <task:annotation-driven executor="executorWithPoolSizeRange"/>
+    <task:executor id="executorWithPoolSizeRange"
+                   pool-size="5-100"
+                   queue-capacity="20000"
+                   keep-alive="120"/>
+
+    <context:component-scan base-package="ru.axetta.ecafe.processor"/>
+
+    <task:scheduled-tasks scheduler="myScheduler">
+        <!--<task:scheduled ref="maintenanceService" method="run" cron="0 */1 * ? * *"/>-->
+        <task:scheduled ref="orgSyncLockService" method="clean" fixed-delay="1800000"/>
+        <task:scheduled ref="SMSService" method="logQueue" fixed-delay="60000"/>
+        <task:scheduled ref="ETPMVService" method="resendStatuses" fixed-delay="3600000"/>
+        <task:scheduled ref="ETPMVClient" method="watchdogRun" fixed-delay="60000"/>
+        <task:scheduled ref="maintenanceService" method="wrapRun" cron="0 0 9 * * ?" />
+        <task:scheduled ref="transactionJournalService" method="processTransactionJournalQueue" fixed-delay="10000"/>
+        <!--EP-320 <task:scheduled ref="projectStateReportService" method="run" cron="0 20 4 ? * *"/> -->
+        <!--        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="45000" />-->
+        <!--Убрано по задаче EP-266<task:scheduled ref="BIDataExportService" method="run" cron="0 0 5 * * ?"/>-->
+        <task:scheduled ref="synchCleanupService" method="run" cron="0 10 0 ? * *"/>
+        <task:scheduled ref="RNIPLoadPaymentsService" method="runRequests" fixed-delay="60000"/>
+        <task:scheduled ref="RNIPLoadPaymentsServiceV21" method="runGetResponse" cron="5 0/1 * * * ?"/>
+        <task:scheduled ref="RNIPLoadPaymentsServiceV21" method="runSendAck" cron="45 0/1 * * * ?"/>
+        <task:scheduled ref="EMPProcessor" method="runStorageMerge" cron="0 0/5 * * * ?"/>
+        <task:scheduled ref="syncStatsManager" method="shortDataLog" cron="0 0/10 * * * ?"/>
+        <task:scheduled ref="syncStatsManager" method="processLogData" cron="0 0 1 * * ?"/>
+        <task:scheduled ref="migrantsManager" method="checkOverdueMigrants" cron="0 0 1 * * ?"/>
+        <task:scheduled ref="migrantsManager" method="checkMigrantsByClientGroup" cron="0 0 0 * * ?"/>
+        <task:scheduled ref="mealManager" method="sendData" cron="0 * * * * ?"/>
+        <task:scheduled ref="scudManager" method="sendData" cron="0 * * * * ?"/>
+        <task:scheduled ref="SMSResendingService" method="executeResending" fixed-delay="60000"/>
+        <!--EP-320 <task:scheduled ref="projectStateReportService" method="runInitContragetsChartTypeAtStartup"
+                        fixed-delay="60000"/> -->
+        <task:scheduled ref="smsDeliveryCalculationService" method="run" cron="0 45 3 ? * *"/>
+        <task:scheduled ref="enterEventsMonitoring" method="calculateEnterEvents" cron="0 0/10 * * * ?"/>
+        <task:scheduled ref="clientMigrationHistoryService" method="processOrgChange" fixed-delay="60000"/>
+        <task:scheduled ref="wtComplexCopyService" method="run" cron="0 4 4 * * ?"/>
+    </task:scheduled-tasks>
+    <task:scheduler id="myScheduler" pool-size="5"/>
+
+
+    <task:scheduler id="syncLogSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="syncLogSchedule">
+        <task:scheduled ref="processLogSaver" method="run" fixed-delay="60000"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="threadDump" pool-size="5"/>
+    <task:scheduled-tasks scheduler="threadDump">
+        <task:scheduled ref="threadDumpService" method="run" fixed-delay="60000"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="importRegisterClientsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="importRegisterClientsSchedule">
+        <task:scheduled ref="importRegisterMSKClientsService" method="run" cron="0 11 0 ? * *"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="importRegisterSpbClientsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="importRegisterSpbClientsSchedule">
+        <task:scheduled ref="importRegisterSpbClientsService" method="run" cron="0 0 4 ? * *"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="importRegisterOrgsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="importRegisterOrgsSchedule">
+        <task:scheduled ref="importRegisterOrgsService" method="run" cron="0 0 5 ? * *"/>
+    </task:scheduled-tasks>
+
+
+    <task:scheduler id="benefitsRecalculationSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="benefitsRecalculationSchedule">
+        <task:scheduled ref="benefitsRecalculationService" method="run" cron="0 15 0 ? * *"/>
+    </task:scheduled-tasks>
+
+
+    <task:scheduler id="cleanupRepositoryReportsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="cleanupRepositoryReportsSchedule">
+        <task:scheduled ref="cleanupReportsService" method="run" cron="0 15 0 ? * *"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="clientsSMSSubscriptionFeeSchedule"/>
+    <task:scheduled-tasks scheduler="clientsSMSSubscriptionFeeSchedule">
+        <task:scheduled ref="smsSubscriptionFeeService" method="notifyClientsAboutSMSSubscriptionFee"
+                        cron="0 0 16 26 * ?"/>
+        <task:scheduled ref="smsSubscriptionFeeService" method="smsSubscriptionFeeWithdraw" cron="0 0 16 1-4 * ?"/>
+    </task:scheduled-tasks>
+
+<!--    <task:scheduler id="regularPaymentSchedule"/>-->
+<!--    <task:scheduled-tasks scheduler="regularPaymentSchedule">-->
+<!--        <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"-->
+<!--                        cron="0 10 11,17 * * ?"/>-->
+<!--    </task:scheduled-tasks>-->
+
+    <task:scheduler id="regularPaymentExpireNotificationSchedule"/>
+    <task:scheduled-tasks scheduler="regularPaymentExpireNotificationSchedule">
+        <task:scheduled ref="regularPaymentSubscriptionService" method="notifyClientsAboutExpiredSubscriptions"
+                        cron="0 0 15 * * ?"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="summaryDownloadMakerSchedule"/>
+    <task:scheduled-tasks scheduler="summaryDownloadMakerSchedule">
+        <task:scheduled ref="summaryDownloadMakerService" method="run"
+                        cron="0 35 1 * * ?"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="summaryClientsMSRSchedule"/>
+    <task:scheduled-tasks scheduler="summaryClientsMSRSchedule">
+        <task:scheduled ref="summaryCardsMSRService" method="run"
+                        cron="0 40 1 * * ?"/>
+    </task:scheduled-tasks>
+
+    <task:scheduler id="processNSIFile"/>
+    <task:scheduled-tasks scheduler="processNSIFile">
+        <task:scheduled ref="ImportRegisterFileService" method="run"
+                        cron="0 30 21 * * ?"/>
+    </task:scheduled-tasks>
+
+    <!-- Оповещение контргента о сторнировании заказов производится каждый день ночью за предыдущий день-->
+    <task:scheduler id="orderStateChangeSchedule"/>
+    <task:scheduled-tasks scheduler="orderStateChangeSchedule">
+        <task:scheduled ref="orderStateChangeService" method="notifyOrderStateChange"
+                        cron="0 0 4 * * ?"/>
+    </task:scheduled-tasks>
+
+</beans>

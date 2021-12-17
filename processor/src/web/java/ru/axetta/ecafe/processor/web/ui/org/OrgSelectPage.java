@@ -105,4 +105,14 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     public interface CompleteHandler {
         void completeOrgSelection(Session session, Long idOfOrg) throws Exception;
     }
+
+    public void clearFilter(){
+        setFilter("");
+        setIdFilter("");
+        setOrgIdFromNsi(null);
+        setEkisId(null);
+        setRegion("");
+        setIdOfSelectedContragent(-1L);
+    }
+
 }

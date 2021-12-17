@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -101,12 +101,13 @@ public class RegularPaymentEasyCheck {
             session.persist(request);
             requestResultEasyCheck.setErrorCode(0);
             transaction.commit();
+            transaction = null;
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage());
             requestResultEasyCheck.setErrorCode(RC_BAD_REQUEST);
             requestResultEasyCheck.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, contractId));
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return requestResultEasyCheck;
@@ -139,7 +140,7 @@ public class RegularPaymentEasyCheck {
     private boolean checkSubscriptionContractId(BankSubscription bs, Long contractId,
             RequestResultEasyCheck requestResult) {
         if (contractId != null) {
-            Client c = DAOService.getInstance().getClientByContractId(contractId);
+            Client c = DAOReadonlyService.getInstance().getClientByContractId(contractId);
             if (c == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, contractId));
@@ -185,9 +186,9 @@ public class RegularPaymentEasyCheck {
                         paymentAmount, session);
             }
             transaction.commit();
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
+            transaction = null;
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
 

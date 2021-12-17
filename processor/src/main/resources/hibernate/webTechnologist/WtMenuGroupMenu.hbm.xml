@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu" table="cf_wt_menu_group_relationships">
+        <id name="id">
+            <column name="id" sql-type="long" not-null="true"/>
+        </id>
+
+        <many-to-one name="menu" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu">
+            <column name="idOfMenu"/>
+        </many-to-one>
+
+        <many-to-one name="menuGroup" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup">
+            <column name="idOfMenuGroup"/>
+        </many-to-one>
+
+        <set name="dishes" lazy="true" table="cf_wt_menu_group_dish_relationships">
+            <key column="idOfMenuMenuGroupRelation"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="idOfDish"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

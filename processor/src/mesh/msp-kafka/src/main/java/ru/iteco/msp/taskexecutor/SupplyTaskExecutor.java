@@ -4,50 +4,39 @@
 
 package ru.iteco.msp.taskexecutor;
 
-import ru.iteco.msp.kafka.KafkaService;
-import ru.iteco.msp.models.dto.SupplyMSPOrders;
-import ru.iteco.msp.service.SupplyMSPService;
+import ru.iteco.msp.kafka.SupplyService;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Date;
-import java.util.List;
 
 @Component
 public class SupplyTaskExecutor {
+
     private static final Logger log = LoggerFactory.getLogger(SupplyTaskExecutor.class);
 
-    private final SupplyMSPService supplyMSPService;
     private final CronTrigger supplyCronTrigger;
     private final ThreadPoolTaskScheduler threadPoolSupplyTaskScheduler;
-    private final KafkaService kafkaService;
+    private final SupplyService supplyService;
+
 
     @Value(value = "${kafka.task.execution.supply.samplesize}")
     private Integer sampleSize;
 
-    public SupplyTaskExecutor(
-            CronTrigger supplyCronTrigger,
-            ThreadPoolTaskScheduler threadPoolSupplyTaskScheduler,
-            SupplyMSPService supplyMSPService,
-            KafkaService kafkaService){
+    public SupplyTaskExecutor(CronTrigger supplyCronTrigger, ThreadPoolTaskScheduler threadPoolSupplyTaskScheduler,
+            SupplyService supplyService) {
         this.supplyCronTrigger = supplyCronTrigger;
         this.threadPoolSupplyTaskScheduler = threadPoolSupplyTaskScheduler;
-        this.supplyMSPService = supplyMSPService;
-        this.kafkaService = kafkaService;
+        this.supplyService = supplyService;
     }
 
     @PostConstruct
-    public void buildRunnableTask(){
+    public void buildRunnableTask() {
         threadPoolSupplyTaskScheduler.schedule(new RunnableTask(), supplyCronTrigger);
     }
 
@@ -55,37 +44,7 @@ public class SupplyTaskExecutor {
 
         @Override
         public void run() {
-            Date begin;
-            Date end;
-            try {
-                ReportingDate reportingDate = new ReportingDate();
-
-                do {
-                    end = reportingDate.getEndPeriod();
-                    begin = reportingDate.getBeginPeriod();
-
-                    log.info(begin.toString());
-                    log.info(end.toString());
-
-                    Pageable pageable = PageRequest.of(0, sampleSize, Sort.by("createdDate"));
-                    List<SupplyMSPOrders> orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
-
-                    while (CollectionUtils.isNotEmpty(orderList)) {
-                        for (SupplyMSPOrders o : orderList) {
-                            kafkaService.sendSupplyMSP(o);
-                        }
-                        orderList.clear();
-                        orderList = null;
-
-                        pageable = pageable.next();
-                        orderList = supplyMSPService.getDiscountOrders(begin, end, pageable);
-                    }
-                    reportingDate = reportingDate.getNext();
-                } while (reportingDate != null);
-
-            } catch (Exception e) {
-                log.error("Critical error in process sending supply MSP info, task interrupt", e);
-            }
+            supplyService.runFromTaskExecutor(sampleSize);
         }
     }
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="wtSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.WtSettingsReportPage"-->
+<h:panelGrid>
+    <h:panelGrid columns="2">
+        <h:outputText escape="true" value="Количество дней, запрещенных для редактирования" styleClass="output-text"/>
+        <h:inputText value="#{wtSettingsReportPage.daysForbid}" styleClass="input-text"
+                     converterMessage="В поле количества дней допустимы только цифры."/>
+    </h:panelGrid>
+    <a4j:commandButton value="Сохранить изменения" action="#{wtSettingsReportPage.save()}"
+                       render="wtSettingsReportPage"/>
+
+    <h:panelGrid columns="1">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

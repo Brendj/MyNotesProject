@@ -36,6 +36,7 @@ public class EnterEvent {
     private Long childPassCheckerId;
     private ClientGroup clientGroup;
     private Long idOfClientGroup;
+    private Long longCardId;
 
 
     //pass direction
@@ -76,7 +77,8 @@ public class EnterEvent {
         // For Hibernate
     }
 
-    public EnterEvent(CompositeIdOfEnterEvent compositeIdOfEnterEvent, String enterName, String turnstileAddr, int passDirection, int eventCode, Date evtDateTime) {
+    public EnterEvent(CompositeIdOfEnterEvent compositeIdOfEnterEvent, String enterName, String turnstileAddr,
+            int passDirection, int eventCode, Date evtDateTime) {
         this.compositeIdOfEnterEvent = compositeIdOfEnterEvent;
         this.enterName = enterName;
         this.turnstileAddr = turnstileAddr;
@@ -251,6 +253,14 @@ public class EnterEvent {
 
     public void setIdOfClientGroup(Long idOfClientGroup) {
         this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getLongCardId() {
+        return longCardId;
+    }
+
+    public void setLongCardId(Long longCardId) {
+        this.longCardId = longCardId;
     }
 
     @Override

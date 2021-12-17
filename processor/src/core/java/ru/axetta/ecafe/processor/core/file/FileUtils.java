@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.file;
 
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
+import ru.axetta.ecafe.processor.core.persistence.ESPattached;
 import ru.axetta.ecafe.processor.core.persistence.OrgFile;
 
 import org.apache.commons.codec.binary.Base64;
@@ -51,6 +52,38 @@ public class FileUtils {
             throw new FileIsTooBigException("file is too big (max size - 3MB)");
         writeByteArraysToFile(formFilePath(idOfOrg, fileName, fileExt), file);
         return fileName;
+    }
+
+    public static String saveFile(Long idOfRequestESP, String filedata, String fullfileName) throws IOException
+    {
+        try {
+            StringBuilder tmp = new StringBuilder();
+            tmp.append(idOfRequestESP);
+            tmp.append(DELIMITER);
+            tmp.append(fullfileName);
+            String path = tmp.toString();
+            String filepath = getBaseFilePathForESP() + path;
+            writeByteArraysToFile(filepath, decodeFromeBase64(filedata));
+            return path;
+        } catch (Exception e)
+        {
+            return "";
+        }
+    }
+    public static String loadFile(String path) {
+        byte[] fileData = null;
+        try {
+            fileData = loadFileAsBytesArray(getBaseFilePathForESP() + path);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return new String(encodeToBase64(fileData));
+    }
+
+    public static String getBaseFilePathForESP()
+    {
+        return System.getProperty("jboss.server.base.dir") + DELIMITER + FILES_DIRECTORY + DELIMITER + "ESP" + DELIMITER;
     }
 
     public static String loadFile(Long idOfOrg, String fileName, String fileExt) {

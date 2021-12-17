@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!-- Панель создания категории -->
+    <!--@elvariable id="codeMSPCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.msp.CodeMSPCreatePage"-->
+    <h:panelGrid>
+        <h:panelGrid id="CodeMSPCreatePanel"
+                     styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Код МСП" styleClass="output-text required-field"/>
+            <h:inputText value="#{codeMSPCreatePage.code}" maxlength="32" styleClass="input-text"/>
+            <h:outputText escape="true" value="Описание кода МСП" styleClass="output-text"/>
+            <h:inputTextarea value="#{codeMSPCreatePage.description}" styleClass="input-text" rows="5" cols="64"/>
+            <h:outputText value="Льгота ИС ПП" styleClass="output-text"/>
+            <h:selectOneListbox id="discountSelectCreate" value="#{codeMSPCreatePage.selectedDiscount}" size="1"
+                                styleClass="output-text">
+                <f:selectItems value="#{codeMSPCreatePage.discounts}"/>
+            </h:selectOneListbox>
+            <h:outputText value="Возрастные группы" styleClass="output-text"/>
+            <h:selectManyCheckbox value="#{codeMSPCreatePage.selectedTypes}" layout="pageDirection">
+                <f:selectItems value="#{codeMSPCreatePage.ageTypeGroups}"/>
+            </h:selectManyCheckbox>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <a4j:commandButton value="Зарегистрировать код" action="#{codeMSPCreatePage.onSave()}"
+                               render="CodeMSPCreatePanel" styleClass="command-button"/>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

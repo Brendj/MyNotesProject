@@ -4,20 +4,18 @@
 
 package ru.axetta.ecafe.processor.core.sync.process;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
-import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
-import ru.axetta.ecafe.processor.core.sync.ResultOperation;
-import ru.axetta.ecafe.processor.core.sync.response.ClientGuardianData;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.sync.ResultOperation;
+import ru.axetta.ecafe.processor.core.sync.response.ClientGuardianData;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -127,7 +125,6 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
     }
 
     private Collection<Long> getFriendlyOrgsId(Long idOfOrg) {
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        return OrgUtils.getFriendlyOrgIds(org);
+        return DAOReadonlyService.getInstance().findFriendlyOrgsIds(idOfOrg);
     }
 }

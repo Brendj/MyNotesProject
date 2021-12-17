@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -87,7 +87,7 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
             printError("Неверное название категории");
             return;
         }
-        if (!DAOService.getInstance().getCategoryOrgByCategoryName(categoryName).isEmpty() )
+        if (!DAOReadonlyService.getInstance().getCategoryOrgByCategoryName(categoryName).isEmpty() )
         {
             printError("Категория с данным названием уже зарегистрирована");
             return;

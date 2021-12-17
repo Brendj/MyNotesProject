@@ -60,7 +60,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
 
     private final ClientFilter clientFilter = new ClientFilter();
 
-    public void onReportPeriodChanged(javax.faces.event.ActionEvent event) {
+    public void onReportPeriodChanged() {
         htmlReport = null;
         switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
@@ -82,7 +82,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
         }
     }
 
-    public void onEndDateSpecified(javax.faces.event.ActionEvent event) {
+    public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
         if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {

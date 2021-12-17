@@ -83,7 +83,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../target/production/web" />
     <output-test url="file://$MODULE_DIR$/../../target/test/web" />
     <exclude-output />

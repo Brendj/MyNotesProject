@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.EnhancedUserType;
 
 import java.io.Serializable;
@@ -82,12 +83,12 @@ public class BoolType implements EnhancedUserType {
         return deepCopy(original);
     }
 
-    public void nullSafeSet(PreparedStatement preparedStatement, Object o, int i, SessionImplementor sessionImplementor)
+    public void nullSafeSet(PreparedStatement preparedStatement, Object o, int i, SharedSessionContractImplementor sessionImplementor)
             throws HibernateException, SQLException {
         nullSafeSet(preparedStatement, o, i);
     }
 
-    public Object nullSafeGet(ResultSet resultSet, String[] strings, SessionImplementor sessionImplementor, Object o)
+    public Object nullSafeGet(ResultSet resultSet, String[] strings, SharedSessionContractImplementor sessionImplementor, Object o)
             throws HibernateException, SQLException {
         return nullSafeGet(resultSet, strings, o);
     }

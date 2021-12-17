@@ -644,6 +644,17 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(guardianItem.getRelationType());
         persistenceSession.persist(clientGuardian);
+        //
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason("Нажата кнопка \"Обработать параметры клиентов\" в Сервис/Обработать параметры клиентов из файлов");
+        clientGuardianHistory.setClientGuardian(clientGuardian);
+        clientGuardianHistory.setChangeDate(new Date());
+        clientGuardianHistory.setAction("Создание новой связки");
+        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+        persistenceSession.persist(clientGuardianHistory);
+        //
         return guardian.getIdOfClient();
     }
 

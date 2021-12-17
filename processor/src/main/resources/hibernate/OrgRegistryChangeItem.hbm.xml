@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2015. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem" table="cf_orgregistrychange_item" optimistic-lock="version">
+        <id name="idOfOrgRegistryChangeItem" column="idOfOrgRegistryChangeItem" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOfOrg" column="idoforg" type="long"/>
+        <property name="state" column="state" type="integer"/>
+        <property name="createDate" column="createdate" type="long"/>
+        <property name="operationType" column="operationtype" type="int"/>
+
+        <property name="applied" column="applied" type="boolean"/>
+
+        <property name="organizationType" column="organizationtype">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationType</param>
+            </type>
+        </property>
+        <property name="organizationTypeFrom" column="organizationtypefrom" not-null="false">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationType</param>
+            </type>
+        </property>
+        <property name="shortName" column="shortname" type="string" length="255"/>
+        <property name="shortNameFrom" column="shortnamefrom" type="string" length="255"/>
+        <property name="shortNameSupplierFrom" column="shortnamesupplierfrom" type="string" length="128"/>
+        <property name="officialName" column="officialname" type="string" length="255"/>
+        <property name="officialNameFrom" column="officialnamefrom" type="string" length="255"/>
+
+        <property name="address" column="address" type="string" length="512"/>
+        <property name="addressFrom" column="addressfrom" type="string" length="512"/>
+        <property name="city" column="city" type="string" length="255"/>
+        <property name="cityFrom" column="cityfrom" type="string" length="255"/>
+        <property name="region" column="region" type="string" length="255"/>
+        <property name="regionFrom" column="regionfrom" type="string" length="255"/>
+        <property name="director" column="director" type="string" length="255"/>
+        <property name="directorFrom" column="directorFrom" type="string" length="255"/>
+
+        <property name="unom" column="unom" type="long"/>
+        <property name="unomFrom" column="unomfrom" type="long"/>
+        <property name="unad" column="unad" type="long"/>
+        <property name="unadFrom" column="unadfrom" type="long"/>
+        <property name="uniqueAddressId" column="uniqueaddressid" type="long"/>
+        <property name="uniqueAddressIdFrom" column="uniqueaddressidfrom" type="long"/>
+        <property name="inn" column="inn" type="string" length="32"/>
+        <property name="innFrom" column="innfrom" type="string" length="32"/>
+        <property name="ekisId" column="ekisId" type="long"/>
+        <property name="ekisIdFrom" column="ekisIdFrom" type="long"/>
+        <property name="egissoId" column="egissoId" type="string" length="128"/>
+        <property name="egissoIdFrom" column="egissoIdFrom" type="string" length="128"/>
+        <property name="municipalDistrict" column="municipal_district" type="string" length="256"/>
+        <property name="municipalDistrictFrom" column="municipal_districtFrom" type="string" length="256"/>
+        <property name="shortAddress" column="short_address" type="string" length="512"/>
+        <property name="shortAddressFrom" column="short_addressFrom" type="string" length="512"/>
+
+        <property name="guid" column="guid" type="string" length="255"/>
+        <property name="guidFrom" column="guidfrom" type="string" length="255"/>
+        <property name="additionalId" column="additionalid" type="long"/>
+        <property name="mainRegistry" column="mainRegistry" type="long" insert="false" update="false"/>
+        <many-to-one name="orgRegistryChange" class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange"
+                     column="mainRegistry" />
+        <property name="founder" column="founder" type="string" length="512"/>
+        <property name="founderFrom" column="founderFrom" type="string" length="512"/>
+        <property name="subordination" column="subordination" type="string" length="512"/>
+        <property name="subordinationFrom" column="subordinationFrom" type="string" length="512"/>
+        <property name="globalId" column="globalId" type="long"/>
+        <property name="globalIdFrom" column="globalIdFrom" type="long"/>
+
+    </class>
+</hibernate-mapping>

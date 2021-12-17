@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -277,7 +278,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 if (!guidOK) {
                     service.setOrgSyncErrorCode(guid, OrgSync.ERROR_STATE_BAD_GUID_CODE);
                     String badGuidString = "";
-                    List<Org> orgs = DAOService.getInstance().findOrgsByGuidAddressINNOrNumber(guid, "", "", "");
+                    List<Org> orgs = DAOReadonlyService.getInstance().findOrgsByGuidAddressINNOrNumber(guid, "", "", "");
                     for (Org o : orgs) {
                         badGuidString += String.format("Guid: %s, Ид. организации: %s, Название организации: %s;\n", guid, o.getIdOfOrg(), o.getShortNameInfoService());
                     }

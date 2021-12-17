@@ -4,9 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import org.richfaces.component.UICommandLink;
 import org.hibernate.Session;
-import org.richfaces.component.html.HtmlPanelMenuGroup;
-import org.richfaces.component.html.HtmlPanelMenuItem;
+import org.richfaces.component.UIPanelMenuGroup;
+import org.richfaces.component.UIPanelMenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +61,17 @@ public class BasicWorkspacePage extends BasicPage {
         boolean done = false;
         while (!done) {
             String itemTitle = null;
-            if (menuComponent instanceof HtmlPanelMenuItem) {
-                HtmlPanelMenuItem currentMenuItem = (HtmlPanelMenuItem) menuComponent;
+            if (menuComponent instanceof UIPanelMenuItem) {
+                UIPanelMenuItem currentMenuItem = (UIPanelMenuItem) menuComponent;
                 itemTitle = (String) currentMenuItem.getLabel();
-            } else if (menuComponent instanceof HtmlPanelMenuGroup) {
-                HtmlPanelMenuGroup currentMenuGroup = (HtmlPanelMenuGroup) menuComponent;
+            } else if (menuComponent instanceof UIPanelMenuGroup) {
+                UIPanelMenuGroup currentMenuGroup = (UIPanelMenuGroup) menuComponent;
                 itemTitle = currentMenuGroup.getLabel();
-            } else {
+            } else if (menuComponent instanceof UICommandLink){ //for complexExtendedReport
+                UICommandLink currentCommandLink = (UICommandLink) menuComponent;
+                itemTitle = currentCommandLink.getTitle();
+            }
+            else {
                 done = true;
                 continue;
             }
@@ -84,8 +89,8 @@ public class BasicWorkspacePage extends BasicPage {
     }
 
     void showAndExpandMenuGroup(UIComponent menuComponent) {
-        if (menuComponent !=null && (menuComponent instanceof HtmlPanelMenuGroup)) {
-            HtmlPanelMenuGroup menuGroup = (HtmlPanelMenuGroup) menuComponent;
+        if (menuComponent !=null && (menuComponent instanceof UIPanelMenuGroup)) {
+            UIPanelMenuGroup menuGroup = (UIPanelMenuGroup) menuComponent;
             if (!menuGroup.isRendered()) {
                 menuGroup.setRendered(true);
                 menuGroup.setExpanded(true);
@@ -105,8 +110,8 @@ public class BasicWorkspacePage extends BasicPage {
 
     public void hideMenuGroup() {
         UIComponent menuComponent = getMainMenuComponent();
-        if (menuComponent instanceof HtmlPanelMenuGroup) {
-            HtmlPanelMenuGroup menuGroup = (HtmlPanelMenuGroup) menuComponent;
+        if (menuComponent instanceof UIPanelMenuGroup) {
+            UIPanelMenuGroup menuGroup = (UIPanelMenuGroup) menuComponent;
             menuGroup.setRendered(false);
         }
     }

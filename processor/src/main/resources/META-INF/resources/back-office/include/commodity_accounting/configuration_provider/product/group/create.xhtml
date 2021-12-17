@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!-- Панель создания правила -->
+    <!--@elvariable id="productGroupCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupCreatePage"-->
+<h:panelGrid>
+    <h:panelGrid id="productGroupCreatePanelGrid" binding="#{productGroupCreatePage.pageComponent}"
+                 styleClass="borderless-grid" columns="1">
+        <h:panelGrid columns="2">
+            <h:outputText escape="true" value="Организация поставщик" styleClass="output-text required-field"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{productGroupCreatePage.shortName}" readonly="true" styleClass="input-text"
+                             style="margin-right: 2px; width: 374px; float: left;"/>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
+                                   styleClass="command-link" style="width: 25px; float: right;">
+                    <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}"/>
+                </a4j:commandButton>
+            </h:panelGroup>
+            <h:outputText escape="true" value="Наименование группы" styleClass="output-text required-field"/>
+            <h:inputTextarea value="#{productGroupCreatePage.productGroup.nameOfGroup}" cols="128" rows="4"
+                             styleClass="input-text long-field"/>
+
+            <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:outputText value="#{productGroupCreatePage.currentConfigurationProvider.name}"
+                              styleClass="output-text"
+                              style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;"/>
+                <a4j:commandButton value="..." action="#{productGroupCreatePage.selectConfigurationProvider}"
+                                   render="configurationProviderSelectModalPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px; float: right;"/>
+            </h:panelGroup>
+            <h:outputText escape="true" value="Код классификации" styleClass="output-text"/>
+            <h:inputText value="#{productGroupCreatePage.productGroup.classificationCode}" maxlength="32"
+                         styleClass="input-text long-field"/>
+        </h:panelGrid>
+
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <a4j:commandButton value="Создать группу" action="#{productGroupCreatePage.onSave}"
+                           render="productGroupCreatePanelGrid" styleClass="command-button"/>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

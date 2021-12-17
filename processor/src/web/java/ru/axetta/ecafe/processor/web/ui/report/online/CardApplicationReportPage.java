@@ -54,7 +54,7 @@ public class CardApplicationReportPage extends OnlineReportPage {
     @PostConstruct
     public void setDates() {
         startDate = CalendarUtils.startOfDay(new Date());
-        onReportPeriodChanged(null);
+        onReportPeriodChanged();
     }
 
     public void showOrgSelectPage() {

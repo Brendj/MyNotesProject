@@ -5,8 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
-
-import org.jboss.as.web.security.SecurityContextAssociationValve;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +24,7 @@ public abstract class OnlineReportPageOnePerUser extends OnlineReportPage {
     public abstract void exportToXLS(ActionEvent actionEvent);
 
     public Object exportToHtmlOnePerUser() {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         HttpSession httpSession = request.getSession(true);
         Long idOfUser = (Long)httpSession.getAttribute(User.USER_ID_ATTRIBUTE_NAME);
         String className = this.getClass().getSimpleName();
@@ -43,7 +42,7 @@ public abstract class OnlineReportPageOnePerUser extends OnlineReportPage {
     }
 
     public void exportToXLSOnePerUser(ActionEvent actionEvent) {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         HttpSession httpSession = request.getSession(true);
         Long idOfUser = (Long)httpSession.getAttribute(User.USER_ID_ATTRIBUTE_NAME);
         String className = this.getClass().getSimpleName();

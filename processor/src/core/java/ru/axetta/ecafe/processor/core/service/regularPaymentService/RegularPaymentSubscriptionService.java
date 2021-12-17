@@ -32,6 +32,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +109,40 @@ public class RegularPaymentSubscriptionService {
 
     public void checkClientBalances() {
         checkClientBalances(null);
+    }
+
+    public void scheduleSync() throws Exception {
+        String syncSchedule = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.regular.payment.cron", "");
+        if (syncSchedule.equals("")) {
+            return;
+        }
+        try {
+            JobDetail job = new JobDetail("RegularPayment", Scheduler.DEFAULT_GROUP, RegularPaymentSubscriptionService.RegularPaymentServiceJob.class);
+            SchedulerFactory sfb = new StdSchedulerFactory();
+            Scheduler scheduler = sfb.getScheduler();
+            if (!syncSchedule.equals("")) {
+                CronTrigger trigger = new CronTrigger("RegularPayment", Scheduler.DEFAULT_GROUP);
+                trigger.setCronExpression(syncSchedule);
+                if (scheduler.getTrigger("RegularPayment", Scheduler.DEFAULT_GROUP) != null) {
+                    scheduler.deleteJob("RegularPayment", Scheduler.DEFAULT_GROUP);
+                }
+                scheduler.scheduleJob(job, trigger);
+            }
+            scheduler.start();
+        } catch(Exception e) {
+            logger.error("Failed to schedule revise 2.0 service job:", e);
+        }
+    }
+
+    public static class RegularPaymentServiceJob implements Job {
+        @Override
+        public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            try {
+                ((RegularPaymentSubscriptionService)RuntimeContext.getAppContext().getBean("regularPaymentSubscriptionService")).checkClientBalances(null);
+            } catch (Exception e) {
+                logger.error("Failed to send data to AIS Contingent:", e);
+            }
+        }
     }
 
     public void notifyClientsAboutExpiredSubscriptions() {

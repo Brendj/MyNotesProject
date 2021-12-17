@@ -84,7 +84,7 @@ public class GostTimeStampVerificationProvider implements TimeStampVerificationP
      * @throws NoSuchProviderException
      */
     public GostTimeStampVerificationProvider(CertificateValidationProvider
-        certificateValidationProvider, String digestProvider) throws NoSuchProviderException {
+                                                     certificateValidationProvider, String digestProvider) throws NoSuchProviderException {
 
         this.certificateValidationProvider = certificateValidationProvider;
         this.messageDigestProvider = digestProvider;
@@ -98,7 +98,7 @@ public class GostTimeStampVerificationProvider implements TimeStampVerificationP
     }
 
     public Date verifyToken(byte[] timeStampToken, byte[] tsDigestInput)
-        throws TimeStampTokenVerificationException {
+            throws TimeStampTokenVerificationException {
 
         TimeStampToken tsToken;
         ASN1InputStream tsaCertStream;
@@ -133,7 +133,7 @@ public class GostTimeStampVerificationProvider implements TimeStampVerificationP
                     final X509CertSelector selector = x509CertSelectorConverter.getCertSelector(signerId);
 
                     final ValidationData validationData = certificateValidationProvider.validate(
-                        selector, tsToken.getTimeStampInfo().getGenTime(), tsTokenInfo);
+                            selector, tsToken.getTimeStampInfo().getGenTime(), tsTokenInfo);
 
                     tsaCert = validationData.getCerts().get(0);
                     break;
@@ -144,7 +144,7 @@ public class GostTimeStampVerificationProvider implements TimeStampVerificationP
                 X509Certificate cert = x509CertificateConverter.getCertificate(certHolder);
 
                 final X509Certificate certImpl = (X509Certificate) CertificateFactory.getInstance("X.509")
-                    .generateCertificate(new ByteArrayInputStream(cert.getEncoded()));
+                        .generateCertificate(new ByteArrayInputStream(cert.getEncoded()));
 
                 tsTokenInfo.add(certImpl);
             }
@@ -173,10 +173,10 @@ public class GostTimeStampVerificationProvider implements TimeStampVerificationP
         try {
 
             final String digestAlgOid = GostXAdESUtility.
-                digestUri2Digest(tsTokenInfo.getMessageImprintAlgOID());
+                    digestUri2Digest(tsTokenInfo.getMessageImprintAlgOID());
 
             final MessageDigest messageDigest = MessageDigest.
-                getInstance(digestAlgOid, messageDigestProvider);
+                    getInstance(digestAlgOid, messageDigestProvider);
 
             if(!Arrays.equals(messageDigest.digest(tsDigestInput), tsTokenInfo.getMessageImprintDigest())) {
                 throw new TimeStampTokenDigestException();

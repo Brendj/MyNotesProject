@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientGroupMigrationHistory" table="CF_ClientGroup_MigrationHistory">
+        <id name="idOfGroupClientMigration" column="idOfGroupClientMigration" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient" not-null="true"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"/>
+
+        <property name="registrationDate" column="RegistrationDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+
+        <property name="oldGroupId" column="oldGroupId" type="long"/>
+        <property name="oldGroupName" column="oldGroupName" type="string"/>
+        <property name="newGroupId" column="newGroupId" type="long"/>
+        <property name="newGroupName" column="newGroupName" type="string"/>
+        <property name="comment" column="comment" type="string"/>
+    </class>
+</hibernate-mapping>
+
+

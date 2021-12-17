@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j">
+
+<h:form id="directorMenuForm" styleClass="borderless-form" eventsQueue="directorFormEventsQueue">
+    <rich:panelMenu id="directorMenu" styleClass="main-menu" expandSingle="true"
+                    disabledGroupClass="main-menu-disabled-group" disabledItemClass="main-menu-disabled-item"
+                    groupClass="main-menu-group" itemClass="main-menu-item" hoveredGroupClass="main-menu-hovered-group"
+                    hoveredItemClass="main-menu-hovered-item" topGroupClass="main-menu-top-group"
+                    topItemClass="main-menu-top-item" iconCollapsedGroup="triangle" iconExpandedGroup="triangleDown"
+                    iconItem="none" mode="ajax">
+        <rich:panelMenuGroup id="directorGroupMenu" label="Личный кабинет директора" expanded="true">
+            <rich:panelMenuItem id="directorUseCardsMenuItem" label="Использование электронных носителей"
+                                action="#{directorPage.showUseCardsPage}" render="workspaceForm" />
+            <rich:panelMenuItem id="directorDiscountFoodMenuItem" label="Предоставление льготного питания"
+                                action="#{directorPage.showDirectorDiscountFoodPage}" render="workspaceForm" />
+            <rich:panelMenuItem id="directorStaffAttendanceMenuItem" label="Посещаемость сотрудников" binding="#{directorPage.directorStaffAttendancePage.mainMenuComponent}"
+                                action="#{directorPage.showDirectorStaffAttendancePage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="directorStudentAttendanceMenuItem" label="Посещаемость обучающихся" binding="#{directorPage.directorStudentAttendancePage.mainMenuComponent}"
+                                action="#{directorPage.showDirectorStudentAttendancePage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="directorFinanceMenuItem" label="Финансовые и количественные показатели платного питания" binding="#{directorPage.directorFinancePage.mainMenuComponent}"
+                                action="#{directorPage.showDirectorFinancePage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="directorLogout" label="Выход" action="#{directorPage.logout}" reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+    </rich:panelMenu>
+</h:form>
+</html>

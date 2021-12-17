@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianHistory;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 
 import java.util.List;
@@ -16,5 +17,5 @@ public interface ImportClientRegisterService {
     RegistryChangeError getRegistryChangeError(Long idOfRegistryChangeError);
 
     List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation,
-            String groupName, ClientsMobileHistory clientsMobileHistory) throws Exception;
+            String groupName, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception;
 }

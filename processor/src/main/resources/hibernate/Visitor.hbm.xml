@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Visitor" table="CF_Visitors">
+        <id name="idOfVisitor" column="IdOfVisitor" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="IdOfPerson"
+                     not-null="true" fetch="select"/>
+
+        <property name="visitorType" column="VisitorType" type="integer"/>
+        <!--<property name="VisitorType" column="VisitorType">-->
+            <!--<type name="org.hibernate.type.EnumType">-->
+                <!--<param name="enumClass">ru.axetta.ecafe.processor.core.persistence.VisitorType</param>-->
+                <!--<param name="type">4</param> &lt;!&ndash; http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER &ndash;&gt;-->
+            <!--</type>-->
+        <!--</property>-->
+
+        <!-- Информация по паспорту -->
+        <property name="passportNumber" column="PassportNumber" type="string"/>
+        <property name="passportDate" column="PassportDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <!-- Информация по водительскому удостоверению -->
+        <property name="driverLicenceNumber" column="DriverLicenceNumber" type="string"/>
+        <property name="driverLicenceDate" column="DriverLicenceDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <!-- Информация по военному билету -->
+        <property name="warTicketNumber" column="WarTicketNumber" type="string"/>
+        <property name="warTicketDate" column="WarTicketDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleted" column="IsDeleted" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+
+        <!-- Информация по новому документу -->
+        <property name="freeDocName" column="FreeDocName" type="string"/>
+        <property name="freeDocNumber" column="FreeDocNumber" type="string"/>
+        <property name="freeDocDate" column="FreeDocDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <set name="cards" inverse="true" cascade="all">
+            <key column="IdOfVisitor"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CardTemp"/>
+        </set>
+
+        <set name="cardsInternal" inverse="true" cascade="all">
+            <key column="IdOfVisitor"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
+        </set>
+
+        <property name="position" column="position" type="string"/>
+
+    </class>
+</hibernate-mapping>

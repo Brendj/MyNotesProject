@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Client" table="CF_Clients" optimistic-lock="version">
+        <!--<cache usage="transactional"/>-->
+        <id name="idOfClient" column="IdOfClient" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">CF_Clients_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <version name="version" column="Version" type="long"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
+                     not-null="true"/>
+        <property name="idOfClientGroup" column="IdOfClientGroup" type="long"/>
+        <property name="clientRegistryVersion" column="ClientRegistryVersion" type="long" not-null="true"/>
+        <many-to-one name="clientGroup" class="ru.axetta.ecafe.processor.core.persistence.ClientGroup" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfClientGroup"/>
+        </many-to-one>
+        <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="IdOfPerson"
+                     not-null="true" fetch="select"/>
+        <many-to-one name="contractPerson" class="ru.axetta.ecafe.processor.core.persistence.Person"
+                     column="IdOfContractPerson" not-null="true" fetch="select"/>
+        <many-to-one name="vendor" class="ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor"
+                     column="idofvendor"/>
+        <property name="flags" column="Flags" type="integer" not-null="true"/>
+        <property name="address" column="Address" type="string" length="128" not-null="true"/>
+        <property name="phone" column="Phone" type="string" length="32"/>
+        <property name="mobile" column="Mobile" type="string" length="32"/>
+        <property name="middleGroup" column="MiddleGroup" type="string" length="64"/>
+        <property name="fax" column="Fax" type="string" length="32"/>
+        <property name="email" column="Email" type="string" length="128"/>
+        <property name="notifyViaEmail" column="NotifyViaEmail"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="notifyViaSMS" column="NotifyViaSMS" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="notifyViaPUSH" column="NotifyViaPUSH" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="dontShowToExternal" column="DontShowToExternal"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="useLastEEModeForPlan" column="UseLastEEModeForPlan"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="false"/>
+        <property name="canConfirmGroupPayment" column="CanConfirmGroupPayment"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="confirmVisualRecognition" column="ConfirmVisualRecognition"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <!--property name="image" column="Image" type="blob"/-->
+        <property name="remarks" column="Remarks" type="string" length="1024"/>
+        <property name="updateTime" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true"/>
+        <property name="contractId" column="contractId" type="long" not-null="true"/>
+        <property name="contractTime" column="ContractDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true"/>
+        <property name="contractState" column="ContractState" type="integer" not-null="true"/>
+        <property name="cypheredPassword" column="Password" type="string" length="128" not-null="true"/>
+        <property name="payForSMS" column="PayForSMS" type="integer" not-null="true"/>
+        <property name="freePayMaxCount" column="FreePayMaxCount" type="integer"/>
+        <property name="freePayCount" column="FreePayCount" type="integer" not-null="true"/>
+        <property name="lastFreePayTime" column="LastFreePayTime"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="discountMode" column="DiscountMode" type="integer" not-null="true"/>
+        <property name="specialMenu" column="specialMenu"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="false"/>
+        <property name="balance" column="Balance" type="long" not-null="true" update="false"/>
+
+        <property name="subBalance1" column="SubBalance1" type="long" not-null="true" update="false"/>
+        <property name="ssoid" column="SSOID" type="string" length="50"/>
+
+        <property name="gender" column="Gender" type="int"/>
+        <property name="birthDate" column="BirthDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+
+        <property name="ageTypeGroup" column="AgeTypeGroup" type="string" length="128"/>
+
+        <property name="limit" column="Limits" type="long" not-null="true"/>
+        <property name="expenditureLimit" column="ExpenditureLimit" type="long" not-null="true"/>
+        <property name="lastDiscountsUpdate" column="LastDiscountsUpdate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="disablePlanCreationDate" column="DisablePlanCreationDate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="disablePlanEndDate" column="DisablePlanEndDate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="san" column="San" type="string" length="14" not-null="false"/>
+        <property name="externalId" column="ExternalId" type="long" not-null="false"/>
+        <property name="clientGUID" column="ClientGUID" type="string" length="40" not-null="false"/>
+        <property name="meshGUID" column="meshguid" type="string" length="36"/>
+        <property name="passportNumber" column="PassportNumber" type="string" length="20" not-null="false"/>
+        <property name="passportSeries" column="PassportSeries" type="string" length="20" not-null="false"/>
+        <property name="balanceToNotify" column="BalanceToNotify" type="long" not-null="false"/>
+        <property name="lastConfirmMobile" column="LastConfirmMobile"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdFrom" column="CreatedFrom">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType</param>
+            </type>
+        </property>
+        <property name="createdFromDesc" column="CreatedFromDesc" type="string" length="128" not-null="false"/>
+        <property name="hasActiveSmartWatch" column="hasActiveSmartWatch"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="iacRegId" column="iacregid" type="string" length="40"/>
+        <property name="multiCardMode" column="multiCardMode"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+
+        <property name="parallel" column="parallel" type="string" length="255"/>
+        <property name="userOP" column="userop" type="java.lang.Boolean"/>
+
+        <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting"/>
+        </set>
+        <set name="cardsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
+        </set>
+        <set name="callsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Call"/>
+        </set>
+        <set name="notificationsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Notification"/>
+        </set>
+        <set name="clientPaymentOrdersInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder"/>
+        </set>
+        <set name="diaryValuesInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryValue"/>
+        </set>
+        <set name="ordersInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order"/>
+        </set>
+        <set name="clientSmsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientSms"/>
+        </set>
+        <set name="contragentClientAccountsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ContragentClientAccount"/>
+        </set>
+        <set name="transactionsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"/>
+        </set>
+
+        <set name="enterEventsInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.EnterEvent"/>
+        </set>
+
+        <set name="categoriesInternal" table="CF_Clients_CategoryDiscounts" cascade="all">
+            <key column="IdOfClient"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount"
+                          column="IdOfCategoryDiscount"/>
+        </set>
+
+        <set name="categoriesDSZNInternal" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo"/>
+        </set>
+
+        <set name="clientAnswerByQuestionary" inverse="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary"/>
+        </set>
+
+        <set name="clientMigration" lazy="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientMigration"/>
+        </set>
+
+        <set name="prohibitionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfClient"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition"/>
+        </set>
+
+        <set name="goodComplaintBookInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfClient"/>
+            </key>
+            <one-to-many
+                    class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook"/>
+        </set>
+
+        <set name="libVisitInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfClient"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit"/>
+        </set>
+
+        <set name="circulationInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfClient"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation"/>
+        </set>
+    </class>
+</hibernate-mapping>
+
+

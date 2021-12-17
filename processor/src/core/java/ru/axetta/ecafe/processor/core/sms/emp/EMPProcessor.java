@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientsMobileHistory;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalProcess;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.apache.commons.lang.StringUtils;
@@ -137,10 +138,10 @@ public class EMPProcessor {
 
     public EMPStatistics recalculateEMPClientsCount() {
         EMPStatistics statistics = loadEMPStatistics();
-        long notBinded = DAOService.getInstance().getNotBindedEMPClientsCount();
-        long waitBind = DAOService.getInstance().getBindWaitingEMPClients();
-        long binded = DAOService.getInstance().getBindedEMPClientsCount();
-        long errors = DAOService.getInstance().getBindEMPErrorsCount();
+        long notBinded = DAOReadonlyService.getInstance().getNotBindedEMPClientsCount();
+        long waitBind = DAOReadonlyService.getInstance().getBindWaitingEMPClients();
+        long binded = DAOReadonlyService.getInstance().getBindedEMPClientsCount();
+        long errors = DAOReadonlyService.getInstance().getBindEMPErrorsCount();
         statistics.setNotBindedCount(notBinded);
         statistics.setWaitBindingCount(waitBind);
         statistics.setBindedCount(binded);
@@ -178,7 +179,7 @@ public class EMPProcessor {
         String synchDate = "[Привязка клиентов ИСПП к ЕМП " + date + "]: ";
 
         //  Загрузка клиентов для связки
-        List<ru.axetta.ecafe.processor.core.persistence.Client> notBindedClients = DAOService.getInstance()
+        List<ru.axetta.ecafe.processor.core.persistence.Client> notBindedClients = DAOReadonlyService.getInstance()
                 .getNotBindedEMPClients(getConfigPackageSize());
         /*notBindedClients.clear();                                                 //!! TEST ONLY
         notBindedClients.add(DAOService.getInstance().findClientById(585664L));     //!! TEST ONLY*/
@@ -299,7 +300,7 @@ public class EMPProcessor {
                 }
             }
             if (!StringUtils.isBlank(ruleId) && NumberUtils.isNumber(ruleId) && StringUtils.isBlank(newMsisdn) && StringUtils.isBlank(oldMsisdn)) {
-                ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance()
+                ru.axetta.ecafe.processor.core.persistence.Client client = DAOReadonlyService.getInstance()
                         .getClientByContractId(NumberUtils.toLong(ruleId));
                 if (client != null) {
                     if(client.getMobile() == null || StringUtils.isBlank(client.getMobile())) {
@@ -337,7 +338,7 @@ public class EMPProcessor {
     private void updateByMobile(String mobile, String ruleId, String synchDate, StringBuilder logStr, String newSsoid,
             String newEmail, String newNotifyViaEmail, String newNotifyViaSMS, String newNotifyViaPUSH, String oldMsisdn,
             ClientsMobileHistory clientsMobileHistory) {
-        List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(oldMsisdn != null ? oldMsisdn : mobile);
+        List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(oldMsisdn != null ? oldMsisdn : mobile);
         if (clients.size() > 0) {
             String idsList = getClientIdsAsString(clients);
             log(synchDate + "Поступили изменения из ЕМП {SSOID: " + newSsoid + "}, {№ Контракта: " + ruleId +
@@ -458,7 +459,7 @@ public class EMPProcessor {
             return false;
         }
         if (response.getErrorCode() != 0) {
-            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(client.getMobile());
             String idsList = getClientIdsAsString(clients);
             String newSsoid = String.format("E:[%s]", response.getErrorCode());
             log(synchDate + "Произошла ошибка при попытке поиска клиента в ЕМП с телефоном [SSOID: " + client.getMobile() +
@@ -509,7 +510,7 @@ public class EMPProcessor {
         }
         if (newSsoid==null) newSsoid = SSOID_REGISTERED_AND_WAITING_FOR_DATA; // из ЕМП может прийти SSOID = null
 
-        List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+        List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(client.getMobile());
         String idsList = getClientIdsAsString(clients);
         log(synchDate + "С телефоном [" + client.getMobile() + "] в ИС ПП найдено " + clients.size()
                 + " клиентов [" + idsList + "]. Для полученного списка клиентов будут обновлены параметры: {Email: " + newEmail
@@ -548,7 +549,7 @@ public class EMPProcessor {
             return true;
         }
         if (response.getErrorCode() != 0) {
-            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(client.getMobile());
             String idsList = getClientIdsAsString(clients);
             String newSsoid = String.format("E:[%s]", response.getErrorCode());
             log(synchDate + "Произошла ошибка при попытке поиска клиента в ЕМП с телефоном [SSOID: " + client.getMobile() +
@@ -638,7 +639,7 @@ public class EMPProcessor {
         AddEntriesRequest request = buildAddEntryParams(client);
         AddEntriesResponse response = storage.addEntries(request);
         if (response.getErrorCode() != 0) {
-            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(client.getMobile());
             String idsList = getClientIdsAsString(clients);
             String newSsoid = String.format("E:[%s]", response.getErrorCode());
             log(synchDate + "Произошла ошибка при попытке добавления клиента в ЕМП с телефоном [" + client.getMobile() +
@@ -649,7 +650,7 @@ public class EMPProcessor {
         }
 
         if (response.getResult().getAffected().intValue() > 0) {
-            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(client.getMobile());
             String idsList = getClientIdsAsString(clients);
             log(synchDate + "Запрос выполнен, найдено " + clients.size() + " клиентов с телефоном " + client.getMobile() +
                 " [" + idsList + "] установлено {SSOID: " + SSOID_REGISTERED_AND_WAITING_FOR_DATA + "}");
@@ -660,7 +661,7 @@ public class EMPProcessor {
         }
 
         log(synchDate + "Не удалось зарегистрировать клиента [" + client.getIdOfClient() + "] " + client.getMobile() + ", либо клиент уже зарегистрирован в ЕМП");
-        List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+        List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(client.getMobile());
         String idsList = getClientIdsAsString(clients);
         log(synchDate + "Всем клиентам (" + clients.size() + ") с телефоном [" + client.getMobile() + "] [" + idsList +
                 "] будут обновлены следующие параметры: {SSOID: " + SSOID_FAILED_TO_REGISTER + "}");
@@ -830,7 +831,7 @@ public class EMPProcessor {
     @Async
     public void updateNotificationParams(Long contractId) {
         log("Получен запрос на изменение способа уведомления клиента с № контракта " + contractId);
-        Client client = DAOService.getInstance().getClientByContractId(contractId);
+        Client client = DAOReadonlyService.getInstance().getClientByContractId(contractId);
         //Client client = ClientReadOnlyRepository.getInstance().findByContractId(contractId);
         if (client != null){
             updateNotificationParams(client);

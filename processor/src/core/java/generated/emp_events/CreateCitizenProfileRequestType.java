@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Запрос создания профиля пользователя
+ *
  * 
  * <p>Java class for createCitizenProfileRequest_Type complex type.
  * 

@@ -4,6 +4,17 @@
 
 package ru.axetta.ecafe.processor.web;
 
+import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.config.LimitFilterParams;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -14,18 +25,9 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncCollector;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
-import org.apache.commons.lang.CharEncoding;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,6 +54,11 @@ import java.util.zip.GZIPOutputStream;
  * Date: 21.07.2009
  * Time: 16:02:24
  */
+@WebServlet(
+        name = "SyncServlet",
+        description = "Sync with school ARMs",
+        urlPatterns = {"/sync"}
+)
 public class SyncServlet extends HttpServlet {
 
     private static final String CONTENT_TYPE = "text/xml", CONTENT_TYPE_GZIPPED= "application/octet-stream";
@@ -60,13 +67,13 @@ public class SyncServlet extends HttpServlet {
     private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
     private static final HashSet<Long> fullSyncsInProgress = new HashSet<Long>();
     private static final HashSet<Long> accIncSyncsInProgress = new HashSet<Long>();
-    private static final List<String[]> restrictedFullSyncPeriods =
-            getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
+    private static List<String[]> restrictedFullSyncPeriods;
     private static final AtomicLong threadCounter = new AtomicLong();
-    public static final int MAX_SYNCS = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
-    public static final int permitsTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
-    public static final int permitsAccIncTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT);
-    private static final Semaphore permitsForSync = new Semaphore(MAX_SYNCS, true);
+    public static int MAX_SYNCS;
+    public static int permitsTimeout;
+    public static int permitsAccIncTimeout;
+    private static Boolean initComplete = false;
+    private static Semaphore permitsForSync;
     private final static ThreadLocal<Boolean> currentSyncWasGranted = new ThreadLocal<Boolean>(){
         @Override protected Boolean initialValue() { return false; }
     };
@@ -76,7 +83,21 @@ public class SyncServlet extends HttpServlet {
         public Document document;
     }
 
+    private void initOnFirstRequest() {
+        synchronized (initComplete) {
+            if (initComplete) return;
+            restrictedFullSyncPeriods =
+                    getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
+            MAX_SYNCS = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
+            permitsTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
+            permitsAccIncTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT);
+            permitsForSync = new Semaphore(MAX_SYNCS, true);
+            initComplete = true;
+        }
+    }
+
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        initOnFirstRequest();
         RuntimeContext runtimeContext = null;
         Long syncTime = new Date().getTime();
         SyncCollector.registerSyncStart(syncTime);
@@ -123,7 +144,7 @@ public class SyncServlet extends HttpServlet {
             if (syncType==SyncType.TYPE_FULL && isRestrictedFullSyncPeriod()) {
                 String message = String.format("Full sync not allowed in this time, idOfOrg=%d", idOfOrg);
                 logger.error(message);
-                response.addHeader("Retry-After", String.valueOf(LimitFilter.RETRY_AFTER));
+                response.addHeader("Retry-After", String.valueOf(LimitFilter.getLimitFilterParams().getSyncRetryAfter()));
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }
@@ -227,7 +248,7 @@ public class SyncServlet extends HttpServlet {
 
 
             //  Daily logging for sync request
-            syncLogger.registerSyncRequestInDb(idOfOrg, idOfSync);
+            syncLogger.queueSyncRequestAsync(idOfOrg, idOfSync);
 
 
             // Parse XML request
@@ -355,7 +376,7 @@ public class SyncServlet extends HttpServlet {
             // Start data model transaction
             persistenceTransaction = persistenceSession.beginTransaction();
             // Find given org
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
             if (null == org) {
                 final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
                 logger.error(message);

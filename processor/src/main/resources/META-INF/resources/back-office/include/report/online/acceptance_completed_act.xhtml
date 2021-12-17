@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:panelGrid>
+    <!--@elvariable id="acceptanceOfCompletedWorksActPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AcceptanceOfCompletedWorksActPage"-->
+    <h:panelGrid id="acceptanceOfCompletedWorksActPanelGrid" binding="#{acceptanceOfCompletedWorksActPage.pageComponent}"
+                 styleClass="borderless-grid">
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+
+            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{acceptanceOfCompletedWorksActPage.filter}" readonly="true"
+                             styleClass="input-text long-field" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+            <rich:calendar value="#{acceptanceOfCompletedWorksActPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDateCalendar,acceptanceOfCompletedWorksActPanel"
+                             listener="#{acceptanceOfCompletedWorksActPage.onReportPeriodChanged}" />
+            </rich:calendar>
+
+            <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+            <h:selectOneMenu id="endDatePeriodSelect" value="#{acceptanceOfCompletedWorksActPage.periodTypeMenu.periodType}"
+                             styleClass="input-text" style="width: 250px;">
+                <f:converter converterId="periodTypeConverter" />
+                <f:selectItems value="#{acceptanceOfCompletedWorksActPage.periodTypeMenu.items}" />
+                <a4j:ajax event="change" render="endDateCalendar,acceptanceOfCompletedWorksActPanel"
+                             listener="#{acceptanceOfCompletedWorksActPage.onReportPeriodChanged}" />
+            </h:selectOneMenu>
+            <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+            <rich:calendar id="endDateCalendar" value="#{acceptanceOfCompletedWorksActPage.endDate}"
+                           datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:ajax event="change" render="endDatePeriodSelect,acceptanceOfCompletedWorksActPanel"
+                             listener="#{acceptanceOfCompletedWorksActPage.onEndDateSpecified}" />
+            </rich:calendar>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="false" value="Сформировать Акт по юр.лицу (весь образовательный комплекс)" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{acceptanceOfCompletedWorksActPage.showAllOrgs}"
+                                     styleClass="output-text">
+            </h:selectBooleanCheckbox>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Тип питания" styleClass="output-text" />
+            <h:selectOneMenu id="typeList" value="#{acceptanceOfCompletedWorksActPage.type}" style="width: 200px">
+                <f:selectItems value="#{acceptanceOfCompletedWorksActPage.types}" />
+            </h:selectOneMenu>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать документ" action="#{acceptanceOfCompletedWorksActPage.buildReportHTML}"
+                               render="acceptanceOfCompletedWorksActPanel" styleClass="command-button"/>
+            <h:commandButton value="Выгрузить в Word" actionListener="#{acceptanceOfCompletedWorksActPage.showWordList}"
+                             styleClass="command-button" />
+            <a4j:commandButton value="Очистить" action="#{acceptanceOfCompletedWorksActPage.clear}"
+                               render="acceptanceOfCompletedWorksActPanelGrid" styleClass="command-button"/>
+        </h:panelGrid>
+
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <h:panelGrid styleClass="borderless-grid" id="acceptanceOfCompletedWorksActPanel"
+                     columnClasses="center-aligned-column">
+            <!-- не показывать пустую таблицу -->
+            <h:panelGrid rendered="${acceptanceOfCompletedWorksActPage.htmlReport!=null &amp;&amp; not empty acceptanceOfCompletedWorksActPage.htmlReport}">
+                <h:outputText escape="false" value="#{acceptanceOfCompletedWorksActPage.htmlReport}" />
+            </h:panelGrid>
+        </h:panelGrid>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
+    </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

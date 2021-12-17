@@ -11,8 +11,8 @@ package ru.axetta.ecafe.processor.web.partner.library;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
+import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -23,18 +23,18 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Enumeration;
 
 @Path(value = "")
 @Controller
-public class LibraryController {
+@ApplicationPath("/ispp/library")
+public class LibraryController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(LibraryController.class);
     public static final String KEY_FOR_LIBRARY = "ecafe.processor.library.key";

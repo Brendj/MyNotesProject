@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Menu" table="CF_Menu">
+        <id name="idOfMenu" column="IdOfMenu" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">CF_Menu_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     update="false"/>
+        <property name="menuDate" column="MenuDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="menuSource" column="MenuSource" type="int" not-null="true" update="false"/>
+        <property name="flags" column="Flags" type="int" not-null="true" update="true"/>
+        <property name="detailsHashCode" column="DetailsHashCode" type="int" not-null="true" update="true"/>
+        <set name="menuDetailsInternal" inverse="true" cascade="all">
+            <key column="IdOfMenu"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.MenuDetail"/>
+        </set>
+    </class>
+</hibernate-mapping>
+
+

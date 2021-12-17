@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.axetta.ecafe.processor.config.LimitFilterParams;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.utils.SyncCollector;
@@ -21,14 +23,14 @@ import java.util.Date;
  */
 public class LimitFilter implements Filter {
 
-    private final int limit = RuntimeContext.getInstance()
-            .getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);//150; // FILTER LIMIT -> OPTION_REQUEST_SYNC_LIMITS moved to SyncServlet
-    public static int RETRY_AFTER = RuntimeContext.getInstance()
-            .getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
     public static final int SC_TOO_MANY_REQUESTS = 429;
     private final String SC_TOO_MANY_REQUESTS_MESSAGE = "Too Many Requests";
     private int count;
     private Object lock = new Object();
+
+    public static LimitFilterParams getLimitFilterParams() {
+        return (LimitFilterParams)RuntimeContext.getAppContext().getBean("limitFilterParams");
+    }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -43,7 +45,7 @@ public class LimitFilter implements Filter {
         try {
             boolean ok;
             synchronized (lock) {
-                ok = count++ < limit;
+                ok = count++ < getLimitFilterParams().getSyncLimit();
             }
             if (ok) {
                 // let the request through and process as usual
@@ -55,7 +57,7 @@ public class LimitFilter implements Filter {
                 String remoteAddress = request.getRemoteAddr();
                 String errorMsg =
                         ((Integer) SC_TOO_MANY_REQUESTS).toString() + ": " + SC_TOO_MANY_REQUESTS_MESSAGE + ": "
-                                + "Retry-After - " + String.valueOf(RETRY_AFTER) + ", Remote address : "
+                                + "Retry-After - " + String.valueOf(getLimitFilterParams().getSyncRetryAfter()) + ", Remote address : "
                                 + remoteAddress;
 
                 SyncCollector.setErrMessage(syncTime, errorMsg);
@@ -63,7 +65,7 @@ public class LimitFilter implements Filter {
 
                 HttpServletResponse httpServletResponse = (HttpServletResponse) response;
                 httpServletResponse.setContentType("text/html");
-                httpServletResponse.addHeader("Retry-After", String.valueOf(RETRY_AFTER));
+                httpServletResponse.addHeader("Retry-After", String.valueOf(getLimitFilterParams().getSyncRetryAfter()));
                 httpServletResponse.sendError(SC_TOO_MANY_REQUESTS, SC_TOO_MANY_REQUESTS_MESSAGE);
             }
         } finally {

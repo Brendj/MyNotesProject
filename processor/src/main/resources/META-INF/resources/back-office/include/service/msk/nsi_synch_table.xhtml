@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="NSIOrgRegistrySynchOverviewPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistrySynchOverviewPage"-->
+
+<h:panelGrid>
+    <h:panelGrid id="NSIOrgRegistrySynchOverviewPage" styleClass="borderless-grid" >
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Фильтр по названию организации" styleClass="output-text"/>
+            <h:inputText value="#{NSIOrgRegistrySynchOverviewPage.orgFilter}" size="64" styleClass="input-text"/>
+
+            <h:outputText value="Только не синхронизированные последние 2 дня" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchOverviewPage.showOnlyUnsynch}"/>
+
+            <h:outputText escape="true" value="Тип сверки" styleClass="output-text"/>
+            <h:selectOneMenu id="regionsList" value="#{NSIOrgRegistrySynchOverviewPage.typeFilter}"
+                             style="width:325px;">
+                <f:selectItems value="#{NSIOrgRegistrySynchOverviewPage.types}"/>
+            </h:selectOneMenu>
+        </h:panelGrid>
+
+        <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchOverviewPage.doUpdate}"
+                           render="workspaceTogglePanel" styleClass="command-button"/>
+        <h:commandButton value="Генерировать в Excel" actionListener="#{NSIOrgRegistrySynchOverviewPage.doGenerateXLS}"
+                         styleClass="command-button"/>
+
+        <rich:dataTable value="#{NSIOrgRegistrySynchOverviewPage.list}" var="e" footerClass="data-table-footer"
+                        width="350px" rows="20" id="table" rowKeyVar="row">
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="№"/>
+                </f:facet>
+                <h:outputText value="#{row+1}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="ID"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.idoforg}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Наименование"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.orgName}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Всего"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.total}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Добавленных"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.created}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Измененных"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.modified}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Перемещенных"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.moved}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Удаленных"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.deleted}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Дата сверки"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.date}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Тип сверки"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{e.type}"
+                              style="#{(e.outOfSynch) ? 'color:red' : ''}"/>
+            </rich:column>
+
+            <f:facet name="footer">
+                <rich:dataScroller for="table" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                    </f:facet>
+                </rich:dataScroller>
+            </f:facet>
+        </rich:dataTable>
+
+    </h:panelGrid>
+</h:panelGrid>
+</ui:composition>

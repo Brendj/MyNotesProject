@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +43,11 @@ import java.util.Enumeration;
 /**
  * Принимает callback от Chronopay и увеличивает баланс у клиента
  */
+@WebServlet(
+        name = "ChronopayPaymentServlet",
+        description = "ChronopayPaymentServlet",
+        urlPatterns = {"/chronopay/acceptpay"}
+)
 public class ChronopayPaymentServlet extends HttpServlet {
 
     /**

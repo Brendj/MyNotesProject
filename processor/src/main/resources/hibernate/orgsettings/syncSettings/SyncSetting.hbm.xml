@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting" table="cf_SyncSettings">
+        <id name="idOfSyncSetting" column="idOfSyncSetting" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"/>
+        <property name="everySecond" column="everySecond" type="integer" />
+        <property name="limitStartHour" column="limitStartHour" type="integer"/>
+        <property name="limitEndHour" column="limitEndHour" type="integer"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="deleteState" column="deleteState" type="boolean" not-null="true"/>
+        <property name="monday" column="monday" type="boolean" not-null="true"/>
+        <property name="tuesday" column="tuesday" type="boolean" not-null="true"/>
+        <property name="wednesday" column="wednesday" type="boolean" not-null="true"/>
+        <property name="thursday" column="thursday" type="boolean" not-null="true"/>
+        <property name="friday" column="friday" type="boolean" not-null="true"/>
+        <property name="saturday" column="saturday" type="boolean" not-null="true"/>
+        <property name="sunday" column="sunday" type="boolean" not-null="true"/>
+        <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+        <property name="concreteTime" column="concreteTime" type="string"/>
+
+        <property name="contentType" column="contentType" not-null="true">
+            <type name="org.hibernate.type.EnumType" >
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType</param>
+                <param name="useNamed">true</param>
+                <param name="type">12</param>
+            </type>
+        </property>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" table="cf_wt_menu_groups">
+        <id name="id">
+            <column name="id" sql-type="long"/>
+        </id>
+
+        <property name="name">
+            <column name="name" sql-type="varchar(64)" length="64"/>
+        </property>
+
+        <property name="createDate">
+            <column name="createDate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+
+        <property name="lastUpdate">
+            <column name="lastUpdate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+
+        <many-to-one name="createdUser" class="ru.axetta.ecafe.processor.core.persistence.User">
+            <column name="create_by_id"/>
+        </many-to-one>
+
+        <many-to-one name="updatedUser" class="ru.axetta.ecafe.processor.core.persistence.User">
+            <column name="update_by_id"/>
+        </many-to-one>
+
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
+
+        <property name="deleteState">
+            <column name="deleteState" sql-type="integer"/>
+        </property>
+
+        <many-to-one name="contragent" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+            <column name="idOfContragent"/>
+        </many-to-one>
+
+        <set name="menuGroupMenus" inverse="true" cascade="all" lazy="true">
+            <key>
+                <column name="id"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

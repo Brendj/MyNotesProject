@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.FrontController.FrontControllerException;
@@ -228,8 +228,12 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         User user = MainPage.getSessionInstance().getCurrentUser();
         clientsMobileHistory.setUser(user);
         clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+		ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason("Проведена сверка");
         List<RegistryChangeCallback> result = proceedRegistryChangeItemInternal(list,
-                RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, clientsMobileHistory);
+                RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
         doUpdate();
         if (result != null) {
             //  Ошибка
@@ -249,8 +253,8 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
     }
 
     protected List<RegistryChangeCallback> proceedRegistryChangeItemInternal(List<Long> list, int operation,
-            boolean fullNameValidation, ClientsMobileHistory clientsMobileHistory) {
-        return frontControllerProcessor.proceedRegistryChangeItem(list, operation, fullNameValidation, clientsMobileHistory);
+            boolean fullNameValidation, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) {
+        return frontControllerProcessor.proceedRegistryChangeItem(list, operation, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
     }
 
     public void doRefresh() {
@@ -814,7 +818,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
 
         public String getMigrateFromOrgName() {
             return operation == ImportRegisterMSKClientsService.MOVE_OPERATION ?
-                        DAOService.getInstance().findOrById(getIdOfMigrateOrgFrom()).getOfficialName() : "";
+                    DAOReadonlyService.getInstance().findOrById(getIdOfMigrateOrgFrom()).getOfficialName() : "";
         }
 
         public boolean isApplied() {

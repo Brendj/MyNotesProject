@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
@@ -20,7 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
@@ -238,7 +238,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     }
 
     public void createUser(Session session) throws Exception {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
         try {
@@ -310,13 +310,14 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setFunctions(functionSelector.getSupplierReportFunctions(session));
                 user.setRoleName(role.toString());
                 if (contragentItems.isEmpty()) {
-                    this.printError("Список контрагенотов пуст.");
+                    this.printError("Список контрагентов пуст.");
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
             if(role != null && (role.equals(User.DefaultRole.CLASSROOM_TEACHER)
                     || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT)
-                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR))) {
+                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR)
+                    || role.equals(User.DefaultRole.WA_ADMIN_SECURITY))) {
                 user.setRoleName(role.toString());
                 if(user.getClient() == null){
                     this.printError("Выберите клиента.");
@@ -438,10 +439,26 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         return role.equals(User.DefaultRole.DEFAULT);
     }
 
+    public Boolean getIsDefaultOrAdmin(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.DEFAULT) || role.equals(User.DefaultRole.ADMIN);
+    }
+
     public Boolean getIsSecurityAdmin(){
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.ADMIN_SECURITY);
+    }
+
+    public Boolean getIsWebArmUser(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.WA_ADMIN_SECURITY);
+    }
+
+    public Boolean getRenderContragent() {
+        return !getIsSecurityAdmin() && !getIsWebArmUser() && !getIsDirector();
     }
 
     public Boolean getIsSupplier() {

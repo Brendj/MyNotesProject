@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.repository;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -40,7 +41,7 @@ public class RepositoryReportsRenamePage extends BasicWorkspacePage {
     }
 
     public SelectItem[] getRuleNameItems() {
-        List<String> l = DAOService.getInstance().getCurrentRepositoryReportNames();
+        List<String> l = DAOReadonlyService.getInstance().getCurrentRepositoryReportNames();
         SelectItem[] items = new SelectItem[l.size()];
         int n=0;
         for (String s : l) {
@@ -51,7 +52,7 @@ public class RepositoryReportsRenamePage extends BasicWorkspacePage {
     }
 
     public SelectItem[] getAllowedRuleNameItems() {
-        List<String> l = DAOService.getInstance().getReportHandleRuleNames();
+        List<String> l = DAOReadonlyService.getInstance().getReportHandleRuleNames();
         SelectItem[] items = new SelectItem[l.size()];
         int n=0;
         for (String s : l) {

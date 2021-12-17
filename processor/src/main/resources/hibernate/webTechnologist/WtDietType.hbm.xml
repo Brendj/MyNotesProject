@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType" table="cf_wt_diet_type">
+        <id name="idOfDietType">
+            <column name="idOfDietType" sql-type="long"/>
+        </id>
+        <property name="description">
+            <column name="description" sql-type="varchar(255)" length="255"/>
+        </property>
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
+
+        <set name="wtComplexes" inverse="true" cascade="all" lazy="true">
+            <key>
+                <column name="idOfComplex"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

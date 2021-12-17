@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreorderJournalReport" pageWidth="1301" pageHeight="100000" columnWidth="1261" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8c825af0-a087-4437-8ca9-1415cdd91f95">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="5.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="111"/>
 	<parameter name="startDate" class="java.util.Date" isForPrompting="false"/>
 	<parameter name="endDate" class="java.util.Date" isForPrompting="false"/>
 	<field name="number" class="java.lang.Integer"/>
@@ -27,13 +27,10 @@
 		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></variableExpression>
 		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></initialValueExpression>
 	</variable>
-	<background>
-		<band splitType="Stretch"/>
-	</background>
 	<title>
-		<band height="57" splitType="Stretch">
+		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="25" width="1260" height="20" uuid="e52ac3a9-f7e8-4f84-94be-615179187426"/>
+				<reportElement x="0" y="0" width="1260" height="20" uuid="e52ac3a9-f7e8-4f84-94be-615179187426"/>
 				<textElement textAlignment="Center">
 					<font size="14"/>
 				</textElement>
@@ -217,7 +214,7 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch">
+		<band height="20" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="36" height="20" uuid="ca2a7c03-1a1f-44c6-b7a2-d60e88efbacb"/>
 				<box>
@@ -376,13 +373,4 @@
 			</textField>
 		</band>
 	</detail>
-	<columnFooter>
-		<band height="45" splitType="Stretch"/>
-	</columnFooter>
-	<pageFooter>
-		<band height="54" splitType="Stretch"/>
-	</pageFooter>
-	<summary>
-		<band height="42" splitType="Stretch"/>
-	</summary>
 </jasperReport>

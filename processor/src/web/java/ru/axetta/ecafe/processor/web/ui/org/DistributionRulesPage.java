@@ -42,7 +42,7 @@ public class DistributionRulesPage extends BasicWorkspacePage {
     }
 
     @Transactional
-    private void reload() throws Exception{
+    public void reload() throws Exception{
         String restiction = "";
         try {
             Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();

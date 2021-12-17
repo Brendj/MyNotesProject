@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.director;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.statistic.DirectorDiscountFoodReport;
 import ru.axetta.ecafe.processor.core.statistic.DirectorLoader;
@@ -24,6 +26,8 @@ import java.util.*;
 /**
  * Created by i.semenov on 19.09.2017.
  */
+@Component
+@Scope("session")
 public class DirectorDiscountFoodPage extends OnlineReportPage {
     private Logger logger = LoggerFactory.getLogger(DirectorDiscountFoodPage.class);
     private DirectorDiscountFoodReport directorDiscountFoodReport;

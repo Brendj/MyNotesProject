@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditPayment())-->
+    <!--      { out.println("Недостаточно прав для просмотра страницы"); return; } %>-->
+
+    <h:panelGrid rendered="#{!mainPage.isEligibleToEditPayment()}">
+        <h:outputText escape="true" styleClass="output-text"
+                      value="Недостаточно прав для просмотра страницы">
+        </h:outputText>
+    </h:panelGrid>
+
+    <!-- Панель редактирования платежа между контрагнетами -->
+    <h:panelGrid id="settlementEditPanel"
+                 styleClass="borderless-grid" columns="2" rendered="#{mainPage.isEligibleToEditPayment()}">
+        <h:outputText escape="true" value="Плательщик" styleClass="output-text"/>
+        <h:inputText value="#{mainPage.settlementEditPage.contragentPayer.contragentName}" readonly="true"
+                     styleClass="input-text"/>
+        <h:outputText escape="true" value="Получатель" styleClass="output-text"/>
+        <h:inputText value="#{mainPage.settlementEditPage.contragentReceiver.contragentName}" readonly="true"
+                     styleClass="input-text"/>
+        <h:outputText escape="true" value="Дата платежа" styleClass="output-text"/>
+        <rich:calendar value="#{mainPage.settlementEditPage.paymentDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter"
+                       inputClass="input-text" showWeeksBar="false"/>
+        <h:outputText escape="true" value="Платежный документ" styleClass="output-text"/>
+        <h:inputText value="#{mainPage.settlementEditPage.paymentDoc}" maxlength="32" styleClass="input-text"/>
+        <h:outputText escape="true" value="Сумма" styleClass="output-text"/>
+        <h:inputText value="#{mainPage.settlementEditPage.summa}" maxlength="32" styleClass="input-text"/>
+    </h:panelGrid>
+    <h:panelGrid columns="4" styleClass="borderless-grid">
+        <a4j:commandButton value="Сохранить" action="#{mainPage.updateSettlement}"
+                           render="mainMenu, workspaceTogglePanel"
+                           styleClass="command-button"/>
+        <a4j:commandButton value="Восстановить" action="#{mainPage.showSettlementEditPage}"
+                           render="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</ui:composition>

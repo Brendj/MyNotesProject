@@ -4,33 +4,30 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.*;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem;
-import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.DishMenuWebArmPPItem;
+import ru.axetta.ecafe.processor.core.report.DishMenuWebArmPPReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
-import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.webTechnolog.ComplexListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +36,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.*;
 
@@ -70,7 +66,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     private List<ComplexItem> complexItems = new ArrayList<ComplexItem>();
 
     public SelectItem[] getTypesOfFood() {
-        List<WtGroupItem> wtGroupItems = DAOService.getInstance().getMapTypeFoods();
+        List<WtGroupItem> wtGroupItems = DAOReadonlyService.getInstance().getMapTypeFoods();
         SelectItem[] items = new SelectItem[wtGroupItems.size() + 1];
         items[0] = new SelectItem(-1, "Не выбрано");
         int n = 1;
@@ -82,7 +78,7 @@ public class DishMenuWebARMPPReportPage extends OnlineReportPage
     }
 
     public SelectItem[] getAgeGroup() {
-        List<WtAgeGroupItem> ageGroups = DAOService.getInstance().getAgeGroups();
+        List<WtAgeGroupItem> ageGroups = DAOReadonlyService.getInstance().getAgeGroups();
         SelectItem[] items = new SelectItem[ageGroups.size() + 1];
         items[0] = new SelectItem(-1, "Не выбрано");
         int n = 1;

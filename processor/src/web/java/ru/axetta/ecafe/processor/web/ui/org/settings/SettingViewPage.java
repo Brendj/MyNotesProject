@@ -4,15 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,7 +41,7 @@ public class SettingViewPage extends BasicWorkspacePage {
 
     public Object edit() throws Exception {
         selectedSettingsGroupPage.setSelectSettings(setting);
-        Org currentOrg = daoService.getOrg(setting.getOrgOwner());
+        Org currentOrg = DAOReadonlyService.getInstance().findOrg(setting.getOrgOwner());
         selectedSettingsGroupPage.setCurrentOrg(new OrgItem(currentOrg));
         selectedSettingsGroupPage.onShow();
         MainPage.getSessionInstance().setCurrentWorkspacePage(settingEditPage);

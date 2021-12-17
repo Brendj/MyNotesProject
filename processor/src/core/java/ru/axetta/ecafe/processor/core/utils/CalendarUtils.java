@@ -96,6 +96,17 @@ public class CalendarUtils {
         }
     }
 
+    public static XMLGregorianCalendar toXmlDateTimeWithTimezoneOffset(Date date) {
+        try {
+            GregorianCalendar c = new GregorianCalendar();
+            c.setTime(date);
+            XMLGregorianCalendar xc = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
+                    RuntimeContext.getInstance().getDefaultLocalTimeZone(null).getRawOffset()/60000);
+            xc.setTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
+            return xc;
+        }catch (Exception ignore) { return null;}
+    }
+
     public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) {
         SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
         try {safeDateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));} catch (Exception ignore) {}
@@ -113,6 +124,10 @@ public class CalendarUtils {
         return ((createDate.before(generateEndTime) && createDate.after(generateBeginTime)) ||
                 // сравниваем только начальную
                 (createDate.getTime() == generateBeginTime.getTime()));
+    }
+
+    public static boolean betweenMoreMonth(Date startDate, Date endDate) {
+        return 31 < getDifferenceInDays(startDate, endDate);
     }
 
     public static String toStringFullDateTimeWithUTCTimeZone(Date dateTime) throws ParseException {
@@ -190,6 +205,18 @@ public class CalendarUtils {
         c.setTime(date);
         startOfDay(c);
         return c.getTime();
+    }
+
+    public static Date dateInUTC() {
+        GregorianCalendar c = new GregorianCalendar();
+        int offset = c.get(Calendar.ZONE_OFFSET);
+        return new Date(new Date().getTime()+offset);
+    }
+
+    public static Date convertdateInUTC(Date date) {
+        GregorianCalendar c = new GregorianCalendar();
+        int offset = c.get(Calendar.ZONE_OFFSET);
+        return new Date(date.getTime()-offset);
     }
 
     public static Date truncateToDayOfMonthAndAddDay(Date date) {
@@ -313,6 +340,10 @@ public class CalendarUtils {
     }
     public static String dateShortToString(Date date) {
         SimpleDateFormat safeDateShortFormat = dateShortFormat.get();
+        return safeDateShortFormat.format(date);
+    }
+    public static String dateShotFullYearToString(Date date) {
+        SimpleDateFormat safeDateShortFormat = dateShortFormatFullYear.get();
         return safeDateShortFormat.format(date);
     }
     /**
@@ -640,7 +671,7 @@ public class CalendarUtils {
         return result;
     }
 
-    public static List<Long> daysBetweenInMillis( Date start, Date end ){
+    public static List<Long> daysBetweenInMillis( Date start, Date end){
         Date startLocal = (Date) start.clone();
         int i = getDifferenceInDays(startLocal,end);
         List<Long> result = new ArrayList<Long>();
@@ -651,18 +682,22 @@ public class CalendarUtils {
         return result;
     }
 
-    public static List<String> datesBetween(Date start, Date end) {
+    public static List<String> datesBetween(Date start, Date end, int format) {
         List<String> dates = new ArrayList<String>();
 
         Calendar c = Calendar.getInstance();
         c.setTime(start);
         while (c.getTimeInMillis() < end.getTime() ){
-            dates.add(dateShortToString(c.getTime()));
+            if (format == 1)
+                dates.add(dateShortToString(c.getTime()));
+            if (format == 2)
+                dates.add(dateShotFullYearToString(c.getTime()));
             c.add(Calendar.DATE, 1);
         }
 
         return dates;
     }
+
 
     public static Integer getMonthNumb(Date date) {
         Calendar c = Calendar.getInstance();

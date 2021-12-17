@@ -329,6 +329,7 @@ public class ClientFilter {
         clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
         clientBalanceCondition = ClientBalanceFilter.NO_CONDITION;
         clientGroupId = ClientGroupMenu.CLIENT_ALL;
+        email = null;
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws HibernateException {
@@ -343,8 +344,7 @@ public class ClientFilter {
 
     public List retrieveClients(Session session) throws Exception {
         Criteria criteria = session.createCriteria(Client.class);
-        criteria.createAlias("person","p", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("contractPerson","cp", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("person","p", JoinType.INNER_JOIN);
         addRestrictions(session, criteria);
         return criteria.list();
     }

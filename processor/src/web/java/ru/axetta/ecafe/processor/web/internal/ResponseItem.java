@@ -35,6 +35,9 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_REQUIRED_FIELDS_NOT_FILLED = 430;
     public static final int ERROR_ORGANIZATION_NOT_FOUND = 440;
     public static final int ERROR_CLIENT_ALREADY_EXIST = 450;
+    public static final int ERROR_GUARDIAN = 460;
+    public static final int ERROR_LONG_CARDNO_MATCH_ORG = 470;
+    public static final int ERROR_LONG_CARDNO_NOT_UNIQUE = 480;
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";
     public static final String ERROR_WRONG_KEY_MESSAGE_EMIAS = "Доступ запрещен";
@@ -63,6 +66,10 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_CLIENT_ALREADY_EXIST_MESSAGE = "Клиент уже существует";
     public static final String ERROR_INCORRECT_FORMAT = "Некорректный формат";
     public static final String USED_IN_ANOTHER_ORG = "Используется в другой ОО";
+    public static final String ERROR_GUARDIAN_MESSAGE = "Связка опекуна с опекаемым не найдена";
+    public static final String ERROR_LONG_CARDNO_MATCH_ORG_MESSAGE = "Не указан longCardNo для организации "
+            + "с включенным флагом использования длинных UID";
+    public static final String ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE = "Длинный UID карты уже существует";
     public int code;
     public String message;
 

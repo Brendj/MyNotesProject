@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!--@elvariable id="ordersMonitoringReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.OrdersMonitoringReportPage"-->
+    <h:panelGrid styleClass="borderless-grid">
+        <h:panelGrid columns="2">
+            <h:outputText value="Статус: " styleClass="output-text"/>
+            <h:panelGroup>
+                <a4j:commandLink render="mainMenu, workspaceForm" value="#{ordersMonitoringReportPage.missingCount}"
+                                 action="#{mainPage.showGoodRequestReportPage}" styleClass="command-link">
+                    <f:setPropertyActionListener value="-1" target="#{mainPage.goodRequestReportPage.requestsFilter}"/>
+                    <f:setPropertyActionListener value="2" target="#{mainPage.goodRequestReportPage.daysLimit}"/>
+                    <f:setPropertyActionListener value="#{ordersMonitoringReportPage.missingStartDate}"
+                                                 target="#{mainPage.goodRequestReportPage.startDate}"/>
+                </a4j:commandLink>
+                <h:outputText value=" / #{ordersMonitoringReportPage.overallCount}" styleClass="output-text"/>
+            </h:panelGroup>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Обновить отчет" action="#{ordersMonitoringReportPage.doGenerateReport}"
+                               render="mainMenu, workspaceTogglePanel, ordersMonitoringReportTable"
+                               styleClass="command-button" status="statusSyncReportGenerateStatus"/>
+            <a4j:status id="statusSyncReportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages"/>
+    </h:panelGrid>
+</ui:composition>

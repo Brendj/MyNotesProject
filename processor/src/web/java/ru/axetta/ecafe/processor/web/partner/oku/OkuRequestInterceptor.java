@@ -4,13 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.partner.oku;
 
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.web.partner.oku.dataflow.ErrorResult;
 
 import org.jboss.resteasy.annotations.interception.Precedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -28,7 +28,7 @@ import java.util.List;
 @Precedence("SECURITY")
 public class OkuRequestInterceptor implements PreProcessInterceptor {
     @Override
-    public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure,
+    public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method) throws Failure,
             WebApplicationException {
 
         String apiKey = RuntimeContext.getInstance().getOkuApiKey();

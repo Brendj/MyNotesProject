@@ -53,7 +53,7 @@ public class CardsUidUpdateService {
                                         card.getIssueTime(), card.getExternalId());
                                 cardManager.createCard(client.getIdOfClient(), newCardNo, card.getCardType(),
                                         CardState.ISSUED.getValue(), CalendarUtils.addYear(new Date(), 10),
-                                        Card.ISSUED_LIFE_STATE, null, new Date(), newCardPrintedNo);
+                                        Card.ISSUED_LIFE_STATE, null, new Date(), newCardPrintedNo, null);
                             }
                         }
                     } catch (NumberFormatException e) {
@@ -70,7 +70,7 @@ public class CardsUidUpdateService {
         }
     }
 
-    public void processClientDoubles(Long idOfOrg) throws Exception {
+    public void processClientDoubles(Long idOfOrg, ClientGuardianHistory clientGuardianHistory) throws Exception {
         logger.info("Start processClientDoubles");
         Session session = null;
         Transaction transaction = null;
@@ -106,7 +106,7 @@ public class CardsUidUpdateService {
                 }
                 ClientManager.createClientGroupMigrationHistory(session, fromClient, fromClient.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
                         ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), BALANCE_TRANSFER + " Пользователь: "
-                                + user.getUserName());
+                                + user.getUserName(), clientGuardianHistory);
                 fromClient.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
                 fromClient.setClientRegistryVersion(clientRegistryVersion);

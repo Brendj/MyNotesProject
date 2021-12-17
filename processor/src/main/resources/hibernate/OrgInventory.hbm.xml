@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2017. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.OrgInventory" table="CF_Org_inventory">
+        <id name="idOfOrgInventory" column="IdOfOrgInventory" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOfOrg" column="IdOfOrg" type="long" not-null="true"/>
+        <property name="amount_armadmin" column="amount_armadmin" type="integer" length="2"/>
+        <property name="amount_armcontroller" column="amount_armcontroller" type="integer" length="2"/>
+        <property name="amount_turnstiles" column="amount_turnstiles" type="integer" length="2"/>
+        <property name="amount_elocks" column="amount_elocks" type="integer" length="2"/>
+        <property name="amount_ereaders" column="amount_ereaders" type="integer" length="2"/>
+        <property name="amount_infopanels" column="amount_infopanels" type="integer" length="2"/>
+        <property name="amount_armoperator" column="amount_armoperator" type="integer" length="2"/>
+        <property name="amount_infokiosks" column="amount_infokiosks" type="integer" length="2"/>
+        <property name="amount_armlibrary" column="amount_armlibrary" type="integer" length="2"/>
+    </class>
+</hibernate-mapping>
+
+

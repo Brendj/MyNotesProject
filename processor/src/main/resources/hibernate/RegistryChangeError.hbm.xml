@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.RegistryChangeError" table="CF_RegistryChange_Errors" optimistic-lock="version">
+        <id name="idOfRegistryChangeError" column="IdOfRegistryChangeError" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <property name="idOfOrg" column="IdOfOrg" type="long" not-null="true"/>
+        <property name="revisionCreateDate" column="RevisionCreateDate" type="long" not-null="true"/>
+        <property name="error" column="Error" type="string" length="255" not-null="true"/>
+        <property name="errorDetail" column="ErrorDetails" type="string" length="255" not-null="true"/>
+        <property name="comment" column="Comment" type="string" length="255" not-null="true"/>
+        <property name="commentAuthor" column="CommentAuthor" type="string" length="64" not-null="true"/>
+        <property name="createDate" column="CreateDate" type="long" not-null="true"/>
+        <property name="commentCreateDate" column="CommentCreateDate" type="long" not-null="true"/>
+    </class>
+</hibernate-mapping>
+
+

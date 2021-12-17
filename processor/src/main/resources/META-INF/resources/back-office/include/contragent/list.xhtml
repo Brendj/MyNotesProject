@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <!-- Панель просмотра списка контрагентов -->
+    <h:panelGrid id="orgListPanelGrid"
+                 styleClass="borderless-grid">
+
+        <!-- Панель фильтрации контрагенотов:
+        фильтр производиться по идентификатору и по имени контрагенвтов -->
+
+        <rich:togglePanel label="Фильтр (#{mainPage.contragentListPage.contragentFilter.status})" switchType="client"
+                          eventsQueue="mainFormEventQueue" opened="false" headerClass="filter-panel-header">
+
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                <h:outputText escape="true" value="Наименование контрагента" styleClass="output-text"/>
+
+                <h:inputText value="#{mainPage.contragentListPage.contragentFilter.officialName}" maxlength="64"
+                             styleClass="input-text"/>
+
+            </h:panelGrid>
+
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+
+                <a4j:commandButton value="Применить" action="#{mainPage.updateContragentListPage}"
+                                   render="workspaceTogglePanel" styleClass="command-button"/>
+
+                <a4j:commandButton value="Очистить" action="#{mainPage.updateContragentListPage}"
+                                   render="workspaceTogglePanel &amp;&amp; contragentTable" styleClass="command-button">
+                    <f:setPropertyActionListener value=""
+                                                 target="#{mainPage.contragentListPage.contragentFilter.officialName}" />
+                </a4j:commandButton>
+            </h:panelGrid>
+
+        </rich:togglePanel>
+
+        <!-- Список контрагентов -->
+        <rich:dataTable id="contragentTable" value="#{mainPage.contragentListPage.items}" var="item" rows="20"
+                        columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
+                        footerClass="data-table-footer">
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Идентификатор"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.idOfContragent}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Контрагент"/>
+                </f:facet>
+                <a4j:commandLink render="mainMenu, workspaceForm" value="#{item.contragentName}"
+                                 action="#{mainPage.showContragentViewPage}"
+                                 styleClass="command-link">
+                    <f:setPropertyActionListener value="#{item.idOfContragent}"
+                                                 target="#{mainPage.selectedIdOfContragent}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Последние изменения"/>
+                </f:facet>
+                <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter"
+                              styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditContragents}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Редактировать"/>
+                </f:facet>
+                <a4j:commandLink render="mainMenu, workspaceForm" action="#{mainPage.showContragentEditPage}"
+                                 styleClass="command-link">
+                    <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
+                    <f:setPropertyActionListener value="#{item.idOfContragent}"
+                                                 target="#{mainPage.selectedIdOfContragent}"/>
+                </a4j:commandLink>
+            </rich:column>
+            <f:facet name="footer">
+                <rich:dataScroller for="contragentTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                    </f:facet>
+                </rich:dataScroller>
+            </f:facet>
+        </rich:dataTable>
+    </h:panelGrid>
+</ui:composition>

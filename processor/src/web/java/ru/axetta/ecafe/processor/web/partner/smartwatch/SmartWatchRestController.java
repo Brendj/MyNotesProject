@@ -5,9 +5,11 @@
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
@@ -32,7 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
@@ -45,7 +49,8 @@ import static java.lang.Math.abs;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Controller
 @DependsOn("runtimeContext")
-public class SmartWatchRestController {
+@ApplicationPath("/smartwatch/")
+public class SmartWatchRestController extends Application {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
     private boolean debug;
@@ -73,8 +78,8 @@ public class SmartWatchRestController {
             OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal()
     ), ", ");
 
-
-    public SmartWatchRestController(){
+    @PostConstruct
+    public void init(){
         this.cardState = new HashMap<Integer, String>();
         for (CardState state : CardState.values()) {
             this.cardState.put(state.getValue(), state.getDescription());
@@ -105,7 +110,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkAndConvertPhone(mobilePhone);
-            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+            List<Client> clients = DAOReadonlyService.getInstance().getClientsListByMobilePhone(mobilePhone);
             if(clients.isEmpty()){
                 throw new IllegalArgumentException("No clients found for this mobilePhone number: " + mobilePhone);
             }
@@ -288,7 +293,7 @@ public class SmartWatchRestController {
 
             mobilePhone = inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
 
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
+            Client parent = DAOReadonlyService.getInstance().getClientByMobilePhone(mobilePhone);
             Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid,
                     CARD_TYPE_SMARTWATCH);
             if(card == null){
@@ -1286,7 +1291,7 @@ public class SmartWatchRestController {
     }
 
     private List<Client> findParentsByMobile(String mobilePhone) throws Exception {
-        List<Client> parents = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+        List<Client> parents = DAOReadonlyService.getInstance().getClientsListByMobilePhone(mobilePhone);
         if(parents.isEmpty()){
             throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                     + ", but passed the TokenValidator");

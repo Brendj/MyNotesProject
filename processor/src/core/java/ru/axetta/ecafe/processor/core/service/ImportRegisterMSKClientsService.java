@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -114,7 +115,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     public StringBuffer runSyncForOrg(long idOfOrg, boolean performChanges) throws Exception {
-        Org org = DAOService.getInstance().getOrg(idOfOrg);
+        Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
         if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
             throw new Exception(
                     "У организации " + idOfOrg + " не установлен тэг синхронизации с Реестрами: " + ORG_SYNC_MARKER);
@@ -550,7 +551,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                 }
                 try {
-                    if (cl != null && !cl.getOrg().getOrgIdFromNsi().equals(pupil.orgId) && !crossFound) {
+                    if (cl != null && (cl.getOrg().getOrgIdFromNsi() == null || !cl.getOrg().getOrgIdFromNsi().equals(pupil.orgId)) && !crossFound) {
                         log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
                                 cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " + emptyIfNull(
                                 cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " + emptyIfNull(
@@ -1188,7 +1189,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         private String nsiInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
-            Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
+            Set<Org> orgs = DAOReadonlyService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
             orgGuids = new HashSet<String>();
             guidInfo = "";
             orgNSIIds = new HashSet<>();
@@ -1207,7 +1208,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             for (Org o : orgs) {
                 if (o.getOrgIdFromNsi() == null) continue;
                 if (nsiInfo.length() > 0) nsiInfo += ", ";
-                nsiInfo += o.getOrgNumberInName() + ": " + o.getOrgIdFromNsi().toString();
+                nsiInfo += o.getIdOfOrg() + ": " + o.getOrgIdFromNsi().toString();
                 orgNSIIds.add(o.getOrgIdFromNsi().toString());
                 orgNSIIdsLong.add(o.getOrgIdFromNsi());
             }
@@ -1255,7 +1256,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
     @Override
     public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList,
-            boolean fullNameValidation, String groupName, ClientsMobileHistory clientsMobileHistory) throws Exception {
+            boolean fullNameValidation, String groupName, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
         List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
@@ -1287,7 +1288,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 try {
                     session = RuntimeContext.getInstance().createPersistenceSession();
                     transaction = session.beginTransaction();
-                    applyRegistryChange(session, change, fullNameValidation, iterator, groupName, clientsMobileHistory);
+                    applyRegistryChange(session, change, fullNameValidation, iterator, groupName, clientsMobileHistory, clientGuardianHistory);
                     transaction.commit();
                     transaction = null;
                     session.close();
@@ -1302,7 +1303,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 } catch (Exception e) {
                     logger.error("Error ClientRegistryChange: ", e);
                     setChangeError(change.getIdOfRegistryChange(), e);
-                    result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), e.getMessage()));
+                    result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), getErrorMessage(e)));
                 } finally {
                     HibernateUtils.rollback(transaction, logger);
                     HibernateUtils.close(session, logger);
@@ -1313,6 +1314,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private String getErrorMessage(Throwable error){
+        return (error.getCause() == null ? error.getMessage() : (getErrorMessage(error.getCause())));
     }
 
     protected List<RegistryChange> getRegistryChangeList(Session session, List<Long> changesList) {
@@ -1334,7 +1339,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     public void applyRegistryChange(Session session, RegistryChange change, boolean fullNameValidation,
-            Iterator<Long> iterator, String groupName, ClientsMobileHistory clientsMobileHistory) throws Exception {
+            Iterator<Long> iterator, String groupName, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Client afterSaveClient = null;
 
             Client dbClient = null;
@@ -1399,7 +1404,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         deletedClientGroup = DAOUtils.createClientGroup(session, change.getIdOfOrg(),
                                 ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     }
-                    addClientMigrationLeaving(session, dbClient, change);
+                    addClientMigrationLeaving(session, dbClient, change, clientGuardianHistory);
 
                     dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     if(dbClient.getMeshGUID() == null && StringUtils.isNotEmpty(change.getMeshGUID())){
@@ -1488,7 +1493,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                             if((change.getGroupName() == null && change.getGroupNameFrom() == null) ||
                                     (change.getGroupName() != null && change.getGroupNameFrom() != null &&
                                     !change.getGroupName().equals(change.getGroupNameFrom()))) {
-                                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change);
+                                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change, clientGuardianHistory);
                                 //если орг. не меняется, добавляем историю миграции внутри ОО
                             }
                         }
@@ -1555,7 +1560,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     private static void saveClientGuardians(RegistryChange registryChange, Iterator<Long> iterator,
-            ClientsMobileHistory clientsMobileHistory) throws Exception {
+            ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
 
             Set<RegistryChangeGuardians> registryChangeGuardiansSet = registryChange.getRegistryChangeGuardiansSet();
 
@@ -1570,7 +1575,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     Long clientId = registryChange.getIdOfClient();
                     Long idOfOrg = registryChange.getIdOfOrg();
                     ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId, iterator,
-                            clientsMobileHistory);
+                            clientsMobileHistory, clientGuardianHistory);
                     transaction.commit();
                     transaction = null;
                 } finally {
@@ -1587,16 +1592,19 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     //@Transactional
-    private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
+    private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change,
+            ClientGuardianHistory clientGuardianHistory){
         ClientManager.createClientGroupMigrationHistory(session, client, org, client.getIdOfClientGroup(),
-                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
+                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())),
+                clientGuardianHistory);
     }
 
-    private void addClientMigrationLeaving(Session session, Client client, RegistryChange change) throws Exception {
+    private void addClientMigrationLeaving(Session session, Client client, RegistryChange change,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
         Org org = (Org)session.get(Org.class, change.getIdOfOrg());
         ClientManager.createClientGroupMigrationHistory(session, client, org, ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
                 ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY
-                        .concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
+                        .concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())), clientGuardianHistory);
     }
 
     public void setChangeError(long idOfRegistryChange, Exception e) throws Exception {
@@ -1643,7 +1651,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     @Transactional
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
             boolean manualCheckout) throws Exception {
-        if (!DAOService.getInstance().isSverkaEnabled()) {
+        if (!DAOReadonlyService.getInstance().isSverkaEnabled()) {
             throw new ServiceTemporaryUnavailableException("Service temporary unavailable");
         } else if(!RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3)
                 && !ImportRegisterNSI3ServiceKafkaWrapper.workWithKafka()){

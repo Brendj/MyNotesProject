@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CodeMSP;
 import ru.axetta.ecafe.processor.core.persistence.CodeMspAgeTypeGroup;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -61,8 +61,8 @@ public class CodeMSPCreatePage extends BasicWorkspacePage {
     private List<SelectItem> loadDiscounts() {
         List<SelectItem> result = new LinkedList<>();
         try {
-            List<CategoryDiscount> categoryDiscountList = DAOService
-                    .getInstance().getCategoryDiscountListNotDeletedTypeDiscount();
+            List<CategoryDiscount> categoryDiscountList = DAOReadonlyService.getInstance()
+                    .getCategoryDiscountListNotDeletedTypeDiscount();
 
             result.add(new SelectItem(null, ""));
 

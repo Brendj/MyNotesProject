@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+
+    <style type="text/css">
+        .extdt-innerdiv {
+            overflow-x: auto !important;
+            overflow-y: hidden;
+        }
+    </style>
+    <!--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.DashboardPage"-->
+    <h:panelGrid width="100%">
+        <h:panelGrid id="dashboardPanelGrid" binding="#{dashboardPage.pageComponent}" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Организация" styleClass="output-text"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{dashboardPage.filterOrgName}" readonly="true"
+                             styleClass="input-text" style="margin-right: 2px;"/>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;"/>
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="Статус" styleClass="output-text"/>
+            <h:selectOneMenu value="#{dashboardPage.orgStatus}" styleClass="output-text">
+                <f:selectItem itemValue="0" itemLabel="Не обслуживается"/>
+                <f:selectItem itemValue="1" itemLabel="Обслуживается"/>
+                <f:selectItem itemValue="2" itemLabel="Все"/>
+            </h:selectOneMenu>
+
+            <h:outputText escape="true" value="Дата:" styleClass="output-text"/>
+            <rich:calendar value="#{dashboardPage.reportDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
+
+
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif"/>
+                </f:facet>
+            </a4j:status>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+
+        <h:panelGrid width="100%" columns="1" columnClasses="center-aligned-column">
+            <rich:panelMenu  styleClass="center-aligned-column" mode="ajax" expandSingle="true"
+                             groupCollapsedLeftIcon="triangle" groupExpandedLeftIcon="triangleDown">
+
+                <rich:panelMenuGroup styleClass="center-aligned-column"
+                                     escape="true"
+                                     label="Организации (общая)">
+                    <h:panelGrid styleClass="left-aligned-column">
+                        <a4j:commandButton value="Обновить" action="#{dashboardPage.updateOrgBasicStats}"
+                                           render="orgBasicStatsTable"/>
+
+                        <rich:extendedDataTable id="orgBasicStatsTable"
+                                                value="#{dashboardPage.orgBasicStats.orgBasicStatItems}"
+                                                var="item"
+                                                rows="500"
+                                                sortMode="multi" selectionMode="single" width="1500" height="900"
+                                                footerClass="data-table-footer" noDataLabel="Данных нет">
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.idOfOrg}"
+                                         width="35px"
+                                         filterBy="#{item.idOfOrg}" filterEvent="onkeyup">
+                                <f:facet name="header">
+                                    <h:outputText value="Ид." styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.idOfOrg}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgName}"
+                                         width="60px"
+                                         filterBy="#{item.orgName}" filterEvent="onkeyup">
+                                <f:facet name="header">
+                                    <h:outputText value="Номер" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.orgNameNumber}"/>
+                            </rich:column>
+
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfChildrenClients}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Дети" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.numberOfChildrenClients}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfParentsClients}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Родители" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.numberOfParentsClients}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfNonStudentClients}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Сотруд. и др." styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.numberOfNonStudentClients}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfClientsWithoutCard}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Без карт" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.numberOfClientsWithoutCard}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfEnterEvents}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Событий проходов" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.numberOfEnterEvents}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfEnterEvents}"
+                                         width="70px">
+                                <f:facet name="header">
+                                    <h:outputText value="%У" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText
+                                        value="#{item.numberOfStudentsWithEnterEventsPercent}"><f:convertNumber
+                                        type="percent"/></h:outputText>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfEnterEvents}"
+                                         width="70px">
+                                <f:facet name="header">
+                                    <h:outputText value="%С" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText
+                                        value="#{item.numberOfEmployeesWithEnterEventsPercent}"><f:convertNumber
+                                        type="percent"/></h:outputText>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfDiscountOrders}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Льготных заказов" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.numberOfDiscountOrders}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true"
+                                         sortBy="#{item.numberOfPayOrders}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Платных заказов" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.numberOfPayOrders}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgDistrict}"
+                                         width="70px">
+                                <f:facet name="header">
+                                    <h:outputText value="Район" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.orgDistrict}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgLocation}"
+                                         width="70px">
+                                <f:facet name="header">
+                                    <h:outputText value="Локация" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.orgLocation}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgTag}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Тэги" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.orgTag}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgTag}"
+                                         width="120px">
+                                <f:facet name="header">
+                                    <h:outputText value="Летний период" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.isWorkInSummerTime}"/>
+                            </rich:column>
+                            <f:facet name="footer">
+                                <rich:dataScroller for="orgBasicStatsTable" renderIfSinglePage="false" maxPages="5"
+                                                   fastControls="hide"
+                                                   stepControls="auto" boundaryControls="hide">
+                                    <f:facet name="previous">
+                                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                                    </f:facet>
+                                    <f:facet name="next">
+                                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                                    </f:facet>
+                                </rich:dataScroller>
+                            </f:facet>
+                        </rich:extendedDataTable>
+                        <h:commandButton value="Выгрузить в CSV" action="#{dashboardPage.showOrgBasicStatsCSVList}"
+                                         styleClass="command-button"/>
+                        <br>
+                        </br>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+                <rich:panelMenuGroup styleClass="center-aligned-column" escape="true" label="Платежные системы">
+                    <h:panelGrid styleClass="left-aligned-column">
+                        <a4j:commandButton value="Обновить" action="#{dashboardPage.updatePaySysStatus}"
+                                           render="paySysStatusTable"/>
+
+                        <rich:extendedDataTable id="paySysStatusTable"
+                                                value="#{dashboardPage.psStatus.paymentSystemItemInfos}"
+                                                var="items"
+                                                rows="500" sortMode="multi" selectionMode="single" width="1500"
+                                                height="900"
+                                                footerClass="data-table-footer">
+
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{item.idOfOrg}"
+                                         width="35px"
+                                         filterBy="#{item.idOfOrg}" filterEvent="onkeyup">
+                                <f:facet name="header">
+                                    <h:outputText value="Ид." styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.idOfOrg}"/>
+                            </rich:column>
+
+                            <rich:column headerClass="column-header" sortable="true" sortBy="#{items.contragentName}"
+                                         width="200px" filterBy="#{items.contragentName}" filterEvent="onkeyup">
+                                <f:facet name="header">
+                                    <h:outputText value="Наименование" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{items.contragentName}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" width="200px">
+                                <f:facet name="header">
+                                    <h:outputText value="Посл. операция" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{items.lastOperationTime}" converter="timeMinuteConverter"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" width="200px">
+                                <f:facet name="header">
+                                    <h:outputText value="Кол-во операций/сутки" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{items.numOfOperations}"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" sortable="true" width="200px">
+                                <f:facet name="header">
+                                    <h:outputText value="Ошибки" styleClass="output-text" escape="true"/>
+                                </f:facet>
+                                <h:outputText value="#{items.error}"/>
+                            </rich:column>
+                            <f:facet name="footer">
+                                <rich:dataScroller for="paySysStatusTable" renderIfSinglePage="false" maxPages="5"
+                                                   fastControls="hide"
+                                                   stepControls="auto" boundaryControls="hide">
+                                    <f:facet name="previous">
+                                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                                    </f:facet>
+                                    <f:facet name="next">
+                                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                                    </f:facet>
+                                </rich:dataScroller>
+                            </f:facet>
+                        </rich:extendedDataTable>
+                    </h:panelGrid>
+                </rich:panelMenuGroup>
+            </rich:panelMenu>
+        </h:panelGrid>
+    </h:panelGrid>
+</ui:composition>

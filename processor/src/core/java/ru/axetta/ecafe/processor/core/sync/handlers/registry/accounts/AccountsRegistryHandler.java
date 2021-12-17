@@ -110,11 +110,11 @@ public class AccountsRegistryHandler {
 
     private List<AccountItem> getAccountItems(List<Client> clients) {
         List<Card> cards;
-        if (isNewWayAccountsRegistry()) {
-            cards = CardWritableRepository.getInstance().findAllByClientList(clients);
-        } else {
+        //if (isNewWayAccountsRegistry()) {
+        //    cards = CardWritableRepository.getInstance().findAllByClientList(clients);
+        //} else {
             cards = CardReadOnlyRepository.getInstance().findAllByClientList(clients);
-        }
+        //}
 
         List<AccountItem> result = new ArrayList<AccountItem>();
         for (Client client : clients) {
@@ -153,12 +153,12 @@ public class AccountsRegistryHandler {
 
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
-        List<Client> clientList = new ArrayList<>();
+        /*List<Client> clientList = new ArrayList<>();
         clientList.addAll(Processor.getMigrants(idOfOrg));
 
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
-        }
+        }*/
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
         /*List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrgAndDate(idOfOrgs,lastAccRegistrySyncDate);

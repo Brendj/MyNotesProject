@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" table="cf_goods">
+        <id name="globalId" column="IdOfGood" type="long">
+            <generator class="identity"/>
+        </id>
+        <!-- Begin Global params -->
+        <property name="globalVersionOnCreate" column="GlobalVersionOnCreate" type="long"/>
+        <property name="globalVersion" column="GlobalVersion" type="long"/>
+
+        <property name="deletedState" column="DeletedState" type="boolean"/>
+
+        <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
+
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+        not-null="true" update="false"/>
+        <property name="sendAll" column="SendAll">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <!-- End Global params -->
+
+        <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
+        <property name="nameOfGood" column="NameOfGood" type="string" length="512" not-null="true"/>
+        <property name="fullName" column="FullName" type="string" length="1024"/>
+
+        <property name="pathPart1" formula="split_part(FullName, '/', 1)" lazy="true" type="java.lang.String"/>
+        <property name="pathPart2" formula="split_part(FullName, '/', 2)" lazy="true" type="java.lang.String"/>
+        <property name="pathPart3" formula="split_part(FullName, '/', 3)" lazy="true" type="java.lang.String"/>
+        <property name="pathPart4" formula="split_part(FullName, '/', 4)" lazy="true" type="java.lang.String"/>
+
+        <property name="parts" formula="regexp_split_to_array(fullname, '\/')"
+                  type="ru.axetta.ecafe.processor.core.persistence.StringArrayType"/>
+
+        <property name="goodsCode" column="GoodsCode" type="string" length="32" not-null="true"/>
+        <!--<property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>-->
+        <property name="unitsScale" column="UnitsScale">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
+                <param name="type">4</param>
+            </type>
+        </property>
+        <property name="netWeight" column="NetWeight" type="long"  not-null="true"/>
+        <property name="lifeTime" column="LifeTime" type="long"/>
+        <property name="margin" column="Margin" type="long"/>
+
+        <many-to-one name="goodGroup" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
+            <column name="IdOfGoodsGroup" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="product" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product">
+            <column name="IdOfProducts" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="technologicalMap" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap">
+            <column name="IdOfTechnologicalMaps" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="basicGood" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket">
+            <column name="idOfBasicGood" not-null="false" />
+        </many-to-one>
+
+        <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
+        <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
+        <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
+
+        <set name="tradeMaterialGoodInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood" />
+        </set>
+
+        <set name="prohibitionExclusionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProhibitionExclusion" />
+        </set>
+
+        <set name="prohibitionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition" />
+        </set>
+
+        <set name="goodComplaintBookInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook" />
+        </set>
+
+        <set name="goodBasicBasketPriceInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice" />
+        </set>
+
+        <set name="wayBillPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBillPosition" />
+        </set>
+
+        <set name="internalIncomingDocumentPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition" />
+        </set>
+
+        <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition" />
+        </set>
+
+        <set name="goodRequestPositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition" />
+        </set>
+
+        <set name="actOfWayBillDifferencePositionInternal" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfGood"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfWayBillDifferencePosition" />
+        </set>
+        <property name="goodType" column="GoodType" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType</param>
+            </type>
+        </property>
+        <property name="ageGroupType" column="AgeGroup" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType</param>
+            </type>
+        </property>
+        <property name="dailySale" column="DailySale" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+    </class>
+</hibernate-mapping>

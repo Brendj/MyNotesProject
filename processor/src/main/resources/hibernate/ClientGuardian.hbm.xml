@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientGuardian" table="cf_client_guardian">
+        <id name="idOfClientGuardian" column="IdOfClientGuardian" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">cf_client_guardian_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <property name="version" column="Version" type="long"/>
+        <property name="idOfChildren" column="IdOfChildren" type="long" not-null="true"/>
+        <property name="idOfGuardian" column="IdOfGuardian" type="long" not-null="true"/>
+        <property name="guardianType" column="GuardianType" type="integer"/>
+        <property name="disabled" column="Disabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="relation" column="Relation" type="ru.axetta.ecafe.processor.core.persistence.ClientGuardianRelationSQLType" />
+        <property name="createdFrom" column="CreatedFrom">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType</param>
+            </type>
+        </property>
+        <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
+            <key column="IdOfClientGuardian" not-null="true"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting"/>
+        </set>
+        <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <many-to-one name="cardRequest" class="ru.axetta.ecafe.processor.core.persistence.CardRequest" column="IdOfCardRequest" fetch="select"/>
+        <property name="representType" column="isLegalRepresent" type="ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentSQLType"/>
+    </class>
+</hibernate-mapping>

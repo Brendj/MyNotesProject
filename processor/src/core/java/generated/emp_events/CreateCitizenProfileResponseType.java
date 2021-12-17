@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Ответа на запрос создания профиля пользователя
+ *
  * 
  * <p>Java class for createCitizenProfileResponse_Type complex type.
  * 
@@ -47,7 +47,7 @@ public class CreateCitizenProfileResponseType
     extends BaseResponseType
 {
 
-    @XmlElement(name = "return", required = true)
+    @XmlElement(name = "return", required = true, nillable = true)
     protected CreateCitizenProfileResponseType.Return _return;
 
     /**

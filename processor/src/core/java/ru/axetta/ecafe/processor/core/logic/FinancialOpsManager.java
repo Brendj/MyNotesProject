@@ -4,25 +4,24 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -31,6 +30,7 @@ import java.util.Date;
 
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class FinancialOpsManager {
 
     static Boolean useOperatorScheme = null;
@@ -191,7 +191,7 @@ public class FinancialOpsManager {
         order.setIsFromFriendlyOrg(isFromFriendlyOrg);
         order.setIdOrgPayment(idOfOrgPayment);
         if(client != null){
-            Long idOfClientGroup = DAOService.getInstance().getClientGroupByClientId(client.getIdOfClient());    //
+            Long idOfClientGroup = DAOReadonlyService.getInstance().getClientGroupByClientId(client.getIdOfClient());    //
             order.setIdOfClientGroup(idOfClientGroup);
         }
 

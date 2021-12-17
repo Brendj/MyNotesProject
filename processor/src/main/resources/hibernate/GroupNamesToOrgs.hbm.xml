@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs" table="Cf_GroupNames_To_Orgs">
+        <id name="idOfGroupNameToOrg" column="IdOfGroupNameToOrg" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOfMainOrg" column="IdOfMainOrg" type="long"/>
+        <property name="idOfOrg" column="IdOfOrg" type="long"/>
+        <property name="mainBuilding" column="MainBuilding" type="int"/>
+        <property name="groupName" column="GroupName" type="string"/>
+        <property name="version" column="Version" type="long"/>
+        <property name="parentGroupName" column="ParentGroupName" type="string"/>
+        <property name="isMiddleGroup" column="IsMiddleGroup" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="isSixDaysWorkWeek" column="IsSixDaysWorkWeek" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+    </class>
+</hibernate-mapping>

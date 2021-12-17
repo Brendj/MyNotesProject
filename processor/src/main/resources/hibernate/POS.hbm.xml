@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.POS" table="CF_POS">
+        <id name="idOfPos" column="IdOfPos" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">CF_POS_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
+                     column="IdOfContragent"
+                     not-null="true"/>
+        <property name="name" column="Name" type="string" length="128" not-null="true" />
+        <property name="description" column="Description" type="string" length="128" not-null="false" />
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" />
+        <property name="state" column="State" type="integer" not-null="false" />
+        <property name="flags" column="Flags" type="integer" not-null="false" />
+        <property name="publicKey" column="PublicKey" type="string" not-null="true" />
+        <set name="ordersInternal" inverse="true" cascade="all">
+            <key column="IdOfPos"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order" />
+        </set>
+    </class>
+</hibernate-mapping>

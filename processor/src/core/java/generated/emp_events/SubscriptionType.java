@@ -25,7 +25,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="citizenId" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *         &lt;element name="subscriptionId" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="streamId" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="settings">
+ *         &lt;element name="settings" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -36,8 +36,19 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
+ *         &lt;element name="options" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="option" type="{urn://subscription.api.emp.altarix.ru}CitizenProfileOption_Type" maxOccurs="unbounded"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="registerTime" type="{http://www.w3.org/2001/XMLSchema}date"/>
+ *         &lt;element name="registerTime" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -53,6 +64,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "subscriptionId",
     "streamId",
     "settings",
+    "options",
     "status",
     "registerTime"
 })
@@ -63,11 +75,11 @@ public class SubscriptionType {
     protected Integer citizenId;
     protected int subscriptionId;
     protected int streamId;
-    @XmlElement(required = true)
     protected SubscriptionType.Settings settings;
+    protected SubscriptionType.Options options;
     protected int status;
     @XmlElement(required = true)
-    @XmlSchemaType(name = "date")
+    @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar registerTime;
 
     /**
@@ -175,6 +187,30 @@ public class SubscriptionType {
     }
 
     /**
+     * Gets the value of the options property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SubscriptionType.Options }
+     *     
+     */
+    public SubscriptionType.Options getOptions() {
+        return options;
+    }
+
+    /**
+     * Sets the value of the options property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SubscriptionType.Options }
+     *     
+     */
+    public void setOptions(SubscriptionType.Options value) {
+        this.options = value;
+    }
+
+    /**
      * Gets the value of the status property.
      * 
      */
@@ -212,6 +248,66 @@ public class SubscriptionType {
      */
     public void setRegisterTime(XMLGregorianCalendar value) {
         this.registerTime = value;
+    }
+
+
+    /**
+     * <p>Java class for anonymous complex type.
+     * 
+     * <p>The following schema fragment specifies the expected content contained within this class.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="option" type="{urn://subscription.api.emp.altarix.ru}CitizenProfileOption_Type" maxOccurs="unbounded"/>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "option"
+    })
+    public static class Options {
+
+        @XmlElement(required = true)
+        protected List<CitizenProfileOptionType> option;
+
+        /**
+         * Gets the value of the option property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the option property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getOption().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link CitizenProfileOptionType }
+         * 
+         * 
+         */
+        public List<CitizenProfileOptionType> getOption() {
+            if (option == null) {
+                option = new ArrayList<CitizenProfileOptionType>();
+            }
+            return this.option;
+        }
+
     }
 
 

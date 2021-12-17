@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "cf_clients")
-/*@NamedEntityGraphs({
+@NamedEntityGraphs({
         @NamedEntityGraph(
                 name = "only_client"
         ),
@@ -19,17 +19,26 @@ import java.util.Objects;
                 attributeNodes = {
                         @NamedAttributeNode(
                                 value = "discounts",
-                                subgraph = "discount.categoryDiscountDTSZN"
+                                subgraph = "discountWithDTSZNAndCodeMsp"
                         )
                 },
                 subgraphs = {
                       @NamedSubgraph(
-                              name = "discount.categoryDiscountDTSZN",
-                              attributeNodes = @NamedAttributeNode("categoryDiscountDTSZN")
+                              name = "discountWithDTSZNAndCodeMsp",
+                              attributeNodes = {
+                                      @NamedAttributeNode("categoryDiscountDTSZN"),
+                                      @NamedAttributeNode(value = "codeMSPs", subgraph = "codeMSPs.ageTypeGroupList")
+                              }
+                      ),
+                      @NamedSubgraph(
+                              name = "codeMSPs.ageTypeGroupList",
+                              attributeNodes = {
+                                      @NamedAttributeNode("ageTypeGroupList")
+                              }
                       )
                 }
         )
-})*/
+})
 public class Client {
 
     @Id
@@ -42,7 +51,7 @@ public class Client {
     @Column(name = "agetypegroup")
     private String ageGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "idoforg")
     private Org org;
 

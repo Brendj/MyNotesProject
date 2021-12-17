@@ -23,15 +23,21 @@ public class SpecialDate {
     private Long version;
     private String comment;
     private Long idOfClientGroup;
+    private String staffGuid;
+    private Date armLastUpdate;
+    private Date createdDate;
+    private Date lastUpdate;
 
     public SpecialDate() {
     }
 
-    public SpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate,  Boolean isWeekend, String comment) {
+    public SpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate, Boolean isWeekend, String comment) {
         this.idOfOrg = compositeIdOfSpecialDate.getIdOfOrg();
         this.date = compositeIdOfSpecialDate.getDate();
         this.isWeekend = isWeekend;
         this.comment = comment;
+        this.createdDate = new Date();
+        this.lastUpdate = new Date();
     }
 
     /*public CompositeIdOfSpecialDate getCompositeIdOfSpecialDate() {
@@ -120,5 +126,37 @@ public class SpecialDate {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getStaffGuid() {
+        return staffGuid;
+    }
+
+    public void setStaffGuid(String staffGuid) {
+        this.staffGuid = staffGuid;
+    }
+
+    public Date getArmLastUpdate() {
+        return armLastUpdate;
+    }
+
+    public void setArmLastUpdate(Date armLastUpdate) {
+        this.armLastUpdate = armLastUpdate;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

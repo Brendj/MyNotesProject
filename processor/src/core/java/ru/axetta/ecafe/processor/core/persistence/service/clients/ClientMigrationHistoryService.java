@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.service.clients;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
@@ -47,6 +49,7 @@ public class ClientMigrationHistoryService {
         return repository.findAll(org, client);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor=Exception.class)
     public void processOrgChange() {
         if (!isOnBalanceOrDiscount()) { return; }
         logger.info("Start process Org change service");
@@ -60,7 +63,7 @@ public class ClientMigrationHistoryService {
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
             discountChange(list);
-            deleteDOUDiscounts();
+            //deleteDOUDiscounts();
         }
 
         if (isOn(NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG)) {

@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +26,11 @@ import java.util.Date;
  * Date: 18.11.16
  * Time: 10:37
  */
+@WebServlet(
+        name = "SmsServlet",
+        description = "SmsServlet",
+        urlPatterns = {"/sms-state/"}
+)
 public class SmsServlet extends HttpServlet {
     private static Logger logger = LoggerFactory.getLogger(SmsServlet.class);
 

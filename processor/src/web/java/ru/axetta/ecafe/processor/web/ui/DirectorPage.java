@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.director.*;
@@ -13,7 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.richfaces.component.html.HtmlPanelMenu;
+import org.richfaces.component.UIPanelMenu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,8 @@ import java.util.Stack;
  * To change this template use File | Settings | File Templates.
  */
 
+@Component
+@Scope("session")
 public class DirectorPage implements Serializable {
 
     Logger logger = LoggerFactory.getLogger(DirectorPage.class);
@@ -47,7 +51,7 @@ public class DirectorPage implements Serializable {
     private final DirectorFinancePage directorFinancePage = new DirectorFinancePage();
 
     private UIComponent pageComponent;
-    private HtmlPanelMenu mainMenu;
+    private UIPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
     private Stack<BasicPage> modalPages = new Stack<BasicPage>();
     private String orgFilterOfSelectOrgListSelectPage = "";
@@ -263,11 +267,11 @@ public class DirectorPage implements Serializable {
         return outcome;
     }
 
-    public HtmlPanelMenu getMainMenu() {
+    public UIPanelMenu getMainMenu() {
         return mainMenu;
     }
 
-    public void setMainMenu(HtmlPanelMenu mainMenu) {
+    public void setMainMenu(UIPanelMenu mainMenu) {
         this.mainMenu = mainMenu;
     }
 

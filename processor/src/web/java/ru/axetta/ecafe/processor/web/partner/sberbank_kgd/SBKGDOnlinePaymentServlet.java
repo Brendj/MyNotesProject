@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.web.partner.OnlinePaymentServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -23,6 +24,11 @@ import java.util.List;
  * Time: 12:53
  * To change this template use File | Settings | File Templates.
  */
+@WebServlet(
+        name = "SBKGDOnlinePaymentServlet",
+        description = "SBKGDOnlinePaymentServlet",
+        urlPatterns = {"/payment-sbkgd"}
+)
 public class SBKGDOnlinePaymentServlet extends OnlinePaymentServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(SBKGDOnlinePaymentServlet.class);

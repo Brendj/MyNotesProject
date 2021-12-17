@@ -9,11 +9,12 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.UserNotificationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA.
@@ -54,16 +56,11 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
 
     private UserNotificationType selectOrgType;
 
-    private String orgIds;
-
-    @Autowired
-    private RuntimeContext runtimeContext;
-
     @Autowired
     private DAOService daoService;
 
-    //@PersistenceContext
-    //private EntityManager entityManager;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
 
     public String getPageFilename() {
         return "user_setting";
@@ -86,26 +83,25 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         orgItemsCanceled.clear();
 
         selectOrgType = UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY;
-        Map<Long, String> orgList = daoService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
+        Map<Long, String> orgList = daoReadonlyService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
         completeOrgListSelection(orgList);
 
         selectOrgType = UserNotificationType.ORDER_STATE_CHANGE_NOTIFY;
-        Map<Long, String> orgListCanceled = daoService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
+        Map<Long, String> orgListCanceled = daoReadonlyService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
         completeOrgListSelection(orgListCanceled);
     }
 
     public User getCurrentUser() throws Exception {
         FacesContext context = FacesContext.getCurrentInstance();
         String userName = context.getExternalContext().getRemoteUser();
-        //return DAOUtils.findUser(entityManager,userName);
-        return daoService.findUserByUserName(userName);
+        return daoReadonlyService.findUserByUserName(userName);
     }
 
     public boolean updateInfoCurrentUser() throws Exception{
         boolean success=false;
         SecurityJournalAuthenticate.EventType eventType =
                 changePassword ? SecurityJournalAuthenticate.EventType.CHANGE_GRANTS : SecurityJournalAuthenticate.EventType.MODIFY_USER;
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         try {
             if(checkCurrentPassword(currPlainPassword)){
                 if(changePassword){
@@ -193,12 +189,12 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
 
     public boolean userIsSecurityAdmin() {
         if (currUser == null) return false;
-        return (currUser.getIdOfRole() == User.DefaultRole.ADMIN_SECURITY.getIdentification());
+        return (Objects.equals(currUser.getIdOfRole(), User.DefaultRole.ADMIN_SECURITY.getIdentification()));
     }
 
     public boolean userIsCardOperator() {
         if (currUser == null) return false;
-        return (currUser.getIdOfRole() == User.DefaultRole.CARD_OPERATOR.getIdentification());
+        return (Objects.equals(currUser.getIdOfRole(), User.DefaultRole.CARD_OPERATOR.getIdentification()));
     }
 
     public boolean isChangePassword() {

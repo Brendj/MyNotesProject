@@ -28,12 +28,14 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintPossibleCauses;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
 import ru.axetta.ecafe.processor.core.service.*;
+import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockUnblockService;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
@@ -101,6 +103,14 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public static boolean isOrgRoomRunning() {
         return getAppContext().containsBean("orgRoomCommonBean");
+    }
+
+    public static SessionFactory getReportsSessionFactory() {
+        return reportsSessionFactory;
+    }
+
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
     }
 
     public boolean isTestMode() {
@@ -298,8 +308,8 @@ public class RuntimeContext implements ApplicationContextAware {
     private StdPayConfig partnerStdPayConfig;
     private IntegraPartnerConfig integraPartnerConfig;
     private AcquiropaySystemConfig acquiropaySystemConfig;
-    static SessionFactory sessionFactory;
-    static SessionFactory reportsSessionFactory;
+    private static SessionFactory sessionFactory;
+    private static SessionFactory reportsSessionFactory;
     static SessionFactory externalServicesSessionFactory;
     private RegularPaymentSubscriptionService regularPaymentSubscriptionService;
     boolean criticalErrors;
@@ -311,6 +321,8 @@ public class RuntimeContext implements ApplicationContextAware {
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private DAOReadonlyService daoReadonlyService;
     @Autowired
     private DBUpdater updater;
     public final static int TYPE_S = 0, TYPE_P = 1, TYPE_B = 2;
@@ -329,7 +341,21 @@ public class RuntimeContext implements ApplicationContextAware {
             + "AAOBgQBJxDdetDvHdUrzztZoHhfJwDOGYx/bp1zNtd75RVfvM/+Gwu4AiW6CQfLB\n"
             + "qc085KjxxnQZ2Si7FoDhwJ3gCEEERs5YrA/O/Lde+kdUPT15GlZcguJHB5Jk83Ir\n"
             + "GmtI6Yxjlvzt1zcqpq4MZM3HTLdz4gibDBPGG3cd692TYkHeFg==";
+    private static String base64crt_secondary = "MIICcjCCAdugAwIBAgIJAJvboW7jEIVWMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNV\n"
+            + "BAYTAlJVMQwwCgYDVQQIDANNb3MxEzARBgNVBAoMCkl0ZWNvIEluYy4xIDAeBgNV\n"
+            + "BAMMF2xpY2Vuc2Uubm92YXlhc2hrb2xhLnJ1MB4XDTIxMDQwODE1MDkyNFoXDTQx\n"
+            + "MDQwMzE1MDkyNFowUjELMAkGA1UEBhMCUlUxDDAKBgNVBAgMA01vczETMBEGA1UE\n"
+            + "CgwKSXRlY28gSW5jLjEgMB4GA1UEAwwXbGljZW5zZS5ub3ZheWFzaGtvbGEucnUw\n"
+            + "gZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMSEgs6CH7jRO5XZW/Qre3SPaVJc\n"
+            + "uZad7VCx8TUzrR0GEXWc0//q7qhoONj30/bvY1CyZ1z+iq5CqEZ2OErrQyAWuQZo\n"
+            + "mosHO6W46Jgzf46n2IC2YVfntNPVoOUTE4E3pDRxUeLNCndcJn7V3U1mw0kFg4PQ\n"
+            + "00ZCT6U5+3dS2xfpAgMBAAGjUDBOMB0GA1UdDgQWBBRgYTy3qpYZYDq9gb9f6Ryl\n"
+            + "oZyZcDAfBgNVHSMEGDAWgBRgYTy3qpYZYDq9gb9f6RyloZyZcDAMBgNVHRMEBTAD\n"
+            + "AQH/MA0GCSqGSIb3DQEBCwUAA4GBADB7iOb6A1XyqblLTTYZ2GKfnTQj2bisstus\n"
+            + "9pAdUCAGWoI9bbDU/FIY1fOQRgurnUzn/8BkA29mRmcw1QUB0Mdu6EdzQ7EIaab0\n"
+            + "6JeD4RE4mk3493yKxzWFk7LlWhKqThgnrHIQyBTSEl8Pfu50eqpPdRNorzLHSMQm\n" + "2OK2Nyqj";
     private static X509Certificate rtCert = null; // корневой сертификат
+    private static X509Certificate rtCertSecondary = null; // второй корневой сертификат
 
     private boolean logInfoService;
     private String[] methodsInfoService;
@@ -419,6 +445,12 @@ public class RuntimeContext implements ApplicationContextAware {
         session.setDefaultReadOnly(true);
         session.setFlushMode(FlushMode.MANUAL);
         return session;
+    }
+
+    public void initSessionFactory() {
+        sessionFactory = ((EntityManagerFactory)applicationContext.getBean("masterEntityManagerFactory")).unwrap(SessionFactory.class);
+        reportsSessionFactory = ((EntityManagerFactory)applicationContext.getBean("slaveEntityManagerFactory")).unwrap(SessionFactory.class);
+        externalServicesSessionFactory = ((EntityManagerFactory)applicationContext.getBean("externalEntityManagerFactory")).unwrap(SessionFactory.class);
     }
 
     //hibernate cache for processorPU
@@ -599,6 +631,9 @@ public class RuntimeContext implements ApplicationContextAware {
 
     @PostConstruct
     public void init() throws Exception {
+        logger.info("Start runtime context");
+        //applicationContext.getBean(this.getClass()).initSessionFactory();
+        initSessionFactory();
         // to run in transaction
         applicationContext.getBean(this.getClass()).initDB();
 
@@ -797,6 +832,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(MeshCardNotifyTaskExecutor.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).scheduleSync();
+            ((RegularPaymentSubscriptionService)RuntimeContext.getAppContext().getBean("regularPaymentSubscriptionService")).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();
@@ -837,7 +873,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     private void initWSCrypto() {
-        java.util.Properties signatureProps = (java.util.Properties) CxfContextCapture.getApplicationContextInstance()
+        java.util.Properties signatureProps = (java.util.Properties) RuntimeContext.getAppContext()
                 .getBean("wsCryptoProperties");
         String params[] = {
                 "keystore.type", "keystore.password", "file", "truststore.type", "truststore.password",
@@ -888,7 +924,7 @@ public class RuntimeContext implements ApplicationContextAware {
                 boolean budgetExists = false;
                 boolean clientExists = false;
                 final List<Integer> classId = Arrays.asList(Contragent.OPERATOR, Contragent.BUDGET, Contragent.CLIENT);
-                List<Contragent> contragentList = daoService.getContragentsWithClassIds(classId);
+                List<Contragent> contragentList = daoReadonlyService.getContragentsWithClassIds(classId);
                 // Create if not
                 for (Contragent contragent : contragentList) {
                     if (contragent.getClassId().equals(Contragent.OPERATOR)) {
@@ -1727,23 +1763,44 @@ public class RuntimeContext implements ApplicationContextAware {
                 }
             });
             for (File f : files) {
-                processDataFile(f);
+                try {
+                    processDataFile(f, getTrustStore(), getRootCert());
+                } catch (Exception e) {
+                    try {
+                        processDataFile(f, getTrustStoreSecondary(), getRootCertSecondary());
+                    } catch (Exception ignore) {}
+                }
             }
         }
     }
 
     private static X509Certificate getRootCert() throws Exception {
         if (rtCert == null) {
-            byte bytes[] = Base64.decode(base64crt);
+            byte bytes[] = ru.axetta.ecafe.processor.core.utils.Base64.decode(base64crt);
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             rtCert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(bytes));
         }
         return rtCert;
     }
 
+    private static X509Certificate getRootCertSecondary() throws Exception {
+        if (rtCertSecondary == null) {
+            byte bytes[] = ru.axetta.ecafe.processor.core.utils.Base64.decode(base64crt_secondary);
+            CertificateFactory cf = CertificateFactory.getInstance("X509");
+            rtCertSecondary = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(bytes));
+        }
+        return rtCertSecondary;
+    }
+
     private static Set<TrustAnchor> getTrustStore() throws Exception {
         Set<TrustAnchor> resultSet = new HashSet<TrustAnchor>(1);
         resultSet.add(new TrustAnchor(getRootCert(), null));
+        return resultSet;
+    }
+
+    private static Set<TrustAnchor> getTrustStoreSecondary() throws Exception {
+        Set<TrustAnchor> resultSet = new HashSet<TrustAnchor>(1);
+        resultSet.add(new TrustAnchor(getRootCertSecondary(), null));
         return resultSet;
     }
 
@@ -1787,7 +1844,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public LinkedList<DataInfo> dataInfos = new LinkedList<DataInfo>();
 
-    public void processDataFile(File file) {
+    public void processDataFile(File file, Set<TrustAnchor> trustStore, X509Certificate rootCert) throws Exception {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             FileInputStream fis = new FileInputStream(file);
@@ -1804,12 +1861,12 @@ public class RuntimeContext implements ApplicationContextAware {
             List<X509Certificate> mylist = new ArrayList<X509Certificate>();
             mylist.add(cert);
             CertPath cp = cf.generateCertPath(mylist);
-            PKIXParameters pkiXParameters = new PKIXParameters(getTrustStore());
+            PKIXParameters pkiXParameters = new PKIXParameters(trustStore);
             pkiXParameters.setRevocationEnabled(false);
             CertPathValidator cpv = CertPathValidator.getInstance(CertPathValidator.getDefaultType());
             PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) cpv
                     .validate(cp, pkiXParameters);
-            isValid = getRootCert().equals(pkixCertPathValidatorResult.getTrustAnchor().getTrustedCert());
+            isValid = rootCert.equals(pkixCertPathValidatorResult.getTrustAnchor().getTrustedCert());
             DataInfo dataInfo = new DataInfo();
             // проверили сертификат
             String dn = cert.getSubjectDN().getName();
@@ -1861,8 +1918,9 @@ public class RuntimeContext implements ApplicationContextAware {
                 logger.error("Error loading file: " + file.getAbsolutePath(), e);
             }
             else {
-                logger.error("Error validating license file: " + file.getAbsolutePath(), e);
+                logger.error(String.format("Error validating %s file: ", "lacinsi".replaceAll("i", "e").replaceAll("a", "i")) + file.getAbsolutePath(), e);
             }
+            throw e;
         }
     }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment"
+           table="CF_Regular_Payments">
+        <id name="idOfPayment" column="IdOfPayment" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="bankSubscription"
+                     class="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription"
+                     column="IdOfSubscription" not-null="true"/>
+        <many-to-one name="mfrRequest" class="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest"
+                     column="IdOfRequest" unique="true" lazy="proxy"/>
+        <many-to-one name="clientPayment" class="ru.axetta.ecafe.processor.core.persistence.ClientPayment"
+                     column="IdOfClientPayment" lazy="proxy"/>
+        <property name="paymentAmount" column="PaymentAmount" type="long" not-null="true"/>
+        <property name="paymentDate" column="PaymentDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
+                     not-null="true"/>
+        <property name="clientBalance" column="ClientBalance" type="long" not-null="true"/>
+        <property name="thresholdAmount" column="ThresholdAmount" type="long" not-null="true"/>
+        <property name="success" column="IsSuccess" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="status" column="Status" type="string"/>
+        <property name="authCode" column="AuthCode" type="string" length="6"/>
+        <property name="rrn" column="RRN" type="long"/>
+        <property name="errorCode" column="ErrorCode" type="integer"/>
+        <property name="errorDesc" column="ErrorDesc" type="string"/>
+    </class>
+</hibernate-mapping>

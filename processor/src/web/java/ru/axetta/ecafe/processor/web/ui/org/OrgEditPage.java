@@ -8,8 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.CommonTaskService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
@@ -17,6 +21,8 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.faces.model.SelectItem;
 import java.util.*;
@@ -33,6 +39,7 @@ public class OrgEditPage extends BasicWorkspacePage
         CategoryOrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler,
         ConfigurationProviderSelect {
 
+    private final Logger logger = LoggerFactory.getLogger(OrgEditPage.class);
     private Long idOfOrg;
     private String shortName;
     private String shortNameInfoService;
@@ -87,6 +94,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean disableEditingClientsFromAISReestr;
     private Boolean usePaydableSubscriptionFeeding;
     private Boolean workInSummerTime;
+    private Boolean governmentContract;
+    private Boolean useLongCardNo;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -141,6 +150,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean useWebArm;
     private Boolean goodDateCheck;
     private Long orgIdFromNsi = null;
+    private Boolean useMealSchedule;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -195,6 +205,9 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void updateOrg(Session session, Long idOfOrg) throws Exception {
         Contragent defaultSupplier = (Contragent) session.load(Contragent.class, this.defaultSupplier.getIdOfContragent());
+        Long lastVersionOfOrgSetting = OrgSettingDAOUtils.getLastVersionOfOrgSettings(session);
+        Long lastVersionOfOrgSettingItem = OrgSettingDAOUtils.getLastVersionOfOrgSettingsItem(session);
+        OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         Contragent coSupplier = null;
         if (this.coSupplier != null && this.coSupplier.getIdOfContragent() != null) {
             coSupplier = (Contragent) session.load(Contragent.class, this.coSupplier.getIdOfContragent());
@@ -436,9 +449,15 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setUseWebArm(useWebArm);
         org.setGooddatecheck(goodDateCheck);
         org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
+        org.setGovernmentContract(governmentContract);
+        org.setUseLongCardNo(useLongCardNo);
+
+        manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, useMealSchedule, session,
+                lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
 
         session.update(org);
         fill(org);
+        RuntimeContext.getAppContext().getBean(CommonTaskService.class).invalidateOrgMulticast(idOfOrg);
 
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
 
@@ -491,6 +510,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.workInSummerTime = org.getIsWorkInSummerTime();
+        this.useLongCardNo = org.getUseLongCardNo() == null ? false : org.getUseLongCardNo();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -594,6 +614,10 @@ public class OrgEditPage extends BasicWorkspacePage
         this.useWebArm = org.getUseWebArm();
         this.goodDateCheck = org.getGooddatecheck();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
+        this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
+        OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
+        Boolean mealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
+        this.useMealSchedule = mealSchedule != null && mealSchedule;
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1467,4 +1491,28 @@ public class OrgEditPage extends BasicWorkspacePage
     public Long getOrgIdFromNsi() { return orgIdFromNsi; }
 
     public void setOrgIdFromNsi(Long orgIdFromNsi) { this.orgIdFromNsi = orgIdFromNsi; }
+
+    public Boolean getGovernmentContract() {
+        return governmentContract;
+    }
+
+    public void setGovernmentContract(Boolean governmentContract) {
+        this.governmentContract = governmentContract;
+    }
+
+    public Boolean getUseLongCardNo() {
+        return useLongCardNo;
+    }
+
+    public void setUseLongCardNo(Boolean useLongCardNo) {
+        this.useLongCardNo = useLongCardNo;
+    }
+
+    public Boolean getUseMealSchedule() {
+        return useMealSchedule;
+    }
+
+    public void setUseMealSchedule(Boolean useMealSchedule) {
+        this.useMealSchedule = useMealSchedule;
+    }
 }

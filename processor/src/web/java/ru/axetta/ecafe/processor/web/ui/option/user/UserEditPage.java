@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
@@ -22,7 +23,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +121,16 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         }
     }
 
+    public Boolean getIsWebArmUser(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.WA_ADMIN_SECURITY);
+    }
+
+    public Boolean getRenderContragent() {
+        return !getIsSecurityAdmin() && !getIsWebArmUser() && !getIsDirector();
+    }
+
     public void setFunctionSelector(FunctionSelector functionSelector) {
         this.functionSelector = functionSelector;
     }
@@ -131,7 +141,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     }
 
     public void updateUser(Session session, Long idOfUser) throws Exception {
-        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
 
@@ -228,7 +238,8 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             }
             if(role != null && (role.equals(User.DefaultRole.CLASSROOM_TEACHER)
                     || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT)
-                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR))) {
+                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR)
+                    || role.equals(User.DefaultRole.WA_ADMIN_SECURITY))) {
                 user.setRoleName(role.toString());
                 if(user.getClient() == null){
                     this.printError("Выберите клиента.");
@@ -286,7 +297,9 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setRegion(null);
             }
             user.setNeedChangePassword(needChangePassword);
-            user.getUserOrgses().clear();
+            for (UserOrgs uo : user.getUserOrgses()) {
+                session.delete(uo);
+            }
             session.update(user);
             session.flush();
             for (OrgItem orgItem : orgItems) {
@@ -497,6 +510,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DEFAULT);
+    }
+
+    public Boolean getIsDefaultOrAdmin(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.DEFAULT) || role.equals(User.DefaultRole.ADMIN);
     }
 
     public Boolean getIsSecurityAdmin(){

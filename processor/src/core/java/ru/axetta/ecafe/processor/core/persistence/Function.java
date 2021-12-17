@@ -97,6 +97,8 @@ public class Function {
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_REFILL = "Закрыть раздел 'Отчеты по пополнениям'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY = "onlineRprtActivity";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_CALENDAR = "onlineRprtCalendar";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_CALENDAR = "Закрыть раздел 'Календарь дней питания'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_CLIENTS = "onlineRprtClients";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_CLIENTS = "Закрыть раздел 'Отчеты по клиентам'";
     public static final String FUNC_SHOW_REPORTS_REPOSITORY = "showReportRepository";
@@ -149,6 +151,8 @@ public class Function {
     public static final String FUNCD_WORK_ONLINE_REPORT_EE_REPORT = "Онлайн отчеты - Отчеты по проходам";
     public static final String FUNC_WORK_ONLINE_REPORT_MENU_REPORT = "onlineRprtMenuReport";
     public static final String FUNCD_WORK_ONLINE_REPORT_MENU_REPORT = "Онлайн отчеты - Отчет по меню";
+    public static final String FUNC_ESP = "espdesk";
+    public static final String FUNCD_ESP = "Список обращений в ЕСП";
 
     private Long idOfFunction;
     private String functionName;

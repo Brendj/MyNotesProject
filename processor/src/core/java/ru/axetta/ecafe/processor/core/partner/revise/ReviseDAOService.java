@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.service.nsi.ReviseLogger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Component("ReviseDAOService")
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class ReviseDAOService {
     private static final Logger logger = LoggerFactory.getLogger(ReviseDAOService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
@@ -31,7 +33,7 @@ public class ReviseDAOService {
 
     public DiscountItemsWithTimestamp getDiscountsUpdatedSinceDate(Date updated) {
         String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del, mesh_guid "
-                + " from benefits_for_ispp where updated_at > :updatedDate and registry_guid is not null order by updated_at asc limit :lim";
+                + " from benefits_for_ispp where updated_at > :updatedDate and mesh_guid is not null order by updated_at asc limit :lim";
         Query query = entityManager.createNativeQuery(sqlString);
         query.setParameter("updatedDate", updated);
         query.setParameter("lim", RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_LIMIT));

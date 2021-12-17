@@ -6,16 +6,15 @@ package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +39,7 @@ public class LogoutSessionListener implements HttpSessionListener {
             return;
         }
         try {
-            User user = DAOService.getInstance().findUserById(userId);
+            User user = DAOReadonlyService.getInstance().findUserById(userId);
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate.createSuccessLogout(ipAddress, user.getUserName(), user);
             DAOService.getInstance().writeAuthJournalRecord(record);
 

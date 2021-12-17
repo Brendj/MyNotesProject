@@ -104,7 +104,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                             item.getServNumber(), client, item.getDtisznCode(), status,
                                             item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(), nextVersion,
-                                            nextHistoryVersion);
+                                            nextHistoryVersion, item.getDocOrderDate(), item.getIdOfDocOrder());
                             if (!oldStatus.equals(status)) {
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                         new ApplicationForFoodStatus(status.getApplicationForFoodState(),

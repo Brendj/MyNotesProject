@@ -34,6 +34,7 @@ public class FunctionSelector {
     private List<Item> monitorItems = Collections.emptyList();
     private List<Item> repositoryItems = Collections.emptyList();
     private List<Item> helpdeskItems = Collections.emptyList();
+    private List<Item> espItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
 
     private static final List<String> userFunctions = Arrays
@@ -48,7 +49,8 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
                     Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SALES_REPORTS,
                     Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
-                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
+                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     private static final List<String> securityAdminFunctions = Arrays
             .asList(Function.FUNC_USER_VIEW, Function.FUNC_USER_EDIT, Function.FUNC_USER_DELETE,
                     Function.FUNC_WORK_OPTION);
@@ -70,6 +72,7 @@ public class FunctionSelector {
     private static final List<String> repositoryFuncs = Collections
             .singletonList(Function.FUNC_SHOW_REPORTS_REPOSITORY);
     private static final List<String> helpdeskFuncs = Collections.singletonList(Function.FUNC_HELPDESK);
+    private static final List<String> espFuncs = Collections.singletonList(Function.FUNC_ESP);
     private static final List<String> optionsFuncs = Arrays
             .asList(Function.FUNC_WORK_OPTION, Function.FUNC_CATEGORY_EDIT, Function.FUNC_CATEGORY_VIEW,
                     Function.FUNC_RULE_VIEW, Function.FUNC_RULE_EDIT, Function.FUNC_REPORT_EDIT,
@@ -89,7 +92,8 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT,
                     Function.FUNC_RESTRICT_CARD_REPORTS, Function.FUNC_COUNT_CURRENT_POSITIONS,
                     Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_FEEDING_SETTINGS_ADMIN,
-                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT);
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     private static final List<String> onlineReportFuncsForSupplierReport = Arrays
             .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
                     Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT,
@@ -106,7 +110,7 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_INFORM_REPORTS, Function.FUNC_RESTRICT_CARD_REPORTS,
                     Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT, Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY,
                     Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_MANUAL_REPORT,
-                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO);
+                    Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
@@ -158,6 +162,10 @@ public class FunctionSelector {
 
     public List<Item> getHelpdeskItems() {
         return helpdeskItems;
+    }
+
+    public List<Item> getEspItems() {
+        return espItems;
     }
 
     public List<Item> getOptionsItems() {
@@ -304,6 +312,7 @@ public class FunctionSelector {
         List<Item> monitorItems = new LinkedList<>();
         List<Item> repositoryItems = new LinkedList<>();
         List<Item> helpdeskItems = new LinkedList<>();
+        List<Item> espItems = new LinkedList<>();
         List<Item> optionsItems = new LinkedList<>();
 
         for (Function function : allFunctions) {
@@ -328,6 +337,8 @@ public class FunctionSelector {
                 repositoryItems.add(item);
             } else if (helpdeskFuncs.contains(item.getFunctionName())) {
                 helpdeskItems.add(item);
+            } else if (espFuncs.contains(item.getFunctionName())) {
+                espItems.add(item);
             } else if (optionsFuncs.contains(item.getFunctionName())) {
                 optionsItems.add(item);
             } else {
@@ -362,6 +373,7 @@ public class FunctionSelector {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
+        this.espItems = espItems;
         this.optionsItems = optionsItems;
     }
 
@@ -378,6 +390,7 @@ public class FunctionSelector {
         List<Item> monitorItems = new LinkedList<>();
         List<Item> repositoryItems = new LinkedList<>();
         List<Item> helpdeskItems = new LinkedList<>();
+        List<Item> espItems = new LinkedList<>();
         List<Item> optionsItems = new LinkedList<>();
 
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
@@ -436,6 +449,11 @@ public class FunctionSelector {
                     item.setSelected(true);
                 }
                 helpdeskItems.add(item);
+            } else if (espFuncs.contains(item.getFunctionName())) {
+                if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                    item.setSelected(true);
+                }
+                espItems.add(item);
             } else if (optionsFuncs.contains(item.getFunctionName())) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
@@ -476,6 +494,7 @@ public class FunctionSelector {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
+        this.espItems=espItems;
         this.optionsItems = optionsItems;
     }
 
@@ -576,6 +595,13 @@ public class FunctionSelector {
         }
 
         for (Item item : helpdeskItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : espItems) {
             if (item.isSelected()) {
                 Function function = (Function) session.load(Function.class, item.getIdOfFunction());
                 selectedFunctions.add(function);

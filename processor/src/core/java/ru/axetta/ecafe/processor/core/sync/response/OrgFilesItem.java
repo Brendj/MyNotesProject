@@ -5,11 +5,11 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.request.OrgFilesRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -58,7 +58,7 @@ public class OrgFilesItem {
             if (org == null) {
                 emSetter.setCompositeErrorMessage(String.format("Организация с ИД=%s не найдена", idOfOrg));
             } else {
-                List<Long> orgsIds = DAOService.getInstance().findFriendlyOrgsIds(idOfOrgOwner);
+                List<Long> orgsIds = DAOReadonlyService.getInstance().findFriendlyOrgsIds(idOfOrgOwner);
                 if(!orgsIds.contains(idOfOrg)){
                     emSetter.setCompositeErrorMessage(String.format("Организация с ИД=%s не принадлежит организации с ИД=%s", idOfOrg, idOfOrgOwner));
                 }

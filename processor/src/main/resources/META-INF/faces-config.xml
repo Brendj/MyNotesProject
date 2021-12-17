@@ -1,0 +1,374 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+  -->
+
+<faces-config xmlns="http://java.sun.com/xml/ns/javaee"
+                            version="2.0">
+
+
+    <managed-bean>
+        <display-name>mainPage</display-name>
+        <managed-bean-name>mainPage</managed-bean-name>
+        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.MainPage</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <display-name>electionsPage</display-name>
+        <managed-bean-name>electionsPage</managed-bean-name>
+        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.ElectionsPage</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <display-name>directorPage</display-name>
+        <managed-bean-name>directorPage</managed-bean-name>
+        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.DirectorPage</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+
+    <converter>
+        <description>fromTypeConverter</description>
+        <converter-id>fromTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.FromTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>OrgRequestFilterConverter</description>
+        <converter-id>orgRequestFilterConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Org state converter</description>
+        <converter-id>orgStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Org type converter</description>
+        <converter-id>orgTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Org security level converter</description>
+        <converter-id>orgSecurityLevelConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgSecurityLevelConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Timestamp converter with second accuracy</description>
+        <converter-id>timeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.TimeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Timestamp converter with minute accuracy</description>
+        <converter-id>timeMinuteConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.TimeMinuteConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Date to time converter</description>
+        <converter-id>dateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Date to time converter</description>
+        <converter-id>dateConverterWithoutTZ</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DateConverterWithoutTZ</converter-class>
+    </converter>
+
+    <converter>
+        <description>Phone converter</description>
+        <converter-id>phoneConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PhoneConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>User functions converter</description>
+        <converter-id>functionSetConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.option.user.FunctionSetConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client contract state converter</description>
+        <converter-id>clientContractStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ClientContractStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client pay for SMS converter</description>
+        <converter-id>clientPayForSMSConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ClientPayForSMSConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card type converter</description>
+        <converter-id>cardTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card state converter</description>
+        <converter-id>cardStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card life state converter</description>
+        <converter-id>cardLifeStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardLifeStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Contragent class converter</description>
+        <converter-id>contragentClassConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.contragent.ContragentClassConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Copeck sum converter</description>
+        <converter-id>copeckSumConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.CopeckSumConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client discount mode converter</description>
+        <converter-id>clientDiscountModeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ClientDiscountModeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Address list converter</description>
+        <converter-id>addressListConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.report.rule.AddressListConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Report format converter</description>
+        <converter-id>reportFormatConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.ReportFormatConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client contract ID converter</description>
+        <converter-id>contractIdConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ContractIdConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card number converter</description>
+        <converter-id>cardNoConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardNoConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card printed number converter</description>
+        <converter-id>cardPrintedNoConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardPrintedNoConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Sms contents type converter</description>
+        <converter-id>smsContentsTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.SmsContentsTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Sms delivery status converter</description>
+        <converter-id>smsDeliveryStatusConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.SmsDeliveryStatusConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Unit Scale Converter</description>
+        <converter-id>unitScaleConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.UnitScaleConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card Station Converter</description>
+        <converter-id>cardStationConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.CardStationConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Period Type Converter</description>
+        <converter-id>periodTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PeriodTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Mouth Type Converter</description>
+        <converter-id>mouthTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.MouthTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Preorder Requests Type Converter</description>
+        <converter-id>preorderTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PreorderTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Document State Filter Converter</description>
+        <converter-id>documentStateFilterConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DocumentStateFilterConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Organization Type Converter</description>
+        <converter-id>organizationTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Organization Security Level Converter</description>
+        <converter-id>organizationSecurityLevelConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationSecurityLevelConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Organization Type Modify Converter</description>
+        <converter-id>organizationTypeModifyConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationTypeModifyConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Late Payment By One Day Count Type Converter</description>
+        <converter-id>latePaymentByOneDayCountConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.LatePaymentByOneDayCountTypeConverter
+        </converter-class>
+    </converter>
+
+    <converter>
+        <description>Late Payment Days Count Type Converter</description>
+        <converter-id>latePaymentDaysCountTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.LatePaymentDaysCountTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <converter-id>rublesStringConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.RublesStringConverter</converter-class>
+    </converter>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>logout</from-outcome>
+            <to-view-id>/back-office/index.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientCSVList</from-outcome>
+            <to-view-id>/back-office/client_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showAllComplexCSVList</from-outcome>
+            <to-view-id>/back-office/all_complex_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showFreeComplexCSVList</from-outcome>
+            <to-view-id>/back-office/free_complex_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showPayComplexCSVList</from-outcome>
+            <to-view-id>/back-office/pay_complex_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showSaleCSVList</from-outcome>
+            <to-view-id>/back-office/sale_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showTotalServicesCSVList</from-outcome>
+            <to-view-id>/back-office/totalservices_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>downloadReportFile</from-outcome>
+            <to-view-id>/repository/download</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showOrgBasicStatsCSVList</from-outcome>
+            <to-view-id>/back-office/org_basic_stats_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showCardCSVList</from-outcome>
+            <to-view-id>/back-office/card_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientOrgCSVList</from-outcome>
+            <to-view-id>/back-office/client_org_csv_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+
+    <!--<navigation-rule>
+        <from-view-id>/back-office/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>logoutAdmin</from-outcome>
+            <to-view-id>/back-office/admin/index.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>-->
+
+    <converter>
+        <description>Full date to time converter</description>
+        <converter-id>dateTimeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DateTimeConverter</converter-class>
+    </converter>
+
+</faces-config>

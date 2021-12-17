@@ -3,19 +3,21 @@
  */
 
 package ru.axetta.ecafe.processor.web.ui.webTechnolog;
+
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class ComplexListSelectPage extends BasicPage {
@@ -191,19 +193,37 @@ public class ComplexListSelectPage extends BasicPage {
 
     private List retrieveComplexes(Session session, List<Contragent> contragents, List<Long> orgs) throws HibernateException {
         Criteria criteria = session.createCriteria(WtComplex.class).addOrder(Order.asc("name"));
+        Criteria criteria1 = session.createCriteria(WtComplex.class).addOrder(Order.asc("name"));
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.ilike("name", filter, MatchMode.ANYWHERE));
+            criteria1.add(Restrictions.ilike("name", filter, MatchMode.ANYWHERE));
         }
-        if (contragents != null && !contragents.isEmpty())
+        if (contragents != null && !contragents.isEmpty()){
             criteria.add(Restrictions.in("contragent", contragents));
+            criteria1.add(Restrictions.in("contragent", contragents));
+        }
         if (orgs != null && !orgs.isEmpty()) {
+            String getGroup = "select r.idoforggroup "
+                    + "from cf_wt_org_group_relations r "
+                    + "where r.idoforg in (:orgId) ";
+            Query queryOrg = session.createSQLQuery(getGroup);
+            queryOrg.setParameterList("orgId", orgs);
+            List<BigInteger> orgData = queryOrg.list();
+            List<Long> groups = new ArrayList<>();
+            for (BigInteger orgDatum : orgData) {
+                groups.add(orgDatum.longValue());
+            }
+            criteria1.add(Restrictions.in("idOfOrgGroup", groups));
             criteria.createAlias("orgs", "orgsIntrernal");
             criteria.add(Restrictions.in("orgsIntrernal.idOfOrg", orgs));
         }
         criteria.add(Restrictions.eq("deleteState", 0));
+        criteria1.add(Restrictions.eq("deleteState", 0));
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        criteria1.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         List<WtComplex> complexByCriteria = criteria.list();
-        return complexByCriteria; // criteria.list();
+        complexByCriteria.addAll(criteria1.list());
+        return complexByCriteria;
     }
 
     public void selectAllItems() {

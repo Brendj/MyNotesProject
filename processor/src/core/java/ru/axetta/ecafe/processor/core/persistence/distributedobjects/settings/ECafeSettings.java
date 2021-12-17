@@ -31,6 +31,7 @@ public class ECafeSettings extends DistributedObject {
 
     private String settingValue;
     private SettingsIds settingsId;
+    private String settingsIdDescription;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
 
     @Override
@@ -202,4 +203,11 @@ public class ECafeSettings extends DistributedObject {
         return settingValueParser.getParserBySettingValue();
     }
 
+    public String getSettingsIdDescription() {
+        return settingsIdDescription;
+    }
+
+    public void setSettingsIdDescription(String settingsIdDescription) {
+        this.settingsIdDescription = settingsIdDescription;
+    }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" table="cf_provider_configurations">
+        <id name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <property name="name" column="NameOfConfigurationProvider" type="string" length="64" not-null="true"/>
+        <property name="menuSyncCountDays" column="MenuSyncCountDays" type="integer"/>
+        <property name="menuSyncCountDaysInPast" column="MenuSyncCountDaysInPast" type="integer"/>
+        <property name="version" column="Version" type="long" not-null="true"/>
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
+        <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
+
+        <set name="orgInternal" lazy="true" cascade="all">
+            <key>
+                <column name="idOfConfigurationProvider"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Org"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

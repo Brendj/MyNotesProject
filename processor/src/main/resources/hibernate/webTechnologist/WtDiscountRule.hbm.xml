@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" table="cf_wt_discountrules">
+        <id name="idOfRule" column="IdOfRule" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">3</param>
+                <param name="sequence_name">cf_wt_discountrules_Id_Gen_seq</param>
+            </generator>
+        </id>
+        <property name="description">
+            <column name="description" sql-type="varchar(100)" length="100" not-null="true"/>
+        </property>
+        <property name="rate">
+            <column name="rate" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="priority">
+            <column name="priority" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="operationOr">
+            <column name="operationOr" sql-type="boolean" not-null="true"/>
+        </property>
+        <property name="subCategory" column="subCategory" type="string" length="100" />
+
+        <property name="deletedState" column="deletedState" type="boolean"/>
+
+        <set name="complexes" lazy="true" table="cf_wt_discountrules_complexes">
+            <key column="idOfRule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" column="idOfComplex"/>
+        </set>
+
+        <set name="categoryOrgs" lazy="true" table="cf_wt_discountrules_categoryorg">
+            <key column="idOfRule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryOrg" column="idOfCategoryOrg"/>
+        </set>
+
+        <set name="categoryDiscounts" lazy="true" table="cf_wt_discountrules_categorydiscount">
+            <key column="idOfRule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="idOfCategoryDiscount"/>
+        </set>
+        <many-to-one name="codeMSP" class="ru.axetta.ecafe.processor.core.persistence.CodeMSP" lazy="false" column="idofcode" />
+    </class>
+</hibernate-mapping>

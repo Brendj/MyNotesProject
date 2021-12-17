@@ -5,9 +5,8 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.MigrantInitiatorEnum;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -52,7 +51,7 @@ public class OutcomeMigrationRequestsItem {
 
         idOfRequest = getLongValue(itemNode, "IdOfRequest", emSetter, true);
         if(idOfRequest != null) {
-            Org orgRequest = DAOService.getInstance().getOrg(idOfOrgRegistry);
+            Org orgRequest = DAOReadonlyService.getInstance().findOrg(idOfOrgRegistry);
             if (orgRequest == null) {
                 emSetter.setCompositeErrorMessage(String.format("OrgRegistry with id=%s not found", idOfOrgRegistry));
             }
@@ -71,7 +70,7 @@ public class OutcomeMigrationRequestsItem {
 
         idOfClient = getLongValue(itemNode, "IdOfClient", emSetter, true);
         if(idOfClient != null) {
-            Client client = DAOService.getInstance().findClientById(idOfClient);
+            Client client = DAOReadonlyService.getInstance().findClientById(idOfClient);
             if (client == null) {
                 emSetter.setCompositeErrorMessage(String.format("Client with id=%s not found", idOfClient));
             }
@@ -79,7 +78,7 @@ public class OutcomeMigrationRequestsItem {
 
         idOfOrgVisit = getLongValue(itemNode, "IdOfOrgVisit", emSetter, true);
         if(idOfOrgVisit != null) {
-            Org orgVisit = DAOService.getInstance().getOrg(idOfOrgVisit);
+            Org orgVisit = DAOReadonlyService.getInstance().findOrg(idOfOrgVisit);
             if (orgVisit == null) {
                 emSetter.setCompositeErrorMessage(String.format("OrgVisit with id=%s not found", idOfOrgVisit));
             }

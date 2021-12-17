@@ -6,10 +6,9 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
-import ru.axetta.ecafe.processor.core.sms.emp.type.EMPAbstractEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPLeaveWithGuardianEventType;
@@ -20,6 +19,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,6 @@ import javax.annotation.Resource;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +35,7 @@ import java.util.Properties;
 
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class EventNotificationService {
 
     Logger logger = LoggerFactory.getLogger(EventNotificationService.class);
@@ -286,16 +286,16 @@ public class EventNotificationService {
     }
 
     @Async
-    public boolean sendEmailAsync(String email, String type, String[] values) {
+    public void sendEmailAsync(String email, String type, String[] values) {
         if (StringUtils.isEmpty(email)) {
-            return false;
+            return;
         }  else {
 
             String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
                     TYPE_EMAIL_SUBJECT);
             if (emailText == null || emailSubject == null) {
                 logger.info(String.format("No email text is specified for type '%s'. Email is not sent", type));
-                return false;
+                return;
             } else {
                 emailText = formatMessage(emailText, values);
                 emailSubject = formatMessage(emailSubject, values);
@@ -304,12 +304,11 @@ public class EventNotificationService {
                         RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
                     } catch (Exception e) {
                         logger.error("Failed to send email notification", e);
-                        return false;
+                        return;
                     }
                 }
             }
         }
-        return true;
     }
 
     @Async
@@ -604,6 +603,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
@@ -651,8 +651,13 @@ public class EventNotificationService {
                 Date eventDate = df.parse(empDateStr);
                 empType.setTime(eventDate.getTime());
             } catch (Exception e) {
+                empType.setTime(new Date().getTime());
                 logger.error("Failed to parse EMP date", e);
             }
+        }
+        else
+        {
+            empType.setTime(new Date().getTime());
         }
         return empType;
     }
@@ -698,6 +703,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
@@ -706,6 +712,7 @@ public class EventNotificationService {
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
+        empType.setTime(new Date().getTime());
         return empType;
     }
 
@@ -791,7 +798,7 @@ public class EventNotificationService {
         return attachToValues(CLIENT_GENDER_KEY, genderString, values);
     }
 
-    public static final String[] attachAmountBuyAllToValues(Long amountBuyAll, String[] values) {
+    public static final String[] attachMoneyToValues(Long amountBuyAll, String[] values, String nameParam) {
         if (null == amountBuyAll) {
             return values;
         }
@@ -804,7 +811,7 @@ public class EventNotificationService {
         }
         String amountBuyAllString = rub.toString() + "," + cop_str;
 
-        return attachToValues(PARAM_AMOUNT_BUY_ALL, amountBuyAllString, values);
+        return attachToValues(nameParam, amountBuyAllString, values);
     }
 
     public static Long getTargetIdFromValues(String[] values) {
@@ -1116,7 +1123,7 @@ public class EventNotificationService {
                 sn = guardian.getPerson().getSurname();
                 n = guardian.getPerson().getFirstName();
             } catch (Exception e) {
-                Person p = DAOService.getInstance().getPersonByClient(guardian);
+                Person p = DAOReadonlyService.getInstance().getPersonByClient(guardian);
                 sn = p.getSurname();
                 n = p.getFirstName();
             }

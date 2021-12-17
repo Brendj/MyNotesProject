@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:panelGrid id="orgBalanceReportGrid" binding="#{mainPage.orgBalanceReportPage.pageComponent}"
+             styleClass="borderless-grid">
+    <h:panelGrid styleClass="borderless-grid" columns="3">
+        <h:outputText escape="true" value="Базовая дата (не включая)" styleClass="output-text" />
+        <rich:calendar value="#{mainPage.orgBalanceReportPage.baseDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgBalanceReport}"
+                           render="workspaceTogglePanel, orgBalanceReportTable"
+                           styleClass="command-button" status="orgBalanceReportGenerateStatus"/>
+    </h:panelGrid>
+    <a4j:status id="orgBalanceReportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+    <h:panelGrid styleClass="borderless-grid">
+        <h:outputText escape="true" value="Отчет по организации &quot;#{mainPage.orgBalanceReportPage.shortName}&quot;"
+                      styleClass="output-text" />
+        <rich:dataTable id="orgBalanceReportTable"
+                        value="#{mainPage.orgBalanceReportPage.orgBalanceReport.org.clientGroups}" var="clientGroup"
+                        columnClasses="left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column colspan="4" />
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText escape="true" value="Платежи" styleClass="column-header" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText escape="true" value="Покупки по картам" styleClass="column-header" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText escape="true" value="Баланс по картам" styleClass="column-header" />
+                    </rich:column>
+                    <rich:column colspan="4" breakRowBefore="true" styleClass="left-aligned-column">
+                        <h:outputText escape="true" value="#{mainPage.orgBalanceReportPage.shortName}"
+                                      styleClass="column-header" />
+                    </rich:column>
+                    <rich:column styleClass="right-aligned-column">
+                        <h:outputText escape="true"
+                                      value="#{mainPage.orgBalanceReportPage.orgBalanceReport.org.totalClientPaymentSum}"
+                                      converter="copeckSumConverter" styleClass="column-header" />
+                    </rich:column>
+                    <rich:column styleClass="right-aligned-column">
+                        <h:outputText escape="true"
+                                      value="#{mainPage.orgBalanceReportPage.orgBalanceReport.org.totalOrderSumByCard}"
+                                      converter="copeckSumConverter" styleClass="column-header" />
+                    </rich:column>
+                    <rich:column styleClass="right-aligned-column">
+                        <h:outputText escape="true"
+                                      value="#{mainPage.orgBalanceReportPage.orgBalanceReport.org.totalBalance}"
+                                      converter="copeckSumConverter" styleClass="column-header" />
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column colspan="4">
+                <h:outputText escape="true" value="#{clientGroup.groupName}" styleClass="output-text"
+                              style="font-weight: bold;" />
+            </rich:column>
+            <rich:column>
+                <h:outputText escape="true" value="#{clientGroup.totalClientPaymentSum}" converter="copeckSumConverter"
+                              styleClass="output-text" style="font-weight: bold;" />
+            </rich:column>
+            <rich:column>
+                <h:outputText escape="true" value="#{clientGroup.totalOrderSumByCard}" converter="copeckSumConverter"
+                              styleClass="output-text" style="font-weight: bold;" />
+            </rich:column>
+            <rich:column>
+                <h:outputText escape="true" value="#{clientGroup.totalBalance}" converter="copeckSumConverter"
+                              styleClass="output-text" style="font-weight: bold;" />
+            </rich:column>
+
+            <rich:collapsibleSubTable value="#{clientGroup.clients}" var="client"
+                           columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.contractId}" converter="contractIdConverter"
+                                  styleClass="output-text" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.person.surname}" styleClass="output-text" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.person.firstName}" styleClass="output-text" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.person.secondName}" styleClass="output-text" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.totalClientPaymentSum}" converter="copeckSumConverter"
+                                  styleClass="output-text" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.totalOrderSumByCard}" converter="copeckSumConverter"
+                                  styleClass="output-text" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="#{client.totalBalance}" converter="copeckSumConverter"
+                                  styleClass="output-text" />
+                </rich:column>
+            </rich:collapsibleSubTable>
+        </rich:dataTable>
+    </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+</h:panelGrid>
+</ui:composition>

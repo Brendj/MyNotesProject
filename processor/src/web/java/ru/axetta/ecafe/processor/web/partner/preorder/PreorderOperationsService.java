@@ -120,9 +120,15 @@ public class PreorderOperationsService {
         List list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getAllActualPreorders(params);
         Date currentDate = CalendarUtils.startOfDay(new Date());
         Map<Long, List<SpecialDate>> specialDatesMap = new HashMap<Long, List<SpecialDate>>();
+        Set<Long> complexes = new HashSet<>();
         for (Object obj : list) {
             Object[] row = (Object[]) obj;
             PreorderComplex preorderComplex = (PreorderComplex) row[0];
+            if (complexes.contains(preorderComplex.getIdOfPreorderComplex())) {
+                continue;
+            } else {
+                complexes.add(preorderComplex.getIdOfPreorderComplex());
+            }
             Long idOfClientGroup = (Long) row[1];
             try {
                 List<SpecialDate> specialDates = specialDatesMap.get(preorderComplex.getIdOfOrgOnCreate());
