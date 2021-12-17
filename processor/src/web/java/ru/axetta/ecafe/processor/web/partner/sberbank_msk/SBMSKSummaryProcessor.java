@@ -36,7 +36,7 @@ public class SBMSKSummaryProcessor {
             transaction = session.beginTransaction();
             ClientsWithResultCode cd = RuntimeContext.getAppContext().getBean(CommonMethodUtil.class)
                     .getClientsByGuardMobile(guardMobile, session, SBMSKPaymentsCodes.OK.getCode(),
-                            PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(), SBMSKPaymentsCodes.INTERNAL_ERROR.getCode());
+                            SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode(), SBMSKPaymentsCodes.INTERNAL_ERROR.getCode());
 
             SBMSKClientSummaryBaseListResult clientSummaryBaseListResult = new SBMSKClientSummaryBaseListResult();
             if (cd != null && cd.getClients() != null) {

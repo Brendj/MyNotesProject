@@ -49,21 +49,35 @@ public enum SBMSKPaymentsDesc {
     }
 
     public static SBMSKPaymentsDesc getFromPaymentProcessResultCode(Integer paymentProcessResultCode, String type) {
-        if (paymentProcessResultCode.equals(SBMSKPaymentsCodes.TEMPORARY_ERROR.getCode())) {
+        if (type.equals(SBMSKOnlinePaymentRequestParser.ACTION_CHECK)) {
+            if (paymentProcessResultCode.equals(PaymentProcessResult.CLIENT_NOT_FOUND.getCode())) {
+                return CLIENT_NOT_FOUND_ERROR_CHECK;
+            }
+        }
+        if (type.equals(SBMSKOnlinePaymentRequestParser.ACTION_SUMMARY)) {
+            if (paymentProcessResultCode.equals(SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode())) {
+                return CLIENT_NOT_FOUND_ERROR_SUMMARY;
+            }
+        }
+        return null;
+    }
+
+    public static SBMSKPaymentsDesc getFromPaymenResultCode(Integer paymentResultCode, String type) {
+        if (paymentResultCode.equals(SBMSKPaymentsCodes.TEMPORARY_ERROR.getCode())) {
             return TEMPORARY_ERROR;
-        } else if (paymentProcessResultCode.equals(SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode())) {
+        } else if (paymentResultCode.equals(SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode())) {
             if (type.equals(SBMSKOnlinePaymentRequestParser.ACTION_SUMMARY)) {
                 return CLIENT_NOT_FOUND_ERROR_SUMMARY;
             } else if (type.equals(SBMSKOnlinePaymentRequestParser.ACTION_CHECK)) {
                 return CLIENT_NOT_FOUND_ERROR_CHECK;
             } else return null;
-        } else if (paymentProcessResultCode.equals(SBMSKPaymentsCodes.INVALID_MOBILE_ERROR.getCode())) {
+        } else if (paymentResultCode.equals(SBMSKPaymentsCodes.INVALID_MOBILE_ERROR.getCode())) {
             if (type.equals(SBMSKOnlinePaymentRequestParser.ACTION_SUMMARY))
                 return INVALID_MOBILE_ERROR;
-        } else if (paymentProcessResultCode.equals(SBMSKPaymentsCodes.NOT_FOUND_INN.getCode())) {
+        } else if (paymentResultCode.equals(SBMSKPaymentsCodes.NOT_FOUND_INN.getCode())) {
             if (type.equals(SBMSKOnlinePaymentRequestParser.ACTION_SUMMARY))
                 return NOT_FOUND_INN;
-        } else if (paymentProcessResultCode.equals(SBMSKPaymentsCodes.INTERNAL_ERROR.getCode())) {
+        } else if (paymentResultCode.equals(SBMSKPaymentsCodes.INTERNAL_ERROR.getCode())) {
             return INTERNAL_ERROR;
         }
         return null;

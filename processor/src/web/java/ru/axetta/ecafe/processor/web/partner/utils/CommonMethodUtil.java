@@ -105,13 +105,14 @@ public class CommonMethodUtil {
                             result.put(child, addInfo);
                         }
                     }
-                } else {
-                    ClientWithAddInfo addInfo = new ClientWithAddInfo();
-                    addInfo.setInformedSpecialMenu(null);
-                    addInfo.setClientCreatedFrom(ClientCreatedFromType.DEFAULT);
-                    addInfo.setRepresentType(ClientGuardianRepresentType.UNKNOWN);
-                    result.put(DAOUtils.findClient(session, londId), addInfo);
                 }
+//                else {
+//                    ClientWithAddInfo addInfo = new ClientWithAddInfo();
+//                    addInfo.setInformedSpecialMenu(null);
+//                    addInfo.setClientCreatedFrom(ClientCreatedFromType.DEFAULT);
+//                    addInfo.setRepresentType(ClientGuardianRepresentType.UNKNOWN);
+//                    result.put(DAOUtils.findClient(session, londId), addInfo);
+//                }
             }
         }
 
