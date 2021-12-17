@@ -93,7 +93,7 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
                 logger.error("Failed to authenticate request", e);
                 logger.error("Request string", httpRequest.getAttribute("javamelody.request"));
 
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INTERNAL_ERROR);
+                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.TEMPORARY_ERROR);
                 httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                 return;
             }

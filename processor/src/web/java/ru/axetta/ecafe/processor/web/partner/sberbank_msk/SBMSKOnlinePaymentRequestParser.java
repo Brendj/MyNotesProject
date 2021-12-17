@@ -62,6 +62,13 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         return null;
     }
 
+    public String getTypePayment()
+    {
+        ParseResult parseResult = getRequestParams();
+        action = parseResult.getParam("ACTION");
+        return action;
+    }
+
     @Override
     public void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)
             throws Exception {
@@ -129,10 +136,17 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
     public void serializeResponseIfException(HttpServletResponse httpResponse, SBMSKPaymentsCodes error)
     throws Exception {
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
-
-        int resultCode = error.getCode();
-        stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
-        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",error.toString()));
+        SBMSKPaymentsDesc sbmskPaymentsDesc = SBMSKPaymentsDesc.getFromPaymentProcessResultCode(error.getCode(), getTypePayment());
+        if (sbmskPaymentsDesc != null) {
+            int resultCode = sbmskPaymentsDesc.getCode();
+            stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
+            stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", sbmskPaymentsDesc.toString()));
+        } else
+        {
+            int resultCode = error.getCode();
+            stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
+            stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", error.toString()));
+        }
 
         stringBuilder.append("</response>");
         printToStream(stringBuilder.toString(), httpResponse);
