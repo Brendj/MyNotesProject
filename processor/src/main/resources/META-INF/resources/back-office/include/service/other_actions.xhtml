@@ -9,6 +9,11 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <script type="text/javascript">
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:otherActionsGridRender');
+        element.click();
+        element.hidden = true;
+
+
         function disableButtons(value) {
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateGuardiansByOrgs").disabled = value;
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:updateSpbClientDoubles").disabled = value;
@@ -16,7 +21,8 @@
     </script>
 
     <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
-
+    <a4j:commandLink id="otherActionsGridRender" value=""
+                     render="otherActionsGrid"/>
     <!--Тест лога -->
 <h:panelGrid>
     <h:panelGrid id="otherActionsGrid"
