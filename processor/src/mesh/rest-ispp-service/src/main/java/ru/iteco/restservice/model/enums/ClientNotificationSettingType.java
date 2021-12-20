@@ -4,6 +4,9 @@
 
 package ru.iteco.restservice.model.enums;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum ClientNotificationSettingType {
     SMS_SETTING_CHANGED(1L, "Настройки были изменены"),
     SMS_NOTIFY_REFILLS(1000000000L, "Оповещать о пополнениях"),
@@ -26,16 +29,22 @@ public enum ClientNotificationSettingType {
         this.description = description;
     }
 
-    public static ClientNotificationSettingType of(Long code){
-        if(code == null){
-            return null;
+    public static List<ClientNotificationSettingType> of(List<Long> codes){
+        List<ClientNotificationSettingType> result = new ArrayList<>();
+        if(codes == null || codes.isEmpty()){
+            return result;
         }
+
         for(ClientNotificationSettingType t : ClientNotificationSettingType.values()){
-            if(t.getCode().equals(code)){
-                return t;
-            }
+            codes.forEach(code -> compareToDefineType(code, t, result));
         }
-        return null;
+        return result;
+    }
+
+    private static void compareToDefineType(Long code, ClientNotificationSettingType t, List<ClientNotificationSettingType> result)
+    {
+        if (code.equals(t.getCode()))
+            result.add(t);
     }
 
     public Long getCode() {

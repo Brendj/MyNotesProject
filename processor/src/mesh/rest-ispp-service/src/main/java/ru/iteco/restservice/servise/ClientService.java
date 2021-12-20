@@ -265,16 +265,16 @@ public class ClientService {
             throw new IllegalArgumentException("Не указан номер телефона представителя");
         } else if(!phonePattern.matcher(req.getGuardianMobile()).matches()){
             throw new IllegalArgumentException("Номер телефона не соответствует паттерну");
-        } else if(req.getNotificationType() == null){
+        } else if(req.getTypeOfNotification() == null){
             throw new IllegalArgumentException("Не указан тип оповещения");
         } else if(req.getActivity() == null){
             throw new IllegalArgumentException("Не указан флаг включения оповещения");
         }
 
-        ClientNotificationSettingType type = ClientNotificationSettingType.of(req.getNotificationType());
-        if(type == null){
-            throw new NotFoundException("Не найден тип оповещения " + req.getNotificationType());
-        }
+        List<ClientNotificationSettingType> types = ClientNotificationSettingType.of(req.getTypeOfNotification());
+//        if(type == null){
+//            throw new NotFoundException("Не найден тип оповещения " + req.getTypeOfNotification());
+//        }
 
         Client child = clientReadOnlyRepo.getClientByContractId(req.getContractId())
                 .orElseThrow(() -> new NotFoundException(
@@ -300,25 +300,37 @@ public class ClientService {
         ClientGuardian clientGuardianRelations = guardianReadOnlyRepo
                 .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian)
                 .orElseThrow(() -> new NotFoundException("Не найдена активная связь между клиентом и представителем"));
-
-        ClientGuardianNotificationSettings guardianNotificationSettings = guardianNotificationSettingsReadonlyRepo
-                .getClientGuardianNotificationSettingsByClientGuardianAndType(clientGuardianRelations, type);
-
-        if(req.getActivity()){
-            if(guardianNotificationSettings != null){
-                throw new IllegalArgumentException("Оповещение уже активированно");
+        if (types.isEmpty())
+        {
+            //Если перадали пустой массив, то делаем все виды оповещений неактивными
+            List<ClientGuardianNotificationSettings> settings = getNotificationSettingsByClients(req.getContractId(), req.getGuardianMobile());
+            for (ClientGuardianNotificationSettings setting: settings)
+            {
+                setting = writableEntityManager.merge(setting);
+                writableEntityManager.remove(setting);
             }
-            guardianNotificationSettings = new ClientGuardianNotificationSettings();
-            guardianNotificationSettings.setClientGuardian(clientGuardianRelations);
-            guardianNotificationSettings.setCreatedDate(new Date().getTime());
-            guardianNotificationSettings.setType(type);
-            writableEntityManager.merge(guardianNotificationSettings);
-        } else {
-            if(guardianNotificationSettings == null){
-                throw new IllegalArgumentException("Оповещение уже отключено");
+        }
+        for (ClientNotificationSettingType type:  types) {
+            ClientGuardianNotificationSettings guardianNotificationSettings = guardianNotificationSettingsReadonlyRepo
+                    .getClientGuardianNotificationSettingsByClientGuardianAndType(clientGuardianRelations, type);
+            if (req.getActivity()) {
+                if (guardianNotificationSettings != null) {
+                    continue;
+//                    throw new IllegalArgumentException("Оповещение уже активированно");
+                }
+                guardianNotificationSettings = new ClientGuardianNotificationSettings();
+                guardianNotificationSettings.setClientGuardian(clientGuardianRelations);
+                guardianNotificationSettings.setCreatedDate(new Date().getTime());
+                guardianNotificationSettings.setType(type);
+                writableEntityManager.merge(guardianNotificationSettings);
+            } else {
+                if (guardianNotificationSettings == null) {
+                    continue;
+//                    throw new IllegalArgumentException("Оповещение уже отключено");
+                }
+                guardianNotificationSettings = writableEntityManager.merge(guardianNotificationSettings);
+                writableEntityManager.remove(guardianNotificationSettings);
             }
-            guardianNotificationSettings = writableEntityManager.merge(guardianNotificationSettings);
-            writableEntityManager.remove(guardianNotificationSettings);
         }
     }
 
