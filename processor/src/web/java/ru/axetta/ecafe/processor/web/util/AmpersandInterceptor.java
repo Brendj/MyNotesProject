@@ -12,7 +12,7 @@ import java.io.OutputStream;
 
 public class AmpersandInterceptor extends AbstractSoapInterceptor {
     public AmpersandInterceptor(){
-        super(Phase.MARSHAL_ENDING);
+        super(Phase.PRE_STREAM);
     }
 
     @Override
@@ -20,6 +20,7 @@ public class AmpersandInterceptor extends AbstractSoapInterceptor {
         try {
             OutputStream outputStream = message.getContent(OutputStream.class);
             CachedOutputStream cachedOutputStream = new CachedOutputStream();
+            cachedOutputStream.setThreshold(1024*1024);
             message.setContent(OutputStream.class, cachedOutputStream);
 
             message.getInterceptorChain().doIntercept(message);

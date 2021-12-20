@@ -10,9 +10,10 @@ public class ClientRoomControllerAmpInterceptor extends AmpersandInterceptor {
 
     protected String changeOutboundMessage(String currentEnvelopeMessage) {
         try {
-            String result = currentEnvelopeMessage.replaceAll("&amp;quot;", "&quot;");
-            result = result.replaceAll("&amp;lt;", "&lt;");
-            result = result.replaceAll("&amp;gt;", "&gt;");
+            String result = currentEnvelopeMessage.replaceAll("&amp;quot;", "&quot;")
+            .replaceAll("&amp;lt;", "&lt;")
+            .replaceAll("&amp;gt;", "&gt;")
+            .replaceAll("&amp;amp;", "&amp;");
             return result;
         } catch (Exception ignore){
             return null;
