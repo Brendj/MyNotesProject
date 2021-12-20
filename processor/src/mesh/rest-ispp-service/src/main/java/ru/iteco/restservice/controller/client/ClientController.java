@@ -94,8 +94,8 @@ public class ClientController {
             @PositiveOrZero Long contractId,
             @NotNull @RequestParam
             @Parameter(description = "Номер телефона представителя", example = "79000000000")
-            String guardPhone) {
-        List<ClientGuardianNotificationSettings> settings = clientService.getNotificationSettingsByClients(contractId, guardPhone);
+            String guardianMobile) {
+        List<ClientGuardianNotificationSettings> settings = clientService.getNotificationSettingsByClients(contractId, guardianMobile);
         return notificationSettingsGuardiansConverter.toDTOs(settings);
     }
 

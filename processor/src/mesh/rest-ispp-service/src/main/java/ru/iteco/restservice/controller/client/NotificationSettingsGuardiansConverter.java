@@ -23,8 +23,8 @@ public class NotificationSettingsGuardiansConverter extends BaseConverter<Notifi
     public NotificationResponseDTO toDTO(ClientGuardianNotificationSettings item) {
         NotificationResponseDTO dto = new NotificationResponseDTO();
 
-        dto.setSettingsCode(item.getType().getCode());
-        dto.setSettingsName(item.getType().toString());
+        dto.setTypeOfNotification(item.getType().getCode());
+        dto.setNameOfNotification(item.getType().toString());
 
         return dto;
     }
