@@ -61,6 +61,9 @@ public class NotificationSettingsGuardiansConverter extends BaseConverter<Notifi
         List<NotificationResponseDTO> result = new LinkedList<>();
         for (ClientNotificationSettingType type: settings)
         {
+            if(type.equals(ClientNotificationSettingType.SMS_SETTING_CHANGED)){
+                continue;
+            }
             NotificationResponseDTO notificationResponseDTO = new NotificationResponseDTO();
             notificationResponseDTO.setNameOfNotification(type.toString());
             notificationResponseDTO.setTypeOfNotification(type.getCode());

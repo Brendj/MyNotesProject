@@ -18,8 +18,9 @@ public enum ClientNotificationSettingType {
     SMS_NOTIFY_SUMMARY_WEEK(1400000000L, "Оповещать по итогам недели"),
     SMS_NOTIFY_LOW_BALANCE(1500000000L, "Оповещать о снижении баланса"),
     SMS_NOTIFY_MUSEUM(1600000000L, "Оповещение о получении и аннулировании билета в музей"),
-    SMS_NOTIFY_CULTURE(1700000000L, "Оповещение о посещении зданий учреждений Минкультуры (управляется флагом \"Оповещать о проходах\")"),
+    SMS_NOTIFY_CULTURE(1700000000L, "Оповещение о посещении зданий Минкультуры РФ"),
     SMS_NOTIFY_SPECIAL(1800000000L, "Служебные оповещения");
+    
 
     private final Long code;
     private final String description;
