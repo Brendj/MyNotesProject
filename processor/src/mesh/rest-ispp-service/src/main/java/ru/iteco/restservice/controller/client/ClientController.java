@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ru.iteco.restservice.controller.client.request.NotificationUpdateRequest;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
 import ru.iteco.restservice.controller.client.responsedto.NotificationResponseDTO;
+import ru.iteco.restservice.controller.client.responsedto.NotificationResponseErrorDTO;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.ClientGuardianNotificationSettings;
 import ru.iteco.restservice.servise.ClientService;
@@ -105,8 +106,11 @@ public class ClientController {
             summary = "Изменения настроек оповещения для опекунов",
             description = "Позволяет изменить настройки оповещения для опекунов"
     )
-    public void updateNotifications(@NotNull @RequestBody NotificationUpdateRequest req) {
-        clientService.updateNotifications(req);
+    public List<NotificationResponseErrorDTO> updateNotifications(@NotNull @RequestBody NotificationUpdateRequest req) {
+        List<Long> errors = clientService.updateNotifications(req);
+        if (!errors.isEmpty())
+            return clientConverter.toDTOs(errors);;
+        return null;
     }
 
     @PutMapping("/setLimit")
