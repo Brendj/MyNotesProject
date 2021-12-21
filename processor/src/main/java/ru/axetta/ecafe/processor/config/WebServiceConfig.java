@@ -18,9 +18,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS
 import ru.axetta.ecafe.processor.web.partner.integra.soap.POSPaymentControllerWS;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWS;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWsInterceptor;
-import ru.axetta.ecafe.processor.web.util.ClientRoomControllerLoggingInterceptor;
-import ru.axetta.ecafe.processor.web.util.RemoveSecurityHeaderSoapInterceptor;
-import ru.axetta.ecafe.processor.web.util.RemoveSoapActionInterceptor;
+import ru.axetta.ecafe.processor.web.util.*;
 
 import javax.xml.ws.Endpoint;
 
@@ -55,6 +53,10 @@ public class WebServiceConfig {
         endpoint.getInInterceptors().add(removeSecurityHeaderSoapInterceptor);
         endpoint.getInInterceptors().add(removeSoapActionInterceptor);
         endpoint.getInInterceptors().add(clientRoomControllerLoggingInterceptor);
+        ClientRoomControllerLoggingOutInterceptor clientRoomControllerLoggingOutInterceptor = new ClientRoomControllerLoggingOutInterceptor();
+        ClientRoomControllerAmpInterceptor clientRoomControllerAmpInterceptor = new ClientRoomControllerAmpInterceptor();
+        endpoint.getOutInterceptors().add(clientRoomControllerLoggingOutInterceptor);
+        endpoint.getOutInterceptors().add(clientRoomControllerAmpInterceptor);
         endpoint.publish("/client");
         return endpoint;
     }
