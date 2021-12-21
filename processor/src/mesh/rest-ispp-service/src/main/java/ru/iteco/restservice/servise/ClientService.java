@@ -258,7 +258,7 @@ public class ClientService {
     }
 
     @Transactional
-    public void updateNotifications(NotificationUpdateRequest req) {
+    public List<Long> updateNotifications(NotificationUpdateRequest req) {
         if(req.getContractId() == null){
             throw new IllegalArgumentException("Не указан л/с");
         } else if(StringUtils.isEmpty(req.getGuardianMobile())){
@@ -272,6 +272,7 @@ public class ClientService {
         }
 
         List<ClientNotificationSettingType> types = ClientNotificationSettingType.of(req.getTypeOfNotification());
+        List<Long> typesError = ClientNotificationSettingType.ofErrorCodes(req.getTypeOfNotification());
 //        if(type == null){
 //            throw new NotFoundException("Не найден тип оповещения " + req.getTypeOfNotification());
 //        }
@@ -332,6 +333,7 @@ public class ClientService {
                 writableEntityManager.remove(guardianNotificationSettings);
             }
         }
+        return typesError;
     }
 
     @Transactional

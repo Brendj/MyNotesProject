@@ -47,6 +47,28 @@ public enum ClientNotificationSettingType {
             result.add(t);
     }
 
+    public static List<Long> ofErrorCodes(List<Long> codes){
+        List<Long> result = new ArrayList<>();
+        if(codes == null || codes.isEmpty()){
+            return result;
+        }
+        boolean find;
+        for(Long code : codes){
+            find = false;
+            for(ClientNotificationSettingType t : ClientNotificationSettingType.values()){
+                if (code.equals(t.getCode())) {
+                    find = true;
+                    break;
+                }
+            }
+            if (!find)
+            {
+                result.add(code);
+            }
+        }
+        return result;
+    }
+
     public Long getCode() {
         return code;
     }
