@@ -87,7 +87,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         }
     }
 
-    public void applyOfOrgList(ActionEvent ae) {
+    public void applyOfOrgList() {
         if (applyUserSettings) {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -326,7 +326,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     }
 
     private boolean validateFormData() {
-        if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList)){
+        if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList) && !applyUserSettings){
             printError("Выберите список организаций или поставщиков");
             return true;
         }

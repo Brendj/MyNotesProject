@@ -57,14 +57,14 @@ public class DAOService {
 
     public void createStatTable() {
         entityManager.createNativeQuery("CREATE TABLE IF NOT EXISTS srv_clear_menu_stat\n"
-                + "(\n"
-                + "    idoforg BIGINT,\n"
-                + "    startdate BIGINT,\n"
-                + "    enddate BIGINT,\n"
-                + "    datefrom BIGINT,\n"
-                + "    amount integer\n"
-                + ");\n"
-                + "COMMENT ON TABLE srv_clear_menu_stat is 'Статистика сервиса очистки меню'")
+                        + "(\n"
+                        + "    idoforg BIGINT,\n"
+                        + "    startdate BIGINT,\n"
+                        + "    enddate BIGINT,\n"
+                        + "    datefrom BIGINT,\n"
+                        + "    amount integer\n"
+                        + ");\n"
+                        + "COMMENT ON TABLE srv_clear_menu_stat is 'Статистика сервиса очистки меню'")
                 .executeUpdate();
     }
 
@@ -102,7 +102,7 @@ public class DAOService {
     }
 
     public List<Long> getNextFreeLastClientContractId(long divider, long idOfOrg, long lastClientContractId,
-            int count) {
+                                                      int count) {
         //Запрос правильный, не менять.
         String num = "";
         String end = "";
@@ -139,7 +139,7 @@ public class DAOService {
         for (Long contractId : list) {
             contractIds += contractId + ",";
         }
-        contractIds = contractIds.substring(0, contractIds.length()-1);
+        contractIds = contractIds.substring(0, contractIds.length() - 1);
         sql = String.format(sql, contractIds);
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("idOfOrg", idOfOrg);
@@ -156,7 +156,7 @@ public class DAOService {
 
     @SuppressWarnings("unchecked")
     public List<ECafeSettings> geteCafeSettingses(final Long idOfOrg, final SettingsIds settingsIds,
-            final Boolean deleted) {
+                                                  final Boolean deleted) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(ECafeSettings.class);
         if (idOfOrg == null && settingsIds == null) {
@@ -175,7 +175,7 @@ public class DAOService {
     }
 
     public List<ECafeSettings> geteCafeSettingsesWithoutFiveElm(final Long idOfOrg, final SettingsIds settingsIds,
-            final Boolean deleted) {
+                                                                final Boolean deleted) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(ECafeSettings.class);
         if (idOfOrg == null && settingsIds == null) {
@@ -196,7 +196,7 @@ public class DAOService {
     }
 
     public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser,
-            List<Long> idOfOrgList) throws Exception {
+                                        List<Long> idOfOrgList) throws Exception {
         ConfigurationProvider cp = entityManager
                 .find(ConfigurationProvider.class, configurationProvider.getIdOfConfigurationProvider());
         cp.setName(configurationProvider.getName());
@@ -374,7 +374,7 @@ public class DAOService {
     }
 
     public boolean setClientMobilePhone(Long contractId, String mobile, Date dateConfirm,
-            ClientsMobileHistory clientsMobileHistory) {
+                                        ClientsMobileHistory clientsMobileHistory) {
         Query q = entityManager.createQuery(
                 "update Client set mobile=:mobile, lastConfirmMobile = :lastConfirmMobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
@@ -585,7 +585,7 @@ public class DAOService {
     }
 
     public boolean updateBasicGood(Long idOfBasicGood, String nameOfGood, UnitScale unitsScale, Long netWeight,
-            List<Long> idOfProviders) {
+                                   List<Long> idOfProviders) {
         GoodsBasicBasket goodsBasicBasket = entityManager.find(GoodsBasicBasket.class, idOfBasicGood);
         Set<ConfigurationProvider> set = new HashSet<ConfigurationProvider>();
         for (Long id : idOfProviders) {
@@ -736,9 +736,9 @@ public class DAOService {
     }
 
     public ReportInfo registerReport(String ruleName, int documentFormat, String reportName, Date createdDate,
-            Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
-            String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent, String contragent,
-            Integer createState) {
+                                     Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
+                                     String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent, String contragent,
+                                     Integer createState) {
         if (endDate == null) {
             endDate = startDate;
         }
@@ -758,12 +758,15 @@ public class DAOService {
         return entityManager.merge(reportInfo);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void updateInfoCurrentUser(List<Long> orgIds, List<Long> orgIdsCancel, User user) {
         Session session = entityManager.unwrap(Session.class);
         session.refresh(user);
-        user.getUserOrgses().clear();
         session.flush();
+        Query query = entityManager.createNativeQuery("DELETE FROM cf_userorgs WHERE idofuser = :idOfUser");
+        query.setParameter("idOfUser", user.getIdOfUser());
+        query.executeUpdate();
+
         for (Long orgId : orgIds) {
             Org org = (Org) session.load(Org.class, orgId);
             UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY);
@@ -898,7 +901,7 @@ public class DAOService {
     }
 
     public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, String regionFilter, long revisionDate,
-            long operationType, boolean hideApplied) throws Exception {
+                                                         long operationType, boolean hideApplied) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastOrgRegistryChangeRevision();
         }
@@ -926,8 +929,8 @@ public class DAOService {
     }
 
     public List<OrgRegistryChange> getOrgRegistryChangesThroughOrgRegistryChangeItems(String nameFilter,
-            long revisionDate, String regionFilter, long operationType, boolean hideApplied,
-            List<OrgRegistryChange> orgRegistryChangeList) throws Exception {
+                                                                                      long revisionDate, String regionFilter, long operationType, boolean hideApplied,
+                                                                                      List<OrgRegistryChange> orgRegistryChangeList) throws Exception {
         boolean isEmptyRegionFilter = StringUtils.isEmpty(regionFilter);
         boolean isAllOperations = operationType <= 0;
         if (revisionDate < 1L) {
@@ -1242,14 +1245,14 @@ public class DAOService {
         entityManager.persist(object);
         entityManager.flush();
     }
-	
+
     public void setSendedNotificationforDTISZNDiscount(Long idofclientdtiszndiscountinfo, Boolean sendnotification) {
         Session session = (Session) entityManager.getDelegate();
         ClientDtisznDiscountInfo clientDtisznDiscountInfo = entityManager.find(ClientDtisznDiscountInfo.class, idofclientdtiszndiscountinfo);
         clientDtisznDiscountInfo.setSendnotification(sendnotification);
         session.update(clientDtisznDiscountInfo);
     }
-	
+
     public boolean setFlagSendedNotification(Long idofregularpreorder, Boolean valuec) {
         Query q = entityManager
                 .createNativeQuery("update cf_regular_preorders set sendeddailynotification = :valuec where idofregularpreorder = :idofregularpreorder");
@@ -1262,7 +1265,7 @@ public class DAOService {
         Query query = entityManager.createQuery(
                 "update EMIAS set archive=true, version=:version where endDateLiberate<:currentDate and archive=false");
         query.setParameter("currentDate", CalendarUtils.startOfDay(new Date()));
-        query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session)entityManager.getDelegate(), true)+1);
+        query.setParameter("version", DAOUtils.getMaxVersionEMIAS((Session) entityManager.getDelegate(), true) + 1);
         query.executeUpdate();
     }
 
